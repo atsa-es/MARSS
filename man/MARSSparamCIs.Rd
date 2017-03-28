@@ -5,7 +5,7 @@
 Computes standard errors, confidence intervals and bias for the maximum-likelihood estimates of MARSS model parameters.  If you what confidence intervals on the estimated hidden states, see \code{\link{print.marssMLE}} and look for "states.cis".
 }
 \usage{
-MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot=1000)
+MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot=1000, silent=FALSE)
 }
 
 \arguments{
@@ -13,6 +13,7 @@ MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot=1000)
   \item{method}{ Method for calculating the standard errors: "hessian", "parametric", and "innovations" implemented currently. }
   \item{alpha}{ alpha level for the 1-alpha confidence intervals. }
   \item{nboot}{ Number of bootstraps to use for "parametric" and "innovations" methods. }
+  \item{silent}{ If true, a progress bar is shown for "parametric" and "innovations" methods. }
 }
 \details{
   Approximate confidence intervals (CIs) on the model parameters may be calculated from the Hessian matrix (the matrix of partial 2nd derivatives of the parameter estimates) or parametric or non-parametric (innovations) bootstrapping using \code{nboot} bootstraps.  The Hessian CIs are based on the asymptotic normality of MLE parameters under a large-sample approximation.  The Hessian computation for variance-covariance matrices is done on these matrices in their equivalent Cholesky decomposition form (see \code{\link{MARSShessian}}. Bootstrap estimates of parameter bias are reported if method "parametric" or "innovations" is specified.
