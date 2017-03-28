@@ -24,7 +24,6 @@ The following core functions are designed to work with `unfitted' marssMLE objec
 \begin{description}
 	\item[\texttt{MLEobj=MARSSkem(MLEobj)}]\index{functions!MARSSkem}\index{estimation!EM} This will fit a MARSS model via the EM algorithm to the data using a properly specified marssMLE object, which has data, the marssMODEL object and the necessary initial condition and control elements.  See the appendix on the object structures in the MARSS package.  \texttt{MARSSkem}	does no error-checking.  See \texttt{is.marssMLE()}. \verb@MARSSkem@ uses \verb@MARSSkf@ described below.  
 	\item[\texttt{MLEobj=MARSSoptim(MLEobj)}]\index{functions!MARSSoptim}\index{estimation!quasi-Newton} This will fit a MARSS model via the BFGS algorithm provided in \verb@optim()@\index{functions!optim}. This requires a properly specified marssMLE object, such as would be passed to \verb@MARSSkem@. 
-	\item[\texttt{MLEobj=MARSSmcinit(MLEobj)}]\index{functions!MARSSmcinit} This will perform a Monte Carlo initial conditions search and update the marssMLE object with the best initial conditions from the search.
 	\item[\texttt{is.marssMLE(MLEobj)}]\index{functions!is.marssMLE} This will check that a marssMLE object is properly specified and ready for fitting.  This should be called before \texttt{MARSSkem} or \texttt{MARSSoptim} is called.  This function is not typically needed if using \texttt{MARSS()} since \texttt{MARSS()} builds the model object for the user and does error-checking on model structure.
 \end{description}
 
