@@ -7,8 +7,8 @@
 # RShowDoc("versiontest.R", package="MARSS")
 # Change working directory to a directory where many test files can be stored (sandbox)
 # Source the code.
-# Note: Using 'build and reload' from RStudio builds the package into the local
-# library but does not install the doc or help files
+# IMPORTANT: Using 'build and reload' from RStudio builds the package into the local
+# library but does not install the doc folder (which is needed for this test)
 # Use Install from zip and install from a .tar.gz file instead
 # ###########################################
 
@@ -42,7 +42,8 @@ for(unittestfile in unittestfiles){
   sink()
   #make a list of objects created by the test code
   funs=sapply(ls(),function(x){isTRUE(class(get(x))=="function")})
-  test.these = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
+  ls.not.funs = ls()[ls()!="funs"]
+  test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testNew = mget(test.these)
   save(testNew,file=paste(tag,unittestvrs,".Rdata",sep=""))
 }
