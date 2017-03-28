@@ -82,12 +82,14 @@ options(prompt=" ", continue=" ")
 The default MARSS model (\verb@form="marxss"@) is written as follows:
 \begin{equation}\label{eqn:marss}
 \begin{gathered}
-\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ_t)\\
-\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR_t)\\
+\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \GG_t\ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ_t)\\
+\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \HH_t\vv_t, \text{ where } \vv_t \sim \MVN(0,\RR_t)\\
 \xx_1 \sim \MVN(\pipi,\LAM) \text{ or } \xx_0 \sim \MVN(\pipi,\LAM)
 \end{gathered}
 \end{equation}
-$\cc$ and $\dd$ are inputs (aka, exogenous variables or covariates or indicator variables) and must have no missing values.  They are not treated as `data' in the likelihood but as inputs.  The MARSS package is designed to handle linear constraints within the parameter matrices (the $\BB$, $\uu$, $\CC$, $\QQ$, $\ZZ$, $\aa$, $\DD$, $\RR$, $\pipi$, and $\LAM$)).  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements, although typically each matrix element is just a fixed or estimated value.
+$\cc$ and $\dd$ are inputs (aka, exogenous variables or covariates or indicator variables) and must have no missing values.  They are not treated as `data' in the likelihood but as inputs.  In most cases, $\GG$ and $\HH$ are fixed (not estimated) and must have no missing values, but see the User Guide on situations when they can be estimated.
+
+The MARSS package is designed to handle linear constraints within the parameter matrices: $\BB$, $\uu$, $\CC$, $\QQ$, $\ZZ$, $\aa$, $\DD$, $\RR$, $\pipi$, and $\LAM$ (and in limited situations $\GG$ and $\HH$).  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements, although typically each matrix element is just a fixed or estimated value.
 
 The following shows an example of a mean-reverting random walk model with three observation time series written as a MARSS model:
 \begin{gather*}
@@ -138,9 +140,9 @@ The default model form (\verb@form="marxss"@) allows you to pass in an array of 
 %\begin{equation}\label{qeq:MARSS.ex.vec}
 \begin{equation}\label{qeq:MARSS.tv}
 \begin{gathered}
-\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \ww_t, \quad
+\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \GG_t\ww_t, \quad
 \WW_t \sim \MVN(0,\QQ_t)\\
-\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \vv_t, \quad
+\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \HH_t\vv_t, \quad
 \VV_t \sim \MVN(0,\RR_t)\\
 \xx_{t_0} \sim \MVN(\pipi,\LAM)
 \end{gathered}
