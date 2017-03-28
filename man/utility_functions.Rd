@@ -23,6 +23,7 @@
 \alias{ sub3D }
 \alias{ pinv }
 \alias{ pcholinv }
+\alias{ pchol }
 \alias{ all.equal.vector }
 
 \title{ Matrix Utilities }
@@ -53,6 +54,7 @@ matrix.power(x, n)
 sub3D(x,t=1)
 pinv(x)
 pcholinv(x)
+pchol(x) 
 is.solvable(A,y=NULL)
 all.equal.vector(x)
 parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0"), 
@@ -92,6 +94,7 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0"),
   \item \code{ matrix.power } is a faster way to get the n-th power of a matrix.
   \item \code{ pinv } is the pseudoinverse based on singular value decomposition PInv=UD^+V' where a diagonal matrix with non-zero diagonal values of D (from svd) replaced with 1/D.
   \item \code{ pcholinv } is the inverse based on the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
+  \item \code{ pchol } returns the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a marssMLE object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
