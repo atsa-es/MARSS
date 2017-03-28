@@ -1,0 +1,95 @@
+\input{tex/headerfile}
+\input{tex/mathdefs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{Sweave}
+<<RUNFIRST, echo=F, include.source=F>>=
+require(MARSS)
+options(prompt=" ", continue=" ")
+options(width=60)
+@
+
+\setcounter{tocdepth}{1} %no subsections in toc
+% see the list of further useful packages
+% in the Reference Guide, Sects. 2.3, 3.1-3.3
+
+\makeindex             % used for the subject index
+
+%% Set PDF 1.5 and compression, including object compression
+%% Needed for MiKTeX -- most other distributions default to this
+\ifx\pdfoutput\undefined
+\else
+  \ifx\pdfoutput\relax
+  \else
+    \ifnum\pdfoutput>0
+      % PDF output
+      \pdfminorversion=5
+      \pdfcompresslevel=9
+      \pdfobjcompresslevel=2
+    \fi
+  \fi
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\author{E. E. Holmes, E. J. Ward, and M. D. Scheuerell}
+\title{Analysis of multivariate time-series using the MARSS package}
+\subtitle{version \Sexpr{packageDescription("MARSS", fields = "Version")}}
+\maketitle
+\include{./tex/dedic}
+
+\frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{./tex/preface}
+
+\tableofcontents
+
+\mainmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{The MARSS package}
+\include{./tex/Introduction}
+\include{./tex/Functions}
+%\include{./tex/ModelSpec}
+\include{./tex/Algorithms}
+\part{Fitting models with MARSS}
+\include{./tex/MARSS}
+%\SweaveInput{Quick_Examples.xRnw}
+\include{./Quick_Examples.xRnw}
+\part{Applications}
+\include{./tex/Directions}
+%\SweaveInput{Case_Study_1.xRnw}
+\include{./Case_Study_1.xRnw}
+%\SweaveInput{Case_Study_2.xRnw}
+\include{./Case_Study_2.xRnw}
+%\SweaveInput{Case_Study_3.xRnw}
+\include{./Case_Study_3.xRnw}
+%\SweaveInput{Case_Study_4.xRnw}
+\include{./Case_Study_4.xRnw}
+%\SweaveInput{Case_Study_5.xRnw}
+\include{./Case_Study_5.xRnw}
+%\SweaveInput{Case_Study_6.xRnw}
+\include{./Case_Study_6.xRnw}
+\include{./Covariates.xRnw}
+%\SweaveInput{Case_Study_7.xRnw}
+\include{./Case_Study_7.xRnw}
+%\SweaveInput{Case_Study_8.xRnw}
+\include{./Case_Study_8.xRnw}
+\include{./Case_Study_dlm1.xRnw}
+\include{./MARp.xRnw}
+\appendix
+\include{./tex/SSreferences}
+\include{./tex/warnings}
+%\include{./tex/obj_structures}
+
+\backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{./tex/Manual}
+\bibliographystyle{cbe}
+\printindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<Reset, echo=F>>=
+options(prompt="> ", continue="+ ")
+options(width=120)
+@
+
+\end{document}

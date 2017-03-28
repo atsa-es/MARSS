@@ -1,0 +1,457 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS8-, eps=FALSE, split=TRUE}
+\chapter{Combining data from multiple time series}
+\label{chap:combinedata}
+\chaptermark{Combining data from multiple time series}
+
+<<RUNFIRST, echo=FALSE>>=
+require(MARSS)
+options(width=60)
+options(prompt=" ", continue=" ")
+op <- par(no.readonly = TRUE)   
+@
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_CombiningTrendData.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Overview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this section, we  consider the case where multiple time series exist and we want to use all the datasets to estimate a common underlying state-process or common underlying parameters.  In ecological applications, this situation arises when 1) They are time series of observations from the same species as the original time series (e.g. aerial and land based surveys of the same same species) or 2) They are time series collected in the same survey, but represent observations of multiple species (e.g. we might be doing a fisheries trawl survey that collects multiple species in each trawl).  
+Why should we consider using other time series?   In the first scenario, where methodology differs between time series of the same species, observation error may be survey-specific.  These time series may represent observations of multiple populations, or these may represent multiple observations of the same population.  In the second scenario, each species should be treated as a separate process (given its own state vector), but because the survey methodology is the same across species, it might be reasonable to assume a shared observation error variance.  If these species have a similar response to environmental stochasticity, it might be possible to also assume a shared process variance.  
+
+In both of the above examples, MARSS models offer a way to linking multiple time series.  If parameters are allowed to be shared among the state processes (trend parameters, process variances) or observation processes (observation variances), parameter estimates will be more precise than if we treated each time series as independent.  By improving estimates of variance parameters, we will also be better able to discriminate between process and observation error variances.  
+
+In this chapter, we will show examples of using MARSS to analyze multiple time series on the same species but either different populations or different survey methods.  The multivariate first-order autoregressive state process is written as usual as:
+\begin{equation}
+\xx_t = \BB\xx_{t-1} + \uu + \ww_t \text{ where } \ww_t \sim \MVN(0,\QQ)
+\end{equation}
+The true population sizes at time \emph{t} are represented by the state $\xx_t$, whose dimensions are equal to the number of state processes ($m$).  The $m \times m$ matrix $\BB$ allows interaction between processes (density dependence and competition, for instance), $\uu$ is a vector describing the mean trend, and the correlation of the process deviations is determined by the structure of the matrix $\QQ$.
+
+The multivariate observation error model is expressed as, 
+\begin{equation}
+\yy_t = \ZZ\xx_t + \aa + \vv_t \text{ where } \vv_t \sim \MVN(0,\RR) 
+\end{equation} 
+where $\yy_t$ is a vector of observations at time $t$, $\ZZ$ is a design matrix of 0s and 1s, $\aa$ is a vector of bias adjustments, and the correlation structure of observation matrices is specified with the matrix $\RR$. Including $\ZZ$ and $\aa$ will not be required for every model, but is useful when some processes are observed multiple times.
+
+\section{Salmon spawner surveys}
+
+In our first application combining multiple time series, we will analyze a dataset on Chinook salmon (\emph{Oncorhynchus tshawytscha}).  This data comes from the Okanogan River in Washington state, a major tributary of the Columbia River (headwaters in British Columbia).  As an index of the abundance of spawning adults, biologists have conducted redd surveys during summer months (redds are nests or collection of rocks on stream bottoms where females deposit eggs).  Aerial surveys of redds on the Okanogan have been conducted 1956-2008.  Alternative ground surveys of were initiated in 1990, and have been conducted annually.
+
+\subsection{Read in and plot the raw data}
+We will be using the logged counts.
+<<Cs001_readinredddata>>=
+head(okanaganRedds)
+logRedds = log(t(okanaganRedds)[2:3,])
+@   
+Year is in the first column, and the counts (in normal space) are in columns 2:3.  Missing observations are represented by NAs.  
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[totalheight=0.8\textheight]
+\begin{center}
+<<Cs002_fig1,fig=TRUE>>=
+# Code for plotting raw Okanagan redd counts
+plot(okanaganRedds[,1], okanaganRedds[,2],
+    xlab = "Year", ylab="Redd counts",main="", col="red", pch=1)
+points(okanaganRedds[,1], okanaganRedds[,3], col="blue", pch=2)
+legend('topleft', inset=0.1, legend=c("Aerial survey","Ground survey"),
+ col=c("red","blue"), pch=c(1,2))
+@
+\end{center}
+\caption{The two time series look to be pretty close to one another in the years where there is overlap.}
+\label{fig:fig1}
+\end{figure}
+
+\subsection{Test hypotheses about whether the data can be combined}
+Do these surveys represent observations of the same underlying process?  We can evaluate data support for this question by testing a few relatively simple models.  Using the logged data, we will start with a simple model that assumes the underlying population process is univariate (there is one underlying population trajectory) and  each survey is an independent observation of this population process. Mathematically, the model is:
+\begin{equation}
+\begin{gathered}
+x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)  \\
+ \left[ \begin{array}{c}
+    y_{aer} \\
+    y_{gnd} \end{array} \right]_t = 
+    \left[ \begin{array}{c}
+    1\\
+    1 \end{array} \right] x_t +  
+    \left[ \begin{array}{c}
+    0 \\
+    a_2 \end{array} \right] + 
+    \left[ \begin{array}{c}
+    v_{aer} \\
+    v_{gnd} \end{array} \right]_t, \textrm{ where } \vv_t \sim \MVN\begin{pmatrix}(0, \begin{bmatrix}r&0\\0&r\end{bmatrix}\end{pmatrix} 
+\end{gathered}
+\end{equation}
+The $\aa$ structure means that the $a$ for one of the $y$'s is fixed at 0 and the other $a$ is estimated relative to that fixed $a$.  In MARSS, this is the ``scaling'' structure for $\aa$.
+We specify this model in MARSS as follows.  Since $\xx$ is univariate, $\QQ$ and $\uu$ are just scalars (single numbers) and have no structure (like `diagonal').  Thus we can leave them off in our specification.  
+<<Cs003_reddmodel1, keep.source=TRUE, results=hide>>=
+model1=list()
+model1$R="diagonal and equal"
+model1$Z=matrix(1,2,1) #matrix of 2 rows and 1 column
+model1$A="scaling" #the default
+# Fit the single state model, where the time series are assumed 
+# to be from thesame population. 
+kem1 = MARSS(logRedds, model=model1)
+@
+We can print the AIC and AICc values for this model by typing \texttt{kem1\$AIC} and \texttt{kem1\$AICc}.
+
+How would we modify the above model to let the observation error variances to be unique?  We can do this in our second model:
+<<Cs004_reddmodel2, keep.source=TRUE, results=hide>>=
+model2=model1 #model2 is based on model1
+model2$R="diagonal and unequal"
+kem2 = MARSS(logRedds, model=model2)
+@
+
+It is possible that these surveys are measuring different population processes, so for our third model, we will fit a model with two different population process with the same process parameters.  For simplicity, we will keep the trend and variance parameters the same.  Mathematically, the model we are fitting is:
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}x_1\\x_2\end{bmatrix}_t
+= \begin{bmatrix}x_1\\x_2\end{bmatrix}_{t-1} + \begin{bmatrix}u\\u\end{bmatrix} + \ww_t, \textrm{ where } 
+\ww_t \sim \MVN(0,\begin{bmatrix}q&0\\0&q\end{bmatrix})  \\
+ \left[ \begin{array}{c}
+    y_{aer} \\
+    y_{gnd} \end{array} \right]_t = 
+    \begin{bmatrix}1&0\\0&1\end{bmatrix}\begin{bmatrix}x_1\\x_2\end{bmatrix}_t +  
+    \begin{bmatrix}0\\0\end{bmatrix} + 
+    \begin{bmatrix}v_{aer}\\v_{gnd}\end{bmatrix}_t, \textrm{ where } \vv_t \sim 
+    \MVN\begin{pmatrix}0, \begin{bmatrix}r&0\\0&r\end{bmatrix} \end{pmatrix} 
+\end{gathered}
+\end{equation}
+We specify this in MARSS as
+<<Cs005_reddmodel3, keep.source=TRUE, results=hide>>=
+model3=list()
+model3$Q="diagonal and equal"
+model3$R="diagonal and equal"
+model3$U="equal"
+model3$Z="identity"
+model3$A="zero"
+kem3 = MARSS(logRedds, model=model3)
+@
+
+Based on AIC, it looks like the best model is also the simplest one, with one state vector (model1).  This suggests that the two different surveys are not only measuring the same thing, but have the same observation error variance.  Finally,we will make a plot of the model-predicted states (with +/- 2 s.e.s) and the log-transformed data (Figure \ref{fig:fig2}).
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[totalheight=0.8\textheight]
+\begin{center}
+<<Cs006_fig2,fig=TRUE, echo=FALSE>>=
+# Code for plotting the fit from the best model
+plot(okanaganRedds[,1], logRedds[1,],
+xlab = "Year", ylab="Redd counts",main="", col="red", ylim=c(0,8))
+points(okanaganRedds[,1], logRedds[2,], col="blue", pch=2)
+lines(okanaganRedds[,1], c(kem1$states), lty=1, lwd=2)
+lines(okanaganRedds[,1], c(kem1$states + 2*kem1$states.se), lty=1, lwd=1, col="grey40")
+lines(okanaganRedds[,1], c(kem1$states - 2*kem1$states.se), lty=1, lwd=1, col="grey40")
+@
+\end{center}
+\caption{The data support the hypothesis that the two redd-count time series are observations of the same population. The points are the data and the thick black line is the estimated underlying state.}
+\label{fig:fig2}
+\end{figure}
+
+\begin{comment}
+
+\section{Analyzing time series of rockfish recreational catch data}
+For this example, we want to estimate the average long-term trend in total rockfish abundance in the Puget Sound, Washington from recreational catch data.  There are over a dozen species of rockfish within the Puget Sound, the most prevalent the recreational catches have been Copper, Quillback, Canary, and Yelloweye rockfish.  ``Total rockfish'' thus represents the sum of multiple population trajectories and, like the individual population trajectories, is also a random walk.  
+
+We will assume that the underlying process is a univariate stochastic exponential growth process with rates of decline that are not changing through time.  The stochastic exponential is often a decent approximation for many different types of density-independent population processes, and total rockfish catches have been declining over the last 30 years.  Because we are only interested in the total trend, we use a model with one state vector only ($m=1$). Our uncertainty lies in how observation errors may be differing among different types of data. 
+
+<<set-up-rockfish-data>>=
+rec.names=paste("Rec..targeting.bottomfish.",1:4,sep="")
+rec.years=apply(!is.na(rockfish[,rec.names]),1,any)
+recdat = rockfish[rec.years,rec.names]
+flatrecdat=apply(recdat,1,sum,na.rm=TRUE)
+@
+\begin{figure}[totalheight=0.8\textheight]
+\begin{center}
+<<label=rockfish1,fig=TRUE>>=
+matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
+title("Puget Sound Total Rockfish Recreational CPUE data")
+@
+\end{center}
+\caption{Plot of the catch per unit effort data for Puget Sound total rockfish recreational catch data. }
+\label{fig:fig3}
+\end{figure}
+
+Use a $\QQ$ that is reasonable for medium sized vertebrates.
+<<fit-rockfish1>>=
+kem.rock1=MARSS(flatrecdat,model=list(Q=matrix(0.01)))
+@
+
+We think there is a management effect and we'd like to take this into account.
+<<set-up-rock-A>>=
+A.model=array(list(0),dim=c(1,1,dim(recdat)[1]))
+manage.A=!is.na(recdat[,"Rec..targeting.bottomfish.2"])
+A.model[1,1,manage.A]="manag.A"
+manage.B=!is.na(recdat[,"Rec..targeting.bottomfish.3"])
+A.model[1,1,manage.B]="manag.B"
+manage.C=!is.na(recdat[,"Rec..targeting.bottomfish.4"])
+A.model[1,1,manage.C]="manag.C"
+@
+
+<<fit-rockfish2>>=
+kem.rock2=MARSS(flatrecdat,model=list(A=A.model,Q=matrix(0.01)))
+@
+Including the management effect has a big effect on our estimate of trend.
+
+\begin{figure}[totalheight=0.8\textheight]
+\begin{center}
+<<label=rockfish2,fig=TRUE>>=
+matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
+lines(rockfish[rec.years,1],as.vector(kem.rock1$states),col="red",lty=2,lwd=2)
+lines(rockfish[rec.years,1],as.vector(kem.rock2$states),col="blue",lty=1,lwd=2)
+title("Puget Sound Total Rockfish Recreational CPUE data")
+@
+\end{center}
+\caption{Plot of the catch per unit effort data for Puget Sound total rockfish recreational catch data with the fitted lines. The dashed line is the fit with $\AA=0$ so each set of catch data is assumed to have the same bias relative to the underlying population trajectory.  The solid line assumes that the management imposed for data 2, 3, and 4 resulted in that data have a different biases relative to the underlying population trajectory.}
+\label{fig:rock2}
+\end{figure}
+Why was $\QQ$ set to 0.01?  The data are not distinctive enough to allow us to estimate both $\RR$ and $\QQ$.  We can see the problem with the following code.  One has $\QQ$ going to zero and the other has $\RR$ going to zero.
+<<test-rock,results=hide,eval=FALSE>>=
+ kem.rock3a=MARSS(flatrecdat,model=list(A=A.model,tinitx=0))
+ kem.rock3b=MARSS(flatrecdat,model=list(A=A.model,tinitx=1))
+@
+
+
+%%%%%%%% OLD STUFF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Read in and plot the data}
+<<legend, echo=FALSE>>=
+d <- rockfish
+legendnames = (unlist(dimnames(d)[2]))[2:ncol(d)]
+for(i in 1:length(legendnames)) cat(paste(i,legendnames[i],"\n",sep=" "))
+@
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{figure}[totalheight=0.8\textheight]
+\begin{center}
+<<label=fig3,fig=TRUE,echo=FALSE>>=
+d <- rockfish
+dat = d[,2:ncol(d)] #first col is years
+x = d[,1] #first col is years
+n = nrow(dat) #num time series
+
+#set up the graphical parameters to give each data a unique line, color and width
+options(warn=-99)
+ltys=matrix(1,nrow=n)
+cols=matrix(1:4,nrow=n)
+lwds=matrix(1:2,nrow=n)
+pchs=matrix(as.character(c(1:n)),nrow=n)
+options(warn=0)
+
+meany = matrix(apply(dat,2,mean,na.rm=T),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #take off the mean; for better plotting and to mask pattern
+adj = matrix(c(1.5,0,-2,1,2,-2,-1,0,2),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #just to mask pattern in data
+matplot(x,dat-meany+adj,xlab="",ylab="index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
+title("Puget Sound Total Rockfish Indices")
+@
+\end{center}
+\caption{Plot of the catch per unit effort data for Puget Sound total rockfish.  Each time series has been given an arbitrary bias (up or down) to purposefully mask any trend in the data that you might pick out by eye -- for teaching purposes not for analysis purposes. }
+\label{fig:fig3}
+\end{figure}
+
+\subsection{Construct models with different configurations of observation error}
+
+First, let's fit a model that allows unique observation variances for each time series.
+<<fishmodel1, keep.source=TRUE, results=hide>>=
+fishdat = t(rockfish[,2:dim(rockfish)[2]])
+Q.model="diagonal and equal"
+R.model="diagonal and unequal"
+U.model="equal"
+Z.model=factor(rep(1,dim(fishdat)[1]))
+model1 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem1 = MARSS(fishdat, model=model1)
+@
+
+At the other end of the spectrum, we can build a model that assumes each of the time series has the same observation error.  
+<<fishmodel2, keep.source=TRUE, results=hide>>=
+R.model="diagonal and equal"
+model2 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem2 = MARSS(fishdat, model=model2)
+@
+
+Neither of these models converge in 500 iterations.  The models are not that complex and if the models could decently describe the data, they would converge quickly.  Let's try some other observation error structures.  We can improve the partitioning of the variances by constraining some of the measurement variances.  We know that the recreational CPUE data from 1977 on represents a consistent measure of catch effort.  It is the average fish per angler trip over 8 standardized regions in the Puget Sound.  The error between this metric and ``total rockfish'' equals (sampling error variance + variance due to real year-to-year changes in catchability).  The sampling error variance is something we control by our sampling design and sample size.  The year-to-year changes in catchability have to do with things we cannot control -- weather, how hungry fish are, where the fish are, sizes of the fish, etc. etc.  For the recreational data, our sample size is very large: ca 100,000 to 300,000 angler trips.  So we can probably safely say that the measurement error variance is driven by year-to-year changes in catchability rather than changes in sample size.  Thus we will assume that that the measurement errors for time series 4,5,6, and 7 have an identical variance (so there are six observation variances, rather than nine).
+
+<<fishmodel3, keep.source=TRUE, results=hide>>=
+R.model=matrix(list(0),9,9)
+diag(R.model)=list("1","2","4","4","4","4","4","5","6")
+model3 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem3 = MARSS(fishdat, model=model3)
+@
+This model doesn't converge either.  Examination of the model fit reveals that there is a conflict between and the model for pre-1980 and post-1980.  Thus the pre-1980 ``total rockfish'' estimates produced by this model (with $u$=constant) are unsupported by the data.  The reasons for this could be that the population was stable pre-1980 and then declined post-1980.  
+
+\subsection{Last analysis: Only fit the model to 1980-2008 data}
+In this case, our assumption that $u$ is constant over the whole time series is poor, and we should have fit a model using $u_{\textrm{pre-1980}}$ and $u_{\textrm{post-1980}}$.  As a last example, we will drop the data before 1980 (and the time series that do not have data after this year).  
+
+<<testing,echo=FALSE, results=hide>>=
+U.model=array(list(),dim=c(1,1,length(rockfish[,"Year"])))
+U.model[1,1,rockfish[,"Year"]<1980]="pre-1980"
+U.model[1,1,rockfish[,"Year"]>=1980]="post-1980"
+model4 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem4 = MARSS(fishdat, model=model4)
+
+Z.model=factor(c("trawl","trawl","rec","rec","rec","rec","rec","scuba","wdfw.trawl"))
+Q.model="diagonal and unequal"
+U.model="equal"
+model5 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem5 = MARSS(fishdat, model=model5)
+@
+
+Pull out data years 1980 on and drop the columns (observation time series) with no data after 1980:
+<<getdat4>>=
+years = rockfish[,1]
+dat = rockfish[,-1]
+dat4 = dat[years>=1980,]
+years4=years[years>=1980]
+isdata = apply(is.na(dat4),2,sum)!=length(years4)
+dat4 = dat4[,isdata]
+@
+Redo the $\ZZ$ matrix since we now have fewer time series and change the \verb@R.model@ argument to reflect the missing time series:
+<<setargs4>>=
+n4 = ncol(dat4)
+Z4 = as.factor(rep(1,n4))
+R.model4=matrix(list(0),n4,n4)
+diag(R.model4)=list("1","2","2","2","2","3","4")
+@
+Rerun the analysis:
+<<fitanalysis3, results=hide>>=
+model4 =  list(Z = Z4, Q = Q.model, R = R.model4, U = U.model)
+kem4 = MARSS(t(dat4), model=model4)
+@
+
+\end{comment}
+
+\section{American kestrel abundance indices}
+In this example, we evaluate uncertainty in the structure of process variability (environmental stochasticity) using some bird survey data.  Breeding Bird Surveys have been conducted in the U.S. and Canada for 50+ years.  In this analysis, we focus on 3 time series of American kestrel (\emph{Falco sparverius}) abundance from adjacent Canadian provinces along a longitudinal gradient (British Columbia, Alberta, Saskatchewan).  Data have been collected annually, and corrected for changes in observer coverage and detectability.
+
+\subsection{Read in and look at the data}
+Figure \ref{fig:fig5} shows the data.  The data are already log transformed.
+<<Cs007_birddata>>=
+birddat = t(kestrel[,2:4]) 
+head(kestrel)
+@
+
+\begin{figure}[totalheight=0.5\textheight]
+\begin{center}
+<<Cs008_plot-bird-data,fig=TRUE,echo=FALSE>>=
+# Make a plot of the three time series
+plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
+points(kestrel[,1], kestrel[,3], col="blue", pch=22)
+points(kestrel[,1], kestrel[,4], col="purple", pch=25)
+legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
+@
+\end{center}
+\caption{The kestrel data.}
+\label{fig:fig5}
+\end{figure}
+
+We know that the surveys use the same design, so we will force observation error to be shared. Our uncertainty lies in whether these
+time series are sampling the same population, and how environmental stochasticity varies by subpopulation (if there are subpopulations).  Our first model has one population trajectory (meaning there is one big panmictic BC/AB/SK population) and each of these three surveys is an observation of this big population with equal observation variances.  Mathematically, the model is:
+\begin{equation}
+\begin{gathered}
+x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)  \\
+\begin{bmatrix}
+    y_{BC} \\
+    y_{AB} \\
+    y_{SK} \end{bmatrix}_t = \begin{bmatrix}1\\1\\1 \end{bmatrix} x_t +  
+    \begin{bmatrix}0\\ a_2\\ a_3 \end{bmatrix} + 
+    \begin{bmatrix}v_{BC} \\ v_{AB} \\ v_{SK} \end{bmatrix}_t, 
+    \textrm{ where } \vv_t \sim \MVN\bigg(0, \begin{bmatrix}r&0&0\\0&r&0\\0&0&r\end{bmatrix} \bigg) 
+\end{gathered}
+\end{equation}
+In MARSS, we denote the model:
+<<Cs009_fit-bird-model-1, results=hide>>=
+model.b1=list()
+model.b1$R="diagonal and equal"
+model.b1$Z=matrix(1,3,1)
+kem.b1 = MARSS(birddat, model=model.b1, control=list(minit=100) )
+@
+As for the redd count example, we do not need to specify the structure of $\QQ$ and $\uu$ since they are scalar and have no structure.
+<<Cs010_bird-model-1-aic>>=
+kem.b1$AICc
+@
+
+Let's compare this to a model where we assume that there is a separate population for British Columbia, Alberta, and Saskatchewan but they have the same process parameters (trend and process variance).  Mathematically, this model is:
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_t
+= \begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_{t-1} + \begin{bmatrix}u\\u\\u\end{bmatrix} + \ww_t, \textrm{ where } 
+\ww_t \sim \MVN(0,\begin{bmatrix}q&0&0\\0&q&0\\0&0&q\end{bmatrix})  \\
+\begin{bmatrix}
+    y_{BC} \\
+    y_{AB} \\
+    y_{SK} \end{bmatrix}_t = \begin{bmatrix}1&0&0\\0&1&0\\0&0&1 \end{bmatrix} \begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_t +  
+    \begin{bmatrix}0\\ 0\\ 0 \end{bmatrix} + 
+    \begin{bmatrix}v_{BC} \\ v_{AB} \\ v_{SK} \end{bmatrix}_t, 
+    \textrm{ where } \vv_t \sim \MVN\begin{pmatrix}0, \begin{bmatrix}r&0&0\\0&r&0\\0&0&r\end{bmatrix} \end{pmatrix} 
+\end{gathered}
+\end{equation}
+This is specified as:
+<<Cs011_fit-bird-model-2, results=hide>>=
+model.b2=list()
+model.b2$Q="diagonal and equal"
+model.b2$R="diagonal and equal"
+model.b2$Z="identity"
+model.b2$A="zero"
+model.b2$U="equal"
+kem.b2 = MARSS(birddat, model=model.b2)
+@
+The AICc for this model is
+<<Cs012_bird-model-2-aic>>=
+kem.b2$AICc
+@
+
+Because these populations are surveyed over a relatively large geographic area, it is reasonable to expect that environmental variation
+may differ between populations.  For our third model, we will fit a model with separate processes that are allowed to have unequal process parameters.
+<<Cs013_fit-bird-model-3, echo=TRUE, results=hide, keep.source=TRUE>>=
+model.b3=model.b2 #is is based on model.b2
+#all we change is the structure of Q
+model.b3$Q="diagonal and unequal"
+model.b3$U="unequal"
+kem.b3 = MARSS(birddat, model=model.b3)
+@
+<<Cs014_bird-model-3-aic>>=
+kem.b3$AICc
+@
+
+Finally for a fourth model, we will consider lumping Alberta/Saskatchewan, because the time series suggest similar trends.   Mathematically, this model is:
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}x_{BC}\\x_{AB-SK}\end{bmatrix}_t
+= \begin{bmatrix}x_{BC}\\x_{AB-SK}\end{bmatrix}_{t-1} + \begin{bmatrix}u\\u\end{bmatrix} + \ww_t, \textrm{ where } 
+\ww_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}q&0\\0&q\end{bmatrix}\end{pmatrix}  \\
+\begin{bmatrix}
+    y_{BC} \\
+    y_{AB} \\
+    y_{SK} \end{bmatrix}_t = \begin{bmatrix}1&0\\0&1\\0&1 \end{bmatrix} \begin{bmatrix}x_{BC}\\x_{AB-SK}\end{bmatrix}_t +  
+    \begin{bmatrix}0\\ 0\\ a_3 \end{bmatrix} + 
+    \begin{bmatrix}v_{BC} \\ v_{AB} \\ v_{SK} \end{bmatrix}_t, 
+    \textrm{ where } \vv_t \sim \MVN\begin{pmatrix}0, \begin{bmatrix}r&0&0\\0&r&0\\0&0&r\end{bmatrix} \end{pmatrix}
+\end{gathered}
+\end{equation}
+This model is specified as
+<<Cs015_fit-bird-model-4, echo=TRUE, results=hide>>=
+model.b4=list()
+model.b4$Q="diagonal and unequal"
+model.b4$R="diagonal and equal"
+model.b4$Z=factor(c("BC","AB-SK","AB-SK"))
+model.b4$A="scaling"
+model.b4$U="unequal"
+kem.b4 = MARSS(birddat, model=model.b4)
+@
+<<Cs016_bird-model-4-aic>>=
+kem.b4$AICc
+@
+This last model was superior to the others, improving the AICc value compared to model 1 by 8 units.  Figure \ref{fig:fig6} shows the fits for this model.
+
+\begin{figure}[totalheight=0.5\textheight]
+\begin{center}
+<<Cs017_plot-bird-model-4-fits,fig=TRUE,echo=FALSE>>=
+# Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
+plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
+points(kestrel[,1], kestrel[,3], col="blue", pch=22)
+points(kestrel[,1], kestrel[,4], col="purple", pch=25)
+lines(kestrel[,1], c(kem.b4$states[1,]), lty=3, lwd=2, col="red")
+lines(kestrel[,1], c(kem.b4$states[2,]), lty=3, lwd=2, col="blue")
+lines(kestrel[,1], c(kem.b4$states[2,]+coef(kem.b4,type="matrix")$A[3,1]), lty=3, lwd=2, col="purple")
+legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
+@
+\end{center}
+\caption{Plot model 4 fits to the kestrel data.}
+\label{fig:fig6}
+\end{figure}
+
+<<Reset, echo=FALSE>>=
+options(prompt="> ", continue="+ ")
+@

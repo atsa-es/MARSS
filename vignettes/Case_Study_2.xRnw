@@ -1,0 +1,664 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS2-, eps=FALSE, split=TRUE}
+\chapter{Combining multi-site data to estimate regional population trends}
+\label{chap:CStrend}
+\chaptermark{Combining multi-site and subpopulation data}
+
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ")
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Harbor seals in the Puget Sound, WA.}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_SealTrend.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
+In this application, we will use multivariate state-space models\index{MARSS model!multivariate example} to combine surveys from multiple regions (or sites) into one estimate of the average long-term population growth rate and the year-to-year variability in that growth rate.  Note this is not quite the same as estimating the `trend'; `trend' often means what population change happened, whereas the long-term population growth rate refers to the underlying population dynamics.  We will use as our example a dataset from harbor seals in Puget Sound, Washington, USA.  
+
+We have five regions (or sites) where harbor seals were censused from 1978-1999 while hauled out of land\footnote{Jeffries et al. 2003.  Trends and status of harbor seals in Washington State: 1978-1999. Journal of Wildlife Management 67(1):208--219 }.  During the period of this dataset, harbor seals were recovering steadily after having been reduced to low levels by hunting prior to protection.  The methodologies were consistent throughout the 20 years of the data but we do not know what fraction of the population that each region represents nor do we know the observation-error variance for each region.  Given differences between behaviors of animals in different regions and the numbers of haul-outs in each region, the observation errors may be quite different.  The regions have had different levels of sampling; the best sampled region has only 4 years missing while the worst has over half the years missing (Figure~\ref{fig:CS2.fig1}).  
+
+<<noshowlegend, echo=FALSE, results=hide>>=
+d=harborSealWA
+legendnames = (unlist(dimnames(d)[2]))[2:ncol(d)]
+for(i in 1:length(legendnames)) cat(paste(i,legendnames[i],"\n",sep=" "))
+@
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[htp]
+\begin{center}
+<<label=fig1,fig=TRUE,echo=FALSE,width=5,height=5>>=
+d=harborSealWA
+dat = d[,2:ncol(d)] #first col is years
+x = d[,1] #first col is years
+n = ncol(dat) #num time series
+
+#set up the graphical parameters to give each data a unique line, color and width
+options(warn=-99)
+ltys=matrix(1,nrow=n)
+cols=matrix(1:4,nrow=n)
+lwds=matrix(1:2,nrow=n)
+pchs=matrix(as.character(c(1:n)),nrow=n)
+options(warn=0)
+
+matplot(x,dat,xlab="",ylab="log(counts)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds,bty="L")
+title("Puget Sound Harbor Seal Surveys")
+@
+\end{center}
+\caption{Plot of the of the count data from the five harbor seal regions (Jeffries et al. 2003). The numbers on each line denote the different regions: 1) Strait of Juan de Fuca (SJF), 2) San Juan Islands (SJI), 2) Eastern Bays (EBays), 4) Puget Sound (PSnd), and 5) Hood Canal (HC).  Each region is an index of the total harbor seal population, but the bias (the difference between the index and the true population size) for each region is unknown. }
+\label{fig:CS2.fig1}
+\end{figure}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will assume that the underlying population process is a stochastic exponential growth process with rates of increase that were not changing through 1978-1999.  However, we are not sure if all five regions sample a single ``total Puget Sound'' population or if there are  independent subpopulations.  We will estimate the long-term population growth rate using different assumptions about the population structures (one big population versus multiple smaller ones) and observation error structures to see how different assumptions change the trend estimates.  
+
+The harbor seal data are included in the MARSS package.   The data have time running down the rows and years in the first column. We need time across the columns for the \verb@MARSS()@ function, so we will transpose the data:
+<<Cs2-readindata, echo=TRUE, keep.source=TRUE>>=
+dat=t(harborSealWA) #Transpose
+years = dat[1,] #[1,] means row 1
+n = nrow(dat)-1
+dat = dat[2:nrow(dat),] #no years
+@
+If you needed to read data in from a comma-delimited or tab-delimited file, these are the commands to do that:
+<<readtable, eval=FALSE>>=
+dat = read.csv("datafile.csv",header=TRUE)
+dat = read.table("datafile.csv",header=TRUE)
+@
+
+\noindent The years are in column 1 of \texttt{dat} and the logged data are in the rest of the columns. The number of observation time series (\verb@n@) is the number of rows in \verb@dat@ minus 1 (for years row).  Let's look at the first few years of data:
+<<Cs2-showdata>>=
+print(harborSealWA[1:8,], digits=3)
+@
+The \texttt{NA}'s in the data are missing values.   
+
+\subsection{A MARSS model for Puget Sound harbor seals}
+The first step is to mathematically specify the population structure and how the regions relate to that structure.  The general state-space model is
+\begin{eqnarray*}
+\xx_t = \BB \xx_{t-1} + \uu + \ww_t, \textrm{ where } \ww_t \sim \MVN(0,\QQ ) \\
+\yy_t = \ZZ \xx_t + \aa + \vv_t, \textrm{ where } \vv_t \sim \MVN(0,\RR )
+\end{eqnarray*}
+where all the bolded symbols are matrices.  To specify the structure of the population and observations, we will specify what those matrices look like.
+
+\section{A single well-mixed population with i.i.d. errors}
+\label{CS2.ex1}
+When we are looking at data over a large geographic region, we might make the assumption that the different census regions are measuring a single population if we think animals are moving sufficiently such that the whole area (multiple regions together) is ``well-mixed".  We write a model of the total  population abundance for this case as:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+n_t = \exp(u + w_t) n_{t-1},
+\label{eq:expstoc}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+where $n_t$ is the total count in year $t$, $u$ is the mean population growth rate, and $w_t$ is the deviation from that average in year $t$. 
+We then take the log of both sides and write the model in log space:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)
+\label{eq:seg}
+\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+$x_t=\log{n_t}$. When there is one effective population, there is one $x$, therefore $\xx_t$ is a $1 \times 1$ matrix.  There is one population growth rate ($u$) and there is one process variance ($q$).  Thus $\uu$ and $\QQ$ are $1 \times 1$ matrices.   
+
+\subsection{The observation process}
+We assume that all five regional time series are observations of this one population trajectory but they are scaled up or down relative to that trajectory.   In effect, we think that animals are moving around a lot and our regional samples are some fraction of the population.  There is year-to-year variation in the fraction in each region, just by chance.  Notice that under this analysis, we do not think the regions represent independent subpopulations but rather independent observations of one population.
+Our model for the data, $\yy_t = \ZZ \xx_t + \aa + \vv_t$, is written as:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+ \left[ \begin{array}{c}
+    y_{1} \\
+    y_{2} \\
+    y_{3} \\
+    y_{4} \\
+    y_{5} \end{array} \right]_t = 
+    \left[ \begin{array}{c}
+    1\\
+    1\\
+    1\\
+    1\\
+    1\end{array} \right] x_t +  
+    \left[ \begin{array}{c}
+    0 \\
+    a_2 \\
+    a_3 \\
+    a_4 \\
+    a_5 \end{array} \right] + 
+    \left[ \begin{array}{c}
+    v_{1} \\
+    v_{2} \\
+    v_{3} \\
+    v_{4} \\
+    v_{5} \end{array} \right]_t 
+ \label{eq:meas}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each $y_{i}$ is the time series for a different region.  The $a$'s are the bias between the regional sample and the total population.  The $a$'s are scaling (or intercept-like) parameters\footnote{To get rid of the $a$'s, we scale multiple observation time series against each other; thus one $a$ will be fixed at 0. Estimating the bias between regional indices and the total population is important for getting an estimate of the total population size.  The type of time-series analysis that we are doing here (trend analysis) is not useful for estimating $a$'s.  Instead to get $a$'s one would need some type of mark-recapture data.  However, for trend estimation, the $a$'s are not important.  The regional observation variance captures increased variance due to a regional estimate being a smaller sample of the total population.}.  We allow that each region could have a unique observation variance and that the observation errors are independent between regions.  Lastly, we assume that the observations errors on log(counts) are normal and thus the errors on (counts) are log-normal.\footnote{The assumption of normality is not unreasonable since these regional counts are the sum of counts across multiple haul-outs.}  
+
+For our first analysis, we assume that the observation variance is equal across regions but the errors are independent.  This means we estimate one observation variance instead of five.  This is a fairly standard assumption for data that come from the uniform survey methodology.\footnote{By the way, this is not a good assumption for these data since the number haul-outs in each region varies and the regional counts are the sums across all haul-outs in a region.  We will change this assumption in the next fit and see that the AIC values decline.}.  We specify independent observation errors with identical variances by specifying that the $v$'s come from a multivariate normal distribution with variance-covariance matrix $\RR$ ($\vv \sim \MVN(0,\RR)$), where
+\begin{equation}
+\RR = \left[ \begin{array}{ccccc}
+    r & 0 & 0 & 0 & 0 \\
+    0 & r & 0 & 0 & 0 \\
+    0 & 0 & r & 0 & 0 \\
+    0 & 0 & 0 & r & 0 \\
+    0 & 0 & 0 & 0 & r \end{array} \right]
+\end{equation}
+
+$\ZZ$ specifies which observation time series, $y_{i,1:T}$, is associated with which population trajectory, $x_{j,1:T}$.  $\ZZ$ is like a look up table with 1 row for each of the $n$ observation time series and 1 column for each of the $m$ population trajectories.  A 1 in row $i$ column $j$ means that observation time series $i$ is measuring state process $j$.  Otherwise the value in $\ZZ_{ij}=0$.  Since we have only 1 population trajectory, all the regions must be measuring that one population trajectory.  Thus $\ZZ$ is $n \times 1$:
+\begin{equation}
+    \ZZ = \left[ \begin{array}{c}
+    1\\
+    1\\
+    1\\
+    1\\
+    1\end{array} \right]
+\end{equation}
+
+\subsection{Fitting the model}
+We have specified the mathematical form of our state-space model. The next step is to fit this model with \texttt{MARSS()}.  The function call will now look like:
+<<funccallwithconstraints, eval=FALSE>>=
+kem1 = MARSS(dat, model=list(Z=Z.model, R=R.model) ) 
+@
+The \verb@model@ list argument tells the \texttt{MARSS()} function the model structure, i.e. the form of  $\ZZ$, $\uu$, $\QQ$, etc.  For our first analysis, we only need to set the model structure for $\ZZ$ and $\RR$.  Since there is only one population, there is only one $\uu$ and $\QQ$ (they are scalars), so they have no 'structure'.
+
+First we specify the $\ZZ$ matrix.  We need to tell the \texttt{MARSS} function that $\ZZ$ is a $5 \times 1$ matrix of 1s (as in Equation \ref{eq:meas}).  We can do this two ways. We can pass in \verb@Z.model@ as a matrix of ones, \verb@matrix(1,5,1)@, just like in  Equation \eqref{eq:meas} or we can pass in a vector of five factors,  \verb@factor(c(1,1,1,1,1))@. The $i$-th factor specifies which population trajectory the $i$-th observation time series belongs to.  Since there is only one population trajectory in this first analysis, we will have a vector of five $1$'s: every observation time series is measuring the first, and only, population trajectory. 
+<<setwhichPop, eval=TRUE>>=
+Z.model = factor(c(1,1,1,1,1))
+@
+Note, the vector (the \verb@c()@ bit) must be wrapped in \verb@factor()@ so that \verb@MARSS@ recognizes what it is.  You can use either numeric or character vectors: \verb@c(1,1,1,1,1)@ is the same as \verb@c("PS","PS","PS","PS","PS")@.
+
+Next we specify that the $\RR$ variance-covariance matrix only has terms on the diagonal (the variances) with the off-diagonal terms (the covariances) equal to zero:  
+<<setvarcov1>>=
+R.model = "diagonal and unequal" 
+@
+The `and unequal' part specifies that the variances are allowed to be unique on the diagonal.  If we wanted to force the observation variances to be equal at all regions, we would use \verb@"diagonal and equal"@.  
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{figure}[htp]
+\begin{center}
+<<fig2,fig=TRUE,echo=FALSE,width=6,height=6, results=hide>>=
+kem1 = MARSS(dat, model=
+       list(Z=factor(c(1,1,1,1,1)), R="diagonal and unequal"))
+matplot(years, t(dat),xlab="",ylab="index of log abundance",pch=c("1","2","3","4","5"),ylim=c(5,9),bty="L")
+lines(years,kem1$states-1.96*kem1$states.se,type="l",lwd=1,lty=2,col="red")
+lines(years,kem1$states+1.96*kem1$states.se,type="l",lwd=1,lty=2,col="red")
+lines(years,kem1$states,type="l",lwd=2)
+title("Observations and total population estimate",cex.main=.9)
+@
+\end{center}
+\caption{Plot of the estimate of ``log total harbor seals in Puget Sound''. The estimate of the total count has been scaled relative to the first time series. The 95\% confidence intervals on the population estimates are the dashed lines.  These are not the confidence intervals on the observations, and the observations (the numbers) will not fall between the confidence interval lines.}
+\label{fig:CS2.fig2}
+\end{figure}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Code \ref{CS2.ex1} shows you how to fit the single population model (Equations \ref{eq:seg} and \ref{eq:meas}) to the harbor seal data.  
+
+\exbegin{Code \ref{CS2.ex1}}
+<<label=Cs2_Code1,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
+#Code to fit the single population model with i.i.d. errors
+#Read in data
+dat=t(harborSealWA) #Transpose since MARSS needs time ACROSS columns
+years = dat[1,]      
+n = nrow(dat)-1
+dat = dat[2:nrow(dat),]
+legendnames = (unlist(dimnames(dat)[1]))
+
+#estimate parameters
+Z.model = factor(c(1,1,1,1,1))
+R.model = "diagonal and unequal" 
+kem1 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+
+#make figure
+matplot(years, t(dat),xlab="",ylab="index of log abundance",
+  pch=c("1","2","3","4","5"),ylim=c(5,9),bty="L")
+lines(years,kem1$states-1.96*kem1$states.se,type="l",
+  lwd=1,lty=2,col="red")
+lines(years,kem1$states+1.96*kem1$states.se,type="l",
+  lwd=1,lty=2,col="red")
+lines(years,kem1$states,type="l",lwd=2)
+title("Observations and total population estimate",cex.main=.9)
+
+coef(kem1, type="vector")  #show the estimated parameter elements as a vector
+
+#show estimated elements for each parameter matrix as a list
+coef(kem1) 
+
+kem1$logLik   #show the log-likelihood
+kem1$AIC  #show the AIC
+@
+\exend
+
+
+\subsection{The \texttt{MARSS()} output} 
+
+The output from \verb@MARSS()@, here assigned the name \verb@kem1@, is a list of objects:
+<<noshow-listkem1, eval=FALSE>>=
+names(kem1)
+@
+The maximum-likelihood estimates of 
+``total harbor seal population'' scaled to the first observation data series (Figure \ref{fig:CS2.fig2}) are in \verb@kem1$states@, and \verb@kem1$states.se@ are the standard errors on those estimates.  To get 95\% confidence intervals, use \verb@kem1$states +/- 1.96*kem1$states.se@.
+Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the biases, the $/aa$, cannot be estimated and arbitrarily our algorithm choses $a_1=0$, so the population estimate is scaled to the first observation time series.   
+
+The estimated parameters are output with the function \verb@coef@: \verb@coef(kem1)@.  To get the estimate just for \texttt{U}, which is the estimated long-term population growth rate, use \verb@coef(kem1)$U@.  Multiply by 100 to get the percent increase per year.  The estimated process variance is given by \verb@coef(kem2)$Q@.
+
+The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  one initial $x$ ($t=1$), one process variance, one $u$, four $a$'s, and five observation variances's. So $K=12$ parameters.  The AIC\index{model selection!AIC} of this model is $-2 \times \text{log-like} + 2K$, which we can show by typing \verb@kem1$AIC@.
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Single population model with independent and non-identical errors}
+\label{CS2.ex2}
+Here is the estimated $\RR$ matrix for our first model:
+<<Cs2-analysis2obsvariance>>=
+coef(kem1,type="matrix")$R
+@
+Notice that the variances along the diagonal are all the same---we estimated one observation variance and it applied to all observation time series.  We might be able to improve the fit (at the cost of more parameters) by assuming that the observation variance is different across regions while the errors are still independent.  This means we estimate five observation variances instead of one.  In this case, $\RR$ has the form:
+\begin{equation}
+\RR = \left[ \begin{array}{ccccc}
+    r_1 & 0 & 0 & 0 & 0 \\
+    0 & r_2 & 0 & 0 & 0 \\
+    0 & 0 & r_3 & 0 & 0 \\
+    0 & 0 & 0 & r_4 & 0 \\
+    0 & 0 & 0 & 0 & r_5 \end{array} \right]
+\end{equation}
+To impose this model, we set the $\RR$ model to 
+<<label=Cs2-setgroups>>=
+R.model="diagonal and unequal"
+@
+This tells \verb@MARSS@ that all the $r$'s along the diagonal in $\RR$ are different.  To fit this model to the data, call \texttt{MARSS()} as:
+<<Cs2-fitanalysis2, results=hide>>=
+Z.model = factor(c(1,1,1,1,1))
+R.model = "diagonal and equal" 
+kem2 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+@
+
+We estimated  one initial $x$, one process variance, one $u$, four $a$'s, and five observation variances. So $K=11$ parameters.
+The AIC for this new model compared to the old model with one observation variance is:
+<<Cs2-AIC2, eval=TRUE>>=
+c(kem1$AIC,kem2$AIC)
+@
+A smaller AIC means a better model\index{model selection!AIC}.  The difference between the one observation variance versus the unique observation variances is >10, suggesting that the unique observation variances model is better.
+
+\index{diagnostics}One of the key diagnostics when you are comparing fits from multiple models is whether the model is flexible enough to fit the data.  This can be checked by looking for temporal trends in the the residuals between the estimated population states (e.g. \verb@kem2$states@) and the data.  In Figure \ref{fig:CS2.resids2}, the residuals for the second analysis are shown.  Ideally, these residuals should not have a temporal trend. They should look cloud-like.  The fact that the residuals have a strong temporal trend is an indication that our one population model is too restrictive for the data\footnote{When comparing models via AIC, it is important that you only compare models that are flexible enough to fit the data.  Fortunately if you neglect to do this, the inadequate models will usually have very high AICs and fall out of the mix anyhow.}.  Code \ref{CS2.ex2} shows you how to fit the second model and make the diagnostics plot.
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[htp]
+\begin{center}
+<<Cs2-fig5,fig=TRUE,echo=FALSE,width=5,height=5>>=
+plotdat = t(dat)
+matrix.of.biases = matrix(coef(kem2, type="matrix")$A,nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
+xs = matrix(kem2$states,nrow=dim(plotdat)[1],ncol=dim(plotdat)[2],byrow=F)
+resids = plotdat-matrix.of.biases-xs
+par(mfrow=c(2,3))
+for(i in 1:n){
+	plot(resids[!is.na(resids[,i]),i],ylab="residuals")
+	title(legendnames[i])
+	}
+par(mfrow=c(1,1))
+@
+\end{center}
+\caption{Residuals for the model with a single population. The plots of the residuals should not have trends with time, but they do.  This is an indication that the single population model is inconsistent with the data.  The code to make this plot is given in the script file for this chapter.}
+\label{fig:CS2.resids2}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\exbegin{Code \ref{CS2.ex2}}
+<<Cs2_Code2,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
+#Code to fit the single population model with independent and unequal errors 
+
+Z.model = factor(c(1,1,1,1,1))
+R.model = "diagonal and equal" 
+kem2 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+
+coef(kem2) #the estimated parameter elements
+kem2$logLik #log likelihood
+c(kem1$AIC,kem2$AIC)  #AICs
+
+#plot residuals
+plotdat = t(dat)
+matrix.of.biases = matrix(coef(kem2, type="matrix")$A,
+  nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
+xs = matrix(kem2$states,
+  nrow=dim(plotdat)[1],ncol=dim(plotdat)[2],byrow=F)
+resids = plotdat-matrix.of.biases-xs
+par(mfrow=c(2,3))
+for(i in 1:n){
+  plot(resids[!is.na(resids[,i]),i],ylab="residuals")
+  title(legendnames[i])
+}
+par(mfrow=c(1,1))
+@
+\exend
+
+\section{Two subpopulations, north and south}
+\label{CS2.ex3}
+For the third analysis, we will change our assumption about the structure of the population.  We will assume that there are two subpopulations, north and south, and that regions 1 and 2 (Strait of Juan de Fuca and San Juan Islands) fall in the north subpopulation and regions 3, 4 and 5 fall in the south subpopulation.  For this analysis, we will assume that these two subpopulations share their growth parameter, $u$, and process variance, $q$, since they share a similar environment and prey base.  However we postulate that because of fidelity to natal rookeries for breeding, animals do not move much year-to-year between the north and south and the two subpopulations are independent.  
+
+We need to write down the state-space model to reflect this population structure.  There are two subpopulations, $x_n$ and $x_s$, and they have the same growth rate $u$:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+ \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_t = 
+ \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_{t-1} +
+    \left[ \begin{array}{c}
+    u \\
+    u \end{array} \right] +
+    \left[ \begin{array}{c}
+    w_{n} \\
+    w_{s} \end{array} \right]_t
+\label{eq:procanal3}
+\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+We specify that they are independent by specifying that their year-to-year population fluctuations (their process errors) come from a multivariate normal with no covariance:
+\begin{equation}
+ \left[ \begin{array}{c}
+    w_{n} \\
+    w_{s} \end{array} \right]_t \sim 
+ MVN\left(\left[ \begin{array}{c}
+    0 \\
+    0 \end{array} \right], 
+    \left[ \begin{array}{cc}
+    q & 0 \\
+    0 & q \end{array} \right] \right)
+\end{equation}
+
+For the observation process, we use the $\ZZ$ matrix to associate the regions with their respective $x_n$ and $x_s$ values:
+\begin{equation}
+    \left[ \begin{array}{c}
+    y_{1} \\
+    y_{2} \\
+    y_{3} \\
+    y_{4} \\
+    y_{5} \end{array} \right]_t = 
+    \left[ \begin{array}{cc}
+    1 & 0 \\
+    1 & 0 \\
+    0 & 1 \\
+    0 & 1 \\
+    0 & 1 \end{array} \right] \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_t +
+    \left[ \begin{array}{c}
+    0 \\
+    a_2 \\
+    0 \\
+    a_4 \\
+    a_5 \end{array} \right] +
+    \left[ \begin{array}{c}
+    v_{1} \\
+    v_{2} \\
+    v_{3} \\
+    v_{4} \\
+    v_{5} \end{array} \right]_t
+ \label{eq:obsanal3}
+ \end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\subsection{Specifying the \texttt{model} elements}
+We need to change the $\ZZ$ specification to indicate that there are two subpopulations (north and south), and that regions 1 and 2 are in the north subpopulation and regions 3,4 and 5 are in the south subpopulation.  There are a few ways, we can specify this $\ZZ$ matrix for \verb@MARSS()@:
+<<label=Cs2-analysis3-Z, eval=FALSE>>=
+Z.model = matrix(c(1,1,0,0,0,0,0,1,1,1),5,2) 
+Z.model = factor(c(1,1,2,2,2)) 
+Z.model = factor(c("N","N","S","S","S")) 
+@
+Which you choose is a matter of preference as they all specify the same form for $\ZZ$.
+
+We also want to specify that the $u$'s are the same for each subpopulation and that $\QQ$ is diagonal with equal $q$'s.  To do this, we set
+<<label=Cs2-analysis3-UQ, eval=FALSE>>=
+U.model = "equal" 
+Q.model = "diagonal and equal" 
+@
+
+\noindent This says that there is one $u$ and one $q$ parameter and both subpopulations share it (if we wanted the $u$'s to be different, we would use \verb@U.model="unequal"@ or leave off the $\uu$ model since the default behavior is \verb@U.model="unequal"@).  
+
+Code \ref{CS2.ex3} puts all the pieces together and shows you how to fit the north and south population model and create the residuals plot (Figure \ref{fig:CS2.resids3}).  The residuals look better (more cloud-like) but the Hood Canal residuals are still temporally correlated. 
+
+\exbegin{Code \ref{CS2.ex3}}
+<<label=Cs2_Code3,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
+#fit the north and south population model
+Z.model = factor(c(1,1,2,2,2))
+U.model = "equal" 
+Q.model = "diagonal and equal"
+R.model = "diagonal and equal" 
+kem3 = MARSS(dat, model=list(Z=Z.model, 
+  R=R.model, U=U.model, Q=Q.model))
+#plot residuals
+plotdat = t(dat)
+matrix.of.biases = matrix(coef(kem3,type="matrix")$A,
+  nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
+par(mfrow=c(2,3))
+for(i in 1:n){
+  j=c(1,1,2,2,2)
+  xs = kem3$states[j[i],]
+  resids = plotdat[,i]-matrix.of.biases[,i]-xs
+  plot(resids[!is.na(resids)],ylab="residuals")
+  title(legendnames[i])
+}
+par(mfrow=c(1,1))
+@
+\exend
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs2-residuals-analysis3-fig6,fig=TRUE,echo=FALSE,width=5,height=5>>=
+plotdat = t(dat)
+matrix.of.biases = matrix(coef(kem3, type="matrix")$A,nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
+par(mfrow=c(2,3))
+for(i in 1:n){
+  j=c(1,1,2,2,2)
+	xs = kem3$states[j[i],]
+	resids = plotdat[,i]-matrix.of.biases[,i]-xs
+	plot(resids[!is.na(resids)],ylab="residuals")
+	title(legendnames[i])
+	}
+par(mfrow=c(1,1))
+@
+\end{center}
+\caption{The residuals for the analysis with a north and south subpopulation.  The plots of the residuals should not have trends with time.  Compare with the residuals for the analysis with one subpopulation.}
+\label{fig:CS2.resids3}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
+
+\section{Other population structures}
+Now work through a number of different structures and examine how your estimation of the mean population growth rate varies under different assumptions about the structure of the population and the data. You can compare the model fits using AIC (or AICc).  For AIC, lower is better and only the relative differences matter\index{model selection!AIC}.  A difference of 10 between two AICs means substantially more support for the model with lower AIC.  A difference of 30 or 40 between two AICs is very large.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Five subpopulations}
+\label{CS2.ex4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Analyze the data using a model with five subpopulations, where each of the five census regions is sampling one of the subpopulations.  Assume that the subpopulation are independent (diagonal $\QQ$), however let each subpopulation share the same population parameters, $u$ and $q$.  Code \ref{CS2.ex4} shows how to set the \texttt{MARSS()} arguments for this case.  You can use \verb@R.model="diagonal and equal"@ to make all the observation variances equal.
+
+\exbegin{Code \ref{CS2.ex4}}
+<<label=Cs2_Code4,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
+Z.model=factor(c(1,2,3,4,5))
+U.model="equal"
+Q.model="diagonal and equal"
+R.model="diagonal and unequal"
+kem=MARSS(dat, model=list(Z=Z.model, 
+  U=U.model, Q=Q.model, R=R.model) )
+@
+\exend
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two subpopulations with different population parameters}
+\label{CS2.ex5}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Analyze the data using a model that assumes that the Strait of Juan de Fuca and San Juan Islands census regions represent a northern Puget Sound subpopulation, while the other three regions represent a southern Puget Sound subpopulation. This time assume that each population trajectory (north and south) has different $u$ and $q$ parameters: $u_n$,$u_s$ and $q_n$,$q_s$. Also assume that each of the five census regions has a different observation variance.  Try to write your own code.  If you get stuck (or want to check your work, you can open a script file with sample R code by typing \verb@RShowDoc("Chapter_SealTrend.R",package="MARSS")@ at the R command line.
+
+In math form, this model is:
+\begin{equation}
+ \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_t = 
+ \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_{t-1}+
+    \left[ \begin{array}{c}
+    u_n \\
+    u_s \end{array} \right] +
+    \left[ \begin{array}{c}
+    w_{n} \\
+    w_{s} \end{array} \right]_t,
+    \left[ \begin{array}{c}
+    w_{n} \\
+    w_{s} \end{array} \right]_t \sim \MVN\left(0,
+    \left[ \begin{array}{cc}
+    q_n & 0\\
+    0 & q_s \end{array} \right]\right)
+\end{equation}
+\begin{equation}
+\left[ \begin{array}{c}
+    y_{1} \\
+    y_{2} \\
+    y_{3} \\
+    y_{4} \\
+    y_{5} \end{array} \right]_t = 
+    \left[ \begin{array}{cc}
+    1 & 0 \\
+    1 & 0 \\
+    0 & 1 \\
+    0 & 1 \\
+    0 & 1 \end{array} \right] \left[ \begin{array}{c}
+    x_{n} \\
+    x_{s} \end{array} \right]_t +
+    \left[ \begin{array}{c}
+    0 \\
+    a_2 \\
+    0 \\
+    a_4 \\
+    a_5 \end{array} \right] +
+    \left[ \begin{array}{c}
+    v_{1} \\
+    v_{2} \\
+    v_{3} \\
+    v_{4} \\
+    v_{5} \end{array} \right]_t
+ \label{eq:obsanal5}
+ \end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hood Canal covaries with the other regions}
+\label{CS2.ex6}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Analyze the data using a model with two subpopulations with the  divisions being Hood Canal versus everywhere else.  In math form, this model is:
+\begin{equation}
+ \left[ \begin{array}{c}
+    x_{p} \\
+    x_{h} \end{array} \right]_t = 
+ \left[ \begin{array}{c}
+    x_{p} \\
+    x_{h} \end{array} \right]_{t-1} +
+    \left[ \begin{array}{c}
+    u_p \\
+    u_h \end{array} \right] +
+    \left[ \begin{array}{c}
+    w_{p} \\
+    w_{h} \end{array} \right]_t,
+    \left[ \begin{array}{c}
+    w_{p} \\
+    w_{h} \end{array} \right]_t \sim \MVN\left(0,
+    \left[ \begin{array}{cc}
+    q & c\\
+    c & q \end{array} \right]\right)
+\end{equation}
+\begin{equation}
+\left[ \begin{array}{c}
+    y_{1} \\
+    y_{2} \\
+    y_{3} \\
+    y_{4} \\
+    y_{5} \end{array} \right]_t = 
+    \left[ \begin{array}{cc}
+    1 & 0 \\
+    1 & 0 \\
+    1 & 0 \\
+    1 & 0 \\
+    0 & 1 \end{array} \right] \left[ \begin{array}{c}
+    x_{p} \\
+    x_{h} \end{array} \right]_t +
+    \left[ \begin{array}{c}
+    0 \\
+    a_2 \\
+    a_3 \\
+    a_4 \\
+    0 \end{array} \right] +
+    \left[ \begin{array}{c}
+    v_{1} \\
+    v_{2} \\
+    v_{3} \\
+    v_{4} \\
+    v_{5} \end{array} \right]_t
+ \label{eq:obsanal6}
+ \end{equation}
+ 
+To specify that $\QQ$ has one value on the diagonal (one variance) and one value on the off-diagonal (covariance) you can specify \verb@Q.model@ two ways:
+<<norun3, eval=FALSE>>=
+Q.model = "equalvarcov" 
+Q.model = matrix(c("q","c","c","q"),2,2)
+@  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Three subpopulations with shared parameter values}
+\label{CS2.ex7}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Analyze the data using a model with three subpopulations as follows: north (regions 1 and 2), south (regions 3 and 4), Hood Canal (region 5). You can specify that some subpopulations share parameters while others do not.  First, let's specify that each population is affected by independent environmental variability, but that the variance of that variability is the same for the two interior populations:
+<<eval=FALSE,keep.source=TRUE>>=
+Q.model=matrix(list(0),3,3)
+diag(Q.model)=c("coastal","interior","interior")
+print(Q.model)
+@
+Notice that $\QQ$ is a diagonal matrix (independent year-to-year environmental variability) but the variance of two of the populations is the same.  Notice too that the off-diagonal terms are numeric; they do not have quotes.  We specified $\QQ$ using a matrix of class list, so that we could have numeric values (fixed) and character values (estimated parameters).
+
+In a similar way, we specify that the observation errors are independent but that estimates from a plane do not have the same variance as those from a boat:
+<<eval=FALSE,keep.source=TRUE>>=
+R.model=matrix(list(0),5,5)
+diag(R.model)=c("boat","boat","plane","plane","plane")
+@
+
+For the long-term trends, we specify that $x_1$ and $x_2$ share a long-term trend (``puget sound'') while $x_3$ is allowed to have a separate trend (``hood canal'').   
+<<eval=F,keep.source=TRUE>>=
+U.model=matrix(c("puget sound","puget sound","hood canal"),3,1)
+@
+
+\section{Discussion}
+There are a number of corners that we cut in order to show you code that runs quickly:
+\begin{itemize}
+\item{We ran the code starting from one initial condition.  For a real analysis, you should start from a large number of random initial conditions and use the one that gives the highest likelihood.  Since the EM algorithm is a ``hill-climbing'' algorithm, this ensures that it does not get stuck on a local maxima.  \texttt{MARSS()} will do this for you if you pass it the argument \texttt{control=list(MCInit=TRUE)}.  This will use a Monte Carlo routine to try many different initial conditions.  See the help file on \verb@MARSS()@ for more information (by typing \verb@?MARSS@ at the \R prompt).}
+\item{We assume independent observation and process errors.  Depending on your system, observation errors may be driven by large-scale environmental factors (temperature, tides, prey locations) that would cause your observation errors to covary across regions. If your observation errors strongly covary between regions and you treat them as independent, this could be bad for your analysis.  Unfortunately, separating covariance across observation versus process errors will require much data (to have any power).  In practice, the first step is to think hard about what drives sightability for your species and what are the relative levels of process and observation variance.  You may be able to subsample your data in a way that will make the observation errors more independent.}
+\item{The \verb@MARSS()@ argument \verb@control@ specifies the options for the EM algorithm. We left the default tolerance for the convergence test.  You would want to set this lower for a real analysis.  You will need to up the \texttt{maxit} argument correspondingly.}
+\item{We used the large-sample approximation for AIC\index{model selection!AIC} instead of a bootstrap AIC\index{model selection!bootstrap AIC} that is designed to correct for small sample size in state-space models.  The bootstrap metric, AICb, takes a long time to run. Use the call \verb@MARSSaic(kem, output=c("AICbp"))@ to compute AICb\index{model selection!bootstrap AIC, AICbp}.  We could have shown AICc\index{model selection!AICc}, which is the small-sample size corrector for non-state-space models.  Type \verb@kem$AICc@ to get that.}
+\end{itemize}
+
+Finally, in a real (maximum-likelihood) analysis, one needs to be careful not to dredge the data.  The temptation is to look at the data and pick a population structure that will fit that data.  This can lead to including models in your analysis that have no biological basis.  In practice, we spend a lot of time discussing the population structure with biologists working on the species and review all the biological data that might tell us what are reasonable structures.  From that, a set of model structures to use are selected.   Other times, a particular model structure needs to be used because the population structure is not in question rather it is a matter of using that pre-specified structure and using all the data to get parameter estimates for forecasting.  
+
+ 
+\section*{Some more questions you might ponder}
+Do different assumptions about whether the observation error variances are all identical versus different affect your estimate of the long-term population growth rate ($u$)?  You may want to rerun examples 3-7 with the \texttt{R.model} changed.  \texttt{R.model="diagonal and unequal"} means measurement variances all different versus \texttt{"diagonal and equal"}.
+
+Do assumptions about the underlying structure of the population affect your estimates of $u$?   Structure here means number of subpopulations and which areas are in which subpopulation.  
+
+The confidence intervals for the first two analyses are very tight because the estimated process variance, $\QQ$, was very small.  Why do you think process variance ($q$) was forced to be so small?  [Hint: We are forcing there to be one and only one true population trajectory and all the observation time series have to fit that one time series. Look at the AICs too.]
+
+<<Reset, echo=FALSE>>=
+options(prompt="> ", continue="+ ")
+@
+
+<<label=Cs2_Code5_7, eval=TRUE, echo=FALSE, results=hide>>=
+#Two subpopulations with different population parameters
+Z.model=factor(c(1,1,2,2,2))
+U.model="unequal"
+Q.model="diagonal and unequal"
+R.model="diagonal and unequal"
+kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+
+#Hood Canal covaries with the other regions
+Z.model=factor(c(1,1,1,1,2))
+U.model="unequal"
+Q.model="equalvarcov"
+R.model="diagonal and unequal"
+kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+
+#Three subpopulations with shared parameter values
+Z.model=factor(c(1,1,2,2,3))
+U.model="unequal"
+Q.model="diagonal and unequal"
+R.model="diagonal and unequal"
+kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+@

@@ -1,0 +1,6 @@
+%\VignetteIndexEntry{User Guide} 
+%\VignettePackage{MARSS}
+\documentclass{article}
+\begin{document}
+empty
+\end{document}

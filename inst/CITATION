@@ -1,0 +1,34 @@
+citHeader("To cite the 'MARSS' package in publications use:")
+
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
+vers <- paste("R package version", meta$Version)
+
+citEntry(entry="Manual",
+         title = "MARSS: Multivariate Autoregressive State-Space Modeling",
+         author = personList(as.person("Elizabeth Holmes"),
+                             as.person("Eric Ward"),
+                             as.person("Kellie Wills")),
+         year = year,
+         note = vers,
+         url = "http://cran.r-project.org/web/packages/MARSS/",
+         textVersion =
+         paste("Elizabeth Holmes, Eric Ward, and Kellie Wills (", year,
+               "). MARSS: Multivariate Autoregressive State-Space Modeling. ",
+               vers, ".", sep="") )
+
+citEntry(entry="Article",
+         title = "MARSS: Multivariate autoregressive state-space models for analyzing time-series data",
+         author = personList(as.person("Elizabeth E. Holmes"),
+                             as.person("Eric J. Ward"),
+                             as.person("Kellie Wills")),
+         year     = {2012},
+         journal = "The R Journal",
+         volume     = {4},
+         number     = {1},
+         pages     = {11--19},
+
+         textVersion =
+         paste("Holmes, E. E., Ward, E. J. & Wills, K. (2012)",
+          "MARSS: Multivariate Autoregressive State-space Models for Analyzing Time-series Data.",
+               "The R Journal. 4(1):11-19")
+)

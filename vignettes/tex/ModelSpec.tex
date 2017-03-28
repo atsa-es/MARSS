@@ -1,0 +1,100 @@
+\chapter{Model specification in the core functions}
+\label{chap:modelspec}
+Most users will not directly work with the core functions nor build marssMODEL objects from scratch.  Instead, they will usually interact with the core functions via the function \verb@MARSS()@ described in Chapter \ref{chap:MARSS}.  With the \verb@MARSS()@  function, the user specifies the model structure with matrices or text strings (``diagonal'', ``unconstrained'', etc.) and \verb@MARSS()@ builds the marssMODEL object.   However, a basic understanding of the structure of marssMODEL objects is useful if one wants to  interact directly with the core functions.
+
+The first step of model specification is to write down (e.g. on paper) the model in matrix form (Equation \ref{eqn:marss}) with notes on the dimensions (rows and columns) of each parameter and of $\xx$ and $\yy$.  In the core functions, the parameters in the MARSS model must be passed as matrices of the correct dimension, and the parameters in the \R functions correspond one-to-one to the mathematical equation.  For example, $\uu$ must be passed in as a matrix of dimension \verb@c(m,1)@.  The function will return an error if anything else is passed in (including a matrix with \verb@dim=c(1,m)@ or a vector of length $m$).  
+
+\section{The fixed and free components of the model parameters}\index{model specification!in marssMODEL objects}
+In a marssMODEL object, each parameter must be specified by a pair of matrices: \verb@free@ which gives the location and sharing of the estimated elements in the parameter matrix and \verb@fixed@ which specifies the location and value of the fixed elements in the parameter matrix.  For example, $\QQ$ is specified by \verb@free$Q@ and \verb@fixed$Q@.  
+
+\subsection{The fixed matrices}
+The fixed matrix specifies the values (numeric) of the fixed (meaning not estimated) elements.  In the fixed matrix, the free (meaning estimated or fitted) elements are denoted with \verb@NA@.  The following shows some common examples of the fixed matrix using \verb@fixed$Q@ as the example.  Each of the other fixed matrices for the other parameters uses the same pattern.
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{itemize}
+\item[] $\QQ$ is unconstrained, so there are no fixed values
+\begin{equation*}
+ \texttt{fixed\$Q}=
+ \left[ \begin{array}{ccc}
+    NA\, & NA\, & NA\, \\
+    NA\, & NA\, & NA\, \\
+    NA\, & NA\, & NA\, \end{array} \right] \quad 
+\end{equation*}
+
+\item[] $\QQ$ is a diagonal matrix, so the off-diagonals are fixed at 0.  The diagonal elements will be estimated.
+\begin{equation*}
+ \texttt{fixed\$Q}=
+     \left[ \begin{array}{ccc}
+    NA & 0 & 0 \\
+    0 & NA & 0 \\
+    0 & 0 & NA \end{array} \right]
+\end{equation*}
+
+\item[] $\QQ$ is fixed, i.e. will not be estimated rather all values in the $\QQ$ matrix are fixed.
+\begin{equation*}
+ \texttt{fixed\$Q}=
+     \left[ \begin{array}{ccc}
+    0.1 & 0 & 0 \\
+    0 & 0.1 & 0 \\
+    0 & 0 & 0.1 \end{array} \right]
+\end{equation*}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\end{itemize}
+
+\subsection{The free matrices}
+The free matrix specifies which elements are estimated and specifies how (and whether) the free elements are shared.  In the free matrix, the fixed elements are denoted \verb@NA@.  The following shows some common examples of \verb@free@ using \verb@free$Q@ as the example. \verb@free@ can be passed in as a character matrix or a numeric matrix, but if numeric, the numeric will be changed to character (thus 0 becomes ``0'' and is the name ``0'' not the number 0).
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{itemize}
+\item[] $\QQ$ is a diagonal matrix in which there is only one, shared, value on the diagonal.  Thus there is only one $\QQ$ parameter.
+\begin{equation*}
+ \texttt{free\$Q} =
+ \left[ \begin{array}{ccc}
+    1 & NA & NA \\
+    NA & 1 & NA \\
+    NA & NA & 1 \end{array} \right] \quad \texttt{or} \quad
+ \left[ \begin{array}{ccc}
+    ``a" & NA & NA \\
+    NA & ``a" & NA \\
+    NA & NA & ``a" \end{array} \right]
+\end{equation*}
+Here ``1'' does not mean ``number 1'' but rather that the name of the shared parameter is ``1''.  On the example at the right, the name of the shared parameter is ``a''.
+
+\item[] $\QQ$ is a diagonal matrix in which each of the diagonal elements are different.
+\begin{equation*}
+ \texttt{free\$Q} =
+ \left[ \begin{array}{ccc}
+    1 & NA & NA \\
+    NA & 2 & NA \\
+    NA & NA & 3 \end{array} \right] \quad \texttt{or} \quad
+ \left[ \begin{array}{ccc}
+    ``north" & NA & NA \\
+    NA & ``middle" & NA \\
+    NA & NA & ``south" \end{array} \right]
+\end{equation*}
+
+\item[] $\QQ$ has one value on the diagonal and another one on the off-diagonals. There are no fixed values in $\QQ$.
+\begin{equation*}
+ \texttt{free\$Q} =
+ \left[ \begin{array}{ccc}
+    1 & 2 & 2 \\
+    2 & 1 & 2 \\
+    2 & 2 & 1 \end{array} \right] \quad \texttt{or} \quad
+ \left[ \begin{array}{ccc}
+    ``a" & ``b" & ``b" \\
+    ``b" & ``a" & ``b" \\
+    ``b" & ``b" & ``a" \end{array} \right]
+\end{equation*}
+
+\item[] $\QQ$ is unconstrained.  There are no fixed values in $\QQ$ in this case.  Note that since, $\QQ$ is a variance-covariance matrix, it must be symmetric across the diagonal.  
+\begin{equation*}
+ \texttt{free\$Q} =
+ \left[ \begin{array}{ccc}
+    1 & 2 & 3 \\
+    2 & 4 & 5 \\
+    3 & 5 & 6 \end{array} \right] 
+\end{equation*}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\end{itemize}
+
+\section{Limits on the model forms that can be fit}
+
+The main limitation is that one must specify a model that has only one solution.  The core functions will allow you to attempt to fit an improper model (one with multiple solutions).  If you do this accidentally, it may or may not be obvious that you have a problem.  The estimation functions may chug along happily and return some solution.  Careful thought about your model structure and the structure of the estimated parameter matrices will help you determine if your model is under-constrained and unsolvable.  

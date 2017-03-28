@@ -1,0 +1,454 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS6-, eps=FALSE, split=TRUE}
+\chapter{Detection of outliers and structural breaks}
+\label{chap:CSstrucbreak}
+\chaptermark{Outliers and structural breaks}
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ")
+require(xtable)
+require(Hmisc)
+tabledir="tables/"
+@
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_StructuralBreaks.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<compute.for.figs, echo=FALSE, include.source=FALSE, results=hide>>=
+if(1==0){
+mod.nile.3 = list(
+Z=matrix(c(1,0),1,2), A=matrix(0), R=matrix("r"),
+B=matrix(c(1,0,1,1),2,2), U=matrix(0,2,1), 
+Q=matrix(list("q",0,0,"p"),2,2),
+x0=matrix(c("pi1","pi2"),2,1)
+)
+library(datasets)
+dat=t(as.matrix(Nile))
+model=mod.nile.3
+kem.3=MARSS(dat,model=model,inits=list(x0=matrix(c(1000,-4),2,1)))
+}
+@
+
+\section{River flow in the Nile River}
+\index{structural breaks}\index{outliers} This chapter is based on a short example shown on pages 147-148 in \citet{Koopmanetal1998} using a 100-year record of river flow on the Nile River.  The methods are based on \citet{Harveyetal1998} which is in turn based on techniques in \citet{HarveyKoopman1992} and \citet{Koopman1993}. The Nile dataset is included in \R.  Figure \ref{fig:CS6.fig1} shows the data.
+
+
+\begin{figure}[htp]
+\begin{center}
+<<Cs01_plotdata, eval=TRUE, echo=TRUE, fig=TRUE>>=
+#load the datasets package
+library(datasets)
+data(Nile)   #load the data
+plot(Nile,ylab="Flow volume",xlab="Year")
+@
+\end{center}
+\caption{The Nile River flow volume 1871 to 1970 (included dataset in \R).}
+\label{fig:CS6.fig1}
+\end{figure}
+
+\section{Different models for the Nile flow levels}
+We begin by fitting different flow models to the data and compare these models with AIC.  After that, we will use the model residuals to look for outliers and structural breaks.
+
+\subsection{Flat level model}
+We will start by modeling these data as a simple average river flow with variability around this level.  
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+y_t = a+v_t \text{ where } v_t \sim \N(0,r)    
+ \label{eq:simple.model}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+where $y_t$ is the river flow volume at year $t$ and $x$ is some constant average flow level (notice it has no $t$ subscript).
+
+To fit this model with MARSS, we will explicitly show all the MARSS parameters.
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = 1 \times x_{t-1}+ 0 + w_t    \text{ where } w_t \sim \N(0,0) \\
+y_t = 0 \times x_t + a + v_t \text{ where } v_t \sim \N(0,r)  \\
+x_0 = 0 
+ \end{gathered}   
+ \label{eq:marss.model}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+MARSS includes the state process $x_t$ but we are setting $\ZZ$ to zero so that does not appear in our observation model.  We need to fix all the state parameters to zero so that the algorithm doesn't ``chase its tail'' trying to fit $x_t$ to the data.
+
+An equivalent way to write this model is to use $x_t$ as the average flow level and make it be a constant level by setting $q=0$.  The average flow appears as the $x_0$ parameter.  In MARSS form, the model is:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = 1 \times x_{t-1}+ 0 + w_t    \text{ where } w_t \sim \N(0,0) \\
+y_t = 1 \times x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
+x_0 = a 
+ \end{gathered}   
+ \label{eq:marss.model.0}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+We will use this latter format since we will be building on this form.  The model is specified as a list as follows and we denote this model ``0'':
+<<Cs02_mod.nile.0, eval=TRUE>>=
+mod.nile.0 = list( 
+Z=matrix(1), A=matrix(0), R=matrix("r"),
+B=matrix(1), U=matrix(0), Q=matrix(0),
+x0=matrix("a") )
+@
+
+We then fit the model with \verb@MARSS()@:
+<<Cs03_fit.data.0, eval=TRUE>>=
+#The data is in a ts format, and we need a matrix
+dat = t(as.matrix(Nile))
+#Now we fit the model
+kem.0 = MARSS(dat, model=mod.nile.0)
+@
+
+\subsection{Linear trend in flow model}
+Figure \ref{fig:CS6.fits} shows the fit for the flat average river flow model.  Looking at the data, we might expect that a declining average river flow would be better.  In MARSS form, that model would be:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = 1 \times x_{t-1}+ u + w_t    \text{ where } w_t \sim \N(0,0) \\
+y_t = 1 \times x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
+x_0 = a 
+\end{gathered}   
+\label{eq:marss.model.1}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+where $u$ is now the average per-year decline in river flow volume.  The model is specified as a list as follows and we denote this model ``1":
+<<Cs04_mod.nile.1, eval=TRUE>>=
+mod.nile.1 = list(
+Z=matrix(1), A=matrix(0), R=matrix("r"),
+B=matrix(1), U=matrix("u"), Q=matrix(0),
+x0=matrix("a") )
+@
+
+We then fit the model with \verb@MARSS()@:
+<<Cs05_fit.data.1, eval=TRUE>>=
+kem.1 = MARSS(dat, model=mod.nile.1)
+@
+Figure \ref{fig:CS6.fits} shows the fits for the two models with deterministic models (flat and declining) for mean river flow along with their AICc values (smaller AICc is better).    The AICc for the model with a declining river flow is lower by over 20 (which is a lot).
+
+\subsection{Stochastic level model}
+Looking at the flow levels, we might suspect that a model that allows the average flow to change would model the data better and we might suspect that there have been sudden, and anomalous, changes in the river flow level.
+We will now model the average river flow at year $t$ as a random walk, specifically an autoregressive process which means that average river flow is year $t$ is a function of average river flow in year $t-1$.  
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = x_{t-1}+w_t \text{ where } w_t \sim \N(0,q) \\
+y_t = x_t+v_t \text{ where } v_t \sim \N(0,r)  \\
+x_0 = \pi 
+\end{gathered}   
+\label{eq:random.walk.w.noise}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+As before, $y_t$ is the river flow volume at year $t$.  With all the MARSS parameters shown, the model is:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+x_t = 1 \times x_{t-1}+ 0 + w_t    \text{ where } w_t \sim \N(0,q) \\
+y_t = 1 \times x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
+x_0 = \pi 
+ \end{gathered}   
+ \label{eq:marss.model.2}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+Thus, $\ZZ=1$, $\aa=0$, $\RR=r$, $\BB=1$, $\uu=0$, $\QQ=q$, and $\xx_0=\pi$.  The model is then specified as:
+<<Cs06_mod.nile.2, eval=TRUE>>=
+mod.nile.2 = list(
+Z=matrix(1), A=matrix(0), R=matrix("r"),
+B=matrix(1), U=matrix(0), Q=matrix("q"),
+x0=matrix("pi") )
+@
+We could also use the text shortcuts to specify the model.  Because $\RR$ and $\QQ$ are $1 \times 1$ matrices, ``unconstrained'', ``diagonal and unequal``, ``diagonal and equal'' and ``equalvarcov'' will all lead to a $1 \times 1$ matrix with one estimated element.  For $\aa$ and $\uu$, the following shortcut could be used:
+<<mod.nile.not.used, eval=FALSE>>=
+A=U="zero"
+@
+Because $\xx_0$ is $1 \times 1$, it could be specified as ``unequal'', ``equal'' or ``unconstrained''.
+
+We fit the model with the \verb@MARSS()@ function.  We are using the ``BFGS" algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
+<<Cs07_fit.data.2, eval=TRUE>>=
+kem.2em = MARSS(dat, model=mod.nile.2, silent=TRUE)
+kem.2 = MARSS(dat, model=mod.nile.2,
+  inits=kem.2em$par, method="BFGS")
+@
+This is the same model fit in \citet[p. 148]{Koopmanetal1998} except that we estimate $x_1$ as parameter rather than specifying $x_1$ via a diffuse prior\index{prior!diffuse}. As a result, the log-likelihood value and $\RR$ and $\QQ$ are a little different than in  \citet{Koopmanetal1998}. 
+
+\begin{comment}
+
+To fit the model as Koopman et al. did, use the following specifications:  
+<<fit.data.koop, eval=TRUE>>=
+mod.nile.3 = list(
+Z=matrix(1), A=matrix(0), R=matrix("r"),
+B=matrix(1), U=matrix(0), Q=matrix("q"),
+x0=matrix("pi"), tinitx=1, diffuse=TRUE
+)
+#kem.3.koop=MARSS(dat, model=mod.nile.3, 
+#  inits=kem.2em$par, method="BFGS")
+@
+The \verb@model$diffuse=TRUE@\index{prior!diffuse} specification means to use a true diffuse prior (variance is infinite).
+
+\end{comment}
+
+\begin{figure}[htp]
+\begin{center}
+<<Cs08_plotfit, eval=TRUE, echo=FALSE, fig=TRUE, width=5, height=6>>=
+library(Hmisc)
+par(mfrow=c(3,1), mar=c(4,4,0.5,0.5), oma=c(1,1,1,1))
+x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
+#model 0
+plot(Nile,ylab="Flow volume",xlab="",xaxp=c(1870,1970,10),bty="L")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+kem=kem.0 #model 0 results
+lines(x,kem$states[1,],col="red",lwd=2)
+legend("topright", paste("model 0, AICc=",format(kem.0$AICc,digits=1)), bty="n")
+
+#model 1
+plot(Nile,ylab="Flow volume",xlab="",xaxp=c(1870,1970,10),bty="n")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+kem=kem.1 #model 1 results
+lines(x,kem$states[1,],col="red",lwd=2)
+legend("topright", paste("model 1, AICc=",format(kem.1$AICc,digits=1)),bty="n")
+
+#model 2
+plot(Nile,ylab="Flow volume",xlab="",xaxp=c(1870,1970,10),bty="L")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+kem=kem.2 #model 0 results
+lines(x,kem$states[1,],col="red",lwd=2)
+lines(1871:1970,kem$states[1,]-2*kem$states.se[1,],col="red",lty=2)
+lines(1871:1970,kem$states[1,]+2*kem$states.se[1,],col="red",lty=2)
+legend("topright", paste("model 2, AICc=",format(kem$AICc,digits=1)),bty="n")
+@
+\end{center}
+\caption{The Nile River flow volume with the model estimated flow rates (solid lines).  The bottom model is a stochastic level model, and the 2 standard deviations for the level are also shown.  The other two models are deterministic level models so the state is not stochastic and does not have a standard deviation.}
+\label{fig:CS6.fits}
+\end{figure}
+
+\section{Observation and state residuals}
+Figure \ref{fig:CS6.fits} shows the MARSS fits to the data.  From these model fits, auxiliary residuals can be computed which contain information about whether the data and models fits at time $t$ differ more than you would expect given the model and the model fits at time $t-1$.  In this section, we follow the example shown on page 147-148 in \citet{Koopmanetal1998} and use these residuals to look for outliers and sudden flow level changes.  Using auxiliary residuals this way follows mainly from \citet{HarveyKoopman1992}, but see also \citet[sec. 3]{Koopman1993},  \citet{deJongPenzer1998} and \citet{Penzer2001} for discussions of using auxiliary residuals for detection of outliers and structural breaks. 
+
+The MARSS function will output the expected values of $x_t$ conditioned on the maximum-likelihood values of $q$, $r$, and $x_1$ and on the data ($y$ from $t=1$ to $T$).   In time-series literature, these are called the smoothed state estimates and they are output by the Kalman filter-smoother.  We will call these smoothed estimates $\tilde{x}_{t|T}$ (and are \verb@xtT@ in the MARSS output). The time value after the $|$ in the subscript indicates the data on which the estimate was conditioned (in this case, 1 to $T$). From these, we can compute the model predicted value of $y_t$, denoted or $\hat{y}_{t|T}$.  This is the predicted value of $y_t$ conditioned on $\tilde{x}_{t|T}$. 
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+\tilde{x}_{t|T} &= \E(X_t|\hat{\theta},y_1^T)\\
+\hat{y}_{t|T} &= \E(Y_t|\hat{\theta},\tilde{x}_{t|T} ) \\
+&= \tilde{x}_{t|T} + \E(w_t|\hat{\theta},y_1^T) = \tilde{x}_{t|T}
+\end{split}   
+\label{eq:hatxy}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \eqref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
+
+\subsection{Using observation residuals to detect outliers}
+The standardized smoothed observation residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data standardized by the observation variance:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+\hat{v}_t &= y_t - \hat{y}_{t|T}  \\
+e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
+\end{split}
+ \label{eq:smoothations}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@residuals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   It returns the standardized residuals (also called auxiliary residuals) as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). 
+
+<<Cs09_compute.resids, eval=TRUE, echo=TRUE>>=
+resids.0=residuals(kem.0)$std.residuals
+resids.1=residuals(kem.1)$std.residuals
+resids.2=residuals(kem.2)$std.residuals
+@
+
+Figure \ref{fig:CS6.outliers} shows the observation residuals for the three models developed above.  We immediately see that model 0 (flat level) and model 1 (linear declining level) have problems because the residuals are all positive for the first part of the time series and then all negative.  The residuals should not be temporally correlated like that.  Model 2 with a stochastic level shows well-behaving residuals with low temporal correlation between $t$ and $t-1$.  Looking at the residuals for model 2, we see that there are a number of years with flow levels that appear to be outliers (are beyond the dashed level lines).
+
+\begin{figure}[htp]
+\begin{center}
+<<Cs10_plotoutliertests, eval=TRUE, echo=FALSE, fig=TRUE>>=
+require(Hmisc)
+par(mfrow=c(3,1),mar=c(3,4,1.5,2))
+x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
+plot(x,resids.0[1,],ylab="std. residuals",xlab="",type="l",
+   ylim=c(-4,4),xaxp=c(1870,1970,10),bty="L")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97,0),lty=2)
+title("model 0--flat level")
+
+plot(x,resids.1[1,],ylab="std. residuals",xlab="",type="l",
+   ylim=c(-4,4),xaxp=c(1870,1970,10),bty="L")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97,0),lty=2)
+title("model 1--linearly declining level")
+
+plot(x,resids.2[1,],ylab="std. residuals",xlab="",type="l",
+   ylim=c(-4,4),xaxp=c(1870,1970,10),bty="L")
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97,0),lty=2)
+title("model 2--stochastic level")
+@
+\end{center}
+\caption{The standardized observation residuals from models 0, 1, and 2.  These residuals are the standardized $\hat{v}_t$.  The dashed lines are the 95\% CIs for a $t$-distribution.}
+\label{fig:CS6.outliers}
+\end{figure}
+
+\subsection{Detecting sudden level changes}
+The standardized smoothed state residuals ($f_t$ below) are the difference between the estimated state at time $t$ and the estimated state at time $t-1$ conditioned on all the data standardized by the standard deviation:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+\hat{w}_t &= \tilde{x}_{t|T} - \tilde{x}_{t-1|T}   \\
+f_t &= \frac{1}{\sqrt{\var(\hat{w}_t)}}\hat{w}_t
+\end{split}
+ \label{eq:stateresids}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+These state residuals do not show simple changes in the average level; $x_t$ is clearly changing in Figure \ref{fig:CS6.fits}, bottom panel.  Instead we are looking for ``breaks" or sudden changes in the level.  The bottom panel of Figure \ref{fig:CS6.levelchanges} shows the standardized state residuals ($f_t$).  This shows, as we can see by eye, the average flow level in the Nile appears to have suddenly changed around the turn of the century when the first Aswan dam was built.  The top panel shows the standardized observation residuals for comparison.  
+
+\begin{figure}[htp]
+\begin{center}
+<<Cs11_plotresids, eval=TRUE, echo=FALSE, fig=TRUE>>=
+par(mfrow=c(2,1),mar=c(4,3,2,1))
+x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
+plot(x,resids.2[1,],ylab="",xlab="",type="l",ylim=c(-4,4),xaxp=c(1870,1970,10))
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97),lty=2)
+title("test for outliers")
+
+plot(x,resids.2[2,],ylab="",xlab="",type="l",ylim=c(-4,4),xaxp=c(1870,1970,10))
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97),lty=2)
+title("test for level changes")
+mtext("standardized residuals", side=2, outer=TRUE, line=-1) 
+@
+\end{center}
+\caption{Top panel, the standardized observation residuals.  Bottom panel, the standardized state residuals.  This replicates Figure 12 in Koopman et al. (1999).}
+\label{fig:CS6.levelchanges}
+\end{figure}
+
+
+\begin{comment}
+\subsection{Detecting changes in the drift parameter in a random walk model}
+For the Nile River data, a random walk with drift model does not make much sense (nor is such a model supported via AICc).  In other studies, for example when looking for long-term trends or movement studies, the drift parameter of a random walk is the main object of interest.  In this case, the default model would be a random walk with drift: 
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+y_t = x_t+v_t \text{ where } v_t \sim \N(0,r)  \\
+x_t = x_{t-1}+u+w_t \text{ where } w_t \sim \N(0,q) \\
+x_1 = \pi 
+\end{gathered}   
+\label{eq:random.walk.w.drift}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+The $u$ parameter is the drift term and gives the long-term average rate of change.   One of the questions of interest is often whether the $u$ parameter has changed over time or whether it has experienced sudden breaks.
+
+To fit this model with MARSS, we will explicitly show all the MARSS parameters:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+y_t &= 1 \times \x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
+x_t &= 1 \times x_{t-1}+ u + w_t    \text{ where } w_t \sim \N(0,q) \\
+x_1 = \pi 
+ \end{split}   
+ \label{eq:marss.model.2}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+Thus, $\ZZ=1$, $\aa=0$, $\RR=r$, $\BB=1$, $\uu=0$, $\QQ=q$, and $\xx_0=\pi$.  For MARSS, all parameters must be written as matrices.  The model is specified as a list as follows:
+<<mod.nile.u, eval=FALSE>>=
+mod.nile.u = list(
+Z=matrix(1), A=matrix(0), R=matrix("r"),
+B=matrix(1), U=matrix("u"), Q=matrix("q"),
+x0=matrix("pi")
+)
+@
+
+
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+y_t &= x_t + v_t \text{where } v_t &\sim \N(0,r)  \\
+x_t &= x_{t-1} + \beta_{t-1} + w_t \text{ where } w_t &\sim \N(0,q) \\
+\beta_t &= \beta_{t-1} +  z_t \text{ where } z_t &\sim \N(0,p) \\
+x_1 = \pi_x \text{ and }  \beta_1 = \pi_\beta
+ \end{split}   
+ \label{eq:stochastic.slope}\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Write the model in MARSS form:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+y_t &= \begin{bmatrix}1&0\end{bmatrix}\begin{bmatrix}x_t\\\beta_t\end{bmatrix} + w_t \\
+\\
+\begin{bmatrix}x_t\\ \beta_t\end{bmatrix}
+&= \begin{bmatrix}1&1\\0&1\end{bmatrix}
+\begin{bmatrix}x_{t-1}\\ \beta_{t-1}\end{bmatrix} 
++ \begin{bmatrix}v_t\\ z_t\end{bmatrix}
+ \end{split}   
+ \label{eq:marss.stochastic.slope}
+ \end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+Define a matrix $\xx$ and $\ww$ 
+\begin{equation*}
+\begin{split}
+\xx_t = \begin{bmatrix}x_t\\ \beta_t \end{bmatrix} \\
+\ww_t = \begin{bmatrix}v_t\\ z_t \end{bmatrix} \\
+\ww_t \sim \MVN\bigg(0, \begin{bmatrix}q&0\\0&p \end{bmatrix}\bigg) 
+\end{split}
+\end{equation*}
+
+The model is then:
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{split}
+y_t &= \ZZ\xx + \aa + v_t \\
+\xx_t&=\BB\xx_{t-1}+\uu+ \ww_t\\
+\ZZ= \begin{bmatrix}1&0\end{bmatrix}\\
+\aa= \begin{bmatrix}0\end{bmatrix}\\
+\RR= \begin{bmatrix}r\end{bmatrix}\\
+\BB= \begin{bmatrix}1&1\\0&1\end{bmatrix}\\
+\uu= \begin{bmatrix}0\\0\end{bmatrix}\\
+\QQ= \begin{bmatrix}q&0\\0&p \end{bmatrix}\\
+\xx_0= \begin{bmatrix}\pi_1\\ \pi_2 \end{bmatrix}\\
+ \end{split}   
+ \label{eq:marss.stochastic.slope2}
+ \end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+We then write this in \R for the MARSS() function:
+<<mod.nile3, eval=FALSE>>=
+mod.nile.3 = list(
+Z=matrix(c(1,0),1,2), A=matrix(0), R=matrix("r"),
+B=matrix(c(1,0,1,1),2,2), U=matrix(0,2,1), 
+Q=matrix(list("q",0,0,"p"),2,2),
+x0=matrix(c("pi1","pi2"),2,1)
+)
+@
+We could also use the following text shortcuts to specify the model.  
+<<mod.nile.not.used.2, eval=FALSE>>=
+Q="diagonal and unequal"
+x0="unequal"
+@
+
+This model takes a long time to fit with the EM algorithm.  We could run the EM algorithm a long time, but there is a quicker trick in this case.  We will run the EM algorithm for a few iterations and stop before convergence.  Then we will use the fit from the EM algorithm as the initial condition for the faster BFGS algorithm for the final approach to the maximum-likelihood:
+<<fit.mod3, eval=FALSE, echo=TRUE>>=
+model=mod.nile.3
+kem.3=MARSS(dat,model=model,inits=list(x0=matrix(c(1000,-4),2,1)),control=list(maxit=20))
+kem.3=MARSS(dat,model=model,inits=kem.3$par,method="BFGS")
+@
+
+Now we will compute the model residuals as before:
+<<compute.var.hat.vt2, eval=FALSE, echo=TRUE>>=
+resids = MARSSresids(kem.3)$std.et
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<plotslopetests, eval=FALSE, echo=TRUE, fig=TRUE>>=
+require(Hmisc)
+par(mfrow=c(2,1),mar=c(4,3,2,1))
+x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
+plot(x,resids[2,],ylab="",xlab="",type="l",ylim=c(-4,4),xaxp=c(1870,1970,10))
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97),lty=2)
+title("test for level changes")
+
+plot(x,resids[3,],ylab="",xlab="",type="l",ylim=c(-4,4),xaxp=c(1870,1970,10))
+minor.tick(nx=10,ny=0,tick.ratio=.3)
+abline(h=c(1.97,-1.97),lty=2)
+title("test for slope changes")
+mtext("standardized residuals", side=2, outer=TRUE, line=-1) 
+@
+\end{center}
+\caption{The standardized residuals for null model against one with level changes and slope changes.}
+\label{fig:CS6.fig3}
+\end{figure}
+
+\end{comment}
+
+<<Reset, echo=FALSE>>=
+options(prompt="> ", continue="+ ")
+options(width=120)
+@

@@ -1,0 +1,17 @@
+In this part, we walk you through some longer analyses using MARSS models for a variety of different applications.  Most of these are analyses of ecological data, but the same models are used in many other fields.  These longer examples will take you through both the conceptual steps (with pencil and paper) and a \R step which translates the conceptual model into code. 
+
+\section*{Set-up}
+\begin{itemize}
+\item If you haven't already, install the MARSS package.  See directions on the CRAN webpage (http://cran.r-project.org/) for instructions on installing packages.  You will need write permissions for your \R program directories to install packages.  See the help pages on CRAN for workarounds if you don't have write permission.
+\item Type in \texttt{library(MARSS)} at the \R command line to load the package after you install it.
+\end{itemize}
+
+\section*{Tips}
+\begin{itemize}
+\item \verb@summary(foo$model)@, where \verb@foo@ is a fitted model object, will print detailed information on the structure of the MARSS model that was fit in the call \verb@foo = MARSS(logdata)@. This allows you to double check the model you fit.  \verb@print(foo)@ will print a `English' version of the model structure along with the parameter estimates.
+\item When you run \verb@MARSS()@, it will output the number of iterations used.  If you reached the maximum, re-run with \texttt{control=list(maxit=...)} set higher than the default. 
+\item If you mis-specify the model, \texttt{MARSS()} will post an error that should give you an idea of the problem (make sure \verb@silent=FALSE@ to see full error reports).  Remember, the number of rows in your data is $n$, time is across the columns, and the length of the vector or factors passed in for \verb@model$Z@ must be $m$, the number of $x$ hidden state trajectories in your model.
+\item The missing value indicator is NA.
+\item Running \texttt{MARSS(data)}, with no arguments except your data, will fit a MARSS model with $m=n$, a diagonal $\QQ$ matrix with $m$ variances, and i.i.d. observation errors.
+\item Try \texttt{MARSSinfo()} at the command line if you get errors or warnings you don't understand.  You might find insight there.  Or look at the warnings and errors notes in the appendix of this user guide.
+\end{itemize}

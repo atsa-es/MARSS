@@ -1,0 +1,370 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/ARMAp-, eps=FALSE, split=TRUE}
+<<RUNFIRST, echo=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ", width=60)
+@
+\chapter{Lag-p models with MARSS}
+\label{chap:ARMA}
+\chaptermark{Models with lag-p}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_MARp.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
+\section{Background}
+Most of the chapters in the User Guide are `lag-1' in the autoregressive part of the model.  This means that $\xx_t$ in the process model only depends on $\xx_{t-1}$ and not $\xx_{t-2}$ (lag-2) or more generally $\xx_{t-p}$ (lag-p).  A lag-p model can be written in state-space form as a MARSS lag-1 model, aka a MARSS(1) model (see section 11.3.2 in \citet{Tsay2010}).  Writing lag-p models in this form allows one to take advantage of the fitting algorithms for MARSS(1) models. There are a number of ways to do the conversion to a MARSS(1) form.  We use Hamilton's form (section 1 in \citet{Hamilton1994}) because it can be fit with an EM algorithm while the other forms (Harvey's and Akaike's) cannot.
+
+This chapter shows how to convert and fit the following using the MARSS(1) form:
+\begin{description}
+\item[AR(p)] A univariate autoregressive model where $x_t$ is a function of $x_{t-p}$ (and the prior lags usually too).  No observation error.
+\item[MAR(p)] The same as AR(p) but the $\xx$ term is multivariate not univariate.
+\item[ARSS(p)] The same as AR(p) but with a observation model and observation error.  The observations may be multivariate ($\yy$ can be multivariate) but the $\xx$ term is univariate.
+\item[MARSS(p)] The same as ARSS(p) but the $\xx$ term is multivariate not univariate.
+\end{description}
+Note that only ARSS(p) and MARSS(p) assume observation error in the data.  AR(p) and MAR(p) will be rewritten in the state-space form with a $\yy$ component to facilitate statistical analysis but the data themselves are considered error free.  
+
+Note there are many \R packages for fitting AR(p) (and ARMA(p,q) for that matter) models.  If you are only interested in univariate data with no observation error in the data then you probably want to look into the \verb@arima()@ function included in base \R and into \R packages that specialize in fitting ARMA models to univariate data.  The forecast package in \R is a good place to start but others can be found on the \href{http://cran.r-project.org/web/views/TimeSeries.html}{CRAN task view: Time Series Analysis}.  
+
+\section{MAR(2) models}
+\index{MAR(p)}
+A MAR(2) model is a lag-2 MAR model, aka a multivariate autoregressive process with no observation process (no SS part).  A MAR(2) model is written
+\begin{equation}
+\xx^\prime_t = \BB_1\xx^\prime_{t-1} + \BB_2\xx^\prime_{t-2} + \uu + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ)
+\end{equation}
+
+We rewrite this as MARSS(1) by defining $\xx_t = \begin{bmatrix}\xx^\prime_t \\ \xx^\prime_{t-1}\end{bmatrix}$:
+\begin{equation}\label{eq:mar2.x}
+\begin{gathered}
+\begin{bmatrix}\xx^\prime_t \\ \xx^\prime_{t-1}\end{bmatrix}
+= \begin{bmatrix}\BB_1 & \BB_2 \\ \II_m & 0\end{bmatrix}
+\begin{bmatrix}\xx^\prime_{t-1} \\ \xx^\prime_{t-2}\end{bmatrix}
++ \begin{bmatrix}\uu \\ 0 \end{bmatrix}
++ \begin{bmatrix}w_t\\ 0\end{bmatrix},
+ \text{ } 
+\begin{bmatrix}w_t\\ 0\end{bmatrix} \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\QQ & 0 \\ 0 & 0 \end{bmatrix} \end{pmatrix} \\
+ \begin{bmatrix}\xx^\prime_0 \\ \xx^\prime_{-1}\end{bmatrix} 
+ \sim  \MVN(\pipi,\LAM)  
+\end{gathered}
+\end{equation}
+Our observations are of $\xx_t$ only, so our observation model is
+\begin{equation}\label{eq:mar2.y}
+\yy_t 
+= \begin{bmatrix}\II & 0 \end{bmatrix}
+\begin{bmatrix}\xx^\prime_t \\ \xx^\prime_{t-1}\end{bmatrix}
+\end{equation}
+
+\subsection{Example of AR(2): univariate data}
+Here is an example of fitting a univariate AR(2) model written in MARSS(1) form.  First, let's generate some simulated AR(2) data from this AR(2) process:
+\begin{equation}
+x_t = -1.5 x_{t-1} + -0.75 x_{t-2} + w_t, \text{ where } w_t \sim \N(0,1)
+\end{equation}
+<<set.seed,echo=FALSE>>=
+set.seed(10)
+@
+<<Cs_01_ar2.sim>>=
+TT=50
+true.2=c(r=0,b1=-1.5,b2=-0.75,q=1)
+temp=arima.sim(n=TT,list(ar=true.2[2:3]),sd=sqrt(true.2[4]))
+sim.ar2=matrix(temp,nrow=1)
+@
+
+Next, we set up the model list for an AR(2) model written in MARSS(1) form (refer to Equation \ref{eq:mar2.x} and \ref{eq:mar2.y}):
+<<Cs_02_ar2.model>>=
+Z=matrix(c(1,0),1,2)
+B=matrix(list("b1",1,"b2",0),2,2)
+U=matrix(0,2,1)
+Q=matrix(list("q",0,0,0),2,2)
+A=matrix(0,1,1)
+R=matrix(0,1,1)
+pi=matrix(sim.ar2[2:1],2,1)
+V=matrix(0,2,2)
+model.list.2=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+@
+Notice that we do not need to estimate $\pipi$. We will fit our model to the data ($y$) starting at $t=2$.  Because $\RR=0$ (see Equation 
+ref{eq:mar2.y}, this means $\xx_1=\begin{bmatrix}y_2\\ y_1\end{bmatrix}$.  If we define $\pipi\equiv\xx_1$ by setting \verb@tinitx=1@, then $\pipi$ is known and is simply the first two data points.
+
+Then we can then estimate the $b_1$ and $b_2$ parameters for the AR(2) process.
+<<Cs_03_ar2.fit>>=
+ar2=MARSS(sim.ar2[2:TT],model=model.list.2)
+@
+Comparison to the true values shows the estimates are close:
+<<Cs_03a_ar2.fit>>=
+print(cbind(true=true.2[2:4],estimates=coef(ar2,type="vector")))
+@
+Missing values in the data are fine.  Let's make half the data missing being careful that the first data point does not get categorized as missing:
+<<Cs_04_ar2.gappy, results=hide>>=
+gappy.data=sim.ar2[2:TT]
+gappy.data[floor(runif(TT/2,2,TT))]=NA
+ar2.gappy=MARSS(gappy.data,model=model.list.2)
+@
+And the estimates are still close:
+<<Cs_04a_ar2.gappy>>=
+print(cbind(true=true.2[2:4],
+   estimates.no.miss=coef(ar2,type="vector"),
+   estimates.w.miss=coef(ar2.gappy,type="vector")))
+@
+
+By the way, there are much easier and faster functions in \R for fitting univariate AR models (no observation error).  For example, here is how you would fit the AR(2) model using the base \verb@arima()@ function:
+<<Cs_05_arima>>=
+arima(gappy.data,order=c(2,0,0),include.mean=FALSE)
+@
+The advantage of using the MARSS package really only comes in when you are fitting to multivariate data or data with observation error.
+
+\subsection{Example of MAR(2): multivariate data}
+Here we show an example of fitting a MAR(2) model.  Let's make some simulated data of two realizations of the same AR(2) process:
+<<set.seed,echo=FALSE>>=
+set.seed(11)
+@
+<<Cs_060_mar2-sim>>=
+TT=50
+true.2=c(r=0,b1=-1.5,b2=-0.75,q=1)
+temp1=arima.sim(n=TT,list(ar=true.2[c("b1","b2")]),sd=sqrt(true.2["q"]))
+@
+<<set.seed,echo=FALSE>>=
+set.seed(12)
+@
+<<Cs_061_mar2-sim>>=
+temp2=arima.sim(n=TT,list(ar=true.2[c("b1","b2")]),sd=sqrt(true.2["q"]))
+sim.mar2=rbind(temp1,temp2)
+@
+
+Although these are independent time series, we want to fit with a MAR(2) model to allow us to use both datasets together to estimate the AR(2) parameters.  We need to set up the model list for the multivariate model (Equation \ref{eq:mar2.x} and \ref{eq:mar2.y}):
+<<Cs_07_mar2-model>>=
+Z=matrix(c(1,0,0,1,0,0,0,0),2,4)
+B1=matrix(list(0),2,2); diag(B1)="b1"
+B2=matrix(list(0),2,2); diag(B2)="b2"
+B=matrix(list(0),4,4)
+B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+U=matrix(0,4,1)
+Q=matrix(list(0),4,4)
+Q[1,1]="q"; Q[2,2]="q"
+A=matrix(0,2,1)
+R=matrix(0,2,2)
+pi=matrix(c(sim.mar2[,2],sim.mar2[,1]),4,1)
+V=matrix(0,4,4)
+model.list.2m=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+@
+Notice the form of the $\ZZ$ matrix:
+<<Z,echo=FALSE>>=
+Z
+@
+It is a $2 \times 2$ identity matrix followed by a $2 \times 2$ all-zero matrix.  The $\BB$ matrix is composed of $\BB_1$ and $\BB_2$ which are diagonal matrices with $b_1$ and $b_2$ respectively on the diagonal.
+<<B,echo=FALSE>>=
+B
+@
+
+We fit the model as usual:
+<<Cs_08_mar2-fit, results=hide>>=
+mar2=MARSS(sim.mar2[,2:TT],model=model.list.2m)
+@
+Then we can compare how using two time series improves the fit versus using only one alone:
+<<Cs_09_mar2-compare, results=hide>>=
+model.list.2$x0=matrix(sim.mar2[1,2:1],2,1)
+mar2a=MARSS(sim.mar2[1,2:TT],model=model.list.2)
+model.list.2$x0=matrix(sim.mar2[2,2:1],2,1)
+mar2b=MARSS(sim.mar2[2,2:TT],model=model.list.2)
+@
+<<Cs_10_compare-mars, echo=FALSE>>=
+print(cbind(true=true.2[2:4],est.mar2=coef(mar2,type="vector"),est.mar2a=coef(mar2a,type="vector"),est.mar2b=coef(mar2b,type="vector")))
+@
+
+\section{MAR(p) models}
+A MAR(p) model is similar to a MAR(2) except it has lags up to time $p$:
+\begin{equation*}
+\xx^\prime_t = \BB_1\xx^\prime_{t-1} + \BB_2\xx^\prime_{t-2} + \dots + \BB_p\xx^\prime_{t-p} + \uu^\prime + \ww^\prime_t, \text{ where } \ww^\prime_t \sim \MVN(0,\QQ^\prime)
+\end{equation*}
+where
+\begin{equation}
+\begin{gathered}
+\xx_t = \begin{bmatrix}\xx^\prime_t \\ \xx^\prime_{t-1} \\ \vdots \\ \xx^\prime_{t-p} \end{bmatrix},
+\BB=\begin{bmatrix}\BB_1 & \BB_2 & \dots & \BB_p \\
+\II_m & 0 & \dots & 0 \\
+0  & \II_m & \dots & 0 \\
+0  & 0 & \ddots & \vdots \\
+0  & 0 & \dots & 0
+ \end{bmatrix},
+\uu = \begin{bmatrix}\uu^\prime \\ 0 \\ \vdots \\ 0 \end{bmatrix},
+\QQ= \begin{bmatrix}
+\QQ^\prime & 0 & \dots & 0 \\
+ 0 & 0 & \dots & 0 \\
+ 0  & 0 & \ddots & \vdots \\
+0  & 0 & \dots & 0
+\end{bmatrix}  
+\end{gathered}
+\label{eqn:marssp}
+\end{equation}
+
+Here's an example of fitting a univariate AR(3) in MARSS(1) form.  We need more data to estimate an AR(3), so use 100 time steps.
+<<set.seed,echo=FALSE>>=
+set.seed(13)
+@
+<<Cs_11_sim-ar3-data>>=
+TT=100
+true.3=c(r=0,b1=-1.5,b2=-0.75,b3=.05,q=1)
+temp3=arima.sim(n=TT,list(ar=true.3[c("b1","b2","b3")]),sd=sqrt(true.3["q"]))
+sim.ar3=matrix(temp3,nrow=1)
+@
+We set up the model list for the AR(3) in MARSS(1) form as follows:
+<<Cs_12_set-up-ar3-model>>=
+Z=matrix(c(1,0,0),1,3)
+B=matrix(list("b1",1,0,"b2",0,1,"b3",0,0),3,3)
+U=matrix(0,3,1)
+Q=matrix(list(0),3,3); Q[1,1]="q"
+A=matrix(0,1,1)
+R=matrix(0,1,1)
+pi=matrix(sim.ar3[3:1],3,1)
+V=matrix(0,3,3)
+model.list.3=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+@
+and fit as normal:
+<<Cs_130_fit-ar3, results=hide>>=
+ar3=MARSS(sim.ar3[3:TT],model=model.list.3)
+@
+The estimates are:
+<<Cs_131_fit-ar3>>=
+print(cbind(true=true.3[c("b1","b2","b3","q")],
+   estimates.no.miss=coef(ar3,type="vector")))
+@
+
+\section{MARSS(p): models with observation error}
+We can easily fit MAR(p) processes observed with error using MARSS(p) models, but the difficulty is specifying the initial state condition.  $\pipi\equiv\xx_1$ and thus involves $\xx_1$, $\xx_0$, ....  However, we do not know the variance covariance structure for these consequtive $\xx$.  Specifying $\LAM=0$ and estimating $\pipi$ often causes the EM algorithm to run into numerical problems.  But if we have an abundance of data, fixing $\pipi$ might not overly affect the $\BB$ and $\QQ$ estimates.  
+
+Here is an example where we set $\pipi$ to the mean of the data and set $\LAM$ to zero. Why not set $\LAM$ equal to a diagonal matrix with large values on the diagonal to approximate a vague prior?  The temporally consecutive initial states are definitely not independent.  A diagonal matrix would imply independence which will conflict with the process model and means our model would be fundamentally inconsistent with the data (and that usually has bad consequences for estimation).
+<<set.seed,echo=FALSE>>=
+set.seed(14)
+@
+
+Create some simulated data:
+<<Cs_140_fig-arss-model, keep.source=TRUE>>=
+TT=1000 #set long
+true.2ss=c(r=.5,b1=-1.5,b2=-0.75,q=.1)
+temp=arima.sim(n=TT,list(ar=true.2ss[c("b1","b2")]),sd=sqrt(true.2ss["q"]))
+sim.ar=matrix(temp,nrow=1)
+noise=rnorm(TT-1,0,sqrt(true.2ss["r"]))
+noisy.data=sim.ar[2:TT]+noise
+@
+Set up the model list for the model in MARSS(1) form:
+<<Cs_141_fig-arss-model>>=
+Z=matrix(c(1,0),1,2)
+B=matrix(list("b1",1,"b2",0),2,2)
+U=matrix(0,2,1)
+Q=matrix(list("q",0,0,0),2,2)
+A=matrix(0,1,1)
+R=matrix("r")
+V=matrix(0,2,2)
+pi=matrix(mean(noisy.data),2,1)
+model.list.2ss=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=0)
+@
+Fit as usual:
+<<Cs_142_fig-arss-model>>=
+ar2ss=MARSS(noisy.data,model=model.list.2ss)
+@
+
+We can compare the results to modeling the data as if there is no observation error, and we see that that assumption leads to poor $\BB$ estimates:
+<<Cs_150_fit-arss2-model, keep.source=TRUE>>=
+model.list.2ss.bad=model.list.2ss
+#set R to zero in this model
+model.list.2ss.bad$R=matrix(0)
+@
+Fit using the model with $\RR$ set to 0:
+<<Cs_151_fit-arss2-model, keep.source=TRUE, results=hide>>=
+ar2ss2=MARSS(noisy.data,model=model.list.2ss.bad)
+@
+Compare results
+<<Cs_153_fit-arss2-model, keep.source=TRUE>>=
+print(cbind(true=true.2ss,
+  model.no.error=c(NA,coef(ar2ss2,type="vector")),
+  model.w.error=coef(ar2ss,type="vector")))
+@ 
+The middle column are the estimates assuming that the data have no observation error and the right column are our estimates with the observation error estimated.  Clearly, assuming no observation error when it is present has negative consequences for the $\BB$ and $\QQ$ estimates.
+
+By the way, there is a straight-forward way to deal with the measurement error if you are working with univariate ARMA models and you are only interested in the AR parameters (the $b$'s).   Inclusion of measurement error leads to additional MA components up to lag $p$ \citep{StaudenmayerBuonaccorsi2005}.  This means that if you are fitting a AR(p) model with measurement error, you can fit a ARMA(p,p) and the measurement error will be absorbed in the $p$ MA components.  For the example above, we could estimate the AR parameters for our AR(2) data with measurement error by fitting a ARMA(p,p) model.  Here's how we could do that using \R's \verb@arima()@ function:
+<<Cs_16_fit-arss2-with-arima>>=
+arima(noisy.data,order=c(2,0,2),include.mean=FALSE)
+@
+Accounting for the measurement error definitely improves the estimates for the AR component.  
+
+<<loadmarssperf,echo=FALSE>>=
+nsim=200; TT=100
+file=paste("AR2SS",TT,".RData",sep="")
+if(file %in% dir()) {
+	load(file)
+	saved.res = TRUE
+} else { saved.res = FALSE }
+@
+
+<<Cs_17_code-to-compare-arss-estimation,echo=FALSE,keep.source=TRUE>>=
+# This is the code used to make the figure comparing different ways to estimate 
+# AR parameters from AR with noise data
+# saved.res is just a flag.  Set to FALSE to run the if statement
+if(!saved.res) {
+file=paste("AR2SS",TT,".RData",sep="")
+params=matrix(0,8,nsim)
+#sim 2   true.2ss=c(r=.5,b1=0.8,b2=-0.2,q=.1)
+#sim 1   
+true.2ss=c(r=.5,b1=-1.5,b2=-0.75,q=.1)
+
+Z=matrix(c(1,0),1,2)
+B=matrix(list("b1",1,"b2",0),2,2)
+U=matrix(0,2,1)
+Q=matrix(list("q",0,0,0),2,2)
+A=matrix(0,1,1)
+V=matrix(0,2,2)
+R=matrix("r")
+pi=matrix(0,2,1) #since demeaned
+model.list.2ss=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+
+for(i in 1:nsim){
+temp=arima.sim(n=TT,list(ar=true.2ss[2:3]),sd=sqrt(true.2ss[4]))
+sim.ar=matrix(temp,nrow=1)
+noise=rnorm(TT,0,sqrt(true.2ss[1]))
+noisy.data=sim.ar+noise
+noisy.data=as.vector(noisy.data-mean(noisy.data)) #demean
+test.it=try(arima(noisy.data[2:TT],order=c(2,0,2),include.mean=FALSE))
+while(class(test.it)=="try-error"){
+temp=arima.sim(n=TT,list(ar=true.2ss[2:3]),sd=sqrt(true.2ss[4]))
+sim.ar=matrix(temp,nrow=1)
+noise=rnorm(TT,0,sqrt(true.2ss[1]))
+noisy.data=sim.ar+noise
+noisy.data=as.vector(noisy.data-mean(noisy.data)) #demean
+test.it=try(arima(noisy.data[2:TT],order=c(2,0,2),include.mean=FALSE))
+}
+init.list=list(Q=matrix(.01,1,1),B=matrix(1,2,1))
+tmp.kem=MARSS(noisy.data[2:TT],model=model.list.2ss,inits=init.list,silent=TRUE)
+params[1:2,i]=coef(tmp.kem)$B
+tmp.bfgs=MARSS(noisy.data[2:TT],model=model.list.2ss,inits=init.list,silent=TRUE,method="BFGS")
+#if(any(is.na(tmp.bfgs$states.se)) | any(is.na(tmp.kem$states.se))) print(i)
+params[3:4,i]=coef(tmp.bfgs)$B
+params[5:6,i]=arima(noisy.data[2:TT],order=c(2,0,2),include.mean=FALSE)$coef[1:2]
+params[7:8,i]=arima(noisy.data[2:TT],order=c(2,0,0),include.mean=FALSE)$coef[1:2]
+cat(i);cat("\n")
+if((i %% 25)==0) save(true.2ss,TT,params,file=file)
+}
+}
+save(true.2ss,TT,params,file=file)
+@
+
+\begin{figure}[htp]
+\begin{center}
+<<CS_18_marssperffig,fig=TRUE,echo=FALSE, keep.source=TRUE>>=
+# This makes a plot of the comparisons
+par(ylbias=-.2,tcl=-.2,cex=.75)
+boxplot(t(params[c(7,1,3,5,8,2,4,6),]),names=c("AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)","AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)"),ylab="estimates of the ar coefficients",las=2)
+points(1:8,apply(params[c(7,1,3,5,8,2,4,6),],1,mean),pch="x",cex=1.25)
+par(cex=1.5)
+axis(side=3,at=c(2,6),labels=c(expression(b[1]),expression(b[2])),tick=FALSE,cex=2)
+lines(c(0,4.5),c(true.2ss[2],true.2ss[2]),lty=2)
+lines(c(4.5,9),c(true.2ss[3],true.2ss[3]),lty=2)
+abline(v=4.5)
+@
+\end{center}
+\caption{Comparison of the AR parameter estimates using different approaches to model ARSS(2) data (univariate AR(2) data observed with error).  Results are from \Sexpr{nsim} simulations of AR(2) data with \Sexpr{TT} time steps.  Results are shown for the $b_1$ and $b_2$ parameters of the AR process fit with a 1) AR(2) model with no correction for measurement error, 2) MARSS(1) model fit via the EM optimization, 3) MARSS(1) model fit via BFGS optimization, 4) ARMA(2,2) model fit with the R \texttt{arima} function, and 5) AR(2) model fit 2nd differencing with the R \texttt{arima} function.  The "x" shows the mean of the simulations and the bar in the boxplot is the median.  The true values are shown with the dashed horizontal line. The $\sigma^2$ for the AR process was \Sexpr{true.2ss[4]} and the $\sigma^2$ for the measurement error was \Sexpr{true.2ss[1]}.  The $b_1$ parameters was \Sexpr{true.2ss[2]},and $b_2$ was \Sexpr{true.2ss[3]}.}
+\label{fig:CS4.arperf}
+\end{figure}
+
+\section{Discussion}
+Although both MARSS(1) and ARMA(p,p) approaches can be used to deal with AR(p) processes (univariate data) observed with error, our simulations suggest that the MARSS(1) approach is less biased and more precise (Figure \ref{fig:CS4.arperf}) and that the EM algorithm is working better for this problem.  The performance of different approaches depends greatly on the underlying model.  We chose AR parameters where both ARMA(p,p) and MARSS(1) approaches work. If we used, for example, $b_1=0.8$ and $b_2=-0.2$, the ARMA(2,2) gives $b_1$ estimates close to 0 (i.e. wrong) while the MARSS(1) EM approach gives estimates close to the truth (though rather variable).  One would want to also check REML approaches for fitting the ARMA(p,p) models since REML has been found to be less biased than ML estimation for this class \citep{CheangReinsel2000, Ivesetal2010}. Ives et al. 2010 has R code for REML estimation of ARMA(p,q) models in their appendix.
+
+For multivariate data observed with error, especially multivariate data without a one-to-one relationship to the underlying autoregressive process, an explict MARSS model will need to be used rather than an ARMA(p,p) model.  The time steps required for good parameter estimates are likely to be large; in our simulations, we used 100 for a AR(3) and 1000 for a ARSS(2). Thorough simulation testing should be conducted to determine if the data available are sufficient to allow estimation of the $\BB$ terms at multiple lags.
+
+<<reset, echo=FALSE, include.source=FALSE>>=
+options(prompt="> ", continue=" +", width=120)
+@
