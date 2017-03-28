@@ -545,6 +545,7 @@ print(thetable, type = "latex", file = paste(tabledir,"tablefit.tex",sep=""), in
 \input{tables/tablefit}
 
 \section{Using varimax rotation to determine the loadings and trends}
+
 As \citet[p. 450]{Harvey1989} discusses in section 8.5.1, there are multiple equivalent solutions to the dynamic factor loadings.  We arbitrarily constrained $\ZZ$ in such a way to choose only one of these solutions, but fortunately the different solutions are equivalent, and they can be related to each other by a rotation matrix $\HH$.  Let $\HH$ be any $m \times m$ non-singular matrix.  The following are then equivalent solutions:
 \begin{equation}
 \begin{gathered}
@@ -565,7 +566,7 @@ As \citet[p. 450]{Harvey1989} discusses in section 8.5.1, there are multiple equ
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
  $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.
  
-The varimax rotation is easy to compute because \verb@R@ has a built in function for this. To do so, we first get the model fits from the highest ranked model.
+The varimax rotation is easy to compute because \verb@R@ has a built in function that returns $\HH^{-1}$. To do so, we first get the model fits from the highest ranked model.
  
 <<Cs20_getbestmodel, eval=TRUE>>=
 # get the "best" model
@@ -577,13 +578,15 @@ Next, we retrieve the matrix used for varimax rotation.
 
 <<Cs21_varimax, eval=TRUE>>=
 # get the inverse of the rotation matrix
-H.inv = varimax(coef(best.fit, type="matrix")$Z)$rotmat
+Z.est = coef(best.fit, type="matrix")$Z
+H.inv = 1
+if(ncol(Z.est)>1) H.inv = varimax(coef(best.fit, type="matrix")$Z)$rotmat
 @
-Finally, we use $\HH^{-1}$ to rotate the factor loadings and $\HH$ to rotate the trends as in Equation \ref{eq:dfa.rotated}.
+The rotation matrix that varimax returns $\HH^{-1}$ rather than $\HH$. If $\ZZ$ has one column, there is only one $\ZZ$; there is only a rotation matrix if $\ZZ$ has more than one column.  We use $\HH^{-1}$ to rotate the factor loadings and $\HH$ to rotate the trends as in Equation \ref{eq:dfa.rotated}.
 
 <<Cs22_rotations, eval=TRUE>>=
 # rotate factor loadings
-Z.rot = coef(best.fit, type="matrix")$Z %*% H.inv   
+Z.rot = Z.est %*% H.inv   
 # rotate trends
 trends.rot = solve(H.inv) %*% best.fit$states
 @
@@ -594,12 +597,14 @@ Recall that we set Var($\ww_t$) = $\QQ = \II_m$ in order to make our DFA model i
 
 \begin{figure}[htp]
 \begin{center}
-<<Cs23_plotfacloadings, eval=TRUE, echo=FALSE, fig=TRUE, height=5, width=6>>=
+<<Cs23_plotfacloadings, eval=TRUE, echo=TRUE, keep.source=TRUE, fig=TRUE, height=5, width=6>>=
+#plot the factor loadings
 spp = rownames(dat.z)
 minZ = 0.05
+m=dim(trends.rot)[1]
 ylims = c(-1.1*max(abs(Z.rot)), 1.1*max(abs(Z.rot)))
-par(mfrow=c(ceiling(dim(trends.rot)[1]/2),2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))
-for(i in 1:best.model$m) {
+par(mfrow=c(ceiling(m/2),2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))
+for(i in 1:m) {
 	plot(c(1:N.ts)[abs(Z.rot[,i])>minZ], as.vector(Z.rot[abs(Z.rot[,i])>minZ,i]),
 		type="h", lwd=2, xlab="", ylab="", xaxt="n", ylim=ylims, xlim=c(0,N.ts+1))
 	for(j in 1:N.ts) {
@@ -715,7 +720,7 @@ file=paste(Sys.getenv("TEMP"),"\\CS4--model.fits.Rdata",sep="")
 save(file=file,list=c("model.data", ls(pattern="^kemz.")))
 @
 
-Next we can compare whether the addition of the covariates improves the model fit. (\emph{NOTE}: The following results were obtained by letting the EM algorithm run for a \emph{very long} time, so your results may differ.)
+Next we can compare whether the addition of the covariates improves the model fit (effectively less residual error while accounting for the additional parameters). (\emph{NOTE}: The following results were obtained by letting the EM algorithm run for a \emph{very long} time, so your results may differ.)
 <<Cs28_covar.AICs>>=
 print(cbind(model=c("no covars", "Temp", "TP", "Temp & TP"),
       AICc=round(c(best.fit$AICc, kemz.temp$AICc, kemz.TP$AICc,
@@ -744,7 +749,7 @@ for(i in 1:length(spp)){
 
 \section{Questions and further analyses}
 We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the \verb@R@ code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code.  Copy and paste the code into a new file, and then you can edit that code.
-DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (e.g., set \verb@MCInit = TRUE@), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
+DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
 
 %---------
 % THE END

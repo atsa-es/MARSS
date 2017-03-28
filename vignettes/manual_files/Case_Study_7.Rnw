@@ -78,9 +78,6 @@ z.royale.dat=(royale.dat-apply(royale.dat,1,mean,na.rm=TRUE))/
      sqrt(apply(royale.dat,1,var,na.rm=TRUE))
 @
 
-We also need to change a couple settings before fitting the model.  In the default MARSS model, the initial value of $\xx$ is treated as being at $t=0$.  If we are estimating the $\BB$ matrix, we need to set this to be at $t=1$ so that the initial $\xx$ is constrained by the data\footnote{If there are many missing values at $t=1$, we might still have problems and have to adjust accordingly.}  at $t=1$.  The reason is that we need to estimate the initial $\xx$.  Even if we use a prior on the initial $\xx$, we are still estimating its value\footnote{Also putting a prior on the initial $\xx$'s requires specifying their variance-covariance structure, which depends on the unknown $\BB$, and specifying some variance-covariance structure that conflicts with $\BB$ will change your $\BB$ estimates.  So, in general, using a prior on the initial $\xx$'s when estimating $\BB$ is a bad idea.}.  \index{troubleshooting!sensitivity to x0 prior}A model with a non-diagonal $\BB$ matrix, does not  ``run backwards" well and the estimation of the initial $\xx$ will run in circles.  If we constrain it by data (at $t=1$), we avoid this problem\index{prior!troubleshooting}.   So we will set \verb@model$tinitx=1@.
-
-\index{troubleshooting!degenerate variances}The other setting we want to change is \verb@allow.degen@.  This sets the diagonals of $\QQ$ or $\RR$ to zero if they are heading towards zero.  When the initial $\xx$ is at $t=1$, this can have non-intuitive (not wrong but puzzling; see Appendix \ref{app:warnings}) consequences if $\RR$ is going to zero.   So, we will set \verb@control$allow.degen=FALSE@ and manually set $\RR$ to 0 if needed.
 
 <<Cs04_fit.model, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
 royale.model.1=list(Z="identity", B="unconstrained",
@@ -168,6 +165,22 @@ kem.bad=MARSS(bad.data, model=model)
 @
 You can change the model by changing the constraints on $\RR$ and $\QQ$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Some setting to improve performance when estimating $\BB$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In the default MARSS model, the value of $\E[\xx_0|\yy_0]$ (what \verb@x0@ denotes when \verb@tinitx=0@ in the model list) is estimated.  If we are estimating the $\BB$ matrix, it is better to set \verb@tinitx=1@ so that we are estimating $\E[\xx_1|\yy_0]$ instead\footnote{If there are many missing values at $t=1$, we might still have problems and have to adjust accordingly.}.  The model will fit either way, but setting \verb@tinitx=1@ in the model list will speed up and stabilize the fitting. It doesn't make much of a difference for the wolf-moose dataset but can have a large effect for larger models.  The reason is that the likelihood surface for $\E[\xx_1|\yy_0]$ is better behaved when $\BB$ is small.  For example, if $\BB$ equal to 0, there is no little information about $\E[\xx_0|\yy_0]$ so the algorithm goes in circles trying to estimate it while there is good information $\E[\xx_1|\yy_0]$ from $\yy_1$.  We could use a prior on the initial $\xx$ but this requires its variance-covariance structure, which depends on the unknown $\BB$ and specifying a variance-covariance structure that conflicts with $\BB$ will change your $\BB$ estimates.\index{troubleshooting!sensitivity to x0 prior}
+
+For the wolf-moose model, we set $\RR=0$.  The EM algorithm (default) cannot estimate \verb@x0@ when \verb@tinitx=1@ therefore to fit the model with \verb@tinitx=1@ we need to use \verb@method="BFGS"@.  This is only for the case when $\RR=0$\footnote{because the update for $(\xx_1^0)_{j+1}$ is $\xx_1^T$ but when $\RR=0$ and $\VV_1^0=0$, $\xx_1^T$ will equal $(\xx_1^0)_j$, i.e. whatever value you started with.  Thus the estimate of $\xx_1^0$ never changes.}
+<<Cs05_fit.model.tinitx1, eval=TRUE, echo=TRUE, keep.source=TRUE, results=hide>>=
+royale.model.4=list(
+    B="unconstrained", U="zero", Q="diagonal and unequal",
+    Z="identity", R="zero", tinitx=1)
+kem.4=MARSS(z.royale.dat, model=royale.model.4)
+@
+
+\index{troubleshooting!degenerate variances}The other setting we may want to change is \verb@allow.degen@ in the control list.  This sets the diagonals of $\QQ$ or $\RR$ to zero if they are heading towards zero.  When the initial $\xx$ is at $t=1$, this can have non-intuitive (not wrong but puzzling; see Appendix \ref{app:warnings}) consequences if $\RR$ is going to zero.   So, we will set \verb@control$allow.degen=FALSE@ and manually set $\RR$ to 0 if needed.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Analysis a four-species plankton community}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -219,19 +232,18 @@ We will start by fitting a model with the following assumptions:
 \end{itemize}
 
 <<Cs14_set-up-plankton-model>>=
-Z="identity"
-U="zero"
-B="unconstrained"
 Q=matrix(list(0),4,4); diag(Q)=c("Phyto","Phyto","Zoo","Zoo")
 R=matrix(list(0),4,4); diag(R)=c("Phyto","Phyto","Zoo","Zoo")
-plank.model.0=list(Z=Z, U=U, Q=Q, R=R, B=B)
+plank.model.0=list(
+   B="unconstrained", U="zero", Q=Q,
+   Z="identity", A="zero", R=R,
+   x0="unequal", tinitx=1  )
 @
-Why did we set \verb@U="zero"@? Equation \ref{eq:MSSMX} is a stationary model; it fluctuates about a mean.  The $\uu$ in Equation \ref{eq:MSSMX} is a scaling term that just affects the mean level---once the system is at equilibrium.  If we assume that the mean of $\yy$ (the mean of our data) is  a good estimate of the mean of the system (the $\xx$), then we can set $\uu$ equal to zero.   
+Why did we set \verb@U="zero"@? Equation \ref{eq:MSSMX} is a stationary model; it fluctuates about a mean.  The $\uu$ in Equation \ref{eq:MSSMX} is a scaling term that just affects the mean level---once the system is at equilibrium.  If we assume that the mean of $\yy$ (the mean of our data) is  a good estimate of the mean of the system (the $\xx$), then we can set $\uu$ equal to zero (and $\aa$).  The initial  states ($\xx$) are set at $t=1$ instead of $t=0$, which improves estimation for large systems.
 
 \subsection{Fit the plankton model and look at the estimated $\BB$ matrix}
-The call to fit the model is standard with the addition of setting \verb@model$tinitx@ so that the initial states ($\xx$) are set at $t=1$ instead of $t=0$.
+The call to fit the model is standard:
 <<Cs15_fit-plank-model-0, results=hide>>=
-plank.model.0$tinitx=1
 kem.plank.0 = MARSS(d.plank.dat, model=plank.model.0 )
 @  
 Now we can print the $\BB$ matrix, with a little cleaning up so it looks prettier.

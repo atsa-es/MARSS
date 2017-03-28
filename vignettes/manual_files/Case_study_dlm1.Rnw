@@ -89,7 +89,7 @@ TT = length(years)
 dat = matrix(SalmonSurvCUI[,2],nrow=1)
 @
 
-As we have seen in other case studies, standardizing our covariate(s) to have zero-mean and unit-variance can be helpful in model fitting and interpretation. In this case, it's a good idea because the variance of $CUI.apr$ is orders of magnitude greater than $survival$.
+As we have seen in other chapters, standardizing our covariate(s) to have zero-mean and unit-variance can be helpful in model fitting and interpretation. In this case, it is a good idea because the variance of $CUI.apr$ is orders of magnitude greater than $survival$.
 <<Cs_02_z.score, eval=TRUE>>=
 # get regressor variable
 CUI = SalmonSurvCUI[,3]
