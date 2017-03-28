@@ -1,0 +1,226 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/MCI-, eps=FALSE, split=TRUE}
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ", width=60)
+@
+
+\chapter{Setting and searching initial conditions}
+\label{chap:inits}
+\chaptermark{Setting inits}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_inits.R",package="MARSS")} at the R command line to open a file with all the code for this chapter and see a copy of the old MARSSmcinit function.}
+The EM algorithm is very robust to initial starting conditions however before final results are accepted, they should be tested using other initial conditions. Other times you will want to pass in specific initial conditions because the MARSS() function cannot find initial conditions on its own, which is the case for certain models with certain $\ZZ$ matrices in particular or you might want to start with initial conditions at the MLEs of another fit.  This chapter shows you how to set initial conditions.
+
+The chapter will also cover using a Monte Carlo search over random initial values.  This is brute force method for finding optimal initial conditions.  It simply uses random initial conditions and runs the EM algorithm for a number of iterations and selects the initial conditions with the highest log-likelihood after the given number of iterations.  In MARSS versions 3.9 and earlier, there was a utility function to perform a Monte Carlo search.  However, it is very hard for the function to come up with reasonable random initial conditions for the wide variety of models that MARSS() can fit.  In MARSS version 3.10, the MARSSmcinit() function was removed and replaced with this chapter discussing how to do your own Monte Carlo initial conditions search.  The original MARSSmcinit() function is included in the R code with this chapter (see footnote). 
+
+\section{Fitting a model with a new set of initial conditions}
+Fitting a model with a new set of initial conditions is straight-forward with the MARSS() function.  Simply pass in the argument \verb@inits@.  This is illustrated with an example from chapter \ref{chap:covariates}.
+
+We will fill a model with covariates to phytoplankton data:
+<<Cs_mci_001>>=
+fulldat = lakeWAplanktonTrans
+years = fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
+dat = t(fulldat[years,c("Greens", "Bluegreens")])
+the.mean = apply(dat,1,mean,na.rm=TRUE)
+the.sigma = sqrt(apply(dat,1,var,na.rm=TRUE))
+dat = (dat-the.mean)*(1/the.sigma)
+@
+
+The covariates for this example are temperature and total phosporous.
+<<CS_mci_002>>=
+covariates = rbind(
+   Temp = fulldat[years,"Temp"],
+   TP = fulldat[years,"TP"])
+# demean the covariates
+the.mean = apply(covariates,1,mean,na.rm=TRUE)
+covariates = covariates-the.mean
+@
+
+We will fit a model where algal abundance is a random walk without drift and where the observation errors are explained by the covariates plus independent unexplained noise:
+<<CS_mci_003>>=
+U = x0 = "zero"
+Q = "unconstrained"
+d = covariates
+A = "zero"
+D = "unconstrained"
+R = "diagonal and equal"
+model.list = list(U=U,Q=Q,A=A,R=R,D=D,d=d,x0=x0)
+kem = MARSS(dat, model=model.list)
+@
+
+The \verb@inits@ argument can  be set either as a list that is the same as that from the following:
+<<CS_mci_004, results=hide>>=
+coef(kem, what="par")
+@
+or as a marssMLE object from previous MARSS() call for a model with the same structure.  'same structure' means the model list used for the \verb@model@ argument is the same and the dimensions of the model (number of states and rows of data) are the same.
+
+\subsection{Specifying initial conditions as a list}
+The output from \verb@coef(kem, what="par")@ is a list with a column vector of the estimated values for each parameter matrix.  Here is the value for $\DD$ and $\QQ$:
+<<CS_mci_005>>=
+out=coef(kem, what="par")
+out$D
+out$Q
+@
+MARSS() gave names to the $\DD$ and $\QQ$ estimated values.  It is important to look at the output from \verb@coef(..., what="par")@ before passing in the inits list so that you know where the parameter values fall in the parameter column vector.  For example, note that in the $\QQ$ column vector, the variance for the first row in $\xx$ (Greens) is first, then the covariance, and last the variance of the second row in $\xx$ (Bluegreens).
+
+You can pass in inits for any of the parameters in \verb@coef(..., what="par")@.  You can pass in either a column vectors that is the same size as that output by \verb@coef@, so for $\QQ$, the column vectors must be $3 \times 1$, or a scalar.  If a scalar, then all values in the par column vector will be set to that value---except for $\QQ$, $\RR$ and $\LAM$ which will be set to diagonal matrices with the scalar on the diagonal.
+
+\subsubsection{Examples}
+Pass in an initial value for $\QQ$ that is a diagonal matrix with 1 on the diagonal.
+<<Cs_mci_006, keep.source=TRUE>>=
+inits=list(Q=1)
+kem = MARSS(dat, model=model.list, inits=inits)
+#or
+inits=list(Q=matrix(c(1,0,1),3,1))
+kem = MARSS(dat, model=model.list, inits=inits)
+@
+
+Pass in an initial value for $\QQ$ that is this non-diagonal matrix:
+$$\begin{bmatrix}1&0.5\\0.5&0.7\end{bmatrix}$$
+<<Cs_mci_007>>=
+inits=list(Q=matrix(c(1,0.5,0.7),3,1))
+kem = MARSS(dat, model=model.list, inits=inits)
+@
+
+Pass in an initial value for $\QQ$ and $\DD$:
+<<Cs_mci_008>>=
+inits=list(Q=matrix(c(1,0.5,0.7),3,1), D=1)
+kem = MARSS(dat, model=model.list, inits=inits)
+@
+The initial values for $\DD$ will be all 1s.
+
+Pass in an initial value for $\DD$ set to the value from a previous fit but use default inits for everything else:
+<<Cs_mci_009>>=
+inits=list(D=coef(kem, what="par")$D)
+kem = MARSS(dat, model=model.list, inits=inits)
+@
+
+\subsection{Specifying initial conditions  using output from another fit}
+You can also use a MARSS() fit as an initial condition.  The model must be the same structure.  This is typically used when you want to use an EM fit as a start for a BFGS fit if you are using BFGS for the final MLE search.
+
+You can pass in the inits as a list using the coef() function.
+<<Cs_mci_010>>=
+#create the par list from the output
+inits=coef(kem, what="par")
+kem.bfgs = MARSS(dat, model=model.list, inits=inits, method="BFGS")
+@
+Or you can pass in MARSS() fit.
+You can pass in the inits as a list.
+<<Cs_mci_0101>>=
+#create the par list from the output
+kem.bfgs = MARSS(dat, model=model.list, inits=kem, method="BFGS")
+@
+
+\section{Searching across initial values using a Monte Carlo routine}
+The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima and ridges.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carol search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  In our papers on the distributional properties of  MARSS parameter estimates, we rarely found that an initial conditions search changed the estimates---except in cases where $\ZZ$ and $\BB$ are estimated as unconstrained or as the fraction of missing data in the data set became large.  Regardless an initial conditions search should be done before reporting final estimates for an analysis\footnote{It is also a good idea to try method=BFGS to see if this changes the estimates.}.  
+
+The idea behind a Monte Carlo search of initial conditions is simple.  One simply randomly generates initial conditions, runs the EM algorithm a few iterations (10-20), and save the log-likelihood at the end of those iterations.  The starting initial conditions is selected from that giving the lowest log-likelihood. 
+
+The following function will do a simple Monte Carlo search using a fitted MARSS model (output from a MARSS() call) and drawing random initial conditions from a uniform distribution or a wishart for the variance-covariance matrices. The function will not work for all MARSS models but will give you a starting point for setting up your own Monte Carlo search.  The function uses a control list to set \texttt{numInits}, the number of random initial value draws, \texttt{numInitSteps}, the maximum number of EM iterations for each random initial value draw, and \texttt{boundsInits}, the bounds for the random distributions. It outputs a list with specifying the initial values that give the lowest log-likelihood.
+
+Here is a simple example of using the function:
+<<Cs_mci_011, keep.source=TRUE, eval=FALSE>>=
+  dat = t(harborSeal)
+  dat = dat[c(2,nrow(dat)),]
+  fit1=MARSS(dat)
+  MCinits = MARSSmcinit(fit1) 
+  fit2=MARSS(dat, inits=MCinits)
+@
+
+<<Cs_mci_012, keep.source=TRUE>>=
+######################################################################################################   MARSSmcinit function
+#   Does a simple MonteCarlo initialization of the EM routine
+#   The function uses a number of MARSS utility functions accessed with MARSS:::
+#######################################################################################################
+MARSSmcinit = function(MLEobj, 
+                       control=list(numInits = 500, numInitSteps = 10,
+                                    MCbounds=list(B=c(0,1), U=c(-1,1), Q = c(1,1), 
+                                                  Z=c(0,1), A=c(-1,1), R = c(1,1), x0 = c(-1,1) )),
+                       silent=FALSE) {
+  drawProgressBar = FALSE 
+  if(!silent) { #then we can draw a progress bar
+    cat("\n"); cat("> Starting Monte Carlo Initializations\n")
+    prev = MARSS:::progressBar() #this is an internal function to MARSS
+    drawProgressBar = TRUE
+  }
+  modelObj=MLEobj[["marss"]]
+  y = modelObj$data
+  par.dims=attr(modelObj,"model.dims")
+  m = par.dims[["x"]][1]
+  n = par.dims[["y"]][1]
+  TT = par.dims[["data"]][2]
+  ## YM matrix for handling missing values
+  YM=matrix(as.numeric(!is.na(y)),n,TT)
+  #Make sure the missing vals in y are zeroed out
+  y[YM==0]=0
+
+  free.tmp = modelObj$free 
+  dim.tmp = list(Z=c(n,m), A=c(n,1), R=c(n,n), B=c(m,m), U=c(m,1), Q=c(m,m), x0=c(m,1))
+  bounds.tmp = control$MCbounds
+  init = bestinits = MLEobj$start
+  bestLL = -1.0e10
+
+  # loop over numInits: # of random draws of initial values
+  for(loop in 1:control$numInits) {
+    init.loop = init
+      
+    # Draw random values
+    en = c("Z", "A", "R", "B", "U", "Q","x0")
+    for(el in en) {
+      dim.param = dim.tmp[[el]]
+      if(!MARSS:::is.fixed(free.tmp[[el]])){ #is.fixed is a utility func in MARSS
+        bounds.param = bounds.tmp[[el]]
+        #use the first fixed and free in a temporally varying model; arbitrary
+        tmp=list(f=MARSS:::sub3D(modelObj$fixed[[el]],t=1),D=MARSS:::sub3D(modelObj$free[[el]],t=1))
+        if(el %in% c("Q", "R")){   # random starts drawn from a wishart dist
+          if( bounds.param[1] < dim.param[1]){ df=dim.param[1] }else{ df=bounds.param[1] }
+	        S=diag(bounds.param[2],dim.param[1])
+	        #draw a random matrix from wishart
+	        tmp.random = MARSS:::rwishart(df, S)/df
+	        #reapply the sharing and fixed constraints 
+          par.random = solve(t(tmp$D)%*%tmp$D)%*%t(tmp$D)%*%(MARSS:::vec(tmp.random)-tmp$f)
+	      }else{
+	        par.random = matrix(runif(dim(tmp$D)[2], bounds.param[1], bounds.param[2]), dim(tmp$D)[2],1)
+          if(el %in% c("B")){
+           tmp.max=max(abs(eigen(par.random,only.values=TRUE)$values))
+           #rescale to bring the max abs eigenvalues to between 0 and 1
+           par.random =  par.random/(tmp.max/runif(1,.01,.99))
+          }
+          if(el %in% c("x0")){
+           x0init = init$x0 #where the original start is
+           x.lo = ifelse(x0init > 0, exp(bounds.param[1])*x0init, exp(bounds.param[2])*x0init)
+           x.hi = ifelse(x0init > 0, exp(bounds.param[2])*x0init, exp(bounds.param[1])*x0init)
+           par.random = matrix(runif(dim(tmp$D)[2], x.lo, x.hi), dim(tmp$D)[2],1)
+          }
+
+        } 
+      }else{ par.random=matrix(0,0,1) }
+      init.loop[[el]] = par.random 
+    }
+
+    ## Call MARSSkem() with these inits 
+    MLEobj$start = init.loop
+    MLEobj$control$maxit = control$numInitSteps
+    MLEobj$control$minit = 1
+    MLEobj$control$silent = TRUE #don't print convergence information during kem call          
+    MLEobj = MARSSkem(MLEobj)  #get new fit using this init  
+
+    if(drawProgressBar==TRUE) prev = MARSS:::progressBar(loop/control$numInits, prev)
+
+    ## Check whether the likelihood is the best observed
+    ## Only use bootstrap param draws where loglike did not go down during numInitSteps
+    if(MLEobj$logLik > bestLL) {
+      # update the best initial parameter estimates
+      bestinits = MLEobj$par
+      bestLL = MLEobj$logLik
+    }
+   
+  } # end numInits loop
+
+  return(bestinits)
+}
+@
+
+<<reset, echo=FALSE, include.source=FALSE>>=
+options(prompt="> ", continue=" +", width=120)
+@
