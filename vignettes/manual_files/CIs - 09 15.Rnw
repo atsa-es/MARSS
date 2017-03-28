@@ -1,0 +1,1169 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=../figures/CIs-, eps=FALSE, split=FALSE}
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ", width=60)
+@
+
+\chapter{Standard errors, confidence intervals and prediction intervals for MARSS models}
+\label{chap:cis}
+\chaptermark{Computing CIs and PIs}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_CIs.R",package="MARSS")} at the R command line to open a file with all the code for this chapter.}
+
+This chapters discusses standard errors, confidence intervals and prediction intervals for the states and observations in a MARSS model and shows you how to get these outputs with the MARSS functions.  We will start by illustrating these concepts with a simple linear regression and then discuss them in the more complicated state-space context.  When discussing confidence interval and prediction intervals, it is important to recognize that they concern properties of data we have not collected rather than data we have collected.  When we write of the expected value of $y$ (data) conditioned on the data, these two datasets are different.  We do not need to calculate the expected value of data we have collected; the expected value is simply its value.  To distinguish these two types of data, the data collected is called $y$ and the data not collected (and whose expected value we are interested in) is called $\tilde{y}$.
+
+\section{ Definition and properties of confidence intervals on the fitted $\tilde{y}$ }
+
+A 95\% confidence interval on some test statistic (often a parameter) is an interval constructed in such a way that for 95\% of the possible new data sets, the confidence interval includes (or covers) the true value of the statistic.  We will be computing
+confidence intervals for the value of a regression line for a particular $x$ (value on the $x$-axis).
+
+The \verb@cars@ dataset in R contains 50 data points on stopping distances (ft) and speed (mph) for a car in 1920.  This dataset has a particular linear relationship between car speed ($y$) and stopping distance ($x$): $y = \alpha + \beta x + e$, where $e \sim \N(0, \sigma^2)$ (red line in Figure \ref{fig:CIs.basics}a). We will call this fit \verb@fit@:
+<<Cs_001_fit-full>>=
+fit.full=lm(mpg~wt, data=mtcars)
+fit.full
+@
+This fit has $\alpha$=\Sexpr{round(coef(fit.full)[1],digits=2)} and $\beta$=\Sexpr{round(coef(fit.full)[2],digits=2)}.
+There are other relationships we could fit besides a linear Gaussian one, but for this chapter we will just be concerned with estimating a linear relationship. $\alpha + \beta x$ which is \Sexpr{round(coef(fit.full)[1],digits=2)} + \Sexpr{round(coef(fit.full)[2],digits=2)}$x$ for mtcars.
+
+We could take a sample of 10 cars from the 32-car dataset (crosses in Figure \ref{fig:CIs.basics}a) and estimate $\alpha$ and $\beta$ (black line in Figure \ref{fig:CIs.basics}a).  This estimate would not match the true values since we only took a sample of the 32 cars.  We could do this over and over for all the 10-car samples and there would be many possible regression lines (black lines in Figure \ref{fig:CIs.basics}b).  Here is  code to create a large number of $\alpha$, $\beta$ and $\sigma^2$ estimates from 10-car samples from the original 32-car dataset:
+<<Cs_001_fit-i>>=
+nsim = 5000
+i.results=matrix(NA,nsim,3)
+for(i in 1:nsim){
+  fit.i=lm(mpg~wt, data=mtcars, subset=sample(nrow(mtcars), 10))
+  i.results[i,]=c(coef(fit.i), 
+                  sum(fit.i$residual^2)/fit.i$df.residual)
+}
+@
+
+Let's consider one particular sample of 10 cars from our 32-car dataset.  Let's call this sample the $j$-th sample (there are many 10 car samples and this is just one of them).  We will define this sample as the cars in rows $9, 11, 12, 13, 19, 20, 21, 22, 23, 24$ in the mtcars dataset:
+<<Cs_001_fit-j>>=
+smpj = c(9, 11, 12, 13, 19, 20, 21, 22, 23, 24)
+dat.j = mtcars[smpj,]
+fit.j = lm(mpg~wt, data=dat.j)
+@
+Figure \ref{fig:CIs.basics}c shows the regression line for this sample. Given our estimates, $\hat{\alpha}$ and $\hat{\beta}$, from sample $j$, we can estimate the expected value of $\tilde{y}$ given $x$: $\hat{\alpha} + \hat{\beta} x$.  Similarly we can construct a confidence interval for the expected value of $\tilde{y}$ given $x$. Let's call this interval: $CI_j|x$.  It's a confidence interval for $E[\tilde{y}|x]$ based on $j$-th 10-car sample.  A 95\% confidence interval is an interval constructed in such a way that for 95\% of the possible 10-car samples, the confidence interval includes (or covers) $\alpha + \beta x$.
+
+Before proceeding, we should clarify how the variability in $\tilde{y}$ arises---what is the nature of the data we did not collect but that might have collected or is out there to be collected.  One possibility is that, we decided to only measure mpg in cars with weights $x_j$ (meaning the set of weights in our $j$-th 10-car selection).  In this scenario, the weights were a choice on our part.  We imagine that there are other car models out there with the same weights but different mpgs and that a new, $i$-th, 10-car dataset would follow this relationship:
+$$\yy_i = \alpha + \beta \xx_j + \ee_i$$
+where $\yy_i$ are the 10 mpgs for the cars in the $i$-th 10-car sample, $\xx_j$ are the 10 weights of the cars and are the same weights in the $j$-th 10-car sample, and $\ee_i$ are the 10 residual errors.  The weights are the same as in the $j$-th sample but the mpgs are different because $\ee_i$ is different than $\ee_j$.  
+
+Alternatively, we might imagine that there are lots of car weights possible and we randomly selected cars with the weights $\xx_j$.  A different 10-car sample would have a different set of car weights.  In this case a new data set follows:
+$$\yy_i = \alpha + \beta \xx_i + \ee_i$$
+In this case, $\xx_i$ and $\xx_j$ are different.  These two cases have the same expected value of $\tilde{y}|x$ but the variance of $\tilde{y}|x$ is different.  CIs that are correct for the former case will be correct for the latter case if $\xx_i$ and $\xx_j$ are randomly selected, but the reverse does not necessarily hold.  A CI that is correct for the latter case (new data have random car weights) need not be correct for the former case (new data all have the same set of car weights).
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_001_fig1, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+
+dat=mtcars[mtcars$wt<4,]
+
+#truth from the 32-car data set
+n = dim(dat)[1]
+fit.full = lm(mpg~wt, data=dat)
+sigma2 = sum(fit.full$residual^2)/fit.full$df.residual
+alpha=coef(fit.full)[1]
+beta=coef(fit.full)[2]
+
+plot(dat$wt, dat$mpg, ylim=c(5,30), ylab="", xlab="")
+abline(fit.full, col="red", lwd=2)
+
+#regression line from the j-th sample of 10 cars
+smp.j=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+dat.j = dat[smp.j,]
+fit.j=lm(mpg~wt, data=dat.j)
+points(dat.j$wt, dat.j$mpg, pch=3)
+legend("topright","(a)",bty="n")
+abline(fit.j)
+title("(red) true regression line with 32 cars\n(black) regression line with 10 cars",cex.main=.75)
+
+#distribution of all those regression lines from a sample of 10 cars
+#j sample of 10 cars
+nsim = 5000
+predx=seq(2,5,0.5); nx = length(predx)
+j.results=matrix(NA,nsim,3)
+j.ci95 = matrix(NA,nsim,3*nx)
+j.ci75 = matrix(NA,nsim,3*nx)
+for(i in 1:nsim){
+  tmp.fit=lm(mpg~wt, data=dat, subset=sample(dim(dat)[1], 10))
+  j.results[i,]=c(coef(tmp.fit), sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  j.ci95[i,] = as.vector(predict(tmp.fit, newdata=data.frame(wt=predx), interval="confidence"))
+  j.ci75[i,] = as.vector(predict(tmp.fit, newdata=data.frame(wt=predx), interval="confidence", level=0.75))
+}
+#plot out 1000 of the regression lines
+plot(dat$wt,dat$mpg, ylim=c(5,30), type="n", ylab="", xlab="")  
+title("1000 bootstrapped regression lines\nfrom 10 car samples",cex.main=.75)
+for(i in 1:1000){ lines(predx, j.results[i,1]+j.results[i,2]*predx) }
+legend("topright","(b)",bty="n")
+abline(fit.full, col="red", lwd=2)
+
+#confidence intervals
+plot(dat$wt, dat$mpg, ylim=c(0,30), type="n", ylab="mpg", xlab="weight")
+abline(fit.full, col="red", lwd=2)
+points(dat.j$wt, dat.j$mpg, pch=3)
+abline(fit.j)
+tmp.cis = predict(fit.j, newdata=data.frame(wt=predx), interval="confidence")
+for(i in 1:nx){
+  x=seq(2,5,0.5)[i]
+  lines(c(x,x), tmp.cis[i,2:3])
+}
+legend("topright","(c)",bty="n")
+title("Confidence intervals for the\nfirst 10 car sample",cex.main=.75)
+
+#Coverage
+true.y = predict(fit.full, newdata=data.frame(wt=predx))
+ci.obs95 = ci.obs75 = rep(NA,nx)
+for(i in 1:nx){
+  ci.obs95[i] = sum(j.ci95[,i+nx]<true.y[i] & j.ci95[,i+2*nx]>true.y[i])/nsim
+  ci.obs75[i] = sum(j.ci75[,i+nx]<true.y[i] & j.ci75[,i+2*nx]>true.y[i])/nsim
+}
+
+plot(predx, ci.obs95, ylim=c(0.5,1), ylab="fraction of coverage", xlab="weight")
+points(predx, ci.obs75, ylim=c(0.5,1))
+legend("topright","(d)",bty="n")
+abline(h=c(0.95, 0.75))
+title("Coverage of the 1000 confidence intervals\nversus objective (black line)",cex.main=.75)
+@
+\end{center}
+\caption{Properties of confidence intervals}
+\label{fig:CIs.basics}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\subsection{Different ways to compute confidence intervals}
+
+Figure \ref{fig:cartoon.cis} walks through the logic behind algorithms for construction of confidence intervals.  We start by thinking about a particular set of ten car weights, the $\xx_j$ which are marked as green lines in panel a).  At those weights, we can imagine a set of ten car mpgs generated with the model:
+$$\yy_i = \alpha + \beta \xx_j + \ee_i$$
+where the $e$ in $\ee_i$ are drawn from a Normal distribution with variance $\sigma^2$.  $\alpha$, $\beta$ and $\sigma^2$ are the values from fitting the linear regression to our full 32-car dataset.  We've picked a random sample of ten weights in that dataset and imagine generated new mpgs for cars of those weights.  We could then estimate the regression line from the $\yy_i$ dataset.  Then we could generate a new dataset at the green weights in panel a), and get a new regression line.  We could do this over and over and create a large sample of the possible regression lines from 10 cars with the $\xx_j$ weights.  These are the grey lines in panels a-c.
+
+We could construct a confidence interval at $x=1$ using the 95\% range of values of the grey lines at $x=1$ (panel b).  If we center that blue line on one of the grey regression lines (panel c), it would cover the red line for 95\% of the grey regression lines in panels a and b.  The logic in panels a-c works for any set of ten car weights.  Thus, if we had a strategy to construct a blue CI as in panel b, that is that covers 95\% of the regression lines from a car mpgs for a given set of car weights, that CI would cover the red line for 95\% of 10-car samples (of any weight).  
+
+The trick is to come up with a strategy for constructing the blue line in panel b for a given set of car weights.  We cover five approaches to doing this.  The first four use a parametric model: the linear model with Gaussian independent errors.  The first of these is the analytical CI using a known $\sigma^2$, the second is the analytical CI using an estimate of $\sigma^2$, the third is a parametric bootstrap, and the fourth uses a numerically estimated Hessian matrix.  The fifth approach uses non-parametric bootstrapping. 
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_002_fig.cartoon, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
+smp.j=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+fit.j=lm(mpg~wt, data=mtcars, subset=smp.j)
+x.j = mtcars$wt[smp.j]
+y.j = mtcars$mpg[smp.j]
+ij.results=matrix(NA,100,2)
+for(i in 1:100){
+  y.ij=alpha+beta*x.j+rnorm(10,0,sqrt(sigma2))
+  fit.ij=lm(y.ij ~ x.j)
+  ij.results[i,]=coef(fit.ij)
+}
+
+par(mfrow=c(2,2))
+fig.cartoon.base=function(){
+  plot(mtcars$wt,mtcars$mpg, ylim=c(0,50), type="n", ylab="", xlab="", xlim=c(0,7))
+  for(i in 1:100){
+    x=c(0,7)
+    lines(x,ij.results[i,1]+ij.results[i,2]*x,col="grey")
+  }
+  abline(v=x.j,col="green")
+  abline(fit.full, col="red", lwd=2)
+}
+
+#panel a
+fig.cartoon.base()
+title("100 regression lines from 10-car samples of\ncars with weights at green lines",cex.main=.75)
+legend("topright","(a)",bty="n")
+
+#panel b
+fig.cartoon.base()
+x1=1
+lines( c(x1,x1), quantile(i.results[,1]+i.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("blue line contains 95% of the regression lines\nfrom samples at the green weights",cex.main=.75)
+legend("topright","(b)",bty="n")
+
+#panel c
+plot(mtcars$wt,mtcars$mpg, ylim=c(0,50), type="n", ylab="", xlab="", xlim=c(0,7))
+abline(v=x.j, col="green")
+abline(fit.full, col="red", lwd=2)
+points(x.j, y.j, pch=3)
+abline(fit.j, col="black", lwd=2)
+x1=1
+lines( c(x1,x1), (coef(fit.j)[1]-alpha+(coef(fit.j)[2]-beta)*x1)+quantile(i.results[,1]+i.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("the blue line centered on any regression line\nfrom a 10-car sample at the green lines\nwill cover the red line 95% of the time",cex.main=.75)
+legend("topright","(c)",bty="n")
+
+#panel d
+plot(mtcars$wt,mtcars$mpg, ylim=c(0,50), type="n", ylab="", xlab="", xlim=c(0,7))
+smp.k= c(14, 29, 32, 27, 16, 10, 11,  3, 21, 23)
+fit.k=lm(mpg~wt, data=mtcars, subset=smp.k)
+x.k = mtcars$wt[smp.k]
+y.k = mtcars$mpg[smp.k]
+ik.results=matrix(NA,100,2)
+for(i in 1:100){
+  y.ik=alpha+beta*x.k+rnorm(10,0,sqrt(sigma2))
+  fit.ik=lm(y.ik ~ x.k)
+  ik.results[i,]=coef(fit.ik)
+}
+abline(fit.k, col="black", lwd=2)
+points(x.k, y.k)
+abline(fit.full, col="red", lwd=2)
+x1=1
+lines( c(x1,x1), (coef(fit.k)[1]-alpha+(coef(fit.k)[2]-beta)*x1)+quantile(ik.results[,1]+ik.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("a 95% CI constructed in this way for any regression\nline from any 10-car sample will also cover\nthe red line 95% of the time",cex.main=.75)
+mtext(side=2, outer=TRUE, "car mpg",line=-1.5)
+mtext(side=1, outer=TRUE, "car weight (1000s of pounds)",line=-1.5)
+@
+\end{center}
+\caption{The red line is the true regression line from the 32-car dataset.  In panel a) we think about the set of regression lines for a particular set of 10 car weights, the green lines. The grey lines are 100 random regression lines from samples generated from weights at the green lines and mpgs = $\alpha + \beta \xx_j + \ee$, where the $e$ in $\ee$ are drawn from a Normal distribution with variance $\sigma^2$.  In panel b) the blue line is a $x=1$ 95\% CI constructed from the 95\% range of the grey line values at $x=1$. In panel c) we show one particular regression line (from the grey lines in panels a and b) from one particular set of car mpgs (the crosses) at the green weights.  We center the blue line on the regression line value at $x=1$.  For 95\% of the regression lines (the grey lines), the blue line centered in this way will cover the red line.  Panel d) shows a different set of car mpgs for a different set of car weights.  We could construct a blue line for this set of weights (it will be different than the blue line in panels b and c which used a different set of car weights).  95\% of blue lines constructed as in panel b) and centered on a regression line as in panel c) will cover the red line.}
+\label{fig:cartoon.cis}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\subsection{Analytical construction of CIs using known $\sigma^2$}
+
+We constructed the blue line in panel b of Figure \ref{fig:cartoon.cis} by simulation.  The code is shown below.  Notice that we keep the car weights constant and simulate new residual errors.
+<<Cs_0031>>=
+smp.j = c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+fit.j=lm(mpg~wt, data=mtcars, subset=smp.j)
+x.j = mtcars$wt[smp.j]
+nsim=1000
+i.results=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  y.i=alpha+beta*x.j+rnorm(10,0,sqrt(sigma2))
+  fit.i=lm(y.i ~ x.j)
+  i.results[i,]=coef(fit.i)
+}
+x1=1
+CI=quantile(i.results[,1]+i.results[,2]*x1,probs=c(0.025,.975))
+bias=coef(fit.j)[1]-alpha+(coef(fit.j)[2]-beta)*x1
+@
+\verb@CI@ in the code is the blue line in panel b and \verb@bias@ is the difference between the red and black lines at $x=1$ in panel c.  We need to know the bias to get the blue line centered on the black line.
+
+However, we do not need to simulate for this problem because there is an analytical solution.
+The asymptotic\footnote{meaning large $n$.  $n=10$ is not large but we will proceed nonetheless.} distribution of $\hat{\alpha}$ and $\hat{\beta}$ (the maximum-likelihood estimates, aka MLEs, of $\alpha$ and $\beta$) that define the grey lines in panels a and b in Figure \ref{fig:cartoon.cis} have a multivariate normal distribution:
+\begin{equation}
+\begin{bmatrix}\hat{\alpha}\\\hat{\beta}\end{bmatrix} \sim \MVN\left(
+\begin{bmatrix}\\alpha\\ \beta\end{bmatrix}\sigma^2 (-\HH)^{-1}\right)
+\label{eqn:dist.mls}
+\end{equation}
+where $-\HH$ the negative of the information matrix.  The negative of the information matrix is the second derivative of the negative log-likelihood function:
+$$-\HH=\begin{bmatrix}
+\frac{\partial^2-\log L}{\partial\alpha \partial\alpha}&\frac{\partial^2-\log L}{\partial\alpha \partial\beta}\\
+\frac{\partial^2 -\log L}{\partial\alpha \partial\beta}&\frac{\partial^2 -\log L}{\partial\beta \partial\beta}
+\end{bmatrix}$$
+
+For our linear regression model with Gaussian errors, the negative of the information matrix has a simple equation: $\frac{\XX^\top\XX}{\sigma^2}$
+where $\XX$ is a 2 column matrix with 1s in column 1 and the predictor variables (the car weigthts) in column 2.  The asymptotic variance of the MLEs is the inverse of this, i.e. $\sigma^2( \XX^\top\XX)^{-1}$. Thus for our ten car weights in panel a (the green lines), the estimated $\alpha$'s and $\beta$'s will be normally distributed with a variance of
+<<Cs_004_analytical.mle.var>>=
+x=mtcars$wt[smp.j]
+X=cbind(alpha=1,beta=x)
+analytical.Sigma=sigma2*solve(t(X)%*%X)
+analytical.Sigma
+@
+
+We could also use R to generate a numerical estimate of the information matrix. This doesn't make much sense here since we have an analytical equation for the information matrix, but it is useful when we do not have an analytical solution. Another term for the negative of the information matrix is the Hessian of the negative log-likelihood function. There are a number of R functions that will estimate the Hessian of a function.  We will use \verb@optim()@.  Here is a function to get the Hessian of the log-likelihood function using \verb@optim()@:
+<<Cs_005_ret.hessian.s2>>=
+ret.hessian.known.s2=function(dat, sigma2){
+  NLL <- function(parm, dat=NULL) {
+    resids = dat$mpg - parm[1] - dat$wt * parm[2]
+    resids = suppressWarnings(dnorm(resids, 0, sqrt(sigma2), log = TRUE))
+    -sum(resids)
+  }
+  tmp.fit=lm(mpg ~ wt, data=dat)
+  pars=coef(tmp.fit)
+  names(pars)=c("alpha","beta")
+  ofit=optim(pars, NLL, dat=dat, hessian=TRUE)
+  parSigma = solve(ofit$hessian)
+  parMean = ofit$par
+  return(list(parMean=parMean, parSigma=parSigma))
+}
+@
+The function defines a negative log-likelihood function and then uses \verb@optim()@ to maximize that with the argument \verb@hessian=TRUE@ so it returns a numerical estimate of the Hessian of the function \verb@NLL@, which we defined as the negative log-likelihood function.  The estimate of the variance-covariance matrix of the parameters is the inverse of the Hessian.  Notice that we passed in the true $\sigma^2$ (from the 32-car data set); similarly, the analytical solution also used the true $\sigma^2$.
+
+Let's compare the numerically estimated variance-covariance matrix to the analytically computed one. They are the same:
+<<Cs_006_sigma.example>>=
+dat = mtcars[smp.j,]
+hessian.Sigma=ret.hessian.known.s2(dat, sigma2)$parSigma
+hessian.Sigma
+analytical.Sigma
+@
+
+We can use this $\Sigma$ to compute an interval around $\alpha+\beta x$ that contains 95\% of the grey lines.  We know that
+\begin{equation}
+\begin{gathered}
+\var(\XX_i \hat{\theta}) = \XX_i \var(\hat{\theta}) \XX_i^\top \\
+= \XX_i  \Sigma \XX_i^\top
+\end{gathered}
+\end{equation}
+where $\Sigma=\sigma^2 (\XX^\top\XX)^{-1}$ (the inverse of the Hessian of the negative-log-likelihood).
+
+An interval that contains 95\% of these is
+$$\theta \XX_i + z^{.05/2} \sqrt{\XX_i\Sigma\XX_i^\top}=\theta \XX_i + 1.96 \sqrt{\XX_i\Sigma\XX_i^\top}$$
+
+Here is code to compute the analytical 95\% interval of $\widehat{\E(y)}$ at $x=1$:
+<<Cs_007>>=
+dat=mtcars[smp.j,]
+Xi = cbind(1, dat$wt)
+XiXi.inv = solve(t(Xi)%*%Xi)
+Sigma = sigma2*XiXi.inv
+theta = rbind(alpha, beta)
+x=1; X = cbind(1, x)
+
+#the analytical CI
+X%*%theta + qnorm(c(0.025,.975)) * sqrt(X%*%Sigma%*%t(X))
+
+#CI from the real distribution of the MLEs
+quantile(i.results[,1]+i.results[,2]*x, probs=c(0.025, 0.975))
+@
+They are pretty close.
+
+So this gives us a way to calculate confidence intervals if we know the true residual variance.  We just use
+$$hat{\theta} \XX_i + z^{.05/2} \sqrt{\XX_i\Sigma\XX_i^\top}$$
+But we don't know $\Sigma$; we only have one set of data, in this case one particular 10-car sample from the 32-car dataset and so we only have an estimate of $\Sigma$. 
+
+\subsection{Analytical construction of CIs using an estimate of $\sigma^2$}
+
+The parametric approach gives us a simple equation for $\Sigma$: $\sigma^2( \XX^\top\XX)^{-1}$.  Why not just use that with an estimate of $\sigma^2$? So why not use $-\HH=\hat{\sigma}^2( \XX^\top\XX)^{-1}$ in Equation \ref{eqn:dist.mls}.  The problem with doing that is the distribution of $\hat{y}_i$ conditioned on $\sigma^2$ (known) is Normal but the distribution of $\hat{y}_i$ conditioned on an estimate of $\sigma^2$ has a t-distribution. For large $n$ approximating a t-distribution by a Normal distribution is not too bad, but for small $n$ (like 10), it will lead to overly narrow CIs (too low coverage).
+
+Let's try it and see that this is the case.  We want to simulate data at the green weights in panel a of Figure \ref{{fig:cartoon.cis} and compute CIs for each simulated set of 10 cars using 
+$$\theta \XX + z^{.05/2} \sqrt{\XX\hat{\Sigma}\XX^\top}$$
+where $\hat{\Sigma}=\hat{\sigma}^2 (\XX^\top\XX)^{-1}$.
+Then we will see if these CIs cover the red line 95\% of the time (or not).
+
+<<Cs_008>>=
+#the green weights
+smp.j=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+Xi = cbind(1, mtcars$wt[smp.j])
+XiXi.inv = solve(t(Xi)%*%Xi)
+true.Sigma = sigma2*XiXi.inv
+#where I am going to compute a CI
+x=1; X = cbind(1, x)
+#holder
+i.CIs=matrix(NA,1000,6)
+for(i in 1:1000){
+  mpg.i=alpha+beta*mtcars$wt[smp.j]+rnorm(10,0,sqrt(sigma2))
+  fit.i=lm(mpg.i ~ mtcars$wt[smp.j])
+  hat.theta=matrix(coef(fit.i),ncol=1)
+  hat.sigma2 = sum(fit.i$residual^2)/fit.i$df.residual
+  hat.Sigma = hat.sigma2*XiXi.inv
+  #CI from asymptotic distribution of the MLEs
+  CI.i.bad = X%*%hat.theta + qnorm(c(0.025,0.975)) * sqrt(X%*%hat.Sigma%*%t(X))
+  CI.i.true = X%*%hat.theta + qnorm(c(0.025,0.975)) * sqrt(X%*%true.Sigma%*%t(X))
+  CI.i.corr = X%*%hat.theta + qt(c(0.025,0.975),df=fit.i$df.residual) * sqrt(X%*%hat.Sigma%*%t(X))
+  i.CIs[i,1:2]=CI.i.true
+  i.CIs[i,3:4]=CI.i.bad
+  i.CIs[i,5:6]=CI.i.corr
+}
+@
+
+The true value (red line) at $x=1$ is $\alpha+\beta x$.  The correct CI using the true $\sigma^2$ has the correct coverage:
+<<Cs_009>>=
+true.val = alpha+beta*x
+100*sum(i.CIs[,1]<true.val & i.CIs[,2]>true.val)/1000
+@
+But the CIs using the estimated $\sigma^2$ are too narrow.  They have low coverage (less than 95\%):
+<<Cs_010>>=
+100*sum(i.CIs[,3]<true.val & i.CIs[,4]>true.val)/1000
+@
+But if we used the t-distribution's 95\% intervals to compute our CIs, like so:
+\begin{equation}
+\hat{\theta} \XX + t^{.05/2}_{df \sigma^2} \sqrt{ \XX \hat{\sigma}^2 (\XX_i^\top\XX_i)^{-1} \XX^\top }
+\label{eqn:analytical.CIs}
+\end{equation}
+Then the coverage is correct again (or very nearly):
+<<Cs_011>>=
+100*sum(i.CIs[,5]<true.val & i.CIs[,6]>true.val)/1000
+@
+
+Here is a function to compute the correct CIs:
+<<Cs_012_predict.lm.conf>>=
+CI.analytical.est.s2=function(dat, x){
+  fit=lm(dat$mpg~dat$wt)
+  Xi = cbind(1, dat$wt)
+  XiXi.inv = solve(t(Xi)%*%Xi)
+  hat.sigma2 = sum(fit$residual^2)/fit$df.residual
+  hat.Sigma = hat.sigma2*XiXi.inv
+  hat.theta = rbind(coef(fit)[1], coef(fit)[2])
+  x=1; X = cbind(1, x)
+  CI=X%*%hat.theta + qt(c(0.025,.975), df=fit$df.residual) * sqrt(X%*%hat.Sigma%*%t(X))
+  c(fit=X%*%hat.theta, lwr=CI[1], upr=CI[2])
+}
+@
+This is what the \verb@predict@ function returns.
+<<Cs_013_predict.lm.con>>=
+dat=mtcars[smp.j,]
+x=1
+CI.analytical.est.s2(dat, x)
+predict(lm(mpg~wt, data=dat), new=data.frame(wt=x),interval="confidence")
+@
+
+This illustrates the problem of ignoring the uncertaining in our estimate of $\sigma^2$.  This same problem will arise when we look at other approaches to computing confidence intervals, specifically bootstrap approaches.  
+
+Figure \ref{fig:CIs.basics}c shows the confidence intervals for a series of $x$ for one sample of 10 cars.  We could construct 95\% and 75\% confidence intervals for all the samples of 10 cars used in Figure \ref{fig:CIs.basics}b and look at the fraction of the confidence intervals that cover $\alpha + \beta x$.  If the confidence intervals are constructed correctly then the 95\% confidence intervals should cover $\alpha + \beta x$ 95\% of the time and the 75\% intervals should cover $\alpha + \beta x$ 75\% of the time.  Figure \ref{fig:CIs.basics}d shows the coverage properties of the analytical confidence intervals returned by the \verb@predict.lm@ function for \verb@lm@ objects.  Note, these are based on the assumption that the residuals are Gaussian.
+
+\subsection{Constructing confidence intervals via bootstrapping}\label{subsec:bootstrap}
+
+The basic idea behind a bootstrap CI is that the data are used to generate new data sets (bootstrap data sets) from which parameters are estimated to give a large set of bootstrapped parameter estimates.  On average, the variance-covariance matrix of the bootstrapped parameter estimates will be close to the variance-covariance matrix of the MLE parameter estimates ($\Sigma$ for our example).  Thus the bootstrapped parameter estimates can used to generate CIs (or intervals for any metric using the parameter estimates).
+
+The procedure is simple.  First you generate a large number of bootstrapped data sets, then estimate the model parameters from each data set too get the bootstrap parameter estimates.  For each set of bootstrapped parameter estimates, compute the metric of interest.  We are interested in CIs for the fitted value at $x$, so we compute $\hat{\alpha}_b + \hat{\beta}_b x$ for each bootstrap.  The 95\% quantiles of the $\hat{\alpha}_b + \hat{\beta}_b x$ define the bootstrap CIs. Here is a function to do this:
+<<Cs_014_boot_CIs_fun>>=
+#takes a set of boot parameters and makes CIs from them at x
+boot.CI=function(boot.params, x){
+  CIs=apply(
+    boot.params[,c("alpha","beta"),drop=FALSE]%*%rbind(1,x),
+    2,quantile, c(0.5, 0.025,.975)
+  )
+  colnames(CIs)=x
+  t(CIs) #to look like predict output
+}
+@
+
+The are a different ways to generate bootstrap data sets: parametric and non-parametric.
+
+\subsection{ Constructing confidence intervals via parametric bootstrapping }
+
+In a parametric bootstrap the estimated model is used to generate bootstrapped data, and the parameters are estimated from that bootstrapped data.  The bootstrapped parameter estimates are then used to construct CIs.  It is the same idea as a traditional bootstrap, but we are not sampling from the data to generate new bootstrap data sets but rather using the estimated model to generate new data.  The parametric bootstrap is somewhat mis-leadingly named; it is really the analytical CIs computed via simulation.  Why use a parametric bootstrap instead of the analytical CIs?  You use it when you want CIs based on your parametric model, but do not know the analytical solution or there is no analytical solution for your model.
+
+For our linear regression model, we would generate bootstrap data sets using:
+$\yy_b= \hat{\alpha}+\hat{\beta} \xx + \ee$
+where each $e$ in  $\ee$ is drawn from a Normal distribution with mean 0 and variance $\hat\sigma^2$.  From each $\yy_b$, we estimate $\alpha$ and $\beta$ as usual, e.g. using \verb@lm@, and construct the CIs using the set of bootstrap estimates.  Here is a function to do this.  It takes the original data, gets the MLEs, and then uses those to generate data and a set of bootstrapped parameter estimates.
+
+<<Cs_015_parametricboot>>=
+parametric.boot=function(dat, nboot=1000){
+  #first fit model to data
+  fit=lm(mpg~wt, data=dat)
+  #wts at which to generate new data
+  wt=dat$wt
+  #matrix to store the estimates
+  boot.params=matrix(NA,nboot,3)
+  sigma2 = sum(fit$residual^2)/fit$df.residual
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  for(i in 1:nboot){
+    tmp.dat=alpha + beta*wt + rnorm(nrow(dat),0,sqrt(sigma2))
+    tmp.fit=lm(tmp.dat~wt)
+    boot.params[i,]=c(coef(tmp.fit), sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  }
+  colnames(boot.params)=c("alpha","beta","sigma2")
+  boot.params
+}
+
+parametric.boot.cis=function(dat, x, nboot=1000){
+  boot.params=parametric.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+
+\subsection{Constructing confidence intervals via sampling from the residuals}
+
+The analytical and parametric bootstrap CIs are based on assuming that the residual errors can be approximated by a particular statistical distribution, in our example we use a Normal distribution. Non-parametric bootstrapping allows us to compute CIs when we are unwilling to make a specific assumption about the distribution. We sample from the data in order to use the (empirical) distribution of the data instead of an assumed parametric distribution.
+
+There are two basic types of non-parametric bootstraps.  One type is similar to a parametric bootstrap in that the model is used to generate bootstrap data:
+$$y_{b,i} = \hat{\alpha}+\hat{\beta} x_i + \eta_b$$
+But instead of drawing the $\eta_b$ from a distribution, the $\eta_b$ are generated by sampling with replacement from the residual errors from the fit to the original data.  
+
+The function below shows how to do this.
+<<Cs_020_non_param_boot_function>>=
+residuals.boot=function(dat, nboot=1000){
+  fit=lm(mpg~wt, data=dat)
+  resids=residuals(fit)  
+  wt=dat$wt
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    tmp = sample(n, replace=TRUE)
+    tmp.dat=alpha + beta*wt + resids[tmp]
+    tmp.fit=lm(tmp.dat~wt)
+    boot.params[i,]=c(coef(tmp.fit), sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  }
+  colnames(boot.params)=c("alpha","beta","sigma2")
+  boot.params
+}
+
+residuals.boot.cis=function(dat, x, nboot=1000){
+  boot.params=residuals.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+In this case, there is no structure to the residuals that needs to be preserved.  A common residual structure in time-series data is temporal autocorrelation.  In spatial data, we often have spatial autocorrelation.  If these exist, a strategy must be developed to account for or remove that structure before sampling.
+
+Once a large number of bootstrap data sets are generated, the construction of confidence intervals proceeds as for the parametric bootstrap. The model is fit to each bootstrap dataset $y_b$ and $\alpha_b$, $\beta_b$, and $\sigma_b^2$ are estimated. Those parameters are then used to compute CIs.  
+
+
+
+\subsection{Constructing confidence intervals using the Hessian matrix}
+
+another way we could generate bootstrapped regression lines is by using an estimate of the distribution of the parameter estimates (the $\alpha$ and $\beta$) as opposed to creating bootstrap data (via parametric or non-parametric methods) and fitting to that. We can do this because asymptotically (meaning as sample size gets large), maximum-likelihood parameter estimates have a multivariate normal distribution (Figure \ref{fig:dist.of.ests}).
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_021_fig3, fig=TRUE, echo=FALSE, width=6, height=6>>=
+library(RColorBrewer)
+rf = colorRampPalette(rev(brewer.pal(11,'Spectral')))
+r = rf(32)
+
+nbreaks=50
+library(MASS)
+df = data.frame(x=par.results[,1],y=par.results[,2])
+h1 = hist(df$x, breaks=nbreaks, plot=FALSE)
+h2 = hist(df$y, breaks=nbreaks, plot=FALSE)
+top = max(h1$counts, h2$counts)
+k = kde2d(df$x, df$y, n=nbreaks)
+
+# margins
+oldpar <- par()
+par(mar=c(5,5,1,1))
+layout(matrix(c(2,0,1,3),2,2,byrow=T),c(3,1), c(1,3))
+image(k, col=r) #plot the image
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+par(mar=c(0,2,1,0))
+barplot(h1$counts, axes=FALSE, ylim=c(0, top), space=0, col='red')
+par(mar=c(2,0,0.5,1))
+barplot(h2$counts, axes=FALSE, xlim=c(0, top), space=0, col='red', horiz=T)
+@
+\end{center}
+\caption{Distribution of $\alpha$ and $\beta$ estimates from bootstrapping our 10 data points.  You can see that they are approximately multivariate normal even for $n=10$ (so not $n$ large).  Note, these estimates are from lm() which is using least-squares estimation, but the parameter estimates are the same as the maximum-likelihood estiamates for this problem (linear regression with Gaussian errors).}
+\label{fig:dist.of.ests}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It turns out we can estimate that multivariate normal distribution without actually bootstrapping.  It is an asymptotic estimate (meaning is correct as $n$ gets large).  The Hessian of the log-likelihood function at the maximum-likelihood estimates (MLE) is the second derivative of the log-likelihood function at the MLE.  Its inverse is an estimate of the variance-covariance matrix of the MLEs.  We can get a numerical estimate of the Hessian matrix in a variety of ways in R; one way is via the \verb@optim()@ function.  First we define a log-likelihood function for our model, in this case for a linear regression with Gaussian errors:
+<<Cs_022_linear.reg.LL>>=
+# Define the log likelihood function for a linear regression
+# parm is the parameter vector
+LL <- function(parm, y=NULL, x=NULL) {
+  resids = y - x * parm[2] - parm[1]
+  resids = suppressWarnings(dnorm(resids, 0, parm[3], log = TRUE))
+  -sum(resids)
+}
+@
+Then we can pass that into \verb@optim()@ with \verb@hessian=TRUE@.  To work well, \verb@optim()@ wants good starting values.  We pass in really good ones, i.e. the output from \verb@lm()@.  Remember that $j$ here is referring to the sample of 10 cars from our 32 car original dataset.  $\alpha_j$ is the $\alpha$ estimate from that 10 car dataset.
+<<Cs_023_linear.ref.optim>>=
+ofit.j=optim(c(alpha.j, beta.j, sqrt(s2.j)), LL, y=mtcars.j$mpg, x=mtcars.j$wt, hessian=TRUE)
+parSigma = solve(ofit.j$hessian)
+parMean = ofit.j$par
+@
+Now we can compare the bivariate distributions of parameter estimates from a parametric bootstrap to parameters drawn from the estimated parameter distribution using the Hessian matrix (Figure \ref{fig:dist.of.ests.est.vs.true}).
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_024_fig.biv.comparison, fig=TRUE, echo=FALSE, width=6, height=6>>=
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+nbreaks=50
+#generate bivariate normal alpha and beta from the estimated distribution
+hessian.par = mvrnorm(1000, mu = parMean, Sigma = parSigma)
+# now we do a kernel density estimate
+hessian.kde = kde2d(hessian.par[,1], hessian.par[,2], n = nbreaks)
+
+# now we do a kernel density estimate using the bootstrapped parameters
+boot.kde = kde2d(par.results[,1], par.results[,2], n = nbreaks)
+cont.lev = c(.05,.01,.001)
+contour(boot.kde,levels=cont.lev)
+contour(hessian.kde, add=TRUE, col="red",levels=cont.lev)
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+legend("topright",c("actual distribution","estimated distribution"),lty=1,col=c("black","red"),bty="n")
+@
+\end{center}
+\caption{Comparison of the distribution of $\alpha$ and $\beta$ estimates from bootstrapping our 10 data points to the estimated distribution from the Hessian of the log-likelihood function at the MLE values.}
+\label{fig:dist.of.ests.est.vs.true}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following functions puts all this together to produce CIs using the Hessian matrix.
+<<Cs_015_hessian_cis>>=
+hessian.boot=function(dat, nboot=1000){
+  library(MASS)
+  LL <- function(parm, y=NULL, x=NULL) {
+    resids = y - x * parm[2] - parm[1]
+    resids = suppressWarnings(dnorm(resids, 0, parm[3], log = TRUE))
+    -sum(resids)
+  }
+  fit=lm(mpg~wt, data=dat)
+  sigma2 = sum(fit$residual^2)/fit$df.residual
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  
+  fit.tmp=optim(c(alpha, beta, sqrt(sigma2)), LL, y=dat$mpg, x=dat$wt, hessian=TRUE)
+  parSigma = solve(fit.tmp$hessian)
+  parMean = fit.tmp$par
+  
+  #generate bivariate normal alpha and beta from the estimated distribution
+  boot.params = mvrnorm(1000, mu = parMean, Sigma = parSigma)
+  boot.params[,3]=boot.params[,3]^2
+  
+  colnames(boot.params)=c("alpha","beta","sigma2")
+  boot.params
+}
+
+hessian.boot.cis=function(dat, x, nboot=1000){
+  boot.params=hessian.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+
+\section{Under-coverage in the bootstrap computed CIs}
+
+Notice that in the parametric, residuals and hessian bootstraps, we have not adjusted for the fact that we used the variance in the residuals in our sample as a proxy for the true variance in the resdiduals.  As we saw when discussing the analytical CIs, ignoring the fact that we used an estimate of $\sigma^2$ rather than the true value will lead to overly small CIs with under-coverage.  Compare the CIs from our parametric and residuals bootstraps to the correct analytical CIs:
+<<Cs_021>>=
+smp1=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+
+#analytical CI with estimated sigma2
+CI.analyt.est.sigma=predict(fit.1, new=data.frame(wt=x),interval="confidence")
+
+#CI from parametric bootstrap
+CI.pboot=parametric.boot.cis(mtcars[smp1,],1)
+
+#CI from residuals bootstrap
+CI.rboot=residuals.boot.cis(mtcars[smp1,],1)
+
+#CI from hession
+CI.hboot=hessian.boot.cis(mtcars[smp1,],1)
+
+CI.analyt.est.sigma
+CI.pboot
+CI.rboot
+CI.hboot
+@
+The ones from the bootstraps are too small.  'too small' is defined as covering the true fit (the red line in the plots) for  $1-\alpha$ fraction of 10-car samples.  We know from Figure \ref{fig:CIs.basics}d that the analytical CIs have the correct coverage.  That the CIs from bootstrapping are smaller than the analytical ones will mean that they cover the true fit for a lower fraction of 10-car samples.
+
+How do we fix this? We need to estimate the correction factor, i.e how much to increase the width of our estimated CIs.  From the analytical CIs, we know that this correction factor is $t__{5\%/2, df}/z_{5\%/2}$ or in R \verb@qt(0.025, df=9)/qnorm(0.025)@ for our example with 10 data points.  We will estimate the correction factor with a bootstrap again.  The basic idea is to get a correct CI for one set of parameters, the estimated parameters, and then generate bootstrap data from those and estimate bootstrap CIs.  Then you estimate how small, on average, the bootstrap CIs are to the correct CI (from the true estimated parameters).  Here is a function to do that for the parametric bootstrap.
+
+<<Cs_017_ci_correction>>=
+ci.adj=function(dat, x, nboot1=5000, nboot2=1000){
+  fit=lm(mpg~wt, data=dat)
+  wt=dat$wt
+  sigma2 = sum(fit.j$residual^2)/fit.j$df.residual
+  alpha=coef(fit.j)[1]
+  beta=coef(fit.j)[2]
+  #this is the correct width of the 95\% CI
+  ci=parametric.boot(dat,x,nboot=nboot1)[2:3]
+  ci.width=ci[2]-ci[1]
+  #this will hold are bootstrapped CIs
+  ci.width.boot=rep(NA,nboot2)
+  for(i in 1:nboot2){
+    tmp=alpha + beta*wt + rnorm(nrow(dat),0,sqrt(sigma2))
+    tmp.dat=data.frame(mpg=tmp, wt=wt)
+    tmp.ci=parametric.boot.1(tmp.dat,1,nboot1)[2:3]
+    ci.width.boot[i]=tmp.ci[2]-tmp.ci[1]
+  }
+  ci.width/ci.width.boot
+}
+@
+
+<<Cs_018, eval=FALSE>>=
+#the correct adjustment:
+fit.j=lm(mpg~wt, data=mtcars, subset=smp1)
+qt(c(0.025),df=fit.1$df.residual)/qnorm(c(0.025))
+
+#bootstrap computed
+adj=parametric.boot.adj(mtcars[smp1,],1)
+apply(adj,2,mean,trim=0.1)
+@
+Unfortunately computing the CI adjustment with bootstrapping takes a large number of bootstraps and is thus quite slow. 
+
+Why not draw $\sigma^2$ from its bootstrapped distribution and use that in our CI construction? So instead of using $\hat{\alpha}_b$ and $\hat{\beta}_b$ only, we also use $\hat{\sigma}^2_b$. Wouldn't that properly account for the fact that we use an estimate of $\sigma^2$?  No, unfortunately it does not. 
+
+
+<<Cs_022_non_param_boot_2_pred>>=
+smp1=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+CI.np1boot=non.parametric.boot.1(mtcars[smp1,],1)
+
+CI.pboot
+CI.np1boot
+CI.np2boot
+@
+
+
+
+\subsubsection{Non-parametric bootstrapping via sampling the data}
+
+With the second type of non-parametric bootstrap, the model is not used.  Instead one simply creates bootstrap data by sampling, with replacement, from the data set.  Note that in the second approach, the predictor variables, the $x_i$, in your dataset change.  They change because you sample the data.  In many contexts, it will not be possible to construct CIs by randomly sampling the data because the data have some structure that needs to be retained, for example, you need the car weights in the sample to remain the same.  However, consider the case where our data are themselves a random sample from a collection of cars with different weights.  They are not an experiment in which we fixed the weights and collected data.  In this case, resampling the data makes sense.  
+
+The following function shows how you can create bootstrap data by sampling from the data.  Once a large number of bootstrap data sets are generated, the CIs are created as usual.
+<<Cs_021_non_param_boot_function>>=
+resampling.boot=function(dat, nboot=1000){
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    #sample with replacement
+    tmp = sample(n, replace=TRUE)
+    #tmp.fit is the fit to this bootstrapped data
+    tmp.fit=lm(mpg~wt, data=dat, subset=tmp)
+    boot.params[i,]=c(coef(tmp.fit),sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  }
+  colnames(boot.params)=c("alpha","beta","sigma2")
+  boot.params
+}
+
+resampling.boot.cis=function(dat, x, nboot=1000){
+  boot.params=resampling.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<fig-CIs, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
+fit=lm(mpg~wt, data=mtcars)
+s2 = sum(fit$residual^2)/fit$df.residual
+alpha=coef(fit)[1]
+beta=coef(fit)[2]
+nboot=1000
+
+#for plotting and computing coverage
+pred.wt=seq(1,6,0.25)
+npred=length(pred.wt)
+Ey = alpha+beta*pred.wt
+
+smp1=c(21, 22,  9, 24, 12, 20, 19, 11, 23, 13)
+n=dim(mtcars)[1]
+mtcars.j = mtcars[smp1,] # a specific sample
+fit.j=lm(mpg~wt, data=mtcars.j)
+s2.j = sum(fit.j$residual^2)/fit.j$df.residual
+alpha.j=coef(fit.j)[1]
+beta.j=coef(fit.j)[2]
+
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+
+#Truth from 1000s of 10 car samples from the original dataset of 32 cars; red lines
+nj=nrow(j.results)
+j.preds = matrix(j.results[,1]-alpha+alpha.j,npred,nj,byrow=TRUE)+
+  matrix(pred.wt,npred,1)%*%matrix(j.results[,2]-beta+beta.j,1,nj)
+j.CIs = apply(j.preds,1,quantile,probs=c(0.025,0.975))
+
+plot.fig.cis=function(CIs, pred.wt){
+  #CIs redefined in each panel
+  ylims = c(10,40)
+  plot(mtcars.j$wt,mtcars.j$mpg, ylim=ylims, ylab="", xlab="")
+  abline(fit.j, lwd=2)
+  lines(pred.wt, CIs[1,],lty=2); lines(pred.wt, CIs[2,],lty=2)
+  lines(pred.wt, j.CIs[1,],col="red"); lines(pred.wt, j.CIs[2,],col="red")
+}
+
+#panel 1 analytical
+CIs=t(predict(lm(mpg~wt,data=mtcars.j), newdata=data.frame(wt=pred.wt), interval="confidence")[,2:3])
+plot.fig.cis(CIs, pred.wt)
+title("analytical (a)",cex.main=1)
+
+#coverage using analytical
+nsim = 500
+ci.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=sample(n, 10))
+  preds = predict(tmp.fit, newdata= data.frame(wt=pred.wt), interval="confidence")
+  ci.coverage[i] = 1-sum(Ey>preds[,3] | Ey<preds[,2])/length(pred.wt)
+}
+legend("top",legend=paste("coverage",round(100*sum(ci.coverage)/nsim,digits=1)),bty="n")
+
+#function to take some bootstrapped parameters and make CIs
+boot.cis=function(res, pred.wt){
+  nsim=dim(res)[1]
+  npred=length(pred.wt)
+  preds = matrix(res[,1],npred,nsim,byrow=TRUE)+matrix(pred.wt,npred,1)%*%matrix(res[,2],1,nsim)
+  CIs = apply(preds,1,quantile,probs=c(0.025,0.975))
+  CIs
+}
+
+#panel 2 non-parametric bootstrap
+#function to get CIs from a non-parametric bootstrap of a sample
+nonpar.boot.cis = function(dat, pred.wt, nboot=nboot){
+  results=matrix(NA,nboot,2)
+  n = nrow(dat)
+  for(i in 1:nboot){
+    #sample with replacement
+    tmp = sample(n, replace=TRUE)
+    #tmp.fit is the fit to this bootstrapped data
+    tmp.fit=lm(dat$mpg[tmp]~dat$wt[tmp])
+    results[i,]=coef(tmp.fit)
+  }
+  boot.cis(results, pred.wt)
+}
+CIs=nonpar.boot.cis(mtcars.j, pred.wt, nboot=nboot)
+plot.fig.cis(CIs, pred.wt)
+title("non-parametric bootstrap (b)",cex.main=1)
+#coverage
+nsim = 500
+ci.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.samp=sample(dim(mtcars)[1], 10)
+  CIs=nonpar.boot.cis(mtcars[tmp.samp,], pred.wt, nboot=nboot)
+  ci.coverage[i] = 1-sum(Ey>CIs[2,] | Ey<CIs[1,])/length(pred.wt)
+}
+legend("top",legend=paste("coverage",round(100*sum(ci.coverage)/nsim,digits=1)),bty="n")
+
+
+#panel 3 parametric bootstrap
+par.boot.cis = function(dat, pred.wt, nboot=nboot){
+  fit=lm(mpg~wt, data=dat)
+  s2 = sum(fit$residual^2)/fit$df.residual
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  par.results=matrix(NA,nboot,2)
+  for(i in 1:nboot){
+    tmp=alpha + beta*dat$wt + rnorm(length(dat$wt),0,sqrt(s2))
+    tmp.fit=lm(tmp~dat$wt)
+    par.results[i,]=coef(tmp.fit)
+  }
+  boot.cis(par.results, pred.wt)
+}
+CIs=par.boot.cis(mtcars.j, pred.wt, nboot=nboot)
+plot.fig.cis(CIs, pred.wt)
+title("parametric bootstrap (c)",cex.main=1)
+#coverage
+nsim = 500
+ci.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.samp=sample(dim(mtcars)[1], 10)
+  CIs=par.boot.cis(mtcars[tmp.samp,], x, nboot=nboot)
+  ci.coverage[i] = 1-sum(Ey>CIs[2,] | Ey<CIs[1,])/length(x)
+}
+legend("top",legend=paste("coverage",round(100*sum(ci.coverage)/nsim,digits=1)),bty="n")
+
+#panel 4 bootstrap from hessian
+hes.boot.cis = function(dat, pred.wt, nboot=nboot){
+  LL <- function(parm, y=NULL, x=NULL) {
+    resids = y - x * parm[2] - parm[1]
+    resids = suppressWarnings(dnorm(resids, 0, parm[3], log = TRUE))
+    -sum(resids)
+  }
+  fit=lm(mpg~wt, data=dat)
+  s2 = sum(fit$residual^2)/fit$df.residual
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  ofit=optim(c(alpha, beta, sqrt(s2)), LL, y=dat$mpg, x=dat$wt, hessian=TRUE)
+  parSigma = solve(ofit$hessian)
+  parMean = ofit$par
+  #generate bivariate normal alpha and beta from the estimated distribution
+  hess.results = mvrnorm(nboot, mu = parMean, Sigma = parSigma)
+  boot.cis(hess.results, pred.wt)
+}
+title("bootstrap using hessian (d)",cex.main=1)
+CIs=hes.boot.cis(mtcars.j, pred.wt, nboot=nboot)
+plot.fig.cis(CIs, pred.wt)
+title("bootstrap via hessian (d)",cex.main=1)
+#coverage
+nsim = 500
+ci.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.samp=sample(dim(mtcars)[1], 10)
+  CIs=hes.boot.cis(mtcars[tmp.samp,], x, nboot=nboot)
+  ci.coverage[i] = 1-sum(Ey>CIs[2,] | Ey<CIs[1,])/length(x)
+}
+legend("top",legend=paste("coverage",round(100*sum(ci.coverage)/nsim,digits=1)),bty="n")
+
+@
+\end{center}
+\caption{Comparison of four ways to compute confidence intervals.  There is no one true CI as there are many CI algorithms that would could produce proper coverage; i.e. that the $x$-CI would cover the true relationship $x$ percent of the time.  The red line CIs are based on the true distribution of the $\alpha$ and $\beta$ from all the 10 car samples from the original 32-car dataset.  A CI based on this true distribution would have proper coverage.}
+\label{fig:CIs.comparison}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\subsection{Summary}
+
+Figure \ref{fig:CIs.comparison} compares the CIs from the four different methods for a specific dataset.  All four methods are asymptotically correct, as $n$ gets large.  10 (our $n$) is not large and thus three of the methods produce CIs with too low coverage.  This means as sample size gets large, all methods will produce $x$-CIs (e.g. 95\% CIs) that cover the true value $x$\% of the time.  The analytical approach is fast but is not available to us for MARSS models.  The non-parametric bootstrap is useful if one is unwilling to assume a particular distribution for the errors.  The parametric bootstrap is useful when the estimate of the hessian is numerically difficult or the multivariate normality assumption for the parameters is dubious.  It should be kept in mind that the methods discussed here do not work that well if the likelihood surface is multi-modal.
+
+
+\section{Prediction intervals on the fitted $\tilde{y}$}
+
+The confidence intervals in Figure \ref{fig:CIs.1} are for $\alpha + \beta x$, or the expected value of $\tilde{y}$.  The prediction intervals show the (estimated) 95\% interval of $\tilde{y}$, not the expected value of $\tilde{y}$.  The 95\% prediction intervals should contain (or cover) 95\% of $\tilde{y}$ (mpg) observed for cars of weight $x$. Prediction intervals are wider than confidence intervals because prediction intervals predict the distribution of $\tilde{y}$ while confidence intervals predict the expected value of $\tilde{y}$.
+
+Let's go back to our true relationship between mpg and weight (the red line in Figure \ref{fig:CIs.basics}a). This is the relationship for our 32 car dataset, but let's imagine it holds for all models of cars. Let's also say that the residual variance we see in Figure \ref{fig:CIs.basics}a (the difference between the dots and the red line) characterizes the variability in the relationship for all models of cars.  We could imagine many more data points (car models) around the red line, which we could generate like so:
+<<Cs_5>>=
+fit = lm(mpg~wt, data=mtcars)
+s2 = sum(fit$residual^2)/fit$df.residual
+alpha=coef(fit)[1]
+beta=coef(fit)[2]
+plot(mtcars$wt,mtcars$mpg,ylim=c(0,60),xlab="car weight",ylab="mpg")
+x = runif(1000,1,6)
+y = alpha+beta*x+rnorm(1000,0,sqrt(s2))
+points(x,y)
+abline(fit, lwd=2, col="red")
+@
+
+Then we could construct an interval at any $x$ (car weight) that would contain 95\% of the data points at that  $x$ (Figure \ref{fig:PIs}a).  For any new $\tilde{y}$, there would be a 95\% chance it would fall within our constructed interval.  Since our errors are Gaussian, this is just $\alpha+\beta x \pm 1.96\sigma$.  We could add these to our plot using:
+<<Cs_6>>=
+lines(c(0,10),alpha+beta*c(0,10)+1.96*sqrt(s2),col="red",lty=2,lwd=1)
+lines(c(0,10),alpha+beta*c(0,10)-1.96*sqrt(s2),col="red",lty=2,lwd=1)
+@
+
+However, we do not know $\alpha$, $\beta$ or $\sigma^2$, so we cannot construct this perfect prediction interval.  But we can devise a method of constructing a prediction interval such that 95\% of the constructed prediction intervals will cover new $\tilde{y}$.  This is the same idea as constructing confidence intervals except that now we are predicting $\tilde{y}$ instead of the expected value of $\tilde{y}$.
+
+The analytical equation for the prediction intervals assumes the data come from the linear model with Gaussian errors and can be generated using the predict function \verb@predict@:
+<<Cs_7>>=
+npred=1000
+plot(mtcars$wt,mtcars$mpg,ylim=c(0,60),type="n",xlab="car weight",ylab="mpg")
+x = runif(npred,1,6)
+y = alpha+beta*x+rnorm(npred,0,sqrt(s2))
+points(x,y, col="grey")
+abline(fit, lwd=2, col="red")
+abline(fit.j, lwd=2)
+points(mtcars.j$wt, mtcars.j$mpg, pch=3)
+preds = predict(lm(mpg~wt,data=mtcars.j), newdata= data.frame(wt=pred.wt), interval="prediction")
+lines(pred.wt,preds[,2],lty=2)
+lines(pred.wt,preds[,3],lty=2)
+@
+Figure \ref{fig:CIs.2}b shows the prediction intervals computed using our $j$ sample (the crosses).  These are a bit wide and cover a little too much of the $\tilde{y}$ distribution (the grey circles).  The prediction interval is worse, meaning too much coverage, the farther we try to predict from the center of the prediction variable (car weight):
+<<Cs_8>>=
+#get the 95% pred intervals for each x
+preds = predict(fit.j, newdata= data.frame(wt=x), interval="prediction")
+#see how many y fall outside that
+1-sum(y>preds[,3] | y<preds[,2])/npred
+#see how many fall inside at different x values
+1-tapply(y>preds[,3] | y<preds[,2],cut(x,breaks=1:6),mean)
+@
+
+However that was just for one sample of 10 cars.  If we look at large number of 10 car samples, we see that on average the prediction interval does cover 95\% of the $\tilde{y}$:
+<<Cs_9>>=
+#j sample of 10 cars
+nsim = 5000
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=sample(dim(mtcars)[1], 10))
+  preds = predict(tmp.fit, newdata= data.frame(wt=x), interval="prediction")
+  pi.coverage[i] = 1-sum(y>preds[,3] | y<preds[,2])/npred
+}
+sum(pi.coverage)/nsim
+@
+In the above code, the $\tilde{y}$ were generated using a Gaussian distribution and this gave us a bit of an unfair advantage.  We could also generate $\tilde{y}$ by sampling from the residuals.  This is fairer since the data are not exactly normal. However, the average coverage is close to 95\% even with new data generated by sampling from the residuals.
+<<Cs_10>>=
+y = alpha+beta*x+sample(residuals(fit), npred, replace=TRUE)
+nsim = 5000
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=sample(dim(mtcars)[1], 10))
+  preds = predict(tmp.fit, newdata= data.frame(wt=x), interval="prediction")
+  pi.coverage[i] = 1-sum(y>preds[,3] | y<preds[,2])/npred
+}
+sum(pi.coverage)/nsim
+@
+
+\subsection{Computing prediction intervals via bootstrapping}
+In the same way that we generated confidence intervals via bootstrapping, we also can generate prediction intervals from bootstrapping. The idea is fairly simple.  Say we want to generate a prediction interval for weight $x$.  We fit a model to the data and then use the fitted model to generate bootstrap data. We fit to that bootstrap data to get bootstrap parameter estimates including an estimate of the residual variance. We then generate a new data point for $x$ using those parameter estimates.  We repeat this thousands of times to get many predictions for $x$ and the 95\% quantiles are the bootstapped prediction intervals at $x$.  
+
+
+
+\subsection{Prediction interval includes two types of uncertainty}
+
+Includes uncertainty about the relationship between mpg and weight, i.e. in the regression parameters, and uncertainty in what $\tilde{y}$ will be due to observation error.
+
+We will not get the right prediction interval if we simply use our estimated regression line and add on the estimated residual variance.  I think this might work though: bootstrapping a bunch of regression lines and simulating new data based on $\hat{\alpha}_b + \hat{\beta}_b x + e$ with $e\sim \N(0,\hat{\sigma^2}_b)$.
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<fig-PIs, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
+par(mfrow=c(2,2))
+set.seed(32421)
+#TRUTH (the relationship in the 32-car dataset
+fit = lm(mpg~wt, data=mtcars)
+s2 = sum(fit$residual^2)/fit$df.residual
+alpha=coef(fit)[1]
+beta=coef(fit)[2]
+x = runif(1000,1,6)
+y = alpha+beta*x+rnorm(1000,0,sqrt(s2))
+ylims=c(0,60); xlims=c(1,6)
+
+#panel 1
+#using MLEs
+plot(mtcars$wt,mtcars$mpg,ylim=ylims,xlim=xlims,xlab="car weight",ylab="mpg",type="n")
+points(x,y, col="grey")
+abline(fit.j, lwd=2, col="red")
+points(mtcars.j$wt, mtcars.j$mpg, pch=3,col="red")
+lines(c(0,10),alpha.j+beta.j*c(0,10)+1.96*sqrt(s2.j),col="red",lty=2,lwd=1)
+lines(c(0,10),alpha.j+beta.j*c(0,10)-1.96*sqrt(s2.j),col="red",lty=2,lwd=1)
+title("using MLEs (a)",cex.main=1)
+#coverage using MLEs
+nsim = 1000
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  npred=length(x)
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=sample(dim(mtcars)[1], 10))
+  s2.tmp = sum(tmp.fit$residual^2)/fit.j$df.residual
+  alpha.tmp=coef(tmp.fit)[1]
+  beta.tmp=coef(tmp.fit)[2]
+  preds = cbind(
+    alpha.tmp+x*beta.tmp+1.96*sqrt(s2.tmp),
+    alpha.tmp+x*beta.tmp-1.96*sqrt(s2.tmp)
+  )
+  pi.coverage[i] = 1-sum(y>preds[,1] | y<preds[,2])/npred
+}
+legend("top",legend=paste("coverage",round(100*sum(pi.coverage)/nsim,digits=1)),bty="n")
+
+#panel 2
+#analytical
+plot(mtcars$wt,mtcars$mpg,ylim=ylims,xlim=xlims,xlab="car weight",ylab="mpg",type="n")
+points(x,y, col="grey")
+abline(fit.j, lwd=2,col="red")
+points(mtcars.j$wt, mtcars.j$mpg, pch=3,col="red")
+preds = predict(lm(mpg~wt,data=mtcars.j), newdata= data.frame(wt=pred.wt), interval="prediction")
+lines(pred.wt,preds[,2],lty=2,col="red")
+lines(pred.wt,preds[,3],lty=2,col="red")
+title("analytical (b)",cex.main=1)
+#coverage using analytical
+nsim = 1000
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  npred=length(x)
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=sample(dim(mtcars)[1], 10))
+  preds = predict(tmp.fit, newdata= data.frame(wt=x), interval="prediction")
+  pi.coverage[i] = 1-sum(y>preds[,3] | y<preds[,2])/npred
+}
+legend("top",legend=paste("coverage",round(100*sum(pi.coverage)/nsim,digits=1)),bty="n")
+
+#panel 3
+#parametric bootstrap
+#function to do get PIs from parametric bootstrap
+par.boot.PIs=function(predvar, pars, PIx, nboot=1000){
+  par.results=matrix(NA,nboot,3)
+  for(i in 1:nboot){
+    tmp=pars[1] + pars[2]*predvar + rnorm(length(predvar),0,sqrt(pars[3]))
+    tmp.fit=lm(tmp~predvar)
+    par.results[i,]=c(coef(tmp.fit),sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  }
+  res=par.results
+  PIs=apply(matrix(res[,1],length(PIx),dim(res)[1],byrow=TRUE)+
+              matrix(PIx,ncol=1)%*%matrix(res[,2],nrow=1)+
+              matrix(rnorm(dim(res)[1],0,sqrt(res[,3])),length(PIx),dim(res)[1]),
+            1,quantile,probs=c(0.025,0.975))
+  
+  PIs
+}
+plot(mtcars$wt,mtcars$mpg,ylim=ylims,xlim=xlims,xlab="car weight",ylab="mpg",type="n")
+points(x,y, col="grey")
+abline(fit.j, lwd=2,col="red")
+points(mtcars.j$wt, mtcars.j$mpg, pch=3,col="red")
+PIs=par.boot.PIs(mtcars.j$wt, c(alpha.j, beta.j, s2.j), pred.wt)
+lines(pred.wt, PIs[1,],lty=2,col="red")
+lines(pred.wt, PIs[2,],lty=2,col="red")
+title("parametric bootstrap (c)",cex.main=1)
+#coverage using par boot.  Just use x at 1:6
+nsim = 100
+ys=c()
+for(i in 1:6) ys=cbind(ys,alpha+beta*i+rnorm(1000,0,sqrt(sigma2)))
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.samp=sample(dim(mtcars)[1], 10)
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=tmp.samp)
+  s2.tmp = sum(tmp.fit$residual^2)/fit.j$df.residual
+  alpha.tmp=coef(tmp.fit)[1]
+  beta.tmp=coef(tmp.fit)[2]
+  PIs=par.boot.PIs(mtcars$wt[tmp.samp], c(alpha.tmp, beta.tmp, s2.tmp), 1:6, nboot=1000)
+  pi.coverage[i] = 1-sum(ys>matrix(PIs[2,],1000,6,byrow=TRUE) | ys<matrix(PIs[1,],1000,6,byrow=TRUE))/6000
+}
+legend("top",legend=paste("coverage",round(100*sum(pi.coverage)/nsim,digits=1)),bty="n")
+
+
+#panel 4
+#bootstrap using hessian
+hess.boot.PIs=function(predvar, respvar, PIx, nboot=1000){
+  LL <- function(parm, y=NULL, x=NULL) {
+    resids = y - x * parm[2] - parm[1]
+    resids = suppressWarnings(dnorm(resids, 0, sqrt(parm[3]), log = TRUE))
+    -sum(resids)
+  }
+  tmp.fit=lm(respvar~predvar)
+  pars=c(coef(tmp.fit), sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  ofit.j=optim(pars, LL, y=respvar, x=predvar, hessian=TRUE)
+  parSigma = solve(ofit.j$hessian)
+  parMean = ofit.j$par
+  hess.results = mvrnorm(nboot, mu = parMean, Sigma = parSigma)
+  res=hess.results[hess.results[,3]>0,]
+  PIs=apply(matrix(res[,1],length(PIx),dim(res)[1],byrow=TRUE)+
+              matrix(PIx,ncol=1)%*%matrix(res[,2],nrow=1)+
+              matrix(rnorm(dim(res)[1],0,sqrt(res[,3])),length(PIx),dim(res)[1]),
+            1,quantile,probs=c(0.025,0.975))
+  PIs
+}
+plot(mtcars$wt,mtcars$mpg,ylim=ylims,xlim=xlims,xlab="car weight",ylab="mpg",type="n")
+points(x,y, col="grey")
+abline(fit.j, lwd=2,col="red")
+points(mtcars.j$wt, mtcars.j$mpg, pch=3,col="red")
+PIs=hess.boot.PIs(mtcars.j$wt, mtcars.j$mpg, pred.wt, nboot=1000)
+lines(pred.wt, PIs[1,],lty=2,col="red")
+lines(pred.wt, PIs[2,],lty=2,col="red")
+title("bootstrap using hessian (d)",cex.main=1)
+#coverage using hess boot.  Just use x at 1:6
+nsim = 100
+ys=c()
+for(i in 1:6) ys=cbind(ys,alpha+beta*i+rnorm(1000,0,sqrt(sigma2)))
+pi.coverage=rep(NA, nsim)
+for(i in 1:nsim){
+  tmp.samp=sample(dim(mtcars)[1], 10)
+  tmp.fit=lm(mpg~wt, data=mtcars, subset=tmp.samp)
+  s2.tmp = sum(tmp.fit$residual^2)/fit.j$df.residual
+  alpha.tmp=coef(tmp.fit)[1]
+  beta.tmp=coef(tmp.fit)[2]
+  PIs=hess.boot.PIs(mtcars$wt[tmp.samp], mtcars$mpg[tmp.samp], 1:6, nboot=1000)
+  pi.coverage[i] = 1-sum(ys>matrix(PIs[2,],1000,6,byrow=TRUE) | ys<matrix(PIs[1,],1000,6,byrow=TRUE))/6000
+}
+legend("top",legend=paste("coverage",round(100*sum(pi.coverage)/nsim,digits=1)),bty="n")
+@
+\end{center}
+\caption{Comparison of four ways to compute prediction intervals.  There is no one true CI as there are many CI algorithms that would could produce proper coverage; i.e. that the $x$-CI would cover the true relationship $x$ percent of the time.  The red line CIs are based on the true distribution of the $\alpha$ and $\beta$ from all the 10 car samples from the original 32 car dataset.  A CI based on this true distribution is simple one of the CIs that will have proper coverage.}
+\label{fig:PIs}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+\section{Expected values of states and data in MARSS models}
+
+Unlike a linear regression, a MARSS model has two types of random variables: the new data ($\y\tilde{y}$) like a regression but also the state ($\xx$).  In a linear regression, we are uncertain about the relationship (the red line i Figure \ref{fig:CI.basic}) because we are uncertain about the parameters that describe that line.  In a MARSS model, we have the uncertainty about the parameters, but even if we did not, we would still be uncertain about the $\xx$ that the $\y\tilde{y}$ are observations of because $\xx$ is a random process.
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}
+\begin{gathered}
+\xx_t = \xx_{t-1}+\ww_t \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \ZZ\xx_t+\aa+\vv_t \text{ where } \vv_t \sim \MVN(0,\RR)  \\
+\xx_0 \sim \MVN(\pipi,\LAM) 
+\end{gathered}   
+\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In a linear regression, you, typically, plot the regression line on to the data (as in Figure \ref{fig:CI.basic}a).  The regression line is the expected value of new $y$ at a given $x$ given the estimated parameter values.  You can get the expected value of $\tilde{y}$ from a linear regression fit using either the \verb@fitted@ or \verb@predict@ function.
+
+In a MARSS model, the expected value of $\y\tilde{y}$ has the same interpretation but the calculation of the expected value involves both the estimated parameters and the expected value of $\xx$:
+\begin{equation}
+\E[\y\tilde{y}_t] = \hat{\ZZ}\E[\xx_t] + \hat{\aa}
+\end{equation}
+where the expectation is conditioned on the data ($\yy$).  You can get the expected value of $\y\tilde{y}$ from a MARSS fit using either the \verb@fitted@ or \verb@predict@ function:
+<<Cs_9>>=
+#show example
+@
+
+Often it is the case that the objective of the analysis is to estimate $\xx$ and it is its expected value that is desired.  
+
+Show standard error of $\xx$.  That makes sense.  We don't know what $\xx$ is.
+
+We can also the show the stand. error for functions of $\xx$.  We could show the standard error of $\hat{\ZZ}\E[\xx_t] + \hat{\aa}$ .  That however is NOT the variability of $\E[\y\tilde{y}]$.  If we just collected a bunch of new data for the same time period, the $\xx$ stays the same.  The s.e. reflects our uncertainty but the $\xx$ is not changing.  $\E[\y\tilde{y}]=\ZZ\xx+\uu$ and uncertainty about that is due to our uncertainty in both $\xx$ and the parameters.  We are uncertain about $\xx$ in the same way as we are uncertain about the red line.  Confidence interval not standard error.  The standard error of $\yy$ is from $\RR$.  E(param estimate) have standard errors and $\xx_t$ has a standard error.
+
+Doesn't make sense to use that to compute the standard error of $\yy$ unless we wanted to show the stand. error if the whole process were run again or run forward.  We assume the parameters are at their estimated values and run forward. But why would the new process be governed by the estimated parameters?
+
+Expected value of $\yy$ if we ran the process over and over and each time generated a new $\xx$ using the estimated parameters.  ??? 
+\xx_t = \hat{\BB}\xx_{t-1}+\hat{\uu+\ww_t \text{ where } \ww_t \sim \MVN(0,\hat{\QQ}) \\
+
+Forecasting using the estimated values.  Yes, standard thing to do but keep in mind that it the prediction intervals will be too narrow.
+
+
+why show variability in the E(y)? You are uncertain about the parameters.  s.e. of the states has nothing to do with the uncertainty in the parameters.  You are uncertain about the states even if you are certain about the 
+
+\section{Confidence intervals and prediction intervals for MARSS models}
+

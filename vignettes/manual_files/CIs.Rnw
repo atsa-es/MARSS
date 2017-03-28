@@ -1,0 +1,1425 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=../figures/CIs-, eps=FALSE, split=FALSE}
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+require(MARSS)
+options(prompt=" ", continue=" ", width=60)
+@
+
+%For debugging, the file is set up to be Sweaved on its own.
+% Sweave("CIs.Rnw")
+\chapter{Confidence intervals for parameters and states in MARSS models}
+\label{chap:cis}
+\chaptermark{Computing CIs}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_CIs.R",package="MARSS")} at the R command line to open a file with all the code for this chapter.}
+
+This chapter discusses the computation of confidence intervals and standard errors.  The bulk of the chapter illustrates these concepts and the approaches with a simple linear regression.  At the end of the chapter,  we discuss how these concepts are applied for MARSS models.  When discussing confidence interval, it is important to recognize that they concern properties of data we have not collected rather than data we have collected.  When we write of the expected value of $\tilde{y}$ (new data) conditioned on the observed data, these two datasets are different.  We do not need to calculate the expected value of data we have collected; the expected value is simply its value.  To distinguish these two types of data, the data collected is called $y$ (or $\yy$ to denote a set of $y$) and new data (whose expected value we are interested in) is called $\tilde{y}$.
+
+For this chapter, we will use a data set on the date of first spring flight observed in two butterfly species in the California Sierra from 1972 to 2002\footnote{Collected by Dr. A. M. Shapiro at UC Davis.  \url{http://butterfly.ucdavis.edu/}}.
+We will regress this data against the average maximum daily temperature in February (Figure \ref{fig:dat}).
+<<readdat,echo=FALSE,results=hide>>=
+# Data compiled by 
+# Dr. Arthur M. Shapiro
+# http://butterfly.ucdavis.edu/
+library(stringr)
+bdat=read.csv("butterfly_data.csv")
+sppcol=which(str_detect(colnames(bdat),"Skipper"))
+sppcol=which(str_detect(colnames(bdat),"Common.Skipper"))
+nspp = length(sppcol)
+sppnames=colnames(bdat)[sppcol]
+#badyr=bdat$year==1983 | bdat$year==1985
+badyr=1983
+for(i in sppcol) bdat[,i]=bdat[,i]-mean(bdat[,i])
+#express as relative to mean date of first spring flight
+ave.max.win = (bdat$ave.max.mar.temp+bdat$ave.max.feb.temp+bdat$ave.max.jan.temp)/3
+dat=data.frame(
+  y=unlist(bdat[,sppcol]),
+  x=rep(ave.max.win,nspp),
+  year=rep(bdat$year, each=nspp),
+  name=rep(sppnames,each=dim(bdat)[1]))
+dat=dat[!(dat$year %in% badyr),]
+@
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]\label{fig:dat}
+\begin{center}
+<<Cs_000_fig0, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=4>>=
+par(mfrow=c(1,2),mar=c(5,5,2,2))
+n = dim(dat)[1]
+fit = lm(y~x, data=dat)
+sigma = sqrt(sum(fit$residual^2)/fit$df.residual) #unbiased not MLE
+alpha=coef(fit)[1]
+beta=coef(fit)[2]
+
+plot(dat$x, dat$y, xlim=c(min(ave.max.win),max(ave.max.win)), ylim=c(min(bdat[,sppcol]),max(bdat[,sppcol])),
+     ylab="Day of first spring flight\nminus the mean", xlab="Average max Jan-Mar temperature (F)",
+     bty="L")
+abline(fit, col="red", lwd=2)
+m=10000
+x=runif(m,min(ave.max.win),max(ave.max.win))
+y=alpha+beta*x+rnorm(m,0,sigma)
+points(x,y,pch=".",col="red")
+points(dat$x,dat$y,pch=16,col="blue")
+points(rep(ave.max.win[bdat$year %in% badyr],length(sppcol)),bdat[bdat$year %in% badyr,sppcol],pch=1,col="blue")
+
+#panel b
+hist(dat$x,xlab="Ave max winter temperature", main="", col="grey")
+
+@
+\end{center}
+\caption{First flight data for Common Skippers at field sites in Northern California 1972-2002.  Left) The day of first observed spring flight ($y$) relative to the mean versus the average maximum daily temperature ($x$) recorded at the Willow Slough site in January to March.  On the $y$ axis, 0 indicates the average observed day of first flight from 1972 to 2002; 20 means 20 days after the average and -20 means before.  The blue dots are the observed data and the red dots are the 'hypothetical' data generated from the fitted relationship: $y=\alpha+\beta x + e$ where $e \sim N(0,\sigma)$. The point marked with an open circle is 1983 and was removed as an outlier year. Right) Histogram of average maximum winter temperatures in the 30-year butterfly dataset.}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We will assume that these data are a random sample from this generating process:
+\begin{equation}\label{eqn:genmodel}
+y = \alpha + \beta x + e, \quad\quad e \sim N(0,\sigma)
+\end{equation}
+That is, that the day of first spring flight relative to the mean is a linear function of the average winter maximum temperature. We will assume that $\alpha$ = \Sexpr{round(alpha,digits=3)}, $\beta$= \Sexpr{round(beta,digits=3)}, and $\sigma$=\Sexpr{round(sigma,digits=3)} based on the 1972-2002 data.  The red dots in Figure \ref{fig:dat} show hypothetical data generated from this model with the observed data shown in blue. The red line is the expected value of data generated with Equation \ref{eqn:genmodel} at each $x$ value on the $x$-axis.  We will denote this expected value as $E[\tilde{y}|x]$.
+
+\section{Definition and properties of confidence intervals }
+
+A 95\% confidence interval on some test statistic is an interval constructed in such a way that for 95\% of the possible new data sets, the confidence interval includes (or covers) the true value of the statistic.  We will be computing
+confidence intervals for $E[\tilde{y}|x=58]$, the value of the red regression line at $x=58$, based on a sample (the observed data) from the generating model (Equation \ref{eqn:genmodel}). $E[\tilde{y}|x=58]$ is a function of the parameters: $E[\tilde{y}|x=58]=\alpha + \beta x$, however, everything in this chapter also applies to other functions of parameters and in particular to the parameter themselves.
+
+Let's say we observe 10 data points from the generating model (Equation \ref{eqn:genmodel}). We will denote these observations $\yy_j$ and throughout this chapter, $\yy_j$ is referring to this particular observed set of data associated with a particular set of $\xx_j$.
+To generate a $\yy_j$ for this chapter, we will set the random seed to 123, and then will generate both $y$ (first flight day relative to mean) and $x$ (average max winter temperature):
+<<Cs_001_fit-j>>=
+set.seed(123)
+nsamp=10 #sample size
+x.j = runif(nsamp, min(dat$x), max(dat$x))
+y.j =  alpha + beta*x.j + rnorm(nsamp,0,sigma)
+dat.j = data.frame(x=x.j, y=y.j)
+#we will use the fit to the j-data throughout the chapter
+fit.j = lm(y~x, data=dat.j)
+df.j = fit.j$df.residual
+alpha.j = coef(fit.j)[1]
+beta.j = coef(fit.j)[2]
+sigma.j = sqrt(sum(fit.j$residual^2)/df.j) #unbiased not MLE
+@
+There are other possible $y$ data we could have collected with the same $x$ values, say different years with the same set of temperatures or same years but a different schedule of site visits.  These hypothetical samples will be denoted $\tilde{\yy}_j$; the the $j$ subscript reminds us that the $x$ values are $\xx_j$ the $\tilde$ denotes that these are hypothetical data that could have been generated from the model.
+
+Figure \ref{fig:CIs.basics}c shows a regression line fit to $\yy_j$. The value of this regression at $x=58$ is our estimate of the expected value of new or hypothetical data generated at the value $x=58$, denoted $\hat{E}[\tilde{y}|x=58]$. This estimate of $E[\tilde{y}|x=58]$ is $\hat{\alpha}_j + \hat{\beta}_j 58$, where the $j$ subscript denotes that these estimates come from $\yy_j$.  We can construct a confidence interval for $E[\tilde{y}|x=58]$. 
+
+This 95\% confidence interval is an interval constructed in such a way that for 95\% of the possible random samples of 10, the confidence interval includes (or covers) the true expected value: $\alpha + \beta 58$.  What does this mean?  We can imagine other samples of 10 and other regression lines that we would compute with those samples. Here is  code to create a large number of $\alpha$, $\beta$ and $\sigma^2$ estimates from samples of 10:
+<<Cs_001_fit-i>>=
+nsim = 5000
+i.results=matrix(NA,nsim,3)
+for(i in 1:nsim){
+  x = runif(nsamp, min(dat$x), max(dat$x))
+  y = alpha + beta*x + rnorm(nsamp,0,sigma)
+  dat.i=data.frame(x=x, y=y)
+  fit.i=lm(y~x, data=dat.i)
+  i.results[i,]=c(coef(fit.i), 
+                  sqrt(sum(fit.i$residual^2)/fit.i$df.residual))
+}
+@
+For each sample, we could compute $E[\tilde{y}|x=58]=\hat{\alpha}+58 \hat{\beta}$ and we could construct a confidence interval for it just like in Figure \ref{fig:CIs.basics}c.  If the confidence interval is constructed properly, for 95\% of the regression lines in Figure \ref{fig:CIs.basics}b, the interval will include $\alpha + 58 \beta$.  Figure \ref{fig:CIs.basics}d shows that this is the case for the interval constructed as in panel b. The $y$-axis is the fraction of CIs that cover $\alpha + 58 \beta$ minus the correct fraction (99\%, 95\% or 75\%). Notice that the $x$ were generated randomly rather than being fixed at $\xx_j$.  We could have also fixed $\xx_j$, but in order to correctly compute CIs, we need to know which, fixed or random $x$, is appropriate for our data.
+
+% \subsection{The nature of the different samples of 10}
+% 
+% Before proceeding, we should clarify how the different samples or observations of 10 are generated---what is the nature of the data that produces the distribution of regression lines in Figure \ref{fig:CIs.basics}b.  One possibility is that we collected data for years with particular maximum winter temperatures.  In this scenario, the values on the $x$-axis were a choice on our part.  Even if we don't set the value of the $x$, we could effectively be doing that if we said ahead of time that we were going to collect data  in 10 specific years.  In that scenario, if we imagine collecting a different set of data, then we should fix the $x$ for $\tilde{y}$ to be that in our observed data.  Alternatively, we might imagine that the $x$ are random and that if we were to collect a different data set, the $x$ would be different.  
+% 
+% Knowing how the predictor variables were choosen (randomly or by design) is important because CIs that are correct for one case, won't necessarily be correct for the other case.  This mainly comes up when constructing confindence intervals via bootstraping.
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_001_fig1, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+#truth
+n = dim(dat)[1]
+fit = lm(y~x, data=dat)
+sigma = sqrt(sum(fit$residual^2)/fit$df.residual)
+alpha=coef(fit)[1]
+beta=coef(fit)[2]
+
+plot(dat$x, dat$y, ylab="first flight relative to mean", xlab="", col="red")
+abline(fit, col="red", lwd=2)
+
+#regression line from the j-th sample of 10
+points(dat.j$x, dat.j$y, pch=17)
+legend("topright","(a)",bty="n")
+abline(fit.j)
+title("(red) true regression line\n(black) regression line with j sample of 10",cex.main=.75)
+
+#distribution of all those regression lines from a sample of 10
+#j sample of 10
+nsim = 5000
+predx=seq(min(dat$x),max(dat$x),(max(dat$x)-min(dat$x))/7)[2:7]; nx = length(predx)
+j.results=matrix(NA,nsim,3)
+j.ci99 = j.ci95 = j.ci75 = matrix(NA,nsim,3*nx)
+for(i in 1:nsim){
+  x = runif(nsamp, min(dat$x), max(dat$x))
+  y = alpha + beta*x + rnorm(nsamp,0,sigma)
+  tmp.dat=data.frame(x=x, y=y)
+  tmp.fit=lm(y~x, data=tmp.dat)
+  j.results[i,]=c(coef(tmp.fit), sum(tmp.fit$residual^2)/tmp.fit$df.residual)
+  j.ci99[i,] = as.vector(predict(tmp.fit, newdata=data.frame(x=predx), interval="confidence", level=0.99))
+  j.ci95[i,] = as.vector(predict(tmp.fit, newdata=data.frame(x=predx), interval="confidence", level=0.95))
+  j.ci75[i,] = as.vector(predict(tmp.fit, newdata=data.frame(x=predx), interval="confidence", level=0.75))
+}
+#plot out 1000 of the regression lines
+plot(dat$x, dat$y, type="n", ylab="first flight relative to mean", xlab="")  
+title("1000 bootstrapped regression lines\nfrom samples of 10",cex.main=.75)
+for(i in 1:1000){ lines(c(min(dat$x),max(dat$x)), j.results[i,1]+j.results[i,2]*c(min(dat$x),max(dat$x))) }
+legend("topright","(b)",bty="n")
+abline(fit, col="red", lwd=2)
+
+#confidence intervals
+plot(dat$x, dat$y, type="n", ylab="first flight relative to mean", xlab="ave. max. temperature")
+abline(fit, col="red", lwd=2)
+points(dat.j$x, dat.j$y, pch=17)
+abline(fit.j)
+tmp.cis = predict(fit.j, newdata=data.frame(x=predx), interval="confidence")
+for(i in 1:nx){
+  x=predx[i]
+  lines(c(x,x), tmp.cis[i,2:3])
+}
+legend("topright","(c)",bty="n")
+title("Confidence intervals for the\nj sample of 10",cex.main=.75)
+
+#Coverage
+true.y = predict(fit, newdata=data.frame(x=predx))
+ci.obs95 = ci.obs75 = ci.obs99 = rep(NA,nx)
+for(i in 1:nx){
+  ci.obs99[i] = sum(j.ci99[,i+nx]<true.y[i] & j.ci99[,i+2*nx]>true.y[i])/nsim
+  ci.obs95[i] = sum(j.ci95[,i+nx]<true.y[i] & j.ci95[,i+2*nx]>true.y[i])/nsim
+  ci.obs75[i] = sum(j.ci75[,i+nx]<true.y[i] & j.ci75[,i+2*nx]>true.y[i])/nsim
+}
+
+plot(dat$x, dat$y, type="n", ylim=c(-.02,.02), 
+     ylab="fraction of coverage\nminus correct fraction", xlab="ave. max. temperature")
+abline(h=0,col="red")
+#points(predx, ci.obs75)
+lines(predx, ci.obs99-0.99, lty=1)
+lines(predx, ci.obs95-0.95, lty=2)
+lines(predx, ci.obs75-0.75, lty=3)
+
+legend("topright","(d)",bty="n")
+legend("bottomright",c("99%","95%","75%"),lty=1:3,bty="n")
+title(paste("Coverage of the",nsim, "confidence intervals\nversus objective (red line)"),cex.main=.75)
+@
+\end{center}
+\caption{Properties of confidence intervals}
+\label{fig:CIs.basics}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\subsection{Logic behind the construction of confidence intervals}
+
+Figure \ref{fig:cartoon.cis} walks through the logic behind algorithms for construction of confidence intervals.  There are two approaches you could take based on the distribution of regression lines from fixed $x$ values or from random $x$ values.  The former is the typical way to construct CIs but the later arises in some types of bootstrapping.  
+
+Using the left-hand strategy (panels a-c), we start by thinking about a particular set of $x$ values, the $\xx_j$ which are marked as green lines in panel a.  At those values, we can imagine a sets of $y$ generated with the model:
+$$\yy = \alpha + \beta \xx_j + \ee$$
+where the $e$ in $\ee$ are drawn from a Normal distribution with variance $\sigma^2$.  We could then estimate the regression lines from the $\yy$ datasets.  These are shown by the grey lines in panel a).  We could construct a confidence interval at $x=58$ using the 95\% range of values of the grey lines at $x=58$ (panel b).  If we were to center that blue line on each of regression lines in panel a), it would cover the red line 95\% of the time.  
+
+The strategy in the right-hand panels is similar except the regression lines are generated from sets of $x$ that are drawn randomly from the possible set of $x$.  In the 30-year butterfly dataset, the $x$ have bi-modal distribution (Figure \ref{fig:dat}).  We  imagine drawing 10 $x$ randomly from that distribution and generate $\yy$ with
+$$\yy = \alpha + \beta \xx + \ee$$
+that would lead to a different distribution of regression lines shown in panel d.  We would construct the blue line from the distribution of lines in panel d and use that for the CI for any set of 10 $x$ we might draw.  
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_002_fig_cartoon, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=8>>=
+nsim=1000
+ij.results=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  y.ij=alpha+beta*x.j+rnorm(nsamp,0,sigma)
+  fit.ij=lm(y.ij ~ x.j)
+  ij.results[i,]=coef(fit.ij)
+}
+
+par(mfcol=c(3,2),oma=c(1.5,1.5,3,0))
+## Left side of figure
+fig.cartoon.base=function(){
+  plot(dat$x,dat$y, ylim=c(-30,30), type="n", ylab="", xlab="", xlim=c(56,63))
+  for(i in 1:nsim){
+    lines(c(56,63), ij.results[i,1]+ij.results[i,2]*c(56,63),col="grey")
+  }
+  abline(v=x.j,col="green")
+  abline(fit, col="red", lwd=2)
+}
+
+#panel a
+fig.cartoon.base()
+title("Regression lines from samples of 10\nwith x values at green lines",cex.main=.75)
+legend("topright","(a)",bty="n")
+
+#panel b
+fig.cartoon.base()
+x1=58
+lines( c(x1,x1), quantile(ij.results[,1]+ij.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("blue line contains 95% of the regression lines\nfrom samples at the green x",cex.main=.75)
+legend("topright","(b)",bty="n")
+
+#panel c
+plot(dat$x,dat$y, ylim=c(-30,30), type="n", ylab="", xlab="", xlim=c(56,63))
+abline(v=x.j, col="green")
+abline(fit, col="red", lwd=2)
+points(x.j, y.j, pch=3)
+abline(fit.j, col="black", lwd=2)
+x1=58
+lines( c(x1,x1), (coef(fit.j)[1]-alpha+(coef(fit.j)[2]-beta)*x1)+quantile(ij.results[,1]+ij.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("the blue line centered on any regression line from\na sample of 10 at green x covers red line 95% of the time",cex.main=.75)
+legend("topright","(c)",bty="n")
+
+# #panel d
+# plot(dat$x,dat$y, ylim=c(-30,30), type="n", ylab="", xlab="", xlim=c(56,63))
+# set.seed(222)
+# x.k = runif(nsamp, min(dat$x), max(dat$x))
+# y.k = alpha + beta*x.k + rnorm(nsamp,0,sqrt(sigma2))
+# dat.k=data.frame(x=x.k, y=y.k)
+# fit.k = lm(y~x, data=dat.k)
+# ik.results=matrix(NA,100,2)
+# for(i in 1:100){
+#   y.ik=alpha+beta*x.k+rnorm(10,0,sqrt(sigma2))
+#   fit.ik=lm(y.ik ~ x.k)
+#   ik.results[i,]=coef(fit.ik)
+# }
+# abline(fit.k, col="black", lwd=2)
+# points(x.k, y.k)
+# abline(fit, col="red", lwd=2)
+# abline(v=x.k, col="green")
+# x1=58
+# lines( c(x1,x1), (coef(fit.k)[1]-alpha+(coef(fit.k)[2]-beta)*x1)+quantile(ik.results[,1]+ik.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+# title("a 95% CI constructed in this way from samples\nwith other x values will also cover\nthe red line 95% of the time",cex.main=.75)
+
+ik.results=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  x.k = sample(dat$x,nsamp,replace=TRUE)
+  y.ik=alpha+beta*x.k+rnorm(nsamp,0,sigma)
+  fit.ik=lm(y.ik ~ x.k)
+  ik.results[i,]=coef(fit.ik)
+}
+
+## Right side of figure
+fig.cartoon.base=function(){
+  plot(dat$x,dat$y, ylim=c(-30,30), type="n", ylab="", xlab="", xlim=c(56,63))
+  for(i in 1:nsim){
+    lines(c(56,63),ij.results[i,1]+ij.results[i,2]*c(56,63),col="grey")
+  }
+  abline(fit, col="red", lwd=2)
+}
+
+#panel d
+fig.cartoon.base()
+title("Regression lines from samples of 10\nwith random x values",cex.main=.75)
+legend("topright","(d)",bty="n")
+
+#panel b
+fig.cartoon.base()
+x1=58
+lines( c(x1,x1), quantile(ik.results[,1]+ik.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("blue line contains 95% of the regression lines\nfrom samples with x drawn from historical range",cex.main=.75)
+legend("topright","(e)",bty="n")
+
+#panel c
+plot(dat$x,dat$y, ylim=c(-30,30), type="n", ylab="", xlab="", xlim=c(56,63))
+abline(fit, col="red", lwd=2)
+points(x.j, y.j, pch=3)
+abline(fit.j, col="black", lwd=2)
+x1=58
+lines( c(x1,x1), (coef(fit.j)[1]-alpha+(coef(fit.j)[2]-beta)*x1)+quantile(ik.results[,1]+ik.results[,2]*x1,probs=c(0.025,.975)), lwd=4, col="blue" )
+title("the blue line centered on any regression line from\na sample of 10 will cover red line 95% of the time",cex.main=.75)
+legend("topright","(f)",bty="n")
+
+mtext(side=3, outer=TRUE, "Two approaches to constructing CIs",line=1)
+mtext(side=2, outer=TRUE, "first flight day minus average",line=-1.5)
+mtext(side=1, outer=TRUE, "ave. max. temperature",line=-1.5)
+@
+\end{center}
+\caption{Two approaches to construction CIs that will cover the red line (the true regression line) for 95\% of any sample of 10.  On the left side, we hold the $x$ values constant and on the right, we chose them randomly from the possible sets of $x$ values.  In panel a) we show the distribution of regression lines for a particular set of $x$ values, $\xx_j$, shown by the green lines. The grey lines are random regression lines from samples generated from $y=\alpha + \beta \xx_j + \ee$, where the $e$ in $\ee$ are drawn from a Normal distribution with variance $\sigma^2$.  In panel b, the blue line is a 95\% CI constructed from the 95\% range of the grey line values at $x=58$. In panel c, we show one particular regression line (from the grey lines in panels a and b) from one particular set of $y$ (the crosses) at $\xx_j$.  We center the blue line from panel b on the black regression line value at $x=58$.  For 95\% of the regression lines (the grey lines) in panel a), the blue line centered in this way will cover the red line.  This works for any set of $\xx$ values and thus this approach will properly define a CI for any $\xx$.  On the right side the strategy is similar, but instead of generating regressions at one set of $\xx_j$, the regressions are from $\xx$ drawn randomly from the possible sets of $\xx$.}
+\label{fig:cartoon.cis}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The trick is to come up with a strategy for estimating the blue line---that is the distribution of regression lines in panels a) or d).  The blue line is determined by the generating model. The left panel of Figure \ref{fig:distparam} shows the true bivariate distribution of $\hat{\alpha}$ and $\hat{\beta}$. We need to know the shape of this, but we do not need to know the true $\alpha$ and $\beta$ that determine the location of the maximum.  That's because the shape determines the length of the blue line and that's all we need to construct our CI.  The different strategies for constructing CIs are based on estimating the shape of the distribution on the left from the data.  The right hand panel illustrates this.  This is the distribution of $\hat{\alpha}$ and $\hat{\beta}$ estimates from data sets generated from parametric bootstaps from one set of data\footnote{Fit model to observed data. Use that model to generate data.  Fit model to bootstrap data to get parameter estimates. Repeat.}.  You can see that the shape is similar to that on the left. All CI strategies are based on this idea of using the observed data to estimate the shape of the true distribution of $\hat{\alpha}$ and $\hat{\beta}$.
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_001_dist_of_param, fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=4>>=
+require(MASS)
+par(mfrow=c(1,2), mar=c(5,5,4,2))
+nsim=5000
+nsamp=nrow(dat.j)
+true.dist=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  y.ij=alpha+beta*x.j+rnorm(nsamp,0,sigma)
+  fit.ij=lm(y.ij ~ x.j)
+  true.dist[i,]=coef(fit.ij)
+}
+
+data.dist=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  y.ij=alpha.j+beta.j*x.j+rnorm(nsamp,0,sigma.j)
+  fit.ij=lm(y.ij ~ x.j)
+  data.dist[i,]=coef(fit.ij)
+}
+
+nbreaks=50
+# now we do a kernel density estimate
+true.kde = kde2d(true.dist[,1], true.dist[,2], n = nbreaks)
+data.kde = kde2d(data.dist[,1], data.dist[,2], n = nbreaks)
+
+cont.lev = c(.002,.001,.0001)
+contour(true.kde,levels=cont.lev,xlim=c(0,700),ylim=c(-12,0))
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+title("True distribution")
+
+contour(data.kde, col="red",levels=cont.lev,xlim=c(0,700),ylim=c(-12,0))
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+title("Distribution estimated\nfrom one data set")
+
+@
+\end{center}
+\caption{True distribution of $\hat{\alpha}$ and $\hat{\beta}$ from random samples of 10 from the true generating model (left) versus the distribution from fitting a model to observed data and then estimating $\alpha$ and $\beta$ from bootstrap data sets created with the model estimated from the observed data.}
+\label{fig:distparam}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+\section{Different ways to compute confidence intervals}
+
+Five approaches for constructing confidence intervals are covered in this chapter.  The first four use a parametric model: the linear model with Gaussian independent errors.  The first of these is the analytical CI using a known $\sigma^2$, the second is the analytical CI using an estimate of $\sigma^2$, the third is a parametric bootstrap, and the fourth uses a numerically estimated Hessian matrix.  The fifth approach uses resampling from the data. 
+All the above methods are asymptotically correct, as $n$ gets large.  This means as sample size gets large, all methods will produce $x$-CIs (e.g. 95\% CIs) that cover the true value $x$\% of the time.  
+
+\subsection{Analytical construction of CIs using a known $\sigma$}
+
+We constructed the blue line in panel b of Figure \ref{fig:cartoon.cis} by simulation.  The code is shown below.  Notice that we keep the $x$ values constant and simulate new residual errors.
+<<Cs_0031>>=
+nsim=5000; ij.results=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  y.ij=alpha+beta*x.j+rnorm(nsamp,0,sigma)
+  ij.results[i,]=coef(lm(y.ij ~ x.j))
+}
+x1=58
+CI=quantile(ij.results[,1]+ij.results[,2]*x1,probs=c(0.025,.975))
+@
+\verb@CI@ in the code is the blue line in panel b in Figure \ref{fig:cartoon.cis}.
+
+However, we do not need to simulate for this problem because there is an analytical solution.
+The asymptotic\footnote{meaning large $n$.} distribution of $\hat{\alpha}$ and $\hat{\beta}$ values that define the grey lines in panels a) and b) in Figure \ref{fig:cartoon.cis} is a multivariate normal distribution (left panel of Figure \ref{fig:distparam}). The distribution is:
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}\hat{\alpha}\\\hat{\beta}\end{bmatrix} \sim \MVN\left(
+\ttheta, \Sigma \right)\\
+\ttheta = \begin{bmatrix}\alpha\\ \beta\end{bmatrix}\text{ and } \Sigma = \II(\ttheta)^{-1}
+\end{gathered}
+\label{eqn:dist.mls}
+\end{equation}
+where $\II(\ttheta)$ is the Fisher information matrix.  The Fisher information matrix is the second derivative of the negative log-likelihood function:
+$$\II(\ttheta)=\begin{bmatrix}
+\frac{\partial^2-\log L}{\partial\alpha \partial\alpha}&\frac{\partial^2-\log L}{\partial\alpha \partial\beta}\\
+\frac{\partial^2 -\log L}{\partial\alpha \partial\beta}&\frac{\partial^2 -\log L}{\partial\beta \partial\beta}
+\end{bmatrix}$$
+
+For our linear regression model with Gaussian errors, the Fisher information matrix has a simple equation: 
+$$\II(\ttheta)=\frac{1}{\sigma^2}\XX_j^\top\XX_j$$
+where $\XX_j$ is a 2 column matrix with 1s in column 1 and the predictor variables (the $\xx_j$) in column 2.  The asymptotic variance-covariance matrix of the MLEs is the inverse of this, i.e., $\sigma^2( \XX_j^\top\XX_j)^{-1}$. Thus for our $\xx_j$ in panel a (the green lines), the estimated $\alpha$'s and $\beta$'s will be normally distributed with a variance of
+<<Cs_004_analytical.mle.var>>=
+Xj=cbind(alpha=1,beta=x.j)
+analytical.Sigma=sigma^2*solve(t(Xj)%*%Xj)
+analytical.Sigma
+@
+
+We can use the variance-covariance matrix of the MLEs, $\Sigma$, to compute an interval around $\alpha+58 \beta$ that contains 95\% of the grey lines at $x=58$.  We know that
+\begin{equation}
+\var(\hat{\alpha} + 58 \hat{\beta}) = \var(\XX \hat{\ttheta}) =  \XX \var(\hat{\ttheta}) \XX^\top = \XX  \Sigma \XX^\top
+\end{equation}
+where $\XX$ is a matrix with 1 in column 1 and 58 in column 2 (58 is where we are constructing the CI), $\Sigma=\sigma^2 (\XX_j^\top\XX_j)^{-1}$, $\XX_j$ is a matrix with 1s in column 1 and $\xx_j$ in column 2,  and $\hat{\ttheta}=\begin{bmatrix}\hat{\alpha}\\ \hat{\beta}\end{bmatrix}$.
+An interval that contains 95\% of $\hat{\alpha} + 58 \hat{\beta}$ is
+$$ \XX \ttheta + z^{.05/2} \sqrt{\XX\Sigma\XX^\top}= \XX \ttheta + 1.96 \sqrt{\XX\Sigma\XX^\top}$$
+where $z^{.05/2}$ is the quantile of the unit Normal at $.05/2$.
+
+Here is code to compute the analytical 95\% CIs at $x=58$:
+<<Cs_007>>=
+Xj = cbind(1, dat.j$x)
+XjXj.inv = solve(t(Xj)%*%Xj)
+Sigma = sigma^2*XjXj.inv
+theta = rbind(alpha, beta)
+x=58; X = cbind(1, x)
+
+#the analytical CI
+X%*%theta + qnorm(c(0.025,.975)) * sqrt(X%*%Sigma%*%t(X))
+@
+We can compare this to the real distribution of the regression lines at $x=58$:
+<<Cs_0071>>=
+quantile(ij.results[,1]+ij.results[,2]*x, probs=c(0.025, 0.975))
+@
+They are pretty close even though $n$ is quite small and the asymptotic solution is an approximation.
+
+This gives us a way to calculate confidence intervals for $\E(\tilde{y}|x=58)$ if we know the true $\sigma$. The width of the CI is specified as above but we center it on $\XX \hat{\ttheta}$ which is our estimate of $\E(\tilde{y}|x=58)$:
+$$\XX \hat{\ttheta}  + z^{.05/2} \sqrt{\XX\Sigma\XX^\top}$$
+where $\Sigma=\sigma^2(\XX_j^\top\XX_j)^{-1}$.
+The problem is we don't know $\sigma$. We only have an estimate of $\sigma$. 
+
+\subsection{Analytical construction of CIs using an estimate of $\sigma$}
+
+The parametric approach gives us a simple equation for $\Sigma$: $\sigma^2( \XX_j^\top\XX_j)^{-1}$.  Why not just use that with an estimate of $\sigma$? So why not use the \emph{observed} Fisher information matrix
+$$ \II(\hat{\ttheta})=\frac{1}{\hat{\sigma}^2}(\XX_j^\top\XX_j)$$
+in Equation \ref{eqn:dist.mls}.  The problem is the distribution of $\tilde{y}_j$ conditioned on $\sigma$ (known) is Normal but the distribution of $\tilde{y}_j$ conditioned on an estimate of $\sigma$ has a t-distribution. For large $n$, approximating a t-distribution by a Normal distribution is not too bad, but for small $n$ (like 10), it will lead to overly narrow CIs (too low coverage).
+
+The correct CIs when using an estimate of $\sigma$ are
+\begin{equation}
+\XX \hat{\theta}  + t^{.05/2}_{d} \sqrt{\XX\hat{\Sigma}\XX^\top}
+\label{eqn:analytical.CIs}
+\end{equation}
+where $t^{.05/2}_{d}$ is the t-distribution quantile at 0.025 with the degrees of freedom for the $\sigma$ estimation (in our case $d=n-2$) and $\hat{\Sigma}=\hat{\sigma}^2 (\XX_j^\top\XX_j)^{-1}$. The code to compute this is
+<<Cs_0072>>=
+Xj = cbind(1, x.j)
+XjXj.inv = solve(t(Xj)%*%Xj)
+Sigma.j = sigma.j^2*XjXj.inv
+theta.j = matrix(c(alpha.j,beta.j), ncol=1)
+fit.df = fit.j$df.residual
+#Compute CI at x=58
+x=58; X = cbind(1, x)
+EyX = X%*%theta.j
+CI = EyX + qt(c(0.025,.975), df=fit.df) * sqrt(X%*%Sigma.j%*%t(X))
+correct.ci.j = c(fit=EyX, lwr=CI[1], upr=CI[2])
+@
+It is this confidence interval that R's \verb@predict@ function returns:
+<<Cs_013_predict.lm.con>>=
+correct.ci.j
+predict(lm(y~x, data=dat.j), new=data.frame(x=x),interval="confidence")
+@
+
+We can simulate to show that analytical CIs with true $\sigma$ are correct, those with estimated $\sigma$ and no correction have under-coverage, and those with estimated $\sigma$ and correction are correct.  We simulate $y$'s at the $\xx_j$ shown by the green lines in Figure \ref{fig:cartoon.cis} and compute CIs at $x=58$ using true or estimated $\sigma$ and then using the correction.
+
+<<Cs_008>>=
+Xj = cbind(1, x.j)
+XjXj.inv = solve(t(Xj)%*%Xj)
+true.Sigma = sigma^2*XjXj.inv
+#we are going to compute CI at x=58
+x=58; X = cbind(1, x)
+#holders
+nsim=5000
+i.CIs.bad=i.CIs.true=i.CIs.corr=matrix(NA,nsim,2)
+for(i in 1:nsim){
+  tilde.y=alpha+beta*x.j+rnorm(nsamp,0,sigma)
+  fit.i=lm(tilde.y ~ x.j)
+  hat.theta=matrix(coef(fit.i),ncol=1)
+  hat.sigma = sqrt(sum(fit.i$residual^2)/fit.i$df.residual)
+  hat.Sigma = hat.sigma^2*XjXj.inv
+  meanCI = X%*%hat.theta
+  normaldist = qnorm(c(0.025,0.975))
+  tdist = qt(c(0.025,0.975),df=fit.i$df.residual)
+  #CI using asymptotic equation and estimated Sigma
+  i.CIs.bad[i,] = meanCI + normaldist * sqrt(X%*%hat.Sigma%*%t(X))
+  #CI using asymptotic equation and true Sigma
+  i.CIs.true[i,] = meanCI + normaldist * sqrt(X%*%true.Sigma%*%t(X))
+  #Corrected CI using t-distribution
+  i.CIs.corr[i,] = meanCI + tdist * sqrt(X%*%hat.Sigma%*%t(X))
+}
+@
+
+The true value (red line) at $x=58$ is $\alpha+ 58 \beta$.  The correct CI using the true $\sigma$ has the correct coverage:
+<<Cs_009>>=
+x=58
+true.val = alpha+beta*x
+100*sum(i.CIs.true[,1]<true.val & i.CIs.true[,2]>true.val)/nsim
+@
+The CIs using the estimated $\sigma^2$ with no correction are too narrow.  They have low coverage (less than 95\%):
+<<Cs_010>>=
+100*sum(i.CIs.bad[,1]<true.val & i.CIs.bad[,2]>true.val)/nsim
+@
+If we use the t-distribution quantiles to compute our CIs, the coverage is correct again:
+<<Cs_011>>=
+100*sum(i.CIs.corr[,1]<true.val & i.CIs.corr[,2]>true.val)/nsim
+@
+
+Under-coverage when we used $I(\hat{\ttheta})$ without a bias correction (i.e., using the t-distribution quantiles) illustrates the problem of using an estimate of $\sigma$ instead of the true value.  This same problem will arise when we look at other approaches to computing confidence intervals.
+
+<<ci_analytical_est_s2_hidden, echo=FALSE>>=
+#need later
+CI.analytical.est.s2=function(dat, x, alp=0.05){
+  fit=lm(y~x, data=dat)
+  Xi = cbind(1, dat$x)
+  XiXi.inv = solve(t(Xi)%*%Xi)
+  theta = matrix(coef(fit), ncol=1)
+  fit.df=fit$df.residual
+  sigma = sqrt(sum(fit$residual^2)/fit.df)
+  Sigma = sigma^2*XiXi.inv
+  X = cbind(1, x)
+  EyX = X%*%theta
+  #the analytical CI
+  CI = EyX + qnorm(c(alp/2,1-alp/2)) * sqrt(X%*%Sigma%*%t(X))
+  c(fit=EyX, lwr=CI[1], upr=CI[2])
+}
+@
+
+\subsection{Constructing confidence intervals using a numerically estimated information matrix}
+\label{sec:hessian}
+
+To construct the analytical CIs, we estimated the distribution of $\alpha + 58 \beta$ using an estimate of the distribution of $\hat{\alpha}$ and $\hat{\beta}$ based on the observed Fisher information matrix: $\hat{\Sigma}= \II(\hat{\ttheta})^{-1}$.  We have an analytical solution for $\II(\hat{\ttheta})$, but we could also use R to generate a numerical estimate of the information matrix. This doesn't make much sense here since we have an analytical solution, but it is useful when we do not know or have the analytical solution. 
+
+Another term for the observed Fisher information matrix is the Hessian of the negative log-likelihood function at $\hat{\ttheta}$. There are a number of R functions that will estimate the Hessian of a function.  We will use \verb@optim()@.  First we define function to return the negative log-likelihood for our model, a linear regression with Gaussian errors.  
+
+<<Cs_020_linear.reg.LL>>=
+# Define the log likelihood function for a linear regression
+# parm is the alpha, beta vector
+NLL <- function(parm,  dat=NULL, sigma=NULL){
+  resids = dat$y - dat$x * parm[2] - parm[1]
+  dresids = suppressWarnings(dnorm(resids, 0, sigma, log = TRUE))
+  -sum(dresids)
+}
+@
+
+Then we can pass this function into \verb@optim()@ with \verb@hessian=TRUE@.  To work well, \verb@optim()@ needs good starting values.  We pass in really good ones, i.e., the output from \verb@lm()@.  Remember that $j$ here is referring to the observed $j$ sample of 10 (`the data').  \verb@alpha.j@ is the $\alpha$ estimate from that sample.
+<<Cs_023_linear.ref.optim>>=
+start.pars = c(alpha.j, beta.j)
+ofit.j=optim(start.pars, NLL, dat=dat.j, sigma=sigma.j, hessian=TRUE)
+parSigma = solve(ofit.j$hessian)[1:2,1:2]
+parMean = ofit.j$par[1:2]
+@
+This will output the observed Fisher information matrix at the $\alpha$ and $\beta$ MLEs.  
+
+We can then use the Hessian to compute CIs using the correction for using an estimate of the variance:
+<<Cs_023_hessian_cis>>=
+X = cbind(1, 58)
+EyX = X%*%parMean
+hessian.cis = c(EyX, EyX + qt(c(0.025,.975), df=df.j)*sqrt(X%*%parSigma%*%t(X)))
+@
+
+<<Cs_024_hessian_cis>>=
+rbind(hessian=hessian.cis, correct=correct.ci.j) 
+@
+
+Though not necessary here, often one computes CIs by simulating from the numerically estimated $\Sigma$ , generating a large number of estimates of the metric of interest, and then using the quantiles of that.  We will cover this in the bootstrapping section.  
+
+\subsection{Constructing CIs via bootstrapping}\label{subsec:bootstrap}
+
+The basic idea behind a bootstrap CI is that the data are used to generate new data sets (bootstrap data sets) from which parameters are estimated to give a large set of bootstrap parameter estimates and thus regression lines.  On average, the variance-covariance matrix of the bootstrapped parameter estimates will be close to the variance-covariance matrix of the MLE parameter estimates ($\Sigma$ for our example).  Thus the bootstrapped parameter estimates can be used to generate CIs.
+
+The procedure is simple.  First you generate a large number of bootstrapped data sets, then estimate the model parameters from each data set to get the bootstrap parameter estimates.  For each set of bootstrapped parameter estimates, compute the metric of interest.  We are interested in CIs for the fitted value at $x$, so we compute $\hat{\alpha}_b + \hat{\beta}_b x$ for each bootstrap.  The 95\% quantiles of the $\hat{\alpha}_b + \hat{\beta}_b x$ define the bootstrap CIs. Here is a function to do this:
+<<Cs_014_boot_CIs_fun>>=
+boot.CI=function(boot.params, x, alp=0.05){
+  CIs=apply(
+    boot.params[,c("alpha","beta"),drop=FALSE]%*%rbind(1,x),
+    2,quantile, c(0.5, alp/2, 1-alp/2) )
+  colnames(CIs)=x
+  t(CIs) #to look like predict output
+}
+@
+
+The are different ways to generate the bootstrap data sets.  We cover parametric bootstrapping, bootstrapping from the Hessian, residuals resampling, and data resampling.
+
+\subsection{Constructing CIs via parametric bootstrapping }
+
+In a parametric bootstrap, the estimated model is used to generate bootstrapped data, and the parameters are estimated from that bootstrapped data.  The bootstrapped parameter estimates are then used to construct CIs.  It is the same idea as a traditional bootstrap, but we are not sampling from the data to generate new bootstrap data sets but rather using the estimated model to generate new data.  This is similar to the analytical CI approach and CIs from an estimated Hessian.  In all these approaches, one uses the model along with the parameter estimates to estimate the distribution of parameter estimates.
+
+Why use a parametric bootstrap instead of the analytical CIs?  You use it when you want CIs based on your parametric model, but you do not know the analytical solution of $\Sigma$, you want to approximate the small $n$ distribution rather than use the large $n$ approximation, or estimation of the Hessian is unstable.
+
+To generate bootstrap parameter estimates via a parametric bootstrap, we generate data from our estimated model:
+$\yy_b= \hat{\alpha}+\hat{\beta} \xx + \ee$
+where each $e$ in  $\ee$ is drawn from a Normal distribution with mean 0 and variance $\hat\sigma^2$.  From each $\yy_b$, we estimate $\alpha$ and $\beta$, and construct the CIs using the set of bootstrap estimates.  
+Section \ref{sec:funcs} shows functions \verb@parametric.boot@ and \verb@parametric.boot.cis@ to do this.  It takes the original data, gets the MLEs, and then uses those to generate data and a set of bootstrapped parameter estimates.  Notice that the function holds the $x$ values equal to our observed values when simulating new data.  That's rather important.
+
+<<Cs_015_parametricboot, echo=FALSE>>=
+parametric.boot=function(dat, nboot=1000){
+  #first fit model to data
+  fit=lm(y~x, data=dat)
+  #x's at which to generate new data
+  x=dat$x
+  #matrix to store the estimates
+  boot.params=matrix(NA,nboot,3)
+  sigma = sqrt(sum(fit$residual^2)/fit$df.residual)
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  for(i in 1:nboot){
+    y=alpha + beta*x + rnorm(nrow(dat),0,sigma)
+    tmp.fit=lm(y~x)
+    boot.params[i,]=c(coef(tmp.fit), 
+                      sqrt(sum(tmp.fit$residual^2)/tmp.fit$df.residual))
+  }
+  colnames(boot.params)=c("alpha","beta","sigma")
+  boot.params
+}
+
+parametric.boot.cis=function(dat, x, nboot=1000){
+  boot.params=parametric.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+Parametric bootstrapping uses the estimated $\sigma$ to generate new data.  Thus, as you would expect, the confidence intervals are too narrow:
+<<Cs_016_parametricboot.cis>>=
+rbind(
+  parametric=parametric.boot.cis(dat.j, x=58)[1,],
+  correct=correct.ci.j
+)
+@
+However the problem diminishes as sample size increases; 10 is a very small sample size.  We will address how to correct this bias after covering all the bootstrapping approaches.
+
+\subsection{Constructing CIs via bootstrapping from the inverse of the Hessian}
+
+Though not necessary here, often one computes CIs by simulating from the numerically estimated $\Sigma$ , generating a large number of estimates of the metric of interest, and then using the quantiles of that.  We will cover this in the bootstrapping section.  
+
+We can compare the bivariate distributions of parameter estimates from a parametric bootstrap to parameters drawn from the estimated parameter distribution using the numerically estimated Hessian matrix at the MLEs (Figure \ref{fig:dist.of.ests.est.vs.true}).  They should be very similar.  The only difference (besides the parametric bootstrap using simulation) is that the Hessian approach is based on a large $n$ approximation and our parametric bootstrap used the unbiased estimate of $\sigma$.
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_021_fig_biv_comparison, fig=TRUE, echo=FALSE, width=6, height=6>>=
+require(MASS)
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+nbreaks=50
+#generate bivariate normal alpha and beta from the estimated distribution
+hessian.par = mvrnorm(1000, mu = parMean, Sigma = parSigma)
+# now we do a kernel density estimate
+hessian.kde = kde2d(hessian.par[,1], hessian.par[,2], n = nbreaks)
+
+# now we do a kernel density estimate using the bootstrapped parameters
+boot.params=parametric.boot(dat.j)
+boot.kde = kde2d(boot.params[,1], boot.params[,2], n = nbreaks)
+cont.lev = c(.002,.001,.0001)
+contour(boot.kde,levels=cont.lev)
+contour(hessian.kde, add=TRUE, col="red",levels=cont.lev)
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+legend("topright",c("actual distribution","distribution from Hessian"),lty=1,col=c("black","red"),bty="n")
+@
+\end{center}
+\caption{Comparison of the distribution of $\alpha$ and $\beta$ estimates from parametrically bootstrapping using the data $\yy_j$ to the estimate of the distribution from the observed Fisher information matrix at the MLE values.}
+\label{fig:dist.of.ests.est.vs.true}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Section \ref{sec:funcs} includes a functions \verb@hessian.boot@ and \verb@hessian.boot.cis@ to generate CIs using parameter estimates generated from an estimated information matrix.  
+
+\subsection{Constructing CIs via resampling from the residuals}
+
+The analytical and parametric bootstrap CIs are based on assuming that the residual errors can be described by a particular statistical distribution. Sampling from the residuals allows us to compute CIs when we are unwilling to make a specific assumption about the distribution but are willing to treat the structure of the data as known: $\yy=\alpha+\beta \xx+\ee$. Instead of assuming that the $e$ in $\ee$ come from a specific distribution, we generate $\ee$ for our bootstrap data by sampling with replacement from the residual errors from the fit to the original data. Section \ref{sec:funcs} shows functions to do this.
+
+<<Cs_017_residuals_boot_function, echo=FALSE>>=
+residuals.boot=function(dat, nboot=1000){
+  fit=lm(y~x, data=dat)
+  resids=residuals(fit)  
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    tmp = sample(n, replace=TRUE)
+    tmp.y=alpha + beta*dat$x + resids[tmp]
+    tmp.fit=lm(tmp.y~dat$x)
+    boot.params[i,]=c(coef(tmp.fit), 
+                      sqrt(sum(tmp.fit$residual^2)/tmp.fit$df.residual))
+  }
+  colnames(boot.params)=c("alpha","beta","sigma")
+  boot.params
+}
+
+residuals.boot.cis=function(dat, x, nboot=1000){
+  boot.params=residuals.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+Once a large number of bootstrap data sets are generated, the construction of confidence intervals proceeds as for the parametric bootstrap. The model is fit to each bootstrap dataset $\yy_b$ and $\alpha_b$ and $\beta_b$ are estimated. Those parameters are then used to compute CIs.  
+However, once again we are using the variance in the observed residuals to generate samples of residuals.  So, you expect the confidence intervals to be too narrow, and they are:
+<<Cs_018_residuals_boot_cis>>=
+rbind(
+  residuals=residuals.boot.cis(dat.j, x=58)[1,],
+  correct=correct.ci.j
+)
+@
+
+\subsection{Constructing confidence intervals via resampling the data}
+
+The last bootstrap approach we will cover is to sample, with replacement, from the data.  This approach follows the logic of panels d-f in Figure \ref{fig:cartoon.cis}.  We are trying to estimate, via resampling, the distribution of regression lines that we would see if we had many samples of data drawn from the 'universe' of possible $y$ and $x$.  
+
+Note that in this approach, the predictor variables, the $x$, in your bootstrap data (your $\yy_b$) change from bootstrap to bootstrap.  That might be problem. The variance of your regressions depends on your $x$ values.  What if your $x$ values must be fixed---because you choose them to be a particular value, for example, as part of your experimental design.  Using anything other than the $x$ values you chose would give the wrong CIs.  In this case, resampling from the residuals would make more sense.
+
+In other cases, the $x$ values you observed were random (you did not choose them). If your sample size is large enough, resampling from the data has some benefits.  Like resampling from the residuals, you are not assuming a specific distribution for the residuals, unlike the analytical CIs or parametric bootstrap CIs.  Unlike sampling from the residuals, you also allow that the residual distribution could be different for different $x$ values.  For example, this approach would allow the residual variance to be smaller for large $x$ and larger for small $x$, say.  
+
+<<Cs_024_non_param_boot_function, echo=FALSE>>=
+resampling.boot=function(dat, nboot=1000){
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    #sample with replacement
+    tmp = sample(n, replace=TRUE)
+    #tmp.fit is the fit to this bootstrapped data
+    tmp.fit=lm(y~x, data=dat, subset=tmp)
+    boot.params[i,]=c(
+      coef(tmp.fit),
+      sqrt(sum(tmp.fit$residuals^2)/tmp.fit$df.residual))
+  }
+  colnames(boot.params)=c("alpha","beta","sigma")
+  boot.params
+}
+
+resampling.boot.cis=function(dat, x, nboot=5000){
+  boot.params=resampling.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+Section \ref{sec:funcs} shows functions to create bootstrap data by resampling the data.  Once a large number of bootstrap data sets are generated, the CIs are created as usual.
+As usual we are using the variance in the data as a proxy for the variance in the `universe' of data and the CIs will tend to be too narrow.  However, this is countered by the fact that the $x$ values in our resamples will have lower spread (because we are resampling from the observed $x$) and this tends to cause the CIs to be larger than they should be.  This problem is severe for small samples, like $n=10$.
+<<Cs_025_resampling_cis>>=
+rbind(
+  resampling=resampling.boot.cis(dat.j, x=58)[1,],
+  correct=correct.ci.j
+)
+@
+But the problem diminishes as sample size increases:
+<<Cs_026_resampling_cis_big>>=
+#create a larger sample
+nsamp=50
+x = runif(nsamp, min(dat$x), max(dat$x))
+y = alpha + beta*x + rnorm(nsamp,0,sigma)
+dat.big=data.frame(x=x, y=y)
+
+rbind(
+  resampling=resampling.boot.cis(dat.big, x=x1)[1,],
+  correct=predict(lm(y~x, data=dat.big), new=data.frame(x=58),interval="conf")[1,]
+)
+@
+
+\subsection{Correcting under-coverage of CIs}
+
+Ignoring the fact that we used an estimate of $\sigma$ (either explicitly or implicitly) leads to overly small CIs with under-coverage.  We saw this when the CIs from the parametric, non-parametric and Hessian bootstraps were compared to the correct analytical CIs coming from the \verb@predict@ function.  
+
+How do we fix this? We need to estimate the correction factor, i.e., how much to increase the width of our estimated CIs.  From the analytical CIs, we know that this correction factor is $t_{\alpha/2, df}/z_{\alpha/2}$ or in R \verb@qt(0.025, df=8)/qnorm(0.025)@ for our example with $\alpha=0.05$, 10 data points and Gaussian errors.  We can estimate the correction factor via simulating from the estimated model.  The basic idea is to compute your CI for one set of parameters, the estimated parameters, and then generate bootstrap data and estimate bootstrap CIs.  Then you estimate how small, on average, the bootstrap CIs are to the CI estimated from the observed data.  That mean bias is the correction factor.  Section \ref{sec:funcs} has a function to do this.
+
+<<ci_adj_hidden, echo=FALSE>>=
+ci.adj=function(dat, x, nboot1=5000, nboot2=1000, type="hessian"){
+  #x is the x where the ci is computed; one value
+  #type is analytical, hessian, parametric or residuals
+  nsamp=nrow(dat)
+  fit=lm(y~x, data=dat)
+  sigma = sqrt(sum(fit$residuals^2)/fit$df.residual)
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  #this is the correct width of the 95\% CI
+  #for a model with the parameters estimated from dat
+  ci=parametric.boot.cis(dat,x,nboot=nboot1)[2:3]
+  ci.width=ci[2]-ci[1]
+  #ci.width.boot will hold a set of bootstrapped CIs
+  ci.width.boot=rep(NA,nboot2)
+  for(i in 1:nboot2){
+    if(type %in% c("parametric", "hessian", "analytical")){
+      y=alpha + beta*dat$x + rnorm(nsamp,0,sigma)
+      tmp.dat=data.frame(x=dat$x, y=y)
+      if(type=="analytical") tmp.ci=CI.analytical.est.s2(tmp.dat,x)[2:3]
+      if(type=="parametric") tmp.ci=parametric.boot.cis(tmp.dat,x,nboot1)[2:3]
+      if(type=="hessian") tmp.ci=hessian.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "residuals"){
+      y=alpha + beta*dat$x + sample(fit$residuals, nsamp)
+      tmp.ci=residuals.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "resampling"){
+      tmp.dat = dat[sample(nsamp, replace=TRUE),]
+      tmp.ci=resampling.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    ci.width.boot[i]=tmp.ci[2]-tmp.ci[1]
+  }
+  #Trim to deal with random ouliers
+  mean(ci.width/ci.width.boot, trim=.1)
+}
+@
+
+Here is the correct adjustment:
+<<Cs_025_ci_adj>>=
+qt(c(0.025),df=fit.j$df.residual)/qnorm(c(0.025))
+@
+and the adjustment computed via bootstrapping:
+<<Cs_0251_ci_adj>>=
+ci.adj(dat.j, 58, type="analytical")
+@
+To use the estimated correction factor, we multiply our upper and lower CIs by the correction factor.
+
+Unfortunately computing the CI adjustment with bootstrapping takes a large number of bootstraps and is thus quite slow particular for the parametric and residuals bootstraps. Also it is an estimate of the bias.  The expected value of the estimate will be the correct bias, but for any one data set, the estimated bias will not be precisely correct.
+Why not draw $\sigma$ from its bootstrapped distribution and use that in our CI construction? So instead of using $\hat{\alpha}_b$ and $\hat{\beta}_b$ only, we also use $\hat{\sigma}^2_b$. Wouldn't that properly account for the fact that we use an estimate of $\sigma$?  No, it does not. 
+
+\section{Confidence intervals in MARSS models}
+
+Unlike a linear regression, a MARSS model \ref{eqn:marssmodeluni} has two types of random variables: the new data ($\tilde{y}$) like a regression but also the state ($x$).  In a linear regression, we are uncertain about the relationship (the red line in Figure \ref{fig:CIs.basics}) because we are uncertain about the parameters that describe that line.  In a MARSS model, we have the uncertainty about the parameters, but even if we did not, we would still be uncertain about the $x$ that the $\tilde{y}$ are observations of because $x$ is a random process.  Equation \ref{eqn:marssmodeluni} shows a univariate MARSS model.  We will start with the univariate case.
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}\label{eqn:marssmodeluni}
+\begin{gathered}
+x_t = x_{t-1}+w_t \text{ where } w_t \sim \N(0,q) \\
+y_t = z x_t+a+v_t \text{ where } v_t \sim \MVN(0,r)  \\
+x_0 \sim \N(\pi,\lambda) 
+\end{gathered}   
+\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\subsection{Confidence intervals of the MARSS parameters}
+
+Show the bivariate distribution?
+
+For large $n$, the MLEs are multivariate normal and an interval that contains 95\% of $\hat{\ttheta}$ is
+\begin{equation}\label{eqn:marsscis}
+\ttheta + z^{.05/2} \sqrt{trace(\Sigma)}
+\end{equation}
+where $\ttheta$ are the parameters (in a column matrix),$\Sigma$ is the variance-covariance matrix of the MLEs, and `trace' is the diagonal of $\Sigma$.
+
+Here is an example using the kestral time-series data:
+<<Cs_026>>=
+dat = t(kestrel)
+dat = dat[2:3,]
+#maxit set low to speed up the example
+dat=cumsum(rnorm(20,0,sqrt(.02)))+rnorm(20,0,sqrt(.05))
+kem = MARSS(dat, model=list(U="equal",Q=matrix(.02)))
+@
+$\QQ$ has been fixed to speed up the bootstrapping.
+
+Create 1000 bootstrap parameter estimates via parametric bootstrapping and compute the quantiles on the parameter estimates:
+<<Cs_027>>=
+boot.params=MARSSboot(kem, nboot=100)$boot.params
+apply(boot.params,1,quantile,probs=c(0.025,0.975))
+@
+
+We can then compare these to the 95\% intervals estimated from the variance-covariance matrix of the MLEs (Equation \ref{eqn:marsscis}).  The function \verb@MARSSparamCIs@ will do this computation using an estimated $\Sigma$ from the Hessian\footnote{You can get the Hessian from \verb@MARSShessian@ but that uses a transformation of variances.  Read how to transform the variance-covariance matrices at \verb@?MARSShessian@.}.
+<<Cs_028>>=
+MARSSparamCIs(kem)
+@
+The 95\% ranges are quite similar.
+
+This suggests that we can use the estimated $\Sigma$ to compute confidence intervals and that these confidence intervals will contain the true value 95\% of the time:
+\begin{equation}\label{eqn:marsscisest}
+\hat{\ttheta} + z^{0.05/2, 1-0.05/2} \sqrt{trace(\hat{\Sigma)}}
+\end{equation}
+Note that Equation \ref{eqn:marsscisest}
+
+\subsection{Confidence intervals of the $\E(\tilde{y_t})$}
+
+In a linear regression, you, typically, plot the regression line onto the data (as in Figure \ref{fig:CIs.basics}a).  The regression line is the expected value of $\tilde{y}$ at a given $x$ given the estimated parameter values: $\hat{\alpha} + \hat{\beta} x$. 
+In a MARSS model, the expected value of $\tilde{y}_t$ has the same interpretation but the calculation of the expected value involves both the estimated parameters and the expected value of $x$_t. 
+\begin{equation}
+\E[\tilde{y}_t|\yy] = \hat{z}\E[x_t|\yy] + \hat{a}
+\end{equation}
+where the expectation is conditioned on the data ($\yy$).  You can get the expected value of $\tilde{y}_t$ from a MARSS fit using the \verb@fitted@ function:
+<<Cs_9, results=hide>>=
+dat = t(harborSealWA)
+dat = dat[2:4,] #remove the year row
+kemfit = MARSS(dat)
+fitted(kemfit)
+@
+
+Often it is the case that the objective of the analysis is to estimate $x_t$ and it is its expected value that is desired.  The expected value of $x_t$ is output from the Kalman filter.  You can call the Kalman filter directly or use the print function:
+<<Cs_10, results=hide>>=
+MARSSkf(kemfit)
+print(kemfit, what="states")
+@
+
+Show standard error of $\xx$.  That makes sense.  We don't know what $\xx$ is.
+
+We can also the show the stand. error for functions of $\xx$.  We could show the standard error of $\hat{\ZZ}\E[\xx_t] + \hat{\aa}$ .  That however is NOT the variability of $\E[\y\tilde{y}]$.  If we just collected a bunch of new data for the same time period, the $\xx$ stays the same.  The s.e. reflects our uncertainty but the $\xx$ is not changing.  $\E[\y\tilde{y}]=\ZZ\xx+\uu$ and uncertainty about that is due to our uncertainty in both $\xx$ and the parameters.  We are uncertain about $\xx$ in the same way as we are uncertain about the red line.  Confidence interval not standard error.  The standard error of $\yy$ is from $\RR$.  E(param estimate) have standard errors and $\xx_t$ has a standard error.
+
+Doesn't make sense to use that to compute the standard error of $\yy$ unless we wanted to show the stand. error if the whole process were run again or run forward.  We assume the parameters are at their estimated values and run forward. But why would the new process be governed by the estimated parameters?
+
+Expected value of $\yy$ if we ran the process over and over and each time generated a new $\xx$ using the estimated parameters.  ??? 
+\xx_t = \hat{\BB}\xx_{t-1}+\hat{\uu+\ww_t \text{ where } \ww_t \sim \MVN(0,\hat{\QQ}) \\
+
+Forecasting using the estimated values.  Yes, standard thing to do but keep in mind that it the prediction intervals will be too narrow.
+
+
+why show variability in the E(y)? You are uncertain about the parameters.  s.e. of the states has nothing to do with the uncertainty in the parameters.  You are uncertain about the states even if you are certain about the 
+
+\subsection{CI computation for the parameters of MARSS models}
+
+The MARSS package will allow you to construct CIs via an estimated Hessian, parametric bootstrapping, or residuals bootstrapping.   Construction of CIs using an estimated Hessian distribution is the fastest and it the default approach for producing CIs for the parameter estimates  via function \verb@MARSSparamCIs()@.   The residuals bootstrap, called innovations bootstrapping for MARSS models, is useful if one is unwilling to assume a particular distribution for the errors. Residuals bootstrapping is selected by passing in \verb@method="innovations"@ to  \verb@MARSSparamCIs()@.  The parametric bootstrap is useful when the estimate of the Hessian is numerically difficult or the multivariate normality assumption for the parameters is dubious. Parametric bootstrapping is selected by passing in \verb@method="parametric"@ to  \verb@MARSSparamCIs()@. It should be kept in mind that the methods discussed here do not work that well if the likelihood surface is multi-modal.
+
+If one needs CIs for a metric that is some function of the estimated parameters, then CIs can be constructed using the intervals (e.g. 95\%) from a large number of bootstrapped parameter estimates.  The function \verb@MARSSboot@ will generate bootstrap parameter estimates via an estimated Hessian, residuals bootstrapping or parametric bootstrapping.
+
+<<Cs_005_ret.hessian.s2, eval=FALSE, echo=FALSE>>=
+#Here's a function to return the Hessian when sigma is known
+ret.hessian.known.s2=function(dat, sigma){
+  NLL <- function(parm, dat=NULL) {
+    resids = dat$y - parm[1] - dat$x * parm[2]
+    resids = suppressWarnings(dnorm(resids, 0, sigma, log = TRUE))
+    -sum(resids)
+  }
+  pars=coef(lm(y ~ x, data=dat))
+  names(pars)=c("alpha","beta")
+  ofit=optim(pars, NLL, dat=dat, hessian=TRUE)
+  parSigma = solve(ofit$hessian)
+  parMean = ofit$par
+  return(list(parMean=parMean, parSigma=parSigma))
+}
+@
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_019_fig3, fig=TRUE, echo=FALSE, width=6, height=6, eval=FALSE>>=
+#create many parameter estimates
+nsim=5000
+#ij.results is alpha, beta, sigma from parametric boot of dat.j
+ij.results=matrix(NA,nsim,3)
+for(i in 1:nsim){
+  y.i = alpha.j + beta.j*x.j + rnorm(nsamp,0,sigma.j)
+  fit.i=lm(y.i~x.j)
+  ij.results[i,]=c(coef(fit.i), 
+                   sqrt(sum(fit.i$residual^2)/fit.i$df.residual))
+}
+
+library(RColorBrewer)
+rf = colorRampPalette(rev(brewer.pal(11,'Spectral')))
+r = rf(32)
+
+nbreaks=50
+library(MASS)
+df = data.frame(x=ij.results[,1],y=ij.results[,2])
+h1 = hist(df$x, breaks=nbreaks, plot=FALSE)
+h2 = hist(df$y, breaks=nbreaks, plot=FALSE)
+top = max(h1$counts, h2$counts)
+k = kde2d(df$x, df$y, n=nbreaks)
+
+# margins
+oldpar <- par()
+par(mar=c(5,5,1,1))
+layout(matrix(c(2,0,1,3),2,2,byrow=T),c(3,1), c(1,3))
+image(k, col=r) #plot the image
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+par(mar=c(0,2,1,0))
+barplot(h1$counts, axes=FALSE, ylim=c(0, top), space=0, col='red')
+par(mar=c(2,0,0.5,1))
+barplot(h2$counts, axes=FALSE, xlim=c(0, top), space=0, col='red', horiz=T)
+@
+\end{center}
+\caption{Distribution of $\alpha$ and $\beta$ estimates from parametrically bootstrapping using the fit to $\yy_j$.  You can see that they are approximately multivariate normal even for $n=10$ (so not $n$ large).  Note, these estimates are from lm() which is using least-squares estimation, but the parameter estimates are the same as the maximum-likelihood estiamates for this problem (linear regression with Gaussian errors).}
+\label{fig:dist.of.ests}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{equation}\label{eqn:marssmodel}
+\begin{gathered}
+\xx_t = \xx_{t-1}+\ww_t \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \ZZ\xx_t+\aa+\vv_t \text{ where } \vv_t \sim \MVN(0,\RR)  \\
+\xx_0 \sim \MVN(\pipi,\LAM) 
+\end{gathered}   
+\end{equation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In a linear regression, you, typically, plot the regression line onto the data (as in Figure \ref{fig:CIs.basics}a).  The regression line is the expected value of $\tilde{y}$ at a given $x$ given the estimated parameter values: $\hat{\alpha} + \hat{\beta} x$. 
+In a MARSS model, the expected value of $\tilde{y}$ has the same interpretation but the calculation of the expected value involves both the estimated parameters and the expected value of $\xx$:
+\begin{equation}
+\E[\tilde{y}_t] = \hat{\ZZ}\E[\xx_t] + \hat{\aa}
+\end{equation}
+where the expectation is conditioned on the data ($\yy$).  You can get the expected value of $\y\tilde{y}$ from a MARSS fit using either the \verb@fitted@ or \verb@predict@ function:
+<<Cs_9>>=
+#show example
+@
+
+Often it is the case that the objective of the analysis is to estimate $\xx$ and it is its expected value that is desired.  
+
+Show standard error of $\xx$.  That makes sense.  We don't know what $\xx$ is.
+
+We can also the show the stand. error for functions of $\xx$.  We could show the standard error of $\hat{\ZZ}\E[\xx_t] + \hat{\aa}$ .  That however is NOT the variability of $\E[\y\tilde{y}]$.  If we just collected a bunch of new data for the same time period, the $\xx$ stays the same.  The s.e. reflects our uncertainty but the $\xx$ is not changing.  $\E[\y\tilde{y}]=\ZZ\xx+\uu$ and uncertainty about that is due to our uncertainty in both $\xx$ and the parameters.  We are uncertain about $\xx$ in the same way as we are uncertain about the red line.  Confidence interval not standard error.  The standard error of $\yy$ is from $\RR$.  E(param estimate) have standard errors and $\xx_t$ has a standard error.
+
+Doesn't make sense to use that to compute the standard error of $\yy$ unless we wanted to show the stand. error if the whole process were run again or run forward.  We assume the parameters are at their estimated values and run forward. But why would the new process be governed by the estimated parameters?
+
+Expected value of $\yy$ if we ran the process over and over and each time generated a new $\xx$ using the estimated parameters.  ??? 
+\xx_t = \hat{\BB}\xx_{t-1}+\hat{\uu+\ww_t \text{ where } \ww_t \sim \MVN(0,\hat{\QQ}) \\
+
+Forecasting using the estimated values.  Yes, standard thing to do but keep in mind that it the prediction intervals will be too narrow.
+
+
+why show variability in the E(y)? You are uncertain about the parameters.  s.e. of the states has nothing to do with the uncertainty in the parameters.  You are uncertain about the states even if you are certain about the 
+
+\subsection{CI computation for the parameters of MARSS models}
+
+The MARSS package will allow you to construct CIs via an estimated Hessian, parametric bootstrapping, or residuals bootstrapping.   Construction of CIs using an estimated Hessian distribution is the fastest and it the default approach for producing CIs for the parameter estimates  via function \verb@MARSSparamCIs()@.   The residuals bootstrap, called innovations bootstrapping for MARSS models, is useful if one is unwilling to assume a particular distribution for the errors. Residuals bootstrapping is selected by passing in \verb@method="innovations"@ to  \verb@MARSSparamCIs()@.  The parametric bootstrap is useful when the estimate of the Hessian is numerically difficult or the multivariate normality assumption for the parameters is dubious. Parametric bootstrapping is selected by passing in \verb@method="parametric"@ to  \verb@MARSSparamCIs()@. It should be kept in mind that the methods discussed here do not work that well if the likelihood surface is multi-modal.
+
+If one needs CIs for a metric that is some function of the estimated parameters, then CIs can be constructed using the intervals (e.g. 95\%) from a large number of bootstrapped parameter estimates.  The function \verb@MARSSboot@ will generate bootstrap parameter estimates via an estimated Hessian, residuals bootstrapping or parametric bootstrapping.
+
+<<Cs_005_ret.hessian.s2, eval=FALSE, echo=FALSE>>=
+#Here's a function to return the Hessian when sigma is known
+ret.hessian.known.s2=function(dat, sigma){
+  NLL <- function(parm, dat=NULL) {
+    resids = dat$y - parm[1] - dat$x * parm[2]
+    resids = suppressWarnings(dnorm(resids, 0, sigma, log = TRUE))
+    -sum(resids)
+  }
+  pars=coef(lm(y ~ x, data=dat))
+  names(pars)=c("alpha","beta")
+  ofit=optim(pars, NLL, dat=dat, hessian=TRUE)
+  parSigma = solve(ofit$hessian)
+  parMean = ofit$par
+  return(list(parMean=parMean, parSigma=parSigma))
+}
+@
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs_019_fig3, fig=TRUE, echo=FALSE, width=6, height=6, eval=FALSE>>=
+#create many parameter estimates
+nsim=5000
+#ij.results is alpha, beta, sigma from parametric boot of dat.j
+ij.results=matrix(NA,nsim,3)
+for(i in 1:nsim){
+  y.i = alpha.j + beta.j*x.j + rnorm(nsamp,0,sigma.j)
+  fit.i=lm(y.i~x.j)
+  ij.results[i,]=c(coef(fit.i), 
+                   sqrt(sum(fit.i$residual^2)/fit.i$df.residual))
+}
+
+library(RColorBrewer)
+rf = colorRampPalette(rev(brewer.pal(11,'Spectral')))
+r = rf(32)
+
+nbreaks=50
+library(MASS)
+df = data.frame(x=ij.results[,1],y=ij.results[,2])
+h1 = hist(df$x, breaks=nbreaks, plot=FALSE)
+h2 = hist(df$y, breaks=nbreaks, plot=FALSE)
+top = max(h1$counts, h2$counts)
+k = kde2d(df$x, df$y, n=nbreaks)
+
+# margins
+oldpar <- par()
+par(mar=c(5,5,1,1))
+layout(matrix(c(2,0,1,3),2,2,byrow=T),c(3,1), c(1,3))
+image(k, col=r) #plot the image
+title(
+  xlab=expression(paste("intercept (",alpha,")",sep="")),
+  ylab=expression(paste("slope (",beta,")",sep=""))
+)
+par(mar=c(0,2,1,0))
+barplot(h1$counts, axes=FALSE, ylim=c(0, top), space=0, col='red')
+par(mar=c(2,0,0.5,1))
+barplot(h2$counts, axes=FALSE, xlim=c(0, top), space=0, col='red', horiz=T)
+@
+\end{center}
+\caption{Distribution of $\alpha$ and $\beta$ estimates from parametrically bootstrapping using the fit to $\yy_j$.  You can see that they are approximately multivariate normal even for $n=10$ (so not $n$ large).  Note, these estimates are from lm() which is using least-squares estimation, but the parameter estimates are the same as the maximum-likelihood estiamates for this problem (linear regression with Gaussian errors).}
+\label{fig:dist.of.ests}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\section{Functions used in the chapter}\label{sec:funcs}
+
+\subsection{Analytical CIs}
+
+This function computes the analytical CIs with the Fisher information matrix using the known (true) $\sigma$ if passed in or estimated $\sigma$ if not.
+<<Cs_100>>=
+CI.analytical.true.s2=function(dat, x, sigma, alp=0.05){
+  fit=lm(y~x, data=dat)
+  Xi = cbind(1, dat$x)
+  XiXi.inv = solve(t(Xi)%*%Xi)
+  theta = matrix(coef(fit), ncol=1)
+  if(is.null(sigma)){
+    sigma = sqrt(sum(fit$residual^2)/fit.df)
+  }
+  Sigma = sigma^2*XiXi.inv
+  X = cbind(1, x)
+  EyX = X%*%theta
+  #the analytical CI
+  CI = EyX + qnorm(c(alp/2,1-alp/2)) * sqrt(X%*%Sigma%*%t(X))
+  c(fit=EyX, lwr=CI[1], upr=CI[2])
+}
+@
+
+This function computes the analytical CIs with the observed Fisher information matrix using the estimated $\sigma$. This is biased.
+<<Cs_101>>=
+CI.analytical.est.s2=function(dat, x, alp=0.05){
+  fit=lm(y~x, data=dat)
+  Xi = cbind(1, dat$x)
+  XiXi.inv = solve(t(Xi)%*%Xi)
+  theta = matrix(coef(fit), ncol=1)
+  fit.df=fit$df.residual
+  sigma = sqrt(sum(fit$residual^2)/fit.df)
+  Sigma = sigma^2*XiXi.inv
+  X = cbind(1, x)
+  EyX = X%*%theta
+  #the analytical CI
+  CI = EyX + qnorm(c(alp/2,1-alp/2)) * sqrt(X%*%Sigma%*%t(X))
+  c(fit=EyX, lwr=CI[1], upr=CI[2])
+}
+@
+
+This function computes analytical CIs with the observed Fisher information matrix and corrects using the quantiles for the t-distribution.
+<<Cs_102>>=
+CI.analytical.corrected=function(dat, x, alp=0.05){
+  fit=lm(y~x, data=dat)
+  fit.df = fit$df.residual
+  Xi = cbind(1, dat$x)
+  XiXi.inv = solve(t(Xi)%*%Xi)
+  hat.sigma = sqrt(sum(fit$residual^2)/fit.df)
+  hat.Sigma = hat.sigma^2*XiXi.inv
+  hat.theta = matrix(coef(fit), ncol=1)
+  X = cbind(1, x)
+  EyX = X%*%hat.theta
+  CI = EyX + qt(c(alp/2,1-alp/2), df=fit.df) * sqrt(X%*%hat.Sigma%*%t(X))
+  c(fit=EyX, lwr=CI[1], upr=CI[2])
+}
+@
+
+\subsection{Numerical estimation of the Hessian of the negative log-likelihood function}
+
+The following function numerically estimates the Hessian of the negative of the log-likelihood functions and inverts that to give us an estimate of $\Sigma$:
+<<Cs_103>>=
+#Get the MLEs and MLE Sigma
+hessian.parm=function(dat, sigma.mle=FALSE){
+  library(MASS)
+  NLL <- function(parm, dat=NULL, sigma=NULL) {
+    resids = dat$y - dat$x * parm[2] - parm[1]
+    dresids = suppressWarnings(dnorm(resids, 0, sigma, log = TRUE))
+    -sum(dresids)
+  }
+  fit=lm(y~x, data=dat)
+  df.sigma = fit$df.residual
+  if(sigma.mle) df.sigma = df.sigma+1
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  pars=c(alpha, beta)
+  names(pars)=c("alpha","beta")
+  
+  fit.tmp=optim(pars, NLL, dat=dat, sigma=sigma, hessian=TRUE)
+  parSigma = solve(fit.tmp$hessian)
+  parMean = matrix(fit.tmp$par, ncol=1)
+  names(parMean)=c("alpha","beta","sigma")
+  
+  list(parMean=parMean, parSigma=parSigma, df.sigma=df.sigma)
+}
+@
+
+\subsection{Functions for producing bootstrapped parameter estimates}
+
+This function produces parameter estimates by drawing from the estimated $\Sigma$:
+<<Cs_104>>=
+hessian.boot=function(dat, nboot=1000){
+  hes=hessian.parm(dat)  
+  #generate alpah and beta from Sigma
+  boot.params = mvrnorm(nboot, mu = hes$parMean, Sigma = hes$parSigma)
+  colnames(boot.params)=c("alpha","beta")
+  boot.params
+}
+@
+
+This function produces parameter estimates by parametric bootstrapping:
+<<Cs_105>>=
+parametric.boot=function(dat, nboot=1000, n=NULL, x=NULL){
+  if(is.null(n)) n=nrow(dat)
+  #x's at which to generate new data
+  if(is.null(x)) x=dat$x
+  #first fit model to data
+  fit=lm(y~x, data=dat)
+  #matrix to store the estimates
+  boot.params=matrix(NA,nboot,3)
+  sigma = sqrt(sum(fit$residual^2)/fit$df.residual)
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  for(i in 1:nboot){
+    y=alpha + beta*x + rnorm(n,0,sigma)
+    tmp.fit=lm(y~x)
+    boot.params[i,]=coef(tmp.fit)
+  }
+  colnames(boot.params)=c("alpha","beta")
+  boot.params
+}
+@
+
+This function produces parameter estimates by resampling from the residuals:
+<<Cs_106>>=
+residuals.boot=function(dat, nboot=1000){
+  fit=lm(y~x, data=dat)
+  resids=residuals(fit)  
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    tmp = sample(n, replace=TRUE)
+    tmp.y=alpha + beta*dat$x + resids[tmp]
+    tmp.fit=lm(tmp.y~dat$x)
+    boot.params[i,]=coef(tmp.fit)
+  }
+  colnames(boot.params)=c("alpha","beta")
+  boot.params
+}
+@
+
+This function produces parameter estimates by resampling the data:
+<<Cs_107>>=
+resampling.boot=function(dat, nboot=1000){
+  boot.params=matrix(NA,nboot,3)
+  n = nrow(dat) #number of data points
+  for(i in 1:nboot){
+    #sample with replacement
+    tmp = sample(n, replace=TRUE)
+    #tmp.fit is the fit to this bootstrapped data
+    tmp.fit=lm(y~x, data=dat, subset=tmp)
+    boot.params[i,]=coef(tmp.fit)
+  }
+  colnames(boot.params)=c("alpha","beta")
+  boot.params
+}
+@
+
+\subsection{Functions for producing CIs from bootstrapped parameter estimates}
+
+This function produces CIs at $x$ from a set of bootstrapped parameter estimates:
+<<Cs_108>>=
+boot.CI=function(boot.params, x, alp=0.05){
+  CIs=apply(
+    boot.params%*%rbind(1,x), 2,
+    quantile, c(0.5, alp/2, 1-alp/2) )
+  colnames(CIs)=x
+  t(CIs) #to look like predict output
+}
+@
+
+This function is then combined with the functions for producing bootstrapped parameter estimates to produces CIs for the different bootstrap methods:
+<<Cs_109>>=
+hessian.boot.cis=function(dat, x, nboot=1000){
+  boot.params=hessian.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+
+parametric.boot.cis=function(dat, x, nboot=1000){
+  boot.params=parametric.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+
+residuals.boot.cis=function(dat, x, nboot=1000){
+  boot.params=residuals.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+
+resampling.boot.cis=function(dat, x, nboot=5000){
+  boot.params=resampling.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+\subsection{Estimating the correction for a CI via bootstrapping}
+
+<<Cs_110>>=
+ci.adj=function(dat, x, nboot1=5000, nboot2=1000, type="hessian"){
+  #x is the x where the ci is computed; one value
+  #type is analytical, hessian, parametric or residuals
+  nsamp=nrow(dat)
+  fit=lm(y~x, data=dat)
+  sigma = sqrt(sum(fit$residuals^2)/fit$df.residual)
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  #this is the correct width of the 95\% CI
+  #for a model with the parameters estimated from dat
+  ci=parametric.boot.cis(dat,x,nboot=nboot1)[2:3]
+  ci.width=ci[2]-ci[1]
+  #ci.width.boot will hold a set of bootstrapped CIs
+  ci.width.boot=rep(NA,nboot2)
+  for(i in 1:nboot2){
+    if(type %in% c("parametric", "hessian", "analytical")){
+      y=alpha + beta*dat$x + rnorm(nsamp,0,sigma)
+      tmp.dat=data.frame(x=dat$x, y=y)
+      if(type=="analytical") tmp.ci=CI.analytical.est.s2(tmp.dat,x)[2:3]
+      if(type=="parametric") tmp.ci=parametric.boot.cis(tmp.dat,x,nboot1)[2:3]
+      if(type=="hessian") tmp.ci=hessian.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "residuals"){
+      y=alpha + beta*dat$x + sample(fit$residuals, nsamp)
+      tmp.ci=residuals.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "resampling"){
+      tmp.dat = dat[sample(nsamp, replace=TRUE),]
+      tmp.ci=resampling.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    ci.width.boot[i]=tmp.ci[2]-tmp.ci[1]
+  }
+  #Trim to deal with random ouliers
+  mean(ci.width/ci.width.boot, trim=.1)
+}
+@
+
+\subsection{Functions for producing PIs from bootstrapped parameter estimates}
+
+This function produces PIs at $x$ from a set of bootstrapped parameter estimates:
+<<Cs_108>>=
+boot.PI=function(boot.params, x, alp=0.05){
+  n=dim(boot.params)[1]
+  PIs=apply(
+    boot.params[,c("alpha","beta"),drop=FALSE]%*%rbind(1,x)+rnorm(n,0,boot.params[,"sigma"]),
+    2,quantile, c(0.5, alp/2, 1-alp/2) )
+  colnames(PIs)=x
+  t(PIs) #to look like predict output
+}
+@
+
+This function is then combined with the functions for producing bootstrapped parameter estimates to produces CIs for the different bootstrap methods:
+<<Cs_109>>=
+hessian.boot.pis=function(dat, x, nboot=5000){
+  boot.params=hessian.boot(dat, nboot=nboot)
+  boot.PI(boot.params, x)
+}
+
+parametric.boot.pis=function(dat, x, nboot=5000){
+  boot.params=parametric.boot(dat, nboot=nboot)
+  boot.PI(boot.params, x)
+}
+
+residuals.boot.cis=function(dat, x, nboot=1000){
+  boot.params=residuals.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+
+resampling.boot.cis=function(dat, x, nboot=5000){
+  boot.params=resampling.boot(dat, nboot=nboot)
+  boot.CI(boot.params, x)
+}
+@
+
+\subsection{Estimating the correction for a CI via bootstrapping}
+
+<<Cs_110>>=
+ci.adj=function(dat, x, nboot1=5000, nboot2=1000, type="hessian"){
+  #x is the x where the ci is computed; one value
+  #type is analytical, hessian, parametric or residuals
+  nsamp=nrow(dat)
+  fit=lm(y~x, data=dat)
+  sigma = sqrt(sum(fit$residuals^2)/fit$df.residual)
+  alpha=coef(fit)[1]
+  beta=coef(fit)[2]
+  #this is the correct width of the 95\% CI
+  #for a model with the parameters estimated from dat
+  ci=parametric.boot.cis(dat,x,nboot=nboot1)[2:3]
+  ci.width=ci[2]-ci[1]
+  #ci.width.boot will hold a set of bootstrapped CIs
+  ci.width.boot=rep(NA,nboot2)
+  for(i in 1:nboot2){
+    if(type %in% c("parametric", "hessian", "analytical")){
+      y=alpha + beta*dat$x + rnorm(nsamp,0,sigma)
+      tmp.dat=data.frame(x=dat$x, y=y)
+      if(type=="analytical") tmp.ci=CI.analytical.est.s2(tmp.dat,x)[2:3]
+      if(type=="parametric") tmp.ci=parametric.boot.cis(tmp.dat,x,nboot1)[2:3]
+      if(type=="hessian") tmp.ci=hessian.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "residuals"){
+      y=alpha + beta*dat$x + sample(fit$residuals, nsamp)
+      tmp.ci=residuals.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    if(type == "resampling"){
+      tmp.dat = dat[sample(nsamp, replace=TRUE),]
+      tmp.ci=resampling.boot.cis(tmp.dat,x,nboot1)[2:3]
+    }
+    ci.width.boot[i]=tmp.ci[2]-tmp.ci[1]
+  }
+  #Trim to deal with random ouliers
+  mean(ci.width/ci.width.boot, trim=.1)
+}
+@
