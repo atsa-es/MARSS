@@ -6,7 +6,7 @@
 % choose options for [] as required from the list
 % in the Reference Guide, Sect. 2.2
 
-%\usepackage{Sweave}
+\usepackage{Sweave}
 \usepackage{multirow}
 \usepackage[bottom]{footmisc}% places footnotes at page bottom
 \usepackage[round]{natbib}
@@ -40,7 +40,8 @@
 \def\TH{\mbox{\boldmath $\Theta$}}
 \def\UPS{\mbox{\boldmath $\Upsilon$}}
 \def\XI{\mbox{\boldmath $\Xi$}}
-\def\AA{\mbox{$\mathbf A$}}	\def\aa{\mbox{$\mathbf a$}} \def\Ab{\mbox{$\mathbf F$}} \def\Aa{\mbox{$\mathbf h$}} \def\Am{\PI}
+\def\AA{\mbox{$\mathbf A$}}	\def\aa{\mbox{$\mathbf a$}}
+\def\Ab{\mbox{$\mathbf D$}} \def\Aa{\mbox{$\mathbf d$}} \def\Am{\PI}
 \def\BB{\mbox{$\mathbf B$}}	\def\bb{\mbox{$\mathbf b$}} \def\Bb{\mbox{$\mathbf J$}} \def\Ba{\mbox{$\mathbf L$}} \def\Bm{\UPS}
 \def\CC{\mbox{$\mathbf C$}}	\def\cc{\mbox{$\mathbf c$}}
 \def\Ca{\Delta} \def\Cb{\GAM}
@@ -51,7 +52,7 @@
 \def\FF{\mbox{$\mathbf F$}} \def\ff{\mbox{$\mathbf f$}}
 \def\GG{\mbox{$\mathbf G$}}	\def\gg{\mbox{$\mathbf g$}}
 \def\HH{\mbox{$\mathbf H$}}	\def\hh{\mbox{$\mathbf h$}}
-\def\II{\mbox{$\mathbf I$}}
+\def\II{\mbox{$\mathbf I$}} \def\ii{\mbox{$\mathbf i$}}
 \def\IIm{\mbox{$\mathbf I$}}
 \def\JJ{\mbox{$\mathbf J$}}
 \def\KK{\mbox{$\mathbf K$}}
@@ -64,7 +65,9 @@
 \def\QQ{\mbox{$\mathbf Q$}}	 \def\qq{\mbox{$\mathbf q$}} \def\Qb{\mbox{$\mathbf G$}}  \def\Qm{\mathbb{Q}}
 \def\RR{\mbox{$\mathbf R$}}	 \def\rr{\mbox{$\mathbf r$}} \def\Rb{\mbox{$\mathbf H$}}	\def\Rm{\mathbb{R}}
 \def\SS{\mbox{$\mathbf S$}}
-\def\UU{\mbox{$\mathbf U$}}	\def\uu{\mbox{$\mathbf u$}} \def\Ub{\mbox{$\mathbf C$}} \def\Ua{\mbox{$\mathbf g$}} \def\Um{\UPS}
+\def\TT{\mbox{$\mathbf T$}}
+\def\UU{\mbox{$\mathbf U$}}	\def\uu{\mbox{$\mathbf u$}}
+\def\Ub{\mbox{$\mathbf C$}} \def\Ua{\mbox{$\mathbf c$}} \def\Um{\UPS}
 \def\VV{\mbox{$\mathbf V$}}	\def\vv{\mbox{$\mathbf v$}}
 \def\WW{\mbox{$\mathbf W$}}	\def\ww{\mbox{$\mathbf w$}}
 %\def\XX{\mbox{$\mathbf X$}}
@@ -125,6 +128,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \author{Elizabeth Eli Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Derivation of an EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models}
@@ -171,7 +175,7 @@ The first part of this report will review the derivation of an EM algorithm for 
 The linear constraints appear as the vectorization of each parameter ($\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$, $\RR$, $\xixi$, $\LAM$) is described by the relation $\ff_t+\DD_t\mm$. This relation  specifies linear constraints of the form $\beta_i + \beta_{a,i} a + \beta_{b,i} b + \dots$ on the elements in each MARSS parameter matrix. Equation \eqref{eq:MARSS.ex} is a much broader class of MARSS models that includes MARSS models with exogenous variable (covariates), AR-p models, moving average models, constrained MARSS models and models that are combinations of these. The derivation also includes partially deterministic systems where $\GG_t$, $\HH_t$ and $\FF$ may have all zero rows.
 
 \subsection{The joint log-likelihood function}
-Denote the set of all $y$'s and $x$'s from $t=1$ to $T$ by $\yy$ and $\xx$. The joint log-likelihood\footnote{This is not the log likelihood output by the Kalman filter.  The log likelihood output by the Kalman filter is the $\log\LL(\yy;\Theta)$ (notice $\xx$ does not appear), which is known as the marginal log likelihood.} of $\yy$ and $\xx$ can then be written then as follows\footnote{The log-likelihood function is shown here for the MARSS with non-time varying parameters (equation \ref{eq:MARSS}).}, where $\XX_t$ denotes the random variable and $\xx_t$ is a realization from that random variable (and similarly for $\YY_t$):\footnote{To alleviate clutter, I have left off subscripts on the $f$'s.  To emphasize that the $f$'s represent different density functions, one would often use a subscript showing what parameters are in the functions, i.e. $f(\xx_t|\XX_{t-1}=\xx_{t-1})$ becomes $f_{B,u,Q}(\xx_t|\XX_{t-1}=\xx_{t-1})$.}
+Equation \ref{eq:MARSS.ex} describes a multivariate stochastic process and $\YY_t$ and $\XX_t$ are random variables whose distributions are given by Equation \ref{eq:MARSS.ex}. Denote a specific realization of these random variables as $\yy$ and $\xx$ which denotes a set of all $y$'s and $x$'s from $t=1$ to $T$. The joint log-likelihood\footnote{This is not the log likelihood output by the Kalman filter.  The log likelihood output by the Kalman filter is the $\log\LL(\yy;\Theta)$ (notice $\xx$ does not appear), which is known as the marginal log likelihood.} of $\yy$ and $\xx$ can then be written then as follows\footnote{The log-likelihood function is shown here for the MARSS with non-time varying parameters (equation \ref{eq:MARSS}).}, where $\XX_t$ denotes the random variable and $\xx_t$ is a realization from that random variable (and similarly for $\YY_t$):\footnote{To alleviate clutter, I have left off subscripts on the $f$'s.  To emphasize that the $f$'s represent different density functions, one would often use a subscript showing what parameters are in the functions, i.e. $f(\xx_t|\XX_{t-1}=\xx_{t-1})$ becomes $f_{B,u,Q}(\xx_t|\XX_{t-1}=\xx_{t-1})$.}
 \begin{equation}
 f(\yy,\xx) = f(\yy|\XX=\xx)f(\xx),
 \end{equation}
@@ -339,14 +343,22 @@ d_{n,m}
 
 
 \begin{table}
-	\caption{Derivatives of a scalar with respect to vectors and matrices.  In the following $\aa$ and $\cc$ are $n \times 1$ column vectors, $\bb$ and $\dd$ are $m \times 1$ column vectors, $\DD$ is a $n \times m$ matrix, $\CC$ is a $n \times n$ matrix, and $\AA$ is a diagonal $n \times n$ matrix (0s on the off-diagonals).  $\CC^{-1}$ is the inverse of $\CC$, $\CC^\top$ is the transpose of $\CC$, $\CC^{-\top} = \big(\CC^{-1}\big)^\top = \big(\CC^\top\big)^{-1}$, and $|\CC|$ is the determinant of $\CC$. Note, all the numerators in the differentials reduce to scalars.  Although the matrix names may be the same as in the text, these matrices are dummy matrices to show the matrix derivative relations.}
+	\caption{Derivatives of a scalar with respect to vectors and matrices.  In the following $a$ is a scalar (unrelated to $\aa$), $\aa$ and $\cc$ are $n \times 1$ column vectors, $\bb$ and $\dd$ are $m \times 1$ column vectors, $\DD$ is a $n \times m$ matrix, $\CC$ is a $n \times n$ matrix, and $\AA$ is a diagonal $n \times n$ matrix (0s on the off-diagonals).  $\CC^{-1}$ is the inverse of $\CC$, $\CC^\top$ is the transpose of $\CC$, $\CC^{-\top} = \big(\CC^{-1}\big)^\top = \big(\CC^\top\big)^{-1}$, and $|\CC|$ is the determinant of $\CC$. Note, all the numerators in the differentials on the far left reduce to scalars.  Although the matrix names may be the same as those of matrices referred to in the text, the matrices in this table are dummy matrices used to show the matrix derivative relations.}
 	\label{tab:MatrixDerivatives}
 \begin{center}\begin{tabular}{lr}
 \hline
 \\
+\refstepcounter{equation}\label{eq:derivproductrule}
+$\partial(\ff^\top\gg)/\partial\aa = \ff^\top\partial(\gg)/\partial\aa + \gg^\top\partial(\ff)/\partial\aa$ 
+& \multirow{2}{*}{(\theequation)} \\
+$\ff=f(\aa)$ and \gg=$g(\aa)$ are some functions of $\aa$ and are column vectors. & \\
+$\partial \ff /\partial\aa = \partial \ff /\partial \gg \, \partial\gg/\partial\aa$
+&\\
+\\
 \refstepcounter{equation}\label{eq:derivaTc}
-$\partial(\aa^\top\cc)/\partial\aa = \partial(\cc^\top\aa)/\partial\aa = \cc^\top$
-& (\theequation) \\
+$\partial(\aa^\top\cc)/\partial\aa = \partial(\cc^\top\aa)/\partial\aa = \cc^\top$ & \multirow{2}{*}{(\theequation)} \\
+$\partial(\aa)/\partial\(\aa) = \partial(\aa^\top)/\partial\(\aa) = \II_n$ 
+&\\
 \\
 \refstepcounter{equation}\label{eq:derivaTDb}
 $\partial(\aa^\top\DD\bb)/\partial\DD = \partial(\bb^\top\DD^\top\aa)/\partial\DD = \bb\aa^\top$
@@ -355,9 +367,12 @@ $\partial(\aa^\top\DD\bb)/\partial\vec(\DD) = \partial(\bb^\top\DD^\top\aa)/\par
 &\\
 \\
 \refstepcounter{equation}\label{eq:derivlogDet}
-$\partial(\log |\CC|)/\partial\CC = -\partial(\log |\CC^{-1}|)/\partial\CC=(\CC^\top)^{-1} = \CC^{-\top}$
-& \multirow{2}{*}{(\theequation)} \\
+$\CC$ is invertable.& \multirow{6}{*}{(\theequation)} \\
+$\partial(\log |\CC|)/\partial\CC = -\partial(\log |\CC^{-1}|)/\partial\CC=(\CC^\top)^{-1} = \CC^{-\top}$\\
 $\partial(\log |\CC|)/\partial\vec(\CC) = \big(\vec(\CC^{-\top})\big)^\top$& \\
+If $\CC$ is also symmetric and $\BB$ is not a function of $\CC$.& \\
+$\partial(\log |\CC^\top\BB\CC|)/\partial\CC = 2\CC^{-1}$\\
+$\partial(\log |\CC^\top\BB\CC|)/\partial\vec(\CC) = 2\big(\vec(\CC^{-1})\big)^\top$\\
 \\
 \refstepcounter{equation}\label{eq:derivbDTCDd}
 $\partial(\bb^\top\DD^\top\CC\DD\dd)/\partial\DD = \dd\bb^\top\DD^\top\CC + \bb\dd^\top\DD^\top\CC^\top$ 
@@ -896,21 +911,21 @@ The first part of this report dealt with the case of a MARSS model (equation \re
 The time-varying MARSS model is written:
 \begin{subequations}\label{eq:MARSS.ex2}
 \begin{gather}
-\xx_t = \BB_t\xx_{t-1} + \uu_t + \HH_t\ww_t, \text{ where } \WW_t \sim \MVN(0,\QQ_t)\\
-\yy_t = \ZZ_t\xx_t + \aa_t + \GG_t\vv_t, \text{ where } \VV_t \sim \MVN(0,\RR_t)\\
+\xx_t = \BB_t\xx_{t-1} + \uu_t + \GG_t\ww_t, \text{ where } \WW_t \sim \MVN(0,\QQ_t)\\
+\yy_t = \ZZ_t\xx_t + \aa_t + \HH_t\vv_t, \text{ where } \VV_t \sim \MVN(0,\RR_t)\\
 \xx_{t_0} = \xixi+\FF\ll, \text{ where } t_0=0 \text{ or } t_0=1\\
 \LL \sim \MVN(0,\LAM)\\
 \begin{bmatrix}\ww_t\\ \vv_t\end{bmatrix} \sim \MVN(0,\Sigma), \quad \Sigma=\begin{bmatrix}\QQ_t&0\\ 0&\RR_t\end{bmatrix}
 \end{gather}
 \end{subequations}
-This looks quite similar to the previous non-time varying MARSS model, but now the model parameters, $\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$ and $\RR$, have a $t$ subscript and we have a multiplier matrix on the error terms $\vv_t$, $\ww_t$, $\ll$. The $\HH_t$ multiplier is $m \times s$, so we now have $s$ state errors instead of $m$.  The $\GG_t$ multiplier is $n \times k$, so we now have $k$ observation errors instead of $n$.  The $\FF$ multiplier is $m \times j$, so now we can have some initial states ($j$ of them) be stochastic and others be fixed.  I assume that appropriate constraints are put on $\GG$ and $\HH$ so that the resulting MARSS model is not under- or over-constrained\footnote{For example, if both $\GG$ and $\HH$ are column vectors, then the system is over-constrained and has no solution.}.
+This looks quite similar to the previous non-time varying MARSS model, but now the model parameters, $\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$ and $\RR$, have a $t$ subscript and we have a multiplier matrix on the error terms $\vv_t$, $\ww_t$, $\ll$. The $\GG_t$ multiplier is $m \times s$, so we now have $s$ state errors instead of $m$.  The $\HH_t$ multiplier is $n \times k$, so we now have $k$ observation errors instead of $n$.  The $\FF$ multiplier is $m \times j$, so now we can have some initial states ($j$ of them) be stochastic and others be fixed.  I assume that appropriate constraints are put on $\GG$ and $\HH$ so that the resulting MARSS model is not under- or over-constrained\footnote{For example, if both $\GG$ and $\HH$ are column vectors, then the system is over-constrained and has no solution.}.
 The notation/presentation here was influenced by SJ Koopman's work, esp. \citet{KoopmanOoms2011} and \citet{Koopman1993}, but in these works, $\QQ_t$ and $\RR_t$ equal $\II$ and the variance-covariance structures are instead specified only by $\HH_t$ and $\GG_t$.  I keep $\QQ_t$ and $\RR_t$ in my formulation as it seems more intuitive (to me) in the context of the EM algorithm and the required joint-likelihood function. 
 
 We can rewrite this MARSS model using vec relationships (table \ref{tab:VecRelations}):
 \begin{equation}\label{eq:MARSS.ex.vec}
 \begin{gathered}
-\xx_t = (\xx_{t-1}^\top \otimes \II_m)\vec(\BB_t) + \vec(\uu_t) + \HH_t\ww_t, \WW_t  \sim \MVN(0,\QQ_t)\\
-\yy_t = (\xx_t^\top \otimes \II_n)\vec(\ZZ_t) + \vec(\aa_t) + \GG_t\vv_t, \VV_t \sim \MVN(0,\RR_t)\\
+\xx_t = (\xx_{t-1}^\top \otimes \II_m)\vec(\BB_t) + \vec(\uu_t) + \GG_t\ww_t, \WW_t  \sim \MVN(0,\QQ_t)\\
+\yy_t = (\xx_t^\top \otimes \II_n)\vec(\ZZ_t) + \vec(\aa_t) + \HH_t\vv_t, \VV_t \sim \MVN(0,\RR_t)\\
 \xx_{t_0} = \xixi+\FF\ll, \LL \sim \MVN(0,\LAM)
 \end{gathered}
 \end{equation}
@@ -1066,12 +1081,17 @@ $\vec(\AA\BB) = (\II_p \otimes \AA)\vec(\BB) = (\BB^\top \otimes \II_n)\vec(\AA)
 $\vec(\AA\BB\CC) = (\CC^\top \otimes \AA)\vec(\BB)$
 & (\theequation) \\
 \\
-\refstepcounter{equation}\label{eq:kron.prod}
-$(\AA \otimes \BB)(\CC \otimes \DD) = (\AA\CC \otimes \BB\DD)$
+\refstepcounter{equation}\label{eq:vec.aTBa}
+$\vec(\aa^\top\BB\aa) = \aa^\top\BB\aa = (\aa^\top \otimes \aa)\vec(\BB)$
 & (\theequation) \\
 \\
+\refstepcounter{equation}\label{eq:kron.prod}
+$(\AA \otimes \BB)(\CC \otimes \DD) = (\AA\CC \otimes \BB\DD)$
+&\multirow{2}{*}{(\theequation)} \\
+$(\AA \otimes \BB)+(\AA \otimes \CC) = (\AA \otimes (\BB+\CC))$ &\\
+\\
 \refstepcounter{equation}\label{eq:kron.column.vec}
-$(\aa \otimes \II_p)\CC = (\aa \otimes \CC)$ &\multirow{4}{*}{(\theequation)} \\
+$(\aa \otimes \II_p)\CC = (\aa \otimes \CC)$ &\multirow{3}{*}{(\theequation)} \\
 $\CC(\aa^\top \otimes \II_q) = (\aa^\top \otimes \CC)$ &\\
 $\EE(\aa^\top \otimes \DD)=\EE\DD(\aa^\top \otimes \II_p)=(\aa^\top \otimes \EE\DD)$ &\\
 \\
@@ -1080,9 +1100,9 @@ $(\aa \otimes \II_p)\CC(\bb^\top \otimes \II_q) = (\aa\bb^\top \otimes \CC)$ &
 (\theequation) \\
 \\
 \refstepcounter{equation}\label{eq:kron.column.column.vec}
-$(\aa \otimes \aa)=\vec(\aa\aa^\top)$ 
+$(\aa \otimes \bb)=\vec(\bb\aa^\top)$ 
 &\multirow{2}{*}{(\theequation)} \\
-$(\aa^\top \otimes \aa^\top)=(\aa \otimes \aa)^\top=(\vec(\aa\aa^\top))^\top$ &\\
+$(\aa^\top \otimes \bb^\top)=(\aa \otimes \bb)^\top=(\vec(\bb\aa^\top))^\top$ &\\
 \\
 \refstepcounter{equation}\label{eq:kron.trans}
 $(\AA^\top \otimes \BB^\top)=(\AA \otimes \BB)^\top$ &
@@ -1093,18 +1113,18 @@ $(\AA^\top \otimes \BB^\top)=(\AA \otimes \BB)^\top$ &
 \end{table}
 
 \subsection{A MARSS model with exogenous variables}
-The following is a commonly seen MARSS model with covariates $\gg_t$ and $\hh_t$ appearing as additive elements:
+The following is a commonly seen MARSS model with covariates $\cc_t$ and $\dd_t$ appearing as additive elements:
 \begin{equation*}
 \begin{split}
-\xx_t &= \BB\xx_{t-1} + \CC\gg_t + \ww_t\\
-\yy_t &= \ZZ\xx_t + \FF\hh_t + \vv_t 
+\xx_t &= \BB\xx_{t-1} + \CC\cc_t + \ww_t\\
+\yy_t &= \ZZ\xx_t + \DD\dd_t + \vv_t 
 \end{split}
 \end{equation*}
-We would typically want to estimate $\CC$ or $\FF$ which are the influence of our covariates on our responses, $\xx$ or $\yy$.  Let's say there are $p$ covariates in $\hh_t$ and $q$ covariates in $\gg_t$.  Then we can write the above in vec form:
+Here, $\DD$ is the effect of $\dd_t$ on $\yy_t$ not a design matrix (which would have a subscript).  We would typically want to estimate $\CC$ or $\DD$ which are the influence of our covariates on our responses, $\xx$ or $\yy$.  Let's say there are $p$ covariates in $\cc_t$ and $q$ covariates in $\dd_t$.  Then we can write the above in vec form:
 \begin{equation}\label{eq:MARSS.simple.ex}
 \begin{split}
-\xx_t &= (\xx_{t-1}^\top \otimes \II_m)\vec(\BB) + (\hh_t^\top \otimes \II_p)\vec(\CC) + \ww_t\\
-\yy_t &= (\xx_t^\top \otimes \II_n)\vec(\ZZ) + (\gg_t^\top \otimes \II_q)\vec(\DD) + \vv_t 
+\xx_t &= (\xx_{t-1}^\top \otimes \II_m)\vec(\BB) + (\cc_t^\top \otimes \II_p)\vec(\CC) + \ww_t\\
+\yy_t &= (\xx_t^\top \otimes \II_n)\vec(\ZZ) + (\dd_t^\top \otimes \II_q)\vec(\DD) + \vv_t 
 \end{split}
 \end{equation}
 Let's say we put no constraints $\BB$, $\ZZ$, $\QQ$, $\RR$, $\xixi$, or $\LAM$.  Then in the form of equation \eqref{eq:MARSS.ex.vec},
@@ -1120,13 +1140,13 @@ with the parameters defined as follows:
 \vec(\BB_t) &= \ff_{t,b} + \DD_{t,b}\bbeta;
 \, \ff_{t,b} = 0;\, \DD_{t,b}=1;\, \bbeta=\vec(\BB)\\
 \vec(\uu_t) &= \ff_{t,u} + \DD_{t,u}\uupsilon;
-\, \ff_{t,u} = 0;\, \DD_{t,u}=(\hh_t^\top \otimes \II_p);\, \uupsilon=\vec(\CC)\\
+\, \ff_{t,u} = 0;\, \DD_{t,u}=(\cc_t^\top \otimes \II_p);\, \uupsilon=\vec(\CC)\\
 \vec(\QQ_t) &= \ff_{t,q} + \DD_{t,q}\qq;
 \, \ff_{t,q}= 0;\,  \DD_{t,q}= \DD_q \\
 \vec(\ZZ_t) &= \ff_{t,z} + \DD_{t,z}\zzeta;
 \, \ff_{t,z} = 0;\, \DD_{t,z}=1;\, \zzeta=\vec(\ZZ)\\
 \vec(\aa_t) &= \ff_{t,a} + \DD_{t,a}\aalpha;
-\, \ff_{t,a} = 0;\, \DD_{t,a}=(\gg_t^\top \otimes \II_q);\, \aalpha=\vec(\FF)\\
+\, \ff_{t,a} = 0;\, \DD_{t,a}=(\dd_t^\top \otimes \II_q);\, \aalpha=\vec(\DD)\\
 \vec(\RR_t) &= \ff_{t,r} + \DD_{t,r}\rr;
 \, \ff_{t,r}= 0;\,  \DD_{t,r}= \DD_r \\
 \vec(\LAM)&= \ff_\lambda+\DD_\lambda\llambda;
@@ -1141,7 +1161,7 @@ The transformation of the simple MARSS with covariates (equation \ref{eq:MARSS.s
 
 \subsection{A general MARSS model with exogenous variables}
 Let's imagine now a very general MARSS model with various `inputs'.  `
-input' here just means that it is some fully known matrix rather than something we are estimating.  It could be a sequence of 0s and 1s if for example we were fitting a before/after sort of model.  Below the letters with a $t$ subscript are the inputs, except $\xx$, $\yy$, $\ww$ and $\vv$.
+input' here just means that it is some fully known matrix rather than something we are estimating.  It could be a sequence of 0s and 1s if for example we were fitting a before/after sort of model.  Below the letters with a $t$ subscript are the inputs (and $\Ab_t$ is an input not a design matrix), except $\xx$, $\yy$, $\ww$ and $\vv$.
 \begin{equation}\label{eq:MARSS.general.ex}
 \begin{split}
 \xx_t &= \Bb_t\BB\Ba_t\xx_{t-1} + \Ub_t\UU\Ua_t + \Qb_t\ww_t\\
@@ -1183,9 +1203,9 @@ Here, for example $\ff_b$ and $\DD_b$ indicate the linear constraints on $\BB$ a
 As usual, this reformulation looks cumbersome, but would be hidden from the user presumably.
 
 \subsection{The expected log-likelihood function}
-As mentioned above, we do not necessarily want to assume that $\GG_t\RR_t\GG_t^\top$, $\HH_t\QQ_t\HH_t^\top$, and $\FF\LAM\FF^\top$ are valid variance-covariance matrices.  This would rule out many MARSS models that we would like to fit.  For example, if $\QQ=\sigma^2$ and $\HH=\begin{bmatrix}1\\ 1\\ 1\end{bmatrix}$,  $\HH\QQ\HH^\top$ would be an invalid variance-variance matrix.  However, this is a valid MARSS model.
+As mentioned above, we do not necessarily want to assume that $\HH_t\RR_t\HH_t^\top$, $\GG_t\QQ_t\GG_t^\top$, and $\FF\LAM\FF^\top$ are valid variance-covariance matrices.  This would rule out many MARSS models that we would like to fit.  For example, if $\QQ=\sigma^2$ and $\GG=\begin{bmatrix}1\\ 1\\ 1\end{bmatrix}$,  $\GG\QQ\GG^\top$ would be an invalid variance-variance matrix.  However, this is a valid MARSS model. We do need to be careful that $\HH_t$ and $\GG_t$ are specified such that the model has a solution.  For example, a model where both $\GG$ and $\HH$ are $\begin{bmatrix}1\\ 1\\ 1\end{bmatrix}$ would not be solvable for all $\yy$.
 
-Instead I will define  $\Phi_t=(\HH_t^\top\HH_t)^{-1}\HH_t^\top$, $\Xi_t=(\GG_t^\top\GG_t)^{-1}\GG_t^\top$, and $\Pi = (\FF^\top\FF)^{-1}\FF^\top$. I then require that the inverses of $\GG_t^\top\GG_t$, $\HH_t^\top\HH_t$, and $\FF^\top\FF$ exist and that  $\ff_{t,q}+\DD_{t,q}\qq$, $\ff_{t,r}+\DD_{t,r}\rr$, and $\ff_\lambda+\DD_\lambda\llambda$ specify valid variance-covariance matrices. These are much less stringent restrictions.
+Instead I will define  $\Phi_t=(\GG_t^\top\GG_t)^{-1}\GG_t^\top$, $\Xi_t=(\HH_t^\top\HH_t)^{-1}\HH_t^\top$, and $\Pi = (\FF^\top\FF)^{-1}\FF^\top$. I then require that the inverses of $\GG_t^\top\GG_t$, $\HH_t^\top\HH_t$, and $\FF^\top\FF$ exist and that  $\ff_{t,q}+\DD_{t,q}\qq$, $\ff_{t,r}+\DD_{t,r}\rr$, and $\ff_\lambda+\DD_\lambda\llambda$ specify valid variance-covariance matrices. These are much less stringent restrictions.
 
 For the purpose of writing down the expected log-likelihood, our MARSS model is now written
 \begin{equation}\label{eq:MARSS.ex.reformed}
@@ -1219,7 +1239,7 @@ The vec of the model parameters are defined as follows:
 \vec(\ZZ_t)&=\ff_{t,z}+\DD_{t,z}\zzeta\\
 \vec(\aa_t) &= \ff_{t,a}+\DD_{t,a}\aalpha\\
 \vec(\QQ_t)&=\ff_{t,q}+\DD_{t,q}\qq\\
-\vec(RR_t)&=\ff_{t,r}+\DD_{t,r}\rr\\
+\vec(\RR_t)&=\ff_{t,r}+\DD_{t,r}\rr\\
 \vec(\xixi)&=\ff_\xi+\DD_\xi\pp\\
 \vec(\LAM)&=\ff_\lambda+\DD_\lambda\llambda\\
 \Phi_t&=(\GG_t^\top\GG_t)^{-1}\GG_t^\top\\
@@ -1277,6 +1297,7 @@ We solve for $\uupsilon$, and the new $\uupsilon$ for the $j+1$ iteration of the
   \sum_{t=1}^T \DD_{t,u}^\top\Qm_t\big(\hatxt- (\hatxtm^\top \otimes \II_m)\vec(\BB_t) - \ff_{t,u} \big)
 \end{split}
 \end{equation}
+where $\Qm_t = \Phi_t^\top\QQ_t^{-1}\Phi_t = \GG_t(\GG_t^\top\GG_t)^{-1}\QQ_t^{-1}(\GG_t^\top\GG_t)^{-1}\GG_t^\top$.
 
 The update equation requires that $\sum_{t=1}^T \DD_{t,u}^\top\Qm_t\DD_{t,u}$ is invertible. It generally will be if $\Phi_t\QQ_t\Phi_t^\top$ is a proper variance-covariance matrix (positive semi-definite) and $\DD_{t,u}$ is full rank.  If $\GG_t$ has all-zero rows then $\Phi_t\QQ_t\Phi_t^\top$ has zeros on the diagonal and we have a partially deterministic model.  In this case, $\Qm_t$ will have all-zero row/columns and $\DD_{t,u}^\top\Qm_t\DD_{t,u}$ will not be invertible unless the corresponding row of $\DD_{t,u}$ is zero.  This means that if one of the $\xx$ rows is fully deterministic then the corresponding row of $\uu$ would need to be fixed.  We can get around this, however.  See section \ref{sec:degenerate} on the modifications to the update equation when some of the $\xx$'s are fully deterministic.
 
@@ -1460,7 +1481,7 @@ Thus,
   - \E[\Bm_t^\top\Qm_t\Bm_t]\ff_{t,b} \big)
 \end{equation}
 Now we need to deal with the expectations.
-\begin{equation}
+\begin{equation}\label{eq:B.expect1}
 \begin{split}
 \E[\Bm_t^\top\Qm_t\Bm_t]
 &=\E[(\XX_{t-1}^\top \otimes \II_m)^\top\Qm_t(\XX_{t-1}^\top \otimes \II_m)]\\
@@ -1471,7 +1492,7 @@ Now we need to deal with the expectations.
 \end{split}
 \end{equation}
 
-\begin{equation}
+\begin{equation}\label{eq:B.expect2}
 \begin{split}
 \E[\Bm_t^\top\Qm_t\XX_t]
 &=\E[(\XX_{t-1}^\top \otimes \II_m)^\top\Qm_t\XX_t]\\
@@ -1482,7 +1503,7 @@ Now we need to deal with the expectations.
 \end{split}
 \end{equation}
 
-\begin{equation}
+\begin{equation}\label{eq:B.expect3}
 \begin{split}
 \E[\Bm_t]^\top\Qm_t\uu_t&=(\E[\XX_{t-1}] \otimes \II_m)\Qm_t\uu_t \\
 &= (\hatxtm \otimes \Qm_t)\uu_t \\
@@ -1512,7 +1533,7 @@ The derivation of the update equation for $\zzeta$ with fixed and shared values 
 \begin{equation}\label{eq:general.Z.update}
 \begin{split}
 \zzeta_{j+1} = 
-\big(\sum_{t=1}^T \DD_{t,z}^\top(\hatPt  \otimes \Rm_t)\DD_{t,z} \big)\bbeta 
+\bigg(\sum_{t=1}^T \DD_{t,z}^\top(\hatPt  \otimes \Rm_t)\DD_{t,z} \bigg)^{-1} 
 \times  \sum_{t=1}^T \DD_{t,z}^\top \big(\vec(\Rm_t\hatYXt) - (\hatPt \otimes \Rm_t)\ff_{t,z} - \vec(\Rm_t\aa_t\hatxt^\top)  \big)
 \end{split}
 \end{equation}
@@ -1531,7 +1552,7 @@ The general update equation for $\QQ$ with these constraints is
 \text{where }\SS_t&=\Phi_t\big(\hatPt - \hatPttm \BB_t^\top - \BB_t\hatPtmt 
 - \hatxt\uu_t^\top - \uu_t\hatxt^\top + \\
 &\quad \BB_t\hatPtm\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \uu_t\uu_t^\top \big)\Phi_t^\top\\
-\QQ_t&=\ff_{t,q}+\DD_{t,q}\qq \\
+\vec(\QQ_t)_{j+1}&=\ff_{t,q}+\DD_{t,q}\qq_{j+1} \\
 \text{where}\\
 \Phi_t = (\GG_t^\top\GG_t)^{-1}\GG_t^\top
 \end{split}
@@ -1579,7 +1600,9 @@ Take the partial derivative of $\Psi$ with respect to $\pmb{q^{*}}$.  We can do 
 & - \partial\big(\frac{T}{2}\log |\QQ| \big)/\partial\pmb{q^{*}} \\
 \end{split}
 \end{equation}
-Using the same vec operations as in the derivations for $\BB$ and $\ZZ$, pull $\QQ^{-1}$ out from the middle and replace the expectations with the Kalman smoother output.\footnote{Another, more common, way to do this is to use a ``trace trick'', $\trace(\aa^\top\AA\bb)=\trace(\AA\bb\aa^\top)$, to pull $\QQ^{-1}$ out.}
+Use vec operation Equation \ref{eq:vec.aTBa} to pull $\QQ^{-1}$ out from the middle\footnote{Another, more common, way to do this is to use a ``trace trick'', $\trace(\aa^\top\AA\bb)=\trace(\AA\bb\aa^\top)$, to pull $\QQ^{-1}$ out.}, using 
+$$\aa^\top \Phi^\top \QQ^{-1} \Phi \bb = (\bb^\top\Phi^\top \otimes \aa^\top \Phi^\top)\vec(\QQ^{-1}) = (\bb^\top \otimes \aa^\top)(\Phi^\top \otimes \Phi^\top)\vec(\QQ^{-1})$$.
+Then replace the expectations with the Kalman smoother output,
 \begin{equation}\label{eq:Q.gendiag2}
 \begin{split}
 &\partial\Psi/\partial\pmb{q^{*}} = -\frac{1}{2} \sum_{t=1}^T\partial\bigg(
@@ -1590,7 +1613,14 @@ Using the same vec operations as in the derivations for $\BB$ and $\ZZ$, pull $\
 &\quad + \E[(\BB_t\XX_{t-1})^\top \otimes \uu_t^\top]
 + \E[\uu_t^\top \otimes (\BB\XX_{t-1})^\top] + (\uu_t^\top \otimes \uu_t^\top) \bigg)(\Phi_t \otimes \Phi_t)^\top\vec(\QQ^{-1})/\partial\pmb{q^{*}}\\
 & - \partial\bigg(\frac{T}{2}\log |\QQ| \bigg)/\partial\pmb{q^{*}} \\
-&\quad = -\frac{1}{2} \sum_{t=1}^T\vec(\SS_t)^\top\partial\big(\vec(\QQ^{-1})\big)/\partial\pmb{q^{*}}
+\end{split}
+\end{equation}
+This can be further reduced using
+$$(\bb^\top \otimes \aa^\top)(\Phi^\top \otimes \Phi^\top)=(\vec(\aa\bb^\top))^\top (\Phi \otimes \Phi)^\top = \vec(\Phi \aa\bb^\top \Phi^\top)^\top$$
+With this reduction and replacing $\log|\QQ|$ with $-\log|\QQ^{-1}|$, we get
+\begin{equation}
+\begin{split}
+&\partial\Psi/\partial\pmb{q^{*}} = -\frac{1}{2} \sum_{t=1}^T\vec(\SS_t)^\top\partial\big(\vec(\QQ^{-1})\big)/\partial\pmb{q^{*}}
 + \partial\big(\frac{T}{2}\log|\QQ^{-1}| \big)/\partial\pmb{q^{*}} \\
 &\text{where }\\
 &\SS_t=\Phi_t\big(\hatPt - \hatPttm \BB_t^\top - \BB\hatPtmt 
@@ -1598,9 +1628,7 @@ Using the same vec operations as in the derivations for $\BB$ and $\ZZ$, pull $\
 &\quad \BB_t\hatPtm\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \uu_t\uu_t^\top \big)\Phi_t^\top
 \end{split}
 \end{equation}
-This reduction used
-$$(\Phi_t \otimes \Phi_t)(\XX \otimes \XX)=\vec(\XX\XX^\top)=\vec(\Phi_t\vec(\XX\XX^\top)\Phi_t^\top).$$
-I also  replaced $\log|\QQ|$ with $-\log|\QQ^{-1}|$; the determinant of a diagonal matrix is the product of its diagonal elements.  Thus,
+The determinant of a diagonal matrix is the product of its diagonal elements. Thus,
 \begin{equation}\label{eq:Q.gendiag3}
 \begin{split}
 &\partial\Psi/\partial\pmb{q^{*}}= 
@@ -1609,7 +1637,8 @@ I also  replaced $\log|\QQ|$ with $-\log|\QQ^{-1}|$; the determinant of a diagon
 \end{split}
 \end{equation}
 where $k$ is the number of times $q_1$ appears on the diagonal of $\QQ$ and $l$ is the number of times $q_2$ appears, etc.
-Taking the derivatives,
+
+Taking the derivatives and transposing the whole equation we get,
 \begin{equation}\label{eq:Q.gendiag4}
 \begin{split}
 &\partial\Psi/\partial\pmb{q^{*}} = 
@@ -1794,7 +1823,7 @@ The following are block-symmetric:
 \mathbb{C}_{1,2}&\mathbb{C}_{1,2}&\mathbb{E}_2\\
 \end{bmatrix}
 \end{equation*}
-The following are NOT block-symmetric:
+The following are NOT legal block-symmetric matrices:
 \begin{equation*}
 \begin{bmatrix}
 \mathbb{E}_1&\mathbb{C}_{1,2}&0\\
@@ -1869,15 +1898,15 @@ The update equation is
 \begin{equation}\label{eq:R.general}
 \begin{split}
 &\rr_{j+1}  =   
-\bigg(\sum_{t=1}^T\DD_{t,r}^\top \DD_{t,r}\bigg)^{-1} \vec\bigg(\sum_{t=1}^T \DD_{t,r}^\top\RR_{t,{j+1}}  
+\bigg(\sum_{t=1}^T\DD_{t,r}^\top \DD_{t,r}\bigg)^{-1} \sum_{t=1}^T \DD_{t,r}^\top\vec\bigg(\TT_{t,{j+1}}  
  \bigg)\\
-&\quad\quad\quad\quad\vec(\RR)_{t,j+1} = \ff_{t,r} + \DD_{t,r} \rr_{j+1}
+&\quad\quad\quad\quad\vec(\RR_t)_{j+1} = \ff_{t,r} + \DD_{t,r} \rr_{j+1}
 \end{split}
 \end{equation}
-The $\RR_{t,j+1}$ used at time step $t$ in equation \eqref{eq:R.general} is the term that appears in the summation in the unconstrained update equation with no missing values (equation \ref{eq:R.update.unconstrained}):
+The $\TT_{t,j+1}$ used at time step $t$ in equation \eqref{eq:R.general} is the term that appears in the summation in the unconstrained update equation with no missing values (equation \ref{eq:R.update.unconstrained}):
 \begin{equation}
 \begin{split}
-\RR_{t,j+1}=\Xi_t\bigg(  
+\TT_{t,j+1}=\Xi_t\bigg(  
  \hatOt - \hatYXt\ZZ_t^\top - \ZZ_t\hatYXt^\top 
  - \hatyt\aa_t^\top - \aa_t\hatyt^\top 
  + \ZZ_t\hatPt\ZZ_t^\top + \ZZ_t\hatxt\aa_t^\top + \aa_t\hatxt^\top\ZZ_t^\top 
@@ -1885,6 +1914,138 @@ The $\RR_{t,j+1}$ used at time step $t$ in equation \eqref{eq:R.general} is the 
 \end{split}
 \end{equation}
 where $\Xi_t = (\HH_t^\top\HH_t)^{-1}\HH_t^\top$.
+
+\subsection{Special case: update equation for $\GG$ diagonal and $\QQ_t$ fixed}
+Up to now, I have assumed that $\GG$ is fixed, i.e. not estimated.  There is an important special case where $\QQ_t$ is fixed, i.e. not estimated, and $\GG_t$ is an estimated diagonal matrix with one estimated value on the diagonal and no fixed values on the diagonal.  The case arises when one wants to constrain the correlation structure for the process errors but not the level of variance.  This can be done by noting that any variance-covariance matrix $\Sigma$ can be written as:
+$$\Sigma = \DD \rho \DD$$
+where $\DD$ is a diagonal matrix comprised of the square root of the diagonal elements of $\Sigma$ (all equal) and $\rho$ is the correlation matrix of $\Sigma$.  Thus if we fix $\QQ=\rho$ and estimate a diagonal $\GG$, we are constraining the process errors to have a particular correlation structure.  The requirement that $\GG_t$ is an diagonal matrix with one estimated value on the diagonal and no fixed values on the diagonal arises because otherwise we would end up with a derivative with terms $\gg (\gg^*)^\top$ and $\gg \gg^\top$ and we cannot solve for $\gg$. Instead we will make the problem much simpler and assume that the process variance-covariance matrix has the form
+$$\sigma_t \QQ_t \sigma_t$$
+where $\QQ_t$ is a correlation matrix not a variance-covariance matrix.  Here I derive an update equation for $\sigma^2$.
+
+We allow that $\sigma_t^2$ could be time-varying and at some time steps might take a fixed value.  $\gg$ is a column vector with all the $\sigma_t^2$ values.  For example, we might have a before and after variance, so there would be two values in $\gg$. 
+\begin{equation}
+\begin{gathered}
+\GG_t = \begin{bmatrix}\sigma_t&0&\dots\\0&\sigma_t&\dots\\\dots&\dots&\dots\end{bmatrix}=\sigma_t\II_m\quad
+\diag(\GG_t\GG_t) \equiv \ff_{g,t} + \DD_{g,t}\gg \\
+\GG_t^{-1} = \begin{bmatrix}1/\sigma_t&0&\dots\\0&1/\sigma_t&\dots\\\dots&\dots&\dots\end{bmatrix}=\sigma_t^{-1}\II_m\quad
+\diag(\GG_t^{-1}\GG_t^{-1}) \equiv \ff_{g,t}^{-1} + \DD_{g,t}\gg^{-1} = \ff_{g,t}^* + \DD_{g,t}\gg^*\\
+
+\vec(\GG_t^{-1}) \equiv \ff_{g,t}^{-1} + \DD_{g,t}\gg^{-1} = \ff_{g,t}^* + \DD_{g,t}\gg^*\\
+
+\end{gathered}
+\end{equation}
+where $\gg$ is column vector with $\sigma_1^2$, $\sigma_2^2$, etc. and $\gg^{-1}$ means a column vector with $1/\sigma_1^2$, $1/\sigma_2^2$, etc. $\diag(\AA)$ means a column vector of the diagonal elements of $\AA$.  $\ff_{g,t}$ is a $m \times 1$ matrix and $\DD_{g,t}$ is a $m \times s$ matrix where $s$ is the number of estimated $\sigma$'s. I will require that $\GG$ is either fixed or estimated so that $\diag(\GG_t\GG_t)$ is either $\ff_{t,g}$ or $\DD_{t,g}\gg$.
+
+First we write the log-likelihood equation that we want to take the derivative of and we will take the derivative with respect to $\gg^*$:
+\begin{equation}\label{eq:psi.G}
+\begin{split}
+&\partial\Psi/\partial\gg^* = -\frac{1}{2} \sum_{t=1}^T\partial\bigg(
+\E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t]
+- \E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1}] \\
+&\quad -\E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t] 
+ - \E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t] \\
+&\quad - \E[\uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t] 
++ \E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1}] \\
+&\quad + \E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t] 
++ \E[ \uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1} ] 
++ \uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t \bigg)/\partial\gg^*\\
+& - \partial\big(\frac{1}{2}\sum_{t_0+1}^T\log |\GG_t\QQ_t\GG_t| \big)/\partial\gg^*
+\end{split}
+\end{equation}
+
+$\GG$ is a diagonal matrix.  One of the properties of diagonal matrices is that $\AA\bb=\BB\aa$, where $\AA$ is a diagonal matrix with diagonal $\aa$ and $\BB$ is a diagonal matrix with diagonal $\bb$. $(\AA \otimes \AA)$ is a diagonal matrix with $\vec(\aa\aa^\top)$ on the diagonal.  We can use these properties to rewrite the log-likelihood.
+All the terms except the last one in the $\Psi$ equation (\ref{eq:psi.G}) can be written in the form:
+\begin{equation}\label{}
+\begin{split}
+\partial(\cc^\top \GG_t^{-1}\QQ_t^{-1} \GG_t^{-1} \dd)/\partial \gg^* &= \partial(\cc^\top \GG_t^{-1}\QQ_t^{-1} \GG_t^{-1} \dd)/\partial \vec(\GG_t^{-1}) \, \partial \vec(\GG_t^{-1})/\partial \gg^*\\
+&= (\vec(\dd\cc^\top \GG_t^{-1} \QQ_t^{-1}) + \vec(\cc\dd^\top \GG_t^{-1} \QQ_t^{-1}))^\top
+\, \partial (\ff_{g,t}^* + \DD_{g,t}\gg^*)/\partial \gg^*\\
+& \text{see Eqn. \ref{} in Table \ref{} } \\
+&= ((\QQ_t^{-1} \otimes \dd\cc^\top)\vec(\GG_t^{-1})+(\QQ_t^{-1} \otimes \cc\dd^\top)\vec(\GG_t^{-1}))^\top \DD_{g,t} \\
+&= (\ff+\DD\gg^*)^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t} \\
+&= (\gg^*)^\top\DD^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t} \\
+& + \ff^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t}\\
+&= (\gg^*)^\top\DD^\top\AA\DD+\ff^\top\AA\DD\\
+&= (\gg^*)^\top\DD^\top\AA\DD
+\end{split}
+\end{equation}
+Because I require that the diagonal of $\GG$ is either fixed or estimated, $\ff^\top\AA\DD = 0 (1 \times p)$. $\cc$ and $\dd$ are column vectors and $\AA = (\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top))$.
+
+$\AA$ in \ref{eq:psi.G} is
+\begin{equation}\label{eq:psi.G2}
+\begin{split}
+\AA &= ( \QQ_t^{-1} \otimes \E[2\XX_t\XX_t^\top-2\BB_t\XX_{t-1}\XX_t^\top - 2\XX_t\XX_{t-1}^\top\BB_t^\top - 
+2\uu_t\XX_t^\top-2\XX_t\uu_t^\top \\
+& + 2\BB_t\XX_{t-1}\XX_{t-1}^\top\BB_t^\top + 2\uu_t\XX_{t-1}^\top\BB_t^\top + 2\BB_t\XX_{t-1}\uu_t^\top + 2\uu_t\uu_t^\top] ) \\
+ &= 2 (\QQ_t^{-1} \otimes \SS_t)\\
+\SS_t &= \hatPt - \BB_t\hatPtmt - \hatPttm\BB_t^\top - \uu_t\hatxt^\top - \hatxt\uu_t^\top + \BB_t\hatPtm\BB_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\uu_t^\top
+\end{split}
+\end{equation}
+
+The last term in the $\Psi$ equation (\ref{eq:psi.G}) is:
+\begin{equation}\label{}
+\begin{split}
+\partial \log |\GG_t\QQ_t\GG_t| \big)/\partial\gg^* &=-\partial \log |\GG_t^{-1}\QQ_t^{-1}\GG_t^{-1}| \big)/\partial\gg^* \\
+&= - \partial \log |\GG_t^{-1}\QQ_t^{-1}\GG_t^{-1}|/\partial \vec(\GG_t^{-1}) \, \partial \vec(\GG_t^{-1})/\partial\gg^* \\
+&= - 2\vec(\GG_t)^\top  \, (\ff+\DD\gg^*)/\partial \gg^*   \\
+&= - 2(\ff+\DD\gg)^\top \DD = -2\ff^\top\DD - 2 \gg^\top\DD^\top\DD \\
+&= - 2 \gg^\top\DD^\top\DD 
+\end{split}
+\end{equation}
+Because of the requirement that the diagonal of $\GG$ is either fixed or estimated, $\ff^\top\DD = 0 (1 \times p)$.
+
+
+Thus the derivative in Equation \ref{eq:psi.G} becomes
+\begin{equation}\label{eq:psi.G2}
+\begin{split}
+\partial\Psi/\partial\gg^* &= -\frac{1}{2}\sum_1^T\bigg( (\gg^*)^\top\DD^\top\AA\DD  - 2 \gg^\top\DD^\top\DD  \bigg) \\
+&= -\sum_1^T\bigg( (\gg^*)^\top\DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD - 2 \gg^\top\DD^\top\DD \bigg) \\
+(\gg^*)^\top \sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg) &= \gg^\top\sum_1^T \DD^\top\DD \\
+\text{ multiply both sides by $\gg$ and note that $\gg (\gg^*)^\top = \II_p$ }\\
+(\gg^*)^\top\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1} &= \gg^\top \\
+(\gg^*)^\top\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1} &= \gg^\top \\
+(\gg^*)^\top\BB\gg^* &= \gg^\top\gg^* = m \\
+\BB&=\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1}
+\end{split}
+\end{equation}
+Solve for $\gg^*$, which may or may not be possible.
+
+
+The derivative of the second part of equation \ref{eq:psi.G4} is
+\begin{equation}
+\begin{split}
+\log |\sigma^{-1}_t\QQ_t^{-1}\sigma^{-1}_t| &= \log (\sigma^{-2}_t)^m |\QQ_t^{-1}|) = m \log \sigma^{-2}_t + \log |\QQ_t^{-1}| \\
+&= m \log(\ff_{g,t}^* + \DD_{g,t}\gg^*) + \log |\QQ_t^{-1}|
+\end{split}
+\end{equation}
+I require that $\sigma_t$ be either estimated or fixed.  It is not allowed to be a fixed value plus an estimated value.
+
+Take the derivative with respect to $\gg^*$ to get
+\begin{equation}
+\begin{split}
+\partial \log |\GG_t\QQ_t\GG_t|/\partial \gg^* &= - m \begin{bmatrix}0 & \dots & g_t & 0 & \dots\end{bmatrix} = - \gg^\top \DD_{t,g}^\top\DD_{t,g}
+\end{split}
+\end{equation}
+Thus will be a $1 \times s$ matrix with all 0s except where $g_t$ (the $g$ associated with time $t$) appears. The fixed $\ff$ drop out as they never appear with a $\gg$ value.
+
+Putting the two pieces together we have
+\begin{equation}
+\begin{split}
+\partial\Psi/\partial\gg &= - \frac{1}{2} \sum_{t=1}^T 
+\vec(\SS_t)^\top  \vec(\QQ_t^{-1}) \DD_{t,g}  + \frac{1}{2}\sum_{t_0+1}^T m \gg^\top \DD_{t,g}^\top\DD_{t,g}
+\end{split}
+\end{equation}
+
+Set the left side to 0 (a $1 \times s$ matrix of 0s) and transpose:
+\begin{equation}
+\gg \sum_{t_0+1}^T m  \DD_{t,g}^\top\DD_{t,g} =  \sum_{t=1}^T \vec(\SS_t)^\top \vec(\QQ_t^{-1})  \DD_{t,g} 
+\end{equation}
+And arrive at the update equation for $\gg$ when $\QQ$ is a fixed correlation matrix and $\GG$ is a diagonal matrix with a single $\sigma_t$ (an estimated value) or $\ff_t$ (fixed value) on the diagonal. The $\gg$ are the $\sigma_t$ values being estimated:
+\begin{equation}
+\gg = \frac{1}{m} \bigg( \sum_{t_0+1}^T \DD_{t,g}^\top\DD_{t,g} \bigg)^{-1} \sum_{t=1}^T \DD_{t,g}^\top \vec(\QQ_t^{-1})^\top  \vec(\SS_t)
+\end{equation}
+where $\SS_t = \hatPt + \BB_t\hatPtmt + \hatPttm\BB_t^\top + \uu_t\hatxt^\top + \hatxt\uu_t^\top + \BB_t\hatPtm\BB_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\uu_t^\top$.
+
 
 \section{Computing the expectations in the update equations}\label{sec:compexpectations}
 For the update equations, we need to compute the expectations of $\XX_t$ and $\YY_t$ and their products conditioned on 1) the observed data $\YY(1)=\yy(1)$ and 2) the parameters at time $t$, $\Theta_j$.  This section shows how to compute these expectations.  Throughout the section, I will normally leave off the conditional $\YY(1)=\yy(1),\Theta_j$ when specifying an expectation. Thus any $\E[ ]$ appearing without its conditional is conditioned on $\YY(1)=\yy(1),\Theta_j$.  However if there are additional or different conditions those will be shown.  Also all expectations are over the joint distribution of $XY$ unless explicitly specified otherwise.
@@ -2880,7 +3041,7 @@ The expectation can be pulled inside the $\Delta$s since the $\Delta$s in front 
 Take the derivative of this with respect to $\pp$ and arrive at:
 \begin{equation}
 \begin{split}
-\label{eq:p.degen.update.x0.0.a}
+\label{eq:p.degen.update.x0.0.a.fixed}
 \pp_{j+1} &= \big(\sum_{t=1}^T\Delta_{t,8}^\top\Qm_t\Delta_{t,8} + \sum_{t=1}^T\Delta_{t,6}^\top\Rm_t\Delta_{t,6} + \DD_\xi^\top\LAMm\DD_\xi\big)^{-1} \times\\
 &\quad \bigg(\sum_{t=1}^T\Delta_{1,8}^\top\Qm_t\Delta_{1,7} + \sum_{t=1}^T \Delta_{t,6}^\top\Rm_t\Delta_{t,5} + \DD_\xi^\top\LAMm(\E[\XX_{t_0}] - \ff_\xi)\bigg)
 \end{split}
@@ -2948,7 +3109,7 @@ With $\VV_1^1$, $\xx_1^1$ and $\KK_1$ set to their correct initial values, the n
 Below are discussed the update equations for the different parameters.  Here I summarize the constraints that are scattered throughout these subsections.  These requirements are coded into the function MARSSkemcheck() in the MARSS package but some tests must be repeated in the function degen.test(), which tests if any of the $\RR$ or $\QQ$ diagonals can be set to zero if it appears they are going to zero.  A model that is allowed when $\RR$ and $\QQ$ are non-zero, might be disallowed if $\RR$ or $\QQ$ diagonals were to be set to zero.  degen.test() does this check.
 
 \begin{itemize}
-\item $(\II_m \otimes \II_r^{(0)}\ZZ_t\II_q^{(0)})\DD_{t,b}$,  is  all zeros; is all zeros. If there is a all zero row in $\HH_t$ and it is linked (through $\ZZ$) to a all zero row in $\GG_t$, then the corresponding $\BB_t$ elements are fixed instead of estimated.  Corresponding $\BB$ rows means those rows in $\BB$ where there is a non-zero column in $\ZZ$.  We need $\II_r^{(0)}\ZZ_t\II_q^{(0)}\BB_t$ to only specify fixed $\BB_t$ elements, which means $\vec(\II_r^{(0)}\ZZ_t\II_q^{(0)}\BB_t\II_m)$ only specifies fixed values.  This in turn leads to the condition above. MARSSkemcheck()
+\item $(\II_m \otimes \II_r^{(0)}\ZZ_t\II_q^{(0)})\DD_{t,b}$,  is  all zeros. If there is a all zero row in $\HH_t$ and it is linked (through $\ZZ$) to a all zero row in $\GG_t$, then the corresponding $\BB_t$ elements are fixed instead of estimated.  Corresponding $\BB$ rows means those rows in $\BB$ where there is a non-zero column in $\ZZ$.  We need $\II_r^{(0)}\ZZ_t\II_q^{(0)}\BB_t$ to only specify fixed $\BB_t$ elements, which means $\vec(\II_r^{(0)}\ZZ_t\II_q^{(0)}\BB_t\II_m)$ only specifies fixed values.  This in turn leads to the condition above. MARSSkemcheck()
 \item $(\II_1 \otimes \II_r^{(0)}\ZZ_t\II_q^{(0)})\DD_{t,u}$ is all zeros;  if there is a all zero row in $\HH_t$ and it is linked (through $\ZZ_t$) to a all zero row in $\GG_t$, then the corresponding $\uu_t$ elements are fixed instead of estimated.  MARSSkemcheck()
 \item $(\II_m \otimes \II_r^{(0)})\DD_{t,z}$, where  is  all zeros; if $y$ has no observation error, then the corresponding $\ZZ_t$ rows are fixed values. $(\II_m \otimes \II_r^{(0)})$ is a diagonal matrix with 1s for the rows of $\DD_{t,z}$ that correspond to elements of $\ZZ_t$ on the $R=0$ rows. MARSSkemcheck()
 \item $(\II_1 \otimes \II_r^{(0)})\DD_{t,a}$ is all zeros; if $y$ has no observation error, then the corresponding $\aa_t$ rows are fixed values. MARSSkemcheck()
@@ -2964,7 +3125,7 @@ Below are discussed the update equations for the different parameters.  Here I s
 The dimension of the identity matrices in the above constraints is given by the subscript on $\II$ except when it is implicit.
 
 \section{Implementation comments}\label{sec:implementation}
-The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carol search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  In my experience, Monte Carlo initial conditions searches become important as the fraction of missing data in the data set increases.  Certainly an initial conditions search should be done before reporting final estimates for an analysis.  However in our\footnote{``Our'' and ``we'' in this section means work and papers by E. E. Holmes and E.J. Ward.} studies on the distributional properties of parameter estimates, we rarely found it necessary to do an initial conditions search.
+The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carol search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  However an initial conditions search should be done before reporting final estimates for an analysis.  In our papers on the distributional properties of  MARSS parameter estimates, we rarely found that an initial conditions search changed the estimates---except in cases where $\ZZ$ and $\BB$ are estimated as unconstrained and as the fraction of missing data in the data set became large.
 
 The EM algorithm will quickly home in on parameter estimates that are close to the maximum, but once the values are close, the EM algorithm can slow to a crawl.   Some researchers start with an EM algorithm to get close to the maximum-likelihood parameters and then switch to a quasi-Newton method for the final search.  In many ecological applications, parameter estimates that differ by less than 3 decimal places are for all practical purposes the same.  Thus we have not used the quasi-Newton final search.
 
