@@ -15,7 +15,7 @@ The rest of this help page discusses the vectorized form of a MARSS model.
 The MARSS package fits time-varying state-space models that can be transformed into the form (termed form=marss):
 \describe{
 \item{x(t) = (t(x(t-1)) (x) I_m)(f_b(t)+D_b(t)beta) + (f_u(t)+D_u(t)upsilon) + w(t), where w(t) ~ MVN(0,Q(t))}{}
-\item{y(t) = (t(x(t)) (x) I_n)(f_z(t)+D_z(t)zeta) + (f_z(t)+D_z(t)alpha) + v(t), where v(t) ~ MVN(0,R(t))}{}
+\item{y(t) = (t(x(t)) (x) I_n)(f_z(t)+D_z(t)zeta) + (f_a(t)+D_a(t)alpha) + v(t), where v(t) ~ MVN(0,R(t))}{}
 \item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0)}{} 
 }
 where beta, upsilon, zeta, and alpha are column vectors of estimated values, the f are column vectors of inputs, and the D are matrices of inputs.  The f and D are potentially time-varying. (x) means kronecker product and I_p is a p x p identity matrix.  The function \code{MARSS()} is used to fit MARSS models using the argument \code{form} to specify the type of state-space model being fit.  
@@ -24,8 +24,8 @@ Most commonly used multivariate autoregressive state-space models can be reformu
 
 The default MARSS form is "marxss" which is the state-space model:
 \describe{
-\item{x(t) = B(t) x(t-1) + u(t) + C(t)c(t) + w(t), where w(t) ~ MVN(0,Q(t))}{}
-\item{y(t) = Z(t) x(t) + a(t) + D(t)d(t) + v(t), where v(t) ~ MVN(0,R(t))}{}
+\item{x(t) = B(t) x(t-1) + u(t) + C(t)c(t) + G(t)w(t), where w(t) ~ MVN(0,Q(t))}{}
+\item{y(t) = Z(t) x(t) + a(t) + D(t)d(t) + H(t)v(t), where v(t) ~ MVN(0,R(t))}{}
 \item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0)}{} 
 }
 See \code{\link{MARSS.marxss}} for arguments and defaults information.
@@ -34,15 +34,14 @@ If you are working with models with time-varying parameters, it is important to 
 }
 \usage{
 MARSS(y, 
-    inits=NULL,
     model=NULL,
+    inits=NULL,
     miss.value=as.numeric(NA),
     method = "kem",
     form = "marxss",
     fit=TRUE, 
     silent = FALSE,
     control = NULL,
-    MCbounds = NULL,
     fun.kf = "MARSSkfas",
     ...) 
 }
@@ -66,13 +65,10 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
       \item{\code{conv.test.slope.tol}}{ The slope of the log parameter versus log iteration to use as the cut-off for convergence.  The default is 0.5 which is a bit high.  For final analyses, this should be set lower.  If you want to only use abstol as your convergence test, then to something very large, for example conv.test.slope.tol=1000.  Type \code{MARSSinfo(11)} to see some comments of when you might want to do this.}
       \item{\code{abstol}}{ The logLik.(iter-1)-logLik.(iter) convergence tolerance for the maximization routine. To meet convergence both the abstol and slope tests must be passed.} 
       \item{\code{allow.degen}}{ Whether to try setting Q or R elements to zero if they appear to be going to zero. }
-      \item{\code{trace}}{An integer specifying the level of information recorded and error-checking run during the algorithms.  trace=0, specifies basic error-checking and brief error-messages; trace>0 will print full error messages. In addition if trace>0, the Kalman filter output will be added to the outputted \code{marssMLE} object.  Additional information recorded depends on the method of maximization. For the EM algorithm, a record of each parameter estimate for each EM iteration will be added.   See \code{\link{optim}} for trace output details for the BFGS method.   trace=-1 will turn off most internal error-checking and most error messages.  The internal error checks are time expensive so this can speed up MARSS.  This is particularly useful for bootstrapping and simulation studies.}
-      \item{\code{MCInit}}{   If TRUE, do a Monte Carlo search of the initial condition space. (T/F) } 
-      \item{\code{numInits}}{   Number of random initial value draws if MCInit=TRUE (ignored otherwise). (positive integer)} 
-      \item{\code{numInitSteps}}{   Number of EM iterations for each random initial value draw if \code{MCInit=TRUE} (ignored otherwise). (positive integer)}
-      \item{\code{silent}}{   1 or TRUE, Suppresses all printing including progress bars, error messages and convergence information. 0, Turns on all printing of progress bars, fitting information and error messages.  2, Prints a brief success/failure message.    }
+      \item{\code{trace}}{ An integer specifying the level of information recorded and error-checking run during the algorithms.  trace=0, specifies basic error-checking and brief error-messages; trace>0 will print full error messages. In addition if trace>0, the Kalman filter output will be added to the outputted \code{marssMLE} object.  Additional information recorded depends on the method of maximization. For the EM algorithm, a record of each parameter estimate for each EM iteration will be added.   See \code{\link{optim}} for trace output details for the BFGS method.   trace=-1 will turn off most internal error-checking and most error messages.  The internal error checks are time expensive so this can speed up MARSS.  This is particularly useful for bootstrapping and simulation studies.}
+      \item{\code{silent}}{   TRUE/FALSE(default), Suppresses all printing including progress bars, error messages and convergence information. 0, Turns on all printing of progress bars, fitting information and error messages.  2, Prints a brief success/failure message.    }
+      \item{\code{safe}}{   TRUE/FALSE(default), Setting safe=TRUE runs the Kalman smoother after each parameter update rather than running the smoother only once after updated all parameters.  The latter is faster but is not a strictly correct EM algorithm.  In most cases, safe=FALSE (default) will not change the fits.  If this setting does cause problems, you will know because you will see an error regarding the log-likelihood dropping and it will direct you to set safe=TRUE.    }
   } }
-    \item{MCbounds}{   Bounds on the uniform distributions from which initial values will be drawn if MCInit=TRUE (ignored otherwise). The Q (and analogously R) random matrices are created by a random draw from a wishart distribution where df=bounds[1] and S=diag(bounds[2],m). }
     \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: MARSSkfas which is based on the Kalman filter in the KFAS package based on Koopman and Durbin and MARSSkfss which is a native R implimentation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  MARSSkfas modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
     \item{...}{ Optional arguments passed to function specified by form. }
 }
@@ -83,7 +79,7 @@ A call to \code{MARSS()} returns an object of class \code{marssMLE}.  The MARSS 
 
  Many different types of multivariate time-series models can be converted to the MARSS form (see the User Guide). \code{MARSS()} allows the user to specify the form of their model using the argument \code{form}. The default form is a multivariate lag-1 (time-varying) state-space model which is denoted using \code{form="marxss"}. Look at \code{\link{MARSS.marxss}}) to see how the model argument for the marxss form is specified.   The model argument is a list, but the elements of that and how it is converted to a marssMODEL(form=marss) object (needed for the internal algorithms) depends intimately on the equation form.  Thus you will need to refer to that appropriate help page (\code{MARSS.formname}) for your equation form.  
 
- The likelihood surface for MARSS models can be  multimodal or with strong ridges.  It is  recommended that for final analyses the ML estimates are checked by using the Monte Carlo initial conditions search using \code{MCInit=TRUE} in the \code{control} list.  This requires more computation time, but reduces the chance of the algorithm terminating at a local maximum and not reaching the true MLEs.  Also it is wise to check the EM results against the BFGS results (if possible) since if there are strong ridges in the likelihood.  Such ridges seems to slow down the EM algorithm considerably and can cause the algorithm to report convergence far from the ML values.  EM steps up the likelihood and the convergence test is based on the rate of change of the LL in each step; once on a strong ridge, the steps can slow dramatically.  You can force the algorithm to keep working by setting \code{minit}.  BFGS seems less hindered by the ridges but can be prodigiously slow for some multivariate problems.
+ The likelihood surface for MARSS models can be  multimodal or with strong ridges.  It is  recommended that for final analyses the ML estimates are checked by using a Monte Carlo initial conditions search; see the chapter on initial conditions searches in the User Guide.  This requires more computation time, but reduces the chance of the algorithm terminating at a local maximum and not reaching the true MLEs.  Also it is wise to check the EM results against the BFGS results (if possible) since if there are strong ridges in the likelihood.  Such ridges seems to slow down the EM algorithm considerably and can cause the algorithm to report convergence far from the ML values.  EM steps up the likelihood and the convergence test is based on the rate of change of the LL in each step; once on a strong ridge, the steps can slow dramatically.  You can force the algorithm to keep working by setting \code{minit}.  BFGS seems less hindered by the ridges but can be prodigiously slow for some multivariate problems.
 }
 
 \value{
@@ -102,7 +98,7 @@ A call to \code{MARSS()} returns an object of class \code{marssMLE}.  The MARSS 
   \item{states}{ The expected value of x conditioned on the data. }
   \item{states.se}{ The standard errors of the expected value of x. }
   \item{ytT}{ The expected value of y conditioned on the data.  Note this is just y for those y that are not missing. }
-  \item{y.se}{ The standard errors of the expected value of y. Note this is 0 for any non-missing y.}
+  \item{ytT.se}{ The standard errors of the expected value of y. Note this is 0 for any non-missing y.}
   \item{numIter}{ Number of iterations required for convergence. }
   \item{convergence}{ Convergence status. 0 means converged successfully.  Anything else is a warning or error. 2 means the MLEobj has an error; the MLEobj is returned so you can debug it.  The other numbers are errors during fitting.  The error code depends on the fitting method.  See \code{\link{MARSSkem}} and \code{\link{MARSSoptim}}. }
   \item{logLik}{ Log-likelihood. }
