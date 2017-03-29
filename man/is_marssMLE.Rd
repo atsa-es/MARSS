@@ -42,11 +42,7 @@ is.marssMLE(MLEobj)
       \item{\code{allow.degen}}{ If TRUE, replace Q or R diagonal elements by 0 when they become very small.} 
       \item{\code{min.degen.iter}}{ Number of iterations before trying to set a diagonal element of Q or R to zero). } 
       \item{\code{degen.lim}}{ How small the Q or R diagonal element should be before attempting to replace it with zero. }
-      \item{\code{MCInit}}{ If TRUE, do a Monte Carlo search of the initial condition space.} 
-      \item{\code{numInits}}{ Number of random initial value draws if MCInit=TRUE (ignored otherwise). } 
-      \item{\code{numInitSteps}}{ Number of EM iterations for each random initial value draw if MCInit=TRUE (ignored otherwise). }
-      \item{\code{boundsInits}}{ Bounds on the uniform distributions from which initial values will be drawn if MCInit=TRUE (ignored otherwise). }
-      \item{\code{silent}}{ Suppresses printing of progress bar, error messages and convergence information. } 
+  \item{\code{silent}}{ Suppresses printing of progress bar, error messages and convergence information. } 
     }
   }
   \item{\code{method}}{ A string specifying the estimation method. MARSS allows "kem" for EM and "BFGS" for quasi-Newton. }
@@ -55,7 +51,7 @@ Once the model has been fitted, additional elements are added.
   \item{\code{states}}{ Expected values of the x (hidden states). }
   \item{\code{states.se}}{ Standard errors on the estimates states. }
   \item{\code{ytT}}{ Expected values of the y.  This is just y for non-missing y. }
-  \item{\code{y.se}}{ Standard errors on the y. This will be 0 for non-missing y. }
+  \item{\code{ytT.se}}{ Standard errors on the ytT. This will be 0 for non-missing y. }
   \item{\code{kf}}{ A list containing Kalman filter/smoother output if \code{control$trace} is > 0.}
   \item{\code{Ey}}{ A list containing expectations involving y. Output if \code{control$trace} is > 0.}
   \item{\code{numIter}}{ Number of iterations which were required for convergence. }
