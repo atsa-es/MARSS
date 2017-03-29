@@ -2,7 +2,7 @@
 \alias{MARSShatyt}
 \title{ Compute Expected Value of Y,YY, and YX}
 \description{
-Computes the expected value of random variables involving Y for the EM algorithm.  This function is not exported.  Users should use \code{print( MLEobj, what="Ey")} to access this output.  See \code{\link{print.marssMLE}}.
+Computes the expected value of random variables involving Y for the EM algorithm.  Users can also use \code{print( MLEobj, what="Ey")} to access this output.  See \code{\link{print.marssMLE}}.
 }
 \usage{
 MARSShatyt( MLEobj )
@@ -21,6 +21,7 @@ A list with the following components (n is the number of state processes). Follo
   \item{OtT}{ Estimates E[Y(t) t(Y(t) | Y(1)=y(1)] (n x n x T array). }
   \item{yxtT}{ Estimates E[Y(t) t(X(t) | Y(1)=y(1)] (n x m x T array). }
   \item{yxt1T}{ Estimates E[Y(t) t(X(t-1) | Y(1)=y(1)] (n x m x T array). }
+  \item{yxttpT}{ Estimates E[Y(t) t(X(t+1) | Y(1)=y(1)] (n x m x T array). }
   \item{errors}{ Any error messages due to ill-conditioned matrices. }
   \item{ok}{ (T/F) Whether errors were generated. }
 }
