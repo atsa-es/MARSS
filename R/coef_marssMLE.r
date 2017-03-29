@@ -8,7 +8,10 @@ coef.marssMLE <- function (object, ..., type="list", form=NULL, what="par") {
   return.obj=list()
   if(class(object)!="marssMLE"){
     stop("coef.marssMLE: coef needs a marssMLE object.")
-}
+  }
+  if(!(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start")))
+    stop("coef.marssMLE: what must be \"par\", \"par.se\", \"par.bias\", \"par.lowCI\", \"par.upCI\", or \"start\".")
+  
   #for now coef only has function specific to the marssMODEL forms
   if(missing(form)) form=attr(object[["model"]],"form")
   
