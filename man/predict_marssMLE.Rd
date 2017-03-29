@@ -38,7 +38,7 @@ This function is still in beta development.  Not exported in version 3.5.  Compu
   \item{E.x}{ A matrix of the expected values of the states (X) given \code{newdata}. This is the Kalman smoother \code{xtT} output using \code{newdata} as the input for data and any inputs. See \code{\link{MARSSkf}}. }
   \item{E.y}{  A matrix of the expected values of the observations (Y) given \code{newdata}. This is \code{ytT} output using \code{newdata} as the input for data and any inputs. See \code{\link{MARSShatyt}}.}
   \item{x.se}{ A matrix of the estimated standard errors of the X predictions. }
-  \item{y.se}{ A matrix of the estimated standard errors of the Y predictions. }
+  \item{ytT.se}{ A matrix of the estimated standard errors of the Y predictions. }
   \item{newdata}{ The \code{newdata} list that was constructed from the inputs. }
   \item{pred.MLEobj}{ The \code{\link{marssMLE}} object that was constructed with \code{newdata}.  This can be passed to \code{\link{MARSSkf}} if the full Kalman filter and smoother output is needed. }
   \item{pred.MLEobj}{ The \code{\link{marssMLE}} object that was constructed with \code{newdata}.  This can be passed to \code{\link{MARSSkf}} if the full Kalman filter and smoother output is needed. }
