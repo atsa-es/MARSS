@@ -2,16 +2,15 @@
 #  Summary method for class marssMODEL
 ###############################################################################################################################################
 
-summary.marssMODEL <- function (object, ...) 
+summary.marssMODEL <- function (object, ..., silent = FALSE) 
 {
 
    n = dim(object$data)[1]; m = dim(object$fixed$x0)[1]
    cat(paste("Model Structure is\n","m: ",m," state process(es)\n","n: ",n," observation time series\n",sep=""))
 
    rpt.list = list()
-   en = attr(object,"par.names") #c("Z", "A", "R", "B", "U", "Q", "x0", "V0")
+   en = attr(object,"par.names") 
    dim.tmp = attr(object, "model.dims") 
-   #dim.tmp = list(Z=c(n,m), A=c(n,1), R=c(n,n), B=c(m,m), U=c(m,1), Q=c(m,m), x0=c(m,1), V0=c(m,m))
 
    xnames = attr(object,"X.names")
 	 if(is.null(xnames)) xnames = paste("X",1:m,sep="")
@@ -36,7 +35,7 @@ summary.marssMODEL <- function (object, ...)
   } #for elem
   rpt.list$tinitx = object$tinitx
    
-  print(rpt.list, quote=FALSE)
+  if(!silent) print(rpt.list, quote=FALSE)
   invisible(rpt.list)
           
   }
