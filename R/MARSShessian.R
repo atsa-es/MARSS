@@ -1,10 +1,33 @@
 #######################################################################################################
-#   MARSShessian functions
+#   MARSShessian.chol functions
+#   Numerical estimation of the hessian of the negative log-likelihood function
+#   Uses a cholesky transformation of the var-cov matrices to ensure they stay positive definite
+#
 #   Adds Hessian, parameter var-cov matrix, and parameter mean to a marssMLE object
 #   Returns par and fixed and free in chol form
-#   Note set up to allow unconstrained var-cov matrices but I don't think it really works for that
+#   The func MARSShessian.chol.backtrans (below) transforms that to the original form
 #######################################################################################################
-MARSShessian = function(MLEobj) {
+MARSShessian.chol = function(MLEobj) {
+  ##
+  # Define needed functions
+  ##
+  kfNLL = function(x, MLEobj=NULL){  #NULL assignment needed for optim call syntax
+    #MLEobj is the MLEobj with chol transformation of the variances so has altered free and fixed
+    #x is the paramvector with variances chol transformed
+    
+    par.untransformed=MARSShessian.backtrans(MLEobj, x)
+    MLEobj.orig=MLEobj
+    MLEobj.orig$marss$fixed = MLEobj$fixed.original
+    MLEobj.orig$marss$free = MLEobj$free.original
+    #reconstruction the original
+    MLEobj.orig=MARSSvectorizeparam(MLEobj.orig, par.untransformed)
+    
+    #kfsel selects the Kalman filter / smoother function based on MLEobj$fun.kf
+    negLL = MARSSkf(MLEobj.orig, only.logLik=TRUE, return.lag.one=FALSE )$logLik
+
+    -1*negLL
+  }
+  
   
   fun="MARSSkf"
   
@@ -37,7 +60,7 @@ MARSShessian = function(MLEobj) {
         if(!tmp$ok) stop("Stopped in MARSShessian(): The variance matrix must be diagonal for the Hessian computation.")#I think you can have time-varying but I need to figure how to compute fixed and free using the t=1 par; 
         
         #what's happening here is I am chol-transforming the var-cov matrix.  The matrix can have fixed and shared elements.
-        #This is why I can't just do chol(the.par).  I need to 
+        #This is why I can't just do chol(the.par).  I need to solve for the pars
         f=sub3D(fixed[[elem]],t=min(t,TT.f)) 
         d=sub3D(free[[elem]],t=min(t,TT.d))
         the.par=unvec(f+d%*%pars[[elem]], dim=par.dims[[elem]][1:2])
@@ -46,24 +69,27 @@ MARSShessian = function(MLEobj) {
         the.par=t(chol(the.par))  #transpose of chol
         if(any(is.zero)) diag(the.par)[is.zero]=0  #set back to 0
         
-        #This is the part that doesn't work if not (block) diagonal or (block) unconstrained
+        #when being passed to fdHess, pars for var-cov mat is the chol which has the upper.tri set to 0, 
+        #so need to reset free and fixed matrices
+        #compute the D matrix corresponding to upper.tri=0 at in t(chol)
+        #This part that only works if (block) diagonal or (block) unconstrained; in only those cases the 
+        #is list matrix for the chol simply the list matrix for original with 0s in upper tri
+        tmp.list.mat=fixed.free.to.formula(sub3D(tmp.MLEobj[["marss"]][["fixed"]][[elem]],t=min(t,TT.f)),sub3D(tmp.MLEobj[["marss"]][["free"]][[elem]],t=min(t,TT.d)),par.dims[[elem]][1:2])
+        tmp.list.mat[upper.tri(tmp.list.mat)]=0   #set upper tri to zero
+        d.tchol=convert.model.mat(tmp.list.mat)[["free"]][,,1] #because only sending one f and d to fixed.free.to.formulat
+        tmp.MLEobj[["marss"]][["free"]][[elem]][,,min(t,TT.d)]=d.tchol #set the correct d[,,t] to the chol version
+        #I don't need the fixed matrix at all
+        
+        #This part also doesn't work if not (block) diagonal or (block) unconstrained
         #This only works because I don't allow matrix elements to have 2 estimated values or estimated and fixed values; a+b and 1+a are illegal
-        #This will be a p x 1 matrix, with 0 at a p that doesn't appear that time step.
-        #the diag(as.numeric(tmp.par==0)) is removing par estimates that have already been computed (!=0)
+        #the diag(as.numeric(tmp.par==0)) is removing par estimates that have already been computed (!=0) in prev time steps
         #from f+Dm=M so m = solve(crossprod(d))%*%t(d)%*%(vec(the.par)-f)
         #but if d!=0,then f==0. if f!-0, then d==0.  
         #Thus crossprod(d))%*%t(d) has 0 cols where fs appear in the.par and f is not needed
-        tmp.par = tmp.par + diag(as.numeric(tmp.par==0))%*%solve(crossprod(d))%*%t(d)%*%vec(the.par)
+        tmp.par = tmp.par + diag(as.numeric(tmp.par==0))%*%solve(crossprod(d.tchol))%*%t(d.tchol)%*%vec(the.par)
       }
       tmp.MLEobj[["par"]][[elem]] = tmp.par 
 
-      #when being passed to fdHess, pars for var-cov mat is the chol which has the upper.tri set to 0, so need to reset free and fixed matrices
-      #compute the D matrix corresponding to upper.tri=0 at in t(chol)
-      for(t in 1:TT.d){
-        tmp.list.mat=fixed.free.to.formula(sub3D(tmp.MLEobj[["marss"]][["fixed"]][[elem]],t=min(t,TT.f)),sub3D(tmp.MLEobj[["marss"]][["free"]][[elem]],t=t),par.dims[[elem]][1:2])
-        tmp.list.mat[upper.tri(tmp.list.mat)]=0   #set upper tri to zero
-        tmp.MLEobj[["marss"]][["free"]][[elem]][t]=convert.model.mat(tmp.list.mat)[["free"]][t]
-      }
     }else{ tmp.MLEobj[["par"]][[elem]] = matrix(0,0,1) }
 
   }
@@ -97,43 +123,7 @@ MARSShessian = function(MLEobj) {
   return(MLEobj)
 }
 
-kfNLL = function(x, MLEobj=NULL){  #NULL assignment needed for optim call syntax
-  #MLEobj is tmp.MLEobj so has altered free and fixed
-  #x is the paramvector
-  
-  #update the MLEobj by putting the estimated pars from optim in
-  MLEobj = MARSSvectorizeparam(MLEobj, x)
-  free=MLEobj$marss$free
-  pars=MLEobj$par
-  par.dims=attr(MLEobj[["marss"]],"model.dims")
-  for(elem in c("Q","R","V0")){
-    if(!is.fixed(free[[elem]])) #recompute par if needed since par in parlist is transformed
-    {
-      tmp.par=matrix(0,dim(MLEobj[["par"]][[elem]])[1],1) #holder for the estimated elements
-      TT.d=dim(free[[elem]])[3]
-      for(t in 1:TT.d){
-        d=sub3D(free[[elem]],t=t)
-        par.dim=par.dims[[elem]][1:2]
-        #t=1 since D not allowed to be time-varying; since code 4 lines down won't work otherwise
-        L=unvec(d%*%pars[[elem]],dim=par.dim) #this by def will have 0 row/col at the fixed values
-        the.par = tcrossprod(L)#L%*%t(L)
-        tmp.par = tmp.par + diag(as.numeric(tmp.par==0))%*%solve(crossprod(d))%*%t(d)%*%vec(the.par)
-      }
-      MLEobj[["par"]][[elem]] = tmp.par 
-    }
-  } #end for over elem
-  #This function is passed a special MLEobj with a marss.original element
-  MLEobj$marss$fixed = MLEobj$fixed.original
-  MLEobj$marss$free = MLEobj$free.original
-  
-  #kfsel selects the Kalman filter / smoother function based on MLEobj$fun.kf
-  negLL = MARSSkf( MLEobj, only.logLik=TRUE, return.lag.one=FALSE )$logLik
-  
-  -1*negLL
-}
-
-
-MARSShessian.backtrans = function(MLEobj.hessian, par.hessian){
+MARSShessian.chol.backtrans = function(MLEobj.hessian, par.hessian){
   #MLEobj is your original untransformed MLEobj
   #MLEobj.hessian is a transformed version with the chol transformation for variances
   #par.hessian is a vector of parameters where the variances are in chol form
