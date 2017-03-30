@@ -3,7 +3,7 @@
 \alias{MARSShessian.backtrans}
 \title{ MARSS Parameter Variance-Covariance Matrix from the Hessian Matrix}
 \description{
-Calculates an approximate parameter variance-covariance matrix for the parameters.  The variance-covariance parameters are transformed via a Cholesky decomposition so that the variance-covariance matrices remain positive definite.  The function returns a 
+Calculates an approximate parameter variance-covariance matrix for the parameters.  The variance-covariance parameters are TRANSFORMED via a Cholesky decomposition so that the variance-covariance matrices remain positive definite.  The function returns a 
   \code{\link{marssMLE}} object in this TRANSFORMED form.  It appends \code{$Hessian}, \code{$parMean}, \code{$parSigma} in this transformed state. This is a utility function in the \code{\link{MARSS-package}}.
 }
 \usage{
