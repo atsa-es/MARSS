@@ -24,10 +24,6 @@ Objects of class \code{\link{marssMLE}} may be built from scatch but are easier 
       \item{\code{allow.degen}}{ Whether to try setting Q or R elements to zero if they appear to be going to zero. }
       \item{\code{trace}}{ A positive integer. If not 0, a record will be created of each variable over all EM iterations and detailed warning messages (if appropriate) will be printed. }
       \item{\code{safe}}{ If TRUE, \code{MARSSkem} will rerun \code{\link{MARSSkf}} after each individual parameter update rather than only after all parameters are updated.  The latter is slower and unnecessary for many models, but in some cases, the safer and slower algorithm is needed because the ML parameter matrices have high condition numbers. }
-      \item{\code{MCInit}}{ If TRUE, Monte Carlo initialization will be performed by \code{\link{MARSSmcinit}}. } 
-      \item{\code{numInits}}{ Number of random initial value draws to be used with \code{\link{MARSSmcinit}}. Ignored if \code{MCInit=FALSE}. } 
-      \item{\code{numInitSteps}}{ Maximum number of EM iterations for each random initial value draw to be used with \code{\link{MARSSmcinit}}. Ignored if \code{MCInit=FALSE}. }
-      \item{\code{boundsInits}}{ Length 6 list. Each component is a length 2 vector of bounds on the uniform distributions (for B, U, and A) from which initial values will be drawn to be used with \code{MARSSmcinit()}. For R and Q, the 2 bounds specify the df and S(=diag(bound[2],m)) for a wishart distribution. Ignored if \code{MCInit=FALSE}. See Examples.}
       \item{\code{silent}}{ Suppresses printing of progress bars, error messages, warnings and convergence information. }    
     }
 }
@@ -61,7 +57,7 @@ Objects of class \code{\link{marssMLE}} may be built from scatch but are easier 
 }
 
 \section{Discussion}{
- To ensure that the global maximum-likelihood values are found, it is recommended that for your final fit initial parameter values be set using Monte Carlo initialization (\code{MLEobj$control$MCInit} = TRUE), particularly if the model is not a good fit to the data.  This requires more compuation time, but reduces the chance of the algorithm terminating at a local maximum and not reaching the true MLEs.   For many models and for draft analyses, this is unnecessary, but answers should be checked using an initial conditions search before reporting final values.
+ To ensure that the global maximum-likelihood values are found, it is recommended that you test the fit under different initial parameter values, particularly if the model is not a good fit to the data.  This requires more compuation time, but reduces the chance of the algorithm terminating at a local maximum and not reaching the true MLEs.   For many models and for draft analyses, this is unnecessary, but answers should be checked using an initial conditions search before reporting final values.  See the chapter on initial conditions in the User Guide for a discussion on how to do this.
 
  \code{MARSSkem()} calls a Kalman filter/smoother (\code{\link{MARSSkf}}) for hidden state estimation.   The algorithm allows two options for the initial state conditions: fixed but unknown or a prior.  In the first case, x0 (whether at t=0 or t=1) is treated as fixed but unknown (estimated); in this case, \code{fixed$V0=0} and x0 is estimated.  This is the default behavior.  In the second case, the initial conditions are specified with a prior and V0!=0.   In the later case, x0 or V0 may be estimated.  MARSS will allow you to try to estimate both, but many researchers have noted that this is not robust so you should fix one or the other.
  
