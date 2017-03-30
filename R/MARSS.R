@@ -1,18 +1,22 @@
-MARSS = function(y,
-                 inits=NULL,
+MARSS = function(y,                 
                  model=NULL,
+                 inits=NULL,
                  miss.value=as.numeric(NA),
                  method = "kem",
                  form = "marxss",
                  fit=TRUE, 
                  silent = FALSE,
                  control = NULL,
-                 MCbounds = NULL,
                  fun.kf = "MARSSkfas",
                  ... 
 ) 
 {
-  ## Start by checking the data, since if the data have major problems then the rest of the code
+  allowed.methods=get("allowed.methods", envir=pkg_globals)
+  #Some error checks depend on an allowable method
+  if(!method %in% allowed.methods){
+    stop(paste("method must be one of:", allowed.methods))
+  }
+    ## Start by checking the data, since if the data have major problems then the rest of the code
   ## will have problems
   if(!missing(miss.value)){
     stop("miss.value is deprecated in MARSS.  Replace missing values in y with NA.\n")
@@ -24,10 +28,10 @@ MARSS = function(y,
   if(!(is.vector(y) | is.matrix(y))) stop("MARSS: Data (y) must be a vector or matrix (time going across columns).",call.=FALSE)
   if(length(y)==0) stop("MARSS: Data (y) is length 0.",call.=FALSE)
   if(is.vector(y)) y=matrix(y,nrow=1)
-  if(any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem is NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
+  if(any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)]=as.numeric(NA)
   
-  MARSS.call = list(data=y, inits=inits, MCbounds=MCbounds, model=model, control=control, method=method, form=form, silent=silent, fit=fit, fun.kf=fun.kf, ...)
+  MARSS.call = list(data=y, inits=inits, model=model, control=control, method=method, form=form, silent=silent, fit=fit, fun.kf=fun.kf, ...)
   
   #First make sure specified equation form has a corresponding function to do the conversion to marssMODEL (form=marss) object
   as.marss.fun = paste("MARSS.",form[1],sep="")
@@ -74,11 +78,13 @@ MARSS = function(y,
   ###########################################################################################################
   
   ## MLE estimation
+  kem.methods=get("kem.methods", envir=pkg_globals)
+  optim.methods=get("optim.methods", envir=pkg_globals) 
   if(method %in% c(kem.methods, optim.methods)) {
     
     ## Create the marssMLE object
     
-    MLEobj = list(marss=marss.object, model=MARSS.inputs$model, control=c(MARSS.inputs$control, list(MCbounds=MARSS.inputs$MCbounds), silent=silent), method=method, fun.kf=fun.kf)
+    MLEobj = list(marss=marss.object, model=MARSS.inputs$model, control=c(MARSS.inputs$control, silent=silent), method=method, fun.kf=fun.kf)
     #Set the call form since that info needed for MARSSinits
     if(MLEobj$control$trace != -1){ MLEobj$call=MARSS.call } 
     
@@ -140,12 +146,7 @@ MARSS = function(y,
       }
       #MLEobj$Ey=Eytest
     }
-    
-    ## If a MCinit on the EM algorithm was requested
-    if(MLEobj$control$MCInit) {
-      MLEobj$start = MARSSmcinit(MLEobj)
-    }
-    
+        
     if(!fit) MLEobj$convergence=3
     
     if(fit) {
@@ -167,7 +168,7 @@ MARSS = function(y,
         MLEobj = MARSSaic(MLEobj)
         MLEobj$coef = coef(MLEobj,type="vector")
       }
-      ## Add states.se and y.se if no errors.  Return kf and Ey if trace>0
+      ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
       if((MLEobj$convergence%in%c(0,1,3)) | (MLEobj$convergence%in%c(10,11) && method %in% kem.methods) ){
         kf=MARSSkf(MLEobj) #use function requested by user
         if(fun.kf=="MARSSkfas") kfss=MARSSkfss(MLEobj) else kfss=kf
@@ -188,11 +189,12 @@ MARSS = function(y,
         if(!is.null(Ey[["OtT"]])){
           n = attr(MLEobj$marss,"model.dims")[["y"]][1]
           TT = attr(MLEobj$marss,"model.dims")[["data"]][2]
-          if(n == 1) y.se = sqrt(matrix(Ey[["OtT"]][,,1:TT], nrow=1))
-          if(n > 1) y.se = apply(Ey[["OtT"]],3,function(x){sqrt(takediag(x))})
-          rownames(y.se)=attr(MLEobj$marss, "Y.names")
-        }else{  y.se=NULL }
-        MLEobj$y.se=y.se
+          if(n == 1) yy = matrix(Ey[["OtT"]][,,1:TT], nrow=1)
+          if(n > 1) yy = apply(Ey[["OtT"]],3,function(x){takediag(x)})
+          ytT.se = sqrt(yy-MLEobj$ytT^2)
+          rownames(ytT.se)=attr(MLEobj$marss, "Y.names")
+        }else{  ytT.se=NULL }
+        MLEobj$ytT.se=ytT.se
         if(MLEobj$control$trace>0){ #then return kf and Ey
           MLEobj$kf=kf #from above will use function requested by user
           #except these are only returned by MARSSkfss
