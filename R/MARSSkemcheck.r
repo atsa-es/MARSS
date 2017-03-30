@@ -22,10 +22,11 @@ msg=NULL
     ifixed=min(t,dim(fixed$B)[3])
     if( is.fixed(free$B[,,ifixed,drop=FALSE]) ){  #works on 3D matrices
     #parmat needs modelObj and par list
-    tmp.MLEobj=list( marss=modelObj,par=list(B=matrix(0,0,1)) ) #B is fixed so par is set to fixed value
+      if(is.null(MLEobj$par$B)) tmpparB=MLEobj$start$B else tmpparB=MLEobj$par$B
+    tmp.MLEobj=list( marss=modelObj,par=list(B=tmpparB) ) #B is fixed but par might have cols from other times
     parB = parmat(tmp.MLEobj,"B",t=t)$B
-    if( !all(abs(eigen(parB,only.values=TRUE)$values)<=1)){ 
-      msg=c(msg, " All the eigenvalues of B must be within the unit circle: all(abs(eigen(fixed$B)$values)<=1)\n")
+    if( !all(abs(Re(eigen(parB,only.values=TRUE)$values))<=1)){ 
+      msg=c(msg, " All the eigenvalues of B must be within the unit circle: all(abs(Re(eigen(fixed$B)$values))<=1)\n")
       ok=FALSE
     } }
    } #end for over time to check B
