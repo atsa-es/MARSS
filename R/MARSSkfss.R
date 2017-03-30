@@ -43,7 +43,10 @@ MARSSkfss = function( MLEobj ) {
            time.varying = c(time.varying, elem)
     }
     pari=parmat(MLEobj,t=1)
-    Z=pari$Z; A=pari$A; R=pari$R; B=pari$B; U=pari$U; Q=pari$Q; x0=pari$x0; V0=pari$V0
+    Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; x0=pari$x0; 
+    R=tcrossprod(pari$H %*% pari$R, pari$H) 
+    Q=tcrossprod(pari$G %*% pari$Q, pari$G)
+    V0=tcrossprod(pari$L%*%pari$V0, pari$L)
     if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
     #Check that if any R are 0 then model is solveable
     OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -77,9 +80,11 @@ MARSSkfss = function( MLEobj ) {
 
     for (t in 1:TT) {
       if(length(time.varying)!=0){
+        #update the time.varying ones
         pari[time.varying]=parmat(MLEobj,time.varying,t=t)
-        Z=pari$Z; A=pari$A; R=pari$R; B=pari$B; U=pari$U; Q=pari$Q; x0=pari$x0; V0=pari$V0
-        if("R" %in% time.varying){
+        Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; #update
+        if("R" %in% time.varying | "H" %in% time.varying){
+          R=tcrossprod(pari$H %*% pari$R, pari$H) 
           if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
           #Check that if any R are 0 then model is solveable
           OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -98,7 +103,8 @@ MARSSkfss = function( MLEobj ) {
           diag.OmgRVtt = takediag(OmgRVtt)
           }
         } #if R in time.varying
-        if("Q" %in% time.varying ){ 
+        if("Q" %in% time.varying | "G" %in% time.varying){
+          Q=tcrossprod(pari$G %*% pari$Q, pari$G)
           if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
         }
         if("B" %in% time.varying) t.B = matrix(B,m,m,byrow=TRUE)   #faster transpose
@@ -111,7 +117,9 @@ MARSSkfss = function( MLEobj ) {
       At = Mt%*%A
       Omg1=I.n[YM[,t]==1,,drop=FALSE]
       t.Omg1 = I.n[,YM[,t]==1,drop=FALSE] 
-      Rt = Mt%*%R%*%Mt + I.2%*%R%*%I.2    #per 6.78 in Shumway and Stoffer
+      #per 6.78 in Shumway and Stoffer
+      #Need to 0 out the covariance between R assoc with non-missing and R assoc with missing values
+      Rt = Mt%*%R%*%Mt + I.2%*%R%*%I.2    
     }else { Zt=Z; Rt=R; At=A; Omg1=I.n; t.Omg1=I.n; Mt=I.n }
     if(m*n==1) t.Zt = Zt else t.Zt = matrix(Zt,m,n,byrow=TRUE) #faster transpose
     
@@ -197,7 +205,6 @@ MARSSkfss = function( MLEobj ) {
      #Abandon if solution is so unstable that Vtt diagonal became negative
      if(m==1) diag.Vtt = unname(Vtt[,,t]) else diag.Vtt=unname(Vtt[,,t])[1 + 0:(m - 1)*(m + 1)]   #much faster way to get the diagonal
      if( any(diag.Vtt<0) ){
-       browser()
           return(list(ok=FALSE, 
           errors=paste("Stopped in MARSSkfss: soln became unstable and negative values appeared on the diagonal of Vtt at t=",t,".\n",sep="") ) )
      }
@@ -313,7 +320,7 @@ MARSSkfss = function( MLEobj ) {
     #Innovations form of the likelihood
     rtn.list = list(xtT = xtT, VtT = VtT, Vtt1T = Vtt1T, x0T = x0T, V0T = V0T, Vtt = Vtt,
             Vtt1 = Vtt1, J=J, J0=J0, Kt=Kt, xtt1 = xtt1, xtt=xtt, Innov=vt, Sigma=Ft)
-    loglike = -sum(YM)/2*log(2*base::pi)    #sum(M) is the number of data points
+    loglike = -sum(YM)/2*log(2*base::pi)    #sum(YM) is the number of data points
     for (t in 1:TT) {
       if(n==1) diag.Ft=Ft[,,t] else diag.Ft=unname(Ft[,,t])[1 + 0:(n - 1)*(n + 1)]
       if( any(diag.Ft==0)){
@@ -321,16 +328,22 @@ MARSSkfss = function( MLEobj ) {
          return(c(rtn.list,list(ok=FALSE, logLik = NaN,
          errors = paste("One of the diagonal elements of Sigma[,,",t,"]=0. That should never happen when t>1 or t=1 and tinitx=0.  \n Are both Q[i,i] and R[i,i] being set to 0?\n",sep=""))))
         }else{ #t=1 so ok. get the det of Ft and deal with 0s that might appear on diag of Ft when t=1 and V0=0 and R=0 and tinitx=1
-         if(any(abs(vt[diag.Ft==0,1])>1E-16)){
-             return(c(rtn.list,list(ok=FALSE, logLik = Inf, errors = "V0=0, tinitx=1, R=0 and y[1] does not match x0. You shouldn't estimate x0 when R=0.\n")))
-         }
+#2-5-15 This isn't an error.  x10 can be != y[1] when R=0; x11 cannot be.
+#          if(any(abs(vt[diag.Ft==0,1])>1E-16)){
+#              return(c(rtn.list,list(ok=FALSE, logLik = -Inf, errors = "V0=0, tinitx=1, R=0 and y[1] does not match x0. You shouldn't estimate x0 when R=0.\n")))
+#          }
           OmgF1=makediag(1,n)[diag.Ft!=0,,drop=FALSE] #permutation matrix
+          #need to remove those y[1] associated with Ft[,,1]==0 that were non-missing
+          loglike = loglike + sum(diag.Ft==0 & YM[,1]!=0)/2*log(2*base::pi)   
+          
           if(dim(OmgF1)[1]==0){ #no non-zero Ft[,,1]
             detFt=1 #means R and diag(Ft[,,1] all 0; will become 0 when logged
           }else{
             #when R(i,i) is 0 then vt_t(i) will be zero and Sigma[i,i,1] will be 0 if V0=0.
             #OmgF1 makes sure we don't try to take 1/0 
-            if(length(OmgF1%*%Ft[,,t]%*%t(OmgF1))==1) detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1) else detFt = det(OmgF1%*%Ft[,,t]%*%t(OmgF1))
+            if(length(OmgF1%*%Ft[,,t]%*%t(OmgF1))==1)
+              detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
+            else detFt = det(OmgF1%*%Ft[,,t]%*%t(OmgF1))
           }
           #get the inv of Ft
           if(n==1){ Ftinv=pcholinv(matrix(Ft[,,t],1,1)) 
