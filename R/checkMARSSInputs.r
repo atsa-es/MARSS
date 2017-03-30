@@ -1,7 +1,7 @@
 ############################################################################################################################
 #   checkMARSSInputs()
 #   This checks user inputs to MARSS().
-#MARSS = function(y, inits=NULL, model=NULL, method = "kem", form = "marxss", fit=TRUE,  silent = FALSE, control = NULL, MCbounds = NULL ) 
+#MARSS = function(y, inits=NULL, model=NULL, method = "kem", form = "marxss", fit=TRUE,  silent = FALSE, control = NULL ) 
 #   checks y, duplication in inits, method, form, fit, silent
 # control is checked when the is.marssMLE is called.
 ##########################################################################################################################
@@ -10,7 +10,7 @@ checkMARSSInputs = function(MARSS.inputs, silent=FALSE)
 alldefaults = get("alldefaults",pkg_globals)
 
 #Check that wrapper passed in and all wrapper elements are present
-  el = c("data", "inits", "MCbounds", "marss", "control", "method", "form", "fit", "silent", "fun.kf")
+  el = c("data", "inits", "marss", "control", "method", "form", "fit", "silent", "fun.kf")
   if( !all(el %in% names(MARSS.inputs)) ){ 
      msg=paste(" Element", el[!(el %in% names(MARSS.inputs))], "is missing in MARSS call.\n")
      cat("\n","Errors were caught in checkMARSSInputs \n", msg, sep="")
@@ -19,7 +19,8 @@ alldefaults = get("alldefaults",pkg_globals)
   
 #Second make sure specified method is allowed
 # The user might further restrict this in their MARSS.form() function
-# allowed.methods is speced in MARSSsettings
+# allowed.methods is speced in .onLoad
+  allowed.methods=get("allowed.methods", envir=pkg_globals)
   if(!(MARSS.inputs$method %in% allowed.methods)){
     msg=paste(" ", MARSS.inputs$method, "is not among the allowed methods. See ?MARSS.\n")
     cat("\n","Errors were caught in MARSS \n", msg, sep="") 
@@ -34,16 +35,25 @@ if(!is.null(MARSS.inputs$control$diffuse))
      stop("Stopped in checkMARSSInputs: diffuse is no longer part of the control list in MARSS 3+.\n  Pass in diffuse in the model list instead.\n",call.=FALSE)
 }
 
-# check that control, MCbounds and control have some default values if not passed in
+# check that control has some default values if not passed in
 # the user might reset these in their MARSS.form function
-  req.args = c("inits", "MCbounds", "control")  #needed but not necessarily speced by user
+  req.args = c("inits", "control")  #needed but not necessarily speced by user
 
 # the alldefaults is set in MARSSsettings but user might override later in MARSS.form()
-defaults=alldefaults[[MARSS.inputs$method]] #just use the generic values in MARSSsettings
+defaults=alldefaults[[MARSS.inputs$method]] #just use the generic values in .onLoad
 
 ## Now set defaults if needed, first deal with case where arg not passed in all
 for(el in req.args)
   if(is.null(MARSS.inputs[[el]])) MARSS.inputs[[el]]=defaults[[el]]
+
+## Now deal with case that inits passed in is a marssMLE object
+if(class(MARSS.inputs[["inits"]])=="marssMLE"){
+  if(is.null(MARSS.inputs[["inits"]])){ stop("Stopped in checkMARSSInputs() because inits must have the par element if class marssMLE.\n", call.=FALSE)
+  }else{
+    MARSS.inputs[["inits"]]=coef(MARSS.inputs[["inits"]], what="par")
+    if(!is.list(MARSS.inputs[["inits"]])) stop("Stopped in checkMARSSInputs() because par element of inits$par must be a list if inits is marssMLE object.\n", call.=FALSE)
+  }
+}
 
 ### If some elements are missing from args use the defaults    
 for(el in req.args) {
@@ -52,7 +62,7 @@ for(el in req.args) {
      stop(paste("Stopped in checkMARSSInputs: arg ",el," must be passed in as a list (or left off to use defaults).\n",sep=""),call.=FALSE)
   if(!all(names(tmp) %in% names(defaults[[el]]))){
      bad.name = names(tmp)[!(names(tmp) %in% names(defaults[[el]]))]
-     if(el=="inits") extra.msg="For inits, you need to use the marss form, which is in $par or use coef(fit,form=\"marss\").\n"
+     if(el=="inits") extra.msg="For inits, you need to use a list in the same model form. Use coef(fit) to see the elements in this list.\n"
      else extra.msg=""
      stop(paste("\nStopped in checkMARSSInputs: elements ", bad.name," is not allowed in arg ",el," (misspelled?).\n",extra.msg,sep=""),call.=FALSE) 
      }
