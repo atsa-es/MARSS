@@ -1,10 +1,46 @@
 #######################################################################################################
 #   Parameter estimation using R's optim function
 #   Minimal error checking is done.  You should run is.marssMLE() before calling this.
+#   Q and R are not allowed to be time-varying
 #   Likelihood computation is via  Kalman filter
 #######################################################################################################
 MARSSoptim = function(MLEobj) {
 # This function does not check if user specified a legal MLE object.
+  ## 
+  # Define needed negLogLik function with chol transformed variances
+  # 
+  neglogLik = function(x, MLEobj=NULL){  #NULL assignment needed for optim call syntax
+    #MLEobj is tmp.MLEobj so has altered free and fixed
+    #x is the paramvector
+    
+    #update the MLEobj by putting the estimated pars from optim in
+    MLEobj = MARSSvectorizeparam(MLEobj, x)
+    free=MLEobj$marss$free
+    pars=MLEobj$par
+    par.dims=attr(MLEobj[["marss"]],"model.dims")
+    for(elem in c("Q","R","V0")){
+      if(!is.fixed(free[[elem]])) #recompute par if needed since par in parlist is transformed
+      {
+        d=sub3D(free[[elem]],t=1) #this will be the one with the upper tri zero-ed out
+        par.dim=par.dims[[elem]][1:2]
+        #t=1 since D not allowed to be time-varying; since code 4 lines down won't work otherwise
+        L=unvec(d%*%pars[[elem]],dim=par.dim) #this by def will have 0 row/col at the fixed values
+        the.par = tcrossprod(L)#L%*%t(L)
+        #from f+Dm=M and if f!=0, D==0 so can leave off f
+        MLEobj$par[[elem]]=solve(crossprod(d))%*%t(d)%*%vec(the.par)
+        #solve(t(d)%*%d)%*%t(d)%*%vec(the.par)
+      }
+    } #end for over elem
+    #This function is passed a special MLEobj with a marss.original element
+    MLEobj$marss$fixed = MLEobj$fixed.original
+    MLEobj$marss$free = MLEobj$free.original
+    
+    #kfsel selects the Kalman filter / smoother function based on MLEobj$fun.kf
+    negLL = MARSSkf( MLEobj, only.logLik=TRUE, return.lag.one=FALSE )$logLik
+    
+    -1*negLL
+  }
+  
   tmp = is.marssMLE(MLEobj)
   if(!isTRUE(tmp)) {
       cat(tmp)
@@ -14,12 +50,8 @@ MARSSoptim = function(MLEobj) {
     if(dim(MLEobj$model$free[[elem]])[3]>1)
      stop(paste("Stopped in MARSSoptim() because function does not allow estimated part of ",elem," to be time-varying.\n",sep=""), call.=FALSE)      
   }
-  #the is.marssMODEL code has an additional test that the blocks are diagonal or unconstrained in the varcov matrices
+  #the is.marssMODEL call is.validvarcov() which tests that the blocks are diagonal or unconstrained in the varcov matrices
 
-#  if(MLEobj$model$diffuse)
-#      stop(paste("Stopped in MARSSoptim() because version 3.0 does not allow diffuse=TRUE.\n",sep=""), call.=FALSE)      
-
-  
   ## attach would be risky here since user might have one of these variables in their workspace    
   modelObj=MLEobj[["marss"]]
   y = modelObj$data #must have time going across columns
@@ -53,7 +85,7 @@ MARSSoptim = function(MLEobj) {
   tmp.MLEobj$par = tmp.inits  #set initial conditions for estimated parameters
   for(elem in c("Q","R","V0")){ #need the chol for these
         d=sub3D(free[[elem]],t=1) #free[[elem]] is required to be time constant
-        f=sub3D(fixed[[elem]],t=1)
+        f=sub3D(fixed[[elem]],t=1) #placeholder.  Need structure not actual values
         the.par=unvec(f+d%*%tmp.inits[[elem]], dim=par.dims[[elem]][1:2])
         is.zero=diag(the.par)==0   #where the 0s on diagonal are
         if(any(is.zero)) diag(the.par)[is.zero]=1    #so the chol doesn't fail if there are zeros on the diagonal
@@ -148,49 +180,6 @@ MARSSoptim = function(MLEobj) {
   ## Add AIC and AICc to the object
   if(!is.null(kf.out)) MLEobj.return = MARSSaic(MLEobj.return)
 
-# I don't want these added here
-#   ## Calculate confidence intervals based on state std errors, see caption of Fig 6.3 (p337) Shumway and Stoffer
-#   if(!is.null(kf.out)){
-#     TT = dim(MLEobj.return$marss$data)[2]; m = dim(MLEobj.return$marss$fixed$x0)[1]
-#     if(m == 1) states.se = sqrt(matrix(kf.out$VtT[,,1:TT], nrow=1))
-#     if(m > 1) {
-#       states.se = matrix(0, nrow=m, ncol=TT)
-#       for(i in 1:TT) states.se[,i] = t(sqrt(takediag(kf.out$VtT[,,i])))
-#     }
-#     MLEobj.return$states.se = states.se
-#     }
-    
   return(MLEobj.return)
 }
 
-neglogLik = function(x, MLEobj=NULL){  #NULL assignment needed for optim call syntax
-#MLEobj is tmp.MLEobj so has altered free and fixed
-#x is the paramvector
-    
-    #update the MLEobj by putting the estimated pars from optim in
-    MLEobj = MARSSvectorizeparam(MLEobj, x)
-    free=MLEobj$marss$free
-    pars=MLEobj$par
-    par.dims=attr(MLEobj[["marss"]],"model.dims")
-  for(elem in c("Q","R","V0")){
-     if(!is.fixed(free[[elem]])) #recompute par if needed since par in parlist is transformed
-        {
-        d=sub3D(free[[elem]],t=1) #this will be the one with the upper tri zero-ed out
-        par.dim=par.dims[[elem]][1:2]
-        #t=1 since D not allowed to be time-varying; since code 4 lines down won't work otherwise
-        L=unvec(d%*%pars[[elem]],dim=par.dim) #this by def will have 0 row/col at the fixed values
-        the.par = tcrossprod(L)#L%*%t(L)
-        #from f+Dm=M and if f!=0, D==0 so can leave off f
-        MLEobj$par[[elem]]=solve(crossprod(d))%*%t(d)%*%vec(the.par)
-        #solve(t(d)%*%d)%*%t(d)%*%vec(the.par)
-        }
-    } #end for over elem
-    #This function is passed a special MLEobj with a marss.original element
-    MLEobj$marss$fixed = MLEobj$fixed.original
-    MLEobj$marss$free = MLEobj$free.original
-
-    #kfsel selects the Kalman filter / smoother function based on MLEobj$fun.kf
-    negLL = MARSSkf( MLEobj, only.logLik=TRUE, return.lag.one=FALSE )$logLik
-    
-    -1*negLL
-    }
