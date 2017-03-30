@@ -2,7 +2,7 @@
 #   MARSSvectorizeparam  function
 #   Returns a vector of the ESTIMATED parameters or if vector passed in, that is put into list form for MLEobj$marss
 #######################################################################################################
-MARSSvectorizeparam = function(MLEobj, parvec=NA, what="par") {
+MARSSvectorizeparam = function( MLEobj, parvec=NA, what="par" ) {
 #This helper function  ONLY FOR marssMODEL form=marss!!
   #if parvec=NA) returns a vector version of all the estimated parameters (for use in say optim) from a mssm  model
   #if parvec is passed in) returns a marssMLE object with par fixed by parvec
