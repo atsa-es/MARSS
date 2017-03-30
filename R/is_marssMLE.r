@@ -111,6 +111,7 @@ is.marssMLE <- function(MLEobj)
     }
   }
   
+  alldefaults=get("alldefaults", envir=pkg_globals)
   ## Check controls
   if(!is.null(MLEobj[["control"]])){
     if(!is.list(MLEobj[["control"]])) stop("Stopped in is.marssMLE() because control must be passed in as a list.\n", call.=FALSE)
@@ -124,12 +125,12 @@ is.marssMLE <- function(MLEobj)
 
     if( !is.null(control[[el]]) ) { 
       #everything must be numeric except these
-      if( el %in% en[!(en %in% c("safe", "MCInit", "allow.degen", "demean.states", "sparse"))] ) {
+      if( el %in% en[!(en %in% c("safe", "allow.degen", "demean.states", "sparse"))] ) {
         null.flag <- (!is.numeric(control[[el]]))
         if(null.flag) msg = c(msg, paste("control list element", el,"is non-numeric\n"))
       }
       #everything must be positive or 0 except these
-      if( (el %in% en[!(en %in% c("safe", "MCInit", "trace", "allow.degen", "demean.states", "sparse"))])  && is.numeric(control[[el]]) ) {
+      if( (el %in% en[!(en %in% c("safe", "trace", "allow.degen", "demean.states", "sparse"))])  && is.numeric(control[[el]]) ) {
         null.flag <- ( control[[el]] <= 0)
         if(null.flag) msg = c(msg, paste("control list element", el,"less than or equal to zero\n"))
       }
@@ -139,7 +140,7 @@ is.marssMLE <- function(MLEobj)
         if(null.flag) msg = c(msg, paste("control list element trace must be an integer greater than or equal to -1.\n"))
       }
       #these need to be whole numbers
-      if (el %in% c("numInits", "numInitSteps", "trace", "minit", "maxit", "min.iter.conv.test", "conv.test.deltaT", "min.degen.iter") && is.numeric(control[[el]])) {
+      if (el %in% c("trace", "minit", "maxit", "min.iter.conv.test", "conv.test.deltaT", "min.degen.iter") && is.numeric(control[[el]])) {
         null.flag <- ( !is.wholenumber(control[[el]]) )
         if(null.flag) msg = c(msg, paste("control list element", el,"is not a whole number\n"))
       }
@@ -153,7 +154,7 @@ is.marssMLE <- function(MLEobj)
         null.flag <- ( control[[el]] < 2)
         if(null.flag) msg = c(msg, "control list element conv.test.deltaT must be greater than 2\n")
       }
-      if (el %in% c("safe", "MCInit", "allow.degen", "demean.states", "sparse")) {
+      if (el %in% c("safe", "allow.degen", "demean.states", "sparse")) {
         null.flag <- !(control[[el]] %in% c(TRUE, FALSE) )	  
         if(null.flag) msg = c(msg, paste("control list element", el,"is not TRUE or FALSE\n"))
       }
@@ -162,37 +163,10 @@ is.marssMLE <- function(MLEobj)
   }      # for el in en
   } #not null control
   
-  ## Check control$MCbounds
-    if(is.null(control[["MCbounds"]])) msg = c(msg, "control$MCbounds is missing from the control list\n")
-    if(!is.null(control[["MCbounds"]])){
-    en = c("B", "U", "Q", "R", "A", "Z")
-
-    for (el in en) {
-      target = control[["MCbounds"]]
-      null.flag <- ( is.null(target[[el]]) )
-      if(null.flag) msg = c(msg, paste("control$MCbounds list element", el,"is missing\n"))
-
-      if(el %in% c("R","Q")){ dim.bound = 2 }else{dim.bound=2}
-      null.flag <- ( !is.null(target[[el]]) && length(target[[el]]) != dim.bound)
-      if(null.flag) msg = c(msg, paste("control$MCbounds list element", el,"is not a ",dim.bound,"element vector\n"))
- 
-      if (!null.flag) {
-        null.flag <- (!is.numeric(target[[el]]))	  
-        if(null.flag){ msg = c(msg, paste("control$MCbounds list element", el,"is not numeric\n"))
-        }else {
-           if(el %in% c("B", "U", "A", "Z")) {
-           null.flag <- (target[[el]][1] >= target[[el]][2])
-           if(null.flag) msg = c(msg, paste("The first element of control$MCbounds$", el," is not smaller than the second\n",sep=""))
-           if (el %in% c("R", "Q")) {
-              null.flag <- ( any(target[[el]] <= 0) )	  
-              if(null.flag) msg = c(msg, "One of the elements of control$MCbounds$", el, " is <= 0\n", sep="") }           }	  
-        }
-      }      
-    }
   ## if $diffuse, method="BFGS" and $tinitx=1
   if( identical(MLEobj$marss$diffuse,TRUE) & !(MLEobj$method=="BFGS" & MLEobj$marss$tinitx==1) ) 
     msg = c(msg, "If you specify a diffuse prior, method must be BFGS and model$tinitx set to 1.\n")    
-  } 
+ 
 
 if(length(msg) == 0){ return(TRUE)
 }else {
