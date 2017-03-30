@@ -16,9 +16,12 @@ MARSS.dfa=function(MARSS.call){
 # MARSS(data, model=list(), covariates=NULL, z.score=TRUE, demean=TRUE, control=list())
 # model.defaults =list(A="zero", R="diagonal and equal", D="zero", x0="zero", V0=diag(5,1), tinitx=0, diffuse=FALSE, m=1)
 
+  #load needed package globals
+  common.allowed.in.MARSS.call=get("common.allowed.in.MARSS.call", envir=pkg_globals)
+  
 
 #Part 1 Set up defaults and check that what the user passed in is allowed
-# 1 Check for form dependent user inputs for method and reset defaults for inits, MCbounds, and control if desired
+# 1 Check for form dependent user inputs for method and reset defaults for inits, and control if desired
 # 2 Specify the text shortcuts and whether factors or matrices can be passed in
 #   The names in the allowed list do not need to be A, B, Q .... as used in the marss form
 #   Other names can be used if you want the user to use those names; then in the MARSS.form function,
@@ -157,7 +160,7 @@ if(MARSS.call[["z.score"]]){
   dat = dat * (1/Sigma)
 }
 
-MARSS.call = list(data=dat, inits=MARSS.call$inits, MCbounds=MARSS.call$MCbounds, control=MARSS.call$control, method=MARSS.call$method, form="dlm", silent=MARSS.call$silent, fit=MARSS.call$fit, fun.kf=MARSS.call$fun.kf)
+MARSS.call = list(data=dat, inits=MARSS.call$inits, control=MARSS.call$control, method=MARSS.call$method, form="dlm", silent=MARSS.call$silent, fit=MARSS.call$fit, fun.kf=MARSS.call$fun.kf)
 
 #dfa is a type of marxss model, so use MARSS.marxss to test it and set up the marss object
 tmp = MARSS.marxss(list(data=dat,model=dfa.model,method=MARSS.call$method,silent=MARSS.call$silent))
