@@ -2,7 +2,11 @@
 #  Print method for class marssMLE. 
 ##############################################################################################################################################
 print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what="fit", form=NULL, silent=FALSE) {
-#First make sure specified equation form has a corresponding function to do the conversion to marssMODEL object
+#load needed package globals
+  kem.methods=get("kem.methods", envir=pkg_globals)
+  optim.methods=get("optim.methods", envir=pkg_globals) 
+  
+  #First make sure specified equation form has a corresponding function to do the conversion to marssMODEL object
   return.obj=list()
   what.to.print = what
   orig.x=x
@@ -38,7 +42,6 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
       if (!is.null(x[["par"]])) {
       cat("\nMARSS fit is\n")
       cat(paste("Estimation method:", x$method, "\n"))
-	    if(x$control$MCInit) cat("Monte Carlo initialization with", x$controlnumInits, "random starts. \n")
       if( x$method %in% kem.methods ) 
         cat(paste("Convergence test: conv.test.slope.tol = ", x$control$conv.test.slope.tol,", abstol = ", x$control$abstol, "\n", sep=""))
 	    if(x$convergence==0){
@@ -117,7 +120,9 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
 	}
 	#printCoefmat(cmat, digits=digits)
 	print(cmat, digits=digits)
-      
+  if(x$model$tinitx==1) cat("Initial states (x0) defined at t=1\n")
+  else cat("Initial states (x0) defined at t=0\n")
+  
   cat("\n")
   if(is.null(x[["par.se"]])) cat("Standard errors have not been calculated. \n")
   if(!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])){
@@ -165,7 +170,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
     }
     if(what=="par"){
       if(!silent){ cat("List of the estimated values in each parameter matrix\n"); print(x$par); cat("\n") }
-      return.obj[[what]]=coef(orig.x,type="vector")
+      return.obj[[what]]=x$par
     }
     if(what=="logLik"){
       if(!silent){ cat(paste("Log-likelihood: ",x$logLik,sep="")); cat("\n") }
