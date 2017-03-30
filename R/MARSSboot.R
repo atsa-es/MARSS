@@ -26,6 +26,10 @@ MARSSboot = function(MLEobj, nboot=1000, output="parameters", sim="parametric",
   # control is a list which holds options for the estimation function (see help file)
   # silent controls whether a progress bar is shown
   
+  #load needed package globals
+  kem.methods=get("kem.methods", envir=pkg_globals)
+  optim.methods=get("optim.methods", envir=pkg_globals) 
+  
   ###### Error-checking on the arguments
   msg=NULL
   if(!is.numeric(nboot))
@@ -163,7 +167,7 @@ MARSSboot = function(MLEobj, nboot=1000, output="parameters", sim="parametric",
     for(i in 1:nboot) {
       if( param.gen == "MLE" ) {
 	        newmod = marss.model #marss form     
-	        newmod[["data"]] = array(boot.data[,,i], dim=dim(boot.data)[1:2])  
+	        newmod[["data"]] = array(boot.data[,,i], dim=dim(boot.data)[1:2], dimnames=dimnames(marss.model$data))
           mle.object[["marss"]]=newmod #we are resetting the marss object
 	        if(mle.object[["method"]] %in% kem.methods) boot.model = MARSSkem(mle.object) 
 	        if(mle.object[["method"]] %in% optim.methods) boot.model = MARSSoptim(mle.object) 
