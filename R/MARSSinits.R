@@ -4,7 +4,7 @@
 ## Will return a par list that looks just like MLEobj par list
 ## Wants either a scalar (dim=NULL) or a matrix the same size as $par[[elem]] or a marssMLE object with the par element
 
-MARSSinits <- function(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, R=0.05, x0=-99, V0=5)){
+MARSSinits <- function(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, R=0.05, x0=-99, V0=5, G=0, H=0, L=0)){
 modelObj=MLEobj[["marss"]]
 method=MLEobj[["method"]]
 if(is.null(inits)) inits=list()
@@ -26,6 +26,7 @@ if(!is.list(inits)) stop("Stopped in MARSSinits() because inits must be a list.\
   }else{ stop(paste("Stopped in MARSSinits.  You need a MARSSinits_",attr(MLEobj$model,"form")[1]," function to tell MARSS how to interpret the inits list",sep=""), call.=FALSE) }
 }
 
+alldefaults=get("alldefaults", envir=pkg_globals)
 default = alldefaults[[method]][["inits"]]
 for(elem in names(default)){
   if(is.null(inits[[elem]])) inits[[elem]]=default[[elem]]
@@ -37,7 +38,10 @@ for(elem in names(default)){
   f = modelObj$fixed
   parlist = list()
   
-  par.dims=list(Z=c(n,m),A=c(n,1),R=c(n,n),B=c(m,m),U=c(m,1),Q=c(m,m),x0=c(m,1),V0=c(m,m))
+  g1=dim(modelObj$fixed$G)[1]/m
+  h1=dim(modelObj$fixed$H)[1]/n
+  l1=dim(modelObj$fixed$L)[1]/m
+  par.dims=list(Z=c(n,m),A=c(n,1),R=c(h1,h1),B=c(m,m),U=c(m,1),Q=c(g1,g1),x0=c(m,1),V0=c(l1,l1),G=c(m,g1),H=c(n,h1),L=c(m,l1))
 
   for(elem in names(par.dims)){
   if(is.fixed(modelObj$free[[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
