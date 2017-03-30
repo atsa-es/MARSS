@@ -11,8 +11,8 @@ The main function is \code{\link{MARSS}} which is used to fit a specified model 
 
 The default MARSS model form is "marxss", which is a model of the following form:
 \describe{
-\item{x(t+1) = B x(t) + U + C c(t) + w(t), where w(t) ~ MVN(0,Q)}{}
-\item{y(t) = Z x(t) + A + D d(t) + v(t), where v(t) ~ MVN(0,R)}{}
+\item{x(t+1) = B x(t) + U + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}{}
+\item{y(t) = Z x(t) + A + D d(t) + H v(t), where v(t) ~ MVN(0,R)}{}
 \item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }{} 
 }
 The parameters, hidden state processes (x), and observations (y) are matrices:
@@ -22,9 +22,11 @@ The parameters, hidden state processes (x), and observations (y) are matrices:
     \item Z is n x m 
     \item B is m x m 
     \item U is m x 1 
-    \item Q is m x m 
+    \item Q is g x g (typically m x m) 
+    \item G is m x g
     \item A is n x 1 
-    \item R is n x n
+    \item R is h x h (typically n x n)
+    \item H is n x h
     \item C is m x q
     \item D is n x p
     \item c(t) is q x 1
