@@ -70,10 +70,6 @@ Objects of class marssMLE\index{objects!marssMLE} specify maximum-likelihood est
       \item[\textit{abstol}]{ Optional tolerance for log-likelihood change.  If log-likelihood decreases less than this amount relative to the previous iteration, the EM algorithm exits. } 
       \item[\textit{trace}]{ A positive integer. If not zero, a record will be created of each variable the maximization iterations. The information recorded depends on the maximization method.}
       \item[\textit{safe}]{If TRUE, \verb@MARSSkem()@ will rerun \verb@MARSSkf()@ after each individual parameter update rather than only after all parameters are updated.  }
-      \item[\textit{MCInit}]{ Use Monte Carlo initialization? } 
-      \item[\textit{numInits}]{ Number of random initial value draws. } 
-      \item[\textit{numInitSteps}]{ Number of iterations for each initial value draw. }
-      \item[\textit{boundsInits}]{ Bounds on the uniform distributions from which initial values will be drawn. (Note that bounds for the covariance matrices Q and R, which require positive values, are specified in logs.) }
       \item{\textit{silent}}{ Suppresses printing of progress bar and convergence information. }    
     \end{description}
   }
