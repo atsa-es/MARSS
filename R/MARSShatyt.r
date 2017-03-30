@@ -22,8 +22,11 @@ MARSShatyt = function( MLEobj ) {
   hatxtt1=kfList$xtt1      #1:TT
   E.x0 = (diag(1,m)-IIz$V0)%*%kfList$x0T+IIz$V0%*%parmat(MLEobj, "x0", t=1)$x0  #0:T-1
   hatxt1=cbind(E.x0,kfList$xtT[,1:(TT-1),drop=FALSE])
+  hatxtp=cbind(kfList$xtT[,2:TT,drop=FALSE],NA)
   hatVt=kfList$VtT
   hatVtt1=kfList$Vtt1T
+  hatVtpt = array(NA,dim=dim(kfList$Vtt1T))
+  hatVtpt[,,1:(TT-1)] = kfList$Vtt1T[,,2:TT,drop=FALSE]
   
   msg=NULL
   
@@ -49,7 +52,7 @@ MARSShatyt = function( MLEobj ) {
   #notation bad.  should be hatytT
   hatyt = hatytt1 = matrix(0,n,TT)     
   hatOt = array(0,dim=c(n,n,TT))     
-  hatyxt = hatyxtt1 = array(0,dim=c(n,m,TT))
+  hatyxt = hatyxtt1 = hatyxttp = array(0,dim=c(n,m,TT))
   
   for (t in 1:TT) {
     for(elem in time.varying){
@@ -63,13 +66,14 @@ MARSShatyt = function( MLEobj ) {
     }
     if(all(YM[,t]==1)){  #none missing
       hatyt[,t]=y[,t,drop=FALSE]
-      hatytt1[,t]=y[,t,drop=FALSE]
+      hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
       hatOt[,,t]=tcrossprod(hatyt[,t,drop=FALSE]) #matrix() is faster than t()
 #      hatOt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n) #matrix() is faster than t()
       hatyxt[,,t]=tcrossprod(hatyt[,t,drop=FALSE], hatxt[,t,drop=FALSE])
 #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt[,t,drop=FALSE],1,m)
       hatyxtt1[,,t]=tcrossprod(hatyt[,t,drop=FALSE], hatxt1[,t,drop=FALSE])
 #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt1[,t,drop=FALSE],1,m)
+      hatyxttp[,,t]=tcrossprod(hatyt[,t,drop=FALSE], hatxtp[,t,drop=FALSE])
     }else{
       I.2 = I.r = I.n; 
       I.2[YM[,t]==1,]=0 #1 if YM=0 and 0 if YM=1
@@ -96,8 +100,9 @@ MARSShatyt = function( MLEobj ) {
 #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVt[,,t]
       hatyxtt1[,,t]=tcrossprod(hatyt[,t,drop=FALSE],hatxt1[,t,drop=FALSE])+Delta.r%*%pari$Z%*%hatVtt1[,,t]
 #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt1[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVtt1[,,t]
+      hatyxttp[,,t]=tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%pari$Z%*%t(hatVtpt[,,t])
     }
   } #for loop over time
-  rtn.list=list(ytT = hatyt, OtT = hatOt, yxtT=hatyxt, yxt1T=hatyxtt1, ytt1 = hatytt1) 
+  rtn.list=list(ytT = hatyt, OtT = hatOt, yxtT=hatyxt, yxt1T=hatyxtt1, yxttpT = hatyxttp, ytt1 = hatytt1) 
   return(c(rtn.list,list(ok=TRUE, errors = msg)))
 }
