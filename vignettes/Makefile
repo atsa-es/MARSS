@@ -6,35 +6,41 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave EMDerivation.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave Quick_Start.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave UserGuide.Rnw
-	"$(R_HOME)/bin/R" CMD Sweave Quick_Examples.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_1.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_2.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_3.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_4.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_5.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_6.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_7.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_8.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Case_Study_dlm1.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave ./tex/MARp.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave ./tex/Covariates.xRnw
-	"$(R_HOME)/bin/R" CMD Sweave Manual.xRnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Quick_Examples.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_1.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_2.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_3.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_4.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_5.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_6.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_7.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_8.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_dlm1.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_mlr.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Setting_Inits.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/CIs.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./tex/MARp.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./tex/Covariates.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Manual.Rnw
 	 
 stangle: 
 	"$(R_HOME)/bin/R" CMD Stangle EMDerivation.Rnw
 	"$(R_HOME)/bin/R" CMD Stangle Quick_Start.Rnw
 	"$(R_HOME)/bin/R" CMD Stangle UserGuide.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_1.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_2.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_3.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_4.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_5.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_6.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_7.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_8.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle Case_Study_dlm1.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle ./tex/Covariates.xRnw
-	"$(R_HOME)/bin/R" CMD Stangle ./tex/MARp.xRnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_1.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_2.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_3.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_4.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_5.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_6.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_7.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_8.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_dlm1.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_mlr.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Setting_Inits.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/CIs.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./tex/Covariates.Rnw
+	"$(R_HOME)/bin/R" CMD Stangle ./tex/MARp.Rnw
 
 makeRfiles:
 	cat ./figures/CS1--Cs1_*.R > ../inst/doc/Chapter_PVA.R
@@ -47,31 +53,29 @@ makeRfiles:
 	cat ./figures/CS8--Cs*.R > ../inst/doc/Chapter_CombiningTrendData.R
 	cat ./figures/CSDLM--Cs_*.R > ../inst/doc/Chapter_UnivariateDLM.R
 	cat ./figures/Covar--Covar_*.R > ../inst/doc/Chapter_Covariates.R
+	cat ./figures/MLR--Cs_*.R > ../inst/doc/Chapter_MLR.R
+	cat ./figures/MCI--Cs_mci_*.R > ../inst/doc/Chapter_inits.R
 	cat ./figures/ARMAp--Cs_*.R > ../inst/doc/Chapter_MARp.R
+	cat ./figures/CIs--Cs_*.R > ../inst/doc/Chapter_CIs.R
 
 pdf:	
 	texi2dvi --pdf --clean --verbose EMDerivation.tex
 	texi2dvi --pdf --clean --verbose Quick_Start.tex
 	texi2dvi --pdf --clean --verbose UserGuide.tex
-	cat Manual.xRnw.tex > Manual.tex
 	texi2dvi --pdf --clean --verbose Manual.tex
 	cat Manual.pdf > UserGuide.pdf
-	rm Manual.pdf
-	rm *.xRnw.tex
-	rm Manual.tex
-	make clean
 
 clean:
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
-	$(RM) *.xRnw *.xRnw.R
+	$(RM) *.Rnw
+	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
-	$(RM) ./tex/*.tex
-	$(RM) ./tex/*.bib
-	$(RM) ./tex/*.xRnw
+	$(RM) ./tex/*.*
 	$(RM) ./figures/*.*
-	$(RM) *.Rdata *RData
+	$(RM) ./manual_files/*.*
+	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
 	rm -rf ./tables
