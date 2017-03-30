@@ -1,7 +1,16 @@
 ###############################################################################################################################################
-#  Predict method for class marssMLE. 
+#  Predict method for class marssMLE.
 ##############################################################################################################################################
-predict.marssMLE <- function (object, ..., n.ahead=1, t.start=NULL, newdata=list(), se.fit=TRUE, nboot=1000, param.gen="hessian", verbose=FALSE, prediction.intervals=TRUE) {
+predict.marssMLE <- function (object, newdata, n.ahead=NULL, t.start=NULL, 
+                              se.fit=TRUE, 
+                              interval = c("none", "confidence", "prediction"),
+                              level = 0.95, type=c("observation", "state"),
+                              nboot=1000, param.gen="hessian", verbose=FALSE, ...) {
+
+  # if n.ahead is not passed in, the function acts like predict.lm
+  #   predict(fit) with potentially se.fit, interval, level passed in
+  
+  
   #This function works by constructing a marssMODEL object (form=marss) with parameter values at each t to be predicted
   #This will be passed to the Kalman filter to compute the expected x values
   #Then to haty to get the expected y values
@@ -10,7 +19,7 @@ predict.marssMLE <- function (object, ..., n.ahead=1, t.start=NULL, newdata=list
   #n.ahead is the number of time steps
   #t.start is where to start relative to the original data.  
   #t.start=1 would start at the beginning of the original data
-  #the initial x will be E(x)_(t.start-1)
+  #the initial x will be E(x|y(1:t.start-1))_(t.start-1); so kf$xtt[t.start-1]
   
   if(class(object)!="marssMLE") stop("predict.marssMLE: object must be a marssMLE object.",call.=FALSE)
   
@@ -76,17 +85,17 @@ predict.marssMLE <- function (object, ..., n.ahead=1, t.start=NULL, newdata=list
     var.y.tT=
       if(n == 1){
         var.y.tT = Ey[["OtT"]][,,1:TT] - Ey[["ytT"]][,1:TT]*Ey[["ytT"]][,1:TT]
-        y.se = sqrt(matrix(var.y.tT, nrow=1))
+        ytT.se = sqrt(matrix(var.y.tT, nrow=1))
       }
     if(n > 1) {
-      y.se = matrix(0, nrow=n, ncol=TT)
+      ytT.se = matrix(0, nrow=n, ncol=TT)
       for(i in 1:TT){
         var.y.tT = Ey[["OtT"]][,,i] - Ey[["ytT"]][,i,drop=FALSE]%*%t(Ey[["ytT"]][,i,drop=FALSE])
-        y.se[,i] = t(sqrt(takediag( var.y.tT )))
+        ytT.se[,i] = t(sqrt(takediag( var.y.tT )))
       }
     }
-  }else{  y.se=NULL }
-  rtn.list$y.se = y.se
+  }else{  ytT.se=NULL }
+  rtn.list$ytT.se = ytT.se
   
   if(prediction.intervals){
     pred.obj$kf=NULL #just to be sure
