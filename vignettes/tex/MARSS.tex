@@ -205,7 +205,7 @@ Like the variance-covariance matrices ($\QQ$, $\RR$ and $\LAM$), $\BB$ can be sp
 
 \section{$\ZZ$ model}
 
-Like $\BB$ and the variance-covariance matrices, $\ZZ$ can be specified with a list matrix to allow you to have both fixed and estimated elements in $\ZZ$. If $\ZZ$ is a square matrix, many of the same text shortcuts are available: ``diagonal and equal", ``diagonal and equal", and ``equalvarcov".  If $\ZZ$ is a design matrix\footnote{a matrix with only 0s and 1s and where the row sums are all equal to 1}, then a special shortcut is available using \texttt{factor()} which allows you to specify which $\yy$ rows are associated with which $\xx$ rows.  See Chapter \ref{Examples} and the case studies for more examples.
+Like $\BB$ and the variance-covariance matrices, $\ZZ$ can be specified with a list matrix to allow you to have both fixed and estimated elements in $\ZZ$. If $\ZZ$ is a square matrix, many of the same text shortcuts are available: ``diagonal and equal", ``diagonal and equal", and ``equalvarcov".  If $\ZZ$ is a design matrix\footnote{a matrix with only 0s and 1s and where the row sums are all equal to 1}, then a special shortcut is available using \texttt{factor()} which allows you to specify which $\yy$ rows are associated with which $\xx$ rows.  See Chapter \ref{Examples} and the applications chapters for more examples.
 
 \begin{itemize}\itemsep5pt
 \item[] \texttt{Z=factor(c(1,1,1))}:  All $\yy$ time series are observing the same (and only) hidden state trajectory $x$ ($n=3$ and $m=1$):
