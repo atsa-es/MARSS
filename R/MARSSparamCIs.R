@@ -5,13 +5,13 @@
 MARSSparamCIs = function(MLEobj, method="hessian", alpha=0.05, nboot=1000, silent=TRUE) {
 #this function expects a marssMLE object
 #it will add some vectors of standard errors, biases, low/up CIs to MLEobj
-if(!(method %in% c("hessian","parametric","innovations","hessian-harvey1989"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, and innovations.\n", call.=FALSE)
-if(!is.marssMLE(MLEobj)) stop("Stopped in MARSSparamCIs(). This function needs a valid marss MLE object.\n", call.=FALSE)
+if(!(method %in% c("hessian","parametric","innovations","hessian-harvey1989"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, innovations, and hessian-harvey1989.\n", call.=FALSE)
+if(!is.marssMLE(MLEobj)) stop("Stopped in MARSSparamCIs(). This function needs a valid marssMLE object.\n", call.=FALSE)
 paramvec = MARSSvectorizeparam(MLEobj)
 if(length(paramvec)==0) stop("Stopped in MARSSparamCIs(). No estimated parameter elements.\n", call.=FALSE)
 paramnames=names(paramvec)
 if(method=="hessian")  {
-    #Only for fixed, diagonal or unconstrained R, Q, or V0
+    #Only for fixed, diagonal or block-diagonal unconstrained R, Q, or V0
     ok.form=TRUE
     RQV0type=c(Q=NA, R=NA, V0=NA)
     tmp=coef(MLEobj, type="matrix")
@@ -23,7 +23,7 @@ if(method=="hessian")  {
         }  #ok is unconstrained
       ok.form==FALSE #hit an error
     }
-    if(!ok.form) stop("MARSSparamCIs: To use method=hessian, R, Q, and V0 must be either fixed, diagonal or unconstrained.")
+    if(!ok.form) stop("MARSSparamCIs: To use method=hessian, R, Q, and V0 must be either fixed, diagonal or block diagonal unconstrained.")
     #Run emHessian to get hessian
     #MLEobj that is returned has var-cov matrices chol transformed
     MLEobj.hessian = MARSShessian(MLEobj)
