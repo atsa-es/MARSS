@@ -1,4 +1,4 @@
-residuals.marssMLE2 = function(object,..., Harvey=FALSE, normalize=FALSE){
+residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
   #Harvey=TRUE uses Harvey et al algorithm to compute these
   #Harvey=FALSE uses the straight smoother output
   # model.residuals y(t|yT)-Zx(t|yT)-a
