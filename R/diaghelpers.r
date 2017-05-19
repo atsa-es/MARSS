@@ -129,9 +129,9 @@ is.validvarcov = function(x, method="kem"){
       #within a block, you cannot have fixed and estimated values.  They have to be one or the other
     if(!(all(unlist(lapply(vals, is.numeric))) | all(unlist(lapply(vals, is.character)))))
       return(list(ok=FALSE, error="numeric (fixed) and estimated values cannot mixed within blocks in a varcov matrix "))
-    #if method="BFGS", then blocks must be diagonal or unconstrained, if estimated
+    #if method="BFGS", then blocks must be diagonal or block unconstrained, if estimated
     if(method=="BFGS" & is.character(vals[[1]])){ #only test first since all the same class
-      if(any(duplicated(unlist(vals)))) return(list(ok=FALSE, error="when method=BFGS, no constraints can be put on varcov blocks except being diagonal "))
+      if(any(duplicated(unlist(vals)))) return(list(ok=FALSE, error="when method=BFGS, no constraints can be put on varcov blocks except being block diagonal unconstrained "))
     }
     #if the block is numeric, it must be positive definite
     if(is.numeric(vals[[1]])){  
