@@ -1,16 +1,17 @@
 #######################################################################################################
 #   MARSSparamCIs function
 #   This returns CIs for ML parameter estimates
+#   If method='hessian', uses the Harvey 1989 algorithm.  Numerical estimate, possible too.
 #######################################################################################################
 MARSSparamCIs = function(MLEobj, method="hessian", alpha=0.05, nboot=1000, silent=TRUE) {
 #this function expects a marssMLE object
 #it will add some vectors of standard errors, biases, low/up CIs to MLEobj
-if(!(method %in% c("hessian","parametric","innovations","hessian-harvey1989"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, innovations, and hessian-harvey1989.\n", call.=FALSE)
+if(!(method %in% c("hessian","parametric","innovations","hessian-numerical"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, innovations, and hessian-numerical.\n", call.=FALSE)
 if(!is.marssMLE(MLEobj)) stop("Stopped in MARSSparamCIs(). This function needs a valid marssMLE object.\n", call.=FALSE)
 paramvec = MARSSvectorizeparam(MLEobj)
 if(length(paramvec)==0) stop("Stopped in MARSSparamCIs(). No estimated parameter elements.\n", call.=FALSE)
 paramnames=names(paramvec)
-if(method=="hessian")  {
+if(method=="hessian-numerical")  {
     #Only for fixed, diagonal or block-diagonal unconstrained R, Q, or V0
     ok.form=TRUE
     RQV0type=c(Q=NA, R=NA, V0=NA)
