@@ -10,10 +10,10 @@
 #   page 157 suggest that this derivative is hard to compute.
 #######################################################################################################
 MARSSFisherI = function( MLEobj, method="Harvey1989") {
-  #options are Harvey1989, Optim, 
+  #options are Harvey1989, numerical, 
   
-    if(method=="optim"){
-      tmp = MARSShessian( MLEobj )
+    if(method=="numerical"){
+      tmp = MARSShessian.chol( MLEobj )
       # Q and R are TRANSFORMED here
       obsFI = tmp$Hessian
     }
