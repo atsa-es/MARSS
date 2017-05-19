@@ -1,6 +1,6 @@
 #######################################################################################################
 #   MARSSFisherI function
-#   Compute the Fisher Information Matrix via Harvey () and Cavanaugh & Shumway (1996) methods
+#   Compute the Fisher Information Matrix via Harvey (1989) and Cavanaugh & Shumway (1996) methods
 #   Louis (1982) is nicely related to the derivatives used by the EM algorithm, but the 
 #   temporally correlation must be dealt with, e.g. Duan & Fulop (2011) A stable estimator of the information matrix 
 #   under EM for dependent data. Statistics and Computing 21: 83-91
@@ -9,17 +9,14 @@
 #   Ho, Shumway and Ombao (2006) The state-space approach to modeling dynamic processes in Models for Intensive Longitudinal Data
 #   page 157 suggest that this derivative is hard to compute.
 #######################################################################################################
-MARSSFisherI = function( MLEobj, method="Harvey1989") {
-  #options are Harvey1989, numerical, 
-  
-    if(method=="numerical"){
-      tmp = MARSShessian.chol( MLEobj )
-      # Q and R are TRANSFORMED here
-      obsFI = tmp$Hessian
-    }
+MARSSFisherI = function( MLEobj, method="Harvey1989" ) {
+  if(method=="numerical"){
+    tmp = MARSShessian.chol( MLEobj )
+    # Q and R are TRANSFORMED here
+    obsFI = tmp$Hessian
+  }
   if(method=="Harvey1989"){
     obsFI = MARSSharveyobsFI( MLEobj )
   }
-  
   return(obsFI)
 }
