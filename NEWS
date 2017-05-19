@@ -20,17 +20,18 @@ BUGS
 * CSEGriskfigure() panel 2 was wrong when mu>0 (increasing population).
 * CSEGriskfigure() panel 2 CIs were wrong when CI method=hessian since Q had not been back transformed (so was using sqrt(Q)).
 * MARSSkemcheck()'s test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
-* MARSSparamCIs() gave the wrong s.e. for variances and covariances when method="hessian".  Also wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%*%t(chol) ).
--- MARSSparamCIs() gets the hessian numerically using a var-cov matrix that has been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed via back-transformation but the s.e.'s for the variances and covariances were not corrected.  So the s.e. for R and Q were wrong in all cases.
+* MARSSparamCIs() gave the wrong s.e. for variances and covariances when method="hessian".  It also gave the wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%*%t(chol) ).
+-- MARSSparamCIs(), vs 3.9 was getting the hessian numerically using a var-cov matrix that has been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed from the s.e.'s. I back-transformed the Hessian to the original (non-chol) scale the same way I back transform a var-covariance matrix.  But the variance of s^2 is not the var(s)^2, which is what I was doing, essentially. So the s.e. for R and Q were wrong in all cases.
 -- There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.
 -- The s.e.'s and CIs were completely wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2
--- The hessian used was for the chol-transformation and that MLE is not necessarily equal to the MLE for the untransformed var-cov matrices.
+-- The hessian used was for the chol-transformation and the curvature of the LL surface for the chol-transformed values is different than the curvature for the untransformed var-cov elements.
 -- Fix: 
-#1 Created new function MARSSharveyobsFI() which uses the Harvey 1989 recursion to compute the observed Fisher Information matrix. This is the hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can be negative).
-#2 This is now the default for method="kem" (Kalman-EM algorithm).
-#3 Fixed the back-transformation for s.e.'s when var-cov matrices are diagonal.  
-#4 For "unconstrained" matrices, I simulate from the $parMean and $parSigma, compute the var-cov matrix, Renamed MARSShessian.chol to indicate that it is for the Cholesky transformed var-cov matrices.
-#5 MARSShessian.chol is the default for method="BFGS", because BFGS is finding the MLEs for Cholesky transformed var-cov matrices.
+#1 Created a new function MARSSharveyobsFI() which uses the Harvey 1989 recursion to compute the observed Fisher Information matrix. This is the hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can be negative).
+#2 Harvey1989 is now the default for method for MLE objects from method="BFGS".
+#3 The user can also select method='hessian-numerical'.  This is mainly for debugging and comparison to the Harvey 1989 algorithm.
+#3a Fixed the back-transformation for s.e.'s when var-cov matrices are diagonal.  
+#3b For "unconstrained" matrices, I simulate from the $parMean and $parSigma, compute the var-cov matrix, #3c The numerical functions Renamed MARSShessian.chol to indicate that it is for the Cholesky transformed var-cov matrices.
+#3d MARSShessian(..., method="numerical") is the default for MLE objects from method="BFGS", because BFGS is finding the MLEs for Cholesky transformed var-cov matrices.
 
 
 IMPROVEMENTS
