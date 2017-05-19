@@ -7,7 +7,6 @@ export(
   MARSSaic,
   MARSSboot,
   MARSShessian,
-  MARSShessian.backtrans,
   MARSSinfo,
   MARSSinits,
   MARSSinnovationsboot,
