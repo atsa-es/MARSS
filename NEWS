@@ -7,29 +7,30 @@ CHANGES IN MARSS 3.10.2
 BUGS
 * removed use of stringr package; only needed 1 or 2 functions
 * y.se was not the standardard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
-* residuals.marssMLE had a bug that lead to erroneous standardized residuals when Z was non-diagonal (and thus also > 1 row). Also changed residuals.MARSSMLE so it returns residuals (which would be equal to 0) when there are 0s on the diagonal of Q or R
+* residuals.marssMLE() had a bug that lead to erroneous standardized residuals when Z was non-diagonal (and thus also > 1 row). Also changed residuals.MARSSMLE so it returns residuals (which would be equal to 0) when there are 0s on the diagonal of Q or R
 * residuals.marssMLE had a bug so it didn't return the residuals at t=1 when x0 was fixed
 * residuals.marssMLE had a bug so that it returned the wrong residuals if there were any missing values.  Fix involved implementing the missing values modifications for the Kalman filter described in Shumway and Stoffer.
 * fixed some minor issues with coef.marssMLE.  Was not stopping when illegal "what: arg passed in.  man page did not say what happens when type=parameter.
 * passing in method not in allowed.methods was causing errors since model conversion and testing happening before checkMARSSinputs and model testing is algorithm dependent (some forms not allowed by BFGS).  Added check for method at top of MARSS function.
 * in MARSSinits_marxss() function would give error if U, A, C, or D fixed and user passed in inits.  inits ignored in this case so should not throw error.
-* alldefaults could be updated by form.  A few functions were neglecting to (re)load alldefaults or to ressign alldefaults when updated: is_marssMLE, MARSSinits.marxss, MARSSinits.  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
-* MARSSkf was not passing optional function args to MARSSkfas.
-* MARSSkfss mis-counting num data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
-* MARSShatyt was setting ytt1 (expected value of y(t) conditioned on data up to t-1) to y(t), which is incorrect. Expected value of y(t) conditioned on y up to t-1 is Z xtt1 + a
-* CSEGriskfigure panel 2 was wrong when mu>0 (increasing population).
-* CSEGriskfigure panel 2 CIs were wrong when CI method=hessian since Q had not been back transformed (so was using sqrt(Q)).
-* MARSSkemcheck's test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
-* MARSSparamCIs gave the wrong s.e. for variances and covariances when method="hessian".  Also wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%*%t(chol) ).
--- MARSSparamCIs gets the hessian numerically using a var-cov matrix that has been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed via back-transformation but the s.e.'s for the variances and covariances were not corrected.  So the s.e. for R and Q were wrong in all cases.
--- There was a bug in MARSShessian error in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.
+* alldefaults could be updated by form.  A few functions were neglecting to (re)load alldefaults or to ressign alldefaults when updated: is_marssMLE(), MARSSinits.marxss(), MARSSinits().  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
+* MARSSkf() was not passing optional function args to MARSSkfas().
+* MARSSkfss() mis-counting num data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
+* MARSShatyt() was setting ytt1 (expected value of y(t) conditioned on data up to t-1) to y(t), which is incorrect. Expected value of y(t) conditioned on y up to t-1 is Z xtt1 + a
+* CSEGriskfigure() panel 2 was wrong when mu>0 (increasing population).
+* CSEGriskfigure() panel 2 CIs were wrong when CI method=hessian since Q had not been back transformed (so was using sqrt(Q)).
+* MARSSkemcheck()'s test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
+* MARSSparamCIs() gave the wrong s.e. for variances and covariances when method="hessian".  Also wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%*%t(chol) ).
+-- MARSSparamCIs() gets the hessian numerically using a var-cov matrix that has been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed via back-transformation but the s.e.'s for the variances and covariances were not corrected.  So the s.e. for R and Q were wrong in all cases.
+-- There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.
 -- The s.e.'s and CIs were completely wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2
 -- The hessian used was for the chol-transformation and that MLE is not necessarily equal to the MLE for the untransformed var-cov matrices.
 -- Fix: 
-#1 Created new function MARSShessian.H1989 which uses the Harvey 1989 recursion to compute the observed Fisher Information matrix. This is the hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can be negative).
+#1 Created new function MARSSharveyobsFI() which uses the Harvey 1989 recursion to compute the observed Fisher Information matrix. This is the hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can be negative).
 #2 This is now the default for method="kem" (Kalman-EM algorithm).
-#3 Fixed the back-transformation for s.e.'s when var-cov matrices are diagonal.  For "unconstrained" matrices, I use simulate from the $parMean and $parSigma, compute the var-cov matrix, Renamed MARSShessian.chol to indicate that it is for the Cholesky transformed var-cov matrices.
-#4 MARSShessian.chol is the default for method="BFGS", because BFGS is finding the MLEs for Cholesky transformed var-cov matrices.
+#3 Fixed the back-transformation for s.e.'s when var-cov matrices are diagonal.  
+#4 For "unconstrained" matrices, I simulate from the $parMean and $parSigma, compute the var-cov matrix, Renamed MARSShessian.chol to indicate that it is for the Cholesky transformed var-cov matrices.
+#5 MARSShessian.chol is the default for method="BFGS", because BFGS is finding the MLEs for Cholesky transformed var-cov matrices.
 
 
 IMPROVEMENTS
@@ -86,7 +87,7 @@ CHANGES IN MARSS 3.8
 - bugs
 * in MARSSkfss. When Z was not square (num rows > num cols), OmgRVtt was not getting set.  OmgRVtt sets Vtt diagonals (and corresponding cols and row) to zero when R had 0s on the diagonal.
 * in MARSSkfas. Was returning $Innov and $Sigma using $v and $F, but as detailed in the KFS help page (KFAS package), the ones returned by KFS are not the same as the standard innovations and Sigma for multivariate data.  Now, MARSSkfas() returns a text message to use MARSSkfss to get these.
-* residuals.marssMLE & MARSSinnovationsboot that was not running MARSSkfss to get Innov, Kt, and Sigma when R was not diagonal.  Problem occurred after I changed MARSSkfss() to return text error instead of NULL for these.
+* residuals.marssMLE & MARSSinnovationsboot were not running MARSSkfss to get Innov, Kt, and Sigma when R was not diagonal.  Problem occurred after I changed MARSSkfss() to return text error instead of NULL for these.
 * bug introduced in 3.6 that printed no absol convergence when convergence=10.  Should have printed abstol convergence only.
 * bug in MARSSoptim (method=BFGS) that lead to only diagonal var-cov matrices when anything other than a diagonal var-cov matrix was selected.
 * same bug affected attempt to compute CIs for non-diagonal var-cov matrices with Hessian.
