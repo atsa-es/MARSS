@@ -25,14 +25,13 @@ BUGS
 -- There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.
 -- The s.e.'s and CIs were completely wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2
 -- The hessian used was for the chol-transformation and the curvature of the LL surface for the chol-transformed values is different than the curvature for the untransformed var-cov elements.
--- Fix: 
-#1 Created a new function MARSSharveyobsFI() which uses the Harvey 1989 recursion to compute the observed Fisher Information matrix. This is the hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can be negative).
-#2 Harvey1989 is now the default for method for MLE objects from method="BFGS".
-#3 The user can also select method='hessian-numerical'.  This is mainly for debugging and comparison to the Harvey 1989 algorithm.
-#3a Fixed the back-transformation for s.e.'s when var-cov matrices are diagonal.  
-#3b For "unconstrained" matrices, I simulate from the $parMean and $parSigma, compute the var-cov matrix, #3c The numerical functions Renamed MARSShessian.chol to indicate that it is for the Cholesky transformed var-cov matrices.
-#3d MARSShessian(..., method="numerical") is the default for MLE objects from method="BFGS", because BFGS is finding the MLEs for Cholesky transformed var-cov matrices.
 
+Fix: I completely abandoned working with the chol transformed variance-covariance matrices for the Hessian calculation.  I realized this was not necessary for computing the Hessian since the Hessian is computed at the MLEs and localized.  The chol is needed when maximizing the LL function to ensure the var-cov matrices stay positive-definite but computation of the Hessian does not involve 'searching' or 'search' steps.
+
+#1 Created a new function MARSSharveyobsFI() which uses the Harvey (1989) recursion to compute the observed Fisher Information matrix. This is the Hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can lead to negative lower CIs).
+#2 Harvey1989 is now the default function when method='hessian'.
+#3 The user can also select method='hessian' and hessian.fun='fdHess' or hessian.fun='optim'.  This will compute the Hessian (of the log-LL function at the MLEs) numerically using these functions.  The variance-covariance matrices are NOT chol transformed.  These are numerically estimated Hessians of the untransformed variance-covariance matrices.
+#4 Added MARSSinfo(26) which discusses the reason for NAs in the Hessian.
 
 IMPROVEMENTS
 * main change was to allow w(t) and v(t) to be specified as G(t)*w(t) and H(t)*v(t) where G and H are fixed matrices (not estimated).
