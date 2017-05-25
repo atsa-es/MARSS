@@ -443,7 +443,7 @@ MARSSkem = function( MLEobj ) {
           Delta6=Z%*%IId%*%Bstar%*%(IIzV0%*%d.x0)         
           if(any(diag.R1==0)){
             if(any(crossprod(Delta6,IIz.R)%*%Delta6 !=0)){
-              stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo() for help.\n", sep="")
+              stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo(\"x0R0\") for help.\n", sep="")
               stopped.with.errors=TRUE
               break
             }
@@ -477,7 +477,7 @@ MARSSkem = function( MLEobj ) {
             #Deal with Delta6=0 and Rinv=Inf, so 0*Inf
             if(any(diag.R1==0)){
               if(any(crossprod(Delta6, IIz.R)%*%Delta6 !=0)){
-                stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo() for help.\n", sep="")
+                stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo(\"x0R0\") for help.\n", sep="")
                 stopped.with.errors=TRUE
                 break
               }
@@ -1060,7 +1060,7 @@ degen.test = function(elem, MLEobj, iter){
         if(!new.kf$ok) msg.degen=c(msg.degen,paste("iter=",iter," MARSSkf returned error in attempt to set 0 diagonals for ", elem,"\n  ", new.kf$errors,"Perhaps Q and R are both going to 0?\n", sep="") ); 
         if(new.kf$ok && is.finite(loglike.old) && is.finite(new.kf$logLik) ) tmp.cvg2 = new.kf$logLik - loglike.old  else tmp.cvg2=Inf
         if(new.kf$ok && tmp.cvg2 < -sqrt(.Machine$double.eps)) {
-          msg.degen=c(msg.degen,paste("iter=",iter," Setting diagonal to 0 blocked. logLik was lower in attempt to set 0 diagonals on ",elem," logLik old=", loglike.old, " new=", new.kf$logLik,"\n", sep=""))
+          msg.degen=c(msg.degen,paste("iter=",iter," Setting diagonal to 0 blocked. logLik was lower in attempt to set 0 diagonals on ",elem," logLik old=", loglike.old, " new=", new.kf$logLik,  ", See MARSSinfo(\"",elem,"0blocked\").\n", sep=""))
         }
         if(new.kf$ok && tmp.cvg2 > -sqrt(.Machine$double.eps)) { #this means degenerate elem has lower LL, so accept it
           MLEobj=MLEobj.tmp
@@ -1074,7 +1074,7 @@ degen.test = function(elem, MLEobj, iter){
           MLEobj$logLik=new.kf$logLik
           set.degen=TRUE
         } 
-      }else{ msg.degen=c( msg.degen, paste("iter=",iter," Setting element of ",elem," to 0, blocked due to the following MARSSkemcheck errors.\n  MARSSkemcheck error: ", kemcheck$msg,sep="")) }
+      }else{ msg.degen=c( msg.degen, paste("iter=",iter," Setting element of ",elem," to 0, blocked.  See MARSSinfo(\"",elem,"0blocked\"). The error is due to the following MARSSkemcheck errors.\n  MARSSkemcheck error: ", kemcheck$msg,sep="")) }
     } #for degen.par; do one by one
   } #update MLEobj
   #set.degen is a flag to say if any 0 elements were set

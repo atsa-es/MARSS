@@ -13,7 +13,7 @@ MARSShessian=function(MLEobj, method="Harvey1989"){
   Hess.tmp=MLEobj$Hessian
   na.diag = is.na(diag(Hess.tmp))
   if(any(na.diag)) {
-    msg="MARSShessian: Hessian has NAs due to numerical errors. parSigma returned but some elements will be NA. See MARSSinfo('HessianNA').\n"
+    msg="MARSShessian: Hessian has NAs due to numerical errors. parSigma returned but some elements will be NA. See MARSSinfo(\"HessianNA\").\n"
     warning(msg)
     MLEobj$errors=c(MLEobj$errors, msg)
   }
@@ -23,7 +23,7 @@ MARSShessian=function(MLEobj, method="Harvey1989"){
   
   hessInv = try(solve(Hess.tmp), silent=TRUE)
   if(inherits(hessInv, "try-error")) {
-    msg="MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo('HessianNA').\n"
+    msg="MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo(\"HessianNA\").\n"
     warning(msg)
     MLEobj$parSigma=NULL
     MLEobj$errors=c(MLEobj$errors, msg)

@@ -165,7 +165,7 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
     tmpchol=try(pchol(tmpvar), silent=TRUE)
     if(class(tmpchol)=="try-error"){ 
       st.et[,t]=NA
-      cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =",t,"\n"))
+      cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =",t,". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
     tmpcholinv=try(psolve(tmpchol), silent=TRUE)

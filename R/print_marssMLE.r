@@ -13,7 +13,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
   if(class(x$model)[1]!="marssMODEL"){
     cat("\nThe model element of your marssMLE object is not class marssMODEL.\n")
     cat("Are you using a marssMLE object from a MARSS version before 3.5?\n")
-    cat("Type MARSSinfo(20) for help.\n")
+    cat("Type MARSSinfo(\"modelclass\") for help.\n")
     return()
   }
     
@@ -128,7 +128,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
   if(!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])){
     cat(paste("CIs calculated at alpha = ", x$par.CI.info$alpha, " via method=", x$par.CI.info$method, sep=""), "\n")
     if( x$par.CI.info$method=="hessian" & ( any(is.na(x[["par.lowCI"]])) | any(is.na(x[["par.upCI"]])) | any(is.na(x[["par.se"]])) ) ){
-      cat("There are NAs in the Hessian matrix. Type MARSSinfo(26) for details.\n")
+      cat("There are NAs in the Hessian matrix. Type MARSSinfo(\"HessianNA\") for details.\n")
     }
     }else cat("Use MARSSparamCIs to compute CIs and bias estimates.\n")
 	if(!is.null(x[["par.bias"]])){cat(paste("Bias calculated via",x$par.CI.method,"bootstrapping with",x$par.CI.nboot,"bootstraps. \n"))
