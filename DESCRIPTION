@@ -1,8 +1,8 @@
 Package: MARSS
 Type: Package
 Title: Multivariate Autoregressive State-Space Modeling
-Version: 3.10.2
-Date: 2015-6-23
+Version: 3.10.3
+Date: 2017-5-24
 Depends: R (>= 2.15.0)
 Imports: nlme, mvtnorm, KFAS (>= 1.0.1), stats, utils, graphics
 Suggests: Hmisc, maps, xtable
