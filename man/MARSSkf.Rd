@@ -49,26 +49,25 @@ A list with the following components (m is the number of state processes). "V" e
   \item{errors}{ Any error messages. }
 }
 \references{
-A. C. Harvey (1989).  Chapter 5, Forecasting, Structural Time Series Models and the Kalman Filter.  Cambridge University Press.
+A. C. Harvey (1989).  Chapter 5, Forecasting, structural time series models and the Kalman filter.  Cambridge University Press.
 
-R. H. Shumway and D. S. Stoffer (2006).  Time Series Analysis and its Applications: With R Examples.  Second Edition. Springer-Verlag, New York.
+R. H. Shumway and D. S. Stoffer (2006).  Time series analysis and its applications: with R examples.  Second Edition. Springer-Verlag, New York.
 
 Ghahramani, Z. and Hinton, G.E. (1996) Parameter estimation for linear dynamical systems.  University of Toronto Technical Report CRG-TR-96-2.
 
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive
 state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \code{RShowDoc("EMDerivation",package="MARSS")} to open a copy.
 
-Jouni Helske (2012). KFAS: Kalman Filter and Smoother for Exponential Family State Space Models. R package version
+Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. R package version
   0.9.11. \code{http://CRAN.R-project.org/package=KFAS}
   
 Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Assosiation, 92, 1630-38.
 
-Koopman, S.J. and Durbin J. (2001). Time Series Analysis by State Space Methods. Oxford: Oxford University Press.
+Koopman, S.J. and Durbin J. (2001). Time series analysis by state space methods. Oxford: Oxford University Press.
 
 Koopman, S.J. and Durbin J. (2003). Filtering and smoothing of state vector for diffuse state space models, Journal of Time Series Analysis, Vol. 24, No. 1.
 
-The user guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
-Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.     
+The user guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.     
 
 }
 \author{ 

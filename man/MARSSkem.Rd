@@ -67,7 +67,7 @@ Objects of class \code{\link{marssMLE}} may be built from scatch but are easier 
      }
 
 \references{ 
-  R. H. Shumway and D. S. Stoffer (2006).  Chapter 6 in Time Series Analysis and its Applications.  Springer-Verlag, New York.
+  R. H. Shumway and D. S. Stoffer (2006).  Chapter 6 in Time series analysis and its applications.  Springer-Verlag, New York.
   
   Ghahramani, Z. and Hinton, G. E. (1996) Parameter estimation for linear dynamical systems. Technical Report CRG-TR-96-2, University of
 Totronto, Dept. of Computer Science. 
