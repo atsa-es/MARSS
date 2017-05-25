@@ -1,5 +1,7 @@
 #######################################################################################################
 #   MARSSFisherI function
+#   Compute the observed Fisher Information Matrix at the values in the MLEobj
+
 #   Compute the Fisher Information Matrix via Harvey (1989) and Cavanaugh & Shumway (1996) methods
 #   Louis (1982) is nicely related to the derivatives used by the EM algorithm, but the 
 #   temporally correlation must be dealt with, e.g. Duan & Fulop (2011) A stable estimator of the information matrix 
@@ -10,10 +12,10 @@
 #   page 157 suggest that this derivative is hard to compute.
 #######################################################################################################
 MARSSFisherI = function( MLEobj, method="Harvey1989" ) {
-  if(method=="numerical"){
-    tmp = MARSShessian.chol( MLEobj )
-    # Q and R are TRANSFORMED here
-    obsFI = tmp$Hessian
+  # optim is here for debugging.  optim will maximize the likelihood so is not evaluating
+  if(!(method %in% c("Harvey1989", "fdHess", "optim"))) stop("MARSSFisherI: method must be either Harvey1989 or fdHess")
+  if(method=="fdHess" | method=="optim"){
+    obsFI = MARSShessian.numerical( MLEobj, fun=method )
   }
   if(method=="Harvey1989"){
     obsFI = MARSSharveyobsFI( MLEobj )
