@@ -1,5 +1,5 @@
 residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
-  #Harvey=TRUE uses Harvey et al algorithm to compute these
+  #Harvey=TRUE uses Harvey et al (1998) algorithm to compute these
   #Harvey=FALSE uses the straight smoother output
   # model.residuals y(t|yT)-Zx(t|yT)-a
   # state.residuals x(t|yT)-Bx(t-1|yT)-u
