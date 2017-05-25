@@ -1,6 +1,6 @@
 MARSSinfo = function(number){
   if(missing(number)){
-cat("Pass in a number (or label in quotes) to get info on a MARSS error or warning message.
+cat("Pass in a label (in quotes) to get info on a MARSS error or warning message.
      convergence: Non-convergence warnings
      denominv: An error related to denom not invertible
      degenvarcov: Warnings about degenerate variance-covariance matrices or variance going to 0
