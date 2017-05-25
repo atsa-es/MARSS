@@ -278,7 +278,7 @@ MARSS.marss=function(MARSS.call){
         tmp[[el]][min(which(tmp$Z[,i]!=0)), 1] = 0
       }
     }     
-    if(identical(tmp[[el]],"not assigned")) stop(paste("MARSS.marxss: tmp was not assigned for ",el,".\n",sep=""))
+    if(identical(tmp[[el]],"not assigned")) stop(paste("Stopped in MARSS.marxss(): tmp was not assigned for ",el,".\n",sep=""))
     free[[el]] = convert.model.mat(tmp[[el]])$free
     fixed[[el]] = convert.model.mat(tmp[[el]])$fixed 
     

@@ -23,7 +23,7 @@ if(!is.list(inits)) stop("Stopped in MARSSinits() because inits must be a list.\
   tmp=try(exists(inits.fun,mode="function"),silent=TRUE)
   if(isTRUE(tmp)){
       inits=eval(call(inits.fun, MLEobj, inits))
-  }else{ stop(paste("Stopped in MARSSinits.  You need a MARSSinits_",attr(MLEobj$model,"form")[1]," function to tell MARSS how to interpret the inits list",sep=""), call.=FALSE) }
+  }else{ stop(paste("Stopped in MARSSinits().  You need a MARSSinits_",attr(MLEobj$model,"form")[1]," function to tell MARSS how to interpret the inits list",sep=""), call.=FALSE) }
 }
 
 alldefaults=get("alldefaults", envir=pkg_globals)
@@ -48,11 +48,11 @@ for(elem in names(default)){
   }else{ #not fixed
     #must be numeric
     if( !is.numeric(inits[[elem]]) ){
-      stop(paste("MARSSinits: ",elem," inits must be numeric.",sep=""),call.=FALSE)
+      stop(paste("Stopped in MARSSinits(): ",elem," inits must be numeric.",sep=""),call.=FALSE)
     }
     #must be either length 1 or same length as the number of estimated values for elem
     if( !((is.null(dim(inits[[elem]])) & length(inits[[elem]])==1) | isTRUE(all.equal(dim(inits[[elem]]),c(dim(modelObj$free[[elem]])[2],1)))) ){
-      stop(paste("MARSSinits: ",elem," inits must be either a scalar (dim=NULL) or the same size as the par$",elem," element.",sep=""),call.=FALSE)
+      stop(paste("Stopped in MARSSinits(): ",elem," inits must be either a scalar (dim=NULL) or the same size as the par$",elem," element.",sep=""),call.=FALSE)
       }
     parlist[[elem]]=matrix(inits[[elem]],dim(modelObj$free[[elem]])[2],1)
   
@@ -98,9 +98,9 @@ for(elem in names(default)){
       tmp=Zmat%*%Bmat%*%dx0
       if(is.solvable(tmp)=="underconstrained"){
           if(modelObj$tinitx==0){
-            stop("MARSSinits: Z B d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
+            stop("Stopped in MARSSinits(): Z B d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
           }else{
-            stop("MARSSinits: Z d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
+            stop("Stopped in MARSSinits(): Z d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
           }
       }
       parlist$x0 = pinv(tmp)%*%(y1-Zmat%*%Bmat%*%fx0-Zmat%*%Umat-Amat)

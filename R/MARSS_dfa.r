@@ -134,9 +134,9 @@ MARSS.call$model=checkModelList( MARSS.call[["model"]], model.defaults, model.al
 model=MARSS.call[["model"]]
 
 if(!(MARSS.call$z.score %in% c(TRUE,FALSE)))
-   stop("Stopped in MARSS.dlm: demean must be TRUE/FALSE.\n", call.=FALSE)
+   stop("Stopped in MARSS.dlm(): demean must be TRUE/FALSE.\n", call.=FALSE)
 if(!(MARSS.call$demean %in% c(TRUE,FALSE)))
-   stop("Stopped in MARSS.dlm: demean must be TRUE/FALSE.\n", call.=FALSE)
+   stop("Stopped in MARSS.dlm(): demean must be TRUE/FALSE.\n", call.=FALSE)
 
 #Set up U; always 0 for dfa
 U=matrix(0,m,1)

@@ -8,7 +8,7 @@ takediag = function(x)
   ############# Function to take the diagonal; deals with R trying to think too much with diag()
 {
   if(length(x)==1) return(x)
-  if(!is.matrix(x)) stop("takediag: function requires a 2D matrix")
+  if(!is.matrix(x)) stop("Stopped in MARSS internal function takediag(): function requires a 2D matrix.\n", call.=FALSE)
   d1=dim(x)[1]
   return(x[1 + 0:(d1 - 1)*(d1 + 1)])  #faster diag
 }
@@ -22,7 +22,7 @@ makediag = function(x,nrow=NA)
     return(diag(c(x),nrow))
   }
   if((is.matrix(x) | is.array(x)))
-    if(!(dim(x)[1]==1 | dim(x)[2]==1))  stop("makediag: error in call to makediag; x is not vector")
+    if(!(dim(x)[1]==1 | dim(x)[2]==1))  stop("Stopped in MARSS internal function makediag(): error in call to makediag; x is not vector.\n", call.=FALSE)
   if(is.na(nrow)) nrow=length(x)
   return(diag(c(x),nrow))
 }
@@ -73,12 +73,12 @@ is.diagonal = function(x, na.rm=FALSE) {
 is.identity = function(x, dim=NULL) {
   #works on 2D numeric, character or list matrices; "1" is not identical to 1 however
   #if dim!=NULL, it means that a vec version of the matrix was passed in so dim specifies what the dim of the original matrix is
-  if(!is.matrix(x)) stop("is.identity: argument must be a matrix") #x must be 2D matrix; is.matrix returns false for 3D array
+  if(!is.matrix(x)) stop("Stopped in MARSS internal function is.identity(): argument must be a matrix.\n", call.=FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
   if(!is.null(dim)){
-    if(length(dim)!=2) stop("is.identity: dim must be length 2 vector")
-    if(!is.numeric(dim)) stop("is.identity: dim must be numeric")
-    if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("is.identity: dim must be positive whole number")
-    if(length(x)!=(dim[1]*dim[2])) stop("is.identity: dim is not the right size.  length(x)=dim1*dim2")
+    if(length(dim)!=2) stop("Stopped in MARSS internal function is.identity(): dim must be length 2 vector.\n", call.=FALSE)
+    if(!is.numeric(dim)) stop("Stopped in MARSS internal function is.identity(): dim must be numeric.\n", call.=FALSE)
+    if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("Stopped in MARSS internal function is.identity(): dim must be positive whole number.\n", call.=FALSE)
+    if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.identity(): dim is not the right size.  length(x)=dim1*dim2", call.=FALSE)
     x=unvec(x,dim=dim)
   }
   if(!is.diagonal(x)) return(FALSE)
@@ -248,15 +248,15 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
   #zero.rows.ok means that the rowsums can be 0 (if that row is fixed, say)
   #if dim not null it means a vec-ed version of the matrix was passed in so dim is dim of orig matrix
   #can be a list matrix; 
-  if(!is.array(x)) stop("is.design: function requires a 2D or 3D matrix") #x can be 2D or 3D matrix
+  if(!is.array(x)) stop("Stopped in MARSS internal function is.design(): function requires a 2D or 3D matrix.\n", call.=FALSE) #x can be 2D or 3D matrix
   if(length(dim(x))==3)
-    if(dim(x)[3]!=1){ stop("is.design: if 3D, 3rd dim of matrix must be 1")
+    if(dim(x)[3]!=1){ stop("Stopped in MARSS internal function is.design(): if 3D, 3rd dim of matrix must be 1.\n", call.=FALSE)
     }else{ x=matrix(x, dim(x)[1], dim(x)[2]) }
   if(!is.null(dim)){
-    if(length(dim)!=2) stop("is.design: dim must be length 2 vector")
+    if(length(dim)!=2) stop("Stopped in MARSS internal function is.design(): dim must be length 2 vector.\n", call.=FALSE)
     if(!is.numeric(dim)) stop("is.design: dim must be numeric")
-    if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("is.design: dim must be positive whole number")
-    if(length(x)!=(dim[1]*dim[2])) stop("is.design: dim is not the right size.  length(x)=dim1*dim2")
+    if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("Stopped in MARSS internal function is.design(): dim must be positive whole number.\n", call.=FALSE)
+    if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.design(): dim is not the right size.  length(x)=dim1*dim2.\n", call.=FALSE)
     x=unvec(x,dim=dim)
   }
   x=as.matrix(unname(x)) #so that all.equal doesn't fail
@@ -281,10 +281,10 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
 
 is.fixed = function(x, by.row=FALSE) { #expects the D (free) matrix; can be 3D or 2D; can be a numeric list matrix
   #by.row means it reports whether each row is fixed 
-  if(!is.array(x)) stop("is.fixed: function requires a 2D or 3D free(D) matrix")
-  if(!(length(dim(x)) %in% c(2,3))) stop("is.fixed: function requires a 2D or 3D free(D) matrix")
-  if(!is.numeric(x)) stop("is.fixed: free(D) must be numeric")  #must be numeric
-  if(any(is.na(x)) | any(is.nan(x))) stop("is.fixed: free(D) cannot have NAs or NaNs")
+  if(!is.array(x)) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
+  if(!(length(dim(x)) %in% c(2,3))) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
+  if(!is.numeric(x)) stop("Stopped in MARSS internal function is.fixed(): free(D) must be numeric.\n", call.=FALSE)  #must be numeric
+  if(any(is.na(x)) | any(is.nan(x))) stop("Stopped in MARSS internal function is.fixed(): free(D) cannot have NAs or NaNs.\n", call.=FALSE)
   if(dim(x)[2]==0){ 
     if(!by.row){ return(TRUE) }else{ return(rep(TRUE,dim(x)[1])) }
   }

@@ -4,7 +4,7 @@
 #######################################################################################################
 MARSSkf = function( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE ) {
 if(is.null(MLEobj$par))
-  stop("MARSSkf: par element of marssMLE object is required.\n")
+  stop("Stopped in MARSSkf(): par element of marssMLE object is required.\n")
 #full=TRUE means to return all the kf info, this is currently done by MARSSkfss
 if(MLEobj$fun.kf=="MARSSkfss") 
   return(MARSSkfss(MLEobj))

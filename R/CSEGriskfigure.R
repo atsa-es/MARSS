@@ -1,6 +1,6 @@
 CSEGriskfigure=function(data, te=100, absolutethresh=FALSE, threshold=0.1, datalogged=FALSE, silent=FALSE, return.model=FALSE, CI.method="hessian", CI.sim=1000) {
 if(!(CI.method %in% c("hessian","parametric","innovations","none"))) 
-  stop("Stopped in CSEGriskfigure because allowed CI methods are none, hessian, parametric, and innovations.\n", call.=FALSE)
+  stop("Stopped in CSEGriskfigure(): Allowed values of 'CI.method' are \"none\", \"hessian\", \"parametric\", and \"innovations\".\n", call.=FALSE)
 
 if(!silent){
 if(datalogged) cat("Analysis assumes that data and threshold are already logged")

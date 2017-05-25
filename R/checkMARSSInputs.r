@@ -30,9 +30,9 @@ alldefaults = get("alldefaults",pkg_globals)
 ## Alert users re 3.0+ not compatible with control$kf.x0 or $diffuse
 if(is.list(MARSS.inputs$control)){  
 if(!is.null(MARSS.inputs$control$kf.x0))
-     stop("Stopped in checkMARSSInputs: control$kf.x0 is no longer used in MARSS 3+.\n  Set the initial state time using the model$tinitx=1 or =0 instead.\n",call.=FALSE)
+     stop("Stopped in checkMARSSInputs(): control$kf.x0 is no longer used in MARSS 3+.\n  Set the initial state time using the model$tinitx=1 or =0 instead.\n",call.=FALSE)
 if(!is.null(MARSS.inputs$control$diffuse))
-     stop("Stopped in checkMARSSInputs: diffuse is no longer part of the control list in MARSS 3+.\n  Pass in diffuse in the model list instead.\n",call.=FALSE)
+     stop("Stopped in checkMARSSInputs(): diffuse is no longer part of the control list in MARSS 3+.\n  Pass in diffuse in the model list instead.\n",call.=FALSE)
 }
 
 # check that control has some default values if not passed in
@@ -59,12 +59,12 @@ if(class(MARSS.inputs[["inits"]])=="marssMLE"){
 for(el in req.args) {
   tmp = MARSS.inputs[[el]]
   if( is.list(defaults[[el]]) && !is.list(tmp) )  #then that el must be list
-     stop(paste("Stopped in checkMARSSInputs: arg ",el," must be passed in as a list (or left off to use defaults).\n",sep=""),call.=FALSE)
+     stop(paste("Stopped in checkMARSSInputs(): arg ",el," must be passed in as a list (or left off to use defaults).\n",sep=""),call.=FALSE)
   if(!all(names(tmp) %in% names(defaults[[el]]))){
      bad.name = names(tmp)[!(names(tmp) %in% names(defaults[[el]]))]
      if(el=="inits") extra.msg="For inits, you need to use a list in the same model form. Use coef(fit) to see the elements in this list.\n"
      else extra.msg=""
-     stop(paste("\nStopped in checkMARSSInputs: elements ", bad.name," is not allowed in arg ",el," (misspelled?).\n",extra.msg,sep=""),call.=FALSE) 
+     stop(paste("\nStopped in checkMARSSInputs(): elements ", bad.name," is not allowed in arg ",el," (misspelled?).\n",extra.msg,sep=""),call.=FALSE) 
      }
   #set defaults for any req elements that were not passed in 
   passed.in = (names(defaults[[el]]) %in% names(tmp))

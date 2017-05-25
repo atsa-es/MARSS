@@ -126,9 +126,9 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
   cat("\n")
   if(is.null(x[["par.se"]])) cat("Standard errors have not been calculated. \n")
   if(!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])){
-    cat(paste("CIs calculated at alpha = ", x$par.CI.alpha, " via method=", x$par.CI.method, sep=""), "\n")
-    if( x$par.CI.method=="hessian" & ( any(is.na(x[["par.lowCI"]])) | any(is.na(x[["par.upCI"]])) | any(is.na(x[["par.se"]])) ) ){
-      cat("There are NAs in the Hessian matrix. Type MARSSinfo() for details.\n")
+    cat(paste("CIs calculated at alpha = ", x$par.CI.info$alpha, " via method=", x$par.CI.info$method, sep=""), "\n")
+    if( x$par.CI.info$method=="hessian" & ( any(is.na(x[["par.lowCI"]])) | any(is.na(x[["par.upCI"]])) | any(is.na(x[["par.se"]])) ) ){
+      cat("There are NAs in the Hessian matrix. Type MARSSinfo(26) for details.\n")
     }
     }else cat("Use MARSSparamCIs to compute CIs and bias estimates.\n")
 	if(!is.null(x[["par.bias"]])){cat(paste("Bias calculated via",x$par.CI.method,"bootstrapping with",x$par.CI.nboot,"bootstraps. \n"))

@@ -7,10 +7,10 @@ coef.marssMLE <- function (object, ..., type="list", form=NULL, what="par") {
 #First make sure specified equation form has a corresponding function to do the conversion form=marss object
   return.obj=list()
   if(class(object)!="marssMLE"){
-    stop("coef.marssMLE: coef needs a marssMLE object.")
+    stop("Stopped in coef.marssMLE() because the function needs a marssMLE object.\n", call.=FALSE)
   }
   if(!(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start")))
-    stop("coef.marssMLE: what must be \"par\", \"par.se\", \"par.bias\", \"par.lowCI\", \"par.upCI\", or \"start\".")
+    stop("Stopped in coef.marssMLE(): The 'what' argument must be \"par\", \"par.se\", \"par.bias\", \"par.lowCI\", \"par.upCI\", or \"start\".\n", call.=FALSE)
   
   #for now coef only has function specific to the marssMODEL forms
   if(missing(form)) form=attr(object[["model"]],"form")
@@ -33,7 +33,7 @@ coef.marssMLE <- function (object, ..., type="list", form=NULL, what="par") {
    model.names=attr(model,"obj.elements")
    
 if(!(type %in% c("vector", "list", "par", "matrix", par.names, model.names)))
-  stop("coef.marssMLE: allowed coef types are vector, list, par, matrix")
+  stop("Stopped in coef.marssMLE(): The 'type' argument can be \"vector\", \"list\", \"par\", or \"matrix\".\n", call.=FALSE)
 
    
   for(the.type in type){ #type is what kind of coef to show

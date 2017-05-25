@@ -5,7 +5,7 @@
 CSEGtmufigure = function(N=20, u= -0.1, s2p=0.01, make.legend=TRUE){
 mu=u 
 sigma2.b=s2p
-if(s2p==0) stop("The CSEGtmufigure function does not work with s2p=0")
+if(s2p==0) stop("Stopped in CSEGtmufigure(): function does not work with s2p=0.\n", call.=FALSE)
 #Set up some figure parameters
 ngrid=100; Tvals=seq(1,110,length=ngrid); 
 #win.graph(6,6); par(mfrow=c(1,1),cex.axis=1.35,cex.lab=1.35,yaxs="i",xaxs="i"); 

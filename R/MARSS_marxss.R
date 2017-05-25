@@ -377,7 +377,7 @@ MARSS.marxss=function(MARSS.call){
         if(any(nonzeroZ)) tmp[[el]][min(which(nonzeroZ)), 1] = 0
       }
     }     
-    if(identical(tmp[[el]],"not assigned")) stop(paste("MARSS.marxss: tmp was not assigned for ",el,".\n",sep=""))
+    if(identical(tmp[[el]],"not assigned")) stop(paste("Stopped in MARSS.marxss(): tmp was not assigned for ",el,".\n",sep=""))
     tmpconst=convert.model.mat(tmp[[el]])
     free[[el]] = tmpconst$free
     fixed[[el]] = tmpconst$fixed 
@@ -440,7 +440,7 @@ MARSS.marxss=function(MARSS.call){
 }
 
 marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
-  if(!(class(x) %in% c("marssMODEL","marssMLE"))) stop("marss_to_marxss: this function needs a marssMODEL or marssMLE object")
+  if(!(class(x) %in% c("marssMODEL","marssMLE"))) stop("Stopped in marss_to_marxss(): this function needs a marssMODEL or marssMLE object")
   #This function returns a MLE object where the model and par parts of the MLE object are in marxss form for printing purposes.
   #This function needs a marxss marssMODEL object and will break otherwise
   #You cannot back construct a marxss from the marss model
@@ -449,19 +449,19 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
   
   if(class(x)=="marssMODEL"){
     marss.model=x
-    if(!("marss" %in% attr(marss.model,"form"))) stop("marss_to_marxss: this function requires a marssMODEL object in marss form.\n",call.=FALSE)
+    if(!("marss" %in% attr(marss.model,"form"))) stop("Stopped in marss_to_marxss(): this function requires a marssMODEL object in marss form.\n",call.=FALSE)
   }else{ 
     marss.model=x[["marss"]]
-    if(!("marss" %in% attr(marss.model,"form"))) stop("marss_to_marxss: this function requires a marssMLE object with element $marss a marssMODEL in marss form.\n",call.=FALSE)
+    if(!("marss" %in% attr(marss.model,"form"))) stop("Stopped in marss_to_marxss(): this function requires a marssMLE object with element $marss a marssMODEL in marss form.\n",call.=FALSE)
   }
   
   if(!C.and.D.are.zero){
     if(class(x)=="marssMODEL"){ 
-      stop("marss_to_marxss: function was called with a marss model object instead of MLE object, so needs a marxss model passed in.")
+      stop("Stopped in marss_to_marxss(: function was called with a marss model object instead of MLE object, so needs a marxss model passed in.")
     }else{ 
       marxss.model=x[["model"]] #should be model since we want the marxss form
       if(any(is.null(attr(marxss.model,"form")),!("marxss" %in% attr(marxss.model,"form")))){
-        stop("marss_to_marxss: function was called with a MLE object, so needs the $model element to be form marxss.")
+        stop("Stopped in marss_to_marxss(: function was called with a MLE object, so needs the $model element to be form marxss.")
       }
     }
   }else{ #C and D are zero so we can construct a marxss object
@@ -530,17 +530,17 @@ marxss_to_marss=function(x, only.par=FALSE){
   #hold on to this since x will be changing and need to know what to return
   class.x=class(x)
   if(!(class.x %in% c("marssMODEL","marssMLE"))){
-    stop("marxss_to_marss: x$model must be a marssMODEL or marssMLE.",call.=FALSE)
+    stop("Stopped in marss_to_marxss(): x$model must be a marssMODEL or marssMLE.",call.=FALSE)
   }
   
   #check form if user passed in marssMODEL
   if(class.x=="marssMODEL"){
-    if(!("marxss" %in% attr(x, "form"))) stop("marxss_to_marss: this function requires a marssMODEL object in marxss form.")
+    if(!("marxss" %in% attr(x, "form"))) stop("Stopped in marss_to_marxss(): this function requires a marssMODEL object in marxss form.")
   }
   
   if(class.x=="marssMLE"){ #Then set the par elements to correspond to marss if they are in marxss form
     #check that the model element they passed in is marxss
-    if(!("marxss" %in% attr(x[["model"]], "form"))) stop("marxss_to_marss: x$model must be in marxss form.",call.=FALSE)
+    if(!("marxss" %in% attr(x[["model"]], "form"))) stop("Stopped in marss_to_marxss(): x$model must be in marxss form.",call.=FALSE)
     
     x.marss = list()
     
@@ -692,10 +692,10 @@ coef_marxss = function(x){ return(marss_to_marxss(x)) } #this uses $model for ma
 MARSSinits_marxss = function(MLEobj, inits){
   alldefaults=get("alldefaults", envir=pkg_globals)
   if(is.null(MLEobj[["model"]])){
-    stop("MARSSinits_marxss: this function needs a marssMODEL in marxss form in $model",call.=FALSE)
+    stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }else{
-    if(class(MLEobj[["model"]])!="marssMODEL") stop("MARSSinits_marxss: this function needs a marssMODEL in marxss form in $model",call.=FALSE)
-    if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("MARSSinits_marxss: this function needs a marssMODEL in marxss form in $model",call.=FALSE)    
+    if(class(MLEobj[["model"]])!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
+    if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)    
   }
     
   #B, Z, R, Q, x0 and V0 stay the same
@@ -707,7 +707,7 @@ MARSSinits_marxss = function(MLEobj, inits){
     tmp.dim=dim(MLEobj$model$free[[elem]])[2] #how many estimated pars in marxss vers
     if(!is.null(inits[[elem]]) & !(tmp.dim==0)){ #tmp.dim==0 means no estimated
       if(!(length(inits[[elem]]) %in% c(tmp.dim,1))) 
-        stop(paste("MARSSinits: ", elem," inits must be either a scalar (dim=NULL) or a matrix with 1 col and rows equal to the num of est values in ",elem,".",sep=""), call.=FALSE )
+        stop(paste("Stopped in MARSSinits_marxss(): ", elem," inits must be either a scalar (dim=NULL) or a matrix with 1 col and rows equal to the num of est values in ",elem,".",sep=""), call.=FALSE )
       if(tmp.dim!=0) inits[[elem]] = matrix(inits[[elem]],tmp.dim,1) else inits[[elem]]=matrix(0,0,1)
     }else{
       inits[[elem]] = matrix(alldefaults[[MLEobj$method]][["inits"]][[elem]],tmp.dim,1) }
@@ -730,13 +730,13 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   marxss.par = marss_to_marxss(x)[["par"]] #we only need par changed since marxss is in $model
   marxss.dims = attr(x[["model"]], "model.dims") #the marxss model dims
   marxss.model = x[["model"]]
-  if( !("marxss" %in% attr(marxss.model,"form")) ) stop("predict_marxss: x$model needs to be in marxss form.", call.=FALSE)
+  if( !("marxss" %in% attr(marxss.model,"form")) ) stop("Stopped in predict_marxss(): x$model needs to be in marxss form.", call.=FALSE)
   TT=marxss.dims[["y"]][2]
   form="marxss"
   allow.in=c("data","c","d") #allowed in newdata
   
   if(!(class(newdata) %in% c("list","data.frame")))
-    stop("predict_marxss: newdata must be a list or dataframe.",call.=FALSE)
+    stop("Stopped predict_marxss(): newdata must be a list or dataframe.",call.=FALSE)
   
   #next interpret newdata;
   
@@ -746,7 +746,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
     newdata.dataframe=newdata
     newdata=list()
     names.dataframe=names(newdata.dataframe)
-    if(any(duplicated(names.dataframe))) stop("predict_marxss: the dataframe should not have any duplicated names",call.=FALSE)
+    if(any(duplicated(names.dataframe))) stop("Stopped in predict_marxss(): the dataframe should not have any duplicated names",call.=FALSE)
     
     #first construct the data matrix from the dataframe
     Y.names=attr(marxss.model,"Y.names")
@@ -754,9 +754,9 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
     Y.match=match(Y.names,names.dataframe)
     if(any(!is.na(Y.match))){
       if(dim(newdata)[1]!=n.ahead){
-        stop("predict_marxss: you have passed data in with newdata as a dataframe.\nThe number of rows must equal n.ahead in this case.",call.=FALSE)
+        stop("Stopped in predict_marxss(): you have passed data in with newdata as a dataframe.\nThe number of rows must equal n.ahead in this case.",call.=FALSE)
       }
-      cat(paste("Alert: y (data) are present in the dataframe and prediction will be conditioned on these values.\n",collapse=""))
+      cat(paste("Alert from predict_marxss(): y (data) are present in the dataframe and prediction will be conditioned on these values.\n",collapse=""))
       newdata[["data"]]=newdata.dataframe[Y.names[!is.na(Y.match)]]
     }
     #those that are missing are replaced with NA
@@ -767,7 +767,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
     newdata[["data"]]=t(as.matrix(newdata[["data"]])) #time across columns
     
     if(!(dim(newdata)[1]==n.ahead | dim(newdata)[1]!=1)){
-      stop("predict_marxss: The number of rows in the newdata dataframe must be 1 or n.ahead.",call.=FALSE)
+      stop("Stopped in predict_marxss(): The number of rows in the newdata dataframe must be 1 or n.ahead.",call.=FALSE)
     }
     
     #Create the c and d matrices
@@ -790,7 +790,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
           bad.names = el.names[!(el.names %in% names.dataframe)]
           if((n.ahead+t.start-1)>TT){
             #require that user passes in all the c and d inputs                       
-            stop(c("predict_marxss: some of the ",el," inputs are missing: ",paste(bad.names,collapse=", ")),call.=FALSE)
+            stop(c("Stopped in predict_marxss(): some of the ",el," inputs are missing: ",paste(bad.names,collapse=", ")),call.=FALSE)
           }else{ #replace missing names with values from the model
             if(marxss.dims[[el]][3]==1) t.el=1 else t.el=t.start:(t.start+n.ahead-1)
             tmp.el=matrix(marxss.model[["fixed"]][[el]][bad.names,1,t.el],length(bad.names),t.start+n.ahead-1)
@@ -801,7 +801,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
         #makesure the columns are in the same order as el.names
         newdata[[el]]=newdata[[el]][el.names,,drop=FALSE]      
         if(any(is.na(newdata[[el]]))){
-          stop(paste("predict_marxss: there cannot be any NAs in the ",el," matrix.\n",sep=""),call.=FALSE)
+          stop(paste("Stopped in predict_marxss(): there cannot be any NAs in the ",el," matrix.\n",sep=""),call.=FALSE)
         }
       }
     } #for el
@@ -818,7 +818,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
         if(!(el %in% names(newdata))){
           if((n.ahead+t.start-1)>TT){
             #require that user passes in all the c and d inputs                       
-            stop(c("predict_marxss: Model has ", toupper(el), " but ", el," is missing from newdata\n and cannot be inferred since prediction extends beyond original dataset."),call.=FALSE)
+            stop(c("Stopped in predict_marxss(): Model has ", toupper(el), " but ", el," is missing from newdata\n and cannot be inferred since prediction extends beyond original dataset."),call.=FALSE)
           }else{ #replace missing names with values from the model
             if(marxss.dims[[el]][3]==1) t.el=1 else t.el=t.start:(t.start+n.ahead-1)
             newdata[[el]]=matrix(marxss.model[["fixed"]][[el]][,,t.el],marxss.dims[[el]][1],t.start+n.ahead-1)
@@ -826,7 +826,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
           }
         }
         if(!is.matrix(newdata[[el]]))
-          stop(c("predict_marxss: ", el," in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
+          stop(c("Stopped in predict_marxss(): ", el," in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
         names.list=rownames(newdata[[el]])
         el.names=rownames(marxss.model[["fixed"]][[el]])
         #find any row names in the matrix that match the rownames in the el
@@ -838,7 +838,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
           bad.names = el.names[!(el.names %in% names.list)]
           if((n.ahead+t.start-1)>TT){
             #require that user passes in all the c and d inputs                       
-            stop(c("predict_marxss: some of the ",el," inputs are missing: ",paste(bad.names,collapse=", ")," \nand cannot be inferred since prediction is beyond the end of the original dataset."),call.=FALSE)
+            stop(c("Stopped in predict_marxss(): some of the ",el," inputs are missing: ",paste(bad.names,collapse=", ")," \nand cannot be inferred since prediction is beyond the end of the original dataset."),call.=FALSE)
           }else{ #replace missing names with values from the model
             if(marxss.dims[[el]][3]==1) t.el=1 else t.el=t.start:(t.start+n.ahead-1)
             tmp.el=matrix(marxss.model[["fixed"]][[el]][bad.names,1,t.el],length(bad.names),t.start+n.ahead-1)
@@ -849,7 +849,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
         #makesure the columns are in the same order as el.names
         newdata[[el]]=newdata[[el]][el.names,,drop=FALSE]      
         if(any(is.na(newdata[[el]]))){
-          stop(paste("predict_marxss: There cannot be any NAs in the ",el," matrix.\n",sep=""),call.=FALSE)
+          stop(paste("Stopped in predict_marxss(): There cannot be any NAs in the ",el," matrix.\n",sep=""),call.=FALSE)
         }
       }
     }
@@ -858,12 +858,12 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
       Y.names=attr(marxss.model,"Y.names")
       el.names=Y.names
       if(!is.matrix(newdata[[el]]))
-        stop(c("predict_marxss: ", el," in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
+        stop(c("Stopped in predict_marxss(): ", el," in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
       
       names.list=rownames(newdata[[el]])
       if(!all(el.names %in% names.list)){
         bad.names = el.names[!(el.names %in% names.list)]
-        stop(c("predict_marxss: Some of the ",el," rows are missing: ",paste(bad.names,collapse=", ")),call.=FALSE)
+        stop(c("Stopped in predict_marxss(): Some of the ",el," rows are missing: ",paste(bad.names,collapse=", ")),call.=FALSE)
       }
       #find any row names in the matrix that match the rownames in the el
       el.match=match(el.names,names.list)
@@ -877,7 +877,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   
   
   #now do some error checking
-  if(!all(names(newdata) %in% allow.in)) stop(paste("predict_marxss: only allowed inputs for form ",form," are ",allow.in,".",sep=""),call.=FALSE)
+  if(!all(names(newdata) %in% allow.in)) stop(paste("Stopped in predict_marxss(): only allowed inputs for form ",form," are ",allow.in,".",sep=""),call.=FALSE)
   #Check that the dims of inputs are the same (or = 1) and fix c or d that have length 1 to have same dim 2 as other inputs
   thedims=unlist(lapply(newdata,function(x){dim(x)[2]}))
   #only consider those with length!=1
@@ -886,7 +886,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   #make sure n.ahead and any dim 2 of data, c or d !=1 are the same
   thedims=c(n.ahead,thedims)
   if(!all( abs(thedims - mean(thedims)) < .Machine$double.eps )){
-    stop(paste("predict_marxss: in newdata, the 2nd dimension of all inputs (and n.ahead if passed in) must be equal (if not =1).",sep=""))
+    stop(paste("Stopped in predict_marxss(): in newdata, the 2nd dimension of all inputs (and n.ahead if passed in) must be equal (if not =1).",sep=""))
   }
   
   #set data to be all missing if it wasn't passed in
@@ -895,7 +895,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
     rownames(newdata[["data"]]) = attr(marxss.model,"Y.names")
   }else{ #it was passed in
     if(dim(newdata[["data"]])[2]!=n.ahead)
-      stop(c("predict_marxss: data in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
+      stop(c("Stopped in predict_marxss(): data in newdata must be a matrix with time across the columns and n.ahead columns."),call.=FALSE)
   }
   
   #Now newdata ready as a list with elements c and d that correspond to model c and d as passed into MARSS()
@@ -916,7 +916,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   
   if(any(time.varying)){
     if((t.start+n.ahead-1)>TT)
-      stop(paste("predict_marxss: ",paste(param.names[time.varying], collapse=", ")," are time-varying.\nIn this case, you cannot forecast past the end of the time series\n(t.start+n.ahead must be < length of original data).\n",sep=""),call.=FALSE)
+      stop(paste("Stopped in predict_marxss(): ",paste(param.names[time.varying], collapse=", ")," are time-varying.\nIn this case, you cannot forecast past the end of the time series\n(t.start+n.ahead must be < length of original data).\n",sep=""),call.=FALSE)
     param.t=t.start:(t.start+n.ahead-1)
   }
   #Now we need to construct a marssMODEL object (form=marxss) for predicting
