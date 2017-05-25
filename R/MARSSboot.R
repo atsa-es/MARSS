@@ -175,14 +175,12 @@ MARSSboot = function(MLEobj, nboot=1000, output="parameters", sim="parametric",
       } #if MLE
 
       if( param.gen == "hessian" ) {
-        #any variances will be in the chol transformation
+        if(any(is.na(MLEobj.hessian$parSigma))) stop("MARSSboot: The variance-covariance matrix (parSigma) returned by MARSShessian() has NAs.  See MARSSinfo(26).\n", call.=FALSE)
         hess.params = rmvnorm(1, mean=MLEobj.hessian$parMean, sigma=MLEobj.hessian$parSigma, method="chol")
-        
-        #back transform to non-chol form
-        boot.params[,i] = MARSShessian.backtrans(MLEobj.hessian, hess.params)        
+        boot.params[,i] = hess.params       
       }   #if hessian   
     
-      # Draw the progress bar if silent=F and time library is installed
+      # Draw the progress bar if silent=FALSE and time library is installed
     	if(drawProgressBar) prev <- progressBar(i/nboot,prev)
       }    #end nboot loop
     } # end if parameters in output
