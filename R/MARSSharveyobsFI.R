@@ -1,8 +1,9 @@
-#######################################################################################################
+####################################################################################
 #   MARSSharveyobsFI function
-#   Recursion to compute the observed Fisher Information matrix; Harvey (1989, page 143)
-#   ** All eqn refs are to Harvey 1989
-#######################################################################################################
+#   Recursion to compute the observed Fisher Information matrix; Harvey (1989, pages 142-143)
+#   With modification for missing values
+#   Reference Holmes, E. E. (2014). Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045 [stat.ME]
+####################################################################################
 MARSSharveyobsFI = function( MLEobj ) {
   paramvector = MARSSvectorizeparam( MLEobj )
   par.names = names( paramvector )
@@ -47,12 +48,12 @@ MARSSharveyobsFI = function( MLEobj ) {
   ##############################################
   #Set up the parameters; Same code as in MARSSkf
   ##############################################
-  #Note diff in param names B=T, u=c, a=d in Mine=Harvey
+  #Note diff in param names B=T, u=c, a=d aka My notation (L)=Harvey notation (R)
   model.elem = attr(modelObj,"par.names")
   dims = attr(modelObj, "model.dims")
   time.varying = c()
   for(el in model.elem){
-    if( (dim(modelObj$free[[el]])[3] != 1) | (dim(modelObj$fixed[[el]])[3] != 1))  #not time-varying
+    if( (dim(modelObj$free[[el]])[3] != 1) | (dim(modelObj$fixed[[el]])[3] != 1))  
       time.varying = c(time.varying, el)
   }
   pari=parmat(MLEobj,t=1)
@@ -104,34 +105,43 @@ MARSSharveyobsFI = function( MLEobj ) {
           dp$Zt = Mt%*%dp$Z
           dp$At = Mt%*%dp$A
           #We need to deal with Ft when there are missing values
-          #Normally Ft=1 on the diagonal for missing vals; that way the LL calc works out
+          #Normally Ft=1 on the diagonal for missing vals; 
+          # that way the LL calc works out
           #Ft=E(vt vt) is not defined when there are missing values
-          #So we want Ft row i and col i to be 0 when the i-th obs is missing
-          #this is different than Ft, which we set to 1 on diag, but which doesn't matter since Vtt1 will have 0s in 
-          # in row i col i so will 0 that out
+          #So we want Ft row i and col i to be 0 when the i-th obs is missing.
+          # this is different than Ft, which we set to 1 on diag, 
+          # but the diag set to 1 doesn't matter since Vtt1 will have 0s in 
+          # in row i col i so will 0 that 1 out
           dHRHt = Mt%*%dHRH%*%Mt 
         }else { 
           Zt=Z; dp$Zt=dp$Z; dHRHt=dHRH; dp$At=dp$A
         }
         
-        #t=1 treatment depends on how you define the initial condition.  Either as x at t=1 or x at t=0
+        #t=1 treatment depends on how you define the initial condition.  
+        #Either as x at t=1 or x at t=0
         if(t==1) {
           if(init.state=="x00") {
-            dxtt1 = dp$B%*%x0 + B%*%dp$x0 + dp$U
-            dVtt1 = tcrossprod(dp$B%*%V0, B) + tcrossprod(B%*%dp$V0, B) + tcrossprod(B%*%V0, dp$B) + dGQG          # eqn 6.20
+            #derivs of eqns 6.19 and 6.20 in S&S2006 with x0=x_0^0 and V0=V_0^0
+            dxtt1 = dp$B%*%x0 + B%*%dp$x0 + dp$U # 
+            dVtt1 = tcrossprod(dp$B%*%V0, B) + tcrossprod(B%*%dp$V0, B) + tcrossprod(B%*%V0, dp$B) + dGQG 
           }
-          if(init.state=="x10") {    #Ghahramani treatment of initial states uses x10 and has no x00 (pi is defined as x10 at t=1)
+          if(init.state=="x10") {    #Ghahramani treatment of initial states
+            #uses x10 and has no x00 (pi is defined as x10 at t=1);
+            #See Holmes 2012.
             dxtt1 = dp$x0
             dVtt1 = dp$V0  
           }
         }else {   #t!=1
+          #derivs of eqns 6.19 and 6.20 in S&S2006
           dxtt1 = dp$B%*%xtt[,t-1,drop=FALSE] + B%*%dxt1t1[,pcntr,drop=FALSE] + dp$U
           dVtt1 = tcrossprod(dp$B%*%Vtt[,,t-1], B) + tcrossprod(B%*%dVt1t1[,,pcntr], B) + 
-            tcrossprod(B%*%Vtt[,,t-1], dp$B) + dGQG          
+            tcrossprod(B%*%Vtt[,,t-1], dp$B) + dGQG
         }
-        if(m!=1)dVtt1 = symm(dVtt1) #in general Vtt1 is not symmetric but here it is since Vtt and Q are
+        if(m!=1)dVtt1 = symm(dVtt1) 
+        #in general Vtt1 is not symmetric but here it is since Vtt and Q are
         
-        #equations 3.4.71b and 3.4.73; store for each p; the At etc, denotes that the missing vals mod vs is used
+        #equations 3.4.71b and 3.4.73 in Harvey 1989; store for each p
+        #the At, Zt etc, denotes that the missing vals mod vrs is used (does not denote time)
         dvt[,pcntr] = -Zt%*%dxtt1 - dp$Zt%*%xtt1[,t,drop=FALSE] - dp$At
         dFt[,,pcntr] = tcrossprod( dp$Zt%*%Vtt1[,,t], Zt) + tcrossprod( Zt%*%dVtt1, Zt) + 
           tcrossprod( Zt%*%Vtt1[,,t], dp$Zt) + dHRHt #will always be matrix; Vtt1 is always square
@@ -143,13 +153,14 @@ MARSSharveyobsFI = function( MLEobj ) {
           Ftinv = symm(Ftinv)  #to enforce symmetry after chol2inv call
         }
         
-        #equation 3.4.74a; sets up dxtt[,t-1] needed in equation for dxtt1
+        #equation 3.4.74a in Harvey 1989; sets up dxtt[,t-1] needed for dxtt1
         dxt1t1[,pcntr] = dxtt1 + 
           tcrossprod(dVtt1, Zt)%*%Ftinv%*%vt[,t,drop=FALSE] + 
           tcrossprod(Vtt1[,,t], dp$Zt)%*%Ftinv%*%vt[,t,drop=FALSE] - 
           tcrossprod(Vtt1[,,t], Zt)%*%Ftinv%*%dFt[,,pcntr]%*%Ftinv%*%vt[,t,drop=FALSE] + 
-          tcrossprod(Vtt1[,,t], Zt)%*%Ftinv%*%dvt[,pcntr,drop=FALSE]    
-        #equation 3.4.74b; sets up dVtt[,t-1] needed in equation for dVtt1
+          tcrossprod(Vtt1[,,t], Zt)%*%Ftinv%*%dvt[,pcntr,drop=FALSE]
+        
+        #equation 3.4.74b in Harvey 1989; sets up dVtt[,t-1] needed for dVtt1
         dVt1t1[,,pcntr] = dVtt1 - 
           tcrossprod(dVtt1, Zt)%*%Ftinv%*%Zt%*%Vtt1[,,t] - 
           tcrossprod(Vtt1[,,t], dp$Zt)%*%Ftinv%*%Zt%*%Vtt1[,,t] +
