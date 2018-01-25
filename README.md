@@ -3,6 +3,7 @@ MARSS
 [![cran version](http://www.r-pkg.org/badges/version/MARSS)](https://cran.r-project.org/package=MARSS)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/metacran/cranlogs.app)
 
+
 MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
 
 ### INSTALL
@@ -11,6 +12,15 @@ To install MARSS from CRAN:
 
 ```
 install.packages("MARSS")
+library(MARSS)
+```
+
+To install the development version of MARSS from GitHub:
+
+```
+install.packages("devtools")
+library(devtools)
+install_.packages_github("nwfsc-timeseries/MARSS")
 library(MARSS)
 ```
 
