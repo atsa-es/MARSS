@@ -8,8 +8,8 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
   #    except for missing values, var for y_i missing should be 0 but if Harvey=TRUE, returns R(i,i)
   # std.residuals psolve(chol(var.residuals))%*%model.residuals
   # normalize means to divide residuals by H%*%t(chol(R)) or G%*%t(chol(Q)) so they are scaled to I
-  # Note, I think there is a problem with the Harvey algorithm when the variance of the state residuals
-  # when Q is non-diagonal and there are missing values; it can become non-invertable
+  # Note, I think there is a problem with the Harvey algorithm when the variance of the state residuals (Q)
+  # is non-diagonal and there are missing values; it can become non-invertable
   MLEobj=object
   model.dims=attr(MLEobj$marss,"model.dims")
   TT = model.dims[["x"]][2]
