@@ -313,7 +313,7 @@ if(file %in% dir("./manual_files")) {
 <<Cs_17_code-to-compare-arss-estimation,echo=FALSE,keep.source=TRUE>>=
 # This is the code used to make the figure comparing different ways to estimate 
 # AR parameters from AR with noise data
-# saved.res is just a flag.  Set to FALSE to run the if statement
+# saved.res is just a flag.  Set to FALSE to run the code
 if(!saved.res) {
 file=paste("AR2SS",TT,".RData",sep="")
 params=matrix(0,8,nsim)
