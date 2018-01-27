@@ -1,8 +1,8 @@
-\name{MARSShessian.numerical}
-\alias{MARSShessian.numerical}
+\name{MARSSharveyobsFI}
+\alias{MARSSharveyobsFI}
 \title{ MARSS Hessian Matrix via the Harvey (1989) Recursion}
 \description{
-Calculates the observed Fisher Information via the recursion by Harvey (1989).  This is the same as the Hessian of the log-likelihood function at the MLEs.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
+Calculates the observed Fisher Information analytically via the recursion by Harvey (1989).  This is the same as the Hessian of the log-likelihood function at the MLEs.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
 }
 \usage{
 MARSSharveyobsFI( MLEobj )
