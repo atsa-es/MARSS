@@ -1,8 +1,10 @@
 # ###########################################
 # This compares output from two different MARSS versions using the R code in the doc folder
 # How to run
-# Install one version of MARSS into the base R library
-# Install a second version into the local R library
+# Install one version of MARSS into the base R library R_HOME
+# Install a second version into the local R library R_LIBS_USER
+# RStudio will use R_LIBS_USER if it exists.  It does not by default so
+#  you might have to create this folder to hav a local library.
 # Open the unit test.R file
 # RShowDoc("versiontest.R", package="MARSS")
 # Change working directory to a directory where many test files can be stored (sandbox)
@@ -15,9 +17,10 @@
 #make sure MARSS isn't loaded
 try(detach(package:MARSS),silent=TRUE)
 
-#New version should be in the local library
+#One version should be in the local library
 lib.loc = Sys.getenv("R_LIBS_USER")
 unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
+unittestvrs
 library(MARSS, lib.loc = lib.loc)
 
 #Get whatever code files are in the doc directory; these are tested
@@ -47,12 +50,13 @@ for(unittestfile in unittestfiles){
   testNew = mget(test.these)
   save(testNew,file=paste(tag,unittestvrs,".Rdata",sep=""))
 }
-#detach the new version
+#detach the version
 detach(package:MARSS)
 
-#Repeat for an older version of MARSS which is in the R library (no local library)
+#Other version of MARSS is in the R library (no local library)
 lib.loc = paste(Sys.getenv("R_HOME"),"/library",sep="")
 unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
+unittestvrs
 library(MARSS, lib.loc = lib.loc)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
