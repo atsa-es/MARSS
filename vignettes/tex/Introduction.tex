@@ -81,7 +81,7 @@ and standard errors of the states.  If you are looking only for Kalman filter an
 
 \section{How to get started (quickly)}
 
-If you already work with models in the form of Equation \ref{eqn:marss}, you can immediately fit your model with the MARSS package.  Install the MARSS package and then type \texttt{library(MARSS)} at the command line to load the package.  Look at the Quick Start Guide and then skim through Chapter \ref{Examples}.  
+If you already work with models in the form of Equation \ref{eqn:marss}, you can immediately fit your model with the MARSS package.  Install the MARSS package and then type \texttt{library(MARSS)} at the command line to load the package.  Look at the Quick Start Guide and then skim through Chapter \ref{Examples}.  The Chapter \ref{chap:modelspec} in the appendix also has many examples of how to specify different forms for your parameter matrices. 
 
 \section{Getting your data in right format}
 Your data need to be a matrix (not dataframe nor a ts object) with time going across the columns.  The MARSS functions assume discrete time steps and you will need a column for each time step.  Replace any missing time steps with a missing value holder (e.g. NA).  Write your model down on paper and identify which parameters correspond to which parameter matrices in Equation \ref{eqn:marss}.  Call the \texttt{MARSS()} function (Chapter \ref{chap:MARSS}) using your data and using the \texttt{model} argument to specify the structure of each parameter. 
