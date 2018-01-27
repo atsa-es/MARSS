@@ -87,7 +87,7 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]\code{RS
   eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{ 
-  \code{\link{MARSSmcinit}}, \code{\link{MARSSkf}}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}}
+  \code{\link{MARSSkf}}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}}
   }  
 \examples{
   dat = t(harborSeal)
