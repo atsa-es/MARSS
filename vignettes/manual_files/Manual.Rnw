@@ -49,40 +49,31 @@ options(width=60)
 \part{The MARSS package}
 \include{./tex/Introduction}
 \include{./tex/Functions}
-%\include{./tex/ModelSpec}
 \include{./tex/Algorithms}
 \part{Fitting models with MARSS}
 \include{./tex/MARSS}
-%\SweaveInput{Quick_Examples.xRnw}
 \include{./Quick_Examples}
 \include{./Setting_Inits}
-\include{./CIs}
+%\include{./CIs}
 \part{Applications}
 \include{./tex/Directions}
-%\SweaveInput{Case_Study_1.xRnw}
 \include{./Case_Study_1}
-%\SweaveInput{Case_Study_2.xRnw}
 \include{./Case_Study_2}
-%\SweaveInput{Case_Study_3.xRnw}
 \include{./Case_Study_3}
-%\SweaveInput{Case_Study_4.xRnw}
 \include{./Case_Study_4}
-%\SweaveInput{Case_Study_5.xRnw}
 \include{./Case_Study_5}
-%\SweaveInput{Case_Study_6.xRnw}
 \include{./Case_Study_6}
 \include{./Covariates}
-%\SweaveInput{Case_Study_7.xRnw}
 \include{./Case_Study_7}
-%\SweaveInput{Case_Study_8.xRnw}
 \include{./Case_Study_8}
 \include{./Case_Study_dlm1}
 \include{./Case_Study_mlr}
 \include{./MARp}
 \appendix
-\include{./tex/SSreferences}
+\include{./tex/ModelSpec}
 \include{./tex/warnings}
-%\include{./tex/obj_structures}
+\include{./tex/obj_structures}
+\include{./tex/SSreferences}
 
 \backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{./tex/Manual}
