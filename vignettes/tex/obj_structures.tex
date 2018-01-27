@@ -23,11 +23,11 @@ Objects of class `marssMODEL'\index{objects!marssMODEL} specify Multivariate Aut
     \item[\textbf{V0}]{ m x m }
   \end{description} 
 
-Use \verb@is.marssMODEL()@\index{functions!is.marssMODEL} to check whether an marssMODEL object is correctly specified. The MARSS package includes an \verb@as.marssMODEL()@\index{functions!as.marssMODEL} method to convert objects of class popWrap (see next section) to objects of class marssMODEL. 
+Use \verb@is.marssMODEL()@\index{functions!is.marssMODEL} to check whether an marssMODEL object is correctly specified. The MARSS package includes an \verb@as.marxssMODEL()@\index{functions!as.marssMODEL} method to convert objects of class popWrap (see next section) to objects of class marssMODEL. 
 
-\section*{MARSSinputs}\index{objects!popWrap}
+\section*{MARSSinputs}\index{objects!inputs}
 
-All the user inputs to a MARSS() call are put into a list and then passed to a function called MARSS.form() (where form is the text specified by the form argument) which used the model argument to creates the marssMODEL object and then MARSScheckinputs() to error in the others arguments.
+All the user inputs to a MARSS() call are put into a list and then passed to a function called MARSS.form() (where form is the text specified by the form argument, e.g. MARSS.marss()).  This function is used to create the marssMODEL object and then MARSScheckinputs() is called to error check the other arguments.
 
   \begin{description}
   
@@ -36,25 +36,10 @@ All the user inputs to a MARSS() call are put into a list and then passed to a f
   \item[\textbf{inits}]{ A list with up to 10 matrices Z, A, R, B, U, Q, x0, V0, C, D specifying initial values for parameters. Dimensions are given in the class `marssMODEL' section. }
   \item[\textbf{miss.value}]{ Deprecated. Specifies missing value representation (default is NA). }
   \item[\textbf{method}]{ The method used for estimation: `kem' for EM, `BFGS' for quasi-Newton.}
-  \item[\textbf{form}]{ The form to use to interpret the `model' argument and creat the marssMODEL object.}
+  \item[\textbf{form}]{ The form to use to interpret the `model' argument and create the marssMODEL object.}
   \item[\textbf{control}]{ List of estimation options. These are method dependent. }  
   \end{description}
 
-Component \verb@model@ is a convenient way to specify model structure for certain common cases.  If \verb@model="use fixed/free"@, both \verb@fixed@ and \verb@free@ must be provided.  See the class marssMODEL section for how to specify fixed and free matrices.  The function \verb@MARSS()@\index{functions!MARSS} calls \verb@popWrap()@ to create a popWrap object, then \verb@is.marssMODEL()@ to coerce this object to class marssMODEL for the estimation function.
-
-  The \verb@popWrap()@\index{functions!popWrap} function calls \verb@checkPopWrap()@\index{functions!checkPopWrap} to check user inputs from \verb@MARSS()@. Valid model structures are below.  
-
-  \begin{description}   
-    \item[\textbf{A}]{ String `unconstrained'=`unequal', `equal', `scaling' or `zero'. May also be a $m \times 1$ numeric matrix specifying a fixed $\aa$ matrix. Specified as a list matrix to allow fixed and estimated elements. }
-    \item[\textbf{B}]{ String `identity', `zero', `unconstrained', `diagonal and unequal', `diagonal and equal', or `equalvarcov'. May also be a numeric matrix specifying a fixed $\BB$ matrix or a list matrix with fixed and estimated elements. } 
-    \item[\textbf{Q}]{ String `identity', `zero', `unconstrained', `diagonal and unequal', `diagonal and equal', or `equalvarcov'. May also be a numeric matrix specifying a fixed $\QQ$ matrix or a list matrix with fixed and estimated elements. } 
-    \item[\textbf{R}]{ String `identity', `zero', `unconstrained', `diagonal and unequal', `diagonal and equal', or `equalvarcov'. May also be a numeric matrix specifying a fixed $\RR$ matrix or a list matrix with fixed and estimated elements. }
-    \item[\textbf{V0}]{ String `identity', `zero', `unconstrained', `diagonal and unequal', `diagonal and equal', or `equalvarcov'. May also be a numeric matrix specifying a fixed $\LAM$ matrix or a list matrix with fixed and estimated elements. }
-    \item[\textbf{U}]{ String `unconstrained'=`unequal', `equal', or `zero'. May also be a $m \times 1$ numeric matrix specifying a fixed $\uu$ matrix. Specified as a list matrix to allow fixed and estimated elements.}
-    \item[\textbf{x0}]{ String `unconstrained'=`unequal', `equal', or `zero'. May also be a $m \times 1$ numeric matrix specifying a fixed $\pipi$. Specified as a list matrix to allow fixed and estimated elements.}
-    \item[\textbf{Z}]{ A vector  of class factor specifying which $\yy$ time series correspond to which state time series (in $\xx$) or a numeric $n \times m$ matrix specifying the $\ZZ$ matrix. The string `identity' can be used to specify a $n \times n$ identity matrix and string `ones' may be used to specify a column vector of $n$ ones.  A list matrix is used to specify a combination of fixed and estimated elements.}
-  \end{description}
-  
 
 \section*{ML estimation objects: class marssMLE}\index{objects!marssMLE}
 
