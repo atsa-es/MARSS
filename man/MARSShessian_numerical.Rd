@@ -2,7 +2,7 @@
 \alias{MARSShessian.numerical}
 \title{ MARSS Hessian Matrix via Numerical Approximation}
 \description{
-Calculates the Hessian of the log-likelihood function at the MLEs using either the  \code{\link{fdHess}} function in the  \code{\link{nmle}} package or the  \code{\link{optim}} function.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
+Calculates the Hessian of the log-likelihood function at the MLEs using either the  \code{\link{fdHess}} function in the  \code{\link{nlme}} package or the  \code{\link{optim}} function.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
 }
 \usage{
 MARSShessian.numerical(MLEobj, fun="fdHess")
