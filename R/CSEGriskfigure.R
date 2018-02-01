@@ -48,8 +48,8 @@ kal.cdf  = matrix(0,nrow=te)
 N0 = exp(kem$states[1,length(dat)])
 if(!absolutethresh) thresh = threshold*N0 else thresh=threshold
 xd = log(N0) - log(thresh)
-kal.u = kem$par$U 
-kal.Q = kem$par$Q
+kal.u = as.vector(kem$par$U)
+kal.Q = as.vector(kem$par$Q) # to create scalar from 1x1 matrix
 if(kal.u<=0) p.ever = 1 else p.ever = exp(-2*kal.u*xd/kal.Q) 
 if(N0 <= thresh){ kal.cdf = rep(1,te) 
   }else{
