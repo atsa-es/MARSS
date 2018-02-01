@@ -15,9 +15,9 @@ options(prompt=" ", continue=" ")
 
 For management purposes, three stocks are recognized; the CA stock, the OR/WA coastal stock which consists of four regions (Northern/Southern Oregon, Coastal Estuaries, Olympic Peninsula), and the inland WA stock which consists of the regions in the WA inland waters minus Hood Canal (Figure \ref{fig:CS3.fig1}).  Differences exist in the demographics across regions (e.g. pupping dates), however mtDNA analyses and tagging studies support the larger stock structure.  Harbor seals are known for strong site fidelity, but at the same time travel large distances to forage.
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
-\includegraphics{"../figures/CAORWA"}
+\includegraphics[totalheight=0.8\textheight]{"../figures/CAORWA"}
 \end{center}
 \caption{Map of spatial distribution of harbor seal survey regions in Washington and Oregon. In addition to these nine survey regions, we also have data from the Georgia Strait just north of the San Juan Islands, the California coast and the Channels Islands in Southern California.}
 \label{fig:CS3.fig1}
@@ -68,7 +68,7 @@ The $\ZZ$ matrices specify the relationship between the survey regions and the s
 \bigskip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-\begin{table}[htdp]
+\begin{table}[htp]
 \begin{center}
 \begin{tabular}{rc|ccc|cc|cc|cc|cccc|cc|c|}
  && \multicolumn{3}{c|}{H1} &&& \multicolumn{2}{c|}{H2} &&& \multicolumn{4}{c|}{H4} &&& H5\\
