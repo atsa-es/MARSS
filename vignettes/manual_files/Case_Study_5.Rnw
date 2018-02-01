@@ -207,7 +207,7 @@ for(i in 2:dim(dat)[2])
 
 The command \texttt{mean(distance)} gives us the average distance per day.  We can also make a histogram of the distances traveled per day (Figure \ref{fig:disfig}).
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<disfig,fig=TRUE>>= 
 par(mfrow=c(1,1))
@@ -221,7 +221,7 @@ hist(distance) #make a histogram of distance traveled per day
 
 We can compare the histogram of daily distances to what we would get if we had not accounted for measurement error (Figure \ref{fig:disfig2}).
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<disfig2,fig=TRUE>>= 
 # Compare to the distance traveled per day if you used the raw data
