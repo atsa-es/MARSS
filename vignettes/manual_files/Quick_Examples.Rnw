@@ -1,7 +1,7 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/QE-, eps=FALSE, split=FALSE}
-\chapter{Examples}
-\label{Short examples}
-\chaptermark{MARSS examples}
+\chapter{Short Examples}
+\label{chap:Examples}
+\chaptermark{Examples}
 
 <<RUNFIRST, echo=F, include.source=F>>=
 require(MARSS)
@@ -18,7 +18,7 @@ In these examples, we will use the default \verb@form="marxss"@ argument for a \
 \xx_1 \sim \MVN(\pipi,\LAM) \text{ or } \xx_0 \sim \MVN(\pipi,\LAM)
 \end{gather}
 \end{subequations} 
-The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave off $\cc$ and $\dd$, and we address including inputs only briefly at the end of the chapter.  See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  The $\GG_t$ and $\HH_t$ are also, in most cases, inputs (not estimated).  We will not use $\GG_t$ or $\HH_t$ in this chapter. See Chapter \ref{chap:GH} for a discussion of $\GG_t$ and $\HH_t$ and how it is used and in what situations, they can be estimated.  
+The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave off $\cc$ and $\dd$, and we address including inputs only briefly at the end of the chapter.  See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  The $\GG_t$ and $\HH_t$ are also, in most cases, inputs (not estimated).  We will not use $\GG_t$ or $\HH_t$ in this chapter. 
 
 \section{Fixed and estimated elements in parameter matrices}
 Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following structure:
