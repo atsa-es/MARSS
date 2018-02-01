@@ -128,7 +128,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+%\SweaveOpts{concordance=TRUE}
 \author{Elizabeth Eli Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Derivation of an EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models}
@@ -357,7 +357,7 @@ $\partial \ff /\partial\aa = \partial \ff /\partial \gg \, \partial\gg/\partial\
 \\
 \refstepcounter{equation}\label{eq:derivaTc}
 $\partial(\aa^\top\cc)/\partial\aa = \partial(\cc^\top\aa)/\partial\aa = \cc^\top$ & \multirow{2}{*}{(\theequation)} \\
-$\partial(\aa)/\partial\(\aa) = \partial(\aa^\top)/\partial\(\aa) = \II_n$ 
+$\partial \aa/\partial \aa = \partial(\aa^\top)/\partial \aa = \II_n$ 
 &\\
 \\
 \refstepcounter{equation}\label{eq:derivaTDb}
@@ -1914,137 +1914,6 @@ The $\TT_{t,j+1}$ used at time step $t$ in equation \eqref{eq:R.general} is the 
 \end{split}
 \end{equation}
 where $\Xi_t = (\HH_t^\top\HH_t)^{-1}\HH_t^\top$.
-
-\subsection{Special case: update equation for $\GG$ diagonal and $\QQ_t$ fixed}
-Up to now, I have assumed that $\GG$ is fixed, i.e. not estimated.  There is an important special case where $\QQ_t$ is fixed, i.e. not estimated, and $\GG_t$ is an estimated diagonal matrix with one estimated value on the diagonal and no fixed values on the diagonal.  The case arises when one wants to constrain the correlation structure for the process errors but not the level of variance.  This can be done by noting that any variance-covariance matrix $\Sigma$ can be written as:
-$$\Sigma = \DD \rho \DD$$
-where $\DD$ is a diagonal matrix comprised of the square root of the diagonal elements of $\Sigma$ (all equal) and $\rho$ is the correlation matrix of $\Sigma$.  Thus if we fix $\QQ=\rho$ and estimate a diagonal $\GG$, we are constraining the process errors to have a particular correlation structure.  The requirement that $\GG_t$ is an diagonal matrix with one estimated value on the diagonal and no fixed values on the diagonal arises because otherwise we would end up with a derivative with terms $\gg (\gg^*)^\top$ and $\gg \gg^\top$ and we cannot solve for $\gg$. Instead we will make the problem much simpler and assume that the process variance-covariance matrix has the form
-$$\sigma_t \QQ_t \sigma_t$$
-where $\QQ_t$ is a correlation matrix not a variance-covariance matrix.  Here I derive an update equation for $\sigma^2$.
-
-We allow that $\sigma_t^2$ could be time-varying and at some time steps might take a fixed value.  $\gg$ is a column vector with all the $\sigma_t^2$ values.  For example, we might have a before and after variance, so there would be two values in $\gg$. 
-\begin{equation}
-\begin{gathered}
-\GG_t = \begin{bmatrix}\sigma_t&0&\dots\\0&\sigma_t&\dots\\\dots&\dots&\dots\end{bmatrix}=\sigma_t\II_m\quad
-\diag(\GG_t\GG_t) \equiv \ff_{g,t} + \DD_{g,t}\gg \\
-\GG_t^{-1} = \begin{bmatrix}1/\sigma_t&0&\dots\\0&1/\sigma_t&\dots\\\dots&\dots&\dots\end{bmatrix}=\sigma_t^{-1}\II_m\quad
-\diag(\GG_t^{-1}\GG_t^{-1}) \equiv \ff_{g,t}^{-1} + \DD_{g,t}\gg^{-1} = \ff_{g,t}^* + \DD_{g,t}\gg^*\\
-
-\vec(\GG_t^{-1}) \equiv \ff_{g,t}^{-1} + \DD_{g,t}\gg^{-1} = \ff_{g,t}^* + \DD_{g,t}\gg^*\\
-
-\end{gathered}
-\end{equation}
-where $\gg$ is column vector with $\sigma_1^2$, $\sigma_2^2$, etc. and $\gg^{-1}$ means a column vector with $1/\sigma_1^2$, $1/\sigma_2^2$, etc. $\diag(\AA)$ means a column vector of the diagonal elements of $\AA$.  $\ff_{g,t}$ is a $m \times 1$ matrix and $\DD_{g,t}$ is a $m \times s$ matrix where $s$ is the number of estimated $\sigma$'s. I will require that $\GG$ is either fixed or estimated so that $\diag(\GG_t\GG_t)$ is either $\ff_{t,g}$ or $\DD_{t,g}\gg$.
-
-First we write the log-likelihood equation that we want to take the derivative of and we will take the derivative with respect to $\gg^*$:
-\begin{equation}\label{eq:psi.G}
-\begin{split}
-&\partial\Psi/\partial\gg^* = -\frac{1}{2} \sum_{t=1}^T\partial\bigg(
-\E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t]
-- \E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1}] \\
-&\quad -\E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t] 
- - \E[\XX_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t] \\
-&\quad - \E[\uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\XX_t] 
-+ \E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1}] \\
-&\quad + \E[(\BB_t\XX_{t-1})^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t] 
-+ \E[ \uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\BB_t\XX_{t-1} ] 
-+ \uu_t^\top\GG^{-1}_t\QQ_t^{-1}\GG^{-1}_t\uu_t \bigg)/\partial\gg^*\\
-& - \partial\big(\frac{1}{2}\sum_{t_0+1}^T\log |\GG_t\QQ_t\GG_t| \big)/\partial\gg^*
-\end{split}
-\end{equation}
-
-$\GG$ is a diagonal matrix.  One of the properties of diagonal matrices is that $\AA\bb=\BB\aa$, where $\AA$ is a diagonal matrix with diagonal $\aa$ and $\BB$ is a diagonal matrix with diagonal $\bb$. $(\AA \otimes \AA)$ is a diagonal matrix with $\vec(\aa\aa^\top)$ on the diagonal.  We can use these properties to rewrite the log-likelihood.
-All the terms except the last one in the $\Psi$ equation (\ref{eq:psi.G}) can be written in the form:
-\begin{equation}\label{}
-\begin{split}
-\partial(\cc^\top \GG_t^{-1}\QQ_t^{-1} \GG_t^{-1} \dd)/\partial \gg^* &= \partial(\cc^\top \GG_t^{-1}\QQ_t^{-1} \GG_t^{-1} \dd)/\partial \vec(\GG_t^{-1}) \, \partial \vec(\GG_t^{-1})/\partial \gg^*\\
-&= (\vec(\dd\cc^\top \GG_t^{-1} \QQ_t^{-1}) + \vec(\cc\dd^\top \GG_t^{-1} \QQ_t^{-1}))^\top
-\, \partial (\ff_{g,t}^* + \DD_{g,t}\gg^*)/\partial \gg^*\\
-& \text{see Eqn. \ref{} in Table \ref{} } \\
-&= ((\QQ_t^{-1} \otimes \dd\cc^\top)\vec(\GG_t^{-1})+(\QQ_t^{-1} \otimes \cc\dd^\top)\vec(\GG_t^{-1}))^\top \DD_{g,t} \\
-&= (\ff+\DD\gg^*)^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t} \\
-&= (\gg^*)^\top\DD^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t} \\
-& + \ff^\top(\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top)) \DD_{g,t}\\
-&= (\gg^*)^\top\DD^\top\AA\DD+\ff^\top\AA\DD\\
-&= (\gg^*)^\top\DD^\top\AA\DD
-\end{split}
-\end{equation}
-Because I require that the diagonal of $\GG$ is either fixed or estimated, $\ff^\top\AA\DD = 0 (1 \times p)$. $\cc$ and $\dd$ are column vectors and $\AA = (\QQ_t^{-1} \otimes (\cc\dd^\top+\dd\cc^\top))$.
-
-$\AA$ in \ref{eq:psi.G} is
-\begin{equation}\label{eq:psi.G2}
-\begin{split}
-\AA &= ( \QQ_t^{-1} \otimes \E[2\XX_t\XX_t^\top-2\BB_t\XX_{t-1}\XX_t^\top - 2\XX_t\XX_{t-1}^\top\BB_t^\top - 
-2\uu_t\XX_t^\top-2\XX_t\uu_t^\top \\
-& + 2\BB_t\XX_{t-1}\XX_{t-1}^\top\BB_t^\top + 2\uu_t\XX_{t-1}^\top\BB_t^\top + 2\BB_t\XX_{t-1}\uu_t^\top + 2\uu_t\uu_t^\top] ) \\
- &= 2 (\QQ_t^{-1} \otimes \SS_t)\\
-\SS_t &= \hatPt - \BB_t\hatPtmt - \hatPttm\BB_t^\top - \uu_t\hatxt^\top - \hatxt\uu_t^\top + \BB_t\hatPtm\BB_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\uu_t^\top
-\end{split}
-\end{equation}
-
-The last term in the $\Psi$ equation (\ref{eq:psi.G}) is:
-\begin{equation}\label{}
-\begin{split}
-\partial \log |\GG_t\QQ_t\GG_t| \big)/\partial\gg^* &=-\partial \log |\GG_t^{-1}\QQ_t^{-1}\GG_t^{-1}| \big)/\partial\gg^* \\
-&= - \partial \log |\GG_t^{-1}\QQ_t^{-1}\GG_t^{-1}|/\partial \vec(\GG_t^{-1}) \, \partial \vec(\GG_t^{-1})/\partial\gg^* \\
-&= - 2\vec(\GG_t)^\top  \, (\ff+\DD\gg^*)/\partial \gg^*   \\
-&= - 2(\ff+\DD\gg)^\top \DD = -2\ff^\top\DD - 2 \gg^\top\DD^\top\DD \\
-&= - 2 \gg^\top\DD^\top\DD 
-\end{split}
-\end{equation}
-Because of the requirement that the diagonal of $\GG$ is either fixed or estimated, $\ff^\top\DD = 0 (1 \times p)$.
-
-
-Thus the derivative in Equation \ref{eq:psi.G} becomes
-\begin{equation}\label{eq:psi.G2}
-\begin{split}
-\partial\Psi/\partial\gg^* &= -\frac{1}{2}\sum_1^T\bigg( (\gg^*)^\top\DD^\top\AA\DD  - 2 \gg^\top\DD^\top\DD  \bigg) \\
-&= -\sum_1^T\bigg( (\gg^*)^\top\DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD - 2 \gg^\top\DD^\top\DD \bigg) \\
-(\gg^*)^\top \sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg) &= \gg^\top\sum_1^T \DD^\top\DD \\
-\text{ multiply both sides by $\gg$ and note that $\gg (\gg^*)^\top = \II_p$ }\\
-(\gg^*)^\top\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1} &= \gg^\top \\
-(\gg^*)^\top\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1} &= \gg^\top \\
-(\gg^*)^\top\BB\gg^* &= \gg^\top\gg^* = m \\
-\BB&=\sum_1^T\bigg( \DD^\top(\QQ_t^{-1} \otimes \SS_t)\DD \bigg)\bigg( \sum_1^T \DD^\top\DD \bigg)^{-1}
-\end{split}
-\end{equation}
-Solve for $\gg^*$, which may or may not be possible.
-
-
-The derivative of the second part of equation \ref{eq:psi.G4} is
-\begin{equation}
-\begin{split}
-\log |\sigma^{-1}_t\QQ_t^{-1}\sigma^{-1}_t| &= \log (\sigma^{-2}_t)^m |\QQ_t^{-1}|) = m \log \sigma^{-2}_t + \log |\QQ_t^{-1}| \\
-&= m \log(\ff_{g,t}^* + \DD_{g,t}\gg^*) + \log |\QQ_t^{-1}|
-\end{split}
-\end{equation}
-I require that $\sigma_t$ be either estimated or fixed.  It is not allowed to be a fixed value plus an estimated value.
-
-Take the derivative with respect to $\gg^*$ to get
-\begin{equation}
-\begin{split}
-\partial \log |\GG_t\QQ_t\GG_t|/\partial \gg^* &= - m \begin{bmatrix}0 & \dots & g_t & 0 & \dots\end{bmatrix} = - \gg^\top \DD_{t,g}^\top\DD_{t,g}
-\end{split}
-\end{equation}
-Thus will be a $1 \times s$ matrix with all 0s except where $g_t$ (the $g$ associated with time $t$) appears. The fixed $\ff$ drop out as they never appear with a $\gg$ value.
-
-Putting the two pieces together we have
-\begin{equation}
-\begin{split}
-\partial\Psi/\partial\gg &= - \frac{1}{2} \sum_{t=1}^T 
-\vec(\SS_t)^\top  \vec(\QQ_t^{-1}) \DD_{t,g}  + \frac{1}{2}\sum_{t_0+1}^T m \gg^\top \DD_{t,g}^\top\DD_{t,g}
-\end{split}
-\end{equation}
-
-Set the left side to 0 (a $1 \times s$ matrix of 0s) and transpose:
-\begin{equation}
-\gg \sum_{t_0+1}^T m  \DD_{t,g}^\top\DD_{t,g} =  \sum_{t=1}^T \vec(\SS_t)^\top \vec(\QQ_t^{-1})  \DD_{t,g} 
-\end{equation}
-And arrive at the update equation for $\gg$ when $\QQ$ is a fixed correlation matrix and $\GG$ is a diagonal matrix with a single $\sigma_t$ (an estimated value) or $\ff_t$ (fixed value) on the diagonal. The $\gg$ are the $\sigma_t$ values being estimated:
-\begin{equation}
-\gg = \frac{1}{m} \bigg( \sum_{t_0+1}^T \DD_{t,g}^\top\DD_{t,g} \bigg)^{-1} \sum_{t=1}^T \DD_{t,g}^\top \vec(\QQ_t^{-1})^\top  \vec(\SS_t)
-\end{equation}
-where $\SS_t = \hatPt + \BB_t\hatPtmt + \hatPttm\BB_t^\top + \uu_t\hatxt^\top + \hatxt\uu_t^\top + \BB_t\hatPtm\BB_t^\top + \uu_t\hatxtm^\top\BB_t^\top + \BB_t\hatxtm\uu_t^\top + \uu_t\uu_t^\top$.
 
 
 \section{Computing the expectations in the update equations}\label{sec:compexpectations}
