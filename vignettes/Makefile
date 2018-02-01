@@ -18,29 +18,27 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_dlm1.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_mlr.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Setting_Inits.Rnw
-	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/CIs.Rnw
-	"$(R_HOME)/bin/R" CMD Sweave ./tex/MARp.Rnw
-	"$(R_HOME)/bin/R" CMD Sweave ./tex/Covariates.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/MARp.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Covariates.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Manual.Rnw
 	 
 stangle: 
-	"$(R_HOME)/bin/R" CMD Stangle EMDerivation.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle Quick_Start.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle UserGuide.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_1.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_2.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_3.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_4.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_5.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_6.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_7.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_8.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_dlm1.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Case_Study_mlr.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/Setting_Inits.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./manual_files/CIs.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./tex/Covariates.Rnw
-	"$(R_HOME)/bin/R" CMD Stangle ./tex/MARp.Rnw
+	Rscript -e "Stangle('EMDerivation.Rnw')"
+	Rscript -e "Stangle('Quick_Start.Rnw')"
+	Rscript -e "Stangle('UserGuide.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_1.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_2.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_3.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_4.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_5.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_6.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_7.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_8.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_dlm1.Rnw')"
+	Rscript -e "Stangle('./manual_files/Case_Study_mlr.Rnw')"
+	Rscript -e "Stangle('./manual_files/Setting_Inits.Rnw')"
+	Rscript -e "Stangle('./manual_files/Covariates.Rnw')"
+	Rscript -e "Stangle('./manual_files/MARp.Rnw')"
 
 makeRfiles:
 	cat ./figures/CS1--Cs1_*.R > ../inst/doc/Chapter_PVA.R
@@ -56,20 +54,27 @@ makeRfiles:
 	cat ./figures/MLR--Cs_*.R > ../inst/doc/Chapter_MLR.R
 	cat ./figures/MCI--Cs_mci_*.R > ../inst/doc/Chapter_inits.R
 	cat ./figures/ARMAp--Cs_*.R > ../inst/doc/Chapter_MARp.R
-	cat ./figures/CIs--Cs_*.R > ../inst/doc/Chapter_CIs.R
 
 pdf:	
-	texi2dvi --pdf --clean --verbose EMDerivation.tex
-	texi2dvi --pdf --clean --verbose Quick_Start.tex
-	texi2dvi --pdf --clean --verbose UserGuide.tex
-	texi2dvi --pdf --clean --verbose Manual.tex
+	pdflatex EMDerivation.tex
+	pdflatex Quick_Start.tex
+	pdflatex UserGuide.tex
+	pdflatex Manual.tex
+	bibtex EMDerivation
+	bibtex Quick_Start
+	bibtex UserGuide
+	bibtex Manual
+	pdflatex EMDerivation.tex
+	pdflatex Quick_Start.tex
+	pdflatex UserGuide.tex
+	pdflatex Manual.tex
 	cat Manual.pdf > UserGuide.pdf
 
 clean:
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
-	$(RM) *.sty *.bst *.cls
+	$(RM) *.sty *.bst *.cls *.bib
 	$(RM) *.tex
-	$(RM) *.Rnw
+	$(RM) *.Rnw *.R
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
 	$(RM) ./tex/*.*
