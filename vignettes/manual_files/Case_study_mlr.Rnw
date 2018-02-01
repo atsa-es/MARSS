@@ -124,7 +124,7 @@ coef(mod1.lm)
 @
 
 \subsection{Univariate response using auto-correlated errors: example 1} 
-As \citet{Faraway2005} discusses, the errors in this dataset are temporally correlated.  We can model the errors as an AR(1) process to account for this. This changes our model to 
+As \citet{Faraway2004} discusses, the errors in this dataset are temporally correlated.  We can model the errors as an AR(1) process to account for this. This changes our model to 
 \begin{equation}\label{eqn:longley.correrr}
 \begin{gathered}
 Employed_t = \alpha + \begin{bmatrix}\beta_{GNP}&\beta_{Pop}\end{bmatrix}\begin{bmatrix}GNP_t\\ Pop_t\end{bmatrix} + v_t + x_t, v_t \sim \N(0,r)\\
