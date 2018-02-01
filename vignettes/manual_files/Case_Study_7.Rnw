@@ -29,7 +29,7 @@ Typically, we have one time series per species and thus we assume that $m = n$ a
 In this chapter, we will estimate the $\BB$ matrix of species interactions for a simple wolf-moose system and for a four-species freshwater plankton system.  
 
 \section{Two-species example using wolves and moose}
-Population dynamics of wolves and moose on Isle Royale, Michigan make an interesting case study of a two-species predator-prey interactions.  These populations have been studied intensively since 1958\citep{VucitechPeterson2012web} \footnote{There are many, many publications from this long-term study site; see \url{http://www.isleroyalewolf.org/wolfhome/tech_pubs.html} and the review here \url{http://www.isleroyalewolf.org/data/data/home.html}.}.  Unlike other populations of gray wolves, the Isle Royale population has a diet dominated by one prey item, moose. The only predator of moose on Isle Royale is the gray wolf, as this population is not hunted.  
+Population dynamics of wolves and moose on Isle Royale, Michigan make an interesting case study of a two-species predator-prey interactions.  These populations have been studied intensively since 1958 \footnote{There are many, many publications from this long-term study site; see \url{http://www.isleroyalewolf.org/wolfhome/tech_pubs.html} and the review here \url{http://www.isleroyalewolf.org/data/data/home.html}.}.  Unlike other populations of gray wolves, the Isle Royale population has a diet dominated by one prey item, moose. The only predator of moose on Isle Royale is the gray wolf, as this population is not hunted.  
 
 We will use the wolf and moose winter census data from Isle Royale to learn how to fit community dynamics models to time-series data.  The long-term January (wolf) and February (moose) population estimates are provided at \url{http://www.isleroyalewolf.org}.
 
@@ -664,7 +664,7 @@ max(eigen(t(B)%*%B)$values)-1
 @
 
 \section{Further information}
-MAR modeling and models have been used estimate species interaction strengths, stability metrics, and environmental drivers for a variety of freshwater plankton systems \citep{Ives1995ec, Ivesetal1999, Ivesetal2003, Hamptonetal2008, Hamptonetal2006, HamptonSchindler2006, KlugCottingham2001}.  They have been used to gain much insight into the dynamics of ecological communities and how environmental drivers affect the system.  See \citet{Hamptonetal2014} for a review of the literature using MAR models to understand plankton dynamics.
+MAR modeling and models have been used estimate species interaction strengths, stability metrics, and environmental drivers for a variety of freshwater plankton systems \citep{Ives1995ec, Ivesetal1999, Ivesetal2003, Hamptonetal2008, Hamptonetal2006, HamptonSchindler2006, KlugCottingham2001}.  They have been used to gain much insight into the dynamics of ecological communities and how environmental drivers affect the system.  See \citet{Hamptonetal2013} for a review of the literature using MAR models to understand plankton dynamics.
 
 <<Reset, echo=FALSE, keep.source=FALSE>>=
 options(prompt="> ", continue="+ ")
