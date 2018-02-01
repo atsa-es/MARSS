@@ -44,7 +44,7 @@ logRedds = log(t(okanaganRedds)[2:3,])
 Year is in the first column, and the counts (in normal space) are in columns 2:3.  Missing observations are represented by NAs.  
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<Cs002_fig1,fig=TRUE>>=
 # Code for plotting raw Okanagan redd counts
@@ -127,7 +127,7 @@ kem3 = MARSS(logRedds, model=model3)
 Based on AIC, it looks like the best model is also the simplest one, with one state vector (model1).  This suggests that the two different surveys are not only measuring the same thing, but have the same observation error variance.  Finally,we will make a plot of the model-predicted states (with +/- 2 s.e.s) and the log-transformed data (Figure \ref{fig:fig2}).
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<Cs006_fig2,fig=TRUE, echo=FALSE>>=
 # Code for plotting the fit from the best model
@@ -156,7 +156,7 @@ rec.years=apply(!is.na(rockfish[,rec.names]),1,any)
 recdat = rockfish[rec.years,rec.names]
 flatrecdat=apply(recdat,1,sum,na.rm=TRUE)
 @
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<label=rockfish1,fig=TRUE>>=
 matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
@@ -188,7 +188,7 @@ kem.rock2=MARSS(flatrecdat,model=list(A=A.model,Q=matrix(0.01)))
 @
 Including the management effect has a big effect on our estimate of trend.
 
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<label=rockfish2,fig=TRUE>>=
 matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
@@ -215,7 +215,7 @@ legendnames = (unlist(dimnames(d)[2]))[2:ncol(d)]
 for(i in 1:length(legendnames)) cat(paste(i,legendnames[i],"\n",sep=" "))
 @
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{figure}[totalheight=0.8\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<label=fig3,fig=TRUE,echo=FALSE>>=
 d <- rockfish
@@ -322,7 +322,7 @@ birddat = t(kestrel[,2:4])
 head(kestrel)
 @
 
-\begin{figure}[totalheight=0.5\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<Cs008_plot-bird-data,fig=TRUE,echo=FALSE>>=
 # Make a plot of the three time series
@@ -435,7 +435,7 @@ kem.b4$AICc
 @
 This last model was superior to the others, improving the AICc value compared to model 1 by 8 units.  Figure \ref{fig:fig6} shows the fits for this model.
 
-\begin{figure}[totalheight=0.5\textheight]
+\begin{figure}[htp]
 \begin{center}
 <<Cs017_plot-bird-model-4-fits,fig=TRUE,echo=FALSE>>=
 # Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
