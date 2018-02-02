@@ -70,6 +70,8 @@ options(width=60)
 \include{./Case_Study_mlr}
 \include{./MARp}
 \appendix
+\appendixpage
+\addappheadtotoc
 \include{./tex/ModelSpec}
 \include{./tex/warnings}
 \include{./tex/obj_structures}
