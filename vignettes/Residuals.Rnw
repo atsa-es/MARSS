@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{EM Derivation} 
+%\VignetteIndexEntry{Residuals} 
 %\VignettePackage{MARSS}
 \documentclass[]{article}
 \usepackage{fullpage} %more standardized margins

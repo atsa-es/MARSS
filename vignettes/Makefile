@@ -59,10 +59,13 @@ pdf:
 	pdflatex EMDerivation.tex
 	pdflatex Quick_Start.tex
 	pdflatex Manual.tex
+	pdflatex Residuals.tex
 	bibtex EMDerivation
 	bibtex Manual
+	bibtex Residuals
 	pdflatex EMDerivation.tex
 	pdflatex Quick_Start.tex
+	pdflatex Residuals.tex
 	pdflatex Manual.tex
 	cat Manual.pdf > UserGuide.pdf
 
@@ -70,7 +73,7 @@ clean:
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
 	$(RM) *.sty *.bst *.cls *.bib
 	$(RM) *.tex
-	$(RM) *.Rnw *.R
+	$(RM) *.R
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
 	$(RM) ./tex/*.*
