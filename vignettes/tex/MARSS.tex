@@ -1,6 +1,6 @@
 \chapter{Fitting models: the MARSS() function}\label{chap:MARSS}
 
-From the user perspective, the main package function is \verb@MARSS()@.  This fits a MARSS model (Equation \ref{eqn:marss}) to a matrix of data:
+From the user perspective, the main package function is \verb@MARSS()@.  This fits a MARSS model (Equation \ref{eqn:marss}) to a matrix of data. The function call takes the form:
 \begin{Schunk}
 \begin{Sinput}
 MARSS(data, model=list(), form="marxss")) 
@@ -8,7 +8,7 @@ MARSS(data, model=list(), form="marxss"))
 \end{Schunk}
 The model argument is a list with names \verb@B@, \verb@U@, \verb@C@, \verb@c@, \verb@Q@, \verb@Z@, \verb@A@, \verb@D@, \verb@d@, \verb@R@, \verb@x0@, \verb@V0@.  Elements can be left off to use default values.  The form argument tells \verb@MARSS()@ how to use the model list elements.  The default is \verb@form="marxss"@ which is the model in Equation \ref{eqn:marss}.
 
-The data must be passed in as a $n \times T$ matrix; that is time goes across columns.  A vector is not a matrix, nor is a dataframe. A data matrix consisting of three time series ($n=3$) with six time steps might look like
+The data must be passed in as a $n \times T$ matrix; that is time goes across columns.  A vector is not a matrix, nor is a dataframe, nor is a time-series (\texttt{ts}) object. A data matrix consisting of three time series ($n=3$) with six time steps might look like
 \begin{equation*}
 \yy = \left[ \begin{array}{ccccccc}
     1 & 2 & NA & NA & 3.2 & 8\\
@@ -17,7 +17,7 @@ The data must be passed in as a $n \times T$ matrix; that is time goes across co
 \end{equation*}
 where NA denotes a missing value.
 
-The argument \verb@model@ specifies the structure of the MARSS model.  It is a list\index{model specification!in MARSS}, where the list elements for each model parameter specifies the form of that parameter.  
+The argument \verb@model@ specifies the structure of the MARSS model.  It is a list\index{model specification!in MARSS}, where the list elements for each model parameter specify the form of that parameter.  
 
 The most general way to specify model structure is to use a list matrix.  The list matrix allows one to combine fixed and estimated elements in one's parameter specification.  It allows a one-to-one correspondence between how you write the parameter matrix on paper and how you specify it in \R.  For example, let's say $\QQ$ and $\uu$ have the following forms in your model:
 \begin{equation*}
