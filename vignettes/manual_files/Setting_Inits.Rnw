@@ -143,9 +143,9 @@ MARSSmcinit = function(MLEobj,
     prev = MARSS:::progressBar() #this is an internal function to MARSS
     drawProgressBar = TRUE
   }
-  modelObj=MLEobj[["marss"]]
-  y = modelObj$data
-  par.dims=attr(modelObj,"model.dims")
+  MODELobj=MLEobj[["marss"]]
+  y = MODELobj$data
+  par.dims=attr(MODELobj,"model.dims")
   m = par.dims[["x"]][1]
   n = par.dims[["y"]][1]
   TT = par.dims[["data"]][2]
@@ -154,7 +154,7 @@ MARSSmcinit = function(MLEobj,
   #Make sure the missing vals in y are zeroed out
   y[YM==0]=0
 
-  free.tmp = modelObj$free 
+  free.tmp = MODELobj$free 
   dim.tmp = list(Z=c(n,m), A=c(n,1), R=c(n,n), B=c(m,m), U=c(m,1), Q=c(m,m), x0=c(m,1))
   bounds.tmp = control$MCbounds
   init = bestinits = MLEobj$start
@@ -171,7 +171,7 @@ MARSSmcinit = function(MLEobj,
       if(!MARSS:::is.fixed(free.tmp[[el]])){ #is.fixed is a utility func in MARSS
         bounds.param = bounds.tmp[[el]]
         #use the first fixed and free in a temporally varying model; arbitrary
-        tmp=list(f=MARSS:::sub3D(modelObj$fixed[[el]],t=1),D=MARSS:::sub3D(modelObj$free[[el]],t=1))
+        tmp=list(f=MARSS:::sub3D(MODELobj$fixed[[el]],t=1),D=MARSS:::sub3D(MODELobj$free[[el]],t=1))
         if(el %in% c("Q", "R")){   # random starts drawn from a wishart dist
           if( bounds.param[1] < dim.param[1]){ df=dim.param[1] }else{ df=bounds.param[1] }
 	        S=diag(bounds.param[2],dim.param[1])

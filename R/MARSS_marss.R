@@ -330,14 +330,14 @@ predict_marss = function(x, newdata, n.ahead, t.start){
 }
 
 #describe_marss works generally with marxss form models (of which marss is one type)
-describe_marss = function(modelObj, model.elem=NULL){
+describe_marss = function(MODELobj, model.elem=NULL){
   #This returns the structure of a model using text strings; works for form=marss or marxss
   #You can pass in model.elem to have is drop some elements of marxss (if you don't want these to print)
-  fixed = modelObj$fixed
-  free = modelObj$free
-  model.dims=attr(modelObj,"model.dims")
+  fixed = MODELobj$fixed
+  free = MODELobj$free
+  model.dims=attr(MODELobj,"model.dims")
   m=model.dims$x[1]; n=model.dims$y[1]
-  model.elem=attr(modelObj,"par.names")
+  model.elem=attr(MODELobj,"par.names")
   #set up the constr type list with an element for each par name and init val of "none"
   constr.type=vector("list",length(model.elem))
   names(constr.type)=model.elem
@@ -359,7 +359,7 @@ describe_marss = function(modelObj, model.elem=NULL){
       if( elem=="Z" & is.fixed(free[[elem]]) & dim(fixed[[elem]])[3]==1 ){
         if( all(apply(fixed[[elem]],3,is.design,dim=c(dimm,dimc))) ) { 
           Z.names = c()
-          X.names=attr(modelObj,"X.names")
+          X.names=attr(MODELobj,"X.names")
           if(is.null(X.names)) X.names=as.character(1:m)
           for(i in 1:n) Z.names = c(Z.names, X.names[as.logical(fixed$Z[i,,1])]) #fixed$Z will be time constant
           constr.type[[elem]] = paste("design matrix with rows:",paste(Z.names,collapse=" "))
@@ -434,20 +434,20 @@ describe_marss = function(modelObj, model.elem=NULL){
 # and that these have the proper size and form
 # m is pulled from fixed$x0
 ########################################################################
-is.marssMODEL_marss <- function(modelObj, method="kem"){
+is.marssMODEL_marss <- function(MODELobj, method="kem"){
   msg=NULL
   ## Set up par.names that should be in a marss model
   en = c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   
   #Check that par.names has these and only these names
-  par.names=attr(modelObj, "par.names")
+  par.names=attr(MODELobj, "par.names")
   if( !all(en %in% par.names ) ){ 
     msg = c(msg, "Element ", en[!(en %in% par.names)], " is missing from the par.names attribute of the model object.\n")
   }
   if( !all( par.names %in% en ) ) { 
     msg = c(msg, "Only ", en, "should be in the par.names attribute of the model object.\n")
   }
-  model.dims=attr(modelObj, "model.dims")
+  model.dims=attr(MODELobj, "model.dims")
   if( !all(en %in% names(model.dims) ) ){ 
     msg = c(msg, "Element ", en[!(en %in% names(model.dims) )], " is missing from the model.dims attribute of the model object.\n")
   }
@@ -458,12 +458,12 @@ is.marssMODEL_marss <- function(modelObj, method="kem"){
   ###########################
   # Check model.dims are correct
   ###########################
-  n = dim(modelObj$data)[1]
-  TT = dim(modelObj$data)[2]
-  m = dim(modelObj$fixed$x0)[1]
-  g1=dim(modelObj$fixed$G)[1]/m
-  h1=dim(modelObj$fixed$H)[1]/n
-  l1=dim(modelObj$fixed$L)[1]/m
+  n = dim(MODELobj$data)[1]
+  TT = dim(MODELobj$data)[2]
+  m = dim(MODELobj$fixed$x0)[1]
+  g1=dim(MODELobj$fixed$G)[1]/m
+  h1=dim(MODELobj$fixed$H)[1]/n
+  l1=dim(MODELobj$fixed$L)[1]/m
   en = c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L", "data", "x", "y", "w", "v")
   correct.dim1 = c(Z=n,A=n,R=h1,B=m, U=m, Q=g1, x0=m, V0=l1, G=m, H=n, L=m, data=n, x=m, y=n, w=m, v=n)
   correct.dim2 = c(Z=m,A=1,R=h1,B=m, U=1, Q=g1, x0=1, V0=l1, G=g1, H=h1, L=l1, data=TT, x=TT, y=TT, w=TT, v=TT)
@@ -486,7 +486,7 @@ is.marssMODEL_marss <- function(modelObj, method="kem"){
     return(msg)
   }  
   
-  fixed=modelObj$fixed; free=modelObj$free
+  fixed=MODELobj$fixed; free=MODELobj$free
   
   ###########################
   # Check that x0, V0 and L are not time-varying

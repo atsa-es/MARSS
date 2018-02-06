@@ -180,5 +180,5 @@ print_dfa = function(x){ return(print_marxss(x)) }
 coef_dfa = function(x){ return(coef_marxss(x)) }
 MARSSinits_dfa = function(MLEobj, inits){ return(MARSSinits_marxss(MLEobj, inits)) }
 predict_dfa = function(x, newdata, n.ahead, t.start){ predict_marxss(x, newdata, n.ahead, t.start) }
-describe_dfa = function(modelObj){ describe_marss(modelObj) }
-is.marssMODEL_dfa = function(modelObj, method="kem"){ is.marssMODEL_marxss(modelObj, method=method) }
+describe_dfa = function(MODELobj){ describe_marss(MODELobj) }
+is.marssMODEL_dfa = function(MODELobj, method="kem"){ is.marssMODEL_marxss(MODELobj, method=method) }

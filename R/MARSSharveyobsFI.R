@@ -13,16 +13,16 @@ MARSSharveyobsFI = function( MLEobj ) {
   condition.limit=1E10
   condition.limit.Ft=1E5 #because the Ft is used to compute LL and LL drop limit is about 2E-8
   
-  modelObj = MLEobj$marss
-  n=dim(modelObj$data)[1]; TT=dim(modelObj$data)[2]; m=dim(modelObj$fixed$x0)[1]
+  MODELobj = MLEobj$marss
+  n=dim(MODELobj$data)[1]; TT=dim(MODELobj$data)[2]; m=dim(MODELobj$fixed$x0)[1]
   
   #create the YM matrix
-  YM=matrix(as.numeric(!is.na(modelObj$data)),n,TT)
+  YM=matrix(as.numeric(!is.na(MODELobj$data)),n,TT)
   #Make sure the missing vals in y are zeroed out if there are any
-  y=modelObj$data
+  y=MODELobj$data
   y[YM==0]=0
   
-  if(modelObj$tinitx==1){ init.state="x10" }else{ init.state="x00" }
+  if(MODELobj$tinitx==1){ init.state="x10" }else{ init.state="x00" }
   msg=NULL
   #Construct needed identity matrices
   I.m = diag(1,m); I.n = diag(1,n)
@@ -49,11 +49,11 @@ MARSSharveyobsFI = function( MLEobj ) {
   #Set up the parameters; Same code as in MARSSkf
   ##############################################
   #Note diff in param names B=T, u=c, a=d aka My notation (L)=Harvey notation (R)
-  model.elem = attr(modelObj,"par.names")
-  dims = attr(modelObj, "model.dims")
+  model.elem = attr(MODELobj,"par.names")
+  dims = attr(MODELobj, "model.dims")
   time.varying = c()
   for(el in model.elem){
-    if( (dim(modelObj$free[[el]])[3] != 1) | (dim(modelObj$fixed[[el]])[3] != 1))  
+    if( (dim(MODELobj$free[[el]])[3] != 1) | (dim(MODELobj$fixed[[el]])[3] != 1))  
       time.varying = c(time.varying, el)
   }
   pari=parmat(MLEobj,t=1)

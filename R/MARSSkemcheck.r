@@ -1,10 +1,10 @@
 MARSSkemcheck = function( MLEobj ){
 #This checks that the model can be handled by the MARSSkem algorithm
 # Most of this is implementing the restrictions in Summary of Requirements for Degenerate Models in derivation
-modelObj=MLEobj$marss
-fixed = modelObj$fixed
-free = modelObj$free
-par.dims=attr(modelObj,"model.dims")
+MODELobj=MLEobj$marss
+fixed = MODELobj$fixed
+free = MODELobj$free
+par.dims=attr(MODELobj,"model.dims")
 m=par.dims[["x"]][1]; n=par.dims[["y"]][1]
 TT=par.dims[["data"]][2]
 pseudolim=1E-8
@@ -21,9 +21,9 @@ msg=NULL
    for(t in 1:max(dim(free$B)[3],dim(fixed$B)[3])){
     ifixed=min(t,dim(fixed$B)[3])
     if( is.fixed(free$B[,,ifixed,drop=FALSE]) ){  #works on 3D matrices
-    #parmat needs modelObj and par list
+    #parmat needs MODELobj and par list
       if(is.null(MLEobj$par$B)) tmpparB=MLEobj$start$B else tmpparB=MLEobj$par$B
-    tmp.MLEobj=list( marss=modelObj,par=list(B=tmpparB) ) #B is fixed but par might have cols from other times
+    tmp.MLEobj=list( marss=MODELobj,par=list(B=tmpparB) ) #B is fixed but par might have cols from other times
     parB = parmat(tmp.MLEobj,"B",t=t)$B
     if( !all(abs(Re(eigen(parB,only.values=TRUE)$values))<=1)){ 
       msg=c(msg, " All the eigenvalues of B must be within the unit circle: all(abs(Re(eigen(fixed$B)$values))<=1)\n")
@@ -125,7 +125,7 @@ msg=NULL
       for( el in c("B","U")){
           ifree=min(i,dim(free[[el]])[3])
           #I don't know what par$Z will be.  I want to create a par$Z where there is a non-zero value for any potentially non-zero Z's
-          tmp.MLEobj=list(marss=modelObj, par=list(Z=matrix(1,dim(free$Z)[2],1)))
+          tmp.MLEobj=list(marss=MODELobj, par=list(Z=matrix(1,dim(free$Z)[2],1)))
           tmp.MLEobj$marss$fixed$Z[tmp.MLEobj$marss$fixed$Z!=0]=1
           tmp.MLEobj$marss$free$Z[tmp.MLEobj$marss$free$Z!=0]=1
           parZ=parmat(tmp.MLEobj,"Z",t=i)$Z
@@ -198,7 +198,7 @@ msg=NULL
       el="B"
       ifree=min(i,dim(free[[el]])[3])
       #I don't know what par$B will be.  I want to create a par$B where there is a non-zero value for any potentially non-zero B's
-      tmp.MLEobj=list(marss=modelObj, par=list(B=matrix(1,dim(free$B)[2],1)))
+      tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim(free$B)[2],1)))
       tmp.MLEobj$marss$fixed[[el]][tmp.MLEobj$marss$fixed[[el]]!=0]=1
       tmp.MLEobj$marss$free[[el]][tmp.MLEobj$marss$free[[el]]!=0]=1
       adjB=parmat(tmp.MLEobj,el,t=i)[[el]]
@@ -232,7 +232,7 @@ msg=NULL
         OMGp[[el]] = diag(1,par.dims[[el]][1])[diag(IIp[[el]])==1,,drop=FALSE]
         
         #I don't know what par$B will be.  I want to create a par$B where there is a non-zero value for any potentially non-zero B's
-        tmp.MLEobj=list(marss=modelObj, par=list(B=matrix(1,dim(free$B)[2],1)))
+        tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim(free$B)[2],1)))
         tmp.MLEobj$marss$fixed$B[tmp.MLEobj$marss$fixed$B!=0]=1
         tmp.MLEobj$marss$free$B[tmp.MLEobj$marss$free$B!=0]=1
         Adj.mat=parmat(tmp.MLEobj,"B",t=i)$B

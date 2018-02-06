@@ -7,20 +7,20 @@
 #     smoothed lag-1 covariances needed by the EM algorithm
 #######################################################################################################
 MARSSkfas = function( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE ) {
-    modelObj = MLEobj$marss
+    MODELobj = MLEobj$marss
     control = MLEobj$control
-    diffuse=modelObj$diffuse
-    model.dims=attr(modelObj,"model.dims")
+    diffuse=MODELobj$diffuse
+    model.dims=attr(MODELobj,"model.dims")
     
     n=model.dims$data[1]; TT=model.dims$data[2]; m=model.dims$x[1]
     g1=model.dims$Q[1]; h1=model.dims$R[1]; l1=model.dims$L[1]
     par.1=parmat(MLEobj, t=1)
     t.B=matrix(par.1$B,m,m,byrow=TRUE)
     #create the YM matrix
-    YM=matrix(as.numeric(!is.na(modelObj$data)),n,TT)
+    YM=matrix(as.numeric(!is.na(MODELobj$data)),n,TT)
       
     #Make sure the missing vals in yt are NAs if there are any
-    yt=modelObj$data
+    yt=MODELobj$data
     yt[!YM]=as.numeric(NA)
     
     #Stack the y so that we can get the lag-1 covariance smoother from the Kalman filter output
@@ -123,7 +123,7 @@ MARSSkfas = function( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfa
     
     #Build the a1 and P1 matrices
     #First compute x10 and V10 if tinitx=0
-    if(modelObj$tinitx==0){ # Compute needed x_1 | x_0
+    if(MODELobj$tinitx==0){ # Compute needed x_1 | x_0
        #B(1),U(1), and Q(1) correct here since equivalent to B(0), etc in KFAS terminology
        x00=par.1$x0; V00=tcrossprod(par.1$L%*%par.1$V0,par.1$L)
        x10 = par.1$B%*%x00 + par.1$U   #Shumway and Stoffer treatment of initial states   
@@ -190,10 +190,10 @@ MARSSkfas = function( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfa
 
     x10T = ks.out$alphahat[1:m,1,drop=FALSE] 
     V10T = matrix(VtT[,,1],m,m)
-    if(modelObj$tinitx==1){ 
+    if(MODELobj$tinitx==1){ 
       x00=matrix(NA,m,1); V00=matrix(NA,m,m)
       x0T=x10T; V0T=V10T
-    }else{  #modelObj$tinitx==0
+    }else{  #MODELobj$tinitx==0
       Vtt1.1=sub3D(Vtt1,t=1)
       Vinv=pcholinv(Vtt1.1)
       if(m!=1) Vinv = symm(Vinv)  #to enforce symmetry after chol2inv call

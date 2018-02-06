@@ -3,16 +3,16 @@
 #   Expectations involving hatyt
 #######################################################################################################
 MARSShatyt = function( MLEobj ) {
-  modelObj = MLEobj[["marss"]]
+  MODELobj = MLEobj[["marss"]]
   if(!is.null(MLEobj[["kf"]])){ kfList = MLEobj$kf
   }else{ kfList=MARSSkf(MLEobj) }
-  model.dims=attr(modelObj,"model.dims")
+  model.dims=attr(MODELobj,"model.dims")
   n=model.dims$data[1]; TT=model.dims$data[2]; m=model.dims$x[1]
   
   #create the YM matrix
-  YM=matrix(as.numeric(!is.na(modelObj[["data"]])),n,TT)
+  YM=matrix(as.numeric(!is.na(MODELobj[["data"]])),n,TT)
   #Make sure the missing vals in y are zeroed out if there are any
-  y=modelObj$data
+  y=MODELobj$data
   y[YM==0]=0
   
   #set-up matrices for hatxt for 1:TT and 1:TT-1

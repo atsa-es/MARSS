@@ -1001,7 +1001,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   return(list(MLEobj=x, newdata=newdata))
 }
 
-describe_marxss = function(modelObj){ describe_marss(modelObj) }
+describe_marxss = function(MODELobj){ describe_marss(MODELobj) }
 #describe_marss works generally with marxss form models (of which marss is one type)
 #describe_marss is in the file describe_marssMODEL.R
 
@@ -1013,18 +1013,18 @@ describe_marxss = function(modelObj){ describe_marss(modelObj) }
 # and that these have the proper size and form
 # m is pulled from fixed$x0
 ########################################################################
-is.marssMODEL_marxss <- function(modelObj, method="kem"){
+is.marssMODEL_marxss <- function(MODELobj, method="kem"){
   
   msg=NULL
 
-  if( !("marxss" %in% attr(modelObj, "form") ) ){ 
+  if( !("marxss" %in% attr(MODELobj, "form") ) ){ 
     msg = c(msg, "Form attribute of the model object does not include marxss.\n")
   }
   ## Set up par.names that should be marxss model
   en = c("Z","A","R","B","U","Q","x0","V0","D","C","d","c","G","H","L")
   
   #Check that par.names has these and only these names
-  par.names=attr(modelObj, "par.names")
+  par.names=attr(MODELobj, "par.names")
   if( !all(en %in% par.names ) ){ 
     msg = c(msg, "Element ", en[!(en %in% par.names)], " is missing from the par.names attribute of the model object.\n")
   }
@@ -1038,19 +1038,19 @@ is.marssMODEL_marxss <- function(modelObj, method="kem"){
   ###########################
   # Check model.dims attribute is correct
   ###########################
-  n = dim(modelObj$data)[1]
-  TT = dim(modelObj$data)[2]
-  m = dim(modelObj$fixed$x0)[1]
-  c1=dim(modelObj$fixed$c)[1]
-  d1=dim(modelObj$fixed$d)[1]
-  g1=dim(modelObj$fixed$G)[1]/m
-  h1=dim(modelObj$fixed$H)[1]/n
-  l1=dim(modelObj$fixed$L)[1]/m
+  n = dim(MODELobj$data)[1]
+  TT = dim(MODELobj$data)[2]
+  m = dim(MODELobj$fixed$x0)[1]
+  c1=dim(MODELobj$fixed$c)[1]
+  d1=dim(MODELobj$fixed$d)[1]
+  g1=dim(MODELobj$fixed$G)[1]/m
+  h1=dim(MODELobj$fixed$H)[1]/n
+  l1=dim(MODELobj$fixed$L)[1]/m
   
   en = c("Z","A","R","B","U","Q","x0","V0","D","C","d","c", "G", "H", "L", "data", "x", "y", "w", "v")
   correct.dim1 = c(Z=n,A=n, R=h1, B=m, U=m, Q=g1, x0=m, V0=l1, D=n, C=m, c=c1, d=d1, G=m, H=n, L=m, data=n, x=m, y=n, w=m, v=n)
   correct.dim2 = c(Z=m,A=1, R=h1, B=m, U=1, Q=g1, x0=1, V0=l1, D=d1, C=c1, c=TT, d=TT, G=g1, H=h1, L=l1, data=TT, x=TT, y=TT, w=TT, v=TT)
-  model.dims=attr(modelObj, "model.dims")
+  model.dims=attr(MODELobj, "model.dims")
   for (elem in en) {
     ## Check for problems in the fixed/free pairs. Problems show up as TRUE 
     dim.flag1 = dim.flag2 = FALSE
@@ -1070,7 +1070,7 @@ is.marssMODEL_marxss <- function(modelObj, method="kem"){
     return(msg)
   }  
   
-  fixed=modelObj$fixed; free=modelObj$free
+  fixed=MODELobj$fixed; free=MODELobj$free
   
   ###########################
   # Check that x0, V0 and L are not time-varying

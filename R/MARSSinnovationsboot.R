@@ -15,18 +15,18 @@ MARSSinnovationsboot = function(MLEobj, nboot=1000, minIndx=3 ) {
    }else{ kf=MLEobj[["kf"]] } 
    
    ## Rename things for code readability
-   modelObj=MLEobj[["marss"]]
-   par.dims=attr(modelObj,"model.dims")
+   MODELobj=MLEobj[["marss"]]
+   par.dims=attr(MODELobj,"model.dims")
    TT = par.dims[["data"]][2]
    m = par.dims[["x"]][1]   
    n = par.dims[["y"]][1]
-   f=modelObj[["fixed"]]
-   d=modelObj[["free"]]
+   f=MODELobj[["fixed"]]
+   d=MODELobj[["free"]]
    pari=parmat(MLEobj,t=1)
 
    #### make a list of time-varying parameters
    time.varying = list()
-   for(elem in attr(modelObj,"par.names")) {
+   for(elem in attr(MODELobj,"par.names")) {
     if( (dim(d[[elem]])[3] == 1) & (dim(f[[elem]])[3] == 1)){
         time.varying[[elem]] = FALSE
       }else{ time.varying[[elem]] = TRUE }  #not time-varying
@@ -75,7 +75,7 @@ MARSSinnovationsboot = function(MLEobj, nboot=1000, minIndx=3 ) {
       # reset newStates to its original dim
       newStates = matrix(NA, m, TT+1)
    }
-     return(list(boot.states=boot.states, boot.data=boot.data, marss=modelObj, nboot=nboot))
+     return(list(boot.states=boot.states, boot.data=boot.data, marss=MODELobj, nboot=nboot))
 }
 
 ######################################################################################################################

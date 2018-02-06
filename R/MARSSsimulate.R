@@ -12,15 +12,15 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
   # if miss.loc is the same for all nsim, can pass in dim=c(n, tSteps)
   if(!is.marssMLE(MLEobj) | is.null(MLEobj$par))     
     stop("Stopped in MARSSsimulate(). The function requires a marssMLE object with the par element.\n", call.=FALSE)
-  modelObj=MLEobj[["marss"]]
-  n = dim(modelObj$fixed$A)[1]
-  m = dim(modelObj$fixed$x0)[1]
+  MARSSobj=MLEobj[["marss"]]
+  n = dim(MARSSobj$fixed$A)[1]
+  m = dim(MARSSobj$fixed$x0)[1]
   
-  ###### Error-checking on modelObj
-  tmp = is.marssMODEL(modelObj, method=MLEobj[["method"]])
+  ###### Error-checking on MARSSobj
+  tmp = is.marssMODEL(MARSSobj, method=MLEobj[["method"]])
   if(!isTRUE(tmp)) {
     if(!silent) cat(tmp)
-    stop("Stopped in MARSSsimulate() due to problem with modelObj.\n", call.=FALSE)
+    stop("Stopped in MARSSsimulate() due to problem with MARSSobj.\n", call.=FALSE)
   }
   
   ###### Error-checking on the arguments
@@ -40,11 +40,11 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
     msg=c(msg,"Incorrect input arg: miss.loc dim must be n x tSteps or n x tSteps x nsim.\n")
     
   #Check that if any fixed or free are time-varying, TT = tSteps
-  en=names(modelObj$fixed)
+  en=names(MARSSobj$fixed)
   Tmax = 1
   for(elem in en){
-    Tmax = max(Tmax,dim(modelObj$fixed[[elem]])[3])
-    Tmax = max(Tmax,dim(modelObj$free[[elem]])[3])
+    Tmax = max(Tmax,dim(MARSSobj$fixed[[elem]])[3])
+    Tmax = max(Tmax,dim(MARSSobj$free[[elem]])[3])
   }
   if(is.null(tSteps)) tSteps=Tmax
   if( !(Tmax==1 || Tmax==tSteps) ) 
@@ -81,8 +81,8 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
 
   #### make a list of time-varying parameters
   time.varying = list()
-  for(elem in names(modelObj$free)) {
-    if( (dim(modelObj$free[[elem]])[3] == 1) & (dim(modelObj$fixed[[elem]])[3] == 1)){
+  for(elem in names(MARSSobj$free)) {
+    if( (dim(MARSSobj$free[[elem]])[3] == 1) & (dim(MARSSobj$fixed[[elem]])[3] == 1)){
         time.varying[[elem]] = FALSE
       }else{ time.varying[[elem]] = TRUE }  #not time-varying
   }
@@ -93,7 +93,7 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
   ##### It is required that the 0 locations are time invariant in Q, R and V0; checked in is.marssMLE()
     Omg1=t.Omg1=n.not0=Omg0=t.Omg0=list()
     for(elem in c("Q","R","V0")){
-      dim.par = sqrt(dim(modelObj$fixed[[elem]])[1])
+      dim.par = sqrt(dim(MARSSobj$fixed[[elem]])[1])
       Omg1[[elem]]=t.Omg1[[elem]]=Omg0[[elem]]=t.Omg0[[elem]]=array( 0,dim=c(dim.par,dim.par) )
       n.not0[[elem]]=c()
       the.par=par1[[elem]]
@@ -143,7 +143,7 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
        pro.error = t(rmvnorm(1, mean = rep(0, n.not0$Q), sigma = Q.mat, method="chol"))
        pro.error = t.Omg1$Q%*%pro.error
     }else{ pro.error = matrix(0,m,1) } #Q all zero
-      if(j==2 && modelObj$tinitx==1){ newStates[,2]=newStates[,1]
+      if(j==2 && MARSSobj$tinitx==1){ newStates[,2]=newStates[,1]
       }else{
       if(time.varying$B) pari$B=parmat(MLEobj, "B", t=(j-1) )$B 
       if(time.varying$U) pari$U=parmat(MLEobj, "U", t=(j-1) )$U 

@@ -5,7 +5,7 @@
 ## Wants either a scalar (dim=NULL) or a matrix the same size as $par[[elem]] or a marssMLE object with the par element
 
 MARSSinits <- function(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, R=0.05, x0=-99, V0=5, G=0, H=0, L=0)){
-modelObj=MLEobj[["marss"]]
+MODELobj=MLEobj[["marss"]]
 method=MLEobj[["method"]]
 if(is.null(inits)) inits=list()
 if(class(inits)=="marssMLE"){
@@ -31,30 +31,30 @@ default = alldefaults[[method]][["inits"]]
 for(elem in names(default)){
   if(is.null(inits[[elem]])) inits[[elem]]=default[[elem]]
 }
-  y = modelObj$data
-  m = dim(modelObj$fixed$x0)[1]
-  n = dim(modelObj$data)[1]
-  d = modelObj$free
-  f = modelObj$fixed
+  y = MODELobj$data
+  m = dim(MODELobj$fixed$x0)[1]
+  n = dim(MODELobj$data)[1]
+  d = MODELobj$free
+  f = MODELobj$fixed
   parlist = list()
   
-  g1=dim(modelObj$fixed$G)[1]/m
-  h1=dim(modelObj$fixed$H)[1]/n
-  l1=dim(modelObj$fixed$L)[1]/m
+  g1=dim(MODELobj$fixed$G)[1]/m
+  h1=dim(MODELobj$fixed$H)[1]/n
+  l1=dim(MODELobj$fixed$L)[1]/m
   par.dims=list(Z=c(n,m),A=c(n,1),R=c(h1,h1),B=c(m,m),U=c(m,1),Q=c(g1,g1),x0=c(m,1),V0=c(l1,l1),G=c(m,g1),H=c(n,h1),L=c(m,l1))
 
   for(elem in names(par.dims)){
-  if(is.fixed(modelObj$free[[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
+  if(is.fixed(MODELobj$free[[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
   }else{ #not fixed
     #must be numeric
     if( !is.numeric(inits[[elem]]) ){
       stop(paste("Stopped in MARSSinits(): ",elem," inits must be numeric.",sep=""),call.=FALSE)
     }
     #must be either length 1 or same length as the number of estimated values for elem
-    if( !((is.null(dim(inits[[elem]])) & length(inits[[elem]])==1) | isTRUE(all.equal(dim(inits[[elem]]),c(dim(modelObj$free[[elem]])[2],1)))) ){
+    if( !((is.null(dim(inits[[elem]])) & length(inits[[elem]])==1) | isTRUE(all.equal(dim(inits[[elem]]),c(dim(MODELobj$free[[elem]])[2],1)))) ){
       stop(paste("Stopped in MARSSinits(): ",elem," inits must be either a scalar (dim=NULL) or the same size as the par$",elem," element.",sep=""),call.=FALSE)
       }
-    parlist[[elem]]=matrix(inits[[elem]],dim(modelObj$free[[elem]])[2],1)
+    parlist[[elem]]=matrix(inits[[elem]],dim(MODELobj$free[[elem]])[2],1)
   
     if(elem %in% c("B","Q","R","V0") & is.null(dim(inits[[elem]]))) {  
       #if inits is a scalar, make init a diagonal matrix
@@ -85,7 +85,7 @@ for(elem in names(default)){
       Zmat=sub3D(f$Z,t=1)+sub3D(d$Z,t=1)%*%parlist$Z
       Zmat=unvec(Zmat,dim=c(n,m))
       Amat=sub3D(f$A,t=1)+sub3D(d$A,t=1)%*%parlist$A
-      if(modelObj$tinitx==0){ #y=Z*(B*pi+U)+A
+      if(MODELobj$tinitx==0){ #y=Z*(B*pi+U)+A
         Bmat=sub3D(f$B,t=1)+sub3D(d$B,t=1)%*%parlist$B
         Bmat=unvec(Bmat,dim=c(m,m))
         Umat=sub3D(f$U,t=1)+sub3D(d$U,t=1)%*%parlist$U 
@@ -97,7 +97,7 @@ for(elem in names(default)){
       #y1=Z1*(D*pipi+f)+a if tinit=1 or y1=Z1*(B(D*pipi+f)+U)+A if tinit=0
       tmp=Zmat%*%Bmat%*%dx0
       if(is.solvable(tmp)=="underconstrained"){
-          if(modelObj$tinitx==0){
+          if(MODELobj$tinitx==0){
             stop("Stopped in MARSSinits(): Z B d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
           }else{
             stop("Stopped in MARSSinits(): Z d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")

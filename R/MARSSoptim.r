@@ -53,13 +53,13 @@ MARSSoptim = function(MLEobj) {
   #the is.marssMODEL call is.validvarcov() which tests that the blocks are diagonal or unconstrained in the varcov matrices
 
   ## attach would be risky here since user might have one of these variables in their workspace    
-  modelObj=MLEobj[["marss"]]
-  y = modelObj$data #must have time going across columns
-  free = modelObj$free
-  fixed = modelObj$fixed
+  MODELobj=MLEobj[["marss"]]
+  y = MODELobj$data #must have time going across columns
+  free = MODELobj$free
+  fixed = MODELobj$fixed
   tmp.inits = MLEobj$start
   control=MLEobj$control
-  par.dims=attr(modelObj,"model.dims")
+  par.dims=attr(MODELobj,"model.dims")
   m=par.dims[["x"]][1]
   n=par.dims[["y"]][1]
   
@@ -144,7 +144,7 @@ MARSSoptim = function(MLEobj) {
       
       #back transform Q, R and V0 if needed from chol form to usual form
   for(elem in c("Q","R","V0")){   #this works because by def fixed and free blocks of var-cov mats are independent
-     if(!is.fixed(modelObj$free[[elem]])) #get a new par if needed
+     if(!is.fixed(MODELobj$free[[elem]])) #get a new par if needed
         {
         d=sub3D(tmp.MLEobj$marss$free[[elem]],t=1) #this will be the one with the upper tri zero-ed out but ok since symmetric
         par.dim=par.dims[[elem]][1:2]

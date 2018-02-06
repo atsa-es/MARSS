@@ -4,15 +4,15 @@
 #   Maximization using an EM algorithm with Kalman filter
 #######################################################################################################
 MARSSkem = function( MLEobj ) {
-  modelObj=MLEobj[["marss"]]
+  MODELobj=MLEobj[["marss"]]
   # This is a core function and does not check if user specified a legal or solveable model. 
   # y is MLEobj$marss$data with the missing values replaced by 0
-  kf.x0 = ifelse(modelObj[["tinitx"]]==1,"x10","x00")  #the initial conditions treatment "x00" x0 is at t=0 or "x01" x0 is at t=1
+  kf.x0 = ifelse(MODELobj[["tinitx"]]==1,"x10","x00")  #the initial conditions treatment "x00" x0 is at t=0 or "x01" x0 is at t=1
   #kf.x0=x00 prior is defined as being E[x(t=0)|y(t=0)]; xtt[0]=x0; Vtt[0]=V0
   #kf.x1=x10 prior is defined as being E[x(t=0)|y(t=0)]; xtt1[1]=x0; Vtt1[1]=V0
   
   #The model will be form = marss, so use base function for that form here
-  constr.type = describe_marss( modelObj )
+  constr.type = describe_marss( MODELobj )
   #Check that model is allowed given the EM algorithm constaints; returns some info on the model structure
   if(MLEobj[["control"]][["trace"]] != -1){
     errhead = "\nErrors were caught in MARSSkemcheck \n"
@@ -25,12 +25,12 @@ MARSSkem = function( MLEobj ) {
   msg=NULL; stop.msg=NULL; msg.kem=NULL; msg.kf=NULL; msg.conv=NULL #error messages
   
   ## attach would be risky here since user might have one of these variables in their workspace    
-  y = modelObj[["data"]]#must have time going across columns
-  d = modelObj[["free"]]      # D or free matrix
-  f = modelObj[["fixed"]]   # f matrix
+  y = MODELobj[["data"]]#must have time going across columns
+  d = MODELobj[["free"]]      # D or free matrix
+  f = MODELobj[["fixed"]]   # f matrix
   inits = MLEobj[["start"]]
-  model.el = attr(modelObj, "par.names")
-  model.dims = attr(modelObj, "model.dims")
+  model.el = attr(MODELobj, "par.names")
+  model.dims = attr(MODELobj, "model.dims")
   n =  model.dims[["data"]][1]; TT = model.dims[["data"]][2]; m = model.dims[["x"]][1]
   Id = list(m = diag(1,m), n = diag(1,n)); IIm=diag(1,m) # identity matrices
   

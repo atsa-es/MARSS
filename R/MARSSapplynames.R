@@ -3,14 +3,14 @@ MARSSapplynames=function(MLEobj){
   if(!(class(MLEobj) %in% c("marssMLE")))
      stop("Stopped in MARSSapplynames() because this function is for marssMLE objects only.\n", call.=FALSE)
 
-  modelObj=MLEobj[["marss"]]
-  par.names=attr(modelObj,"par.names")
-  X.names=attr(modelObj,"X.names")
-  Y.names=attr(modelObj,"Y.names")
+  MODELobj=MLEobj[["marss"]]
+  par.names=attr(MODELobj,"par.names")
+  X.names=attr(MODELobj,"X.names")
+  Y.names=attr(MODELobj,"Y.names")
   
   #The par element has rownames that come from the column names of the free matrix   
   for(elem in par.names){
-    if(!is.null(MLEobj[["par"]][[elem]]) & is.null(rownames(MLEobj[["par"]][[elem]]))) rownames(MLEobj[["par"]][[elem]]) = colnames(modelObj$free[[elem]])
+    if(!is.null(MLEobj[["par"]][[elem]]) & is.null(rownames(MLEobj[["par"]][[elem]]))) rownames(MLEobj[["par"]][[elem]]) = colnames(MODELobj$free[[elem]])
   }
   
   rownames(MLEobj[["model"]][["data"]])=Y.names
