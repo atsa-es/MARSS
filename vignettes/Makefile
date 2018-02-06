@@ -58,15 +58,11 @@ makeRfiles:
 pdf:	
 	pdflatex EMDerivation.tex
 	pdflatex Quick_Start.tex
-	pdflatex UserGuide.tex
 	pdflatex Manual.tex
 	bibtex EMDerivation
-	bibtex Quick_Start
-	bibtex UserGuide
 	bibtex Manual
 	pdflatex EMDerivation.tex
 	pdflatex Quick_Start.tex
-	pdflatex UserGuide.tex
 	pdflatex Manual.tex
 	cat Manual.pdf > UserGuide.pdf
 
