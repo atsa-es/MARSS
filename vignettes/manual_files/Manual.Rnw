@@ -72,7 +72,7 @@ options(width=60)
 \appendix
 \appendixpage
 \addappheadtotoc
-\include{./tex/ModelSpec}
+%\include{./tex/ModelSpec} %not up to date
 \include{./tex/warnings}
 \include{./tex/obj_structures}
 \include{./tex/SSreferences}
