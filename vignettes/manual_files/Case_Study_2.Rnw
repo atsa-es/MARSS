@@ -12,9 +12,9 @@ options(prompt=" ", continue=" ")
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_SealTrend.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-In this application, we will use multivariate state-space models\index{MARSS model!multivariate example} to combine surveys from multiple regions (or sites) into one estimate of the average long-term population growth rate and the year-to-year variability in that growth rate.  Note this is not quite the same as estimating the `trend'; `trend' often means what population change happened, whereas the long-term population growth rate refers to the underlying population dynamics.  We will use as our example a dataset from harbor seals in Puget Sound, Washington, USA.  
+In this application, we will use multivariate state-space models\index{MARSS model!multivariate example} to combine surveys from multiple regions (or sites) into one estimate of the average long-term population growth rate and the year-to-year variability in that growth rate.  Note this is not quite the same as estimating the trend; ``trend" often means ``what population change happened?", whereas the long-term population growth rate refers to the underlying population dynamics.  We will use as our example a dataset from harbor seals in Puget Sound, Washington, USA.  
 
-We have five regions (or sites) where harbor seals were censused from 1978-1999 while hauled out of land\footnote{Jeffries et al. 2003.  Trends and status of harbor seals in Washington State: 1978-1999. Journal of Wildlife Management 67(1):208--219 }.  During the period of this dataset, harbor seals were recovering steadily after having been reduced to low levels by hunting prior to protection.  The methodologies were consistent throughout the 20 years of the data but we do not know what fraction of the population that each region represents nor do we know the observation-error variance for each region.  Given differences between behaviors of animals in different regions and the numbers of haul-outs in each region, the observation errors may be quite different.  The regions have had different levels of sampling; the best sampled region has only 4 years missing while the worst has over half the years missing (Figure~\ref{fig:CS2.fig1}).  
+We have five regions (or sites) where harbor seals were censused from 1978-1999 while hauled out of land \citet{Jeffriesetal2003}.  During the period of this dataset, harbor seals were recovering steadily after having been reduced to low levels by hunting prior to protection.  The methodologies were consistent throughout the 20 years of the data but we do not know what fraction of the population that each region represents nor do we know the observation-error variance for each region.  Given differences between behaviors of animals in different regions and the numbers of haul-outs in each region, the observation errors may be quite different.  The regions have had different levels of sampling; the best sampled region has only 4 years missing while the worst has over half the years missing (Figure~\ref{fig:CS2.fig1}).  
 
 <<noshowlegend, echo=FALSE, results=hide>>=
 d=harborSealWA
@@ -56,13 +56,7 @@ years = dat[1,] #[1,] means row 1
 n = nrow(dat)-1
 dat = dat[2:nrow(dat),] #no years
 @
-If you needed to read data in from a comma-delimited or tab-delimited file, these are the commands to do that:
-<<readtable, eval=FALSE>>=
-dat = read.csv("datafile.csv",header=TRUE)
-dat = read.table("datafile.csv",header=TRUE)
-@
-
-\noindent The years are in column 1 of \texttt{dat} and the logged data are in the rest of the columns. The number of observation time series (\verb@n@) is the number of rows in \verb@dat@ minus 1 (for years row).  Let's look at the first few years of data:
+\noindent The years are in column 1 of \texttt{dat} and the logged data are in the rest of the columns. The number of observation time series ($n$) is the number of rows in \verb@dat@ minus 1 (for years row).  Let's look at the first few years of data:
 <<Cs2-showdata>>=
 print(harborSealWA[1:8,], digits=3)
 @
@@ -620,7 +614,7 @@ U.model=matrix(c("puget sound","puget sound","hood canal"),3,1)
 \section{Discussion}
 There are a number of corners that we cut in order to show you code that runs quickly:
 \begin{itemize}
-\item{We ran the code starting from one initial condition.  For a real analysis, you should start from a large number of random initial conditions and use the one that gives the highest likelihood.  Since the EM algorithm is a ``hill-climbing'' algorithm, this ensures that it did not get stuck on a local maxima.  See chapter \ref{chap:inits} for a discussion of initial conditions searchers.}
+\item{We ran the code starting from one initial condition.  For a real analysis, you should start from a large number of random initial conditions and use the one that gives the highest likelihood.  Since the EM algorithm is a ``hill-climbing'' algorithm, this ensures that it did not get stuck on a local maxima.  See Chapter \ref{chap:inits} for a discussion of initial conditions searchers.}
 \item{We assume independent observation and process errors.  Depending on your system, observation errors may be driven by large-scale environmental factors (temperature, tides, prey locations) that would cause your observation errors to covary across regions. If your observation errors strongly covary between regions and you treat them as independent, this could be bad for your analysis.  Unfortunately, separating covariance across observation versus process errors will require much data (to have any power).  In practice, the first step is to think hard about what drives sightability for your species and what are the relative levels of process and observation variance.  You may be able to subsample your data in a way that will make the observation errors more independent.}
 \item{The \verb@MARSS()@ argument \verb@control@ specifies the options for the EM algorithm. We left the default tolerance for the convergence test.  You would want to set this lower for a real analysis.  You will need to up the \texttt{maxit} argument correspondingly.}
 \item{We used the large-sample approximation for AIC\index{model selection!AIC} instead of a bootstrap AIC\index{model selection!bootstrap AIC} that is designed to correct for small sample size in state-space models.  The bootstrap metric, AICb, takes a long time to run. Use the call \verb@MARSSaic(kem, output=c("AICbp"))@ to compute AICb\index{model selection!bootstrap AIC, AICbp}.  We could have shown AICc\index{model selection!AICc}, which is the small-sample size corrector for non-state-space models.  Type \verb@kem$AICc@ to get that.}
@@ -630,7 +624,7 @@ Finally, in a real (maximum-likelihood) analysis, one needs to be careful not to
 
  
 \section*{Some more questions you might ponder}
-Do different assumptions about whether the observation error variances are all identical versus different affect your estimate of the long-term population growth rate ($u$)?  You may want to rerun examples 3-7 with the \texttt{R.model} changed.  \texttt{R.model="diagonal and unequal"} means measurement variances all different versus \texttt{"diagonal and equal"}.
+Do different assumptions about whether the observation error variances are all identical versus different affect your estimate of the long-term population growth rate ($u$)?  You may want to rerun Examples 3-7 with the \texttt{R.model} changed.  \texttt{R.model="diagonal and unequal"} means measurement variances all different versus \texttt{"diagonal and equal"}.
 
 Do assumptions about the underlying structure of the population affect your estimates of $u$?   Structure here means number of subpopulations and which areas are in which subpopulation.  
 

@@ -226,7 +226,7 @@ plot(tau, delta.pop,xlab="time step size (tau)",ylab="population transition size
 abline(den91,col=2)
 @
 \end{center}
-\caption{The regression of $log(N_{t+\tau})-log(N_t)$ against $\tau$.  The slope is the estimate of $u$ and the variance of the residuals is the estimate of $\sigma^2$.}
+\caption{The regression of $log(N_{t+\tau})-log(N_t)$ against $\tau$.  The slope is the estimate of $u$ and the variance of the residuals is the estimate of $\sigma^2$. The regression is constrained to go through (0,0).}
 \label{fig:CS1.den91}
 \end{figure}
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -588,7 +588,7 @@ The MARSS package provides the function \verb@MARSSparamCIs()@ to add bootstrapp
 In the function \verb@CSEGriskfigure()@,  you can set \verb@CI.method = c("hessian",@ \verb@"parametric", "innovations", "none")@ to tell it how to compute the confidence intervals.  The methods `parametric' and `innovations' specify parametric and non-parametric bootstrapping respectively.  Producing parameter estimates by bootstrapping is quite slow.  Approximate confidence intervals on the parameters can be generated rapidly using the inverse of a numerically estimated Hessian matrix\index{confidence intervals!Hessian approximation} (method `hessian').  This uses an estimate of the variance-covariance matrix of the parameters (the inverse of the Hessian matrix).  Using an estimated Hessian matrix to compute confidence intervals is a handy trick that can be used for all sorts of maximum-likelihood parameter estimates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Comments}
+\section{Discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Data with cycles, from age-structure or predator-prey interactions, are difficult to analyze and the EM algorithm used in the MARSS package will give poor estimates for this type of data.  The slope method \citep{Holmes2001} is more robust to those problems.  \citet{Holmesetal2007} used the slope method in a large study of data from endangered and threatened species, and  \citet{EllnerHolmes2008}  showed that the slope estimates are close to the theoretical minimum uncertainty.  Especially, when doing a population viability analysis using a time series with fewer than 25 years of data, the slope method is often less biased and (much) less variable because that method is less data-hungry \citep{Holmes2004}.  However the slope method is not a true maximum-likelihood method and thus constrains the types of further analyses you can do (such as model selection).
 
