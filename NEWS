@@ -25,15 +25,18 @@ kalman filter functions
 Confidence intervals and std error for R and Q
   MARSSparamCIs() gave the wrong s.e. for variances and covariances when method="hessian".  It also gave the wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%*%t(chol) ).
 
-  MARSSparamCIs(), vrs 3.9 was getting the hessian numerically using a var-cov matrix that has been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed from the s.e.'s. I back-transformed the Hessian to the original (non-chol) scale the same way I back transform a var-covariance matrix.  But the variance of s^2 is not the var(s)^2, which is what I was doing, essentially. So the s.e. for R and Q were wrong in all cases.  Note, using a Hessian to estimate CIs for variance-covariance matrices is generally a bad idea anyhow however.
+  MARSSparamCIs(), vrs 3.9 was getting the hessian numerically using a var-cov matrix that had been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed from the s.e.'s. I back-transformed the Hessian to the original (non-chol) scale the same way I back transformed a var-covariance matrix.  But the variance of s^2 is not the var(s)^2, which is what I was doing, essentially. So the s.e. for R and Q were wrong in all cases.  Note, using a Hessian to estimate CIs for variance-covariance matrices is generally a bad idea anyhow however.
   
-  For non-diagonal matrices.  There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.  However, had the se been returned, they would be completely wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2.  The hessian used was for the chol-transformation and the curvature of the LL surface for the chol-transformed values is different than the curvature for the untransformed var-cov elements.
+  For non-diagonal matrices.  There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.  However, had the se been returned, they would be wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2.  The hessian used was for the chol-transformation and the curvature of the LL surface for the chol-transformed values is different than the curvature for the untransformed var-cov elements.
 
-Fix: I completely abandoned working with the chol transformed variance-covariance matrices for the Hessian calculation.  This was not necessary for computing the Hessian since the Hessian is computed at the MLEs and localized.
+Fix: I completely abandoned working with the chol transformed variance-covariance matrices for the Hessian calculation.  The chol transformation was not necessary for computing the Hessian since the Hessian is computed at the MLEs and localized.  
 
-#1 Created a new function MARSSharveyobsFI() which uses the Harvey (1989) recursion to compute the observed Fisher Information matrix. This is the Hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can lead to negative lower CIs).
+#1 Created a new function MARSSharveyobsFI() which uses the Harvey (1989) recursion to analyticallycompute the observed Fisher Information matrix. This is the Hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can lead to negative lower CIs).
+
 #2 Harvey1989 is now the default function when method='hessian'.
+
 #3 The user can also select method='hessian' and hessian.fun='fdHess' or hessian.fun='optim'.  This will compute the Hessian (of the log-LL function at the MLEs) numerically using these functions.  The variance-covariance matrices are NOT chol transformed.  These are numerically estimated Hessians of the untransformed variance-covariance matrices.
+
 #4 Added MARSSinfo(26) which discusses the reason for NAs in the Hessian.
 
 Misc minor bugs
