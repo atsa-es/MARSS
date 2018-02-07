@@ -8,7 +8,7 @@ require(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this chapter, we work through a series of short examples using the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with MARSS models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS models might want to start with the applications. 
+In this chapter, we work through a series of short examples to illustrate the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with MARSS models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS models might want to start with the application chapters. 
 
 In these examples, we will use the default \verb@form="marxss"@ argument for a \verb@MARSS()@ call.  This specifies a MARSS model of the form:
 \begin{subequations}\label{eqn:marss.qe}
@@ -18,7 +18,7 @@ In these examples, we will use the default \verb@form="marxss"@ argument for a \
 \xx_1 \sim \MVN(\pipi,\LAM) \text{ or } \xx_0 \sim \MVN(\pipi,\LAM)
 \end{gather}
 \end{subequations} 
-The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave off $\cc$ and $\dd$, and we address including inputs only briefly at the end of the chapter.  See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  The $\GG_t$ and $\HH_t$ are also, in most cases, inputs (not estimated).  We will not use $\GG_t$ or $\HH_t$ in this chapter. 
+The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave off $\cc$ and $\dd$.  We address including inputs only briefly at the end of the chapter.  See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  We will also not use $\GG_t$ or $\HH_t$ in this chapter. 
 
 \section{Fixed and estimated elements in parameter matrices}
 Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following structure:
@@ -142,7 +142,7 @@ This is the same model except that the five hidden states have correlated proces
 + \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix}, 
  \textrm{ } \vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
 \end{gather*}
-$\BB$ is not shown in the top equation; it is a $m \times m$ identity matrix.  To fit, use \verb@MARSS()@\index{functions!MARSS} with the \verb@model@ argument set.  The output is not shown but it will appear if you type this on the \R command line.
+$\BB$ is not shown in the top equation; it is a $m \times m$ identity matrix.  To fit, use \verb@MARSS()@\index{functions!MARSS} with the \verb@model@ argument set (output not shown).
 <<model-corr1, keep.source=TRUE, results=hide>>=
 kemfit = MARSS(dat, model=list(Q="unconstrained"))
 @
@@ -238,7 +238,7 @@ Note the default model for $\RR$ is \verb@"diagonal and equal"@' so we can leave
 Z=factor(c(1,1,1,1,1))
 kemfit = MARSS(dat, model=list(Z=Z))
 @
-You can also pass in $\ZZ$ exactly as it is in the equation: \verb@Z=matrix(1,5,1)@, but the factor shorthand is handy if you need to assign different observed time series to different underlying state time series (see next examples).   The default $\aa$ form is \verb@"scaling"@, which means that the first $\yy$ row associated with a given $x$ has $a=0$ and the rest are estimated.
+You can also pass in $\ZZ$ exactly as it is in the equation: \verb@Z=matrix(1,5,2)@, but the factor shorthand is handy if you need to assign different observed time series to different underlying state time series (see next examples).   The default $\aa$ form is \verb@"scaling"@, which means that the first $\yy$ row associated with a given $x$ has $a=0$ and the rest are estimated.
 
 \subsection{One hidden state and five independent observation time series with different variances}
 Mathematically, this model is:
@@ -282,7 +282,7 @@ Q="diagonal and equal"
 U="equal"
 kemfit = MARSS(dat, model=list(Z=Z,Q=Q,U=U))
 @
-You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix (\verb@matrix(1,5,1)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples).  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$,$\QQ$,$\RR$, and $\LAM$).
+You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples.  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$,$\QQ$,$\RR$, and $\LAM$).
 
 \section{Time-varying parameters}
 Time-varying parameters are specified by passing in an array of matrices (list, numeric or character) where the 3rd dimension of the array is time and must be the same value as the 2nd (time) dimension of the data matrix.  No text shortcuts are allowed for time-varying parameters; you need to use the matrix form.
@@ -305,55 +305,58 @@ kemfit.tv=MARSS(dat,model=list(U=Ut,Q="diagonal and equal"))
 Note that how the time-varying model is specified for MARSS is the same as you would write the time-varying model on paper in matrix math form.
 
 \section{Including inputs (or covariates)}
+\index{covariates}
 In MARSS models with covariates, the covariates are often treated as inputs and appear as either the $\cc$ or $\dd$ in Equation \ref{eqn:marss.qe}, depending on the application. However, more generally, $\cc$ and $\dd$ are simply inputs that are fully-known (no missing values). $\cc_t$ is the $p \times 1$ vector of inputs at time $t$ which affect the states and $\dd_t$ is a $q \times 1$ vector of inputs (potentially the same as $\cc_t$), which affect the observations.   
 
 $\CC_t$ is an $m \times p$ matrix of coefficients relating the effects of $\cc_t$ to the $m \times 1$ state vector $\xx_t$, and $\DD_t$ is an $n \times q$ matrix of coefficients relating the effects of $\dd_t$ to the $n \times 1$ observation vector $\yy_t$.  The elements of $\CC$ and $\DD$ can be estimated, and their form is specified much like the other matrices.
 
-With the MARSS() function, one can fit a model with inputs by simply passing in \verb@model$c@ and/or \verb@model$d@ in the MARSS() call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  If $\CC$ and $\DD$ are not time-varying, they are passed in as a matrix.  If they are time-varying, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps if they are time-varying.
+With the \verb@MARSS()@ function, one can fit a model with inputs by simply passing in \verb@model$c@ and/or \verb@model$d@ in the MARSS() call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  If $\CC$ and $\DD$ are not time-varying, they are passed in as a 2-dimensional matrix.  If they are time-varying, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps if they are time-varying.
 
-See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.
+See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  Also note that it is not necessary to have your covariates appear in $\cc$ and/or $\dd$.  That is a common form, however in some MARSS models, covariates will appear in one of the parameter matrices as fixed values.
 
 \section{Printing and summarizing models and model fits}
-The package includes print functions for marssMODEL objects and marssMLE objects (fitted models).\index{functions!summary}\index{MARSS model!print}
+\index{print}\index{functions!print}
+The package includes print functions for marssMODEL objects and marssMLE objects (fitted models).\index{functions!summary}\index{print!marssMODEL}\index{print!marssMLE}
 <<model-print, results=hide>>=
 print(kemfit)
 print(kemfit$model)
 @
-This will print the basic information on model structure and model fit that you have seen in the previous examples.
-
-The package also includes a summary function for models.\index{MARSS model!summary}
+This will print the basic information on model structure and model fit that you have seen in the previous examples.  The package also includes a summary function for models.
 <<model-summary, results=hide>>=
 summary(kemfit$model)
 @
-Output is not shown because it is verbose, but it prints each matrix with the fixed elements denoted with their values and the free elements denoted by their names.  This is very helpful for confirming exactly what model structure you are fitting to the data.
+Output for the summary function is not shown because it is verbose. It prints each matrix with the fixed elements denoted with their values and the free elements denoted by their names.  This is very helpful for confirming exactly what model structure you are fitting to the data.
 
-The print function will also print various other things like a vector of the estimated parameters, the estimated states, the state standard errors, etc., using the \verb@what@ argument in the print call:
-<<model-print-par>>=
+The print function will also print various other types of output such as a vector of the estimated parameters, the estimated states, the state standard errors, etc. You use the \verb@what@ argument in the print call to specify the desired output. \index{print!par}
+<<model-print-par, results=hide>>=
 print(kemfit, what="par")
 @
+will print the \verb@par@ element of a marssMLE object.  This will only include the estimated elements in a column matrix.  To see the entire parameter matrix with both estimated and fixed values, you can use:
 <<model-print-Q>>=
 print(kemfit, what="Q")
 @
-Type \verb@?print.MARSS@ to see a list of the types of output that can be printed with a \verb@print@ call.  If you want to use the output from print instead of printing, then assign the print call to a value:
+Type \verb@?print.MARSS@ to see a list of the types of output that can be printed with a \verb@print@ call.  If you want to use the output from print instead of printing to the console, then assign the print call to a value:\index{print!states}
 <<model-print-R>>=
 x=print(kemfit, what="states",silent=TRUE)
-x
 @
 
 \section{Confidence intervals on a fitted model}
-The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default alpha level of 0.05.  The function can compute approximate confidence intervals using a numerically estimated Hessian matrix (\verb@method="hessian"@) or via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.
+\index{confidence intervals!Hessian approximation}
+The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default alpha level of 0.05.  The default is to compute approximate confidence intervals using a the Hessian matrix (\verb@method="hessian"@).  Confidence intervals can also be computed  via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.  Note, if you want confidence intervals on variances, then it is unwise to use the Hessian approximation as it is symmetric and variances are constrained to be positive.
 
 \subsection{Approximate confidence intervals from a Hessian matrix}
-The default method for \verb@MARSSparamCIs@ is to use a numerically estimated Hessian matrix:
+The default method for \verb@MARSSparamCIs@ computes approximate confidence intervals using an analytically computed Hessian matrix \citet[sec 3.4.5]{Harvey1989}.  The call is:
 <<CIs-hessian, include.source=F, keep.source=T>>=
 kem.with.hess.CIs = MARSSparamCIs(kemfit) 
 @
+See \verb@?MARSShessian@ for a discussion of the Hessian calculations.
 Use \verb@print@ or just type the marssMLE object name to see the confidence intervals:
 <<print-CIs>>=
 print(kem.with.hess.CIs) 
 @
 
 \subsection{Confidence intervals from a parametric bootstrap}
+\index{confidence intervals!parametric bootstrap}
 Use \verb@method="parametric"@ to use a parametric bootstrap to compute confidence intervals and  bias using a parametric bootstrap. 
 <<CIs-pboot, include.source=F, keep.source=T>>=
 kem.w.boot.CIs=MARSSparamCIs(kemfit,method="parametric",nboot=10) 
@@ -378,7 +381,7 @@ names(kf)
 MARSSkf(kemfit, only.logLik=TRUE)
 @
 
-\section{Degenerate variance estimates}
+\section{Degenerate variance estimates}\index{troubleshooting!degenerate}
 If your data are short relative to the number of parameters you are estimating, then you are liable to find that some of the variance elements are degenerate (equal to zero).  Try the following:
 <<like.kem.degen, include.source=F, keep.source=T>>=
 dat.short = dat[1:4,1:10]
@@ -439,7 +442,7 @@ print(kemfit.with.AICb)
 @
 
 
-\section{Convergence}
+\section{Convergence}\index{troubleshooting!non-convergence}
 MARSS uses two convergence tests.  The first is
 $$\mathrm{logLik}_{i+1}-\mathrm{logLik}_i < \mathrm{tol}$$
 This is called \verb@abstol@ (meaning absolute tolerance) in the output.  The second is called the \verb@conv.test.slope@. This looks at the slope of the log parameter value (or likelihood) versus log iteration number and asks whether that is close to zero (not changing).  
