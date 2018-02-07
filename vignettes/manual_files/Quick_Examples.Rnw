@@ -416,7 +416,7 @@ Use \verb@silent=TRUE@ to stop the progress bar from printing. The function will
 
 \section{Data simulation}\index{simulation}
 \subsection{Simulated data from a fitted MARSS model}
-Data can be simulated from  marssMLE object using \verb@MARSSsimulate()@\index{functions!MARSSsimulate}\index{simulation!MARSSsimulate function}.
+Data can be simulated from  marssMLE object using \verb@MARSSsimulate()@\index{functions!MARSSsimulate}.
 <<sim, include.source=F, keep.source=T>>=
 sim.data=MARSSsimulate(kemfit, nsim=2, tSteps=100)$sim.data
 @
