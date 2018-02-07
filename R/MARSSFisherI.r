@@ -12,7 +12,7 @@
 #   page 157 suggest that this derivative is hard to compute.
 #######################################################################################################
 MARSSFisherI = function( MLEobj, method="Harvey1989" ) {
-  # optim is here for debugging.  optim will maximize the likelihood so is not evaluating
+  # optim is here for debugging.  fdHess is the numerical method used for users
   if(!(method %in% c("Harvey1989", "fdHess", "optim"))) stop("MARSSFisherI: method must be either Harvey1989 or fdHess")
   if(method=="fdHess" | method=="optim"){
     obsFI = MARSShessian.numerical( MLEobj, fun=method )
