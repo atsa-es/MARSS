@@ -213,6 +213,7 @@ legend("topright", paste("model 2, AICc=",format(kem$AICc,digits=1)),bty="n")
 \end{figure}
 
 \section{Observation and state residuals}
+\index{residuals!auxiliary}
 Figure \ref{fig:CS6.fits} shows the MARSS fits to the data.  From these model fits, auxiliary residuals can be computed which contain information about whether the data and models fits at time $t$ differ more than you would expect given the model and the model fits at time $t-1$.  In this section, we follow the example shown on page 147-148 in \citet{Koopmanetal1998} and use these residuals to look for outliers and sudden flow level changes.  Using auxiliary residuals this way follows mainly from \citet{HarveyKoopman1992}, but see also \citet[sec. 3]{Koopman1993},  \citet{deJongPenzer1998} and \citet{Penzer2001} for discussions of using auxiliary residuals for detection of outliers and structural breaks. 
 
 The MARSS function will output the expected values of $x_t$ conditioned on the maximum-likelihood values of $q$, $r$, and $x_1$ and on the data ($y$ from $t=1$ to $T$).   In time-series literature, these are called the smoothed state estimates and they are output by the Kalman filter-smoother.  We will call these smoothed estimates $\tilde{x}_{t|T}$ (and are \verb@xtT@ in the MARSS output). The time value after the $|$ in the subscript indicates the data on which the estimate was conditioned (in this case, 1 to $T$). From these, we can compute the model predicted value of $y_t$, denoted or $\hat{y}_{t|T}$.  This is the predicted value of $y_t$ conditioned on $\tilde{x}_{t|T}$. 
@@ -228,7 +229,7 @@ The MARSS function will output the expected values of $x_t$ conditioned on the m
 where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \eqref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
 
 \subsection{Using observation residuals to detect outliers}
-The standardized smoothed observation residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data standardized by the observation variance:
+\index{residuals!observation}The standardized smoothed observation residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data standardized by the observation variance:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
@@ -237,7 +238,7 @@ e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 \end{split}
  \label{eq:smoothations}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@residuals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   It returns the standardized residuals (also called auxiliary residuals) as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). 
+These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@residuals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   It returns the standardized residuals (also called auxiliary residuals) as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \index{functions!residuals}
 
 <<Cs09_compute.resids, eval=TRUE, echo=TRUE>>=
 resids.0=residuals(kem.0)$std.residuals
@@ -277,6 +278,7 @@ title("model 2--stochastic level")
 \end{figure}
 
 \subsection{Detecting sudden level changes}
+\index{residuals!state}
 The standardized smoothed state residuals ($f_t$ below) are the difference between the estimated state at time $t$ and the estimated state at time $t-1$ conditioned on all the data standardized by the standard deviation:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
