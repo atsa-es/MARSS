@@ -3,10 +3,10 @@
 \label{chap:CSstrucbreak}
 \chaptermark{Outliers and structural breaks}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ")
-require(xtable)
-require(Hmisc)
+library(xtable)
+library(Hmisc)
 tabledir="tables/"
 @
 %Add footnote with instructions for getting code
@@ -250,7 +250,7 @@ Figure \ref{fig:CS6.outliers} shows the observation residuals for the three mode
 \begin{figure}[htp]
 \begin{center}
 <<Cs10_plotoutliertests, eval=TRUE, echo=FALSE, fig=TRUE>>=
-require(Hmisc)
+library(Hmisc)
 par(mfrow=c(3,1),mar=c(3,4,1.5,2))
 x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
 plot(x,resids.0[1,],ylab="std. residuals",xlab="",type="l",
@@ -427,7 +427,7 @@ resids = MARSSresids(kem.3)$std.et
 \begin{figure}[htp]
 \begin{center}
 <<plotslopetests, eval=FALSE, echo=TRUE, fig=TRUE>>=
-require(Hmisc)
+library(Hmisc)
 par(mfrow=c(2,1),mar=c(4,3,2,1))
 x=seq(tsp(Nile)[1],tsp(Nile)[2],tsp(Nile)[3])
 plot(x,resids[2,],ylab="",xlab="",type="l",ylim=c(-4,4),xaxp=c(1870,1970,10))

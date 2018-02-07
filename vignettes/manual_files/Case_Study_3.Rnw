@@ -3,7 +3,7 @@
 \label{chap:CSpopstruc}
 \chaptermark{Using MARSS models to identify spatial population structure and covariance}
 <<RUNFIRST, echo=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ")
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,6 +1,6 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/ARMAp-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
 \chapter{Lag-p models with MARSS}

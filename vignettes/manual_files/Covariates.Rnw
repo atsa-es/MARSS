@@ -1,6 +1,6 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/Covar-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-require(MARSS)
+libary(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
 \chapter{Incorporating covariates into MARSS models}

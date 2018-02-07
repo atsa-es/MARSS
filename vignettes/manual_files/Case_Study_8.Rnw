@@ -4,7 +4,7 @@
 \chaptermark{Combining data from multiple time series}
 
 <<RUNFIRST, echo=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(width=60)
 options(prompt=" ", continue=" ")
 op <- par(no.readonly = TRUE)   

@@ -2,7 +2,7 @@
 # used for debugging
 make_manual = function(){
 # Having trouble with Makefile on Windows.  Switch to function
-require(here)
+library(here)
   
   rm(list=ls())
   

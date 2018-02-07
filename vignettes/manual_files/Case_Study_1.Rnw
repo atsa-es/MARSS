@@ -4,7 +4,7 @@
 \chaptermark{Count-based PVA}
 
 <<RUNFIRST, echo=FALSE, keep.source=TRUE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ")
 @
 

@@ -1,6 +1,6 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/MCI-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
 

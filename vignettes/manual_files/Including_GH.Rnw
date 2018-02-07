@@ -1,6 +1,6 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/GH-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE>>=
-require(MARSS)
+libary(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
 \chapter{MARSS models with variance weights or constraints: $\GG$ and $\HH$}

@@ -4,7 +4,7 @@
 \chaptermark{Combining multi-site and subpopulation data}
 
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ")
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

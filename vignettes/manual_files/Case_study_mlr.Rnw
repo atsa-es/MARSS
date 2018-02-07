@@ -1,11 +1,11 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/MLR-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-require(MARSS)
-require(xtable)
-require(lattice)
-require(nlme)
-require(stringr)
-require(lme4)
+library(MARSS)
+library(xtable)
+library(lattice)
+library(nlme)
+library(stringr)
+library(lme4)
 tabledir="figures/"
 options(prompt=" ", continue=" ", width=60)
 @
@@ -153,7 +153,7 @@ mod2=MARSS(Employed, model=longley.ar1, inits=inits, control=list(maxit=1000))
 
 We can compare the fit using gls() (\verb@nlme@ package) and see that we get the same estimates:
 <<Cs_014_example2.gls>>=
-require(nlme)
+library(nlme)
 mod2.gls=gls(Employed ~ GNP + Population, 
         correlation=corAR1(), data=longley, method="ML")
 mod2.gls.phi = coef(mod2.gls$modelStruct[[1]], unconstrained=FALSE)
@@ -255,7 +255,7 @@ data(sleepstudy,package="lme4")
 \begin{figure}[htp]
 \begin{center}
 <<Cs_027_sleep-plot, fig=TRUE, echo=FALSE>>=
-require(lattice)
+library(lattice)
 xyplot(Reaction ~ Days | Subject, sleepstudy, type = c("g","p","r"),
        index = function(x,y) coef(lm(y ~ x))[1],
        xlab = "Days of sleep deprivation",
@@ -383,7 +383,7 @@ sleep.mod5.gls=gls(Reaction ~ 0 + Subject + Days:Subject, data=sleepstudy,
 The way the variance-covariance structure is modeled is a little different but it's the same idea.
 
 <<Cs_037_makemodeltable, echo=FALSE, keep.source=FALSE>>=
-require(stringr)
+library(stringr)
 slope.names = paste("D",rownames(dat),sep=".")
 phi.names = names(coef(sleep.mod4, type="vector"))[str_detect(names(coef(sleep.mod4, type="vector")),"B.")]
 

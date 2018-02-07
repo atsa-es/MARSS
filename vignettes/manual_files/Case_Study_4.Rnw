@@ -4,9 +4,9 @@
 \chaptermark{Dynamic factor analysis}
 
 <<RUNFIRST, echo=FALSE, include.source=FALSE, keep.source=FALSE>>=
-require(MARSS)
+library(MARSS)
 options(prompt=" ", continue=" ")
-require(xtable)
+library(xtable)
 tabledir="tables/"
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
