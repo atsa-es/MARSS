@@ -20,7 +20,7 @@ x_{1,t} = x_{1,t-1} + u_1 + w_{1,t}, \;\; w_{1,t} \sim \N(0,\sigma^2_1)\\
 x_{2,t} = x_{2,t-1} + u_2 + w_{2,t}, \;\; w_{2,t} \sim \N(0,\sigma^2_2)
 \label{eq:movement}
 \end{gather}
-where $x_{1,t}$ is the location at time $t$ along one axis (here, longitude) and $x_{2,t}$ is for another, generally orthogonal, axis (in here, latitude).   The parameter $u_1$ is the rate of longitudinal movement and $u_2$ is the rate of latitudinal movement. We add errors to our observations of location:
+where $x_{1,t}$ is the location at time $t$ along one axis (here, longitude) and $x_{2,t}$ is for another, generally orthogonal, axis (here, latitude).   The parameter $u_1$ is the rate of longitudinal movement and $u_2$ is the rate of latitudinal movement. We add errors to our observations of location:
 \begin{gather}
 y_{1,t} = x_{1,t} + v_{1,t}, \;\; v_{1,t} \sim \N(0,\eta^2_1)\\
 y_{2,t} = x_{2,t} + v_{2,t}, \;\; v_{2,t} \sim \N(0,\eta^2_2),
@@ -65,21 +65,24 @@ turtles
 We will  analyze the position data for ``Big Mama''.  We put the data for ``Big Mama'' into matrix \texttt{dat}.  \verb@dat@ is transposed because we need time across the columns.
 <<data3, keep.source=TRUE>>=
 turtlename="BigMama"
-dat = loggerheadNoisy[which(loggerheadNoisy$turtle==turtlename),5:6]
+theTurtle=which(loggerheadNoisy$turtle==turtlename)
+dat = loggerheadNoisy[theTurtle, 5:6]
 dat = t(dat) #transpose
 @
 
-Figure \ref{fig:CS5.fig1} shows the corrupted location data for Big Mama. The figure was generated with the code below and uses the \texttt{maps} \R package. You will need to install this \R package in order to run the example code.  
+Figure \ref{fig:CS5.fig1} shows the corrupted location data for Big Mama. The figure code uses the \texttt{maps} \R package. You will need to install this \R package in order to run the example code.  
 <<fig-code>>=
 #load the map package; you have to install it first
 library(maps) 
 # Read in our noisy data (no missing values)
 pdat = loggerheadNoisy  #for plotting
 turtlename="BigMama"
+theTurtle=which(loggerheadNoisy$turtle==turtlename)
 par(mai = c(0,0,0,0),mfrow=c(1,1))
-map('state', region = c('florida', 'georgia', 'south carolina', 'north carolina', 
-    'virginia', 'delaware','new jersey','maryland'),xlim=c(-85,-70))
-points(pdat$lon[which(pdat$turtle==turtlename)], pdat$lat[which(pdat$turtle==turtlename)], 
+map('state', region = c('florida', 'georgia', 'south carolina',
+    'north carolina', 'virginia', 'delaware','new jersey','maryland'),
+    xlim=c(-85,-70))
+points(pdat$lon[theTurtle], pdat$lat[theTurtle], 
     col="blue",pch=21, cex=0.7)
 @
 
@@ -121,7 +124,7 @@ kem = MARSS(dat, model=list(Z = Z.model,
       Q = Q.model, R = R.model, U = U.model))
 @
 
-Now we can create a plot comparing the estimated and actual locations (Figure \ref{fig:kaltotrue}). In Figure The real locations (from which \texttt{loggerheadNoisy} was produced by adding noise) are in  \texttt{loggerhead} and plotted with crosses.  There are only a few data points for the real data because in the real tag data, there are many missing days.  
+We can create a plot comparing the estimated and actual locations (Figure \ref{fig:kaltotrue}). The real locations (from which \texttt{loggerheadNoisy} was produced by adding noise) are in  \texttt{loggerhead} and plotted with crosses.  There are only a few data points for the real data because in the real tag data, there are many missing days.  
 <<code-to-plot>>=
 #Code to plot estimated turtle track against observations
 #The estimates
@@ -132,9 +135,10 @@ par(mai = c(0,0,0,0),mfrow=c(1,1))
 library(maps)
 pdat=loggerheadNoisy
 turtlename="BigMama"
-map('state', region = c('florida', 'georgia', 'south carolina', 'north carolina', 
-     'virginia', 'delaware','new jersey','maryland'),xlim=c(-85,-70))
-points(pdat$lon[which(pdat$turtle==turtlename)], pdat$lat[which(pdat$turtle==turtlename)],   
+map('state', region = c('florida', 'georgia', 'south carolina',
+    'north carolina', 'virginia', 'delaware','new jersey','maryland'),
+    xlim=c(-85,-70))
+points(pdat$lon[theTurtle], pdat$lat[theTurtle],   
      col="blue",pch=21, cex=0.7)
 lines(pred.lon, pred.lat,col="red", lwd=2)
 
@@ -252,10 +256,10 @@ levels(loggerheadNoisy$turtle)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \SweaveOpts{eval=FALSE}
 \section{Using specialized packages to analyze tag data}
-If you have real tag data to analyze, you should use a state-space modeling package that is customized for fitting MARSS models to tracking data. The MARSS package does not have all the bells and whistles that you would want for analyzing tracking data, particularly tracking data in the marine environment. These are a couple \R packages that we have come across for this purpose:
+If you have real tag data to analyze, you should use a state-space modeling package that is customized for fitting MARSS models to tracking data. The MARSS package does not have all the bells and whistles that you would want for analyzing tracking data, particularly tracking data in the marine environment. Examples are the Ukfsst and kftrack R packages:
 \begin{description}
-\item[UKFSST] http://www.soest.hawaii.edu/tag-data/tracking/ukfsst/
-\item[KFTRACK] http://www.soest.hawaii.edu/tag-data/tracking/kftrack/
+\item[UKFSST] https://github.com/positioning/kalmanfilter/wiki/ArticleUkfsst
+\item[KFTRACK] https://github.com/positioning/kalmanfilter/wiki/Articlekftrack
 \end{description}
 
 \texttt{kftrack}\index{animal tracking!kftrack} is a full-featured toolbox for analyzing tag data with extended Kalman filtering.  It incorporates a number of extensions that are important for analyzing track data: barriers to movement such as coastlines and non-Gaussian movement distributions.  With \texttt{kftrack}, you can use the real tag data which has big gaps, i.e. days with no location.  \texttt{MARSS()} will struggle with these data because it will estimate states for all the unseen days; \texttt{kftrack} only fits to the seen days.  
@@ -263,12 +267,11 @@ If you have real tag data to analyze, you should use a state-space modeling pack
 To use \texttt{kftrack} to fit the turtle data, type
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <<kftrack, keep.source=TRUE, eval=FALSE>>=
-library(kftrack) # must be installed from a local zip file
+library(kftrack) # must be installed from github
 loggerhead = loggerhead
-# Run kftrack with the first turtle (BigMama)
 turtlename = "BigMama"
 dat = loggerhead[which(loggerhead$turtle == turtlename),2:6]
-model = kftrack(dat, fix.first=F, fix.last=F, 
+model = kftrack(dat, fix.first=FALSE, fix.last=FALSE, 
        var.struct="uniform")   
 @
 
