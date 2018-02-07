@@ -12,7 +12,7 @@ MARSSFisherI( MLEobj, method="Harvey1989" )
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 
   This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}}. }
-  \item{method}{ The method to use for computing the Hessian. Options are 'Harvey1989' to use the Harvey (1989) recursion, which is an analytical solution, 'fdHess' or 'optim' which are two numerical methods.}
+  \item{method}{ The method to use for computing the Hessian. Options are 'Harvey1989' to use the Harvey (1989) recursion, which is an analytical solution, 'fdHess' or 'optim' which are two numerical methods.  Although 'optim' can be passed to the function, 'fdHess' is used for all numerical estimates used in the package.}
  }
 \details{
    Method 'fdHess' uses \code{\link{fdHess}} from package \code{\link{nlme}} to numerically estimate the Hessian matrix
