@@ -16,7 +16,7 @@ tabledir="tables/"
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_DFA.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-\index{MARSS model!DFA example}In this chapter, we use MARSS to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[sec. 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
+\index{MARSS model!DFA example}In this chapter, we use MARSS to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[sec. 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in Section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
 
 DFA is conceptually different than what we have been doing in the previous applications.  Here we are trying to explain temporal variation in a set of $n$ observed time series using linear combinations of a set of $m$ hidden random walks, where $m << n$.  A DFA model is a type of MARSS model with the following structure:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,7 +27,7 @@ DFA is conceptually different than what we have been doing in the previous appli
  \xx_0 \sim \MVN(\pipi,\LAM) 
  \end{gathered}   
  \label{eq:dfa}\end{equation}
-The general idea is that the observations ($\yy$) are modeled as a linear combination of hidden trends ($\xx$) and factor loadings ($\ZZ$) plus some offsets ($\aa$).  The DFA model in Equation \ref{eq:dfa} and the standard MARSS model in Equation 1.1 are equivalent--we have simply set the matrix $\BB$ equal to an $m \times m$ identity matrix (i.e., a diagonal matrix with 1's on the diagonal and 0's elsewhere) and the vector $\uu$ = {\bf 0}. 
+The general idea is that the observations ($\yy$) are modeled as a linear combination of hidden trends ($\xx$) and factor loadings ($\ZZ$) plus some offsets ($\aa$).  The DFA model in Equation \ref{eq:dfa} and the standard MARSS model in Equation 1.1 are equivalent---we have simply set the matrix $\BB$ equal to an $m \times m$ identity matrix\footnote{a diagonal matrix with 1's on the diagonal} and the vector $\uu$ = {\bf 0}. 
 
 \subsection{Writing out a DFA model in MARSS form}
 Imagine a case where we had a data set with six observed time series ($n=6$) and we want to fit a model with three hidden trends ($m=3$).  If we write out our DFA model in MARSS matrix form (ignoring the error structures and initial conditions for now), it would look like this:
@@ -142,7 +142,7 @@ If $\ZZ$, $\aa$, and $\QQ$ in Equation \ref{eq:dfa} are not constrained, then th
 \item $\aa$ is constrained so that the first $m$ values are set to zero; and
 \item $\QQ$ is set equal to the identity matrix ($\II_m$).
 \end{itemize}
-\citet{Zuuretal2003a}, however, found that with Harvey's second constraint, the EM algorithm is not particularly robust, and it takes a long time to converge.  Zuur et al. found that the EM estimates are much better behaved if you instead constrain each of the time series in $\xx$ to have a mean of zero across $t=1$ to $T$.  To do so, they replaced the estimates of the hidden states, $\xx_t^T$, coming out of the Kalman smoother with $\xx_t^T-\bar{\xx}$ for $t=1$ to $T$, where \emph{NOTE}: $\bar{\xx}$ is the mean of $\xx_t$ across $t$.  With this approach, you estimate all of the $\aa$ elements, which represent the average level of $\yy_t$ relative to $\ZZ (\xx_t-\bar{\xx})$.  We found that demeaning the $\xx_t^T$ in this way can cause the EM algorithm to have errors (decline in log-likelihood).  Instead, we demean our data, and fix all elements of $\aa$ to zero.
+\citet{Zuuretal2003a}, however, found that with Harvey's second constraint, the EM algorithm is not particularly robust, and it takes a long time to converge.  Zuur et al. found that the EM estimates are much better behaved if you instead constrain each of the time series in $\xx$ to have a mean of zero across $t=1$ to $T$.  To do so, they replaced the estimates of the hidden states, $\xx_t^T$, coming out of the Kalman smoother with $\xx_t^T-\bar{\xx}$ for $t=1$ to $T$, where $\bar{\xx}$ is the mean of $\xx_t$ across $t$.  With this approach, you estimate all of the $\aa$ elements, which represent the average level of $\yy_t$ relative to $\ZZ (\xx_t-\bar{\xx})$.  We found that demeaning the $\xx_t^T$ in this way can cause the EM algorithm to have errors (decline in log-likelihood).  Instead, we demean our data, and fix all elements of $\aa$ to zero.
 
 Using these constraints, the DFA model in Equation \ref{eq:dfa1} becomes
 %~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -286,11 +286,11 @@ N.ts = dim(dat.spp.1980)[1]
 TT = dim(dat.spp.1980)[2] 
 @
 
-It is normal in this type of analysis to standardize each time series by first subtracting its mean and then dividing by its standard deviation (i.e., create a \emph{z}-score $\yy^*_t$ with mean = 0 and SD = 1), such that
+It is normal in this type of analysis to standardize each time series by first subtracting its mean and then dividing by its standard deviation (i.e., create a \emph{z}-score $\yy^*_t$ with mean = 0 and standard deviation = 1), such that
 \begin{equation*}
 \yy^*_t = \Sigma^{-1}(\yy_t-\bar{\yy}) \text{,}
 \end{equation*}
-$\Sigma$ is a diagonal matrix with the standard deviations of each time series along the diagonal, and $\bar{\yy}$ is a vector of the means. In \verb@R@, this can be done as follows
+$\Sigma$ is a diagonal matrix with the standard deviations of each time series along the diagonal, and $\bar{\yy}$ is a vector of the means. In R, this can be done as follows
 <<Cs03_z.score>>=
 Sigma = sqrt(apply(dat.spp.1980, 1, var, na.rm=TRUE))
 y.bar = apply(dat.spp.1980, 1, mean, na.rm=TRUE)
@@ -329,7 +329,7 @@ Z.vals = list(
 "z51","z52","z53")
 Z = matrix(Z.vals, nrow=N.ts, ncol=3, byrow=TRUE)
 @
-When specifying the list values, spacing and carriage returns were added to help show the correspondence with the $\ZZ$ matrix in Equation \ref{eq:dfa2}. If you print $\ZZ$ (at the \verb@R@ command line), you will see that it is a matrix with character values (the estimated elements) and numeric values (the fixed 0's).
+When specifying the list values, spacing and carriage returns were added to help show the correspondence with the $\ZZ$ matrix in Equation \ref{eq:dfa2}. If you print $\ZZ$ (at the R command line), you will see that it is a matrix with character values (the estimated elements) and numeric values (the fixed 0's).
 <<Cs06_print.Z, eval=TRUE>>=
 print(Z)
 @
@@ -362,7 +362,7 @@ R.vals = list(
 R = matrix(R.vals, nrow=N.ts, ncol=N.ts, byrow=TRUE)
 @
 \pagebreak
-You can print $\RR$ at the \verb@R@ command line to see what it looks like:
+You can print $\RR$ at the R command line to see what it looks like:
 <<Cs09_print.R, eval=TRUE>>=
 print(R)
 @
@@ -370,9 +370,9 @@ This form of variance-covariance matrix is commonly used, and therefore MARSS ha
 <<Cs10_set.up.R.short, eval=TRUE>>=
 R = "diagonal and unequal"
 @
-As mentioned in earlier chapters, there are other shorthand notations for many of the common parameter structures.  Type ?MARSS at the \verb@R@ command line to see a list of the shorthand options for each parameter vector/matrix.
+Type ?MARSS at the R command line to see a list of the shorthand options for each parameter vector/matrix.
 
-The parameter vectors $\pipi$ (termed \verb@x0@ in MARSS), $\aa$ and $\uu$ are each set to be a column vector of zeros.  Either of the following can be used:
+The parameter vectors $\pipi$ (termed \verb@x0@ in MARSS), $\aa$ and $\uu$ are each set to be a column vector of zeros.  Any of the following can be used:
 <<Cs11_set.up.U, eval=TRUE>>=
 x0 = U = matrix(0, nrow=3, ncol=1)
 A = matrix(0, nrow=6, ncol=1)
@@ -431,10 +431,10 @@ for(i in 1:length(spp)){
 \label{fig:CS4.fits}
 \end{figure}
 
-\section{Using model selection to determine the number of trends}\label{sec:dfa.usingmodelselection}
+\section{Using model selection to determine the number of trends}\label{sec:dfa.usingmodelselection}\index{model selection}
 Following \citet{Zuuretal2003a}, we use model selection criteria (specifically AICc) to determine the number of underlying trends that have the highest data support.  Our first model had three underlying trends ($m=3$).  Let's compare this to a model with two underlying trends.  The forms for parameter matrix $\RR$ and vector $\aa$ will stay the same but we need to change the other parameter vectors and matrices because $m$ is different.
 
-After showing you the matrix math behind a DFA model, we will now use the \verb@form@ argument for a MARSS call to specify that we want to fit a DFA model.  This will set up the $\ZZ$ matrix and the other parameters for you.  Specify how many trends you want by passing in \verb@model=list(m=x)@.  You can also pass in different forms for the $\RR$ matrix in the usual way.
+After showing you the matrix math behind a DFA model, we will now use the \verb@form@ argument for a MARSS call to specify that we want to fit a DFA model.  Type \verb@?MARSS.dfa@ to learn about the \verb@MARSS()@ call with \verb@form="dfa"@.  This will set up the $\ZZ$ matrix and the other parameters for you.  Specify how many trends you want by passing in \verb@model=list(m=x)@.  You can also pass in different forms for the $\RR$ matrix in the usual way.
 
 Here is how to fit two trends using \verb@form="dfa"@:
 <<set.up.two.trends, eval=TRUE, echo=FALSE, results=hide>>=
@@ -444,7 +444,7 @@ if(!saved.res) {
 	    z.score=TRUE, form="dfa", control=fit.cntl.list)
 	}
 @
-<<Cs16_set.up.two.trends.echo, echo=TRUE>>=
+<<Cs16_set.up.two.trends.echo, echo=TRUE, results=hide>>=
 model.list = list(m=2, R="diagonal and unequal")
 kemz.2 = MARSS(dat.spp.1980, model=model.list,
     z.score=TRUE, form="dfa", control=cntl.list)
@@ -460,12 +460,12 @@ It looks like a model with 3 trends has much more support from the data because 
 \subsection{Comparing many model structures}
 Now let's examine a larger suite of possible models.  We will test from one to four underlying trends ($m$ = 1 to 4) and four different structures for the $\RR$ matrix:
 \begin{enumerate}
-\item same variances \& no covariance (\verb@``diagonal and equal''@);
-\item different variances \& no covariance (\verb@``diagonal and unequal''@);
-\item same variances \& same covariance (\verb@``equalvarcov''@); and
-\item different variances \& covariances (\verb@``unconstrained''@).
+\item same variances \& no covariance (\verb@"diagonal and equal"@);
+\item different variances \& no covariance (\verb@"diagonal and unequal"@);
+\item same variances \& same covariance (\verb@"equalvarcov"@); and
+\item different variances \& covariances (\verb@"unconstrained"@).
 \end{enumerate}
-The following code builds our model matrices; you could also write out each matrix as we did in the first example, but this allows us to build and run all of the models together. (\emph{NOTE}: the following piece of code will take a \emph{very long} time to run!)
+The following code builds our model matrices; you could also write out each matrix as we did in the first example, but this allows us to build and run all of the models together. \emph{NOTE}: the following piece of code will take a \emph{very long} time to run!
 <<set.up.many.trends.no.echo, results=hide, eval=TRUE, echo=FALSE>>=
 #This is being done to speed up building the user guide
 if(!saved.res) {
@@ -521,7 +521,7 @@ for(R in levels.R) {
     } # end R loop
 @
 
-Model selection results are shown in Table \ref{tab:tablefits}.  The model with lowest AICc has 2 trends and an unconstrained $\RR$ matrix. It also appears that, in general, models with an unconstrained $\RR$ matrix fit the data much better than those models with less complex structures for the observation errors (i.e., models with unconstrained forms for $\RR$ had nearly all of the AICc weight). 
+Model selection results are shown in Table \ref{tab:tablefits}.  The models with lowest AICc had 2 or 3 trends and an unconstrained $\RR$ matrix. It also appears that, in general, models with an unconstrained $\RR$ matrix fit the data much better than those models with less complex structures for the observation errors (i.e., models with unconstrained forms for $\RR$ had nearly all of the AICc weight). 
 
 <<Cs19_makemodeltable,echo=FALSE>>=
 # calculate delta-AICc
@@ -547,7 +547,7 @@ print(thetable, type = "latex", file = paste(tabledir,"tablefit.tex",sep=""), in
 
 \section{Using varimax rotation to determine the loadings and trends}
 
-As \citet[p. 450]{Harvey1989} discusses in section 8.5.1, there are multiple equivalent solutions to the dynamic factor loadings.  We arbitrarily constrained $\ZZ$ in such a way to choose only one of these solutions, but fortunately the different solutions are equivalent, and they can be related to each other by a rotation matrix $\HH$.  Let $\HH$ be any $m \times m$ non-singular matrix.  The following are then equivalent solutions:
+As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivalent solutions to the dynamic factor loadings.  We arbitrarily constrained $\ZZ$ in such a way to choose only one of these solutions, but fortunately the different solutions are equivalent, and they can be related to each other by a rotation matrix $\HH$.  Let $\HH$ be any $m \times m$ non-singular matrix.  The following are then equivalent solutions:
 \begin{equation}
 \begin{gathered}
 \yy_t = \ZZ\xx_t+\aa+\vv_t\\
@@ -567,7 +567,7 @@ As \citet[p. 450]{Harvey1989} discusses in section 8.5.1, there are multiple equ
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
  $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.
  
-The varimax rotation is easy to compute because \verb@R@ has a built in function that returns $\HH^{-1}$. To do so, we first get the model fits from the highest ranked model.
+The varimax rotation is easy to compute because R has a built in function that returns $\HH^{-1}$. To do so, we first get the model fits from the highest ranked model.
  
 <<Cs20_getbestmodel, eval=TRUE>>=
 # get the "best" model
@@ -687,13 +687,13 @@ It is standard to add covariates to the analysis so that one removes known impor
  \label{eq:dfa.cov}\end{equation}
 where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and the $n \times q$ matrix $\DD$ contains the effect(s) of the covariate(s) on the observations.  Using \verb@form="dfa"@ and \verb@covariates=@<\emph{covariate name(s)}>, we can easily add covariates to our DFA, but this means that the covariates are input, not data, and there can be no missing values (see Chapter 6 for how to include covariates with missing values).
  
-The Lake Washington dataset has two environmental covariates that we might expect to have effects on phytoplankton growth, and hence, abundance: temperature (Temp) and total phosphorous (TP). We need the covariate inputs to have the same number of time steps as the variate data, and thus we limit the covariate data to the years 1980-1994 also.
+The Lake Washington dataset has two environmental covariates that we might expect to have effects on phytoplankton growth, and hence, abundance: temperature (Temp) and total phosphorous (TP). 
 <<Cs26_set-up-covar>>=
 temp = t(plankdat[,"Temp",drop=FALSE])
 TP = t(plankdat[,"TP",drop=FALSE])
 @
 
-We will now fit 3 different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our ``best" model from Table \ref{tab:tablefits} where \emph{m} = 2 and $\RR$ is ``unconstrained".
+We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our best 2-state model from Table \ref{tab:tablefits} where \emph{m} = 2 and $\RR$ is ``unconstrained".
 <<fit.covar, results=hide, eval=TRUE, echo=FALSE>>=
 if(!saved.res) {
 	model.list=list(m=2, R="unconstrained")
@@ -721,7 +721,7 @@ file=paste(Sys.getenv("TEMP"),"\\CS4--model.fits.Rdata",sep="")
 save(file=file,list=c("model.data", ls(pattern="^kemz.")))
 @
 
-Next we can compare whether the addition of the covariates improves the model fit (effectively less residual error while accounting for the additional parameters). (\emph{NOTE}: The following results were obtained by letting the EM algorithm run for a \emph{very long} time, so your results may differ.)
+Next we can compare whether the addition of the covariates improves the model fit (effectively less residual error while accounting for the additional parameters). \emph{NOTE}: The following results were obtained by letting the EM algorithm run for a \emph{very long} time, so your results may differ.
 <<Cs28_covar.AICs>>=
 print(cbind(model=c("no covars", "Temp", "TP", "Temp & TP"),
       AICc=round(c(best.fit$AICc, kemz.temp$AICc, kemz.TP$AICc,
@@ -748,8 +748,8 @@ for(i in 1:length(spp)){
 \label{fig:CS4.bestcovarfits}
 \end{figure}
 
-\section{Questions and further analyses}
-We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the \verb@R@ code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code.  Copy and paste the code into a new file, and then you can edit that code.
+\section{Discussion}
+We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the R code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code.  Copy and paste the code into a new file, and then you can edit that code.
 DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
 
 %---------
