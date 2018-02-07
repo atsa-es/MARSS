@@ -11,7 +11,7 @@ options(prompt=" ", continue=" ")
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_SealPopStructure.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-\index{MARSS model!multivariate example}In this application, we use time series of harbor seal abundance estimates along the west coast to examine large-scale spatial structure.  Harbor seals are distributed along the west coast of the U.S. from California to Washington.  The populations in Oregon and Washington have been surveyed for over 25 years \citep{Jeffriesetal2003} at a number of haul-out sites (Figure \ref{fig:CS3.fig1}).  These populations have been increasing steadily since the 1972 Marine Mammal Protection Act. 
+\index{MARSS model!multivariate example}In this application, we use harbor seal abundance estimates along the west coast to examine large-scale spatial structure.  Harbor seals are distributed along the west coast of the U.S. from California to Washington.  The populations been surveyed at haul-out sites since the mid-1970s (Figure \ref{fig:CS3.fig1}) and have been increasing steadily since the 1972 Marine Mammal Protection Act. See \verb@?harborSeal@ for the data sources.
 
 For management purposes, three stocks are recognized; the CA stock, the OR/WA coastal stock which consists of four regions (Northern/Southern Oregon, Coastal Estuaries, Olympic Peninsula), and the inland WA stock which consists of the regions in the WA inland waters minus Hood Canal (Figure \ref{fig:CS3.fig1}).  Differences exist in the demographics across regions (e.g. pupping dates), however mtDNA analyses and tagging studies support the larger stock structure.  Harbor seals are known for strong site fidelity, but at the same time travel large distances to forage.
 %~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,11 +100,11 @@ Z.model[c(3:6,11),2]=1  #which elements in col 2 are 1
 Z.model[7:8,3]=1  #which elements in col 3 are 1
 @
 
-MARSS has a shortcut for making this kind of $\ZZ$ matrix using \verb@factor()@.  To make the $\ZZ$ matrix for hypotheses 1, we could also write \verb@factor(c(1,1,2,2,2,2,3,3,1,1,2))@.  Each element is for one of the rows of $\ZZ$ and indicates which column the ``1'' appears in or which row of your data belongs to which subpopulation. Instead of numbers however, we will use text strings to denote the subpopulations. For example, the \verb@Z.model@ specification for hypothesis 1 is
+MARSS has a shortcut for making this kind of $\ZZ$ matrix using \verb@factor()@. The following code specifies the same $\ZZ$ matrix:
 <<Z.model.1>>=
 Z1=factor(c("wa.or","wa.or",rep("ps",4),"ca","ca","wa.or","wa.or","bc")) 
 @
-Notice it is 11 elements in length; one element for each row of data (in this case survey region).
+Each element in the \verb@c()@ vector is for one of the rows of $\ZZ$ and indicates which column the ``1'' appears in or which row of your data belongs to which subpopulation. Notice the vector is 11 elements in length; one element for each row of data (in this case survey region).
 
 \subsection{Specify the $\uu$ structure}
 We will assume that subpopulations can have a unique population growth rate. Mathematically, this means that the $\uu$ matrix in Equation \ref{eqn:spat.struc.marss} looks like this for hypotheses 1 (3 subpopulations):
@@ -238,6 +238,7 @@ for(i in 1:length(Z.models)){
 @
 
 \section{Summarize the data support}
+\index{model selection!AIC weights}
 We will use AICc and AIC weights to summarize the data support for the different hypotheses.  First we will sort the fits based on AICc:
 <<Cs06_sort.results>>=
 min.AICc=order(out.tab$AICc)
@@ -266,7 +267,7 @@ out.tab.1$AIC.weight = round(out.tab.1$AIC.weight, digits=3)
 print(out.tab.1[,c("H","Q","delta.AICc","AIC.weight")], row.names=FALSE)
 @
 
-It appears that a population structure north and south coast subpopulations and two inland subpopulations is more supported than any of the other West Coast population structures---under the assumption of independent process errors. The latter means that good and bad years are not correlated across the subpopulations.  The stock structure, supported by genetic information, does not appear to correspond to independent subpopulations and the individual survey regions, which are characterized by differential pupping times, does not appear to lead to correspond to independent subpopulations either.
+It appears that a population structure north and south coast subpopulations and two inland subpopulations is more supported than any of the other population structures---under the assumption of independent process errors. The latter means that good and bad years are not correlated across the subpopulations.  The stock structure, supported by genetic information, does not appear to correspond to independent subpopulations and the individual survey regions, which are characterized by differential pupping times, does not appear to correspond to independent subpopulations either.
 
 Figure \ref{fig:northsouth} shows the the four subpopulation trajectories estimated by the best fit model.  The trajectories have been rescaled so that each starts at 0 in 1975 (to facilitate comparison).
 
