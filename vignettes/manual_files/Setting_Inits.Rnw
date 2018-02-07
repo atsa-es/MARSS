@@ -127,6 +127,15 @@ MARSSmcinit = function(MLEobj,
                                     MCbounds=list(B=c(0,1), U=c(-1,1), Q = c(1,1), 
                                                   Z=c(0,1), A=c(-1,1), R = c(1,1), x0 = c(-1,1) )),
                        silent=FALSE) {
+  
+  control.default=list(numInits = 500, numInitSteps = 10, MCbounds=list(B=c(0,1), U=c(-1,1), Q = c(1,1), Z=c(0,1), A=c(-1,1), R = c(1,1), x0 = c(-1,1) ))
+  if(!is.null(control)){
+    if(!is.list(control)) stop("MARSSmcinit: control must be a list")
+    if(any(!(names(control)%in%names(control.default)))) stop(paste("MARSSmcinit: allowed control list elements are", names(control.default)))
+    control.new=control.default
+    for(i in names(control)) control.new[[i]]=control[[i]]
+    control = control.new
+  }
   drawProgressBar = FALSE 
   if(!silent) { #then we can draw a progress bar
     cat("\n"); cat("> Starting Monte Carlo Initializations\n")
@@ -216,7 +225,7 @@ Here is a simple example of using the function.  \verb@numInits@ is set low so t
   dat = t(harborSeal)
   dat = dat[c(2,nrow(dat)),]
   fit1=MARSS(dat)
-  MCinits = MARSSmcinit(fit1, numInits = 10) 
+  MCinits = MARSSmcinit(fit1, control=list(numInits = 10)) 
   fit2=MARSS(dat, inits=MCinits)
 @
 
