@@ -367,7 +367,7 @@ The diagonal of this matrix shows that each region appears to experience process
 <<Cs17_Q.diag>>=
 diag(Q.unc)
 @
-We can compute the correlation matrix as follows.  Rownames are added to make the matrix more readable.
+We can compute the correlation matrix as follows.  Row names are added to make the matrix more readable.
 <<Cs18_Q.corr, keep.source=TRUE>>=
 h=diag(1/sqrt(diag(Q.unc)))
 Q.corr=h%*%Q.unc%*%h

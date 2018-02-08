@@ -23,7 +23,7 @@ where $\cc_t$ is the $p \times 1$ vector of covariates (e.g., temperature, rainf
 With the MARSS() function, one can fit this model by passing in \verb@model$c@ and/or \verb@model$d@ in the MARSS() call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  Because $\CC$ and $\DD$ are matrices, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps if they are time-varying.  If they are time-constant, then they can be specified as 2-dimensional matrices.
 
 \section{Examples using plankton data}
-Here we show some examples using the Lake Washington plankton data set and covariates in that dataset.  We use the 10 years of data from 1965-1974 (Figure \ref{fig:plank-plot}), a decade with particularly high green and bluegreen algae levels. We use the transformed plankton dataset which has 0s replaced with NAs. Below, we set up the data and z-score the data. The original data were already z-scored, but  we changed the mean when we subsampled the years so need to z-score again. 
+Here we show some examples using the Lake Washington plankton data set and covariates in that dataset.  We use the 10 years of data from 1965-1974 (Figure \ref{fig:plank-plot}), a decade with particularly high green and blue-green algae levels. We use the transformed plankton dataset which has 0s replaced with NAs. Below, we set up the data and z-score the data. The original data were already z-scored, but  we changed the mean when we sub-sampled the years so need to z-score again. 
 <<Covar_sec2_1_load-plankton-data, eval=TRUE>>=
 fulldat = lakeWAplanktonTrans
 years = fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
@@ -39,9 +39,7 @@ covariates = rbind(
    TP = fulldat[years,"TP"])
    
 # z.score the covariates
-the.mean = apply(covariates,1,mean,na.rm=TRUE)
-the.sigma = sqrt(apply(covariates,1,var,na.rm=TRUE))
-covariates = (covariates-the.mean)*(1/the.sigma)
+covariates = zscore(covariates)
 @
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \setkeys{Gin}{}
@@ -52,7 +50,7 @@ LWA <- ts(cbind(Year=fulldat[years,"Year"], t(dat), t(covariates)), start=c(1965
 plot.ts(LWA[,c("Greens","Bluegreens", "Temp", "TP")], main="", yax.flip=TRUE)
 @
 \end{center}
-\caption{Time series of Green and Bluegreen algae abundances in Lake Washington along with the temperature and total phosporous covariates.}
+\caption{Time series of Green and Blue-green algae abundances in Lake Washington along with the temperature and total phosphorous covariates.}
 \label{fig:plank-plot}
 \end{figure}
 
@@ -61,6 +59,7 @@ plot.ts(LWA[,c("Greens","Bluegreens", "Temp", "TP")], main="", yax.flip=TRUE)
 We can estimate the effect of the covariates using a process-error only model, an observation-error only model, or a model with both types of error.  An observation-error only model is a multivariate regression, and we will start here so you see the relationship of MARSS model to more familiar linear regression models.
 
 \subsection{Multivariate linear regression}
+\index{multivariate linear regression}
 In a standard multivariate linear regression, we only have an observation model with independent errors (\emph{i.e.}, the state process does not appear in the model):
 \begin{equation}
 \begin{gathered}
@@ -102,6 +101,7 @@ kem = MARSS(y, model=model.list)
 We set \verb@A="zero"@ because the data and covariates have been demeaned.   Of course, one can do multiple regression in \R using, say, \verb@lm()@, and that would be much, much faster.  The EM algorithm is over-kill here, but it is shown so that you see how a standard multivariate linear regression model is written as a MARSS model in matrix form.
 
 \subsection{Multivariate linear regression with autocorrelated errors}
+\index{multivariate linear regression!with autocorrelated errors}
 We can add a twist to the standard multivariate linear regression model, and instead of having temporally \emph{i.i.d.} errors in the observation process, we'll assume autoregressive errors. There is still no state process in our model, but we will use the state part of a MARSS model to model our errors.  Mathematically, this can be written as
 \begin{equation}
 \begin{gathered}
@@ -119,7 +119,7 @@ A = U = x0 = "zero"
 R = "diagonal and equal"
 d = covariates
 D = "unconstrained"
-y = dat # to show the relation between dat & the model equations
+y = dat 
 model.list = list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,D=D,d=d,x0=x0)
 control.list = list(maxit=1500)
 kem = MARSS(y, model=model.list, control=control.list)
@@ -127,7 +127,7 @@ kem = MARSS(y, model=model.list, control=control.list)
 You can try setting $\BB$ to identity and MARSS will fit a model with non-mean-reverting autoregressive errors to the data.  It is not done here since it turns out that that is not a very good model and it takes a long time to fit.  If you try it, you'll see that $\QQ$ gets small meaning that the $\xx$ part is being removed from the model. 
 
 \section{Process-error only model}
-Now let's model the data as an autoregressive process observed without error, and incorporate the  covariates into the process model.  Note that this is much different from typical linear regression models. The $\xx$ part represents our model of the data (in this case plankton species).  How is this different from the autoregressive observation errors? Well, we are modeling our data as autoregressive so data at $t-1$ affects the data at $t$.  Population abundances are inherently autoregressive so this model is a bit closer to the underlying mechanism generating the data.  Here is our new process model for plankton abundance.
+Now let's model the data as an autoregressive process observed without error, and incorporate the  covariates into the process model.  Note that this is much different from typical linear regression models. The $\xx$ part represents our model of the data (in this case plankton species).  How is this different from the autoregressive observation errors? Well, we are modeling our data as autoregressive so data at $t-1$ affects the data at $t$.  Population abundances are inherently autoregressive so this model is a bit closer to the underlying mechanism generating the data.  Here is our new process model for plankton abundance. $\xx$ is the plankton abundance.
 \begin{equation}
 \begin{gathered}
 \xx_t = \xx_{t-1} +  \CC\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ) 
@@ -149,7 +149,7 @@ kem = MARSS(dat, model=model.list)
 @
 Notice that the log-likelihood goes up quite a bit, which means that the mean-reverting model fits the data much better.
 
-With this model,  we are estimating $\xx_0^0$ (the starting value for the Kalman filter).  If we set \verb@model$tinitx=1@, to use $\xx_1^0$ as the starting value instead, we will get a error message that $\RR$ diagonals are equal to 0 and we need to fix \verb@x0@. This is a restriction of the (default) EM algorithm having to do with the update equation for $\xx_1^0$.  We cannot use BFGS unless we set $\QQ$ to be either unconstrained or diagonal because the way $\QQ$ is being estimated using the BFGS algorithm to ensure that the matrix stay positive-definite (via a Cholesky transformation) does not allow any constraints on $\QQ$.
+With this model,  we are estimating $\xx_0^0$ (the starting value for the Kalman filter).  If we set \verb@model$tinitx=1@, to use $\xx_1^0$ as the starting value instead, we will get a error message that $\RR$ diagonals are equal to 0 and we need to fix \verb@x0@. This is a restriction of the (default) EM algorithm having to do with the update equation for $\xx_1^0$.  We cannot use BFGS unless we set $\QQ$ to be either unconstrained or diagonal because the way $\QQ$ is being estimated using the BFGS algorithm to ensure that the matrix stays positive-definite (via a Cholesky transformation) does not allow any constraints on $\QQ$.
 
 
 \section{Both process- \& observation-error model}
@@ -173,27 +173,25 @@ Note, our estimates of the effect of temperature and total phosphorous are not t
 
 \section{Including seasonal effects in MARSS models}
 \label{chap:covariates:season}\index{seasonality}
-Time-series data are often collected at intervals with some implicit ``seasonality.'' For example, quarterly earnings for a business, monthly rainfall totals, or hourly air temperatures. In those cases, it is often helpful to extract any recurring seasonal patterns that might otherwise mask some of the other temporal dynamics we are interested in examining.
+Time-series data are often collected at intervals with some implicit seasonality. For example, quarterly earnings for a business, monthly rainfall totals, or hourly air temperatures. In those cases, it is often helpful to extract any recurring seasonal patterns that might otherwise mask some of the other temporal dynamics we are interested in examining.
 
 Here we show a few approaches for including seasonal effects using the Lake Washington plankton data, which were collected monthly.  The following examples will use all five phytoplankton species from Lake Washington.  First, let's set up the data.
 <<Covar_sec6_01_set-up-seasonal-dat, keep.source=TRUE>>=
 years = fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
 phytos = c("Diatoms", "Greens", "Bluegreens",
            "Unicells", "Other.algae")
-dat = t(fulldat[years,phytos])
+dat = t(fulldat[years, phytos])
 
-# z.score data because we changed the mean when we subsampled
-the.mean = apply(dat,1,mean,na.rm=TRUE)
-the.sigma = sqrt(apply(dat,1,var,na.rm=TRUE))
-dat = (dat-the.mean)*(1/the.sigma)
+# z.score data again because we changed the mean when we subsampled
+dat = zscore(dat)
 # number of time periods/samples
-TT = dim(dat)[2]
+TT = ncol(dat)
 @
 
 
 \subsection{Seasonal effects as fixed factors}
 
-One common approach for estimating seasonal effects is to treat each one as a fixed factor, such that the number of parameters equals the number of ``seasons'' (\emph{e.g.}, 24 hours per day, 4 quarters per year). The plankton data are collected monthly, so we will treat each month as a fixed factor.  To fit a model with fixed month effects, we create a 12 $\times$ \emph{T} covariate matrix $\cc$ with one row for each month (Jan, Feb, ...) and one column for each time point. We put a 1 in the January row for each column corresponding to a January time point, a 1 in the February row for each column corresponding to a February time point, and so on. All other values of $\cc$ equal 0. The following code will create such a $\cc$ matrix.
+One common approach for estimating seasonal effects is to treat each one as a fixed factor.  This adds an estimated parameter for each season (\emph{e.g.}, 24 hours per day, 4 quarters per year). The plankton data are collected monthly, so we will treat each month as a fixed factor.  To fit a model with fixed month effects, we create a 12 $\times$ \emph{T} covariate matrix $\cc$ with one row for each month (Jan, Feb, ...) and one column for each time point. We put a 1 in the January row for each column corresponding to a January time point, a 1 in the February row for each column corresponding to a February time point, and so on. All other values of $\cc$ equal 0. The following code will create such a $\cc$ matrix.
 <<Covar_sec6_02_set-up-month-factors>>=
 # number of "seasons" (e.g., 12 months per year)
 period = 12
@@ -209,7 +207,7 @@ rownames(c.in) = month.abb
 @
 
 Next we need to set up the form of the $\CC$ matrix which defines any constraints we want to set on the month effects.  $\CC$ is a $5 \times 12$ matrix. Five taxon and 12 month effects. 
-If we wanted each taxon to have the same month effect, i.e. there is a common month effect across all taxon, then 
+If we wanted each taxon to have the same month effect, a common month effect across all taxon, then 
 we have the same value in each $\CC$ column\footnote{\texttt{month.abb} is a R constant that gives month abbreviations in text.}:
 <<Covar_sec6_03_C-constrained>>=
 C = matrix(month.abb,5,12,byrow=TRUE)
@@ -226,7 +224,7 @@ Then we set up the form for the rest of the model parameters.  We make the follo
 <<Covar_sec6_05_month-factor-marss-params, keep.source=TRUE>>=
 # Each taxon has unique density-dependence
 B = "diagonal and unequal"
-# Assume independent process errors
+# Independent process errors
 Q = "diagonal and unequal"
 # We have demeaned the data & are fitting a mean-reverting model
 # by estimating a diagonal B, thus
@@ -235,10 +233,10 @@ U = "zero"
 Z = "identity" 
 # The data are demeaned & fluctuate around a mean
 A = "zero" 
-# We assume observation errors are independent, but they
+# Observation errors are independent, but they
 # have similar variance due to similar collection methods
 R = "diagonal and equal"
-# We are not including covariate effects in the obs equation
+# No covariate effects in the obs equation
 D = "zero"
 d = "zero"
 @
@@ -246,7 +244,7 @@ d = "zero"
 Now we can set up the model list for MARSS and fit the model (results are not shown since they are verbose with 60 different month effects).
 <<Covar_sec6_06_fit-month-factor-with-MARSS, results=hide, keep.source=TRUE>>=
 model.list = list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=c.in,D=D,d=d)
-seas.mod.1 = MARSS(dat,model=model.list,control=list(maxit=1500))
+seas.mod.1 = MARSS(dat, model=model.list,control=list(maxit=1500))
 
 # Get the estimated seasonal effects
 # rows are taxa, cols are seasonal effects
@@ -255,7 +253,7 @@ rownames(seas.1) = phytos
 colnames(seas.1) = month.abb
 @
 
-The top panel in Figure \ref{fig:mon-effects} shows the estimated seasonal effects for this model.  Note that if we had set U="unequal", we would need to set one of the columns of $\CC$ to zero because the model would be under-determined (infinite number of solutions). If we substracted the mean January abundance off each time series, we could set the January column in $\CC$ to 0 and get rid of 5 estimated effects.
+The top panel in Figure \ref{fig:mon-effects} shows the estimated seasonal effects for this model.  Note that if we had set U="unequal", we would need to set one of the columns of $\CC$ to zero because the model would be under-determined (infinite number of solutions). If we subtracted the mean January abundance off each time series, we could set the January column in $\CC$ to 0 and get rid of 5 estimated effects.
 
 \subsection{Seasonal effects as a polynomial}
 
@@ -335,7 +333,7 @@ axis(1,labels=month.abb, at=1:12,las=2,cex.axis=0.75)
 legend("topright", lty=1:5, legend=phytos, cex=0.6, col=1:5)
 @
 \end{center}
-\caption{Estimated monthly effects for the three approaches to estimating seasonal effects. Top panel: each month modelled as a separate fixed effect for each taxon (60 parameters); Middle panel: monthly effects modelled as a 3rd order polynomial (20 parameters); Bottom panel: monthly effects modelled as a discrete Fourier series (10 parameters). }
+\caption{Estimated monthly effects for the three approaches to estimating seasonal effects. Top panel: each month modeled as a separate fixed effect for each taxon (60 parameters); Middle panel: monthly effects modeled as a 3rd order polynomial (20 parameters); Bottom panel: monthly effects modeled as a discrete Fourier series (10 parameters). }
 \label{fig:mon-effects}
 \end{figure}
 
@@ -346,9 +344,9 @@ data.frame(Model=c("Fixed", "Cubic", "Fourier"),
                         seas.mod.2$AICc,
                         seas.mod.3$AICc),1))
 @
-The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the best of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
+The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
 
-\section{Model diagnostics}
+\section{Model diagnostics}\index{diagnostics}\index{functions!residuals}
 We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals and their autocorrelation functions (ACFs) for all five taxa using the following code:
 <<Covar_sec7_01_diag-code, eval=FALSE>>=
 for(i in 1:3) {
@@ -412,7 +410,7 @@ for(i in 1:5) {
 }
 @
 \end{center}
-\caption{Model residuals and their ACF for the model with monthly effects modelled as a 3$^\emph{rd}$-rd order polynomial. }
+\caption{Model residuals and their ACF for the model with monthly effects modeled as a 3$^\emph{rd}$-rd order polynomial. }
 \label{fig:mon-diagnostics-2}
 \end{figure}
 
@@ -492,7 +490,7 @@ with the $\xx_t$, $\yy_t$ and parameter matrices redefined as in Equations \ref{
 \end{equation}
 Note $\QQ$ and $\RR$ are written as block diagonal matrices, but you could allow covariances if that made sense.  $\uu$ and $\aa$ are column vectors here.  We can fit the model (Equation \ref{eqn:marss.covar}) as usual using the \verb@MARSS()@ function. 
 
-The log-likelihood that is returned by MARSS will include the log-likelihood of the covariates under the covariate state model.  If you want only the the log-likelihood of the non-covariate data, you will need to substract off the log-likelihood of the covariate model:
+The log-likelihood that is returned by MARSS will include the log-likelihood of the covariates under the covariate state model.  If you want only the the log-likelihood of the non-covariate data, you will need to subtract off the log-likelihood of the covariate model:
 \begin{equation}\label{eqn:covar.dummy}
 \begin{gathered}
 \xx^{(c)}_t = \BB^{(c)}\xx_{t-1}^{(c)} + \uu^{(c)} + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ^{(c)}) \\
@@ -504,7 +502,7 @@ An easy way to get this log-likelihood for the covariate data only is use the au
 y.aug = rbind(data,covariates)
 fit.aug = MARSS(y.aug, model=model.aug)
 @
-\texttt{fit.aug} is the MLE object that can be passed to MARSSkf().  You need to make a version of this MLE object with the non-covariate data filled with NAs so that you can compute the logLik without the covariates.  This needs to be done in the \texttt{marss} element since that is what is used by MARSSkf().  Below is code to do this.
+\texttt{fit.aug} is the MLE object that can be passed to \verb@MARSSkf()@.  You need to make a version of this MLE object with the non-covariate data filled with NAs so that you can compute the logLik without the covariates.  This needs to be done in the \texttt{marss} element since that is what is used by MARSSkf().  Below is code to do this.
 <<get-LL-aug-2, eval=FALSE>>=
 fit.cov = fit.aug; fit.cov$marss$data[1:dim(data)[1],] = NA
 extra.LL = MARSSkf(fit.cov)$logLik

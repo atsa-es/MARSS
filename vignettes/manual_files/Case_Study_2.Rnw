@@ -226,11 +226,11 @@ names(kem1)
 @
 The maximum-likelihood estimates of 
 ``total harbor seal population'' scaled to the first observation data series (Figure \ref{fig:CS2.fig2}) are in \verb@kem1$states@, and \verb@kem1$states.se@ are the standard errors on those estimates.  To get 95\% confidence intervals, use \verb@kem1$states +/- 1.96*kem1$states.se@.
-Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the biases, the $/aa$, cannot be estimated and arbitrarily our algorithm choses $a_1=0$, so the population estimate is scaled to the first observation time series.   
+Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the biases, the $/aa$, cannot be estimated and arbitrarily our algorithm chooses $a_1=0$, so the population estimate is scaled to the first observation time series.   
 
 The estimated parameters are output with the function \verb@coef@: \verb@coef(kem1)@.  To get the estimate just for \texttt{U}, which is the estimated long-term population growth rate, use \verb@coef(kem1)$U@.  Multiply by 100 to get the percent increase per year.  The estimated process variance is given by \verb@coef(kem2)$Q@.
 
-The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  one initial $x$ ($t=1$), one process variance, one $u$, four $a$'s, and five observation variances's. So $K=12$ parameters.  The AIC\index{model selection!AIC} of this model is $-2 \times \text{log-like} + 2K$, which we can show by typing \verb@kem1$AIC@.
+The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  one initial $x$ ($t=1$), one process variance, one $u$, four $a$'s, and five observation variances. So $K=12$ parameters.  The AIC\index{model selection!AIC} of this model is $-2 \times \text{log-like} + 2K$, which we can show by typing \verb@kem1$AIC@.
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \section{Single population model with independent and non-identical errors}

@@ -94,8 +94,8 @@ As we have seen in other chapters, standardizing our covariate(s) to have zero-m
 # get regressor variable
 CUI = SalmonSurvCUI[,3]
 # z-score the CUI
-CUI.z = matrix((CUI - mean(CUI))/sqrt(var(CUI)), nrow=1)
-# number of regr params (slope + intercept)
+CUI.z = zscore(CUI)
+# number of regression params (slope + intercept)
 m = dim(CUI.z)[1] + 1
 @
 Plots of logit-transformed survival and the $z$-scored April upwelling index are shown in Figure \ref{fig:CSX.fig1}.
