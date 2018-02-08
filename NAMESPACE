@@ -19,7 +19,8 @@ export(
   MARSSoptim,
   MARSSparamCIs,
   MARSSsimulate,
-  MARSSFisherI
+  MARSSFisherI,
+  zscore
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work

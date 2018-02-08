@@ -749,3 +749,17 @@ str_replace=function(string, pattern, replacement)
     unlist(re_mapply("sub", string, pattern, replacement))
   }
 }
+
+zscore = function(x){
+  ismat = is.matrix(x) #else is vector
+  if(ismat){
+    Sigma = sqrt(apply(x, 1, var, na.rm=TRUE))
+    x.bar = apply(x, 1, mean, na.rm=TRUE)
+  }else{
+    Sigma = sqrt(var(x, na.rm=TRUE))
+    x.bar = mean(x, na.rm=TRUE)
+  }
+  x.z = (x - x.bar) * (1/Sigma)
+  if(ismat) rownames(x.z) = rownames(x)
+  x.z
+}
