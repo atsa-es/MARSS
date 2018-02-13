@@ -14,12 +14,12 @@ op <- par(no.readonly = TRUE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Overview}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this section, we  consider the case where multiple time series exist and we want to use all the datasets to estimate a common underlying state-process or common underlying parameters.  In ecological applications, this situation arises when 1) They are time series of observations from the same species as the original time series (e.g. aerial and land based surveys of the same same species) or 2) They are time series collected in the same survey, but represent observations of multiple species (e.g. we might be doing a fisheries trawl survey that collects multiple species in each trawl).  
+In this section, we  consider the case where multiple time series exist and we want to use all the datasets to estimate a common underlying state-process or common underlying parameters.  In ecological applications, this situation arises when 1) there are time series of observations from the same species as the original time series (e.g. aerial and land based surveys of the same species) or 2) there are time series collected in the same survey, but represent observations of multiple species (e.g. we might be doing a fisheries trawl survey that collects multiple species in each trawl).  
 Why should we consider using other time series?   In the first scenario, where methodology differs between time series of the same species, observation error may be survey-specific.  These time series may represent observations of multiple populations, or these may represent multiple observations of the same population.  In the second scenario, each species should be treated as a separate process (given its own state vector), but because the survey methodology is the same across species, it might be reasonable to assume a shared observation error variance.  If these species have a similar response to environmental stochasticity, it might be possible to also assume a shared process variance.  
 
-In both of the above examples, MARSS models offer a way to linking multiple time series.  If parameters are allowed to be shared among the state processes (trend parameters, process variances) or observation processes (observation variances), parameter estimates will be more precise than if we treated each time series as independent.  By improving estimates of variance parameters, we will also be better able to discriminate between process and observation error variances.  
+In both of the above examples, MARSS models offer a way to link multiple time series.  If parameters are allowed to be shared among the state processes (trend parameters, process variances) or observation processes (observation variances), parameter estimates will be more precise than if we treated each time series as independent.  By improving estimates of variance parameters, we will also be better able to discriminate between process and observation error variances.  
 
-In this chapter, we will show examples of using MARSS to analyze multiple time series on the same species but either different populations or different survey methods.  The multivariate first-order autoregressive state process is written as usual as:
+In this chapter, we will show examples of using MARSS models to analyze multiple time series on the same species but either different populations or different survey methods.  The multivariate first-order autoregressive state process is written as usual as:
 \begin{equation}
 \xx_t = \BB\xx_{t-1} + \uu + \ww_t \text{ where } \ww_t \sim \MVN(0,\QQ)
 \end{equation}
@@ -33,7 +33,7 @@ where $\yy_t$ is a vector of observations at time $t$, $\ZZ$ is a design matrix 
 
 \section{Salmon spawner surveys}
 
-In our first application combining multiple time series, we will analyze a dataset on Chinook salmon (\emph{Oncorhynchus tshawytscha}).  This data comes from the Okanogan River in Washington state, a major tributary of the Columbia River (headwaters in British Columbia).  As an index of the abundance of spawning adults, biologists have conducted redd surveys during summer months (redds are nests or collection of rocks on stream bottoms where females deposit eggs).  Aerial surveys of redds on the Okanogan have been conducted 1956-2008.  Alternative ground surveys of were initiated in 1990, and have been conducted annually.
+In our first application combining multiple time series, we will analyze a dataset on Chinook salmon (\emph{Oncorhynchus tshawytscha}).  This data comes from the Okanogan River in Washington state, a major tributary of the Columbia River (with headwaters in British Columbia).  As an index of the abundance of spawning adults, biologists have conducted redd surveys during summer months (redds are nests or collection of rocks on stream bottoms where females deposit eggs).  Our data are aerial surveys of redds on the Okanogan River conducted 1956-2008 and ground surveys of redds from 1990-2008.
 
 \subsection{Read in and plot the raw data}
 We will be using the logged counts.
@@ -79,26 +79,27 @@ x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)  \\
 \end{gathered}
 \end{equation}
 The $\aa$ structure means that the $a$ for one of the $y$'s is fixed at 0 and the other $a$ is estimated relative to that fixed $a$.  In MARSS, this is the ``scaling'' structure for $\aa$.
-We specify this model in MARSS as follows.  Since $\xx$ is univariate, $\QQ$ and $\uu$ are just scalars (single numbers) and have no structure (like `diagonal').  Thus we can leave them off in our specification.  
+We specify this model as follows.  Since $\xx$ is univariate, $\QQ$ and $\uu$ are just scalars (single numbers), and we can leave them off in our specification.
+
+Fit the single state model, where the time series are assumed 
+to be from the same population. 
 <<Cs003_reddmodel1, keep.source=TRUE, results=hide>>=
 model1=list()
 model1$R="diagonal and equal"
-model1$Z=matrix(1,2,1) #matrix of 2 rows and 1 column
-model1$A="scaling" #the default
-# Fit the single state model, where the time series are assumed 
-# to be from thesame population. 
+model1$Z=matrix(1,2,1)
+model1$A="scaling" 
 kem1 = MARSS(logRedds, model=model1)
 @
-We can print the AIC and AICc values for this model by typing \texttt{kem1\$AIC} and \texttt{kem1\$AICc}.
+The AIC and AICc values for this model are
 
-How would we modify the above model to let the observation error variances to be unique?  We can do this in our second model:
+We can modify the above model to let the observation error variances to be unique:
 <<Cs004_reddmodel2, keep.source=TRUE, results=hide>>=
 model2=model1 #model2 is based on model1
 model2$R="diagonal and unequal"
 kem2 = MARSS(logRedds, model=model2)
 @
 
-It is possible that these surveys are measuring different population processes, so for our third model, we will fit a model with two different population process with the same process parameters.  For simplicity, we will keep the trend and variance parameters the same.  Mathematically, the model we are fitting is:
+It is possible that these surveys are measuring different population processes. For our third model, we will fit a model with two different population process with the same process parameters.  For simplicity, we will keep the trend and variance parameters the same.  Mathematically, the model we are fitting is:
 \begin{equation}
 \begin{gathered}
 \begin{bmatrix}x_1\\x_2\end{bmatrix}_t
@@ -124,7 +125,11 @@ model3$A="zero"
 kem3 = MARSS(logRedds, model=model3)
 @
 
-Based on AIC, it looks like the best model is also the simplest one, with one state vector (model1).  This suggests that the two different surveys are not only measuring the same thing, but have the same observation error variance.  Finally,we will make a plot of the model-predicted states (with +/- 2 s.e.s) and the log-transformed data (Figure \ref{fig:fig2}).
+Based on AICc, it appears that the best model is also the simplest one, with one state vector (model1).
+<<Cs005b_aic>>=
+c(mod1=kem1$AICc, mod2=kem2$AICc, mod3=kem3$AICc)
+@
+This suggests that the two different surveys are not only measuring the same underlying process, but have the same observation error variance.  Finally, we will make a plot of the model-predicted states (with +/- 2 s.e.s) and the log-transformed data (Figure \ref{fig:fig2}).
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
@@ -313,7 +318,7 @@ kem4 = MARSS(t(dat4), model=model4)
 \end{comment}
 
 \section{American kestrel abundance indices}
-In this example, we evaluate uncertainty in the structure of process variability (environmental stochasticity) using some bird survey data.  Breeding Bird Surveys have been conducted in the U.S. and Canada for 50+ years.  In this analysis, we focus on 3 time series of American kestrel (\emph{Falco sparverius}) abundance from adjacent Canadian provinces along a longitudinal gradient (British Columbia, Alberta, Saskatchewan).  Data have been collected annually, and corrected for changes in observer coverage and detectability.
+In this example, we evaluate uncertainty in the structure of process variability (environmental stochasticity) using breeding bird surveys data.  In this analysis, we use three time series of American kestrel (\emph{Falco sparverius}) abundance from adjacent Canadian provinces along a longitudinal gradient (British Columbia, Alberta, Saskatchewan).  The data were collected annually, and corrected for changes in observer coverage and detectability.
 
 \subsection{Read in and look at the data}
 Figure \ref{fig:fig5} shows the data.  The data are already log transformed.
@@ -337,7 +342,7 @@ legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan
 \end{figure}
 
 We know that the surveys use the same design, so we will force observation error to be shared. Our uncertainty lies in whether these
-time series are sampling the same population, and how environmental stochasticity varies by subpopulation (if there are subpopulations).  Our first model has one population trajectory (meaning there is one big panmictic BC/AB/SK population) and each of these three surveys is an observation of this big population with equal observation variances.  Mathematically, the model is:
+time series are sampling the same population, and how environmental stochasticity varies by subpopulation (if there are subpopulations).  Our first model has one population trajectory (meaning there is one panmictic BC/AB/SK population) and each of these three surveys is an observation of this single population with equal observation variances.  Mathematically, the model is:
 \begin{equation}
 \begin{gathered}
 x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)  \\
@@ -357,12 +362,10 @@ model.b1$R="diagonal and equal"
 model.b1$Z=matrix(1,3,1)
 kem.b1 = MARSS(birddat, model=model.b1, control=list(minit=100) )
 @
-As for the redd count example, we do not need to specify the structure of $\QQ$ and $\uu$ since they are scalar and have no structure.
-<<Cs010_bird-model-1-aic>>=
-kem.b1$AICc
+We do not need to specify the structure of $\QQ$ and $\uu$ since they are scalar and have no structure.
 @
 
-Let's compare this to a model where we assume that there is a separate population for British Columbia, Alberta, and Saskatchewan but they have the same process parameters (trend and process variance).  Mathematically, this model is:
+We will compare this to a model where we assume that there is a separate population for British Columbia, Alberta, and Saskatchewan but they have the same process parameters (trend and process variance).  Mathematically, this model is:
 \begin{equation}
 \begin{gathered}
 \begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_t
@@ -387,13 +390,9 @@ model.b2$A="zero"
 model.b2$U="equal"
 kem.b2 = MARSS(birddat, model=model.b2)
 @
-The AICc for this model is
-<<Cs012_bird-model-2-aic>>=
-kem.b2$AICc
-@
 
 Because these populations are surveyed over a relatively large geographic area, it is reasonable to expect that environmental variation
-may differ between populations.  For our third model, we will fit a model with separate processes that are allowed to have unequal process parameters.
+may differ between provinces.  For our third model, we will fit a model with separate processes that are allowed to have unequal process parameters.
 <<Cs013_fit-bird-model-3, echo=TRUE, results=hide, keep.source=TRUE>>=
 model.b3=model.b2 #is is based on model.b2
 #all we change is the structure of Q
@@ -401,11 +400,8 @@ model.b3$Q="diagonal and unequal"
 model.b3$U="unequal"
 kem.b3 = MARSS(birddat, model=model.b3)
 @
-<<Cs014_bird-model-3-aic>>=
-kem.b3$AICc
-@
 
-Finally for a fourth model, we will consider lumping Alberta/Saskatchewan, because the time series suggest similar trends.   Mathematically, this model is:
+For our last model, we will consider lumping Alberta/Saskatchewan, because the time series suggest similar trends.   Mathematically, this model is:
 \begin{equation}
 \begin{gathered}
 \begin{bmatrix}x_{BC}\\x_{AB-SK}\end{bmatrix}_t
@@ -430,10 +426,12 @@ model.b4$A="scaling"
 model.b4$U="unequal"
 kem.b4 = MARSS(birddat, model=model.b4)
 @
-<<Cs016_bird-model-4-aic>>=
-kem.b4$AICc
+
+The AICc values for the four models are
+<<Cs016_aics>>=
+c(mod1=kem.b1$AICc, mod2=kem.b2$AICc, mod3=kem.b3$AICc, mod4=kem.b4$AICc)
 @
-This last model was superior to the others, improving the AICc value compared to model 1 by 8 units.  Figure \ref{fig:fig6} shows the fits for this model.
+The last model is superior to the others, and lowers the AICc value compared to model 1 by 8 units.  Figure \ref{fig:fig6} shows the fits for this model.
 
 \begin{figure}[htp]
 \begin{center}
