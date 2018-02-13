@@ -32,7 +32,7 @@ A vanilla linear regression where our data are time ordered but we treat them as
 \begin{equation}\label{eqn:lm}
 y_t=\alpha + \beta_1 d_{1,t} + \beta_2 d_{2,t} + e_t,
 \end{equation}
-where the $d$ are our explanatory variables.  This model can be written in many different ways in as a MARSS equation. Here we use a specific form that where the i.i.d. component of the errors is $v_t$ in the $y$ part of the MARSS equation and the autocorrelated errors appears as $x_t$ in the $y$ equation.  Specifying the MARSS model this way allows us to use the EM-algorithm to fit the model which will prove to be important.
+where the $d$ are our explanatory variables.  This model can be written in many different ways in as a MARSS equation. Here we use a specific form where the i.i.d. component of the errors is $v_t$ in the $y$ part of the MARSS equation and the autocorrelated errors appear as $x_t$ in the $y$ equation.  Specifying the MARSS model this way allows us to use the EM-algorithm to fit the model which will prove to be important.
 
 \begin{equation}\label{eqn:lm.marss1}
 \begin{gathered}
@@ -76,7 +76,7 @@ A full multivariate MARSS model looks like
 We need to specify the parameters in Equation \ref{eqn:mlm.marss} such that we get Equation 
 \ref{eqn:longley1} 
 
-First, we load the data and set up $y$, the response variable Employed, as a matrix with time going across the columns.
+First, we load the data and set up $y$, the response variable number of people employed, as a matrix with time going across the columns.
 <<Cs_002_example1.data>>=
 data(longley)
 Employed = matrix(longley$Employed, nrow=1)
@@ -93,7 +93,7 @@ longley.model$B=longley.model$Z="identity"
 longley.model$x0="zero"
 longley.model$tinitx=0
 @
-We will estimate $\RR$; this is the variance of the i.i.d. errors (residuals).
+We will estimate $\RR$, the variance of the i.i.d. errors (residuals).
 <<Cs_005_example1.paramsR>>=
 longley.model$R=matrix("r")
 @
@@ -107,7 +107,7 @@ Last we set up our explanatory variables.  This is the $\dd$ matrix and we need 
 longley.model$d = rbind(longley$GNP, longley$Population)
 @
 
-Now we can fit the model with the MARSS() function:
+Now we can fit the model:
 <<Cs_008_example1.marss, results=hide>>=
 mod1=MARSS(Employed, model=longley.model)
 @
@@ -132,34 +132,45 @@ x_t = b x_{t-1}+w_t, w_t \sim \N(0,q)\\
 \xx_0 = 0
 \end{gathered}
 \end{equation}
-We assume the AR(1) errors have mean 0 so $u=0$ in the $x_t$ equation.  Setting $u$ to anything else would make the mean of our errors equal to $u/(1-b)$ for $-1<b<1$. This would lead to two mean levels in our model, $\alpha$ and $u/(1-b)$, and we would not be able to estimate both.  Notice that the model is somewhat confounded since if $b=0$ then $x_t$ is i.i.d. errors same as $v_t$.  In case, either  $q$ or $r$ would be redundant.  It is thus possible that either $r$ or $q$ will go to zero.
+We assume the AR(1) errors have mean 0 so $u=0$ in the $x_t$ equation.  Setting $u$ to anything else would make the mean of our errors equal to $u/(1-b)$ for $-1<b<1$. This would lead to two mean levels in our model, $\alpha$ and $u/(1-b)$, and we would not be able to estimate both.  Notice that the model is somewhat confounded since if $b=0$ then $x_t$ is i.i.d. errors same as $v_t$.  In this case, either  $q$ or $r$ would be redundant.  It is thus possible that either $r$ or $q$ will go to zero.
 
-Then we rewrite the model list from our vanilla linear regression to correspond to this MARSS model with AR(1) errors.  We estimate $b$ (called $\phi$ here) and $q$.
+To fit the model with autoregressive errors, we add the $x$ parameters to our the model list.  We estimate $b$ and $q$.
 <<Cs_011_example2.params>>=
 longley.ar1=longley.model
-longley.ar1$B=matrix("phi")
+longley.ar1$B=matrix("b")
 longley.ar1$Q=matrix("q")
 @
 
-Now we could fit the model with the MARSS() function as before
+Now we can fit the model as before
 <<Cs_012_example2.marss, results=hide>>=
 mod2=MARSS(Employed, model=longley.ar1)
 @
-however, this is a difficult model to fit and takes a long, long time to converge (using \verb@method="BFGS"@ helps a little but not much).  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.
-<<Cs_013_example2.marss.with.inits>>=
+however, this is a difficult model to fit and takes a long, long time to converge.  The default \verb@maxit@ used in the call above is not nearly enough iterations. Using \verb@method="BFGS"@ helps a little but not much.  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.
+<<Cs_013_example2.marss.with.inits, results=hide>>=
 inits=list(A=coef(mod1)$A, D=coef(mod1)$D)
-mod2=MARSS(Employed, model=longley.ar1, inits=inits, control=list(maxit=1000))
+mod2=MARSS(Employed, model=longley.ar1, inits=inits, 
+           control=list(maxit=1000))
+ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A, 
+               GNP=coef(mod2)$D[1], Population=coef(mod2)$D[2],
+               logLik=logLik(mod2))
 @
 
-We can compare the fit using gls() (\verb@nlme@ package) and see that we get the same estimates:
-<<Cs_014_example2.gls>>=
+We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.
+<<Cs_014_example2_gls>>=
 library(nlme)
 mod2.gls=gls(Employed ~ GNP + Population, 
         correlation=corAR1(), data=longley, method="ML")
 mod2.gls.phi = coef(mod2.gls$modelStruct[[1]], unconstrained=FALSE)
-c(mod2.gls.phi, coef(mod2.gls), logLik(mod2.gls))
+ests.gls = c(b=mod2.gls.phi, alpha=coef(mod2.gls)[1],
+              GNP=coef(mod2.gls)[2], Population=coef(mod2.gls)[3],
+              logLik=logLik(mod2.gls))
 @
 Note we need to set \verb@method="ML"@ to maximize the likelihood because the default is to maximize the restricted maximum-likelihood (\verb@method="REML"@) and that gives a different answer from the MARSS() function since MARSS() is maximizing the likelihood.
+
+Both functions return similar values though \verb@gls()@ is much faster and the EM algorithm has not quite converged even with 1000 iterations.
+<<Cs_014b_compare_marss_gls>>=
+rbind(MARSS = ests.marss, GLS = ests.gls)
+@
 
 \subsection{Univariate response using the Longley dataset: example 2}
 The full Longley dataset is often used to test the performance of numerical methods for fitting linear regression models because it has severe collinearity problems (Figure \ref{fig:longley.fig2}).  We can compare the EM and BFGS algorithms for the full dataset and see how fitting a MARSS model with the BFGS algorithm leads to estimates far from the maximum-likelihood values for this problem.
@@ -212,14 +223,14 @@ c(coef(mod3.lm),logLik=logLik(mod3.lm))
 @
 As you can see the BFGS algorithm struggles with the ridge-like likelihood caused by the collinearity in the explanatory variables.
 
-We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called $\phi$) and $q$.
+We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called Phi in \verb@gls()@) and $q$.
 <<Cs_021_full.model.correrr>>=
 longley.correrr.model=longley.model
-longley.correrr.model$B=matrix("phi")
+longley.correrr.model$B=matrix("b")
 longley.correrr.model$Q=matrix("q")
 @
 
-We fit as usual and compare the EM-algorithm (the default) to fits using BFGS.  We will use the estimatefrom the model with i.i.d. errors as initial conditions.
+We fit as usual and compare the EM-algorithm (the default) to fits using BFGS.  We will use the estimate from the model with i.i.d. errors as initial conditions.
 <<Cs_022_full.correrr.fit.hide, results=hide>>=
 inits=list(A=coef(mod3.em)$A, D=coef(mod3.em)$D)
 mod4.em=MARSS(Employed, model=longley.correrr.model, inits=inits)
@@ -227,11 +238,11 @@ mod4.bfgs=MARSS(Employed, model=longley.correrr.model, inits=inits, method="BFGS
 @
 Here are the EM estimates with the log-likelihood.  We only show $\phi$ (the $b$ term in the AR(1) error equation) and the log-likelihood.
 <<Cs_023_full.correrr.em.ests>>=
-c(coef(mod4.em, type="vector")["B.phi"], logLik=mod4.em$logLik)
+c(coef(mod4.em, type="vector")["B.b"], logLik=mod4.em$logLik)
 @
 Compared to the BFGS estimates:
 <<Cs_024_full.correrr.bfgs.ests>>=
-c(coef(mod4.bfgs, type="vector")["B.phi"], logLik=mod4.bfgs$logLik)
+c(coef(mod4.bfgs, type="vector")["B.b"], logLik=mod4.bfgs$logLik)
 @
 And compared to the estimates from the gls() function:
 <<Cs_025_full.gls.ests>>=
@@ -288,7 +299,7 @@ Let's start with a simple regression where each subject has a separate intercept
 \end{equation}
 The response time of subject $i$ is a subject specific intercept ($\alpha_i$) plus an effect of day at time $t$ (so 0, 1, 2, etc) that doesn't vary by subject and error that is i.i.d. across subject and day.
 
-We specifiy and fit this model as follows
+We specify and fit this model as follows
 <<Cs_029_sleepmod1, results=hide>>=
 sleep.model=list(
   A="unequal",B="zero", x0="zero", U="zero",
@@ -356,7 +367,7 @@ sleep.mod4 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
 @
 It is not obvious how to specify these last two models using gls() or if it is possible.
 
-We can also allow each subject has his/her own error process but specify that the parameters of these ($\phi$, $q$ and $r$) are the same across subjects.  We do this by using \verb@"diagonal and equal"@.  Mathematically this model is
+We can also allow each subject to have his/her own error process but specify that the parameters of these ($b$, $q$ and $r$) are the same across subjects.  We do this by using \verb@"diagonal and equal"@.  Mathematically this model is
 \begin{equation}\label{eqn:sleep.mod5}
 \begin{gathered}
 \begin{bmatrix}resp_1\\resp_2\\ \dots \\resp_{18}\end{bmatrix}_t = \begin{bmatrix}\alpha_1\\ \alpha_2\\ \dots \\ \alpha_{18}\end{bmatrix} + \begin{bmatrix}\beta_1\\ \beta_2 \\ \dots \\ \beta_{18} \end{bmatrix} day_t + \begin{bmatrix}v_1\\v_2\\ \dots \\v_{18}\end{bmatrix}_t + \begin{bmatrix}x_1\\x_2\\ \dots \\x_{18}\end{bmatrix}_t\\
