@@ -157,6 +157,7 @@ ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A,
                GNP=coef(mod2)$D[1], Population=coef(mod2)$D[2],
                logLik=logLik(mod2))
 @
+\index{functions!logLik}
 
 We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.\index{functions!gls}
 <<Cs_014_example2_gls>>=
