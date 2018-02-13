@@ -13,9 +13,9 @@ zscore(x)
 \details{
   n = number of observation (y) time series.   T = number of time steps in the time series.
   
-  The z-scored values are
-  $$\yy^*_t = \Sigma^{-1}(\yy_t-\bar{\yy})$$
-  where $\Sigma$ is a diagonal matrix with the standard deviations of each time series (row) along the diagonal, and $\bar{\yy}$ is a vector of the means. 
+  The z-scored values (z) of a matrix of y values are
+\eqn{z_i = \Sigma^{-1}(y_i-\bar{y})}
+  where \deqn{\Sigma} is a diagonal matrix with the standard deviations of each time series (row) along the diagonal, and \deqn{\bar{y}} is a vector of the means. 
 }
 \value{
   n x T matrix of z-scored values.
