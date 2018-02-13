@@ -15,25 +15,25 @@ tabledir="tables/"
 \blfootnote{Type \texttt{RShowDoc("Chapter\_UnivariateDLM.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 \section{Overview of dynamic linear models}
-\index{MARSS model!DLM example}In this chapter, we will use MARSS to analyze dynamic linear models (DLMs), wherein the parameters in a regression model are treated as time-varying. DLMs are used commonly in econometrics, but have received less attention in the ecological literature \citep[c.f.]{Lamonetal1998, ScheuerellWilliams2005}. Our treatment of DLMs is rather cursory---we direct the reader to excellent textbooks by \citet{Poleetal1994} and \citet{Petrisetal2009} for more in-depth treatments of DLMs. The former focuses on Bayesian estimation whereas the latter addresses both likelihood-based and Bayesian estimation methods.
+\index{MARSS model!DLM example}In this chapter, we will use MARSS to analyze dynamic linear models (DLMs), wherein the parameters in a regression model are treated as time-varying. DLMs are used commonly in econometrics, but have received less attention in the ecological literature \citep[c.f.][]{Lamonetal1998, ScheuerellWilliams2005}. Our treatment of DLMs is rather cursory---we direct the reader to excellent textbooks by \citet{Poleetal1994} and \citet{Petrisetal2009} for more in-depth treatments of DLMs. The former focuses on Bayesian estimation whereas the latter addresses both likelihood-based and Bayesian estimation methods.
 
-We begin our description of DLMs with a $static$ regression model, wherein the $i^{th}$ observation is a linear function of an intercept, predictor variable(s), and a random error term. For example, if we had one predictor variable ($F$), we could write the model as
+We begin our description of DLMs with a static regression model, wherein the $i$-th observation is a linear function of an intercept, predictor variable(s), and a random error term. For example, if we had one predictor variable ($F$), we could write the model as
 \begin{equation}\label{eqn:lm}
 y_i = \alpha + \beta F_i + v_i,
 \end{equation}
 where the $\alpha$ is the intercept, $\beta$ is the regression slope, $F_i$ is the predictor variable matched to the $i^{th}$ observation ($y_i$), and $v_i \sim \N(0,r)$. It is important to note here that there is no implicit ordering of the index $i$. That is, we could shuffle any/all of the $(y_i, F_i)$ pairs in our dataset with no effect on our ability to estimate the model parameters. We can write the model in Equation \ref{eqn:lm} using vector notation, such that
 \begin{align}\label{eqn:lmVec}
-y_i &= \begin{pmatrix}1&F_i\end{pmatrix} \times
-\begin{pmatrix}\alpha\\ \beta\end{pmatrix} + v_i \nonumber\\
+y_i &= \begin{bmatrix}1&F_i\end{bmatrix} 
+\begin{bmatrix}\alpha\\ \beta\end{bmatrix} + v_i \nonumber\\
 &= \FF_i^{\top}\ttheta + v_i,
 \end{align}
-and $\FF_i^{\top} = (1,F_i)$ and $\ttheta = (\alpha,\beta)^{\top}$.
+and $\FF_i^{\top} = \begin{bmatrix}\alpha \\ \beta\end{bmatrix}$ and $\ttheta = \begin{bmatrix}\alpha & \beta\end{bmatrix}^{\top}$.
 
-In a DLM, however, the regression parameters are $dynamic$ in that they ``evolve'' over time. For a single observation at time $t$, we can write
+In a DLM, however, the regression parameters are dynamic in that they evolve over time. For a single observation at time $t$, we can write
 \begin{equation}\label{eqn:dlm1}
 y_t = \FF_{t}^{\top}\ttheta_t + v_t,
 \end{equation}
-where $\FF_t$ is a column vector of regression variables at time $t$, $\ttheta_t$ is a column vector of regression parameters at time $t$ and $v_{t}\sim\N(0,r)$. This formulation presents two features that distinguish it from Equation \ref{eqn:lmVec}. First, the observed data are explicitly time ordered (i.e., $\yy=\lbrace{y_1,y_2,y_3,...,y_T}\rbrace$), which means we expect them to contain implicit information. Second, the relationship between the observed datum and the predictor variables are unique at every time $t$ (i.e., $\ttheta=\lbrace{\ttheta_1,\ttheta_2,\ttheta_3,...,\ttheta_T}\rbrace$).
+where $\FF_t$ is a column vector of regression variables at time $t$, $\ttheta_t$ is a column vector of regression parameters at time $t$ and $v_{t}\sim\N(0,r)$. While seemingly identical, this formulation presents two features that distinguish it from Equation \ref{eqn:lmVec}. First, the observed data are explicitly time ordered (i.e., $\yy=\lbrace{y_1,y_2,y_3,...,y_T}\rbrace$), which means we expect them to contain implicit information. Second, the relationship between the observed datum and the predictor variables are unique at every time $t$ (i.e., $\ttheta=\lbrace{\ttheta_1,\ttheta_2,\ttheta_3,...,\ttheta_T}\rbrace$).
 
 However, closer examination of Equation \ref{eqn:dlm1} reveals an apparent complication for parameter estimation. With only one datum at each time step $t$, we could, at best, estimate only one regression parameter, and even then, the 1:1 correspondence between data and parameters would preclude any estimation of parameter uncertainty. To address this shortcoming, we return to the time ordering of model parameters. Rather than assume the regression parameters are independent from one time step to another, we instead model them as an autoregressive process where
 \begin{equation}\label{eqn:dlm2}
@@ -41,15 +41,16 @@ However, closer examination of Equation \ref{eqn:dlm1} reveals an apparent compl
 \end{equation}
 $\GG_t$ is the parameter ``evolution'' matrix, and $\ww_t$ is a vector of process errors, such that $\ww_t\sim\MVN(\mathbf{0},\QQ)$. The elements of $\GG_t$ may be known and fixed \textit{a priori}, or unknown and estimated from the data. Although we allow for $\GG_t$ to be time-varying, we will typically assume that it is time invariant.
 
-The idea is that the evolution matrix $\GG_t$ deterministically maps the parameter space from one time step to the next, so the parameters at time $t$ are temporally related to those before and after. However, the process is corrupted by stochastic error, which amounts to a degradation of information over time. If the diagonal elements of $\QQ$ are relatively large, then the parameters can vary widely from $t$ to $t+1$. If $\QQ\ = \mathbf{0}$, then $\ttheta_1=\ttheta_2=\ttheta_T$ and we are back to the static model in Equation \ref{eqn:lm}.
+The idea is that the evolution matrix $\GG_t$ deterministically maps the parameter space from one time step to the next, so the parameters at time $t$ are temporally related to those before and after. However, the process is stochastic and the mapping includes stochasitic error, which leads to a degradation of information over time. If the diagonal elements of $\QQ$ are relatively large, then the parameters can vary widely from $t$ to $t+1$. If $\QQ\ = \mathbf{0}$, then $\ttheta_1=\ttheta_2=\ttheta_T$ and we are back to the static model in Equation \ref{eqn:lm}.
+
 %------------------------------------
 \section{Example of a univariate DLM}
 %------------------------------------
-Let's consider an example from the literature. \citet{ScheuerellWilliams2005} used a DLM to examine the relationship between marine survival of Chinook salmon and an index of ocean upwelling strength along the west coast of the USA. Upwelling brings cool, nutrient-rich waters from the deep ocean to shallower coastal areas. Scheuerell \& Williams hypothesized that stronger upwelling in April should create better growing conditions for phytoplankton, which would then translate into more zooplankton. In turn, juvenile salmon (``smolts'') entering the ocean in May and June should find better foraging opportunities. Thus, for smolts entering the ocean in year $t$,
+Let's consider an example from the literature. \citet{ScheuerellWilliams2005} used a DLM to examine the relationship between marine survival of Chinook salmon and an index of ocean upwelling strength along the west coast of the USA. Upwelling brings cool, nutrient-rich waters from the deep ocean to shallower coastal areas. Scheuerell and Williams hypothesized that stronger upwelling in April should create better growing conditions for phytoplankton, which would then translate into more zooplankton. In turn, juvenile salmon (``smolts'') entering the ocean in May and June should find better foraging opportunities. Thus, for smolts entering the ocean in year $t$,
 \begin{equation}\label{eqn:dlmSW1}
 survival_t = \alpha_t + \beta_t F_t + v_t \text{ with } v_{t}\sim\N(0,r),
 \end{equation}
-and $F_t$ is the coastal upwelling index (cubic meters of seawater per second per 100 m of coastline) for the month of April in year $t$. 
+and $F_t$ is the coastal upwelling index\footnote{cubic meters of seawater per second per 100 m of coastline} for the month of April in year $t$. 
 
 Both the intercept and slope are time varying, so
 % full univariate DLM as MARSS
@@ -57,7 +58,7 @@ Both the intercept and slope are time varying, so
 \alpha_t &= \alpha_{t-1} + w_t^{(1)} \text{ with } w_t^{(1)} \sim \N(0,q_1); \text{ and}\\
 \beta_t &= \beta_{t-1} + w_t^{(2)} \text{ with } w_t^{(2)} \sim \N(0,q_2).
 \end{align}
-If we define $\ttheta_t = (\alpha_t,\beta_t)^{\top}$, $\GG_t = \II \; \forall \; t$, $\ww_t = (w_t^{(1)},w_t^{(2)})^{\top}$, and $\QQ = \diag(q_1,q_2)$, we get Equation \ref{eqn:dlm2}. If we define $y_t = survival_t$ and $\FF_t = (1,F_t)^{\top}$, we can write out the full univariate DLM as a state-space model with the following form:
+If we define $\ttheta_t = \begin{bmatrix}\alpha_t & \beta_t\end{bmatrix}^\top$, $\GG_t = \II$ for all $t$, $\ww_t = \begin{bmatrix}w_t^{(1)} & w_t^{(2)}\end{bmatrix}^\top$, and $\QQ = \begin{bmatrix}q_1 & 0\\ 0 & q_2\end{bmatrix}$, we get Equation \ref{eqn:dlm2}. If we define $y_t = survival_t$ and $\FF_t = \begin{bmatrix}1 & F_t\end{bmatrix}^{\top}$, we can write out the full univariate DLM as a state-space model with the following form:
 \begin{equation}\label{eqn:dlmSW3}
 \begin{gathered}
 \ttheta_t = \GG_t\ttheta_{t-1} + \ww_t \text{ with } \ww_t \sim \MVN(\mathbf{0},\QQ);\\
@@ -65,7 +66,7 @@ y_t = \FF_t^{\top}\ttheta_t + v_t \text{ with } v_t\sim\N(0,r);\\
 \ttheta_0 \sim \MVN(\pipi_0,\LAM_0).
 \end{gathered}
 \end{equation}
-Equation \ref{eqn:dlmSW3} is, not surprisingly, equivalent to our standard MARSS model: 
+Equation \ref{eqn:dlmSW3} is equivalent to our standard MARSS model: 
 \begin{equation}\label{eqn:MARSSdlm}
 \begin{gathered}
 \xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \ww_t \text{ with } \ww_t \sim \MVN(0,\QQ_t);\\
@@ -79,26 +80,21 @@ where $\xx_t = \ttheta_t$, $\BB_t = \GG_t$, $\uu_t = \CC_t = \cc_t = \zer$, $\yy
 %------------------------------------------------
 Now let's go ahead and analyze the DLM specified in Equations \ref{eqn:dlmSW1}--\ref{eqn:dlmSW3}. We begin by getting the data set, which has 3 columns for 1) the year the salmon smolts migrated to the ocean ($year$), 2) logit-transformed survival\footnote{Survival in the original context was defined as the proportion of juveniles that survive to adulthood. Thus, we use the logit function, defined as $logit(p)=log_e(p/[1-p])$, to map survival from the open interval (0,1) onto the interval $(-\infty,\infty)$, which allows us to meet our assumption of normally distributed observation errors.} ($logit.s$), and 3) the coastal upwelling index for April ($CUI.apr$). There are 42 years of data (1964--2005).
 <<Cs_01_read.in.data, eval=TRUE>>=
-# load the data
 data(SalmonSurvCUI)
-# get time indices
 years = SalmonSurvCUI[,1]
-# number of years of data
 TT = length(years)
-# get response data: logit(survival)
+# response data: logit(survival)
 dat = matrix(SalmonSurvCUI[,2],nrow=1)
 @
 
 As we have seen in other chapters, standardizing our covariate(s) to have zero-mean and unit-variance can be helpful in model fitting and interpretation. In this case, it is a good idea because the variance of $CUI.apr$ is orders of magnitude greater than $survival$.
 <<Cs_02_z.score, eval=TRUE>>=
-# get regressor variable
 CUI = SalmonSurvCUI[,3]
-# z-score the CUI
 CUI.z = zscore(CUI)
 # number of regression params (slope + intercept)
 m = dim(CUI.z)[1] + 1
 @
-Plots of logit-transformed survival and the $z$-scored April upwelling index are shown in Figure \ref{fig:CSX.fig1}.
+Plots of logit-transformed survival and the z-scored April upwelling index are shown in Figure \ref{fig:CSX.fig1}.
 
 \begin{figure}[htp]
 \begin{center}
@@ -110,7 +106,7 @@ axis(1,at=seq(1965,2005,5))
 mtext("Year of ocean entry", 1, line=3)
 @
 \end{center}
-\caption{Time series of logit-transformed marine survival estimates for Snake River spring/summer Chinook salmon (top) and \textit{z}-scores of the coastal upwelling index at 45N 125W (bottom). The \textit{x}-axis indicates the year that the salmon smolts entered the ocean.}
+\caption{Time series of logit-transformed marine survival estimates for Snake River spring/summer Chinook salmon (top) and z-scores of the coastal upwelling index at 45N 125W (bottom). The $x$-axis indicates the year that the salmon smolts entered the ocean.}
 \label{fig:CSX.fig1}
 \end{figure}
 
@@ -142,7 +138,6 @@ mod.list = list(B=B, U=U, Q=Q, Z=Z, A=A, R=R)
 @
 And now we can fit our DLM with MARSS.
 <<Cs_06_univ.DLM.fit, eval=TRUE>>=
-# fit univariate DLM
 dlm1 = MARSS(dat, inits=inits.list, model=mod.list)
 @
 
@@ -175,10 +170,11 @@ mtext("Year of ocean entry", 1, line=3)
 \caption{Time series of estimated mean states (thick lines) for the intercept (top) and slope (bottom) parameters from the univariate DLM specified by Equations \ref{eqn:dlmSW1}--\ref{eqn:dlmSW3}. Thin lines denote the mean $\pm$ 2 standard deviations.}
 \label{fig:CSX.fig2}
 \end{figure}
+
 %----------------------------------------------
 \section{Forecasting with a univariate DLM}
 %----------------------------------------------
-\citet{ScheuerellWilliams2005} were interested in how well upwelling could be used to actually \textit{forecast} expected survival of salmon, so let's look at how well our model does in that context. To do so, we need the predictive distributions for the regression parameters and observation.
+\citet{ScheuerellWilliams2005} were interested in how well upwelling could be used to forecast expected survival of salmon. Let's look at how well our model does in that context. To do so, we need the predictive distributions for the regression parameters and observation.
 
 Beginning with our definition for the distribution of the parameters at time $t=0$, $\ttheta_0 \sim \MVN(\pipi_0,\LAM_0)$ in Equation \ref{eqn:dlmSW3}, we write
 \begin{equation}\label{eqn:dlmFore1}
@@ -200,7 +196,7 @@ y_{t}|y_{1:t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
 %----------------------------------------------
 \subsection{Forecasting a univariate DLM with MARSS}
 %----------------------------------------------
-Working from Equation \ref{eqn:dlmFore3}, we can now use MARSS to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in MARSS notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $\tilde{x}_t^{t-1}$ in MARSS notation and stored as \verb@'xtt1'@ in the list produced by the \verb@MARSSkfss()@ function.
+Working from Equation \ref{eqn:dlmFore3}, we can now use MARSS to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in MARSS notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $\tilde{x}_t^{t-1}$ in MARSS notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkfss()@ function.
 <<Cs_08_univ.DLM.fore.mean, eval=TRUE>>=
 # get list of Kalman filter output
 kf.out = MARSSkfss(dlm1)
@@ -213,7 +209,7 @@ for(t in 1:TT) {
 }
 @
 
-For the variance of the forecasts, we need $\FF_t\Phi_{t}\FF_t^{\top} + \RR$. As with the mean, $\FF_t \equiv \ZZ_t$. The variances of the one-step ahead forecasts of the parameters at time $t$ $(\Phi_t)$ are also calculated as part of the Kalman filter algorithm---they are stored as \verb@'Vtt1'@ in the list produced by the \verb@MARSSkfss()@ function. Lastly, the observation variance $\RR$ is part of the standard MARSS output.
+For the variance of the forecasts, we need $\FF_t\Phi_{t}\FF_t^{\top} + \RR$. As with the mean, $\FF_t \equiv \ZZ_t$. The variances of the one-step ahead forecasts of the parameters at time $t$ $(\Phi_t)$ are also calculated as part of the Kalman filter algorithm---they are stored as \verb@Vtt1@ in the list produced by the \verb@MARSSkfss()@ function. Lastly, the observation variance $\RR$ is part of the standard MARSS output.
 <<Cs_09_univ.DLM.fore.Var, eval=TRUE>>=
 # variance of regr parameters; 1x2xT array
 Phi = kf.out$Vtt1
@@ -245,7 +241,7 @@ axis(1,at=seq(1965,2005,5))
 mtext("Year of ocean entry", 1, line=3)
 @
 \end{center}
-\caption{Time series of logit-transformed survival data (blue dots) and model mean forecasts (thick line). Thin lines denote the approximate 95\% prediction intervals.}
+\caption{Time series of logit-transformed survival data (blue dots) and model mean one-step ahead forecasts (thick line). Thin lines denote the approximate 95\% prediction intervals.}
 \label{fig:CSX.fig3}
 \end{figure}
 
@@ -278,14 +274,14 @@ mtext("Year of ocean entry", 1, line=3)
 \subsection{DLM forecast diagnostics}
 %-------------------------------------
 \begin{samepage}
-As with other time series models, evaluation of a DLM should include some model diagnostics. In a forecasting context, we are often interested in the forecast errors, which are simply the observed data minus the forecasts $(e_t = y_t - \zeta_t)$. In particular, the following assumptions should hold true for $e_t$:
+As with other time series models, evaluation of a DLM should include model diagnostics. In a forecasting context, we are often interested in the forecast errors, which are simply the observed data minus the forecasts $(e_t = y_t - \zeta_t)$. In particular, the following assumptions should hold true for $e_t$:
 \begin{enumerate}
 \item $e_t \sim \N(0,\sigma^2)$;
 \item $\cov(e_t,e_{t-k}) = 0$.
 \end{enumerate}
 \end{samepage}
 
-In the literature on state-space models, the set of $e_t$ are commonly referred to as ``innovations''. \verb@MARSS()@ calculates the innovations as part of the Kalman filter algorithm---they are stored as \verb@'Innov'@ in the list produced by the \verb@MARSSkfss()@ function.
+In the literature on state-space models, the set of $e_t$ are commonly referred to as ``innovations''. \verb@MARSS()@ calculates the innovations as part of the Kalman filter algorithm---they are stored as \verb@Innov@ in the list produced by the \verb@MARSSkfss()@ function.
 <<Cs_12_dlm-forecast-errors, eval=TRUE, echo=TRUE>>=
 # forecast errors
 innov = kf.out$Innov
@@ -321,12 +317,12 @@ qqline(t(innov))
 \label{fig:CSX.fig5}
 \end{figure}
 
-The Q-Q plot (Figure \ref{fig:CSX.fig5}) indicates that the innovations appear to be more-or-less normally distributed (i.e., most points fall on the line). Furthermore, it looks like the mean of the innovations is about 0, but we should use a more reliable test than simple visual inspection. We can formally test whether the mean of the innovations is significantly different from 0 by using a one-sample $t$-test.  based on a null hypothesis of $\E(e_t)=0$. To do so, we will use the function \verb@t.test()@ and base our inference on a significance value of $\alpha = 0.05$.
+The Q-Q plot (Figure \ref{fig:CSX.fig5}) indicates that the innovations appear to be more-or-less normally distributed (i.e., most points fall on the line). Furthermore, it looks like the mean of the innovations is about 0, but we should use a more reliable test than simple visual inspection. We can formally test whether the mean of the innovations is significantly different from 0 by using a one-sample $t$-test.  based on a null hypothesis of $\E[e_t]=0$. To do so, we will use the function \verb@t.test()@ and base our inference on a significance value of $\alpha = 0.05$.
 <<Cs_14_dlm-Innov-t-test, eval=TRUE, echo=TRUE>>=
 # p-value for t-test of H0: E(innov) = 0
 t.test(t(innov), mu=0)$p.value
 @
-The $p$-value $>>$ 0.05 so we cannot reject the null hypothesis that $\E(e_t)=0$.
+The $p$-value $>>$ 0.05 so we cannot reject the null hypothesis that $\E[e_t]=0$.
 
 Moving on to assumption (2), we can use the sample autocorrelation function (ACF) to examine whether the innovations covary with a time-lagged version of themselves. Using the \verb@acf()@ function, we can compute and plot the correlations of $e_t$ and $e_{t-k}$ for various values of $k$. Assumption (2) will be met if none of the correlation coefficients exceed the 95\% confidence intervals defined by $\pm \, z_{0.975} / \sqrt{n}$.
 <<dlmACFplot, eval=FALSE, echo=TRUE>>=
@@ -350,7 +346,7 @@ acf(t(innov), lwd=2, lag.max=10)
 \caption{Autocorrelation plot of the forecast errors (innovations) for the DLM specified in Equations \ref{eqn:dlmSW1}--\ref{eqn:dlmSW3}. Horizontal blue lines define the upper and lower 95\% confidence intervals.}
 \label{fig:CSX.fig6}
 \end{figure}
-The ACF plot (Figure \ref{fig:CSX.fig6}) shows no significant autocorrelation in the innovations at lags 1--10, so it looks like both of our model assumptions have indeed been met.
+The ACF plot (Figure \ref{fig:CSX.fig6}) shows no significant autocorrelation in the innovations at lags 1--10, so it appears that both of our model assumptions have been met.
 
 %---------
 % THE END
