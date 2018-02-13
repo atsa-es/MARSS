@@ -13,6 +13,7 @@ options(prompt=" ", continue=" ", width=60)
 \chapter{Multivariate linear regression}
 \label{chap:mlr}
 \chaptermark{Multivariate linear regression}
+\index{multivariate linear regression}
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_MLR.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
@@ -123,7 +124,8 @@ mod1.lm=lm(Employed ~ GNP + Population, data=longley)
 coef(mod1.lm)
 @
 
-\subsection{Univariate response using auto-correlated errors: example 1} 
+\subsection{Univariate response using auto-correlated errors: example 1}
+\index{multivariate linear regression!with autocorrelated errors}
 As \citet{Faraway2004} discusses, the errors in this dataset are temporally correlated.  We can model the errors as an AR(1) process to account for this. This changes our model to 
 \begin{equation}\label{eqn:longley.correrr}
 \begin{gathered}
@@ -145,7 +147,8 @@ Now we can fit the model as before
 <<Cs_012_example2.marss, results=hide>>=
 mod2=MARSS(Employed, model=longley.ar1)
 @
-however, this is a difficult model to fit and takes a long, long time to converge.  The default \verb@maxit@ used in the call above is not nearly enough iterations. Using \verb@method="BFGS"@ helps a little but not much.  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.
+however, this is a difficult model to fit and takes a long, long time to converge.  The default \verb@maxit@ used in the call above is not nearly enough iterations. Using \verb@method="BFGS"@ helps a little but not much.  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.\index{troubleshooting!non-convergence}
+
 <<Cs_013_example2.marss.with.inits, results=hide>>=
 inits=list(A=coef(mod1)$A, D=coef(mod1)$D)
 mod2=MARSS(Employed, model=longley.ar1, inits=inits, 
@@ -155,7 +158,7 @@ ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A,
                logLik=logLik(mod2))
 @
 
-We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.
+We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.\index{functions!gls}
 <<Cs_014_example2_gls>>=
 library(nlme)
 mod2.gls=gls(Employed ~ GNP + Population, 
@@ -173,6 +176,7 @@ rbind(MARSS = ests.marss, GLS = ests.gls)
 @
 
 \subsection{Univariate response using the Longley dataset: example 2}
+\index{troubleshooting!collinearity}
 The full Longley dataset is often used to test the performance of numerical methods for fitting linear regression models because it has severe collinearity problems (Figure \ref{fig:longley.fig2}).  We can compare the EM and BFGS algorithms for the full dataset and see how fitting a MARSS model with the BFGS algorithm leads to estimates far from the maximum-likelihood values for this problem.
 
 \begin{figure}[htp]
@@ -223,7 +227,7 @@ c(coef(mod3.lm),logLik=logLik(mod3.lm))
 @
 As you can see the BFGS algorithm struggles with the ridge-like likelihood caused by the collinearity in the explanatory variables.
 
-We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called Phi in \verb@gls()@) and $q$.
+We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called Phi in \verb@gls()@) and $q$.\index{functions!gls}
 <<Cs_021_full.model.correrr>>=
 longley.correrr.model=longley.model
 longley.correrr.model$B=matrix("b")
@@ -346,7 +350,7 @@ sleep.model=list(
 sleep.mod3 = MARSS(dat, model=sleep.model, silent=TRUE)
 @
 
-Or we can allow AR(1) errors across subjects and allow each subject to have its own AR(1) parameters for this error.  This model is
+Or we can allow AR(1) errors across subjects and allow each subject to have its own AR(1) parameters for this error.  This model is \index{multivariate linear regression!with autocorrelated errors}
 \begin{equation}\label{eqn:sleep.mod4}
 \begin{gathered}
 \begin{bmatrix}resp_1\\resp_2\\ \dots \\resp_{18}\end{bmatrix}_t = \begin{bmatrix}\alpha_1\\ \alpha_2\\ \dots \\ \alpha_{18}\end{bmatrix} + \begin{bmatrix}\beta_1\\ \beta_2 \\ \dots \\ \beta_{18} \end{bmatrix} day_t + \begin{bmatrix}v_1\\v_2\\ \dots \\v_{18}\end{bmatrix}_t + \begin{bmatrix}x_1\\x_2\\ \dots \\x_{18}\end{bmatrix}_t\\
@@ -386,7 +390,7 @@ sleep.model=list(
   R="diagonal and equal")
 sleep.mod5 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
 @
-This is fairly close to this model fit with gls().
+This is fairly close to this model fit with gls().\index{functions!gls}
 <<Cs_036_mod5.gls>>=
 sleep.mod5.gls=gls(Reaction ~ 0 + Subject + Days:Subject, data=sleepstudy, 
              correlation=corAR1(form=~ 1|Subject), method="ML")

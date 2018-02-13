@@ -15,7 +15,7 @@ tabledir="tables/"
 \blfootnote{Type \texttt{RShowDoc("Chapter\_UnivariateDLM.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 \section{Overview of dynamic linear models}
-\index{MARSS model!DLM example}In this chapter, we will use MARSS to analyze dynamic linear models (DLMs), wherein the parameters in a regression model are treated as time-varying. DLMs are used commonly in econometrics, but have received less attention in the ecological literature \citep[c.f.][]{Lamonetal1998, ScheuerellWilliams2005}. Our treatment of DLMs is rather cursory---we direct the reader to excellent textbooks by \citet{Poleetal1994} and \citet{Petrisetal2009} for more in-depth treatments of DLMs. The former focuses on Bayesian estimation whereas the latter addresses both likelihood-based and Bayesian estimation methods.
+\index{MARSS model!DLM example}\index{dynamic linear modeling!univariate}In this chapter, we will use MARSS to analyze dynamic linear models (DLMs), wherein the parameters in a regression model are treated as time-varying. DLMs are used commonly in econometrics, but have received less attention in the ecological literature \citep[c.f.][]{Lamonetal1998, ScheuerellWilliams2005}. Our treatment of DLMs is rather cursory---we direct the reader to excellent textbooks by \citet{Poleetal1994} and \citet{Petrisetal2009} for more in-depth treatments of DLMs. The former focuses on Bayesian estimation whereas the latter addresses both likelihood-based and Bayesian estimation methods.
 
 We begin our description of DLMs with a static regression model, wherein the $i$-th observation is a linear function of an intercept, predictor variable(s), and a random error term. For example, if we had one predictor variable ($F$), we could write the model as
 \begin{equation}\label{eqn:lm}
@@ -174,7 +174,7 @@ mtext("Year of ocean entry", 1, line=3)
 %----------------------------------------------
 \section{Forecasting with a univariate DLM}
 %----------------------------------------------
-\citet{ScheuerellWilliams2005} were interested in how well upwelling could be used to forecast expected survival of salmon. Let's look at how well our model does in that context. To do so, we need the predictive distributions for the regression parameters and observation.
+\index{dynamic linear modeling!forecasting}\index{forecasting}\citet{ScheuerellWilliams2005} were interested in how well upwelling could be used to forecast expected survival of salmon. Let's look at how well our model does in that context. To do so, we need the predictive distributions for the regression parameters and observation.
 
 Beginning with our definition for the distribution of the parameters at time $t=0$, $\ttheta_0 \sim \MVN(\pipi_0,\LAM_0)$ in Equation \ref{eqn:dlmSW3}, we write
 \begin{equation}\label{eqn:dlmFore1}
@@ -273,6 +273,7 @@ mtext("Year of ocean entry", 1, line=3)
 %-------------------------------------
 \subsection{DLM forecast diagnostics}
 %-------------------------------------
+\index{forecasting!diagnostics}
 \begin{samepage}
 As with other time series models, evaluation of a DLM should include model diagnostics. In a forecasting context, we are often interested in the forecast errors, which are simply the observed data minus the forecasts $(e_t = y_t - \zeta_t)$. In particular, the following assumptions should hold true for $e_t$:
 \begin{enumerate}
