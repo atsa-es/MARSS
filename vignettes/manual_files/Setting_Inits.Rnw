@@ -27,7 +27,7 @@ dat = (dat-the.mean)*(1/the.sigma)
 @
 
 The covariates for this example are temperature and total phosporous.
-<<CS_mci_002>>=
+<<Cs_mci_002>>=
 covariates = rbind(
    Temp = fulldat[years,"Temp"],
    TP = fulldat[years,"TP"])
@@ -37,7 +37,7 @@ covariates = covariates-the.mean
 @
 
 We will fit a model where algal abundance is a random walk without drift and where the observation errors are explained by the covariates plus independent unexplained noise:
-<<CS_mci_003>>=
+<<Cs_mci_003>>=
 U = x0 = "zero"
 Q = "unconstrained"
 d = covariates
@@ -49,14 +49,14 @@ kem = MARSS(dat, model=model.list)
 @
 
 The \verb@inits@ argument can  be set either as a list that is the same as that from the following:
-<<CS_mci_004, results=hide>>=
+<<Cs_mci_004, results=hide>>=
 coef(kem, what="par")
 @
 or as a marssMLE object from previous MARSS() call for a model with the same structure.  `same structure' means the model list used for the \verb@model@ argument is the same and the dimensions of the model (number of states and rows of data) are the same.
 
 \subsection{Specifying initial conditions as a list}
 The output from \verb@coef(kem, what="par")@ is a list with a column vector of the estimated values for each parameter matrix.  Here is the value for $\DD$ and $\QQ$:
-<<CS_mci_005>>=
+<<Cs_mci_005>>=
 out=coef(kem, what="par")
 out$D
 out$Q
