@@ -17,8 +17,10 @@
 
 # ###########################################
 
+setwd("C:\Users\Eli.Holmes\Dropbox\MARSS unit tests 2018")
+
 #make sure MARSS isn't loaded
-try(detach(package:MARSS),silent=TRUE)
+try(detach("package:MARSS", unload=TRUE),silent=TRUE)
 
 #One version should be in the local library
 #if building from RStudio, you can set to build to local
@@ -78,7 +80,7 @@ for(unittestfile in unittestfiles){
   testOld = mget(test.these)
   save(testOld,file=paste(tag,unittestvrs,".Rdata",sep=""))
 }
-detach(package:MARSS)
+detach("package:MARSS", unload=TRUE)
 
 #Now start comparing the lists made using different versions of MARSS
 cat("\n\nStarting object comparisons\n")
