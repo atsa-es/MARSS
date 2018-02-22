@@ -55,7 +55,7 @@ for(unittestfile in unittestfiles){
   save(testNew,file=paste(tag,unittestvrs,".Rdata",sep=""))
 }
 #detach the version
-detach(package:MARSS)
+detach("package:MARSS", unload=TRUE)
 
 #Other version of MARSS is in the R library (no local library)
 lib.loc = paste(Sys.getenv("R_HOME"),"/library",sep="")
