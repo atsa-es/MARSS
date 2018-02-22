@@ -266,11 +266,11 @@ We will analyze some of the Lake Washington plankton data included in the MARSS 
 data(lakeWAplankton)
 # we want lakeWAplanktonTrans, which has been log-transformed
 # and the 0s replaced with NAs
-dat = lakeWAplanktonTrans
-years = dat[,"Year"]>=1980 & dat[,"Year"]<1990
+plankdat = lakeWAplanktonTrans
+years = plankdat[,"Year"]>=1980 & plankdat[,"Year"]<1990
 phytos = c("Cryptomonas", "Diatoms", "Greens",
                   "Unicells", "Other.algae")
-dat.spp.1980 = dat[years,phytos]
+dat.spp.1980 = plankdat[years,phytos]
 @
 Next, we transpose the data and calculate the number of time series and their length.
 <<Cs02_transpose.data, eval=TRUE>>=
