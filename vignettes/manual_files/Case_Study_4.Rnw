@@ -405,12 +405,12 @@ if(file %in% dir("./manual_files")) {
 } else { saved.res = FALSE }
 @
 
-<<fit.data, results=hide, echo=FALSE>>=
+<<Cs14b_fit_data_big_maxit, results=hide, echo=FALSE>>=
 # saved.res is a flag; set to TRUE to not re-run
 if(!exists("saved.res")){ saved.res=FALSE }
 if(!saved.res) {
-	fit.cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)
-	kemz.3 = MARSS(dat.z, model=dfa.model, control=fit.cntl.list)
+	big.maxit.cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)
+	kemz.3 = MARSS(dat.z, model=dfa.model, control=big.maxit.cntl.list)
 	}
 @
 
@@ -444,6 +444,13 @@ model.list = list(m=2, R="diagonal and unequal")
 kemz.2 = MARSS(dat.spp.1980, model=model.list,
     z.score=TRUE, form="dfa", control=cntl.list)
 @
+<<Cs16b_set.up.two.trends.big.maxit, results=hide>>=
+if(!saved.res) {
+    model.list = list(m=2, R="diagonal and unequal")
+    kemz.2 = MARSS(dat.spp.1980, model=model.list,
+        z.score=TRUE, form="dfa", control=big.maxit.cntl.list)
+}
+@
 and compare its AICc value to that from the 3-trend model.
 <<Cs17_compare.mods.2n3>>=
 print(cbind(model=c("3 trends", "2 trends"),
@@ -461,8 +468,8 @@ Now let's examine a larger suite of possible models.  We will test from one to f
 \item different variances \& covariances (\verb@"unconstrained"@).
 \end{enumerate}
 The following code builds our model matrices; you could also write out each matrix as we did in the first example, but this allows us to build and run all of the models together. \emph{NOTE}: the following piece of code will take a \emph{very long} time to run!
-<<set.up.many.trends.no.echo, results=hide, echo=FALSE>>=
-#This is being done to speed up building the user guide
+<<Cs_18a_set.up.many.trends.no.echo, results=hide, echo=FALSE>>=
+# Careful this takes a long time to run
 if(!saved.res) {
 	# set up forms of R matrices
 	levels.R = c("diagonal and equal",
