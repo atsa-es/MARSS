@@ -405,9 +405,7 @@ if(file %in% dir("./manual_files")) {
 } else { saved.res = FALSE }
 @
 
-<<Cs14b_fit_data_big_maxit, results=hide, echo=FALSE>>=
-# saved.res is a flag; set to TRUE to not re-run
-if(!exists("saved.res")){ saved.res=FALSE }
+<<fit_data_big_maxit, results=hide, echo=FALSE>>=
 if(!saved.res) {
 	big.maxit.cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)
 	kemz.3 = MARSS(dat.z, model=dfa.model, control=big.maxit.cntl.list)
@@ -444,7 +442,7 @@ model.list = list(m=2, R="diagonal and unequal")
 kemz.2 = MARSS(dat.spp.1980, model=model.list,
     z.score=TRUE, form="dfa", control=cntl.list)
 @
-<<Cs16b_set.up.two.trends.big.maxit, results=hide>>=
+<<set.up.two.trends.big.maxit, results=hide>>=
 if(!saved.res) {
     model.list = list(m=2, R="diagonal and unequal")
     kemz.2 = MARSS(dat.spp.1980, model=model.list,
@@ -468,7 +466,7 @@ Now let's examine a larger suite of possible models.  We will test from one to f
 \item different variances \& covariances (\verb@"unconstrained"@).
 \end{enumerate}
 The following code builds our model matrices; you could also write out each matrix as we did in the first example, but this allows us to build and run all of the models together. \emph{NOTE}: the following piece of code will take a \emph{very long} time to run!
-<<Cs_18a_set.up.many.trends.no.echo, results=hide, echo=FALSE>>=
+<<set.up.many.trends.no.echo, results=hide, echo=FALSE>>=
 # Careful this takes a long time to run
 if(!saved.res) {
 	# set up forms of R matrices
@@ -482,7 +480,7 @@ if(!saved.res) {
 	for(R in levels.R) {
 	    for(m in 1:(N.ts-1)) {
 	        dfa.model = list(A="zero", R=R, m=m)
-	        kemz = MARSS(dat.z, model=dfa.model, control=fit.cntl.list, form="dfa", z.score=TRUE)
+	        kemz = MARSS(dat.z, model=dfa.model, control=big.maxit.cntl.list, form="dfa", z.score=TRUE)
 	        model.data = rbind(model.data,
 	                           data.frame(R=R,
 	                                      m=m,
@@ -526,6 +524,8 @@ for(R in levels.R) {
 Model selection results are shown in Table \ref{tab:tablefits}.  The models with lowest AICc had 2 or 3 trends and an unconstrained $\RR$ matrix. It also appears that, in general, models with an unconstrained $\RR$ matrix fit the data much better than those models with less complex structures for the observation errors (i.e., models with unconstrained forms for $\RR$ had nearly all of the AICc weight). 
 
 <<Cs19_makemodeltable, echo=FALSE>>=
+#you must run the code to do all the models for this section
+if(exists(model.data)){
 # calculate delta-AICc
 model.data$delta.AICc = model.data$AICc - min(model.data$AICc)
 # calculate Akaike weights
@@ -537,13 +537,17 @@ model.tbl = model.data[order(model.data$AICc),-4]
 # calculate cumulative wts
 model.tbl$Ak.wt.cum = cumsum(model.tbl$Ak.wt)
 model.tbl = model.tbl[,-4]
+}
 @
 <<makelatexofmodeltable,echo=FALSE>>=
+#you must run the code to do all the models for this section
+if(exists(model.data)){
 tmpaln = "c" #figure out the number of cols automatically
 for(i in 1:ncol(model.tbl)) {tmpaln = paste(tmpaln,"c",sep="")}
 thetable = xtable(model.tbl,caption='Model selection results.', label='tab:tablefits', align=tmpaln, digits=c(1,1,1,1,1,2,2))
 align(thetable) = "cp{3.5cm}p{0.7cm}p{1.5cm}p{1.75cm}cc"
 print(thetable, type = "latex", file = paste(tabledir,"tablefit.tex",sep=""), include.rownames=FALSE,include.colnames=TRUE, caption.placement="top",table.placement="htp", sanitize.text.function = function(x){x},hline.after = c(-1,0,nrow(model.data)))
+}
 @
 \input{tables/tablefit}
 
@@ -569,21 +573,20 @@ As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivale
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
  $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.
  
-The varimax rotation is easy to compute because R has a built in function that returns $\HH^{-1}$. To do so, we first get the model fits from the highest ranked model.
- 
-<<Cs20_getbestmodel, eval=TRUE>>=
-# get the "best" model
-best.model = model.tbl[1,]
-fitname = paste("kemz",best.model$m,best.model$R,sep=".")
-best.fit = get(fitname)
+The varimax rotation is easy to compute because R has a built in function that returns $\HH^{-1}$. We will illustrate the use of the varimax rotation with the 2-state model with $\RR$ unconstrained.  We will fit this with a large maxit.
+
+<<Cs20_kem3_R_unconstrained, results=hide>>=
+big.maxit.cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)
+model.list = list(m=2, R="unconstrained")
+the.fit = MARSS(dat.z, model=model.list, control=big.maxit.cntl.list)
 @
 Next, we retrieve the matrix used for varimax rotation.
 
 <<Cs21_varimax, eval=TRUE>>=
 # get the inverse of the rotation matrix
-Z.est = coef(best.fit, type="matrix")$Z
+Z.est = coef(the.fit, type="matrix")$Z
 H.inv = 1
-if(ncol(Z.est)>1) H.inv = varimax(coef(best.fit, type="matrix")$Z)$rotmat
+if(ncol(Z.est)>1) H.inv = varimax(coef(the.fit, type="matrix")$Z)$rotmat
 @
 The rotation matrix that varimax returns $\HH^{-1}$ rather than $\HH$. If $\ZZ$ has one column, there is only one $\ZZ$; there is only a rotation matrix if $\ZZ$ has more than one column.  We use $\HH^{-1}$ to rotate the factor loadings and $\HH$ to rotate the trends as in Equation \ref{eq:dfa.rotated}.
 
@@ -591,10 +594,10 @@ The rotation matrix that varimax returns $\HH^{-1}$ rather than $\HH$. If $\ZZ$ 
 # rotate factor loadings
 Z.rot = Z.est %*% H.inv   
 # rotate trends
-trends.rot = solve(H.inv) %*% best.fit$states
+trends.rot = solve(H.inv) %*% the.fit$states
 @
 
-Rotated factor loadings for the best model are shown in Figure \ref{fig:CS4.facloadings}.  Oddly, some taxa appear to have no loadings on some trends (e.g., diatoms on trend 1).  The reason is that, merely for display purposes, we chose to plot only those loadings that are greater than 0.05, and it turns out that after varimax rotation, several loadings are close to 0.
+Rotated factor loadings for the model are shown in Figure \ref{fig:CS4.facloadings}.  Oddly, some taxa appear to have no loadings on some trends (e.g., diatoms on trend 1).  The reason is that, merely for display purposes, we chose to plot only those loadings that are greater than 0.05, and it turns out that after varimax rotation, several loadings are close to 0.
 
 Recall that we set Var($\ww_t$) = $\QQ = \II_m$ in order to make our DFA model identifiable. Does the variance in the process errors also change following varimax rotation? Interestingly, no. Because $\HH$ is a non-singular, orthogonal matrix, Var($\HH\ww_t$) = $\HH$Var($\ww_t$)$\HH^\top$ = $\HH\II_m\HH^\top$ = $\II_m$.
 
@@ -619,7 +622,7 @@ for(i in 1:m) {
 } # end i loop
 @
 \end{center}
-\caption{Plot of the factor loadings (following varimax rotation) from the best model fit to the phytoplankton data.\newline}
+\caption{Plot of the factor loadings (following varimax rotation) from the 2-state model fit to the phytoplankton data.\newline}
 \label{fig:CS4.facloadings}
 \end{figure}
 
@@ -651,18 +654,18 @@ for(i in 1:dim(ts.trends)[2]) {
 	} # end i loop (trends)
 @
 \end{center}
-\caption{Plot of the unobserved trends (following varimax rotation) from the best model fit to the phytoplankton data.}
+\caption{Plot of the unobserved trends (following varimax rotation) from the 2-state model fit to the phytoplankton data.}
 \label{fig:CS4.trends}
 \end{figure}
 
 \section{Examining model fits}
-Now that we have found a ``best" model and done the appropriate factor and trends rotations, we should examine some plots of model fits (see Figure \ref{fig:CS4.bestfits}).  First, it looks like the model did an adequate job of capturing some of the high frequency variation (i.e., seasonality) in the time series.  Second, some of the time series had much better overall fits than others (e.g., compare Diatoms versus Cryptomonas).  Given the obvious seasonal patterns in the phytoplankton data, it might be worthwhile to first ``detrend" the data and then repeat the model fitting exercise to see (1) how many trends would be favored, and (2) the shape of those trends.
+Now that we have done the appropriate factor and trends rotations, we should examine some plots of model fits (see Figure \ref{fig:CS4.bestfits}).  First, it looks like this model did an adequate job of capturing some of the high frequency variation (i.e., seasonality) in the time series.  Second, some of the time series had much better overall fits than others (e.g., compare Diatoms versus Cryptomonas).  Given the obvious seasonal patterns in the phytoplankton data, it might be worthwhile to first ``detrend" the data and then repeat the model fitting exercise to see (1) how many trends would be favored, and (2) the shape of those trends.
 
 \begin{figure}[htp]
 \begin{center}
 <<Cs25_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
-par.mat=coef(best.fit, type="matrix")
-fit.b = par.mat$Z %*% best.fit$states + matrix(par.mat$A, nrow=N.ts, ncol=TT)
+par.mat=coef(the.fit, type="matrix")
+fit.b = par.mat$Z %*% the.fit$states + matrix(par.mat$A, nrow=N.ts, ncol=TT)
 spp = rownames(dat.z)
 par(mfcol=c(3,2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))
 for(i in 1:length(spp)){
@@ -673,7 +676,7 @@ for(i in 1:length(spp)){
   }
 @
 \end{center}
-\caption{Plot of the "best" model fits to the phytoplankton data.}
+\caption{Plot of the 2-state model fits to the phytoplankton data.}
 \label{fig:CS4.bestfits}
 \end{figure}
 
@@ -687,7 +690,7 @@ It is standard to add covariates to the analysis so that one removes known impor
  \xx_0 \sim \MVN(\pipi,\LAM) 
  \end{gathered}   
  \label{eq:dfa.cov}\end{equation}
-where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and the $n \times q$ matrix $\DD$ contains the effect(s) of the covariate(s) on the observations.  Using \verb@form="dfa"@ and \verb@covariates=@<\emph{covariate name(s)}>, we can easily add covariates to our DFA, but this means that the covariates are input, not data, and there can be no missing values (see Chapter 6 for how to include covariates with missing values).
+where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and the $n \times q$ matrix $\DD$ contains the effect(s) of the covariate(s) on the observations.  Using \verb@form="dfa"@ and \verb@covariates=@<\emph{covariate name(s)}>, we can easily add covariates to our DFA, but this means that the covariates are input, not data, and there can be no missing values (see Chapter \ref{chap:covariates} for how to include covariates with missing values).
  
 The Lake Washington dataset has two environmental covariates that we might expect to have effects on phytoplankton growth, and hence, abundance: temperature (Temp) and total phosphorous (TP). 
 <<Cs26_set-up-covar>>=
@@ -695,20 +698,8 @@ temp = t(plankdat[,"Temp",drop=FALSE])
 TP = t(plankdat[,"TP",drop=FALSE])
 @
 
-We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our best 2-state model from Table \ref{tab:tablefits} where \emph{m} = 2 and $\RR$ is ``unconstrained".
-<<fit.covar, results=hide, eval=TRUE, echo=FALSE>>=
-if(!saved.res) {
-	model.list=list(m=2, R="unconstrained")
-	kemz.temp = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
-	   control=fit.cntl.list, covariates=temp)
-	kemz.TP = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
-	   control=fit.cntl.list, covariates=TP)
-	kemz.both = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
-	   control=fit.cntl.list, covariates=rbind(temp,TP))
-   }
-@
-
-<<Cs27_fit.covar.echo, results=hide, eval=FALSE, echo=TRUE>>=
+We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our 2-state model with $\RR$ ``unconstrained".
+<<Cs27_fit.covar.echo, results=hide, echo=TRUE>>=
 model.list=list(m=2, R="unconstrained")
 kemz.temp = MARSS(dat.spp.1980, model=model.list, z.score=TRUE,
 	form="dfa", control=cntl.list, covariates=temp)
@@ -718,6 +709,22 @@ kemz.both = MARSS(dat.spp.1980, model=model.list, z.score=TRUE,
 	form="dfa", control=cntl.list, covariates=rbind(temp,TP))
 @
 
+<<fit.covar, results=hide, eval=TRUE, echo=FALSE>>=
+if(!saved.res) {
+	model.list=list(m=2, R="unconstrained")
+	kemz.temp = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
+	   control=big.maxit.cntl.list, covariates=temp)
+	kemz.TP = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
+	   control=big.maxit.cntl.list, covariates=TP)
+	kemz.both = MARSS(dat.spp.1980, model=model.list, z.score=TRUE, form="dfa",
+	   control=big.maxit.cntl.list, covariates=rbind(temp,TP))
+}else{
+  #reload to re-define kemz.temp etc since prev chunk redefined
+  load(paste("./manual_files/",file,sep=""))
+}
+@
+
+
 <<save.results, results=hide, eval=TRUE, echo=FALSE>>=
 file=paste(Sys.getenv("TEMP"),"\\CS4--model.fits.Rdata",sep="")
 save(file=file,list=c("model.data", ls(pattern="^kemz.")))
@@ -726,10 +733,10 @@ save(file=file,list=c("model.data", ls(pattern="^kemz.")))
 Next we can compare whether the addition of the covariates improves the model fit (effectively less residual error while accounting for the additional parameters). \emph{NOTE}: The following results were obtained by letting the EM algorithm run for a \emph{very long} time, so your results may differ.
 <<Cs28_covar.AICs>>=
 print(cbind(model=c("no covars", "Temp", "TP", "Temp & TP"),
-      AICc=round(c(best.fit$AICc, kemz.temp$AICc, kemz.TP$AICc,
+      AICc=round(c(the.fit$AICc, kemz.temp$AICc, kemz.TP$AICc,
       kemz.both$AICc))), quote=FALSE)
 @
-This suggests that adding temperature or phosphorus to the model, either alone or in combination with one another, improves overall model fit. If we were truly interested in assessing the ``best" model structure that includes covariates, however, we should examine all combinations of trends and structures for $\RR$. The model fits for the temperature-only model are shown in Fig \ref{fig:CS4.bestcovarfits} and they appear much better than the best model without any covariates.
+This suggests that adding temperature or phosphorus to the model, either alone or in combination with one another, improves overall model fit. If we were interested in assessing the ``best" model structure that includes covariates, however, we should examine all combinations of trends and structures for $\RR$. The model fits for the temperature-only model are shown in Fig \ref{fig:CS4.bestcovarfits} and they appear much better than the model without any covariates.
 
 \begin{figure}[htp]
 \begin{center}
