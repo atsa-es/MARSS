@@ -304,7 +304,7 @@ arima(noisy.data,order=c(2,0,2),include.mean=FALSE)
 @
 Accounting for the measurement error definitely improves the estimates for the AR component.  
 
-<<loadmarssperf,echo=FALSE>>=
+<<loadmarssperf, echo=FALSE>>=
 nsim=200; TT=100
 file=paste("AR2SS",TT,".RData",sep="")
 if(file %in% dir("./manual_files")) {
@@ -319,6 +319,7 @@ if(file %in% dir("./manual_files")) {
 # saved.res is just a flag.  Set to FALSE to run the code
 if(!exists("saved.res")){ saved.res=FALSE }
 if(!saved.res) {
+nsim=200; TT=100
 file=paste("AR2SS",TT,".RData",sep="")
 params=matrix(0,8,nsim)
 #sim 2   true.2ss=c(r=.5,b1=0.8,b2=-0.2,q=.1)
