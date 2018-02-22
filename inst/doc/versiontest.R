@@ -17,7 +17,7 @@
 
 # ###########################################
 
-setwd("C:\Users\Eli.Holmes\Dropbox\MARSS unit tests 2018")
+setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2018")
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
@@ -28,6 +28,7 @@ lib.loc = Sys.getenv("R_LIBS_USER")
 unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.loc)
+zscore.fun = zscore #3.9 does not have this
 
 #Get whatever code files are in the doc directory; these are tested
 unittestfiles = dir(path=paste(lib.loc,"/MARSS/doc",sep=""), pattern="*[.]R$", full.names = TRUE)
@@ -59,24 +60,26 @@ for(unittestfile in unittestfiles){
 #detach the version
 detach("package:MARSS", unload=TRUE)
 
-#Other version of MARSS is in the R library (no local library)
+#Old version of MARSS is in the R library (no local library)
 lib.loc = paste(Sys.getenv("R_HOME"),"/library",sep="")
 unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
 unittestvrs
 library(MARSS, lib.loc = lib.loc)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun"))])
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
+  if(!exists(zscore)){zscore=zscore.fun}
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
   try(source(unittestfile))
   sink()
   funs=sapply(ls(),function(x){isTRUE(class(get(x))=="function")})
-  test.these = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
+  ls.not.funs = ls()[ls()!="funs"]
+  test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testOld = mget(test.these)
   save(testOld,file=paste(tag,unittestvrs,".Rdata",sep=""))
 }
