@@ -525,7 +525,7 @@ Model selection results are shown in Table \ref{tab:tablefits}.  The models with
 
 <<Cs19_makemodeltable, echo=FALSE>>=
 #you must run the code to do all the models for this section
-if(exists(model.data)){
+if(exists("model.data")){
 # calculate delta-AICc
 model.data$delta.AICc = model.data$AICc - min(model.data$AICc)
 # calculate Akaike weights
@@ -541,7 +541,7 @@ model.tbl = model.tbl[,-4]
 @
 <<makelatexofmodeltable,echo=FALSE>>=
 #you must run the code to do all the models for this section
-if(exists(model.data)){
+if(exists("model.data")){
 tmpaln = "c" #figure out the number of cols automatically
 for(i in 1:ncol(model.tbl)) {tmpaln = paste(tmpaln,"c",sep="")}
 thetable = xtable(model.tbl,caption='Model selection results.', label='tab:tablefits', align=tmpaln, digits=c(1,1,1,1,1,2,2))
@@ -578,7 +578,7 @@ The varimax rotation is easy to compute because R has a built in function that r
 <<Cs20_kem3_R_unconstrained, results=hide>>=
 big.maxit.cntl.list = list(minit=200, maxit=5000, allow.degen=FALSE)
 model.list = list(m=2, R="unconstrained")
-the.fit = MARSS(dat.z, model=model.list, control=big.maxit.cntl.list)
+the.fit = MARSS(dat.z, model=model.list, form="dfa", control=big.maxit.cntl.list)
 @
 Next, we retrieve the matrix used for varimax rotation.
 
