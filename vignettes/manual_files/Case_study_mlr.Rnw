@@ -1,13 +1,16 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/MLR-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+tabledir="figures/"
+options(prompt=" ", continue=" ", width=60)
+@
+
+<<Cs_000_required_libraries>>=
 library(MARSS)
 library(xtable)
 library(lattice)
 library(nlme)
 library(stringr)
 library(lme4)
-tabledir="figures/"
-options(prompt=" ", continue=" ", width=60)
 @
 
 \chapter{Multivariate linear regression}
