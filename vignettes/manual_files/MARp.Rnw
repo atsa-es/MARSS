@@ -1,8 +1,11 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/ARMAp-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE>>=
-library(MARSS)
 options(prompt=" ", continue=" ", width=60)
 @
+<<Cs_00_required_libraries>>=
+library(MARSS)
+@
+
 \chapter{Lag-p models with MARSS}
 \label{chap:ARMA}
 \chaptermark{Models with lag-p}
@@ -314,6 +317,7 @@ if(file %in% dir("./manual_files")) {
 # This is the code used to make the figure comparing different ways to estimate 
 # AR parameters from AR with noise data
 # saved.res is just a flag.  Set to FALSE to run the code
+if(!exists(saved.res)) saved.res=FALSE
 if(!saved.res) {
 file=paste("AR2SS",TT,".RData",sep="")
 params=matrix(0,8,nsim)
@@ -363,7 +367,7 @@ save(true.2ss,TT,params,file=file)
 
 \begin{figure}[htp]
 \begin{center}
-<<CS_18_marssperffig,fig=TRUE,echo=FALSE, keep.source=TRUE>>=
+<<Cs_18_marssperffig,fig=TRUE,echo=FALSE, keep.source=TRUE>>=
 # This makes a plot of the comparisons
 par(ylbias=-.2,tcl=-.2,cex=.75)
 boxplot(t(params[c(7,1,3,5,8,2,4,6),]),names=c("AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)","AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)"),ylab="estimates of the ar coefficients",las=2)
