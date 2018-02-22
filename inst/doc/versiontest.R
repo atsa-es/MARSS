@@ -12,15 +12,19 @@
 # IMPORTANT: Using 'build and reload' from RStudio builds the package into the local
 # library but does not install the doc folder (which is needed for this test)
 # Use Install from zip and install from a .tar.gz file instead
+# cd to folder with the source code (e.g. GitHub)
+# R CMD build MARSS (build the tar.gz file)
+
 # ###########################################
 
 #make sure MARSS isn't loaded
 try(detach(package:MARSS),silent=TRUE)
 
 #One version should be in the local library
+#if building from RStudio, you can set to build to local
 lib.loc = Sys.getenv("R_LIBS_USER")
 unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
-unittestvrs
+unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.loc)
 
 #Get whatever code files are in the doc directory; these are tested
