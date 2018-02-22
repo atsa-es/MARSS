@@ -3,11 +3,17 @@
 \label{chap:CSstrucbreak}
 \chaptermark{Outliers and structural breaks}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-library(MARSS)
 options(prompt=" ", continue=" ")
-library(xtable)
-library(Hmisc)
 tabledir="tables/"
+@
+<<Cs00_required_packages>>=
+library(MARSS)
+library(xtable)
+library(survival)
+library(Formula)
+library(ggplot2)
+library(Hmisc)
+library(datasets)
 @
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_StructuralBreaks.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
