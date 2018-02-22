@@ -694,8 +694,8 @@ where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and
  
 The Lake Washington dataset has two environmental covariates that we might expect to have effects on phytoplankton growth, and hence, abundance: temperature (Temp) and total phosphorous (TP). 
 <<Cs26_set-up-covar>>=
-temp = t(plankdat[,"Temp",drop=FALSE])
-TP = t(plankdat[,"TP",drop=FALSE])
+temp = t(plankdat[years,"Temp",drop=FALSE])
+TP = t(plankdat[years,"TP",drop=FALSE])
 @
 
 We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our 2-state model with $\RR$ ``unconstrained".
