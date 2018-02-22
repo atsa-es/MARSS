@@ -390,7 +390,7 @@ Temperature and phosphorous have and estimated positive effect on phytoplankton:
 <<Cs27.5_print-C, keep.source=TRUE, echo=false>>=
 #Cleaning up the B matrix for printing
 Cmat = coef(kem.plank.2,type="matrix")$C[1:4,1,drop=FALSE]
-rownames(Cmat) c("LP","SP","D","ND")
+rownames(Cmat) = c("LP","SP","D","ND")
 Cmat[Cmat==0]=NA
 print(Cmat,digits=2,na.print="--")
 @
