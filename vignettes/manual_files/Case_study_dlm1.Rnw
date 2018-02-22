@@ -88,11 +88,11 @@ dat = matrix(SalmonSurvCUI[,2],nrow=1)
 @
 
 As we have seen in other chapters, standardizing our covariate(s) to have zero-mean and unit-variance can be helpful in model fitting and interpretation. In this case, it is a good idea because the variance of $CUI.apr$ is orders of magnitude greater than $survival$.
-<<Cs_02_z.score, eval=TRUE>>=
-CUI = SalmonSurvCUI[,3]
+<<Cs_02_z.score>>=
+CUI = SalmonSurvCUI[,"CUI.apr"]
 CUI.z = zscore(CUI)
-# number of regression params (slope + intercept)
-m = dim(CUI.z)[1] + 1
+# number of state = # of regression params (slope(s) + intercept)
+m = 1 + 1
 @
 Plots of logit-transformed survival and the z-scored April upwelling index are shown in Figure \ref{fig:CSX.fig1}.
 
