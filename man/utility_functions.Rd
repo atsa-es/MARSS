@@ -57,7 +57,7 @@ pcholinv(x)
 pchol(x) 
 is.solvable(A,y=NULL)
 all.equal.vector(x)
-parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0"), 
+parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
        t = 1, dims = NULL, model.loc = "marss")
 }
 \arguments{
