@@ -10,7 +10,7 @@ citEntry(entry="Manual",
                              as.person("Kellie Wills")),
          year = year,
          note = vers,
-         url = "http://cran.r-project.org/web/packages/MARSS/",
+         url = "https://CRAN.R-project.org/package=MARSS",
          textVersion =
          paste("Elizabeth Holmes, Eric Ward, and Kellie Wills (", year,
                "). MARSS: Multivariate Autoregressive State-Space Modeling. ",
