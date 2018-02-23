@@ -1,17 +1,14 @@
 \name{MARSSoptim}
 \alias{MARSSoptim}
-\alias{neglogLik}
 \title{Parameter estimation for MARSS models using optim}
 \description{
-  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available via the \code{\link{optim}} function.  The \code{MARSSoptim} function is called when \code{\link{MARSS}} is called with \code{method="BFGS"}.  This is a base function in the \code{\link{MARSS-package}}.  \code{neglogLik} is a helper function for \code{MARSSoptim} that returns the negative log-likelihood given a vector of the estimated parameters and a \code{\link{marssMLE}} object.  When possible, the Kalman filter and smoother functions from the KFAS R package are used.
+  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available via the \code{\link{optim}} function.  The \code{MARSSoptim} function is called when \code{\link{MARSS}} is called with \code{method="BFGS"}.  This is a base function in the \code{\link{MARSS-package}}. 
 }
 \usage{
 MARSSoptim(MLEobj)
-neglogLik(x, MLEobj)
 }
 \arguments{
   \item{MLEobj}{An object of class \code{\link{marssMLE}}.}
-  \item{x}{An vector of the estimated parameters as output by \code{coef(MLEobj,type="vector")}.}
 }
 \details{
 Objects of class \code{\link{marssMLE}} may be built from scratch but are easier to construct using \code{\link{MARSS}} with \code{MARSS(..., fit=FALSE, method="BFGS")}.
