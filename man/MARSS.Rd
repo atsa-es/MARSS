@@ -125,7 +125,6 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
 \code{\link{marssMLE}} \code{\link{MARSSkem}} \code{\link{MARSSoptim}} \code{\link{MARSS-package}} \code{\link{print.MARSS}} \code{\link{MARSS.marxss}} \code{\link{MARSS.dfa}}
 }
 \examples{
-#harborSealWA is a n=5 matrix of logged population counts
 dat = t(harborSealWA)
 dat = dat[2:4,] #remove the year row
 #fit a model with 1 hidden state and 3 observation time series
