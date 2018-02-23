@@ -5,10 +5,10 @@
 \alias{residuals.marss}
 \title{ MARSS Standardized Residuals }
 \description{
-  Calculates the standardized (or auxilliary) residuals sensu Harvey, Koopman and Penzer (1998).
+  Calculates the standardized (or auxiliary) residuals sensu Harvey, Koopman and Penzer (1998).
 }
 \usage{
-\method{residuals}{marssMLE}(object,..., Harvey=TRUE, normalize=FALSE)
+\method{residuals}{marssMLE}(object,..., Harvey=FALSE, normalize=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
@@ -48,7 +48,7 @@ If there are no missing data, this becomes
 MLEobj = MARSS(dat)
 Z = coef(MLEobj, type="matrix")$Z
 A = coef(MLEobj, type="matrix")$A
-res1 = dat - Z %*% MLEobj$states - A%*%matrix(1,1,ncol(dat))
+res1 = dat - Z %*% MLEobj$states - A %*% matrix(1,1,ncol(dat))
 res2 = residuals(MLEobj)$model.residuals
 }
 The model.residuals for the missing data is 0 (in res2) because that is the expected value of \eqn{V_t} when data are missing.
@@ -76,7 +76,7 @@ B = coef(MLEobj, type="matrix")$B
 U = coef(MLEobj, type="matrix")$U
 statest = MLEobj$states[,2:TT]
 statestm1 = MLEobj$states[,1:(TT-1)]
-res1 = statest - B %*% statestm1 - U%*%matrix(1,1,TT-1)
+res1 = statest - B %*% statestm1 - U %*% matrix(1,1,TT-1)
 res2 = residuals(MLEobj)$state.residuals
 }
 The state residuals always exist since the expected value of the states exist without data and will be identical with \code{Harvey=TRUE} or \code{Harvey=FALSE}.  Generally speaking, \eqn{E(W_t|y_1^T)} is not 0 even if there are missing data.
@@ -119,7 +119,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
   Q=coef(MLEobj,type="matrix")$Q
   state.resids2=states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
   #standardize to variance of 1
-  state.resids2=solve(t(chol(Q)))%*%state.resids2
+  state.resids2=(solve(t(chol(Q))) \%*\% state.resids2)
   #compare the two
   cbind(t(state.resids1[,-30]),t(state.resids2))
 
@@ -129,7 +129,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 \references{
 Harvey, A., S. J. Koopman, and J. Penzer. 1998. Messy time series: a unified approach. Advances in Econometrics 13: 103-144  (see page 112-113).  Eqn 21 is the Kalman eqns.  Eqn 23 and 24 is the backward recursion to compute the smoothations.  This function uses the MARSSkf output for eqn 21 and then implements the backwards recursion in eqn 23 and eqn 24.  Pages 120-134 discuss the use of standardized residuals for outlier and structural break detection.
 
-de Jong, P. and J. Penzer. 1998. Diagnosing shocks in time series. Journal of the American Statistical Association 93: 796–806.  This one shows the same equations; see eqn 6.  This paper mentions the scaling based on the inverse of the sqrt (chol) of the variance-covariance matrix for the residuals (model and state together).  This is in the right column, half-way down on page 800.
+de Jong, P. and J. Penzer. 1998. Diagnosing shocks in time series. Journal of the American Statistical Association 93: 796-806.  This one shows the same equations; see eqn 6.  This paper mentions the scaling based on the inverse of the sqrt (chol) of the variance-covariance matrix for the residuals (model and state together).  This is in the right column, half-way down on page 800.
 
 Koopman, S. J., N. Shephard, and J. A. Doornik. 1999. Statistical algorithms for models in state space using SsfPack 2.2. Econometrics Journal 2: 113-166. (see pages 147-148).
 
