@@ -11,8 +11,6 @@ MARSSharveyobsFI( MLEobj )
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 
   This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}}. }
  }
-\details{
-}
 \value{
   The observed Fisher Information matrix computed via equation 3.4.69 in Harvey (1989).  The differentials in the equation are computed in the recursion in equations 3.4.73a to 3.4.74b.  Harvey (1989) discusses missing observations in section 3.4.7.  However, the MARSSharveyobsFI() function implements the approach of Shumway and Stoffer (2006) in section 6.4 for the missing values.  See Holmes (2012) for a full discussion of the missing values modifications.
 }
