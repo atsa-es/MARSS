@@ -693,21 +693,20 @@ all.equal.vector = function(x){
 ######################################################################################
 str_detect=function(string, pattern){
   if (length(pattern) == 1) {
-    results <- re_call("grepl", string, pattern)
+    results <- grepl(pattern, string)
   }
   else {
-    results <- unlist(re_mapply("grepl", string, pattern))
+    results <- unlist(mapply("grepl", pattern, string))
   }
-  is.na(results) <- is.na(string)
   results
 }
 
 str_replace_all=function(string, pattern, replacement){
   if (length(pattern) == 1 && length(replacement) == 1) {
-    re_call("gsub", string, pattern, replacement)
+    gsub(pattern, replacement, string)
   }
   else {
-    unlist(re_mapply("gsub", string, pattern, replacement))
+    unlist(mapply("gsub", pattern, replacement, string))
   }
 }
 
@@ -743,12 +742,14 @@ str_length=function(string){
 str_replace=function(string, pattern, replacement) 
 {
   if (length(pattern) == 1 && length(replacement) == 1) {
-    re_call("sub", string, pattern, replacement)
+    sub(pattern, replacement, string)
   }
   else {
-    unlist(re_mapply("sub", string, pattern, replacement))
+    unlist(mapply("sub", pattern, replacement, string))
   }
 }
+
+################################################################
 
 zscore = function(x){
   ismat = is.matrix(x) #else is vector
