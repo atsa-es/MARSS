@@ -422,7 +422,7 @@ Notice that the missing values modified $\hat{\varepsilon}_t^*$ and $\Sigma_t^*$
 There will be 0s on the diagonal of $\Sigma_t^*$ so your code will need to deal with these.
 
 
-\bibliography{./tex/Manual}
+\bibliography{./EMDerivation}
 \bibliographystyle{apalike}
 
 \end{document}
