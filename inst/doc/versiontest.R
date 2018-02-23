@@ -37,7 +37,7 @@ unittestfiles = unittestfiles[unittestfiles!=paste(lib.loc,"/MARSS/doc/versionte
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
   #clean the workspace but keep objects needed for the unit test
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun"))])
   #set up name for log files
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
@@ -71,7 +71,7 @@ for(unittestfile in unittestfiles){
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
-  if(!exists(zscore)){zscore=zscore.fun}
+  if(!exists("zscore")){zscore=zscore.fun}
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
@@ -107,7 +107,19 @@ for(unittestfile in unittestfiles){
   }
   good=rep(TRUE,length(names(testNew)))
   for(ii in 1:length(names(testNew))){
-    if(!identical(testNew[[ii]], testOld[[ii]])) good[ii] = FALSE
+    if(!identical(testNew[[ii]], testOld[[ii]])){
+      good[ii] = FALSE
+      if(class(testNew[[ii]])=="marssMLE"){
+        for(iii in names(testNew[[ii]][["par"]])){
+          if(iii %in% c("G","H","L")) next
+          if(!identical(testNew[[ii]][["par"]][iii], testOld[[ii]][["par"]][iii])){
+            cat("Warning:", names(testNew)[ii],"par",iii,"not identical\n")
+          }else{
+            cat(names(testNew)[ii],"par",iii,"identical\n")
+          }
+        }
+      }
+    }
   }
   if(!all(good)){
     cat("ERROR: The following objects are not identical\n")
