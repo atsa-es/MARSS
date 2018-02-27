@@ -145,7 +145,7 @@ kemfit #print information on the marssMLE object
 
 #fit a model with 3 correlated hidden states 
 # with one variance and one  covariance
-#maxit set low to speed up example, but more iterations are need for convergence  
+#maxit set low to speed up example, but more iters are needed for convergence  
 kemfit = MARSS(dat, model=list(Q="equalvarcov"), control=list(maxit=50))
 # use Q="unconstrained" to allow different variances and covariances
 
