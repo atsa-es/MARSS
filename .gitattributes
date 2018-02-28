@@ -1,0 +1,6 @@
+.gitattributes export-ignore
+.gitignore export-ignore
+vignettes/Makefile export-ignore
+README.md export-ignore
+_config.yml export-ignore
+.Rhistory export-ignore
