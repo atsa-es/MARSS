@@ -27,7 +27,7 @@ To install the latest release from GitHub:
 ```
 install.packages("devtools")
 library(devtools)
-install_github("nwfsc-timeseries/MARSS", ref="3.10.3")
+install_github("nwfsc-timeseries/MARSS", ref="3.10.4")
 library(MARSS)
 ```
 
