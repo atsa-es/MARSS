@@ -50,9 +50,9 @@ Holmes, E. E., Ward, E. J. and Wills, K. (2012) MARSS: Multivariate Autoregressi
 
 You can also cite the package as you would other R packages:
 
-Elizabeth Holmes, Eric Ward, and Kellie Wills (2013). MARSS: Multivariate Autoregressive State-Space Modeling. R package version 3.9.
+Elizabeth Holmes, Eric Ward, Mark Scheuerell, and Kellie Wills (2018). MARSS: Multivariate Autoregressive State-Space Modeling. R package version 3.10.4.
 
-Update the version number and year if you use the more recent version on GitHub.
+Update the version number and year if you use a more recent version on GitHub.
 
 ### PUBLICATIONS
 
