@@ -4,4 +4,12 @@ vignettes/Makefile export-ignore
 README.md export-ignore
 _config.yml export-ignore
 .Rhistory export-ignore
-inst/doc/versiontest.R
+inst/doc/versiontest.R export-ignore
+vignettes/*.sty export-ignore
+vignettes/*.cls export-ignore
+vignettes/*.bst export-ignore
+vignettes/*.R export-ignore
+vignettes/tables export-ignore
+vignettes/tex export-ignore
+vignettes/figures export-ignore
+vignettes/manual_files export-ignore
