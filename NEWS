@@ -55,7 +55,7 @@ IMPROVEMENTS
   - changed MARSSkss to use Q*=G Q t(G), R*=H R t(H) and V0*=L V0 t(L)
 * added Multivariate linear regression chapter
 * added chapter on estimating a Leslie matrix from stage time series using a MARSS model.
-* removed the function MARSSmcinits and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, MARSSmcinits was increasing obsolete and it was impossible to come up with good searching distributions.
+* removed the function MARSSmcinits and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, MARSSmcinits was increasing obsolete and it was impossible to come up with good searching distributions.  Because MARSSmcinits was removed, control$MCInits list item was removed also from defaults and from accepted input.
 * added default inits for c and d in marxss form so that user can pass in inits using coef(fit); was balking because this includes d and c which didn't have defaults.  Removed msg referring to need that model be in marss form for inits (not true).
 * changed MARSS.marxss() to allow c and d to be 3D arrays.  This allows one to use inits=fit to set inits and not get a d (or c) must be 2D error.
 * adding info to MARSSinfo(4) regarding errors about R=0 and x0 not fixed. Added info to the error warnings to direct user to MARSSinfo().
