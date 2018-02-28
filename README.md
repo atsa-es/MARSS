@@ -16,13 +16,21 @@ library(MARSS)
 ```
 
 To install the development version of MARSS from GitHub:
-
 ```
 install.packages("devtools")
 library(devtools)
-install_.packages_github("nwfsc-timeseries/MARSS")
+install_github("nwfsc-timeseries/MARSS")
 library(MARSS)
 ```
+
+To install the latest release from GitHub:
+```
+install.packages("devtools")
+library(devtools)
+install_github("nwfsc-timeseries/MARSS", ref="3.10.3")
+library(MARSS)
+```
+
 
 ### DOCUMENTATION and TUTORIALS
 

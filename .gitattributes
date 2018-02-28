@@ -4,3 +4,4 @@ vignettes/Makefile export-ignore
 README.md export-ignore
 _config.yml export-ignore
 .Rhistory export-ignore
+inst/doc/versiontest.R
