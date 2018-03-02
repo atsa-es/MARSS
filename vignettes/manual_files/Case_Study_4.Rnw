@@ -659,21 +659,73 @@ for(i in 1:dim(ts.trends)[2]) {
 \end{figure}
 
 \section{Examining model fits}
-Now that we have done the appropriate factor and trends rotations, we should examine some plots of model fits (see Figure \ref{fig:CS4.bestfits}).  First, it looks like this model did an adequate job of capturing some of the high frequency variation (i.e., seasonality) in the time series.  Second, some of the time series had much better overall fits than others (e.g., compare Diatoms versus Cryptomonas).  Given the obvious seasonal patterns in the phytoplankton data, it might be worthwhile to first ``detrend" the data and then repeat the model fitting exercise to see (1) how many trends would be favored, and (2) the shape of those trends.
+
+<<func_get_DFA_fits, eval=TRUE, echo=FALSE>>=
+get_DFA_fits <- function(MLEobj, alpha=0.05, covariates=NULL) {
+  ## empty list for results
+  fits <- list()
+  ## extra stuff for var() calcs
+  Ey <- MARSS:::MARSShatyt(MLEobj)
+  ## estimated Z
+  ZZ <- coef(MLEobj, type="matrix")$Z
+  ## number of obs ts
+  nn <- dim(Ey$ytT)[1]
+  ## number of time steps
+  TT <- dim(Ey$ytT)[2]
+  ## inverse of the rotation matrix
+  H_inv <- varimax(ZZ)$rotmat
+  ## check for covars
+  if(!is.null(covariates)) {
+    DD <- coef(MLEobj, type="matrix")$D
+    cov_eff <- DD %*% covariates
+  } else {
+    cov_eff <- matrix(0, nn, TT)
+  }
+  ## model expectation
+  fits$ex <- ZZ %*% H_inv %*% MLEobj$states + cov_eff
+  ## Var in model fits
+  VtT <- MARSSkfss(MLEobj)$VtT
+  VV <- NULL
+  for(tt in 1:TT) {
+    RZVZ <- coef(MLEobj, type="matrix")$R - ZZ%*%VtT[,,tt]%*%t(ZZ)
+    SS <- Ey$yxtT[,,tt] - Ey$ytT[,tt,drop=FALSE] %*% t(MLEobj$states[,tt,drop=FALSE])
+    VV <- cbind(VV,diag(RZVZ + SS%*%t(ZZ) + ZZ%*%t(SS)))
+  }
+  SE <- sqrt(VV)
+  ## upper & lower (1-alpha)% CI
+  fits$up <- qnorm(1-alpha/2)*SE + fits$ex
+  fits$lo <- qnorm(alpha/2)*SE + fits$ex
+  return(fits)
+}
+@
+
+Now that we have done the appropriate factor and trends rotations, we should examine some plots of model fits. To do so, we can use the function `get_DFA_fits()`, which will extract the model fits and estimated $(1 - \alpha)$\% confidence intervals. The function will also take care of the factor rotation for us. 
+
+<<Cs25_get_DFA_fits, eval=TRUE>>=
+fit.b = get_DFA_fits(the.fit)
+@
+
+First, it looks like this model captures some of the high frequency variation (i.e., seasonality) in the time series (see Figure \ref{fig:CS4.bestfits}).  Second, some of the time series had much better overall fits than others (e.g., compare Cryptomonas and Unicells).  Given the obvious seasonal patterns in the phytoplankton data, it would be worthwhile to first ``detrend" the data and then repeat the model fitting exercise to see (1) how many trends would be favored, and (2) the shape of those trends.
 
 \begin{figure}[htp]
 \begin{center}
-<<Cs25_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
-par.mat=coef(the.fit, type="matrix")
-fit.b = par.mat$Z %*% the.fit$states + matrix(par.mat$A, nrow=N.ts, ncol=TT)
-spp = rownames(dat.z)
+<<Cs25.1_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
+# plot the fits
+ylbl = rownames(dat.z)
+w_ts = seq(dim(dat.z)[2])
 par(mfcol=c(3,2), mar=c(3,4,1.5,0.5), oma=c(0.4,1,1,1))
-for(i in 1:length(spp)){
-  plot(dat.z[i,],xlab="",ylab="abundance index",bty="L", xaxt="n", ylim=c(-4,3), pch=16, col="blue")
+for(i in 1:N.ts) {
+  up <- fit.b$up[i,]
+  mn <- fit.b$ex[i,]
+  lo <- fit.b$lo[i,]
+  plot(w_ts, mn, xlab="", ylab=ylbl[i], xaxt="n", type="n", cex.lab=1.2,
+       ylim = c(min(lo),max(up)))
   axis(1,12*(0:dim(dat.z)[2])+1,1980+0:dim(dat.z)[2])
-  lines(fit.b[i,], lwd=2)
-  title(spp[i])
-  }
+  points(w_ts, dat.z[i,], pch=16, col="blue")
+  lines(w_ts, up, col="darkgray")
+  lines(w_ts, mn, col="black", lwd=2)
+  lines(w_ts, lo, col="darkgray")
+}
 @
 \end{center}
 \caption{Plot of the 2-state model fits to the phytoplankton data.}
