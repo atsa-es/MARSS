@@ -46,6 +46,7 @@ Misc minor bugs
 * MARSSkemcheck()'s test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
 * coef.marssMLE() was not stopping when illegal "what: arg passed in.  man page did not say what happens when type=parameter.
 * passing in method not in allowed.methods was causing errors since model conversion and testing happening before checkMARSSinputs and model testing is algorithm dependent (some forms not allowed by BFGS).  Added check for method at top of MARSS function.
+* parmat() failed if model.loc set to "model" and c or d passed in because pars should have been set to coef(MLEobj) not MLEobj$par in that case.  Also parmat() should have failed if elem="c" or "d" since those are not parameters.
 
 
 IMPROVEMENTS
@@ -67,6 +68,7 @@ IMPROVEMENTS
 * added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
 * added E[y(t), x(t+1)] to MARSShatyt output.  Needed for residuals.marssMLE().
 * added code to is.validvarcov() so that it returns an error if the user specifies a structurally illegal variance-covariance matrix.  Added info to MARSSinfo(25).
+* added a model.frame method for marssMODEL and marssMLE
 
 MISC
 * moved info in MARSSsettings.R to .onLoad function.
