@@ -495,7 +495,7 @@ MARSSkem = function( MLEobj ) {
       } #any diag.LAM=0
       if(length(denom)==1){ denom = 1/denom }else{ denom=try(pcholinv( denom ) ) }
       if(inherits(denom, "try-error") | (length(denom)==1 && denom==Inf)){
-        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update. denom is not invertible. This means that some of the x0 cannot be estimated.\n", sep="")
+        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update. denom is not invertible. \n This means that some of the x0 cannot be estimated. Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE
         break
       }
@@ -577,7 +577,7 @@ MARSSkem = function( MLEobj ) {
       }
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ))) }
       if(inherits(denom, "try-error")){
-        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at A update. denom is not invertible. \n If R diagonals equal to 0,\n then A elements corresponding to R==0 cannot be estimated.\n", sep="")
+        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at A update. denom is not invertible. \n If some of your R diagonals equal 0, then A elements corresponding to R==0 cannot be estimated.\n The problem may be with your D matrix (if you have one) also. Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE;  break }
       MLEobj.iter$par$A = denom%*%numer
       
@@ -679,7 +679,7 @@ MARSSkem = function( MLEobj ) {
       } #for i
       if(length(denom)==1){ denom = 1/denom }else{ denom=try(chol2inv(chol( denom ) ),silent=TRUE) }
       if(inherits(denom, "try-error") | (length(denom)==1 && denom==0)){
-        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at U update. denom is not invertible.\n", sep="")
+        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at U update. denom is not invertible.\n This means some of the U (+ C) terms cannot be estimated.\n Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE
         break
       }
@@ -745,7 +745,7 @@ MARSSkem = function( MLEobj ) {
       } #for i
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ) )) }
       if(inherits(denom, "try-error")){
-        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at B update. denom is not invertible.\n", sep="")
+        stop.msg = paste("Stopped at iter=",iter," in MARSSkem at B update. denom is not invertible.\n Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE;  break }
       MLEobj.iter$par$B = denom%*%numer
       if( !is.matrix(MLEobj.iter$par$B) ) MLEobj.iter$par$B=matrix(MLEobj.iter$par$B,dim(d$B)[2],1)
@@ -801,7 +801,7 @@ MARSSkem = function( MLEobj ) {
       } #for i
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ) )) }
       if(inherits(denom, "try-error")){ 
-        stop.msg = paste("Stopped at iter=",iter," in MARSSkem in Z update.  denom is not invertible.\n", sep="")
+        stop.msg = paste("Stopped at iter=",iter," in MARSSkem in Z update.  denom is not invertible.\n Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE;  break }
       MLEobj.iter$par$Z = denom%*%numer
       
