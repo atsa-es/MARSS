@@ -18,7 +18,7 @@ fitted.marssMLE <- function (object, ..., one.step.ahead=FALSE) {
   }
   
   val = matrix(NA, n, TT)
-  rownames(val) = attr(kemz.2$marss,"Y.names")
+  rownames(val) = attr(MLEobj$marss,"Y.names")
   
   for(t in 1:TT){
     Zt=parmat(MLEobj,"Z",t=t)$Z
