@@ -64,9 +64,9 @@ The state residuals \eqn{w_t} are the difference between the state at time t and
 \deqn{ w_t = x_t - B x_{t-1} - u}
 Like the model residual, the state residual \eqn{w_t} is a random variable since \eqn{x_t} is a random variable:
 \deqn{ W_t = X_t - B X_{t-1} - u}
-The unconditional mean and variance of \eqn{W_t} is 0 and Q.  \code{residuals(MLEobj)} returns the conditional mean and variance of \eqn{W_t}.
+The unconditional mean and variance of \eqn{W_t} is 0 and Q.  \code{residuals(MLEobj)} returns the \emph{conditional} mean and variance of \eqn{W_t}.
 
-\code{state.residuals} is the expected value of \eqn{W_t} conditioned on the data and parameter set \eqn{\Theta}.
+\code{state.residuals} is the expected value of \eqn{W_t} conditioned on the data (all the data 1 to T) and parameter set \eqn{\Theta}.
 \deqn{ E(W_t|y_1^T,\Theta) = E(X_t|y_1^T,\Theta) - B E(X_{t-1}|y_1^T, \Theta) - u}
 Thus res1 and res2 in the code below will be the same.
 \preformatted{dat = t(harborSeal)[2:3,]
@@ -76,7 +76,7 @@ B = coef(MLEobj, type="matrix")$B
 U = coef(MLEobj, type="matrix")$U
 statest = MLEobj$states[,2:TT]
 statestm1 = MLEobj$states[,1:(TT-1)]
-res1 = statest - B %*% statestm1 - U %*% matrix(1,1,TT-1)
+res1 = statest - B \%*\% statestm1 - U \%*\% matrix(1,1,TT-1)
 res2 = residuals(MLEobj)$state.residuals
 }
 The state residuals always exist since the expected value of the states exist without data and will be identical with \code{Harvey=TRUE} or \code{Harvey=FALSE}.  Generally speaking, \eqn{E(W_t|y_1^T)} is not 0 even if there are missing data.
