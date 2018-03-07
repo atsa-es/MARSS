@@ -20,7 +20,8 @@ export(
   MARSSparamCIs,
   MARSSsimulate,
   MARSSFisherI,
-  zscore
+  zscore,
+  augment.marssMLE
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
