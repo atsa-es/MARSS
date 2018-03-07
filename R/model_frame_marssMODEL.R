@@ -7,8 +7,9 @@ model.frame.marssMODEL <- function (formula, ...) {
   model=formula
   model.form = attr(model,"form")[1]
   model.dims = attr(model, "model.dims")
+  TT = model.dims[["x"]][2]
   f = model[["fixed"]]
-  ret = data.frame(t(model$data))
+  ret = data.frame(tid=1:TT, t(model$data))
   
   # Add on covariates/inputs c and d if they exist
   if(model.form=="dfa"){
