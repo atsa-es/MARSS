@@ -37,7 +37,8 @@ if(number=="denominv")
   cat( writeLines(strwrap(
 "This is telling you that you specifified a model that is logically indeterminant. First check your data and covariates (if you have them).  Make sure you didn't make a mistake when entering the data.  For example, a row of data that is all NAs or two rows of c or dthat are the same.  Then look at your model by passing in fit=FALSE to the MARSS() call.  Are you trying to estimate B butyou set Q to zero?  That won't work.  
 \n\n
-Note if you are estimating D, your error will report problems in A update. If you are estimating C, your error will say problems in U update.  This is because in the MARSS algorithms, the models with D and C are rewritten into a simpler MARSS model with time-varying A and U. If you have set R=0, you might get this error if you are trying to estimate A.  Did you set a VO (say, diagonal), that is inconsisent with V0T (the covariance matrix implied by the model)?  That can cause problems with the Q update.  Are you estimating C or D, but have rows of c or d that are all zero?  That won't work.  Are you estimating C or D with only one column of c or d? Depending on your constraints in C or D that might not work.
+Note if you are estimating D, your error will report problems in A update. If you are estimating C, your error will report problems in U update.  This is because in the MARSS algorithms, the models with D and C are rewritten into a simpler MARSS model with time-varying A and U. If you have set R=0, you might get this error if you are trying to estimate A (or D).\n\n
+Did you set a VO (say, diagonal), that is inconsisent with V0T (the covariance matrix implied by the model)?  That can cause problems with the Q update.  Are you estimating C or D, but have rows of c or d that are all zero?  That won't work.  Are you estimating C or D with only one column (one time point) of c or d? Depending on your constraints in C or D that might not work.
 \n"
 )))
 
