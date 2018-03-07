@@ -1,20 +1,34 @@
 ###############################################################################################################################################
 #  model.frame method for class marssMLE and class marssMODEL 
-#  returns a data.frame if model is in certain forms
+#  returns a data.frame that has the data (y) and inputs (c and d)
+#  for a MARXSS equation
 ##############################################################################################################################################
 model.frame.marssMODEL <- function (formula, ...) {
   model=formula
-  allowed.forms = c("dlm")
   model.form = attr(model,"form")[1]
-  if(!(model.form %in% allowed.forms)) stop(paste("model.frame.marssMODEL doesn't know how to deal with marssMODEL objects of form ",model.form,".",sep=""))
+  model.dims = attr(model, "model.dims")
+  f = model[["fixed"]]
   ret = data.frame(t(model$data))
   
+  # Add on covariates/inputs c and d if they exist
   if(model.form=="dfa"){
-    if(is.null(MLEobj$call)) stop("model.frame.marssMLE needs to have the call element in the marssMLE object.  This is used for the covariates.")
-    covariates = MLEobj$call$covariates
-    if(!is.null(covariates)){
-      if(is.null(rownames(covariates))) rownames(covariates)=rownames(model$fixed$d)
-      ret = cbind(ret, t(covariates))
+    ddims = model.dims[["d"]]
+    if(ddims[3]!=1){
+    covariates = f[["d"]]
+    dims(covariates)=ddims[c(1,3)]
+    rownames(covariates)=rownames(f[["d"]])
+    ret = cbind(ret, t(covariates))
+    }
+  }
+  if(model.form=="marxss"){
+    for(el in c("d","c")){
+    if(!all(f[[toupper(el)]]==0) | !all(f[[el]]==0)){ #there is el
+      elval = f[[el]]
+      eldims = model.dims[[el]]
+      elval = matrix(elval,eldims[1],eldims[3])
+      rownames(elval)=rownames(f[[el]])
+      ret = cbind(ret, t(elval))
+      }
     }
   }
   ret
