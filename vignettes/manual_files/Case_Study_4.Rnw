@@ -660,20 +660,18 @@ for(i in 1:dim(ts.trends)[2]) {
 
 \section{Examining model fits}
 
-<<func_get_DFA_fits, eval=TRUE, echo=FALSE>>=
-get_DFA_fits <- function(MLEobj, alpha=0.05, covariates=NULL) {
-  ## empty list for results
+Now that we have done the appropriate factor and trends rotations, we should examine some plots of model fits. To do so, we will create the function `get_DFA_fits()`, which will extract the model fits and estimated $(1 - \alpha)$\% confidence intervals. The function will also take care of the factor rotation for us. 
+
+<<Cs25_func_get_DFA_fits, eval=TRUE, echo=FALSE>>=
+get_DFA_fits <- function(MLEobj, alpha=0.05, covariates=NULL, rotate=TRUE) {
   fits <- list()
-  ## extra stuff for var() calcs
-  Ey <- MARSS:::MARSShatyt(MLEobj)
-  ## estimated Z
-  ZZ <- coef(MLEobj, type="matrix")$Z
-  ## number of obs ts
-  nn <- dim(Ey$ytT)[1]
-  ## number of time steps
-  TT <- dim(Ey$ytT)[2]
-  ## inverse of the rotation matrix
-  H_inv <- varimax(ZZ)$rotmat
+  Ey <- MARSShatyt(MLEobj) # for var() calcs
+  ZZ <- coef(MLEobj, type="matrix")$Z # estimated Z
+  nn <- nrow(ZZ) # number of obs ts
+  mm <- ncol(ZZ) # number of factors/states
+  TT <- ncol(Ey$ytT)  # number of time steps
+  H_inv <- diag(1,mm)
+  if(rotate) H_inv <- varimax(ZZ)$rotmat # inv of the rotation matrix
   ## check for covars
   if(!is.null(covariates)) {
     DD <- coef(MLEobj, type="matrix")$D
@@ -695,13 +693,13 @@ get_DFA_fits <- function(MLEobj, alpha=0.05, covariates=NULL) {
   ## upper & lower (1-alpha)% CI
   fits$up <- qnorm(1-alpha/2)*SE + fits$ex
   fits$lo <- qnorm(alpha/2)*SE + fits$ex
+  fits$VV <- VV
   return(fits)
 }
 @
 
-Now that we have done the appropriate factor and trends rotations, we should examine some plots of model fits. To do so, we can use the function `get_DFA_fits()`, which will extract the model fits and estimated $(1 - \alpha)$\% confidence intervals. The function will also take care of the factor rotation for us. 
 
-<<Cs25_get_DFA_fits, eval=TRUE>>=
+<<Cs25b_get_DFA_fits>>=
 fit.b = get_DFA_fits(the.fit)
 @
 
