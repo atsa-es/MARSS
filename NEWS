@@ -64,11 +64,12 @@ IMPROVEMENTS
 * added pchol and psolve functions to return the chol or inverse via solve when there are 0s on the diagonal
 * added information to print.marssMODEL on summary.marssMODEL.  Added silent argument to summary.marssMODEL to block printing to the console.
 * print.marssMLE(x, what="par") returned a vector of estimated values instead of the list of par.  Changed to return the list.
-* added logLik method for marssMLE objects
-* added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
 * added E[y(t), x(t+1)] to MARSShatyt output.  Needed for residuals.marssMLE().
 * added code to is.validvarcov() so that it returns an error if the user specifies a structurally illegal variance-covariance matrix.  Added info to MARSSinfo(25).
 * added a model.frame method for marssMODEL and marssMLE
+* added a broom::augment method for marssMLE
+* added logLik method for marssMLE objects
+* added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
 
 MISC
 * moved info in MARSSsettings.R to .onLoad function.
@@ -78,7 +79,7 @@ MISC
 * Small change to DLM chapter to clarify that rotation matrix only exists if Z has more than 2 columns.
 * All subfunctions for a function moved into the main functions so they are hidden to the rest of the functions.
 * The logLik function was using the logLik, samp.size and df attributes from the MLE object, but this is prone to creating errors.  The user may have changed the model structure or data in a MLE object and is trying to get the new logLik.  Changed to recompute the logLik.
-* removed use of stringr package; only needed 1 or 2 functions
+* removed use of stringr package; did not need
 * Poor name choice. y.se was not the standardard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
 
 
