@@ -334,10 +334,11 @@ parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L")
   #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
   #f=MLEobj$marss$fixed
   model=MLEobj[[model.loc]]
-  pars=MLEobj[["par"]]
+  if(model.loc=="marss") pars=MLEobj[["par"]]
+  if(model.loc=="model") pars=coef(MLEobj)
   f=model[["fixed"]]
   d=model[["free"]]
-  if(!all(elem %in% names(f))) stop("parmat: one of the elem not one of the model parameter names.")
+  if(!all(elem %in% names(pars))) stop("parmat: one of the elem is not one of the model parameter names.")
   par.mat=list()
   if(is.null(dims)) dims = attr(model, "model.dims")
   if(!is.list(dims) & length(elem)!=1) stop("parmat: dims needs to be a list if more than one elem passed in")
