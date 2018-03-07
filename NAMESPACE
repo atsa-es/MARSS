@@ -30,13 +30,15 @@ import(graphics)
 
 ## register S3 methods
 S3method(print, marssMODEL)
+S3method(print, marssMLE)
 S3method(logLik, marssMLE)
 S3method(fitted, marssMLE)
 S3method(summary, marssMODEL)
-S3method(print, marssMLE)
 S3method(summary, marssMLE)
 S3method(coef, marssMLE)
 S3method(residuals, marssMLE)
+S3method(model.frame, marssMODEL)
+S3method(model.frame, marssMLE)
 
 ## Imports; I am only using these functions from these packages
 importFrom(mvtnorm, rmvnorm)
