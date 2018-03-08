@@ -26,10 +26,11 @@ A list with the following components
 }
 \details{
 
-This function returns the conditional expected value (mean) and variance of the model and state residuals.  'conditional' means in this context, conditioned on the observed data and a set of parameters.
+This function returns the conditional expected value (mean) and variance of the model and state residuals.  'conditional' means in this context, conditioned on the observed data and a set of parameters.  If there are no missing values in the data, E(Y|y)=y, and the model residual is the difference between y and the model prediction.  If the data are missing, then the model residual is 0 because E(Y)=model prediction and the difference between these is 0.  The variance however is non-zero.
 
-If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report Holmes (2014).  The difference in the algorithm only concerns the missing values.
+If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report Holmes (2014).  The difference in the algorithm only concerns model residuals and their variance for missing values.  The residual variance for missing data is not normally used but is needed for leave-one-out analyses when a non-missing y(t) is removed and then its residual is compared the model residual variance at time t.
 
+The residuals matrix (and se and variance) has a value for each time step.  The residuals in column t is the residual associated with the data at time t and the process (x) transition from x(t) to x(t+1). In the MARSS package, the process equation is written \eqn{x(t)=f(x(t-1))+w(t)}, and the residual in column t is then {v(t) w(t+1)}.  In many other texts, the process equation is written is written \eqn{x(t)=f(x(t-1))+w(t-1)} and the residual in column t is denoted {v(t) w(t)}.  Regardless, the meaning is the same; the state residual in column t is associated with the transition from x(t) to x(t+1) not the transition from x(t-1) to x(t).
 
 \strong{model.residuals}
 
@@ -79,7 +80,7 @@ statestm1 = MLEobj$states[,1:(TT-1)]
 res1 = statest - B \%*\% statestm1 - U \%*\% matrix(1,1,TT-1)
 res2 = residuals(MLEobj)$state.residuals
 }
-The state residuals always exist since the expected value of the states exist without data and will be identical with \code{Harvey=TRUE} or \code{Harvey=FALSE}.  Generally speaking, \eqn{E(W_t|y_1^T)} is not 0 even if there are missing data.
+The state residuals always exist since the expected value of the states exist without data and will be identical with \code{Harvey=TRUE} or \code{Harvey=FALSE}.  Generally speaking, \eqn{E(W_t|y_1^T)} is not 0 even if there are missing data.  Note that the state residual at the last time step (T) will be NA because it is the residual associated with x(T) to x(T+1) and T+1 is beyond the data.  Similarly, the variance matrix at the last time step will have NAs for the same reason.
 
 \strong{standardized residuals}
 
