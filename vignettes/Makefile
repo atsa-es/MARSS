@@ -67,6 +67,9 @@ pdf:
 	pdflatex Quick_Start.tex
 	pdflatex Residuals.tex
 	pdflatex Manual.tex
+	pdflatex EMDerivation.tex
+	pdflatex Quick_Start.tex
+	pdflatex Residuals.tex
 	pdflatex Manual.tex
 	makeindex Manual
 	pdflatex Manual.tex
