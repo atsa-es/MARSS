@@ -182,34 +182,3 @@ MARSSinits_dfa = function(MLEobj, inits){ return(MARSSinits_marxss(MLEobj, inits
 predict_dfa = function(x, newdata, n.ahead, t.start){ predict_marxss(x, newdata, n.ahead, t.start) }
 describe_dfa = function(MODELobj){ describe_marss(MODELobj) }
 is.marssMODEL_dfa = function(MODELobj, method="kem"){ is.marssMODEL_marxss(MODELobj, method=method) }
-augment_dfa = function(x, type.predict, interval, conf.level, extra){
-  if(is.null(extra[["rotate"]])){ rotate=FALSE }else{ rotate=extra[["rotate"]] }
-  
-  ret = augment_marxss(x, type.predict=type.predict, interval=interval, conf.level=conf.level)
-  
-  if(type.predict=="states")
-    stop("Augment does not return the estimated states (loadings).  See ?augment.marssMLE . Use tidy().\n")
-  
-  if(rotate){
-    coefs = coef(MLEobj, type="matrix")
-    ZZ = coefs[["Z"]]
-    DD = coefs[["DD"]]
-    dd = coefs[["dd"]]
-    AA = coefs[["A"]]
-    H_inv <- varimax(ZZ)[["rotmat"]] # inv of the rotation matrix
-    ## check for covars
-    if(!is.null(covariates)) {
-      DD = coef(MLEobj, type="matrix")$D
-      cov_eff = DD %*% covariates
-    } else {
-      cov_eff = matrix(0, nn, TT)
-    }
-    ret$.fitted = ZZ %*% H_inv %*% MLEobj$states + DD %*% dd + AA
-    if(interval=="confidence"){
-      alpha = 1-conf.level
-      ret$.conf.low = qnorm(alpha/2)*ret$.se.fit + ret$.fitted
-      ret$.conf.up = qnorm(1-alpha/2)*ret$.se.fit + ret$.fitted
-    }
-  }
-  ret
-}
