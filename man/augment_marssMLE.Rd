@@ -1,9 +1,13 @@
 \name{augment.marssMLE}
 \alias{augment.marssMLE}
+\alias{augment_dfa}
+\alias{augment_marss}
+\alias{augmentmarxss}
 \title{Return the model predicted values, residuals, and optionally confidence intervals}
 \usage{
   augment.marssMLE(x, type.predict = c("observations", "states"),
-                  interval = c("none", "confidence"), conf.level = 0.95, ...)
+                              interval = c("none", "confidence"), 
+                              conf.level = 0.95, form=attr(x[["model"]], "form"), ...)
 }
 \arguments{
   \item{x}{a marssMLE object}
@@ -12,8 +16,10 @@
   
   \item{interval}{Type of interval: none or confidence interval.  If the latter, approximate intervals from the standard errors of the fitted values is given.}
   
-  \item{level}{Confidence level.}
+  \item{conf.level}{Confidence level.}
   
+  \item{form}{If you want the augment function to use a different augment function than augment.form.  This might be useful if you manually specified a DFA model and want to use augment.dfa for rotating.}
+
   \item{...}{extra arguments (not used)}
 }
 \description{
