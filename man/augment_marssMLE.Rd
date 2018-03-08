@@ -3,7 +3,7 @@
 \title{Return the model predicted values, residuals, and optionally confidence intervals}
 \usage{
   augment.marssMLE(x, type.predict = c("observations", "states"),
-                  interval = c("none", "confidence"), level = 0.95, ...)
+                  interval = c("none", "confidence"), conf.level = 0.95, ...)
 }
 \arguments{
   \item{x}{a marssMLE object}
@@ -25,7 +25,7 @@ See \code{\link{residuals.marssMLE}} for a discussion of the residuals calculati
 
 \strong{type.predict observations}
 
-This returns a familiar model predicted value of the response (y) and the difference between the model prection and the actual data y(t) is the residual.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the user guide.
+This returns a familiar model predicted value of the response (y) and the difference between the model prediction and the actual data y(t) is the residual.  If there is no data point, then the residual is NA.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the user guide.
 
 In the literature on state-space models, it is very common to use the one-step ahead predicted values of the data.  The fitted values returned by augment are NOT the one-step ahead values and the residuals are not the one-step ahead residuals (called Innovations in the state-space literature).  If you want the one-step ahead fitted values, you can use \code{fitted(x, one.step.ahead=TRUE)}.  The innovations are returned by \code{\link{MARSSkf}}.
 
