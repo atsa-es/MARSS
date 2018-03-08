@@ -212,7 +212,7 @@ Equation \ref{eqn:varvtcondy} can then be written as
 \end{equation}
 $\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package.
 
-$\hatVt$, $\hatUt$ and $\hatSt$ do not depend on the actual values of $\yy$ merely that there is some $\yy$.  They depend instead on the parameters values, $\QQ$, $\BB$, $\RR$, etc., in the MARSS equation. Thus $\E_Y[\var[\VV_t|\yy^{(1)}]] = \var[\VV_t|\yy^{(1)}]$ and 
+$\hatVt$, $\hatUt$ and $\hatSt$ do not depend on the actual values of $\yy$; the conditional is merely indicating that we are concerned with the variances of the conditional values.  They depend instead on the parameters values, $\QQ$, $\BB$, $\RR$, etc., in the MARSS equation. Thus $\E_Y[\var[\VV_t|\yy^{(1)}]] = \var[\VV_t|\yy^{(1)}]$ and 
 \begin{equation}\label{eqn:conditionalvtfinal}
 \var[\hat{\VV}_t]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
 \end{equation}
@@ -231,7 +231,7 @@ $\hatUt$ is not a function of $\yy$ is is only a function of the MARSS parameter
 &= \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
 \end{split}
 \end{equation}
-This will reduce to $\RR_t - \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ has no missing values and to $\RR_t + \ZZ_t \hatVt \ZZ_t^\top$ is $\yy_t$ is all missing values.
+This will reduce to $\RR_t - \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ has no missing values and to $\RR_t + \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ is all missing values.
 
 \subsection{State residuals conditioned on the data}
 The state residuals are $\xx_t - (\BB_t \xx_{t-1} + \uu_t)=\ww_t$.  The unconditional expected value of the state residuals is $\E(\XX_t - (\BB_t \XX_{t-1} + \uu_t)) = \E(\WW_t) = 0$ and the unconditional variance of the state residuals is
