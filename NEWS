@@ -67,7 +67,7 @@ IMPROVEMENTS
 * added E[y(t), x(t+1)] to MARSShatyt output.  Needed for residuals.marssMLE().
 * added code to is.validvarcov() so that it returns an error if the user specifies a structurally illegal variance-covariance matrix.  Added info to MARSSinfo(25).
 * added a model.frame method for marssMODEL and marssMLE
-* added a broom::augment method for marssMLE
+* added a broom::augment and broom::tidy method for marssMLE
 * added logLik method for marssMLE objects
 * added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
 
