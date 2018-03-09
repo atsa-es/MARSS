@@ -32,10 +32,13 @@
 
   eli(dot)holmes(at)noaa(dot)gov
 }
+\seealso{
+\code{\link{augment.marssMLE}} \code{\link{tidy.marssMLE}} \code{\link{print.marssMLE}} 
+}
 \examples{ 
-  dat = t(harborSeal)
-  dat = dat[c(2,11),]
-  MLEobj = MARSS(dat)
+  dat <- t(harborSeal)
+  dat <- dat[c(2,11),]
+  MLEobj <- MARSS(dat)
   
   coef(MLEobj)
   coef(MLEobj,type="vector")
