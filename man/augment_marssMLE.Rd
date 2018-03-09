@@ -50,7 +50,7 @@ The states are estimated.  If you want the expected value of the states and an e
   MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
 
 library(broom)
-library("ggplot2")
+library(ggplot2)
 theme_set(theme_bw())
 
 # Make a plot of the observations and model fits
