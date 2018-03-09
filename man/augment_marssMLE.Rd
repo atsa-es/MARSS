@@ -28,6 +28,7 @@ Return a data.frame with the observations or states fitted values, residuals, an
 \details{
 
 See \code{\link{residuals.marssMLE}} for a discussion of the residuals calculations for MARSS models.
+The reported CIs are the approximate CIs computed using the standard deviations: \code{qnorm(alpha/2)*se.fit + fitted}.
 
 \strong{type.predict observations}
 
@@ -40,5 +41,34 @@ In the literature on state-space models, it is very common to use the one-step a
 The states are estimated.  If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{augment} is not what you want to use.  You want to use \code{tidy} to return the estimate of the state.
 
 \code{augment(MLEobj, type.predict="states")} returns a model prediction of \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)}.  The residuals returned are for w(t), the difference between \eqn{\hat{x}(t)} and the prediction of \eqn{\hat{x}(t)}.  These types of residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{residuals.marssMLE}} and read the references cited.
+
+}
+
+\examples{
+  dat <- t(harborSeal)
+  dat <- dat[c(2,11,12),]
+  MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
+
+library(broom)
+library("ggplot2")
+theme_set(theme_bw())
+
+# Make a plot of the observations and model fits
+d <- augment(MLEobj, interval="confidence")
+ggplot(data = d) + 
+  geom_line(aes(t, .fitted)) +
+  geom_point(aes(t, y)) +
+  geom_ribbon(aes(x=t, ymin=.conf.low, ymax=.conf.up), linetype=2, alpha=0.1) +
+  facet_grid(~.rownames) +
+  xlab("Time Step") + ylab("Count")
+
+# Make a plot of the estimated states
+# Don't use augment.  States are not data.
+d <- tidy(MLEobj, type="states")
+ggplot(data = d) + 
+  geom_line(aes(t, estimate)) +
+  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.1) +
+  facet_grid(~term) +
+  xlab("Time Step") + ylab("Count")
 
 }
