@@ -49,7 +49,7 @@ If there are no missing data, this becomes
 MLEobj = MARSS(dat)
 Z = coef(MLEobj, type="matrix")$Z
 A = coef(MLEobj, type="matrix")$A
-res1 = dat - Z %*% MLEobj$states - A %*% matrix(1,1,ncol(dat))
+res1 = dat - Z \%*\% MLEobj$states - A \%*\% matrix(1,1,ncol(dat))
 res2 = residuals(MLEobj)$model.residuals
 }
 The model.residuals for the missing data is 0 (in res2) because that is the expected value of \eqn{V_t} when data are missing.
@@ -109,18 +109,18 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 } 
 \seealso{ \code{\link{MARSSkem}} \code{\link{marssMLE}} }
 \examples{
-  dat = t(harborSeal)
-  dat = dat[c(2,11),]
-  MLEobj = MARSS(dat)
+  dat <- t(harborSeal)
+  dat <- dat[c(2,11),]
+  MLEobj <- MARSS(dat)
   
   #state residuals
-  state.resids1=residuals(MLEobj)$state.residuals
+  state.resids1 <- residuals(MLEobj)$state.residuals
   #this is the same as
-  states=MLEobj$states
+  states <- MLEobj$states
   Q=coef(MLEobj,type="matrix")$Q
-  state.resids2=states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
+  state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
   #standardize to variance of 1
-  state.resids2=(solve(t(chol(Q))) \%*\% state.resids2)
+  state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   #compare the two
   cbind(t(state.resids1[,-30]),t(state.resids2))
 

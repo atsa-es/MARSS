@@ -21,9 +21,9 @@ MARSSharveyobsFI( MLEobj )
 } 
 \seealso{ \code{\link{MARSShessian}} \code{\link{MARSSparamCIs}} }
 \examples{
-  dat = t(harborSeal)
-  dat = dat[c(2,11),]
-  MLEobj = MARSS(dat)
+  dat <- t(harborSeal)
+  dat <- dat[c(2,11),]
+  MLEobj <- MARSS(dat)
   MARSS:::MARSSharveyobsFI(MLEobj)
 }
 \references{ 

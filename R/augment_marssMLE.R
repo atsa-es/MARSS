@@ -11,14 +11,14 @@ augment.marssMLE <- function (x, type.predict = c("observations", "states"),
     args=list(...)
     if(!all(names(args)%in%c("rotate"))) stop("Unknown extra argument. See ?augment.marssMLE for allowed arguments.\n")
   }
-
+  
   type.predict = match.arg(type.predict)
   interval = match.arg(interval)
   
   augment.fun = paste("augment_", form[1], sep="")
   tmp=try(exists(augment.fun, mode="function"),silent=TRUE)
   if(isTRUE(tmp)){
-    ret=eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level, extra=args))
+    ret=eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level, extra=list(...)))
   }else{ 
     ret=c(msg, paste("No augment_", form[1], " is available.\n", sep=""))
   }
@@ -86,7 +86,7 @@ augment_marxss <- function (x, type.predict, interval, conf.level, extra) {
 }
 
 augment_dfa = function(x, type.predict, interval, conf.level, extra){
-  if(is.null(extra[["rotate"]])){ rotate=FALSE }else{ rotate=extra[["rotate"]] }
+  if(length(extra)==0){ rotate=FALSE }else{ rotate=extra[["rotate"]] }
   
   ret = augment_marxss(x, type.predict=type.predict, interval=interval, conf.level=conf.level)
   
@@ -94,20 +94,21 @@ augment_dfa = function(x, type.predict, interval, conf.level, extra){
     stop("Augment does not return the estimated states (loadings).  See ?augment.marssMLE . Use tidy().\n")
   
   if(rotate){
-    coefs = coef(MLEobj, type="matrix")
+    TT = dim(x[["states"]])[2]
+    coefs = coef(x, type="matrix")
     ZZ = coefs[["Z"]]
-    DD = coefs[["DD"]]
-    dd = coefs[["dd"]]
-    AA = coefs[["A"]]
-    H_inv <- varimax(ZZ)[["rotmat"]] # inv of the rotation matrix
-    ## check for covars
-    if(!is.null(covariates)) {
-      DD = coef(MLEobj, type="matrix")$D
-      cov_eff = DD %*% covariates
-    } else {
-      cov_eff = matrix(0, nn, TT)
+    DD = coefs[["D"]]
+    dd = coefs[["d"]]
+    AA = coefs[["A"]] %*% matrix(1,1,TT)
+    mm = dim(ZZ)[2]
+    if(dim(dd)[2]==1) dd = dd %*% matrix(1,1,TT)
+    if(mm==1){ 
+      ret$.fitted = vec(t(ZZ %*% x[["states"]] + DD %*% dd + AA))
+    }else{
+      H_inv <- varimax(ZZ)[["rotmat"]] # inv of the rotation matrix
+      ret$.fitted = vec(t(ZZ %*% H_inv %*% x[["states"]] + DD %*% dd + AA))
     }
-    ret$.fitted = ZZ %*% H_inv %*% MLEobj$states + DD %*% dd + AA
+    
     if(interval=="confidence"){
       alpha = 1-conf.level
       ret$.conf.low = qnorm(alpha/2)*ret$.se.fit + ret$.fitted

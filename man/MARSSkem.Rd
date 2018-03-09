@@ -90,10 +90,10 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]\code{RS
   \code{\link{MARSSkf}}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}}
   }  
 \examples{
-  dat = t(harborSeal)
-  dat = dat[2:4,] 
+  dat <- t(harborSeal)
+  dat <- dat[2:4,] 
   #you can use MARSS to construct a proper marssMLE object.
-  MLEobj = MARSS(dat, model=list(Q="diagonal and equal", U="equal"), fit=FALSE) 
+  MLEobj <- MARSS(dat, model=list(Q="diagonal and equal", U="equal"), fit=FALSE) 
   #Pass this MLEobj to MARSSkem to do the fit.
-  kemfit = MARSSkem(MLEobj)
+  kemfit <- MARSSkem(MLEobj)
 }

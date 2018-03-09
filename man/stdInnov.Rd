@@ -30,7 +30,7 @@ Stoffer, D. S., and K. D. Wall. 1991. Bootstrapping state-space models: Gaussian
 }
 \examples{
   \dontrun{
-  std.innovations = stdInnov(kfList$Sigma, kfList$Innov)
+  std.innovations <- stdInnov(kfList$Sigma, kfList$Innov)
   }
 }
 

@@ -60,19 +60,19 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
 \examples{
   #nboot is set low in these examples in order to run quickly
   #normally nboot would be >1000 at least
-  dat = t(kestrel)
-  dat = dat[2:4,]
+  dat <- t(kestrel)
+  dat <- dat[2:4,]
   #maxit set low to speed up the example
-  kem = MARSS(dat, model=list(U="equal",Q=diag(.01,3)), 
+  kem <- MARSS(dat, model=list(U="equal",Q=diag(.01,3)), 
      control=list(maxit=50))
-  hess.list = MARSSboot(kem, param.gen="hessian", nboot=5)
+  hess.list <- MARSSboot(kem, param.gen="hessian", nboot=5)
   # (no missing values allowed)
-  boot.list = MARSSboot(kem, output="all", sim="innovations", nboot=5)
+  boot.list <- MARSSboot(kem, output="all", sim="innovations", nboot=5)
 
   # Parametric bootstrap CIs for data with missing values
-  dat = t(harborSealWA)
-  dat = dat[2:4,]
-  kem = MARSS(dat, model=list(Q=diag(.01,3)), 
+  dat <- t(harborSealWA)
+  dat <- dat[2:4,]
+  kem <- MARSS(dat, model=list(Q=diag(.01,3)), 
      control=list(maxit=50))
-  boot.list = MARSSboot(kem, output="all", sim="parametric", nboot=5)
+  boot.list <- MARSSboot(kem, output="all", sim="parametric", nboot=5)
 }

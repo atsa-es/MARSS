@@ -37,11 +37,11 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 \seealso{ \code{\link{MARSSboot}} \code{\link{MARSSinnovationsboot}} \code{\link{MARSShessian}}
  }
 \examples{
-  dat = t(harborSealWA)
-  dat = dat[2:4,]
-  kem = MARSS(dat, model=list(Z=matrix(1,3,1), 
+  dat <- t(harborSealWA)
+  dat <- dat[2:4,]
+  kem <- MARSS(dat, model=list(Z=matrix(1,3,1), 
      R="diagonal and unequal"))
-  kem.with.CIs.from.hessian = MARSSparamCIs(kem)
+  kem.with.CIs.from.hessian <- MARSSparamCIs(kem)
   kem.with.CIs.from.hessian
 }
 

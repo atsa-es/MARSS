@@ -45,9 +45,9 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
 }
 \seealso{ \code{\link{MARSSboot}} }
 \examples{
-  dat = t(harborSealWA)
-  dat = dat[2:3,]
-  kem = MARSS(dat, model=list(Z=matrix(1,2,1), 
+  dat <- t(harborSealWA)
+  dat <- dat[2:3,]
+  kem <- MARSS(dat, model=list(Z=matrix(1,2,1), 
     R="diagonal and equal"))
   kemAIC = MARSSaic(kem, output=c("AIC","AICc"))
 }

@@ -11,6 +11,8 @@ coef.marssMLE <- function (object, ..., type="list", form=NULL, what="par") {
   }
   if(!(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start")))
     stop("Stopped in coef.marssMLE(): The 'what' argument must be \"par\", \"par.se\", \"par.bias\", \"par.lowCI\", \"par.upCI\", or \"start\".\n", call.=FALSE)
+  if((what %in% c("par.se", "par.bias", "par.lowCI", "par.upCI"))&!(what%in%names(object)))
+    stop("Stopped in coef.marssMLE(): The par.se and CIs have not been added to your marssMLE object. Run MARSSparamsCIs() to add.\n", call.=FALSE)
   
   #for now coef only has function specific to the marssMODEL forms
   if(missing(form)) form=attr(object[["model"]],"form")
