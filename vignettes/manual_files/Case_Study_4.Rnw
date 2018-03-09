@@ -730,7 +730,24 @@ for(i in 1:N.ts) {
 \label{fig:CS4.bestfits}
 \end{figure}
 
-\pagebreak
+Alternatively, you can use the \verb@augment@ function to obtain a summary of the estimates and use \verb@ggplot@ to plot:
+<<Cs25.2_plotwithaugment, fig=TRUE, height=6, width=6, results=hide>>=
+library(broom)
+library(ggplot2)
+theme_set(theme_bw()) 
+d <- augment(the.fit, interval="confidence", rotate=TRUE)
+ggplot(data = d) + 
+  geom_line(aes(t, .fitted)) +
+  geom_point(aes(t, y)) +
+  geom_ribbon(aes(x=t, ymin=.conf.low, ymax=.conf.up), linetype=2, alpha=0.2) +
+  facet_grid(~.rownames) +
+  xlab("Time Step") + ylab("Count")
+@
+\end{center}
+\caption{Plot of the 2-state model fits to the phytoplankton data using ggplot.}
+\label{fig:CS4.bestfits.augment}
+\end{figure}
+
 \section{Adding covariates}
 It is standard to add covariates to the analysis so that one removes known important drivers. The DFA with covariates is written:
 \begin{equation}
