@@ -328,17 +328,18 @@ unvec = function(x,dim=NULL){
   return(matrix(x,dim[1],dim[2]))
 }
 
+# model.loc tells parmat which model the pars element is matched to.
+# normally this is $marss.  but for coef() the MLEobj is modified so the pars matches $model
 parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
   #returns a list where each el in elem is an element.  Returns a 2D matrix.
   #needs MLEobj$marss and MLEobj$par
   #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
   #f=MLEobj$marss$fixed
   model=MLEobj[[model.loc]]
-  if(model.loc=="marss") pars=MLEobj[["par"]]
-  if(model.loc=="model") pars=coef(MLEobj)
+  pars=MLEobj[["par"]]
   f=model[["fixed"]]
   d=model[["free"]]
-  if(!all(elem %in% names(pars))) stop("parmat: one of the elem is not one of the model parameter names.")
+  if(!all(elem %in% names(f))) stop("parmat: one of the elem is not one of the marss parameter names.")
   par.mat=list()
   if(is.null(dims)) dims = attr(model, "model.dims")
   if(!is.list(dims) & length(elem)!=1) stop("parmat: dims needs to be a list if more than one elem passed in")
