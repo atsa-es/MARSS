@@ -24,7 +24,7 @@
 \description{
   This returns a data.frame with the estimated parameters (or states) of a MARSS model with optionally standard errors and confidence intervals. This assembles information available via the print and coef functions into a data.frame that summarizes the estimates.
   
-  For parameters, \code{\link{MARSSparamsCIs}} is run to add confidence intervals to the fitted model if these are not already added.  For states, the approximate CIs using the standard deviation of the states is used to compute the confidence intervals (\code{qnorm(alpha/2)*se.fit + fitted}).
+  For parameters, \code{\link{MARSSparamCIs}} is run to add confidence intervals to the fitted model if these are not already added.  For states, the approximate CIs using the standard deviation of the states is used to compute the confidence intervals (\code{qnorm(alpha/2)*se.fit + fitted}).
   
   The tidy function is compatible with the \code{broom} package.
 }
