@@ -6,6 +6,7 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave EMDerivation.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave Quick_Start.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave UserGuide.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave Residuals.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Quick_Examples.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_1.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Case_Study_2.Rnw
@@ -23,9 +24,6 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Manual.Rnw
 	 
 stangle: 
-	Rscript -e "Stangle('EMDerivation.Rnw')"
-	Rscript -e "Stangle('Quick_Start.Rnw')"
-	Rscript -e "Stangle('UserGuide.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_1.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_2.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_3.Rnw')"
@@ -80,15 +78,17 @@ clean:
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
 	$(RM) *.R
-	$(RM) ../README.md ../_config.yml
+	$(RM) ../README.md ../_config.yml ../favicon.ico
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
 	$(RM) ./tex/*.*
 	$(RM) ./figures/*.*
 	$(RM) ./manual_files/*.*
+	$(RM) ./_layouts/*.*
 	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
 	rm -rf ./tables
+	rm -rf ./_layouts
 	$(RM) ../R/toLatex_marssMODEL.R ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
 	
