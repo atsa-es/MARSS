@@ -10,6 +10,7 @@ library(here)
     "EMDerivation.Rnw",
     "Quick_Start.Rnw",
     "UserGuide.Rnw",
+    "Residuals.Rnw",
     "./manual_files/Quick_Examples.Rnw",
     "./manual_files/Case_Study_1.Rnw",
     "./manual_files/Case_Study_2.Rnw",
@@ -27,7 +28,7 @@ library(here)
     "./manual_files/Manual.Rnw")
     
   #Sweave and Stangle
-  for(fil in fils[11]){
+  for(fil in fils){
     Sweave(here("vignettes", fil))
     Stangle(here("vignettes", fil))
     created.objs = ls(); created.objs=created.objs[created.objs!="fils"]
@@ -50,7 +51,7 @@ library(here)
   shell("cat ./figures/ARMAp--Cs_*.R > ../inst/doc/Chapter_MARp.R")
 
 #make pdfs
-  texfils = c("EMDerivation","Quick_Start","UserGuide","Manual")
+  texfils = c("EMDerivation","Quick_Start","UserGuide","Residuals","Manual")
   for(fil in texfils){
     system(paste0("pdflatex ", fil, ".tex"))
     system(paste0("bibtex ", fil))
