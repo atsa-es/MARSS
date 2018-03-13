@@ -706,7 +706,7 @@ First, it looks like this model captures some of the high frequency variation (i
 
 \begin{figure}[htp]
 \begin{center}
-<<Cs25a_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
+<<Cs25c_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
 # plot the fits
 ylbl = rownames(dat.z)
 w_ts = seq(dim(dat.z)[2])
@@ -730,7 +730,10 @@ for(i in 1:N.ts) {
 \end{figure}
 
 Alternatively, you can use the \verb@augment()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot:
-<<Cs25b_plotwithaugment, fig=TRUE, height=6, width=6, results=hide>>=
+
+\begin{figure}[htp]
+\begin{center}
+<<Cs25d_plotwithaugment, fig=TRUE, height=6, width=6, results=hide>>=
 library(broom)
 library(ggplot2)
 theme_set(theme_bw()) 
