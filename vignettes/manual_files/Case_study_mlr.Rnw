@@ -81,16 +81,16 @@ We need to specify the parameters in Equation \ref{eqn:mlm.marss} such that we g
 \ref{eqn:longley1} 
 
 First, we load the data and set up $y$, the response variable number of people employed, as a matrix with time going across the columns.
-<<Cs_002_example1.data>>=
+<<Cs_002_example1-data>>=
 data(longley)
 Employed = matrix(longley$Employed, nrow=1)
 @
 Second create a list to hold our model specification.
-<<Cs_003_example1.params>>=
+<<Cs_003_example1-params>>=
 longley.model=list()
 @
 Set the $\uu$, $\QQ$ and $\xx_0$ parameters to 0.  We will also set $\aa$ and $\CC$ to 0 and $\BB$ and $\ZZ$ to identity although this is not necessary since these are the defaults.
-<<Cs_004_example1.params1>>=
+<<Cs_004_example1-params1>>=
 longley.model$U=longley.model$Q="zero"
 longley.model$C="zero"
 longley.model$B=longley.model$Z="identity"
@@ -98,31 +98,31 @@ longley.model$x0="zero"
 longley.model$tinitx=0
 @
 We will estimate $\RR$, the variance of the i.i.d. errors (residuals).
-<<Cs_005_example1.paramsR>>=
+<<Cs_005_example1-paramsR>>=
 longley.model$R=matrix("r")
 @
 The $\DD$ matrix has the two $\beta$ (slope) parameters for GNP and Population and $a$ has the intercept.\footnote{A better way to fit the model is to put the intercept into $\DD$ by adding a row of 1s to $\dd$ and putting the intercept parameter on the first row of $\DD$.  This reduces by one the number of matrices being estimated by the EM algorithm. It's not done here just so the equations look more like standard linear regression equations.}
-<<Cs_006_example1.paramsD>>=
+<<Cs_006_example1-paramsD>>=
 longley.model$A=matrix("intercept")
 longley.model$D=matrix(c("GNP","Pop"),nrow=1)
 @
 Last we set up our explanatory variables.  This is the $\dd$ matrix and we need each explanatory variable in a row and time across the columns.
-<<Cs_007_example1.eVar>>=
+<<Cs_007_example1-eVar>>=
 longley.model$d = rbind(longley$GNP, longley$Population)
 @
 
 Now we can fit the model:
-<<Cs_008_example1.marss, results=hide>>=
+<<Cs_008_example1-marss, results=hide>>=
 mod1=MARSS(Employed, model=longley.model)
 @
 and look at the estimates.
-<<Cs_009_example1.marss, results=hide>>=
+<<Cs_009_example1-marss, results=hide>>=
 coef(mod1, type="vector")
 @
 \verb@method="BFGS"@ can also be used and gives similar results.
 
 We can compare the fit to that from lm() and see that we get the same estimates:
-<<Cs_010_example1.lm>>=
+<<Cs_010_example1-lm>>=
 mod1.lm=lm(Employed ~ GNP + Population, data=longley)
 coef(mod1.lm)
 @
@@ -140,19 +140,19 @@ x_t = b x_{t-1}+w_t, w_t \sim \N(0,q)\\
 We assume the AR(1) errors have mean 0 so $u=0$ in the $x_t$ equation.  Setting $u$ to anything else would make the mean of our errors equal to $u/(1-b)$ for $-1<b<1$. This would lead to two mean levels in our model, $\alpha$ and $u/(1-b)$, and we would not be able to estimate both.  Notice that the model is somewhat confounded since if $b=0$ then $x_t$ is i.i.d. errors same as $v_t$.  In this case, either  $q$ or $r$ would be redundant.  It is thus possible that either $r$ or $q$ will go to zero.
 
 To fit the model with autoregressive errors, we add the $x$ parameters to our the model list.  We estimate $b$ and $q$.
-<<Cs_011_example2.params>>=
+<<Cs_011_example2-params>>=
 longley.ar1=longley.model
 longley.ar1$B=matrix("b")
 longley.ar1$Q=matrix("q")
 @
 
 Now we can fit the model as before
-<<Cs_012_example2.marss, results=hide>>=
+<<Cs_012_example2-marss, results=hide>>=
 mod2=MARSS(Employed, model=longley.ar1)
 @
 however, this is a difficult model to fit and takes a long, long time to converge.  The default \verb@maxit@ used in the call above is not nearly enough iterations. Using \verb@method="BFGS"@ helps a little but not much.  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.\index{troubleshooting!non-convergence}
 
-<<Cs_013_example2.marss.with.inits, results=hide>>=
+<<Cs_013_example2-marss-with-inits, results=hide>>=
 inits=list(A=coef(mod1)$A, D=coef(mod1)$D)
 mod2=MARSS(Employed, model=longley.ar1, inits=inits, 
            control=list(maxit=1000))
@@ -163,7 +163,7 @@ ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A,
 \index{functions!logLik}
 
 We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.\index{functions!gls}
-<<Cs_014_example2_gls>>=
+<<Cs_014_example2-gls>>=
 library(nlme)
 mod2.gls=gls(Employed ~ GNP + Population, 
         correlation=corAR1(), data=longley, method="ML")
@@ -194,7 +194,7 @@ pairs(longley)
 \end{figure}
 
 We can fit a regression of Employed to all the Longley explanatory variables using the following code.  The mathematical model is the same as in Equation \ref{eqn:longley1} except that instead of two explanatory variables with have all seven shown in Figure \ref{fig:longley.fig2}.
-<<Cs_016_full.model.list>>=
+<<Cs_016_full-model-list>>=
 eVar.names = colnames(longley)[-7]
 eVar = t(longley[,eVar.names])
 longley.model=list()
@@ -210,21 +210,21 @@ longley.model$tinitx=0
 @
 
 And then we fit as usual.  We will fit with the EM-algorithm (the default) and compare to BFGS.
-<<Cs_017_full.model.fit, results=hide>>=
+<<Cs_017_full-model-fit, results=hide>>=
 mod3.em=MARSS(Employed, model=longley.model)
 mod3.bfgs=MARSS(Employed, model=longley.model, method="BFGS")
 @
 Here are the EM estimates with the log-likelihood.
-<<Cs_018_full.em.ests>>=
+<<Cs_018_full-em-ests>>=
 par.names = c("A.intercept", paste("D",eVar.names,sep="."))
 c(coef(mod3.em, type="vector")[par.names], logLik=mod3.em$logLik)
 @
 Compared to the BFGS estimates:
-<<Cs_019_full.bfgs.ests>>=
+<<Cs_019_full-bfgs-ests>>=
 c(coef(mod3.bfgs, type="vector")[par.names], logLik=mod3.bfgs$logLik)
 @
 And compared to the estimates from the lm() function:
-<<Cs_020_full.lm.ests>>=
+<<Cs_020_full-lm-ests>>=
 mod3.lm=lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed 
          + Armed.Forces + Population + Year, data=longley)
 c(coef(mod3.lm),logLik=logLik(mod3.lm))
@@ -232,28 +232,28 @@ c(coef(mod3.lm),logLik=logLik(mod3.lm))
 As you can see the BFGS algorithm struggles with the ridge-like likelihood caused by the collinearity in the explanatory variables.
 
 We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called Phi in \verb@gls()@) and $q$.\index{functions!gls}
-<<Cs_021_full.model.correrr>>=
+<<Cs_021_full-model-correrr>>=
 longley.correrr.model=longley.model
 longley.correrr.model$B=matrix("b")
 longley.correrr.model$Q=matrix("q")
 @
 
 We fit as usual and compare the EM-algorithm (the default) to fits using BFGS.  We will use the estimate from the model with i.i.d. errors as initial conditions.
-<<Cs_022_full.correrr.fit.hide, results=hide>>=
+<<Cs_022_full-correrr-fit-hide, results=hide>>=
 inits=list(A=coef(mod3.em)$A, D=coef(mod3.em)$D)
 mod4.em=MARSS(Employed, model=longley.correrr.model, inits=inits)
 mod4.bfgs=MARSS(Employed, model=longley.correrr.model, inits=inits, method="BFGS")
 @
 Here are the EM estimates with the log-likelihood.  We only show $\phi$ (the $b$ term in the AR(1) error equation) and the log-likelihood.
-<<Cs_023_full.correrr.em.ests>>=
+<<Cs_023_full-correrr-em-ests>>=
 c(coef(mod4.em, type="vector")["B.b"], logLik=mod4.em$logLik)
 @
 Compared to the BFGS estimates:
-<<Cs_024_full.correrr.bfgs.ests>>=
+<<Cs_024_full-correrr-bfgs-ests>>=
 c(coef(mod4.bfgs, type="vector")["B.b"], logLik=mod4.bfgs$logLik)
 @
 And compared to the estimates from the gls() function:
-<<Cs_025_full.gls.ests>>=
+<<Cs_025_full-gls-ests>>=
 mod4.gls=gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
         + Armed.Forces + Population + Year, 
         correlation=corAR1(), data=longley, method="ML")
@@ -315,7 +315,7 @@ sleep.model=list(
 sleep.mod1 = MARSS(dat, model=sleep.model)
 @
 This is the same as the following with \verb@lm()@:
-<<Cs_030_sleepmod1.lm>>=
+<<Cs_030_sleepmod1-lm>>=
 sleep.lm1 = lm(Reaction ~ -1 + Subject + Days, data=sleepstudy)
 @
 
@@ -335,7 +335,7 @@ sleep.model=list(
 sleep.mod2 = MARSS(dat, model=sleep.model, silent=TRUE)
 @
 This is the same as the following with \verb@lm()@:
-<<Cs_032_sleepmod2.lm>>=
+<<Cs_032_sleepmod2-lm>>=
 sleep.lm2 = lm(Reaction ~ 0 + Subject + Days:Subject, data = sleepstudy)
 @
 
@@ -395,7 +395,7 @@ sleep.model=list(
 sleep.mod5 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
 @
 This is fairly close to this model fit with gls().\index{functions!gls}
-<<Cs_036_mod5.gls>>=
+<<Cs_036_mod5-gls>>=
 sleep.mod5.gls=gls(Reaction ~ 0 + Subject + Days:Subject, data=sleepstudy, 
              correlation=corAR1(form=~ 1|Subject), method="ML")
 @

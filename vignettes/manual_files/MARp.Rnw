@@ -59,10 +59,10 @@ Here is an example of fitting a univariate AR(2) model written in MARSS(1) form.
 \begin{equation}
 x_t = -1.5 x_{t-1} + -0.75 x_{t-2} + w_t, \text{ where } w_t \sim \N(0,1)
 \end{equation}
-<<set.seed,echo=FALSE>>=
+<<setseed,echo=FALSE>>=
 set.seed(10)
 @
-<<Cs_01_ar2.sim>>=
+<<Cs_01_ar2-sim>>=
 TT=50
 true.2=c(r=0,b1=-1.5,b2=-0.75,q=1)
 temp=arima.sim(n=TT,list(ar=true.2[2:3]),sd=sqrt(true.2[4]))
@@ -70,7 +70,7 @@ sim.ar2=matrix(temp,nrow=1)
 @
 
 Next, we set up the model list for an AR(2) model written in MARSS(1) form (refer to Equation \ref{eq:mar2.x} and \ref{eq:mar2.y}):
-<<Cs_02_ar2.model>>=
+<<Cs_02_ar2-model>>=
 Z=matrix(c(1,0),1,2)
 B=matrix(list("b1",1,"b2",0),2,2)
 U=matrix(0,2,1)
@@ -84,21 +84,21 @@ model.list.2=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=mu,V0=V,tinitx=0)
 Notice that we do not estimate $\mumu$. We will fit our model to the data ($y$) starting at $t=3$.  Because $\RR=0$, this means $\E[\xx_t|\yy_t]=\xx_t^t=\yy_t$ and $\xx_0^0 \equiv \begin{bmatrix}y_2\\ y_1\end{bmatrix}$.  Note $\E[\xx_t|\yy_{t-1}]=\xx_t^{t-1}\neq\yy_t$ so we do not use $\xx_1^0$ as our initial $\xx$.
 
 Then we can then estimate the $b_1$ and $b_2$ parameters for the AR(2) process.
-<<Cs_03_ar2.fit>>=
+<<Cs_03_ar2-fit>>=
 ar2=MARSS(sim.ar2[3:TT],model=model.list.2)
 @
 Comparison to the true values shows the estimates are close:
-<<Cs_03a_ar2.fit>>=
+<<Cs_03a_ar2-fit>>=
 print(cbind(true=true.2[2:4],estimates=coef(ar2,type="vector")))
 @
 Missing values in the data are fine.  Let's make half the data missing being careful that the first data point does not get categorized as missing:
-<<Cs_04_ar2.gappy, results=hide>>=
+<<Cs_04_ar2-gappy, results=hide>>=
 gappy.data=sim.ar2[3:TT]
 gappy.data[floor(runif(TT/2,2,TT))]=NA
 ar2.gappy=MARSS(gappy.data,model=model.list.2)
 @
 And the estimates are still close:
-<<Cs_04a_ar2.gappy>>=
+<<Cs_04a_ar2-gappy>>=
 print(cbind(true=true.2[2:4],
    estimates.no.miss=coef(ar2,type="vector"),
    estimates.w.miss=coef(ar2.gappy,type="vector")))
@@ -132,7 +132,7 @@ print(cbind(true=true.2[2:4],
 
 \subsection{Example of MAR(2): multivariate data}
 Here we show an example of fitting a MAR(2) model.  Let's make some simulated data of two realizations of the same AR(2) process:
-<<set.seed,echo=FALSE>>=
+<<setseed2,echo=FALSE>>=
 set.seed(11)
 @
 <<Cs_060_mar2-sim>>=
@@ -140,7 +140,7 @@ TT=50
 true.2=c(r=0,b1=-1.5,b2=-0.75,q=1)
 temp1=arima.sim(n=TT,list(ar=true.2[c("b1","b2")]),sd=sqrt(true.2["q"]))
 @
-<<set.seed,echo=FALSE>>=
+<<setseed3,echo=FALSE>>=
 set.seed(13)
 @
 <<Cs_061_mar2-sim>>=
@@ -215,7 +215,7 @@ where
 \end{equation}
 
 Here's an example of fitting a univariate AR(3) in MARSS(1) form.  We need more data to estimate an AR(3), so use 100 time steps.
-<<set.seed,echo=FALSE>>=
+<<setseed4,echo=FALSE>>=
 set.seed(13)
 @
 <<Cs_11_sim-ar3-data>>=
@@ -250,7 +250,7 @@ print(cbind(true=true.3[c("b1","b2","b3","q")],
 We can easily fit MAR(p) processes observed with error using MARSS(p) models, but the difficulty is specifying the initial state condition.  $\pipi\equiv\xx_1$ and thus involves $\xx_1$, $\xx_0$, ....  However, we do not know the variance covariance structure for these consequtive $\xx$.  Specifying $\LAM=0$ and estimating $\pipi$ often causes the EM algorithm to run into numerical problems.  But if we have an abundance of data, fixing $\pipi$ might not overly affect the $\BB$ and $\QQ$ estimates.  
 
 Here is an example where we set $\pipi$ to the mean of the data and set $\LAM$ to zero. Why not set $\LAM$ equal to a diagonal matrix with large values on the diagonal to approximate a vague prior?  The temporally consecutive initial states are definitely not independent.  A diagonal matrix would imply independence which will conflict with the process model and means our model would be fundamentally inconsistent with the data (and that usually has bad consequences for estimation).
-<<set.seed,echo=FALSE>>=
+<<setseed5,echo=FALSE>>=
 set.seed(14)
 @
 

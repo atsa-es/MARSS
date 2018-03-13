@@ -79,7 +79,7 @@ where $\xx_t = \ttheta_t$, $\BB_t = \GG_t$, $\uu_t = \CC_t = \cc_t = \zer$, $\yy
 \subsection{Fitting a univariate DLM with MARSS}
 %------------------------------------------------
 Now let's go ahead and analyze the DLM specified in Equations \ref{eqn:dlmSW1}--\ref{eqn:dlmSW3}. We begin by getting the data set, which has 3 columns for 1) the year the salmon smolts migrated to the ocean ($year$), 2) logit-transformed survival\footnote{Survival in the original context was defined as the proportion of juveniles that survive to adulthood. Thus, we use the logit function, defined as $logit(p)=log_e(p/[1-p])$, to map survival from the open interval (0,1) onto the interval $(-\infty,\infty)$, which allows us to meet our assumption of normally distributed observation errors.} ($logit.s$), and 3) the coastal upwelling index for April ($CUI.apr$). There are 42 years of data (1964--2005).
-<<Cs_01_read.in.data, eval=TRUE>>=
+<<Cs_01_readindata, eval=TRUE>>=
 data(SalmonSurvCUI)
 years = SalmonSurvCUI[,1]
 TT = length(years)
@@ -88,7 +88,7 @@ dat = matrix(SalmonSurvCUI[,2],nrow=1)
 @
 
 As we have seen in other chapters, standardizing our covariate(s) to have zero-mean and unit-variance can be helpful in model fitting and interpretation. In this case, it is a good idea because the variance of $CUI.apr$ is orders of magnitude greater than $survival$.
-<<Cs_02_z.score>>=
+<<Cs_02_zscore>>=
 CUI = SalmonSurvCUI[,"CUI.apr"]
 CUI.z = zscore(CUI)
 # number of state = # of regression params (slope(s) + intercept)
@@ -111,7 +111,7 @@ mtext("Year of ocean entry", 1, line=3)
 \end{figure}
 
 Next, we need to set up the appropriate matrices and vectors for MARSS. Let's begin with those for the process equation because they are straightforward.
-<<Cs_031_univ.DLM.proc, eval=TRUE>>=
+<<Cs_031_univDLMproc, eval=TRUE>>=
 # for process eqn
 B = diag(m)                   # 2x2; Identity
 U = matrix(0,nrow=m,ncol=1)   # 2x1; both elements = 0
@@ -120,7 +120,7 @@ diag(Q) = c("q1","q2")        # 2x2; diag = (q1,q2)
 @
 
 Defining the correct form for the observation model is a little more tricky, however, because of how we model the effect(s) of explanatory variables. In a DLM, we need to use $\ZZ_t$ (instead of $\dd_t$) as the matrix of known regressors/drivers that affect $\yy_t$, and $\xx_t$ (instead of $\DD_t$) as the regression parameters. Therefore, we need to set $\ZZ_t$ equal to an $n$ $\mathsf{x}$ $m$ $\mathsf{x}$ $T$ array, where $n$ is the number of response variables (= 1; $y_t$ is univariate), $m$ is the number of regression parameters (= intercept + slope = 2), and $T$ is the length of the time series (= 42). 
-<<Cs_04_univ.DLM.obs, eval=TRUE>>=
+<<Cs_04_univDLMobs, eval=TRUE>>=
 # for observation eqn
 Z = array(NA, c(1,m,TT))   # NxMxT; empty for now
 Z[1,1,] = rep(1,TT)        # Nx1; 1's for intercept
@@ -130,14 +130,14 @@ R = matrix("r")            # 1x1; scalar = r
 @
 
 Lastly, we need to define our lists of initial starting values and model matrices/vectors. 
-<<Cs_05_univ.DLM.list, eval=TRUE>>=
+<<Cs_05_univDLM-list, eval=TRUE>>=
 # only need starting values for regr parameters
 inits.list = list(x0=matrix(c(0, 0), nrow=m))
 # list of model matrices & vectors
 mod.list = list(B=B, U=U, Q=Q, Z=Z, A=A, R=R)
 @
 And now we can fit our DLM with MARSS.
-<<Cs_06_univ.DLM.fit, eval=TRUE>>=
+<<Cs_06_univDLM-fit, eval=TRUE>>=
 dlm1 = MARSS(dat, inits=inits.list, model=mod.list)
 @
 
@@ -197,7 +197,7 @@ y_{t}|y_{1:t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
 \subsection{Forecasting a univariate DLM with MARSS}
 %----------------------------------------------
 Working from Equation \ref{eqn:dlmFore3}, we can now use MARSS to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in MARSS notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $\tilde{x}_t^{t-1}$ in MARSS notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkfss()@ function.
-<<Cs_08_univ.DLM.fore.mean, eval=TRUE>>=
+<<Cs_08_univDLM-fore-mean, eval=TRUE>>=
 # get list of Kalman filter output
 kf.out = MARSSkfss(dlm1)
 # forecasts of regr parameters; 2xT matrix
@@ -210,7 +210,7 @@ for(t in 1:TT) {
 @
 
 For the variance of the forecasts, we need $\FF_t\Phi_{t}\FF_t^{\top} + \RR$. As with the mean, $\FF_t \equiv \ZZ_t$. The variances of the one-step ahead forecasts of the parameters at time $t$ $(\Phi_t)$ are also calculated as part of the Kalman filter algorithm---they are stored as \verb@Vtt1@ in the list produced by the \verb@MARSSkfss()@ function. Lastly, the observation variance $\RR$ is part of the standard MARSS output.
-<<Cs_09_univ.DLM.fore.Var, eval=TRUE>>=
+<<Cs_09_univDLM-fore-Var, eval=TRUE>>=
 # variance of regr parameters; 1x2xT array
 Phi = kf.out$Vtt1
 # obs variance; 1x1 matrix

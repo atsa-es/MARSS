@@ -18,7 +18,7 @@ library(datasets)
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_StructuralBreaks.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<compute.for.figs, echo=FALSE, include.source=FALSE, results=hide>>=
+<<compute-for-figs, echo=FALSE, include.source=FALSE, results=hide>>=
 if(1==0){
 mod.nile.3 = list(
 Z=matrix(c(1,0),1,2), A=matrix(0), R=matrix("r"),
@@ -85,7 +85,7 @@ x_0 = a
  \label{eq:marss.model.0}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 We will use this latter format since we will be building on this form.  The model is specified as a list as follows and we denote this model ``0'':
-<<Cs02_mod.nile.0, eval=TRUE>>=
+<<Cs02_mod-nile-0, eval=TRUE>>=
 mod.nile.0 = list( 
 Z=matrix(1), A=matrix(0), R=matrix("r"),
 B=matrix(1), U=matrix(0), Q=matrix(0),
@@ -93,7 +93,7 @@ x0=matrix("a") )
 @
 
 We then fit the model with \verb@MARSS()@:
-<<Cs03_fit.data.0, eval=TRUE>>=
+<<Cs03_fit-data-0, eval=TRUE>>=
 #The data is in a ts format, and we need a matrix
 dat = t(as.matrix(Nile))
 #Now we fit the model
@@ -112,7 +112,7 @@ x_0 = a
 \label{eq:marss.model.1}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 where $u$ is now the average per-year decline in river flow volume.  The model is specified as a list as follows and we denote this model ``1":
-<<Cs04_mod.nile.1, eval=TRUE>>=
+<<Cs04_mod-nile-1, eval=TRUE>>=
 mod.nile.1 = list(
 Z=matrix(1), A=matrix(0), R=matrix("r"),
 B=matrix(1), U=matrix("u"), Q=matrix(0),
@@ -120,7 +120,7 @@ x0=matrix("a") )
 @
 
 We then fit the model with \verb@MARSS()@:
-<<Cs05_fit.data.1, eval=TRUE>>=
+<<Cs05_fit-data-1, eval=TRUE>>=
 kem.1 = MARSS(dat, model=mod.nile.1)
 @
 Figure \ref{fig:CS6.fits} shows the fits for the two models with deterministic models (flat and declining) for mean river flow along with their AICc values (smaller AICc is better).    The AICc for the model with a declining river flow is lower by over 20 (which is a lot).
@@ -148,20 +148,20 @@ x_0 = \pi
  \label{eq:marss.model.2}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 Thus, $\ZZ=1$, $\aa=0$, $\RR=r$, $\BB=1$, $\uu=0$, $\QQ=q$, and $\xx_0=\pi$.  The model is then specified as:
-<<Cs06_mod.nile.2, eval=TRUE>>=
+<<Cs06_mod-nile-2, eval=TRUE>>=
 mod.nile.2 = list(
 Z=matrix(1), A=matrix(0), R=matrix("r"),
 B=matrix(1), U=matrix(0), Q=matrix("q"),
 x0=matrix("pi") )
 @
 We could also use the text shortcuts to specify the model.  Because $\RR$ and $\QQ$ are $1 \times 1$ matrices, ``unconstrained'', ``diagonal and unequal``, ``diagonal and equal'' and ``equalvarcov'' will all lead to a $1 \times 1$ matrix with one estimated element.  For $\aa$ and $\uu$, the following shortcut could be used:
-<<mod.nile.not.used, eval=FALSE>>=
+<<mod-nile-not-used, eval=FALSE>>=
 A=U="zero"
 @
 Because $\xx_0$ is $1 \times 1$, it could be specified as ``unequal'', ``equal'' or ``unconstrained''.
 
 We fit the model with the \verb@MARSS()@ function.  We are using the ``BFGS" algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
-<<Cs07_fit.data.2, eval=TRUE>>=
+<<Cs07_fit-data-2, eval=TRUE>>=
 kem.2em = MARSS(dat, model=mod.nile.2, silent=TRUE)
 kem.2 = MARSS(dat, model=mod.nile.2,
   inits=kem.2em$par, method="BFGS")
@@ -171,7 +171,7 @@ This is the same model fit in \citet[p. 148]{Koopmanetal1998} except that we est
 \begin{comment}
 
 To fit the model as Koopman et al. did, use the following specifications:  
-<<fit.data.koop, eval=TRUE>>=
+<<fit-data-koop, eval=TRUE>>=
 mod.nile.3 = list(
 Z=matrix(1), A=matrix(0), R=matrix("r"),
 B=matrix(1), U=matrix(0), Q=matrix("q"),
@@ -246,7 +246,7 @@ e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@residuals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   It returns the standardized residuals (also called auxiliary residuals) as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \index{functions!residuals}
 
-<<Cs09_compute.resids, eval=TRUE, echo=TRUE>>=
+<<Cs09_compute-resids, eval=TRUE, echo=TRUE>>=
 resids.0=residuals(kem.0)$std.residuals
 resids.1=residuals(kem.1)$std.residuals
 resids.2=residuals(kem.2)$std.residuals
@@ -343,7 +343,7 @@ x_1 = \pi
  \label{eq:marss.model.2}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 Thus, $\ZZ=1$, $\aa=0$, $\RR=r$, $\BB=1$, $\uu=0$, $\QQ=q$, and $\xx_0=\pi$.  For MARSS, all parameters must be written as matrices.  The model is specified as a list as follows:
-<<mod.nile.u, eval=FALSE>>=
+<<mod-nile-u, eval=FALSE>>=
 mod.nile.u = list(
 Z=matrix(1), A=matrix(0), R=matrix("r"),
 B=matrix(1), U=matrix("u"), Q=matrix("q"),
@@ -406,7 +406,7 @@ y_t &= \ZZ\xx + \aa + v_t \\
  \end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 We then write this in \R for the MARSS() function:
-<<mod.nile3, eval=FALSE>>=
+<<mod-nile-3, eval=FALSE>>=
 mod.nile.3 = list(
 Z=matrix(c(1,0),1,2), A=matrix(0), R=matrix("r"),
 B=matrix(c(1,0,1,1),2,2), U=matrix(0,2,1), 
@@ -415,20 +415,20 @@ x0=matrix(c("pi1","pi2"),2,1)
 )
 @
 We could also use the following text shortcuts to specify the model.  
-<<mod.nile.not.used.2, eval=FALSE>>=
+<<mod-nile-not-used-2, eval=FALSE>>=
 Q="diagonal and unequal"
 x0="unequal"
 @
 
 This model takes a long time to fit with the EM algorithm.  We could run the EM algorithm a long time, but there is a quicker trick in this case.  We will run the EM algorithm for a few iterations and stop before convergence.  Then we will use the fit from the EM algorithm as the initial condition for the faster BFGS algorithm for the final approach to the maximum-likelihood:
-<<fit.mod3, eval=FALSE, echo=TRUE>>=
+<<fit-mod3, eval=FALSE, echo=TRUE>>=
 model=mod.nile.3
 kem.3=MARSS(dat,model=model,inits=list(x0=matrix(c(1000,-4),2,1)),control=list(maxit=20))
 kem.3=MARSS(dat,model=model,inits=kem.3$par,method="BFGS")
 @
 
 Now we will compute the model residuals as before:
-<<compute.var.hat.vt2, eval=FALSE, echo=TRUE>>=
+<<compute-var-hat-vt2, eval=FALSE, echo=TRUE>>=
 resids = MARSSresids(kem.3)$std.et
 @
 
