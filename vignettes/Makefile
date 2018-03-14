@@ -79,16 +79,17 @@ clean:
 	$(RM) *.tex
 	$(RM) *.R
 	$(RM) ../README.md ../_config.yml ../favicon.ico
+	$(RM) ../_layouts/*.*
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
 	$(RM) ./tex/*.*
 	$(RM) ./figures/*.*
 	$(RM) ./manual_files/*.*
-	$(RM) ./_layouts/*.*
+	$(RM) debug_manual.R debugger_template.Rnw
 	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
 	rm -rf ./tables
-	rm -rf ./_layouts
+	rm -rf ../_layouts
 	$(RM) ../R/toLatex_marssMODEL.R ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
 	
