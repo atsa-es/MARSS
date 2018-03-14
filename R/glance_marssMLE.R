@@ -2,7 +2,7 @@
 #  glance method for class marssMLE
 ##############################################################################################################################################
 glance.marssMLE <- function (x, ...){
-  a = augment(x)
+  a = augment.marssMLE(x)
   a = na.omit(a)
   coef.det = cor(a$.fitted,a$y)^2
   ret = data.frame(
