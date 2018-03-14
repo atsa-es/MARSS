@@ -69,17 +69,22 @@ options(width=60)
 \include{./Case_Study_dlm1}
 \include{./Case_Study_mlr}
 \include{./MARp}
+\part*{Appendices}
+\addcontentsline{toc}{part}{Appendices}
 \appendix
-\appendixpage
-\addappheadtotoc
 \include{./tex/warnings}
 \include{./tex/obj_structures}
 \include{./tex/ModelSpec} 
 \include{./tex/SSreferences}
 
+\bookmarksetup{startatroot} % don't want refs to be part of appendices part
 \backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{./tex/Manual}
 \bibliographystyle{cbe}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\indexname}
 \printindex
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
