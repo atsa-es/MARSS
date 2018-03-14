@@ -1,0 +1,10 @@
+\input{tex/headerfile}
+\input{tex/mathdefs}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\include{tex/ModelSpec}
+
+\bibliography{tex/Manual}
+
+\end{document}
