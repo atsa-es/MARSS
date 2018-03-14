@@ -16,7 +16,7 @@ model.frame.marssMODEL <- function (formula, ...) {
     ddims = model.dims[["d"]]
     if(ddims[3]!=1){
     covariates = f[["d"]]
-    dims(covariates)=ddims[c(1,3)]
+    dim(covariates)=ddims[c(1,3)]
     rownames(covariates)=rownames(f[["d"]])
     ret = cbind(ret, t(covariates))
     }
