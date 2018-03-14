@@ -20,7 +20,7 @@ augment.marssMLE <- function (x, type.predict = c("observations", "states"),
   if(isTRUE(tmp)){
     ret=eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level, extra=list(...)))
   }else{ 
-    ret=c(msg, paste("No augment_", form[1], " is available.\n", sep=""))
+    ret=paste("No augment_", form[1], " is available.\n", sep="")
   }
   ret
 }
