@@ -340,6 +340,17 @@ Type \verb@?print.MARSS@ to see a list of the types of output that can be printe
 x=print(kemfit, what="states",silent=TRUE)
 @
 
+\section{Tidy output}
+
+The \verb@augment@, \verb@tidy@ and \verb@glance@ functions will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \verb@?augment.marssMLE@ for examples.\index{augment}\index{functions!augment}\index{tidy}\index{functions!tidy}
+
+<<model-tidy-R>>=
+library(broom)
+head(augment(kemfit))
+tidy(kemfit)
+glance(kemfit)
+@
+
 \section{Confidence intervals on a fitted model}
 \index{confidence intervals!Hessian approximation}
 The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default alpha level of 0.05.  The default is to compute approximate confidence intervals using a the Hessian matrix (\verb@method="hessian"@).  Confidence intervals can also be computed  via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.  Note, if you want confidence intervals on variances, then it is unwise to use the Hessian approximation as it is symmetric and variances are constrained to be positive.
