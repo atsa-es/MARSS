@@ -32,6 +32,12 @@ The following core functions are designed to work with `unfitted' marssMLE objec
 \section{Functions for a fitted marssMLE object}
 The following functions use a marssMLE object that has a populated \verb@par@ element, i.e. a marssMLE object returned from one of the fitting functions (\verb@MARSS@, \verb@MARSSkem@, \verb@MARSSoptim@).  Below \verb@MODELobj@ means the argument is a marssMODEL object and \verb@MLEobj@ means the argument is a marssMLE object.  Type \verb@?function.name@ to see information on function usage and examples.
 \begin{description}
+  \item[standard functions] The standard R functions for fitted objects are provided: \verb@residuals()@, \verb@fitted()@, \verb@logLik()@, \verb@AIC()@, and \verb@coef().
+  \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output using the \verb@broom@ R package and \verb@augment()@, \verb@tidy()@, and \verb@glance().
+\end{description}
+
+In addition, the following are special functions for MARSS fitted models:
+\begin{description}
 	\item[\texttt{kf=MARSSkf(MLEobj)}]\index{functions!MARSSkf}\index{likelihood}\index{estimation!Kalman filter}\index{estimation!Kalman smoother} This will compute the expected values of the hidden states given data via the Kalman filter (to produce estimates conditioned on $1:t-1$) and the Kalman smoother (to produce estimates conditioned on $1:T$).  The function also returns the exact likelihood of the data conditioned on \verb@MLEobj$par@. A variety of other Kalman filter/smoother information is also output (\verb@kf@ is a list of output); see \verb@?MARSSkf@ for details.
 	\item[\texttt{MLEobj=MARSSaic(MLEobj)}]\index{functions!MARSSaic}\index{model selection!MARSSaic function}  This adds model selection criteria, AIC, AICc, and AICb, to a marssMLE object.  Note, AIC and AICc are added to marssMLE objects by the \verb@MARSS()@ function but AICb is not.
 	\item[\texttt{boot=MARSSboot(MLEobj)}]\index{functions!MARSSboot}\index{bootstrap!MARSSboot function} This returns a list containing bootstrapped parameters and data via parametric\index{bootstrap!parametric} or innovations\index{bootstrap!innovations} bootstrapping.
