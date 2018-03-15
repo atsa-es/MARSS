@@ -11,6 +11,10 @@ op <- par(no.readonly = TRUE)
 @
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_CombiningTrendData.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
+<<Cs000_required_libraries, echo=FALSE>>=
+library(MARSS)
+@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Overview}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
