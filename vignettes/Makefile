@@ -42,7 +42,7 @@ makeRfiles:
 	cat ./figures/CS1--Cs1_*.R > ../inst/doc/Chapter_PVA.R
 	cat ./figures/CS2--Cs2_*.R > ../inst/doc/Chapter_SealTrend.R
 	cat ./figures/CS3--Cs*_*.R > ../inst/doc/Chapter_SealPopStructure.R
-	cat ./figures/CS5--Cs5_*.R > ../inst/doc/Chapter_AnimalTracking.R
+	cat ./figures/CS5--Cs*.R > ../inst/doc/Chapter_AnimalTracking.R
 	cat ./figures/CS4--Cs*.R > ../inst/doc/Chapter_DFA.R
 	cat ./figures/CS6--Cs*.R > ../inst/doc/Chapter_StructuralBreaks.R
 	cat ./figures/CS7--Cs*.R > ../inst/doc/Chapter_SpeciesInteractions.R
