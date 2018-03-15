@@ -7,7 +7,7 @@
 options(prompt=" ", continue=" ")
 tabledir="tables/"
 @
-<<Cs00_required_libraries>>=
+<<Cs00_required_libraries, echo=FALSE>>=
 library(MARSS)
 library(xtable)
 @

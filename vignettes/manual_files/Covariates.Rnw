@@ -2,7 +2,7 @@
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
 options(prompt=" ", continue=" ", width=60)
 @
-<<Covar_sec0_required_libraries>>=
+<<Covar_sec0_required_libraries, echo=FALSE>>=
 library(MARSS)
 @
 \chapter{Incorporating covariates into MARSS models}

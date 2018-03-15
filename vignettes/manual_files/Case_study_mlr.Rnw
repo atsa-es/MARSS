@@ -4,7 +4,7 @@ tabledir="figures/"
 options(prompt=" ", continue=" ", width=60)
 @
 
-<<Cs_000_required_libraries>>=
+<<Cs_000_required_libraries, echo=FALSE>>=
 library(MARSS)
 library(xtable)
 library(lattice)

@@ -8,6 +8,9 @@ library(MARSS)
 options(prompt=" ", continue=" ")
 @
 
+<<Cs1_a_required_libraries, echo=FALSE>>=
+library(MARSS)
+@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Background}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -6,15 +6,7 @@
 options(prompt=" ", continue=" ")
 tabledir="tables/"
 @
-<<Cs00_required_packages>>=
-library(MARSS)
-library(xtable)
-library(survival)
-library(Formula)
-library(ggplot2)
-library(Hmisc)
-library(datasets)
-@
+
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_StructuralBreaks.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,8 +25,19 @@ kem.3=MARSS(dat,model=model,inits=list(x0=matrix(c(1000,-4),2,1)))
 }
 @
 
-\section{River flow in the Nile River}
+\section{Overview}
 \index{structural breaks}\index{outliers} This chapter is based on a short example shown on pages 147-148 in \citet{Koopmanetal1998} using a 100-year record of river flow on the Nile River.  The methods are based on \citet{Harveyetal1998} which is in turn based on techniques in \citet{HarveyKoopman1992} and \citet{Koopman1993}. The Nile dataset is included in \R.  Figure \ref{fig:CS6.fig1} shows the data.
+
+<<Cs00_required_packages, echo=FALSE>>=
+library(MARSS)
+library(xtable)
+library(survival)
+library(Formula)
+library(ggplot2)
+library(Hmisc)
+library(datasets)
+@
+
 
 
 \begin{figure}[htp]
@@ -121,7 +124,8 @@ x0=matrix("a") )
 
 We then fit the model with \verb@MARSS()@:
 <<Cs05_fit-data-1, eval=TRUE>>=
-kem.1 = MARSS(dat, model=mod.nile.1)
+kem.1 = MARSS(dat, model=mod.nile.1, silent=TRUE)
+glance(kem.1)
 @
 Figure \ref{fig:CS6.fits} shows the fits for the two models with deterministic models (flat and declining) for mean river flow along with their AICc values (smaller AICc is better).    The AICc for the model with a declining river flow is lower by over 20 (which is a lot).
 
@@ -164,7 +168,8 @@ We fit the model with the \verb@MARSS()@ function.  We are using the ``BFGS" alg
 <<Cs07_fit-data-2, eval=TRUE>>=
 kem.2em = MARSS(dat, model=mod.nile.2, silent=TRUE)
 kem.2 = MARSS(dat, model=mod.nile.2,
-  inits=kem.2em$par, method="BFGS")
+  inits=kem.2em$par, method="BFGS", silent=TRUE)
+tidy(kem.2, conf.int=FALSE)
 @
 This is the same model fit in \citet[p. 148]{Koopmanetal1998} except that we estimate $x_1$ as parameter rather than specifying $x_1$ via a diffuse prior\index{prior!diffuse}. As a result, the log-likelihood value and $\RR$ and $\QQ$ are a little different than in  \citet{Koopmanetal1998}. 
 

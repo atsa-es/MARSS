@@ -9,6 +9,10 @@ options(width=60)
 options(prompt=" ", continue=" ")
 op <- par(no.readonly = TRUE)   
 @
+<<Cs00_required_libraries, echo=FALSE>>=
+library(MARSS)
+library(maps)
+@
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_AnimalTracking.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,16 +58,16 @@ STOP Data, however we have corrupted this data severely by adding random errors 
 
 Our noisy data are in \texttt{loggerheadNoisy}.  They consist of daily readings of location (longitude/latitude).
   If data are missing for a day, then the entries for latitude and longitude for that day should be NA.  However, to make the code in this chapter run quickly, we have interpolated all missing values in the original, uncorrupted, dataset (\texttt{loggerhead}).  The first six lines of the corrupted data look like so
-<<data2>>=
+<<Cs01_data2>>=
 loggerheadNoisy[1:6,]
 @
 The file has data for eight turtles:
-<<turtles2>>=
+<<Cs02_turtles2>>=
 turtles=levels(loggerheadNoisy$turtle)
 turtles
 @
 We will  analyze the position data for ``Big Mama''.  We put the data for ``Big Mama'' into matrix \texttt{dat}.  \verb@dat@ is transposed because we need time across the columns.
-<<data3, keep.source=TRUE>>=
+<<Cs03_data3, keep.source=TRUE>>=
 turtlename="BigMama"
 theTurtle=which(loggerheadNoisy$turtle==turtlename)
 dat = loggerheadNoisy[theTurtle, 5:6]
@@ -71,7 +75,7 @@ dat = t(dat) #transpose
 @
 
 Figure \ref{fig:CS5.fig1} shows the corrupted location data for Big Mama. The figure code uses the \texttt{maps} \R package. You will need to install this \R package in order to run the example code.  
-<<fig-code>>=
+<<Cs04_fig-code>>=
 #load the map package; you have to install it first
 library(maps) 
 # Read in our noisy data (no missing values)
@@ -89,7 +93,7 @@ points(pdat$lon[theTurtle], pdat$lat[theTurtle],
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
-<<badtagfig,fig=TRUE,echo=FALSE>>=
+<<Cs05_badtagfig,fig=TRUE,echo=FALSE>>=
 #load the map package; you have to install it first
 library(maps) 
 # Read in our noisy data (no missing values)
@@ -112,20 +116,20 @@ points(pdat$lon[which(pdat$turtle==turtlename)], pdat$lat[which(pdat$turtle==tur
 We will begin by specifying the structure of the MARSS model and then use \texttt{MARSS()} to fit that model to the data. There are two state processes (one for latitude and the other for longitude), and there is one observation time series for each state process.   As we saw in Equation \ref{eq:mssmlong.b}, $\ZZ$ is the an identity matrix (a diagonal matrix with 1s on the diagonal).  We could specify this structure as \texttt{Z.model="identity"} or \texttt{Z.model=factor(c(1,2))}. Although technically, this is unnecessary as this is the default form for $\ZZ$.
 
 We will assume that the errors are independent and that there are different drift rates ($u$), process variances ($\sigma^2$) and observation variances for latitude and longitude ($\eta^2$).
-<<setup2>>=
+<<Cs06_setup2>>=
 Z.model="identity"
 U.model="unequal"
 Q.model="diagonal and unequal"
 R.model="diagonal and unequal"
 @
 Fit the model to the data:
-<<fitmodel, results=hide>>=
+<<Cs07_fitmodel, results=hide>>=
 kem = MARSS(dat, model=list(Z = Z.model,
       Q = Q.model, R = R.model, U = U.model))
 @
 
 We can create a plot comparing the estimated and actual locations (Figure \ref{fig:kaltotrue}). The real locations (from which \texttt{loggerheadNoisy} was produced by adding noise) are in  \texttt{loggerhead} and plotted with crosses.  There are only a few data points for the real data because in the real tag data, there are many missing days.  
-<<code-to-plot>>=
+<<Cs08_code-to-plot>>=
 #Code to plot estimated turtle track against observations
 #The estimates
 pred.lon = kem$states[1,]
@@ -153,7 +157,7 @@ legend("bottomright",c("bad locations", "estimated true location",
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{figure}[htp]
 \begin{center}
-<<figbigmama,fig=TRUE,width=6, height=6,echo=FALSE>>=
+<<Cs09_figbigmama,fig=TRUE,width=6, height=6,echo=FALSE>>=
 #Code to plot estimated turtle track against observations
 #The estimates
 pred.lon = kem$states[1,]
@@ -197,12 +201,12 @@ GCDF <- function(lon1, lon2, lat1, lat2, degrees=TRUE, units="miles") {
 }
 @
 We can now compute the distance traveled each day by passing in lat/lon estimates from day $i-1$ and day $i$:
-<<label=distance, eval=FALSE>>=
+<<Cs10_distance, eval=FALSE>>=
 distance[i-1]=GCDF(pred.lon[i-1],pred.lon[i],
                    pred.lat[i-1],pred.lat[i])
 @
 \texttt{pred.lon} and \texttt{pred.lat} are the predicted longitudes and latitudes from \texttt{MARSS()}: rows one and two in \verb@kem$states@.  To calculate the distances for all days, we put this through a \texttt{for} loop:
-<<label=distance2, keep.source=TRUE>>=
+<<Cs11_distance2, keep.source=TRUE>>=
 distance = array(NA, dim=c(dim(dat)[2]-1,1))
 for(i in 2:dim(dat)[2])
    distance[i-1]=GCDF(pred.lon[i-1],pred.lon[i],
@@ -213,7 +217,7 @@ The command \texttt{mean(distance)} gives us the average distance per day.  We c
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
-<<disfig,fig=TRUE>>= 
+<<Cs13_disfig,fig=TRUE>>= 
 par(mfrow=c(1,1))
 hist(distance) #make a histogram of distance traveled per day
 @
@@ -227,7 +231,7 @@ We can compare the histogram of daily distances to what we would get if we had n
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
-<<disfig2,fig=TRUE>>= 
+<<Cs14_disfig2,fig=TRUE>>= 
 # Compare to the distance traveled per day if you used the raw data
 distance.noerr = array(NA, dim=c(dim(dat)[2]-1,1))
 for(i in 2:dim(dat)[2])
@@ -240,7 +244,7 @@ hist(distance.noerr) #make a histogram of distance traveled per day
 \end{figure}
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 We can also compare the mean miles per day:
-<<mean.miles, keep.source=TRUE>>=
+<<Cs15_mean.miles, keep.source=TRUE>>=
 #accounting for observation error
 mean(distance)
 #assuming the data have no observation error
@@ -248,7 +252,7 @@ mean(distance.noerr)
 @
 
 You can repeat the analysis done for ``Big Mama'' for each of the other turtles and compare the turtle speeds and errors.  You will need to replace ``Big Mama'' in the code with the name of the other turtle:
-<<turt-names>>=
+<<Cs16_turt-names>>=
 levels(loggerheadNoisy$turtle)
 @
 
@@ -266,7 +270,7 @@ If you have real tag data to analyze, you should use a state-space modeling pack
 
 To use \texttt{kftrack} to fit the turtle data, type
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<kftrack, keep.source=TRUE, eval=FALSE>>=
+<<Cs17_kftrack, keep.source=TRUE, eval=FALSE>>=
 library(kftrack) # must be installed from github
 loggerhead = loggerhead
 turtlename = "BigMama"
@@ -281,7 +285,7 @@ options(prompt="> ", continue="+ ")
 par(op)
 @
 
-<<label=Cs5_code, eval=TRUE, echo=FALSE, results=hide, fig=FALSE, keep.source=TRUE>>=
+<<Cs18_code, eval=TRUE, echo=FALSE, results=hide, fig=FALSE, keep.source=TRUE>>=
 ###############################################################
 #    GCDF FUNCTION
 #    This function converts units of degrees lat/lon to miles, 
