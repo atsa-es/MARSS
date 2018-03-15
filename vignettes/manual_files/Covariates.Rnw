@@ -88,7 +88,7 @@ The elements in $\aa$ are the intercepts and those in $\DD$ are the slopes (effe
     v_{1} \\
     v_{2} \end{bmatrix}_t 
 \end{split}   
-\label{eq:dfa1}\end{equation}
+\label{eq:mlr.dfa1}\end{equation}
 
 Let's fit this model with MARSS.  The $\xx$ part of the model is irrelevant so we want to fix the parameters in that part of the model.  We won't set $\BB=0$ or $\ZZ=0$ since that might cause numerical issues for the Kalman filter. Instead we fix them as identity matrices and fix $\xx_0=0$ so that $\xx_t=0$ for all $t$.
 <<Covar_sec3_1_covar-model-0, eval=TRUE, keep.source=TRUE>>=
