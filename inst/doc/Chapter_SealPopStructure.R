@@ -1,5 +1,11 @@
 ###################################################
-### code chunk number 8: Cs01_set.up.data
+### code chunk number 2: Cs00_required_libraries
+###################################################
+library(MARSS)
+
+
+###################################################
+### code chunk number 9: Cs01_set.up.data
 ###################################################
 years = harborSeal[,1] #first col is years
 #leave off Hood Canal data for now
@@ -7,7 +13,7 @@ sealData = t(harborSeal[,c(2:7,9:13)])
 
 
 ###################################################
-### code chunk number 9: Cs02_fig1
+### code chunk number 10: Cs02_fig1
 ###################################################
 par(mfrow=c(4,3),mar=c(2,2,2,2))
 for(i in 2:dim(harborSeal)[2]) {
@@ -16,7 +22,7 @@ for(i in 2:dim(harborSeal)[2]) {
 
 
 ###################################################
-### code chunk number 10: Cs03_set.up.Z.models
+### code chunk number 11: Cs03_set.up.Z.models
 ###################################################
 #H1 stock
 Z1=factor(c("wa.or","wa.or",rep("ps",4),"ca","ca","wa.or","wa.or","bc")) 
@@ -36,13 +42,13 @@ names(Z.models)=
 
 
 ###################################################
-### code chunk number 11: Cs04_Q.models
+### code chunk number 12: Cs04_Q.models
 ###################################################
 Q.models=c("diagonal and equal", "diagonal and unequal")
 
 
 ###################################################
-### code chunk number 12: Cs04a_other.models
+### code chunk number 13: Cs04a_other.models
 ###################################################
 U.model="unequal"
 R.model="diagonal and equal"
@@ -56,7 +62,7 @@ model.constant=list(
 
 
 ###################################################
-### code chunk number 13: Cs05_run.the.models
+### code chunk number 14: Cs05_run.the.models
 ###################################################
 out.tab=NULL
 fits=list()
@@ -77,35 +83,35 @@ for(i in 1:length(Z.models)){
 
 
 ###################################################
-### code chunk number 14: Cs06_sort.results
+### code chunk number 15: Cs06_sort.results
 ###################################################
 min.AICc=order(out.tab$AICc)
 out.tab.1=out.tab[min.AICc,]
 
 
 ###################################################
-### code chunk number 15: Cs07_add.delta.aicc
+### code chunk number 16: Cs07_add.delta.aicc
 ###################################################
 out.tab.1=cbind(out.tab.1,
            delta.AICc=out.tab.1$AICc-out.tab.1$AICc[1])
 
 
 ###################################################
-### code chunk number 16: Cs08_add.delta.aicc
+### code chunk number 17: Cs08_add.delta.aicc
 ###################################################
 out.tab.1=cbind(out.tab.1, 
            rel.like=exp(-1*out.tab.1$delta.AICc/2))
 
 
 ###################################################
-### code chunk number 17: Cs09_aic.weight
+### code chunk number 18: Cs09_aic.weight
 ###################################################
 out.tab.1=cbind(out.tab.1,
           AIC.weight = out.tab.1$rel.like/sum(out.tab.1$rel.like))
 
 
 ###################################################
-### code chunk number 18: Cs10_print.table
+### code chunk number 19: Cs10_print.table
 ###################################################
 out.tab.1$delta.AICc = round(out.tab.1$delta.AICc, digits=2)
 out.tab.1$AIC.weight = round(out.tab.1$AIC.weight, digits=3)
@@ -113,7 +119,7 @@ print(out.tab.1[,c("H","Q","delta.AICc","AIC.weight")], row.names=FALSE)
 
 
 ###################################################
-### code chunk number 19: Cs11_fignorthsouth
+### code chunk number 20: Cs11_fignorthsouth
 ###################################################
 best.fit=fits[min.AICc][[1]]
 matplot(years, t(best.fit$states-best.fit$states[,1]), 
@@ -123,7 +129,7 @@ legend("topleft",c("North Coastal","Inland Straits","Puget Sound","South Coastal
 
 
 ###################################################
-### code chunk number 21: Cs12_new.Q.model
+### code chunk number 22: Cs12_new.Q.model
 ###################################################
 for(i in 1:length(Z.models)){
     if(i==5) next #don't rerun panmictic
@@ -142,7 +148,7 @@ for(i in 1:length(Z.models)){
 
 
 ###################################################
-### code chunk number 22: Cs13_out.tab.2
+### code chunk number 23: Cs13_out.tab.2
 ###################################################
 min.AICc=order(out.tab$AICc)
 out.tab.2=out.tab[min.AICc,]
@@ -153,7 +159,7 @@ out.tab.2=cbind(out.tab.2,AIC.weight=out.tab.2$rel.like/sum(out.tab.2$rel.like))
 
 
 ###################################################
-### code chunk number 23: Cs14_out.tab.2
+### code chunk number 24: Cs14_out.tab.2
 ###################################################
 out.tab.2$AIC.weight = round(out.tab.2$AIC.weight, digits=3)
 out.tab.2$delta.AICc = round(out.tab.2$delta.AICc, digits=2)
@@ -161,7 +167,7 @@ print(out.tab.2[1:10,c("H","Q","delta.AICc","AIC.weight")], row.names=FALSE)
 
 
 ###################################################
-### code chunk number 24: Cs15_equalvarcov.weight
+### code chunk number 25: Cs15_equalvarcov.weight
 ###################################################
 c(
 sum(out.tab.2$AIC.weight[out.tab.2$Q=="equalvarcov"]),
@@ -171,19 +177,19 @@ sum(out.tab.2$AIC.weight[out.tab.2$Q=="diagonal and equal"])
 
 
 ###################################################
-### code chunk number 25: Cs16_Q.mat
+### code chunk number 26: Cs16_Q.mat
 ###################################################
 Q.unc=coef(fits[[3]],type="matrix")$Q
 
 
 ###################################################
-### code chunk number 26: Cs17_Q.diag
+### code chunk number 27: Cs17_Q.diag
 ###################################################
 diag(Q.unc)
 
 
 ###################################################
-### code chunk number 27: Cs18_Q.corr
+### code chunk number 28: Cs18_Q.corr
 ###################################################
 h=diag(1/sqrt(diag(Q.unc)))
 Q.corr=h%*%Q.unc%*%h
@@ -194,14 +200,14 @@ Q.corr
 
 
 ###################################################
-### code chunk number 28: Cs19_add.hood.canal
+### code chunk number 29: Cs19_add.hood.canal
 ###################################################
 sealData.hc = rbind(sealData,harborSeal[,8])
 rownames(sealData.hc)[12]="Hood.Canal"
 
 
 ###################################################
-### code chunk number 29: Cs20_hood.z.models
+### code chunk number 30: Cs20_hood.z.models
 ###################################################
 ZH1=factor(c("nc","nc","is","is","ps",
                      "ps","sc","sc","nc","sc","is","ps")) 
@@ -212,7 +218,7 @@ names(Z.models.hc)=c("hood.in.ps","hood.separate")
 
 
 ###################################################
-### code chunk number 30: Cs21_hood.uqr.models
+### code chunk number 31: Cs21_hood.uqr.models
 ###################################################
 Q3=matrix(list("offdiag"),5,5)
 diag(Q3)="q"
@@ -222,13 +228,13 @@ names(Q.models)=c("equalvarcov","unconstrained","hood.independent")
 
 
 ###################################################
-### code chunk number 31: Cs22_hood-q3
+### code chunk number 32: Cs22_hood-q3
 ###################################################
 Q.models$hood.independent
 
 
 ###################################################
-### code chunk number 32: Cs23_out.tab.hc
+### code chunk number 33: Cs23_out.tab.hc
 ###################################################
 out.tab.hc=NULL
 fits.hc=list()
@@ -250,7 +256,7 @@ for(i in 1:length(Z.models.hc)){
 
 
 ###################################################
-### code chunk number 33: Cs24_sort.aicc.hc
+### code chunk number 34: Cs24_sort.aicc.hc
 ###################################################
 min.AICc=order(out.tab.hc$AICc)
 out.tab.hc=out.tab.hc[min.AICc,]
@@ -260,7 +266,7 @@ out.tab.hc=cbind(out.tab.hc,AIC.weight=out.tab.hc$rel.like/sum(out.tab.hc$rel.li
 
 
 ###################################################
-### code chunk number 34: Cs25_out.tab.2
+### code chunk number 35: Cs25_out.tab.2
 ###################################################
 out.tab.hc$AIC.weight = round(out.tab.hc$AIC.weight, digits=3)
 out.tab.hc$delta.AICc = round(out.tab.hc$delta.AICc, digits=2)

@@ -17,20 +17,20 @@ plot(longley$Year, longley$Employed, type="l", ylab="Employed", xlab="")
 
 
 ###################################################
-### code chunk number 4: Cs_002_example1.data
+### code chunk number 4: Cs_002_example1-data
 ###################################################
 data(longley)
 Employed = matrix(longley$Employed, nrow=1)
 
 
 ###################################################
-### code chunk number 5: Cs_003_example1.params
+### code chunk number 5: Cs_003_example1-params
 ###################################################
 longley.model=list()
 
 
 ###################################################
-### code chunk number 6: Cs_004_example1.params1
+### code chunk number 6: Cs_004_example1-params1
 ###################################################
 longley.model$U=longley.model$Q="zero"
 longley.model$C="zero"
@@ -40,45 +40,45 @@ longley.model$tinitx=0
 
 
 ###################################################
-### code chunk number 7: Cs_005_example1.paramsR
+### code chunk number 7: Cs_005_example1-paramsR
 ###################################################
 longley.model$R=matrix("r")
 
 
 ###################################################
-### code chunk number 8: Cs_006_example1.paramsD
+### code chunk number 8: Cs_006_example1-paramsD
 ###################################################
 longley.model$A=matrix("intercept")
 longley.model$D=matrix(c("GNP","Pop"),nrow=1)
 
 
 ###################################################
-### code chunk number 9: Cs_007_example1.eVar
+### code chunk number 9: Cs_007_example1-eVar
 ###################################################
 longley.model$d = rbind(longley$GNP, longley$Population)
 
 
 ###################################################
-### code chunk number 10: Cs_008_example1.marss
+### code chunk number 10: Cs_008_example1-marss
 ###################################################
 mod1=MARSS(Employed, model=longley.model)
 
 
 ###################################################
-### code chunk number 11: Cs_009_example1.marss
+### code chunk number 11: Cs_009_example1-marss
 ###################################################
 coef(mod1, type="vector")
 
 
 ###################################################
-### code chunk number 12: Cs_010_example1.lm
+### code chunk number 12: Cs_010_example1-lm
 ###################################################
 mod1.lm=lm(Employed ~ GNP + Population, data=longley)
 coef(mod1.lm)
 
 
 ###################################################
-### code chunk number 13: Cs_011_example2.params
+### code chunk number 13: Cs_011_example2-params
 ###################################################
 longley.ar1=longley.model
 longley.ar1$B=matrix("b")
@@ -86,13 +86,13 @@ longley.ar1$Q=matrix("q")
 
 
 ###################################################
-### code chunk number 14: Cs_012_example2.marss
+### code chunk number 14: Cs_012_example2-marss
 ###################################################
 mod2=MARSS(Employed, model=longley.ar1)
 
 
 ###################################################
-### code chunk number 15: Cs_013_example2.marss.with.inits
+### code chunk number 15: Cs_013_example2-marss-with-inits
 ###################################################
 inits=list(A=coef(mod1)$A, D=coef(mod1)$D)
 mod2=MARSS(Employed, model=longley.ar1, inits=inits, 
@@ -103,7 +103,7 @@ ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A,
 
 
 ###################################################
-### code chunk number 16: Cs_014_example2_gls
+### code chunk number 16: Cs_014_example2-gls
 ###################################################
 library(nlme)
 mod2.gls=gls(Employed ~ GNP + Population, 
@@ -127,7 +127,7 @@ pairs(longley)
 
 
 ###################################################
-### code chunk number 19: Cs_016_full.model.list
+### code chunk number 19: Cs_016_full-model-list
 ###################################################
 eVar.names = colnames(longley)[-7]
 eVar = t(longley[,eVar.names])
@@ -144,27 +144,27 @@ longley.model$tinitx=0
 
 
 ###################################################
-### code chunk number 20: Cs_017_full.model.fit
+### code chunk number 20: Cs_017_full-model-fit
 ###################################################
 mod3.em=MARSS(Employed, model=longley.model)
 mod3.bfgs=MARSS(Employed, model=longley.model, method="BFGS")
 
 
 ###################################################
-### code chunk number 21: Cs_018_full.em.ests
+### code chunk number 21: Cs_018_full-em-ests
 ###################################################
 par.names = c("A.intercept", paste("D",eVar.names,sep="."))
 c(coef(mod3.em, type="vector")[par.names], logLik=mod3.em$logLik)
 
 
 ###################################################
-### code chunk number 22: Cs_019_full.bfgs.ests
+### code chunk number 22: Cs_019_full-bfgs-ests
 ###################################################
 c(coef(mod3.bfgs, type="vector")[par.names], logLik=mod3.bfgs$logLik)
 
 
 ###################################################
-### code chunk number 23: Cs_020_full.lm.ests
+### code chunk number 23: Cs_020_full-lm-ests
 ###################################################
 mod3.lm=lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed 
          + Armed.Forces + Population + Year, data=longley)
@@ -172,7 +172,7 @@ c(coef(mod3.lm),logLik=logLik(mod3.lm))
 
 
 ###################################################
-### code chunk number 24: Cs_021_full.model.correrr
+### code chunk number 24: Cs_021_full-model-correrr
 ###################################################
 longley.correrr.model=longley.model
 longley.correrr.model$B=matrix("b")
@@ -180,7 +180,7 @@ longley.correrr.model$Q=matrix("q")
 
 
 ###################################################
-### code chunk number 25: Cs_022_full.correrr.fit.hide
+### code chunk number 25: Cs_022_full-correrr-fit-hide
 ###################################################
 inits=list(A=coef(mod3.em)$A, D=coef(mod3.em)$D)
 mod4.em=MARSS(Employed, model=longley.correrr.model, inits=inits)
@@ -188,19 +188,19 @@ mod4.bfgs=MARSS(Employed, model=longley.correrr.model, inits=inits, method="BFGS
 
 
 ###################################################
-### code chunk number 26: Cs_023_full.correrr.em.ests
+### code chunk number 26: Cs_023_full-correrr-em-ests
 ###################################################
 c(coef(mod4.em, type="vector")["B.b"], logLik=mod4.em$logLik)
 
 
 ###################################################
-### code chunk number 27: Cs_024_full.correrr.bfgs.ests
+### code chunk number 27: Cs_024_full-correrr-bfgs-ests
 ###################################################
 c(coef(mod4.bfgs, type="vector")["B.b"], logLik=mod4.bfgs$logLik)
 
 
 ###################################################
-### code chunk number 28: Cs_025_full.gls.ests
+### code chunk number 28: Cs_025_full-gls-ests
 ###################################################
 mod4.gls=gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
         + Armed.Forces + Population + Year, 
@@ -248,7 +248,7 @@ sleep.mod1 = MARSS(dat, model=sleep.model)
 
 
 ###################################################
-### code chunk number 33: Cs_030_sleepmod1.lm
+### code chunk number 33: Cs_030_sleepmod1-lm
 ###################################################
 sleep.lm1 = lm(Reaction ~ -1 + Subject + Days, data=sleepstudy)
 
@@ -263,7 +263,7 @@ sleep.mod2 = MARSS(dat, model=sleep.model, silent=TRUE)
 
 
 ###################################################
-### code chunk number 35: Cs_032_sleepmod2.lm
+### code chunk number 35: Cs_032_sleepmod2-lm
 ###################################################
 sleep.lm2 = lm(Reaction ~ 0 + Subject + Days:Subject, data = sleepstudy)
 
@@ -303,7 +303,7 @@ sleep.mod5 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
 
 
 ###################################################
-### code chunk number 39: Cs_036_mod5.gls
+### code chunk number 39: Cs_036_mod5-gls
 ###################################################
 sleep.mod5.gls=gls(Reaction ~ 0 + Subject + Days:Subject, data=sleepstudy, 
              correlation=corAR1(form=~ 1|Subject), method="ML")

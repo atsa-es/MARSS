@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 6: Cs1_Exercise1
+### code chunk number 7: Cs1_Exercise1
 ###################################################
 par(mfrow=c(3,3))
 sim.u = -0.05 
@@ -30,7 +30,7 @@ legend("topright", c("Observed","True"),
 
 
 ###################################################
-### code chunk number 16: Cs1_Exercise2
+### code chunk number 17: Cs1_Exercise2
 ###################################################
 sim.u = -0.05   # growth rate
 sim.Q = 0.02    # process error variance
@@ -78,7 +78,7 @@ params[nsim+2,]=c(sim.u,sim.u,sim.Q,sim.R,sim.Q)
 
 
 ###################################################
-### code chunk number 20: Cs1_Exercise3
+### code chunk number 21: Cs1_Exercise3
 ###################################################
 #Needs Example 2 to be run first
 par(mfrow=c(3,3))
@@ -127,14 +127,14 @@ legend("bottomright",c("True","Dennis","KalmanEM"),pch=c(1,-1,-1),
 
 
 ###################################################
-### code chunk number 22: Cs1_Exercise4
+### code chunk number 23: Cs1_Exercise4
 ###################################################
 par(mfrow=c(1,1))
 CSEGtmufigure(N=50, u=-0.05, s2p=0.02)
 
 
 ###################################################
-### code chunk number 26: Cs1_Exercise5
+### code chunk number 27: Cs1_Exercise5
 ###################################################
 #If you have your data in a tab delimited file with a header
 #This is how you would read it in using file.choose() 
@@ -144,5 +144,11 @@ CSEGtmufigure(N=50, u=-0.05, s2p=0.02)
 #dat=as.matrix(dat)
 dat = wilddogs
 CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
+
+
+###################################################
+### code chunk number 2: Cs1_a_required_libraries
+###################################################
+library(MARSS)
 
 

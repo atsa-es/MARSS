@@ -1,12 +1,18 @@
 ###################################################
-### code chunk number 2: Cs001_readinredddata
+### code chunk number 2: Cs000_required_libraries
+###################################################
+library(MARSS)
+
+
+###################################################
+### code chunk number 3: Cs001_readinredddata
 ###################################################
 head(okanaganRedds)
 logRedds = log(t(okanaganRedds)[2:3,])
 
 
 ###################################################
-### code chunk number 3: Cs002_fig1
+### code chunk number 4: Cs002_fig1
 ###################################################
 # Code for plotting raw Okanagan redd counts
 plot(okanaganRedds[,1], okanaganRedds[,2],
@@ -17,7 +23,7 @@ legend('topleft', inset=0.1, legend=c("Aerial survey","Ground survey"),
 
 
 ###################################################
-### code chunk number 4: Cs003_reddmodel1
+### code chunk number 5: Cs003_reddmodel1
 ###################################################
 model1=list()
 model1$R="diagonal and equal"
@@ -27,7 +33,7 @@ kem1 = MARSS(logRedds, model=model1)
 
 
 ###################################################
-### code chunk number 5: Cs004_reddmodel2
+### code chunk number 6: Cs004_reddmodel2
 ###################################################
 model2=model1 #model2 is based on model1
 model2$R="diagonal and unequal"
@@ -35,7 +41,7 @@ kem2 = MARSS(logRedds, model=model2)
 
 
 ###################################################
-### code chunk number 6: Cs005_reddmodel3
+### code chunk number 7: Cs005_reddmodel3
 ###################################################
 model3=list()
 model3$Q="diagonal and equal"
@@ -47,13 +53,13 @@ kem3 = MARSS(logRedds, model=model3)
 
 
 ###################################################
-### code chunk number 7: Cs005b_aic
+### code chunk number 8: Cs005b_aic
 ###################################################
 c(mod1=kem1$AICc, mod2=kem2$AICc, mod3=kem3$AICc)
 
 
 ###################################################
-### code chunk number 8: Cs006_fig2
+### code chunk number 9: Cs006_fig2
 ###################################################
 # Code for plotting the fit from the best model
 plot(okanaganRedds[,1], logRedds[1,],
@@ -65,14 +71,14 @@ lines(okanaganRedds[,1], c(kem1$states - 2*kem1$states.se), lty=1, lwd=1, col="g
 
 
 ###################################################
-### code chunk number 25: Cs007_birddata
+### code chunk number 26: Cs007_birddata
 ###################################################
 birddat = t(kestrel[,2:4]) 
 head(kestrel)
 
 
 ###################################################
-### code chunk number 26: Cs008_plot-bird-data
+### code chunk number 27: Cs008_plot-bird-data
 ###################################################
 # Make a plot of the three time series
 plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
@@ -82,7 +88,7 @@ legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan
 
 
 ###################################################
-### code chunk number 27: Cs009_fit-bird-model-1
+### code chunk number 28: Cs009_fit-bird-model-1
 ###################################################
 model.b1=list()
 model.b1$R="diagonal and equal"
@@ -91,7 +97,7 @@ kem.b1 = MARSS(birddat, model=model.b1, control=list(minit=100) )
 
 
 ###################################################
-### code chunk number 28: Cs011_fit-bird-model-2
+### code chunk number 29: Cs011_fit-bird-model-2
 ###################################################
 model.b2=list()
 model.b2$Q="diagonal and equal"
@@ -103,7 +109,7 @@ kem.b2 = MARSS(birddat, model=model.b2)
 
 
 ###################################################
-### code chunk number 29: Cs013_fit-bird-model-3
+### code chunk number 30: Cs013_fit-bird-model-3
 ###################################################
 model.b3=model.b2 #is is based on model.b2
 #all we change is the structure of Q
@@ -113,7 +119,7 @@ kem.b3 = MARSS(birddat, model=model.b3)
 
 
 ###################################################
-### code chunk number 30: Cs015_fit-bird-model-4
+### code chunk number 31: Cs015_fit-bird-model-4
 ###################################################
 model.b4=list()
 model.b4$Q="diagonal and unequal"
@@ -125,13 +131,13 @@ kem.b4 = MARSS(birddat, model=model.b4)
 
 
 ###################################################
-### code chunk number 31: Cs016_aics
+### code chunk number 32: Cs016_aics
 ###################################################
 c(mod1=kem.b1$AICc, mod2=kem.b2$AICc, mod3=kem.b3$AICc, mod4=kem.b4$AICc)
 
 
 ###################################################
-### code chunk number 32: Cs017_plot-bird-model-4-fits
+### code chunk number 33: Cs017_plot-bird-model-4-fits
 ###################################################
 # Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
 plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)

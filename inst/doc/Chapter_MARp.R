@@ -5,7 +5,7 @@ library(MARSS)
 
 
 ###################################################
-### code chunk number 4: Cs_01_ar2.sim
+### code chunk number 4: Cs_01_ar2-sim
 ###################################################
 TT=50
 true.2=c(r=0,b1=-1.5,b2=-0.75,q=1)
@@ -14,7 +14,7 @@ sim.ar2=matrix(temp,nrow=1)
 
 
 ###################################################
-### code chunk number 5: Cs_02_ar2.model
+### code chunk number 5: Cs_02_ar2-model
 ###################################################
 Z=matrix(c(1,0),1,2)
 B=matrix(list("b1",1,"b2",0),2,2)
@@ -28,19 +28,19 @@ model.list.2=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=mu,V0=V,tinitx=0)
 
 
 ###################################################
-### code chunk number 6: Cs_03_ar2.fit
+### code chunk number 6: Cs_03_ar2-fit
 ###################################################
 ar2=MARSS(sim.ar2[3:TT],model=model.list.2)
 
 
 ###################################################
-### code chunk number 7: Cs_03a_ar2.fit
+### code chunk number 7: Cs_03a_ar2-fit
 ###################################################
 print(cbind(true=true.2[2:4],estimates=coef(ar2,type="vector")))
 
 
 ###################################################
-### code chunk number 8: Cs_04_ar2.gappy
+### code chunk number 8: Cs_04_ar2-gappy
 ###################################################
 gappy.data=sim.ar2[3:TT]
 gappy.data[floor(runif(TT/2,2,TT))]=NA
@@ -48,7 +48,7 @@ ar2.gappy=MARSS(gappy.data,model=model.list.2)
 
 
 ###################################################
-### code chunk number 9: Cs_04a_ar2.gappy
+### code chunk number 9: Cs_04a_ar2-gappy
 ###################################################
 print(cbind(true=true.2[2:4],
    estimates.no.miss=coef(ar2,type="vector"),
