@@ -1,5 +1,6 @@
 \input{tex/headerfile}
 \input{tex/mathdefs}
+\makeindex
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{Sweave}
@@ -37,7 +38,6 @@ options(width=60)
 \maketitle
 \include{./tex/dedic}
 
-\makeindex
 
 \frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
