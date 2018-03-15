@@ -3,7 +3,7 @@
 Most users will not directly work with the core functions nor build marssMODEL objects from scratch.  Instead, they will interact with the core functions via the function \verb@MARSS()@ described in Chapter \ref{chap:MARSS}.  With the \verb@MARSS()@  function, the user specifies the model structure with matrices or text strings (``diagonal'', ``unconstrained'', etc.) and \verb@MARSS()@ builds the marssMODEL object.   However, a basic understanding of the structure of marssMODEL objects is useful if one wants to  interact directly with the core functions.
 
 \section{The fixed and free components of the model parameters}\index{model specification!in marssMODEL objects}
-In a marssMODEL object, each parameter is written in vec form and specificed by the equation of the form $\ff + \DD\bbeta$ as in Equation 77 in \citet(Holmes2010). $\ff$ is the fixed matrix, $\DD$ is the free matrix and $\bbeta$ is the column vector of parameters.  In a marssMODEL object, the \verb@fixed@ list has the $\ff$ for each parameter matrix, the \verb@free@ list has the $\DD$ matrix for each parameter matrix, and \verb@par@ in the marssMLE object has the $\bbeta$ column vector of estimated parameters.
+In a marssMODEL object, each parameter is written in vec form and specificed by the equation of the form $\ff + \DD\bbeta$ as in Equation 77 in \citet{Holmes2010}. $\ff$ is the fixed matrix, $\DD$ is the free matrix and $\bbeta$ is the column vector of parameters.  In a marssMODEL object, the \verb@fixed@ list has the $\ff$ for each parameter matrix, the \verb@free@ list has the $\DD$ matrix for each parameter matrix, and \verb@par@ in the marssMLE object has the $\bbeta$ column vector of estimated parameters.
 
 \section{Examples}
 
