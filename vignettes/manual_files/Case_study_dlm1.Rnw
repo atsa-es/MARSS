@@ -18,10 +18,10 @@ tabledir="tables/"
 \index{MARSS model!DLM example}\index{dynamic linear modeling!univariate}In this chapter, we will use MARSS to analyze dynamic linear models (DLMs), wherein the parameters in a regression model are treated as time-varying. DLMs are used commonly in econometrics, but have received less attention in the ecological literature \citep[c.f.][]{Lamonetal1998, ScheuerellWilliams2005}. Our treatment of DLMs is rather cursory---we direct the reader to excellent textbooks by \citet{Poleetal1994} and \citet{Petrisetal2009} for more in-depth treatments of DLMs. The former focuses on Bayesian estimation whereas the latter addresses both likelihood-based and Bayesian estimation methods.
 
 We begin our description of DLMs with a static regression model, wherein the $i$-th observation is a linear function of an intercept, predictor variable(s), and a random error term. For example, if we had one predictor variable ($F$), we could write the model as
-\begin{equation}\label{eqn:lm}
+\begin{equation}\label{eqn:linreg}
 y_i = \alpha + \beta F_i + v_i,
 \end{equation}
-where the $\alpha$ is the intercept, $\beta$ is the regression slope, $F_i$ is the predictor variable matched to the $i^{th}$ observation ($y_i$), and $v_i \sim \N(0,r)$. It is important to note here that there is no implicit ordering of the index $i$. That is, we could shuffle any/all of the $(y_i, F_i)$ pairs in our dataset with no effect on our ability to estimate the model parameters. We can write the model in Equation \ref{eqn:lm} using vector notation, such that
+where the $\alpha$ is the intercept, $\beta$ is the regression slope, $F_i$ is the predictor variable matched to the $i^{th}$ observation ($y_i$), and $v_i \sim \N(0,r)$. It is important to note here that there is no implicit ordering of the index $i$. That is, we could shuffle any/all of the $(y_i, F_i)$ pairs in our dataset with no effect on our ability to estimate the model parameters. We can write the model in Equation \ref{eqn:linreg} using vector notation, such that
 \begin{align}\label{eqn:lmVec}
 y_i &= \begin{bmatrix}1&F_i\end{bmatrix} 
 \begin{bmatrix}\alpha\\ \beta\end{bmatrix} + v_i \nonumber\\
@@ -41,7 +41,7 @@ However, closer examination of Equation \ref{eqn:dlm1} reveals an apparent compl
 \end{equation}
 $\GG_t$ is the parameter ``evolution'' matrix, and $\ww_t$ is a vector of process errors, such that $\ww_t\sim\MVN(\mathbf{0},\QQ)$. The elements of $\GG_t$ may be known and fixed \textit{a priori}, or unknown and estimated from the data. Although we allow for $\GG_t$ to be time-varying, we will typically assume that it is time invariant.
 
-The idea is that the evolution matrix $\GG_t$ deterministically maps the parameter space from one time step to the next, so the parameters at time $t$ are temporally related to those before and after. However, the process is stochastic and the mapping includes stochasitic error, which leads to a degradation of information over time. If the diagonal elements of $\QQ$ are relatively large, then the parameters can vary widely from $t$ to $t+1$. If $\QQ\ = \mathbf{0}$, then $\ttheta_1=\ttheta_2=\ttheta_T$ and we are back to the static model in Equation \ref{eqn:lm}.
+The idea is that the evolution matrix $\GG_t$ deterministically maps the parameter space from one time step to the next, so the parameters at time $t$ are temporally related to those before and after. However, the process is stochastic and the mapping includes stochasitic error, which leads to a degradation of information over time. If the diagonal elements of $\QQ$ are relatively large, then the parameters can vary widely from $t$ to $t+1$. If $\QQ\ = \mathbf{0}$, then $\ttheta_1=\ttheta_2=\ttheta_T$ and we are back to the static model in Equation \ref{eqn:linreg}.
 
 %------------------------------------
 \section{Example of a univariate DLM}
