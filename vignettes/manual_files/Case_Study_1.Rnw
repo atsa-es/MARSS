@@ -558,7 +558,7 @@ CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
 dat = graywhales
 CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
 @
-\exbegin{Example \label{CS1.ex5} code}
+\exbegin{Example \ref{CS1.ex5} code}
 \newline
 <<label=Cs1_Exercise5, keep.source=TRUE, results=hide>>=
 #If you have your data in a tab delimited file with a header
