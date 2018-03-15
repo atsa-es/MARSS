@@ -33,7 +33,7 @@ This chapter will start with classical linear regression where the explanatory v
 \section{Univariate linear regression}
 
 A vanilla linear regression where our data are time ordered but we treat them as independent can be written 
-\begin{equation}\label{eqn:lm}
+\begin{equation}\label{eqn:lm2}
 y_t=\alpha + \beta_1 d_{1,t} + \beta_2 d_{2,t} + e_t,
 \end{equation}
 where the $d$ are our explanatory variables.  This model can be written in many different ways in as a MARSS equation. Here we use a specific form where the i.i.d. component of the errors is $v_t$ in the $y$ part of the MARSS equation and the autocorrelated errors appear as $x_t$ in the $y$ equation.  Specifying the MARSS model this way allows us to use the EM-algorithm to fit the model which will prove to be important.
