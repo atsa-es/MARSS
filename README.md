@@ -15,20 +15,17 @@ install.packages("MARSS")
 library(MARSS)
 ```
 
-To install the development version of MARSS from GitHub:
+The latest release on GitHub may be ahead of the CRAN release. To install the latest release on GitHub:
 ```
 install.packages("devtools")
 library(devtools)
-install_github("nwfsc-timeseries/MARSS")
+install_github("nwfsc-timeseries/MARSS@*release")
 library(MARSS)
 ```
 
-To install the latest release from GitHub:
+The master branch on GitHub has work leading up to a GitHub release.  The code here may be broken though usually prelim work is done on a development branch before merging.  To install the master branch:
 ```
-install.packages("devtools")
-library(devtools)
-install_github("nwfsc-timeseries/MARSS", ref="3.10.4")
-library(MARSS)
+install_github("nwfsc-timeseries/MARSS")
 ```
 
 
