@@ -13,8 +13,6 @@ options(width=60)
 % see the list of further useful packages
 % in the Reference Guide, Sects. 2.3, 3.1-3.3
 
-\makeindex[intoc]             % used for the subject index
-
 %% Set PDF 1.5 and compression, including object compression
 %% Needed for MiKTeX -- most other distributions default to this
 \ifx\pdfoutput\undefined
@@ -38,6 +36,8 @@ options(width=60)
 \subtitle{version \Sexpr{packageDescription("MARSS", fields = "Version")}}
 \maketitle
 \include{./tex/dedic}
+
+\makeindex
 
 \frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
