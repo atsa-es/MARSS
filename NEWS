@@ -2,9 +2,9 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at ``https://nwfsc-timeseries.github.io/MARSS/''.  Notes on known issues are also posted there.
 
-*************************************************************************
+
 CHANGES IN MARSS 3.10
-*************************************************************************
+------------------------------------
 
 The main changes have to do with residuals and confidence intervals calculations.  
 
