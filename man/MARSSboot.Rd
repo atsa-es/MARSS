@@ -71,9 +71,6 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
   # from resampling the innovations (no missing values allowed)
   boot.innov.list <- MARSSboot(kem, output="all", sim="innovations", nboot=4)
 
-  # from a parametric bootstrap
-  boot.list <- MARSSboot(kem, output="all", sim="parametric", nboot=4)
-  
   # bootstrapped parameter estimates
   boot.list$boot.params
 }
