@@ -1,7 +1,14 @@
 %\VignetteIndexEntry{EM Derivation} 
 %\VignettePackage{MARSS}
 \documentclass[]{article}
-\usepackage{fullpage} %more standardized margins
+%set margins to 1in without fullsty
+	\addtolength{\oddsidemargin}{-.875in}
+	\addtolength{\evensidemargin}{-.875in}
+	\addtolength{\textwidth}{1.75in}
+
+	\addtolength{\topmargin}{-.875in}
+	\addtolength{\textheight}{1.75in}
+	%\usepackage{fullpage} %more standardized margins
 
 % choose options for [] as required from the list
 % in the Reference Guide, Sect. 2.2
@@ -128,6 +135,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE}
 \author{Elizabeth Eli Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
