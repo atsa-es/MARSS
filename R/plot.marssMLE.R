@@ -19,7 +19,7 @@ plot.marssMLE= function(x, plot.type=c("observations", "states", "model.residual
       states$term = paste0("State ",states$term)
     }
     p1 = ggplot2::ggplot(states, ggplot2::aes(t, estimate)) +
-      ggplot2::geom_ribbon(aes(ymin = conf.low, ymax=conf.high), alpha=0.3, col="grey") +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = conf.low, ymax=conf.high), alpha=0.3, col="grey") +
       ggplot2::geom_line() + 
       ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
       ggplot2::facet_wrap(~term, scale="free_y")
@@ -31,7 +31,7 @@ plot.marssMLE= function(x, plot.type=c("observations", "states", "model.residual
     # make plot of observations
     df = augment.marssMLE(x, "observations")
     p2 = ggplot2::ggplot(df, ggplot2::aes(t, .fitted)) +
-      ggplot2::geom_ribbon(aes(ymin = .fitted-1.96*.se.fit, ymax=.fitted+1.96*.se.fit), alpha=0.3, col="grey") +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = .fitted-1.96*.se.fit, ymax=.fitted+1.96*.se.fit), alpha=0.3, col="grey") +
       ggplot2::geom_line() + 
       ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
       ggplot2::facet_wrap(~.rownames, scale="free_y") + 
