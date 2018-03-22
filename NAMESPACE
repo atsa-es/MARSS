@@ -34,6 +34,7 @@ import(graphics)
 ## register S3 methods
 S3method(print, marssMODEL)
 S3method(print, marssMLE)
+S3method(plot, marssMLE)
 S3method(logLik, marssMLE)
 S3method(fitted, marssMLE)
 S3method(summary, marssMODEL)
