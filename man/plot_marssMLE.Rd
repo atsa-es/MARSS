@@ -10,7 +10,7 @@
   }
   \arguments{
   \item{object}{ A marssMLE object.  }
-  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn.}
+  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. Options for arguments include 'observations' (fits to the raw data), 'states' (estimates of the hidden or latent trends), 'model.residuals' (residuals for the observation error), 'state.residuals' (residuals associated with the process model), 'model.residuals.qqnorm' (qq plot for the observation residuals), 'state.residuals.qqnorm' (qq plot for the state residuals)}
   \item{...}{ Other arguments, not used. }
   }
 \value{
