@@ -70,6 +70,7 @@ IMPROVEMENTS
 * added broom augment, tidy and glance functions for marssMLE
 * added logLik method for marssMLE objects
 * added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
+* added plot method with diagnostics
 
 MISC
 * moved info in MARSSsettings.R to .onLoad function.
