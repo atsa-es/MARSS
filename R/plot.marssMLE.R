@@ -95,7 +95,7 @@ plot.marssMLE <-
     intercept=tapply(df$.std.resid,df$.rownames,int)
     abline.dat=data.frame(.rownames=names(slope), slope=slope, intercept=intercept)
     p1 = ggplot2::ggplot(df) +
-      geom_qq(aes_(sample = ~.std.resid),na.rm=TRUE) +
+      ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
       ggplot2::xlab("Theoretical Quantiles") + 
       ggplot2::ylab("Standardized Model Residuals") +
       ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue") +
@@ -112,7 +112,7 @@ plot.marssMLE <-
     intercept=tapply(df$.std.resid,df$.rownames,int)
     abline.dat=data.frame(.rownames=names(slope), slope=slope, intercept=intercept)
     p1 = ggplot2::ggplot(df) +
-      geom_qq(aes_(sample = ~.std.resid),na.rm=TRUE) +
+      ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
       ggplot2::xlab("Theoretical Quantiles") + 
       ggplot2::ylab("Standardized State Residuals") +
       ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue") +
