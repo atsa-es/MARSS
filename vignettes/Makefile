@@ -78,7 +78,7 @@ clean:
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
 	$(RM) *.R
-	$(RM) ../README.md ../_config.yml ../favicon.ico logo.jpg logot.png
+	$(RM) ../README.md ../_config.yml ../favicon.ico ../logo.jpg ../logot.png
 	$(RM) ../_layouts/*.*
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
