@@ -7,7 +7,9 @@
 }
   \usage{
   \method{plot}{marssMLE}(x, 
-           plot.type=c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqnorm", "state.residuals.qqnorm"), 
+           plot.type=c("observations", "states", "model.residuals", 
+                       "state.residuals", "model.residuals.qqnorm", 
+                       "state.residuals.qqnorm"), 
            form=c("marxss", "marss", "dfa"), ...)
   }
   \arguments{
