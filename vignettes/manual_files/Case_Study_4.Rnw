@@ -564,11 +564,13 @@ As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivale
  and
 \begin{equation}
 \begin{gathered}
-\yy_t = \ZZ\HH^{-1}\xx_t+\aa+\vv_t\\
- \HH\xx_t = \HH\xx_{t-1}+\HH\ww_t
+\yy_t = \ZZ\HH^{-1}\xx^\dagger_t+\aa+\vv_t\\
+\xx^\dagger_t = \xx^\dagger_{t-1}+\ww^\dagger_t\\
+\xx^\dagger_t=\HH\xx_t; \ww^\dagger_t=\ww_t
 \end{gathered}   
 \label{eq:dfa.rotated}
 \end{equation}
+$\xx^\dagger$ are the rotated trends.
 
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
  $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.
