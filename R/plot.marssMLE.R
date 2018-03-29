@@ -6,7 +6,7 @@ plot.marssMLE <-
   if(missing(form)){
     model_form = attr(x[["model"]],"form")
   }else{
-    form = match.arg(form)
+    model_form = match.arg(form)
   }
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package \"ggplot2\" needed for plot.marrsMLE. Please install it.", call. = FALSE)
@@ -15,9 +15,23 @@ plot.marssMLE <-
   
   if("states" %in% plot.type) {
     # make plot of states and CIs
-    states = tidy.marssMLE(x, "states")
+    extras = list()
+    if(!missing(...)){
+      extras=list(...)
+      allowednames=c("rotate", "method", "hessian.fun", "nboot")
+      bad.names=names(extras)[!(names(extras)%in%allowednames)]
+      if(!all(names(extras)%in%allowednames)) stop(paste(paste(bad.names, collapse=" "), "is/are unknown argument(s). See ?tidy.marssMLE for allowed arguments.\n"), call. = FALSE)
+    }
+
+    if("rotate"%in%names(extras)){
+      rotate=extras[["rotate"]]
+      if(!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n")
+    }else{ rotate=FALSE }
+    
+    states = tidy.marssMLE(x, type="states", ...)
     if(model_form[1] == "dfa"){
-      states$term = paste0("DFA trend ",states$term)
+      if(rotate){ rottext = "rotated" }else{ rottext = "" }
+      states$term = paste("DFA", rottext, "trend",states$term)
     }else{
       states$term = paste0("State ",states$term)
     }
@@ -32,7 +46,7 @@ plot.marssMLE <-
   
   if("observations" %in% plot.type) {
     # make plot of observations
-    df = augment.marssMLE(x, "observations")
+    df = augment.marssMLE(x, "observations", form=model_form, ...)
     df$ymin = df$.fitted - 1.96*df$.se.fit
     df$ymax = df$.fitted + 1.96*df$.se.fit
     p2 = ggplot2::ggplot(data=df, ggplot2::aes_(~t, ~.fitted)) +
@@ -47,7 +61,7 @@ plot.marssMLE <-
   
   if("model.residuals" %in% plot.type) {
     # make plot of observation residuals
-    df = augment.marssMLE(x, "observations")
+    df = augment.marssMLE(x, "observations", form=model_form, ...)
     p1 = ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)),], ggplot2::aes_(~t, ~.resids)) + 
       ggplot2::geom_point(col="blue") +
       ggplot2::stat_smooth(method="loess") +
@@ -60,8 +74,8 @@ plot.marssMLE <-
   }  
   
   if("state.residuals" %in% plot.type) {
-    # make plot of process residuals
-    df = augment.marssMLE(x, "states")
+    # make plot of process residuals; set form='marxss' to get process resids
+    df = augment.marssMLE(x, "states", form="marxss")
     df$.rownames = paste0("State ",df$.rownames)
     p1 = ggplot2::ggplot(df[!is.na(df$.resids),], ggplot2::aes_(~t, ~.resids)) + 
       ggplot2::geom_point(col="blue") + 
@@ -106,7 +120,7 @@ plot.marssMLE <-
   
   if("state.residuals.qqnorm" %in% plot.type) {
     # make qqplot of state residuals
-    df = augment.marssMLE(x, "states")
+    df = augment.marssMLE(x, "states", form="marxss")
     df$.rownames = paste0("State ",df$.rownames)
     slope=tapply(df$.std.resid,df$.rownames,slp)
     intercept=tapply(df$.std.resid,df$.rownames,int)
