@@ -2,25 +2,38 @@
 #  tidy method for class marssMLE
 ##############################################################################################################################################
 tidy.marssMLE = function (x,  type = c("parameters", "states"), 
-                          conf.int = TRUE, conf.level = 0.95, ...) 
+                          conf.int = TRUE, conf.level = 0.95,
+                          form=attr(x[["model"]], "form")[1], ...)
 { 
   type = match.arg(type)
   alpha = 1-conf.level
+  extras=list()
   
-  if(type=="parameters"){
-  ests = coef(x, type="vector")
-  if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n")
-
+  rerun.MARSSparamCIs = FALSE
   model.has.cis = all(c("par.se", "par.lowCI", "par.upCI")%in%names(x))
   if(conf.int) rerun.MARSSparamCIs = ifelse(model.has.cis, FALSE, TRUE)
   if(!missing(...)){
     extras=list(...)
-    if(!all(names(extras)%in%c("method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
+    if(!all(names(extras)%in%c("rotate", "method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
   }
+  
   if(conf.int & (!missing(...) | !missing(conf.level))){
     if(model.has.cis) warning("tidy.marssMLE: Your marssMLE object has par.se and CIs, but you have passed in arguments for calculating CIs.  MARSSparamCIs() will be re-run with these values.\n")
     rerun.MARSSparamCIs = TRUE
   }
+  
+  #set rotate
+  if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n")
+  rotate = FALSE
+  if(form=="dfa" & "rotate"%in%names(extras)){
+    rotate=extras[["rotate"]]
+    if(!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n")
+  }
+  
+  if(type=="parameters"){
+  ests = coef(x, type="vector")
+  if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n")
+  
   ret = data.frame(
     term = names(ests),
     estimate = ests
@@ -41,6 +54,19 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
     state.dims = attr(model, "model.dims")[["x"]]
     mm = state.dims[1]
     TT = state.dims[2]
+    if(form=="dfa" & rotate){
+      Z.est = coef(x, type="matrix")[["Z"]]
+      H = 1
+      if(ncol(Z.est)>1){
+        H = solve(varimax(Z.est)[["rotmat"]])
+        x[["states"]] = H %*% x[["states"]]
+        TT = attr(x$model, "model.dims")[["data"]][2]
+        VtT=MARSSkf(x)[["VtT"]]
+        for(t in 1:TT){
+          x[["states.se"]][,t] = sqrt(takediag(H%*%VtT[,,t]%*%t(H)))
+        }
+      }
+    }
     ret = data.frame(
       term=rep(state.names,each=TT), 
       t=rep(1:TT,mm), 
