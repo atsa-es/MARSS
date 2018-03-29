@@ -6,10 +6,14 @@
 ##############################################################################################################################################
 augment.marssMLE <- function (x, type.predict = c("observations", "states"),
                               interval = c("none", "confidence"), 
-                              conf.level = 0.95, form=attr(x[["model"]], "form"), ...) {
+                              conf.level = 0.95, 
+                              form=attr(x[["model"]], "form"), ...) {
   if(!missing(...)){
     args=list(...)
-    if(!all(names(args)%in%c("rotate"))) stop("Unknown extra argument. See ?augment.marssMLE for allowed arguments.\n")
+    if(!all(names(args)%in%c("rotate"))){
+      bad.names=names(args)[!(names(args)%in%c("rotate"))]
+      stop(paste(paste(bad.names, collapse=" "), "is/are unknown argument(s). See ?augment.marssMLE for allowed arguments.\n"), call. = FALSE)
+    }
   }
   
   type.predict = match.arg(type.predict)
@@ -91,9 +95,9 @@ augment_dfa = function(x, type.predict, interval, conf.level, extra){
   ret = augment_marxss(x, type.predict=type.predict, interval=interval, conf.level=conf.level)
   
   if(type.predict=="states")
-    stop("Augment does not return the estimated states (loadings).  See ?augment.marssMLE . Use tidy().\n")
+    stop("Augment does not return the estimated states (trends), i.e. xtT. It returns xtt1, the one-step ahead predictions.  See ?augment.marssMLE . Use tidy() for state/trend estimates or pass in form='marxss' to get xtt1 and its residuals.\n", call. = FALSE)
   
-  if(rotate){
+  if(rotate){   # if not states, then observations
     TT = dim(x[["states"]])[2]
     coefs = coef(x, type="matrix")
     ZZ = coefs[["Z"]]
