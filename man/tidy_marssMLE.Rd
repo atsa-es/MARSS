@@ -14,7 +14,7 @@
 
   \item{conf.level}{ Confidence level if interval is returned.}
   
-  \item{...}{Optional arguments to be passed to \code{\link{MARSSparamCIs}} if conf.int is TRUE.  See details and \code{\link{MARSSparamCIs}}.}:
+  \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends.}
 
 }
 \description{
