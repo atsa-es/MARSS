@@ -7,14 +7,7 @@
 augment.marssMLE <- function (x, type.predict = c("observations", "states"),
                               interval = c("none", "confidence"), 
                               conf.level = 0.95, 
-                              form=attr(x[["model"]], "form"), ...) {
-  if(!missing(...)){
-    args=list(...)
-    if(!all(names(args)%in%c("rotate"))){
-      bad.names=names(args)[!(names(args)%in%c("rotate"))]
-      stop(paste(paste(bad.names, collapse=" "), "is/are unknown argument(s). See ?augment.marssMLE for allowed arguments.\n"), call. = FALSE)
-    }
-  }
+                              form=attr(x[["model"]], "form")) {
   
   type.predict = match.arg(type.predict)
   interval = match.arg(interval)
@@ -22,7 +15,7 @@ augment.marssMLE <- function (x, type.predict = c("observations", "states"),
   augment.fun = paste("augment_", form[1], sep="")
   tmp=try(exists(augment.fun, mode="function"),silent=TRUE)
   if(isTRUE(tmp)){
-    ret=eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level, extra=list(...)))
+    ret=eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level))
   }else{ 
     ret=paste("No augment_", form[1], " is available.\n", sep="")
   }
@@ -34,7 +27,7 @@ augment.marssMLE <- function (x, type.predict = c("observations", "states"),
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
 ##############################################################################################################################################
-augment_marxss <- function (x, type.predict, interval, conf.level, extra) {
+augment_marxss <- function (x, type.predict, interval, conf.level) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model=x[["model"]]
@@ -89,35 +82,9 @@ augment_marxss <- function (x, type.predict, interval, conf.level, extra) {
   ret
 }
 
-augment_dfa = function(x, type.predict, interval, conf.level, extra){
-  if(length(extra)==0){ rotate=FALSE }else{ rotate=extra[["rotate"]] }
-  
+augment_dfa = function(x, type.predict, interval, conf.level){
+ 
   ret = augment_marxss(x, type.predict=type.predict, interval=interval, conf.level=conf.level)
   
-  if(type.predict=="states")
-    stop("Augment does not return the estimated states (trends), i.e. xtT. It returns xtt1, the one-step ahead predictions.  See ?augment.marssMLE . Use tidy() for state/trend estimates or pass in form='marxss' to get xtt1 and its residuals.\n", call. = FALSE)
-  
-  if(rotate){   # if not states, then observations
-    TT = dim(x[["states"]])[2]
-    coefs = coef(x, type="matrix")
-    ZZ = coefs[["Z"]]
-    DD = coefs[["D"]]
-    dd = coefs[["d"]]
-    AA = coefs[["A"]] %*% matrix(1,1,TT)
-    mm = dim(ZZ)[2]
-    if(dim(dd)[2]==1) dd = dd %*% matrix(1,1,TT)
-    if(mm==1){ 
-      ret$.fitted = vec(t(ZZ %*% x[["states"]] + DD %*% dd + AA))
-    }else{
-      H_inv <- varimax(ZZ)[["rotmat"]] # inv of the rotation matrix
-      ret$.fitted = vec(t(ZZ %*% H_inv %*% x[["states"]] + DD %*% dd + AA))
-    }
-    
-    if(interval=="confidence"){
-      alpha = 1-conf.level
-      ret$.conf.low = qnorm(alpha/2)*ret$.se.fit + ret$.fitted
-      ret$.conf.up = qnorm(1-alpha/2)*ret$.se.fit + ret$.fitted
-    }
-  }
   ret
 }
