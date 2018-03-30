@@ -3,7 +3,8 @@
 \title{Return estimated parameters and states with summary information}
 \usage{
   tidy.marssMLE(x, type = c("parameters", "states"),
-                conf.int = TRUE, conf.level = 0.95, ...)
+                conf.int = TRUE, conf.level = 0.95,
+                form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
   \item{x}{a marssMLE object}
@@ -13,6 +14,8 @@
   \item{conf.int}{ Whether to include a confidence interval.}
 
   \item{conf.level}{ Confidence level if interval is returned.}
+
+  \item{form}{If you want the augment function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set.}
   
   \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
 
