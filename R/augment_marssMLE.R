@@ -8,9 +8,11 @@ augment.marssMLE <- function (x, type.predict = c("observations", "states"),
                               interval = c("none", "confidence"), 
                               conf.level = 0.95, 
                               form=attr(x[["model"]], "form")) {
-  
+  ## Argument checking
   type.predict = match.arg(type.predict)
   interval = match.arg(interval)
+  if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("augment.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+  ## End argument checking
   
   augment.fun = paste("augment_", form[1], sep="")
   tmp=try(exists(augment.fun, mode="function"),silent=TRUE)
