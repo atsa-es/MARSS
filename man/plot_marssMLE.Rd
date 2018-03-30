@@ -30,10 +30,12 @@
 }
 \examples{
 data(harborSealWA)
-kemfit <- MARSS(t(harborSealWA[,-1]), model=list(Z=as.factor(c(1,1,1,1,2)), R="diagonal and equal"))
-plot(kemfit)   
- 
+fit <- MARSS(t(harborSealWA[,-1]), model=list(Z=as.factor(c(1,1,1,1,2)), R="diagonal and equal"))
+plot(fit, plot.type="observations")
+
+\dontrun{
 # DFA example   
 dfa <- MARSS(t(harborSealWA[,-1]), model=list(m=2), form="dfa")
 plot(dfa, plot.type="states")
+}
 }
