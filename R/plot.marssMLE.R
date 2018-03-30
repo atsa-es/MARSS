@@ -1,9 +1,10 @@
 plot.marssMLE <- 
   function(x, 
            plot.type=c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqnorm", "state.residuals.qqnorm"), 
-           form=c("marxss", "marss", "dfa"), ...) {
+           form=c("marxss", "marss", "dfa"), conf.int=TRUE, conf.level=0.95, ...) {
   plot.type = match.arg(plot.type, several.ok = TRUE)
-  if(missing(form)){
+
+    if(missing(form)){
     model_form = attr(x[["model"]],"form")
   }else{
     model_form = match.arg(form)
@@ -27,16 +28,18 @@ plot.marssMLE <-
       rotate=extras[["rotate"]]
       if(!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n")
     }else{ rotate=FALSE }
-    
-    states = tidy.marssMLE(x, type="states", ...)
+
+    states = tidy.marssMLE(x, type="states", conf.int=conf.int, conf.level=conf.level, ...)
     if(model_form[1] == "dfa"){
       if(rotate){ rottext = "rotated" }else{ rottext = "" }
       states$term = paste("DFA", rottext, "trend",states$term)
     }else{
       states$term = paste0("State ",states$term)
     }
-    p1 = ggplot2::ggplot(data=states, ggplot2::aes_(~t, ~estimate)) +
-      ggplot2::geom_ribbon(data=states, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), alpha=0.3, col="grey") +
+    p1 = ggplot2::ggplot(data=states, ggplot2::aes_(~t, ~estimate))
+    if(conf.int) p1 = p1 +
+      ggplot2::geom_ribbon(data=states, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), alpha=0.3, col="grey")
+    p1 = p1 +
       ggplot2::geom_line() + 
       ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
       ggplot2::facet_wrap(~term, scale="free_y")
@@ -46,9 +49,9 @@ plot.marssMLE <-
   
   if("observations" %in% plot.type) {
     # make plot of observations
-    df = augment.marssMLE(x, "observations", form=model_form, ...)
-    df$ymin = df$.fitted - 1.96*df$.se.fit
-    df$ymax = df$.fitted + 1.96*df$.se.fit
+    df = augment.marssMLE(x, "observations", form=model_form)
+    df$ymin = df$.fitted - qnorm(alpha/2)*df$.se.fit
+    df$ymax = df$.fitted + qnorm(alpha/2)*df$.se.fit
     p2 = ggplot2::ggplot(data=df, ggplot2::aes_(~t, ~.fitted)) +
       ggplot2::geom_ribbon(data=df, ggplot2::aes_(ymin = ~ymin, ymax= ~ymax), alpha=0.3, col="grey") +
       ggplot2::geom_line() + 
