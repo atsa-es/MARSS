@@ -10,7 +10,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
   extras=list()
   
   rerun.MARSSparamCIs = FALSE
-  model.has.cis = all(c("par.se", "par.lowCI", "par.upCI", "parSigma")%in%names(x))
+  model.has.cis = all(c("par.se", "par.lowCI", "par.upCI")%in%names(x))
   if(conf.int & type=="parameters") rerun.MARSSparamCIs = ifelse(model.has.cis, FALSE, TRUE)
   if(!missing(...)){
     extras=list(...)
