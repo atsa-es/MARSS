@@ -5,7 +5,12 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
                           conf.int = TRUE, conf.level = 0.95,
                           form=attr(x[["model"]], "form")[1], ...)
 { 
+  ## Argument checking
   type = match.arg(type)
+  if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+  if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
+  ## End Argument checking
+  
   alpha = 1-conf.level
   extras=list()
   
@@ -29,28 +34,29 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
     rotate=extras[["rotate"]]
     if(!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n", call.=FALSE)
   }
-  if(form!="dfa" & "rotate"%in%names(extras)) stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call.=FALSE)
-    
+  if(form!="dfa" & "rotate"%in%names(extras)) 
+    if(rotate) stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call.=FALSE)
+  
   if(type=="parameters"){
-  ests = coef(x, type="vector")
-  if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n", call.=FALSE)
-  if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
-    stop("tidy.marssMLE: You are requesting the parameters for a DFA \n and requested that the Z matrix be rotated. You need to do the rotation yourself.  See ?tidy.marssMLE for the code.\n", call.=FALSE)
-  }else{
-  ret = data.frame(
-    term = names(ests),
-    estimate = ests
-  )
-  if( conf.int ){
-    if(rerun.MARSSparamCIs) x = MARSSparamCIs(x, ...)
-    ret = cbind(ret, 
-            std.error = coef(x, type="vector", what="par.se"),
-            conf.low = coef(x, type="vector", what="par.lowCI"),
-            conf.high = coef(x, type="vector", what="par.upCI")
-    )
-  }
-  }
-  rownames(ret)=NULL
+    ests = coef(x, type="vector")
+    if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n", call.=FALSE)
+    if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
+      stop("tidy.marssMLE: You are requesting the parameters for a DFA \n and requested that the Z matrix be rotated. You need to do the rotation yourself.  See ?tidy.marssMLE for the code.\n", call.=FALSE)
+    }else{
+      ret = data.frame(
+        term = names(ests),
+        estimate = ests
+      )
+      if( conf.int ){
+        if(rerun.MARSSparamCIs) x = MARSSparamCIs(x, alpha=alpha, ...)
+        ret = cbind(ret, 
+                    std.error = coef(x, type="vector", what="par.se"),
+                    conf.low = coef(x, type="vector", what="par.lowCI"),
+                    conf.high = coef(x, type="vector", what="par.upCI")
+        )
+      }
+    }
+    rownames(ret)=NULL
   }
   if(type=="states"){
     model=x[["model"]]
