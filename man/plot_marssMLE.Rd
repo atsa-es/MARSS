@@ -8,14 +8,18 @@
   \usage{
   \method{plot}{marssMLE}(x, 
            plot.type=c("observations", "states", "model.residuals", 
-                       "state.residuals", "model.residuals.qqnorm", 
-                       "state.residuals.qqnorm"), 
-           form=c("marxss", "marss", "dfa"), ...)
+                       "state.residuals", "model.residuals.qqplot", 
+                       "state.residuals.qqplot"), 
+           form=c("marxss", "marss", "dfa"),
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
   }
   \arguments{
   \item{x}{ A marssMLE object.  }
-  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. Options for arguments include 'observations' (fits to the raw data), 'states' (estimates of the hidden or latent trends), 'model.residuals' (residuals for the observation error), 'state.residuals' (residuals associated with the process model), 'model.residuals.qqnorm' (qq plot for the observation residuals), 'state.residuals.qqnorm' (qq plot for the state residuals)}
-  \item{form}{ Optional. Form of the model.  This is normally taken from the form attribute of the MLE object (x), but the user can specify a different form.}
+  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. Options for arguments include 'observations' (fits to the raw data), 'states' (estimates of the hidden or latent trends), 'model.residuals' (residuals for the observation error), 'state.residuals' (residuals associated with the process model), 'model.residuals.qqplot' (qq plot for the observation residuals), 'state.residuals.qqplot' (qq plot for the state residuals)}
+  \item{form}{ Optional. Form of the model.  This is normally taken from the form attribute of the MLE object (x), but the user can specify a different form. }
+  \item{conf.int}{ TRUE/FALSE. Whether to include a confidence interval. }
+  \item{conf.level}{ Confidence level for CIs. }
+  \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots. }
   \item{...}{ Other arguments, not used. }
   }
 \value{
@@ -31,5 +35,5 @@ plot(kemfit)
  
 # DFA example   
 dfa <- MARSS(t(harborSealWA[,-1]), model=list(m=2), form="dfa")
-plt = plot(dfa, type="states")
+plot(dfa, plot.type="states")
 }
