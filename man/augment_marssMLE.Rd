@@ -7,7 +7,7 @@
 \usage{
   augment.marssMLE(x, type.predict = c("observations", "states"),
                               interval = c("none", "confidence"), 
-                              conf.level = 0.95, form=attr(x[["model"]], "form"), ...)
+                              conf.level = 0.95, form=attr(x[["model"]], "form"))
 }
 \arguments{
   \item{x}{a marssMLE object}
@@ -18,9 +18,8 @@
   
   \item{conf.level}{Confidence level.}
   
-  \item{form}{If you want the augment function to use a different augment function than augment.form.  This might be useful if you manually specified a DFA model and want to use augment.dfa for rotating.}
+  \item{form}{If you want the augment function to use a different augment function than augment_form.  This might be useful if you manually specified a DFA model and want to use augment.dfa for rotating.}
 
-  \item{...}{extra arguments (not used)}
 }
 \description{
 Return a data.frame with the observations or states fitted values, residuals, and upper and lower confidence intervals if requested.
