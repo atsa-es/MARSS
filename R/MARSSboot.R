@@ -83,10 +83,8 @@ MARSSboot = function(MLEobj, nboot=1000, output="parameters", sim="parametric",
   }
 
   # Check for marssMLE properness; check that MLEobj$marss$data exists
-  tmp = is.marssMLE(MLEobj)
-  if(!isTRUE(tmp)) {
-    if(!silent) cat(tmp)
-    stop("Stopped in MARSSboot() due to MLE object incomplete or inconsistent.\n", call.=FALSE)
+  if(class(MLEobj)[1]!="marssMLE") {
+    stop("Stopped in MARSSboot(). Object must be class marssMLE.\n", call.=FALSE)
   }
   # Check that it has par added on
   if(is.null(MLEobj[["par"]])){

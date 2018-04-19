@@ -50,14 +50,15 @@ All parameters except x0 and V0 may be time-varying.  If time-varying, then text
     \item{model = list(Z="identity", A="scaling", R="diagonal and equal", B="identity", U="unconstrained", Q="diagonal and unequal", x0="unconstrained", V0="zero", C="zero",D="zero",c=matrix(0,0,1), d=matrix(0,0,1), tinitx=0, diffuse=FALSE)}
     \item{control=list(minit=15, maxit=500, abstol=0.001, trace=0, sparse=FALSE,
                    safe=FALSE, allow.degen=TRUE, min.degen.iter=50, degen.lim=1.0e-04, 
-                   min.iter.conv.test=15, conv.test.deltaT=9, conv.test.slope.tol= 0.5,  demean.states=FALSE) }
+                   min.iter.conv.test=15, conv.test.deltaT=9, conv.test.slope.tol= 0.5,  demean.states=FALSE) You can read about these in \code{\link{MARSS}}.  If you want to speed up your fits, you can turn off most of the model checking using \code{trace=-1}. }
+    \item{fun.kf = "MARSSkfas"; This sets the Kalman filter function to use.  \code{MARSSkfas()} is generally more stable as it uses Durban & Koopman's algorithm.  But it may dramatically slow down when the dataset is large (more than 10 rows of data).  Try the classic Kalman filter algorithm to see if it runs faster by setting \code{fun.kf="MARSSkfss"}. You can read about the two algorithms in \code{\link{MARSSkf}}.}
   }
 For \code{method="BFGS"}, type  \code{MARSS:::alldefaults$BFGS} to see the defaults.
 
 
 }
 \value{
-A object of class \code{\link{marssMLE}}.  See \code{\link{print.marssMLE}} for a discussion of the various output available for \code{\link{marssMLE}} objects (coefficients, residuals, Kalman filter and smoother output, imputed values for missing data, etc.).  See \code{\link{MARSSsimulate}} for simulating from \code{\link{marssMLE}} objects. \code{\link{MARSSboot}} for bootstrapping, \code{\link{MARSSaic}} for calculation of various AIC related model selection metrics, and \code{\link{MARSSparamCIs}} for calculation of confidence intervals and bias. 
+A object of class \code{\link{marssMLE}}.  See \code{\link{print.marssMLE}} for a discussion of the various output available for \code{\link{marssMLE}} objects (coefficients, residuals, Kalman filter and smoother output, imputed values for missing data, etc.).  See \code{\link{MARSSsimulate}} for simulating from \code{\link{marssMLE}} objects. \code{\link{MARSSboot}} for bootstrapping, \code{\link{MARSSaic}} for calculation of various AIC related model selection metrics, and \code{\link{MARSSparamCIs}} for calculation of confidence intervals and bias. See \code{\link{plot.marssMLE}} for some default plots of a model fit.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
