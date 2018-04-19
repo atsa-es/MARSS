@@ -96,6 +96,8 @@ is.validvarcov = function(x, method="kem"){
   nr = dim(x)[1]; nc = dim(x)[2];
   #square
   if(nr != nc) return(list(ok=FALSE, error="matrix is not square and all varcov matrices are "))
+  # diagonal matrices are always fine
+  if(is.diagonal(x)) return(list(ok=TRUE, error=NULL))
   #symmetric
   if(!isTRUE(all.equal(x,t(x)))) return(list(ok=FALSE, error="matrix is not symmetric and all varcov matrices are "))
   #all valid varcov are some kind of blockdiag
@@ -112,7 +114,7 @@ is.validvarcov = function(x, method="kem"){
     if(nr == 0) return(list(ok=TRUE, error=NULL))
   }
   #this tests the blocks to see if there is mixing of fixed and estimated elements
-  #makes a lists of the block estimates to test that blocks with shared values are identical
+  #makes a list of the block estimates to test that blocks with shared values are identical
   tmpx = x
   tmpr = 1:nr
   blocks=list()
