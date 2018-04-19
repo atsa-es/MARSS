@@ -330,9 +330,18 @@ unvec = function(x,dim=NULL){
   return(matrix(x,dim[1],dim[2]))
 }
 
+parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
+  if(length(dim(MLEobj[["marss"]][["free"]][["Q"]])) == 3){ 
+    return(aparmat(MLEobj, elem=elem, model.loc=model.loc)) # 3D
+  }else{
+    return(vparmat(MLEobj, elem=elem, model.loc=model.loc)) # 2D
+  }
+}
+
+# for 3D array format of fixed free
 # model.loc tells parmat which model the pars element is matched to.
 # normally this is $marss.  but for coef() the MLEobj is modified so the pars matches $model
-parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
+aparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
   #returns a list where each el in elem is an element.  Returns a 2D matrix.
   #needs MLEobj$marss and MLEobj$par
   #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
@@ -367,10 +376,10 @@ parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L")
   return(par.mat)
 }
 
-# This is a version of parmat based on a sparse matrix free and fixed notation
-# each column of fixed and free is vec(free[t]).
+# This is a version of parmat based on a vectorized matrix free and fixed notation
+# each column of fixed and free is vec(free[t]). fixed and free are 2D
 # fixed and free are sparse matrices (class Matrix)
-sparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
+vparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
   #returns a list where each el in elem is an element.  Returns a 2D matrix.
   #needs MLEobj$marss and MLEobj$par
   #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
