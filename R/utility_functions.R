@@ -367,6 +367,40 @@ parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L")
   return(par.mat)
 }
 
+# This is a version of parmat based on a sparse matrix free and fixed notation
+# each column of fixed and free is vec(free[t]).
+# fixed and free are sparse matrices (class Matrix)
+sparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
+  #returns a list where each el in elem is an element.  Returns a 2D matrix.
+  #needs MLEobj$marss and MLEobj$par
+  #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
+  #f=MLEobj$marss$fixed
+  model=MLEobj[[model.loc]]
+  pars=MLEobj[["par"]]
+  f=model[["fixed"]]
+  d=model[["free"]]
+  if(!all(elem %in% names(f))) stop("sparmat: one of the elem is not one of the marss parameter names.")
+  par.mat=list()
+  if(is.null(dims)) dims = attr(model, "model.dims")
+  if(!is.list(dims) & length(elem)!=1) stop("sparmat: dims needs to be a list if more than one elem passed in")
+  if(!is.list(dims) & length(elem)==1){ tmp=dims; dims=list(); dims[[elem]]=tmp }
+  for(el in elem){
+    if(length(t)>1){ par.mat[[el]] = array(as.numeric(NA), dim=c(dims[[el]][1:2],length(t))) }
+    dr = dim(d[[el]])[1] # rows
+    left.side = kronecker(t(pars[[el]]), Diagonal(dr))
+    for(i in t){
+      if(dim(d[[el]])[2]==1){ delem=d[[el]] }else{ delem=d[[el]][,i,drop=FALSE] }
+      if(dim(f[[el]])[2]==1){ felem=f[[el]] }else{ felem=f[[el]][,i,drop=FALSE] }
+      if(length(t)==1){
+        par.mat[[el]] = matrix(felem + left.side %*% delem,dims[[el]][1],dims[[el]][2])
+      }else{ 
+        par.mat[[el]][,,i] = matrix(felem + left.side %*% delem,dims[[el]][1],dims[[el]][2])
+      }
+    }
+  }
+  return(par.mat)
+}
+
 is.wholenumber = function(x, tol = .Machine$double.eps^0.5) {
   if(!is.numeric(x)) return(FALSE)
   test = abs(x - round(x)) < tol
