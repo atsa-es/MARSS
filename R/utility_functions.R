@@ -562,7 +562,7 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
 # turns a fixed/free pair to a list (possibly time-varying) matrix describing that 
 # MARSS parameter structure
 # will detect if fixed/free is Matrix class and then treat free as 2D matrix
-fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st and 2nd dims of the outputed list matrix
+fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of the outputed list matrix
   #this will take a 3D or 2D 
   if(length(dim)!=2) stop("fixed.free.to.formula: dim must be a length 2 vector")
   if(is.null(dim(fixed))) stop("fixed.free.to.formula: fixed must be matrix")
@@ -578,8 +578,8 @@ fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st a
     tmax.fixed = dim(fixed)[2]
     Tmax=max(1,tmax.fixed,tmax.free)
     np = dim(free)[1]/dim(fixed)[1] #number of parameters
-    colnames.free=par.names
-    if(is.null(colnames.free)) colnames.free=as.character(1:np)
+    colnames.free=attr(free, "par.names")
+    if(is.null(colnames.free) & np!=0) colnames.free=as.character(1:np)
   }else{
     np = dim(free)[2]
     if(length(dim(fixed))==2) fixed=array(fixed,dim=c(dim(fixed),1))
