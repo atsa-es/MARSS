@@ -551,7 +551,7 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
     }
   } #any characters?
   if(TwoD){
-    attr(free, "par.names")=varnames
+    attr(free, "estimate.names")=varnames
     attr(free, "dim.free")=c(dim.f1,nvar,Tmax)
   }else{
     colnames(free)=varnames 
@@ -578,7 +578,7 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
     tmax.fixed = dim(fixed)[2]
     Tmax=max(1,tmax.fixed,tmax.free)
     np = dim(free)[1]/dim(fixed)[1] #number of parameters
-    colnames.free=attr(free, "par.names")
+    colnames.free=attr(free, "estimate.names")
     if(is.null(colnames.free) & np!=0) colnames.free=as.character(1:np)
   }else{
     np = dim(free)[2]
