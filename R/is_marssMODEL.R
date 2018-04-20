@@ -159,8 +159,12 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     # check dim
     # isM defined at top.  Means is 2D vec form
     dim.fixed.flag = !isTRUE(all.equal( dim(fixed[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
-    if(!isM) dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )       if(!isM) dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
-    if(isM) dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2]*attr(free[[elem]],"free.dims")[2] ) )
+    if(!isM){
+      dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )       
+      dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
+    }else{
+      dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2]*attr(free[[elem]],"free.dims")[2] ) )
+    }
     dim.fixed = c(dim.fixed, dim.fixed.flag)
     dim.free = c(dim.free, dim.free.flag) 
   }
