@@ -550,9 +550,8 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
       }
     }
   } #any characters?
-  fixed=f
   colnames(free)=varnames 
-  return(list(fixed=fixed,free=free))
+  return(list(fixed=f,free=free))
 }
 
 # turns a fixed/free pair to a list (possibly time-varying) matrix describing that 
