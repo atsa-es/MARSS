@@ -331,10 +331,11 @@ unvec = function(x,dim=NULL){
 }
 
 parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
-  if(length(dim(MLEobj[["marss"]][["free"]][["Q"]])) == 3){ 
-    return(aparmat(MLEobj, elem=elem, model.loc=model.loc)) # 3D
+  isM = is(MLEobj[["marss"]][["free"]][["Q"]],"Matrix")
+  if(isM){ 
+    return(vparmat(MLEobj, elem=elem, model.loc=model.loc)) # 2D and Matrix
   }else{
-    return(vparmat(MLEobj, elem=elem, model.loc=model.loc)) # 2D
+    return(aparmat(MLEobj, elem=elem, model.loc=model.loc)) # 3D
   }
 }
 
@@ -537,6 +538,8 @@ convert.model.mat=function(param.matrix){
   return(list(fixed=fixed,free=free))
 }
 
+# turns a fixed/free pair to a list (possibly time-varying) matrix describing that 
+# MARSS parameter structure
 fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of the outputed list matrix
   #this will take a 3D or 2D 
   if(length(dim)!=2) stop("fixed.free.to.formula: dim must be a length 2 vector")
@@ -550,7 +553,6 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
   if(length(dim(free))==2){ free=array(free,dim=c(dim(free),1)); colnames(free)=colnames.free }
   Tmax=max(Tmax,dim(fixed)[3],dim(free)[3])
   
-  #turns a fixed/free pair to a list (possibly time-varying) matrix describing that MARSS parameter structure
   model=array(list(0),dim=c(dim(fixed)[1],dim(fixed)[2],Tmax)) 
   for(t in 1:Tmax){
     free.t = min(t,dim(free)[3])
