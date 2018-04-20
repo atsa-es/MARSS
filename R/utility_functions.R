@@ -562,7 +562,7 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
   
   attr(free, "estimate.names")=varnames
   attr(free, "free.dims")=c(dim.f1,nvar,Tmax)
-  attr(fixed, "fixed.dims")=c(dim.f1,1,Tmax)
+  attr(f, "fixed.dims")=c(dim.f1,1,Tmax)
   if(!TwoD) colnames(free)=varnames 
   return(list(fixed=f,free=free))
 }
