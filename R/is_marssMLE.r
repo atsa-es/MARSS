@@ -48,8 +48,10 @@ is.marssMLE <- function(MLEobj)
   par.dims=attr(model,"model.dims")
   en=attr(model,"par.names")
   dat = model[["data"]]
-  num.ests = lapply(model[["par"]],function(x){dim(x)[1]})
-
+  isM = is(free, "Matrix")
+  if(!isM) num.ests = lapply(free,function(x){dim(x)[2]})
+  if(isM) num.ests = lapply(free,function(x){attr(x, "free.dims")[2]})
+  
   ##### If model is OK, check start
   init.null = dim.init = NULL
   #make sure each element of start is present and is numeric
