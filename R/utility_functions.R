@@ -457,7 +457,7 @@ mystrsplit=function(x){
   return(stre)
 }
 
-convert.model.mat=function(param.matrix, TwoD=TRUE){
+convert.model.mat=function(param.matrix, TwoD=FALSE){
   #uses the list matrix version of a parameter to make the fixed(f) and free(D) matrices; vec(param)=f+D*p
   #will take a numeric, character or list matrix
   #returns fixed and free matrices that are 3D as required for a marssMODEL form=marss model
@@ -475,7 +475,7 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
   varnames=c()
   d=array(sapply(c,is.character),dim=dim(c))
   f=array(0,dim=dim(c))
-  f[!d]=unlist(c[!d])
+  if(any(!d)) f[!d]=unlist(c[!d]) # add check so "all character" matrices don't fail
   if(TwoD){
     f=Matrix(as.vector(f),dim.f1,Tmax)
   }else{
@@ -550,7 +550,12 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
       }
     }
   } #any characters?
-  colnames(free)=varnames 
+  if(TwoD){
+    attr(free, "par.names")=varnames
+    attr(free, "dim.free")=c(dim.f1,nvar,Tmax)
+  }else{
+    colnames(free)=varnames 
+  }
   return(list(fixed=f,free=free))
 }
 
@@ -565,8 +570,8 @@ fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st a
   if( !(length(dim(fixed)) %in% c(2,3)) ) stop("fixed.free.to.formula: fixed must be 2 or 3D matrix")
   if( !(length(dim(free)) %in% c(2,3)) ) stop("fixed.free.to.formula: free must be 2 or 3D matrix")
   
-  isM = if(is(free, "Matrix")) # is Matrix class
-    row.f = dim(fixed)[1]
+  isM = is(free, "Matrix") # is Matrix class
+  row.f = dim(fixed)[1]
   
   if(isM){ # then is 2D with time in columns and each col is vec(d)
     tmax.free = dim(free)[2]
@@ -579,7 +584,7 @@ fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st a
     np = dim(free)[2]
     if(length(dim(fixed))==2) fixed=array(fixed,dim=c(dim(fixed),1))
     colnames.free=colnames(free)
-    if(is.null(colnames.free)) colnames.free=as.character(1:np)
+    if(is.null(colnames.free) & np!=0) colnames.free=as.character(1:np)
     if(length(dim(free))==2){ free=array(free,dim=c(dim(free),1)); colnames(free)=colnames.free }
     Tmax=max(1,dim(fixed)[3],dim(free)[3])
     tmax.free = dim(free)[3]
@@ -604,6 +609,7 @@ fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st a
   for(t in 1:Tmax){
     free.t = min(t,tmax.free)
     fixed.t = min(t,tmax.fixed)
+    # free.2d and fixed.2d are the matrices at time t
     if(isM){
       free.2d = free[,free.t,drop=FALSE]
       dim(free.2d) = c(row.f, np)
@@ -611,6 +617,8 @@ fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st a
     }else{
       free.2d = free[,,free.t,drop=FALSE]
       fixed.2d = fixed[,,fixed.t,drop=FALSE]
+      dim(free.2d) = c(row.f, np)
+      dim(fixed.2d) = c(row.f, 1)
     }
     for(i in 1:row.f){
       if(all(free.2d[i,]==0)){ model[i,1,t]=fixed.2d[i,1]
