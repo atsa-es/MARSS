@@ -513,8 +513,12 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
     }
   } 
   
-  
-  free=array(0,dim=c(dim.f1,length(varnames),Tmax))
+  nvar = length(varnames) #number of variables
+  if(TwoD){
+    free=Matrix(0,dim.f1*nvar,Tmax)
+  }else{
+    free=array(0,dim=c(dim.f1,nvar,Tmax))
+  }
   if(any(d)){ #any character? otherwise all numeric
     if(any(grepl("[*]",c) | grepl("[+]",c))){
       for(i in is.char){
@@ -525,7 +529,13 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
         for(p in varnames){
           drow=i%%dim.f1
           if(drow==0) drow=dim.f1
-          if(p %in% e.vars) free[drow,which(p==varnames),ceiling(i/dim.f1)]=sum(as.numeric(e[(stars-1)[e[stars+1]==p]]))
+          if(p %in% e.vars){ 
+            val = sum(as.numeric(e[(stars-1)[e[stars+1]==p]]))
+            dcol = which(p==varnames)
+            dt = ceiling(i/dim.f1)
+            pos = drow + dim.f1*(dcol-1)+dim.f1*nvar*(dt-1)
+            free[pos]=val
+          }
         }
       }
     }else{ #no * or +? Then this is faster
