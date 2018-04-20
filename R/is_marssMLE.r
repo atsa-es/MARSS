@@ -41,24 +41,27 @@ is.marssMLE <- function(MLEobj)
 
   msg = c()   #reset the messages
 
-  ## If model is OK, check start
+  # Set up some variables
   model=MLEobj[["marss"]]
   free=model[["free"]]
   fixed=model[["fixed"]]
   par.dims=attr(model,"model.dims")
   en=attr(model,"par.names")
   dat = model[["data"]]
+  num.ests = lapply(model[["par"]],function(x){dim(x)[1]})
 
+  ##### If model is OK, check start
   init.null = dim.init = NULL
-
   #make sure each element of start is present and is numeric
-  for (el in en) {   
+  for (el in en) {
+    dim2.free = ifelse(isM,attr(free[[el]],"free.dims")[2],dim(free[[el]])[2])
+    
     init.null.flag <- ( is.null(MLEobj[["start"]][[el]]) || !is.numeric(MLEobj[["start"]][[el]]) )
 
     dim.init.flag = FALSE 
-    if (!init.null.flag) {   #element is present so check it's dimensions
+    if (!init.null.flag) {   #element is present so check its dimensions
       #true means there is a problem
-      dim.init.flag = (dim(free[[el]])[2]!=dim(MLEobj[["start"]][[el]])[1]) || dim(MLEobj[["start"]][[el]])[2]!=1
+      dim.init.flag = (num.ests[[el]]!=dim(MLEobj[["start"]][[el]])[1]) || dim(MLEobj[["start"]][[el]])[2]!=1
     }
  
     init.null <- c(init.null, init.null.flag)
@@ -74,15 +77,35 @@ is.marssMLE <- function(MLEobj)
     }    
   }
 ## TEMPORARY UNTIL change Q and R to not allow 0s (with addition of G and H matrices)
-  #make sure not 0s in par unless corresponding rows of D are all zero
+  #make sure no 0s in par unless corresponding rows of D (free) are all zero
   for(el in c("Q","R","V0")){
   if(!is.fixed(free[[el]])){
     bad.ts=c()
-    dvars=free[[el]][1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1),,,drop=FALSE]
-    dvars.cols=apply(dvars!=0,2,sum)!=0   #those var rows that have values, give use the var columns
-    Tmax=max(dim(fixed[[el]])[3],dim(free[[el]])[3])
+    np=num.ests[[el]] #number of estimated vals
+    # these are the rows of fixed that correspond to diag values of the Q, R or V0
+    drows=1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
+    # dvars are the rows of free corresponding to those diagonal vals
+    if(isM){
+      #isM then each col is the vec of the 2D free matrix; each col is time
+      dvars=free[[el]][drows+0:(np-1),,drop=FALSE]
+      Tmax=max(dim(fixed[[el]])[2],dim(free[[el]])[2])
+    }else{
+      dvars=free[[el]][drows,,,drop=FALSE]
+      Tmax=max(dim(fixed[[el]])[3],dim(free[[el]])[3])
+    }
+    # column (estimated value in par) that is not zero
+    # that is a diagonal value that is being estimated
+    # those values cannot have an init that is 0
+    dvars.cols=apply(dvars!=0,2,sum)!=0
+    # if none of the start values assoc. with diagonals is 0, move on
+    if(!any(MLEobj[["start"]][[el]][dvars.cols]==0)) next
     for(i in 1:Tmax){
-      d=sub3D(free[[el]],t=min(i,dim(free[[el]])[3]))
+      if(isM){ 
+        d=subFree2D(free[[el]],t=min(i,dim(free[[el]])[2]))
+        }else{ 
+        d=sub3D(free[[el]],t=min(i,dim(free[[el]])[3])) 
+        }
+      # is there a value in the dvar.col AND a 0 in the start vector?
       if(any(colSums(d[,dvars.cols,drop=FALSE])!=0 & MLEobj[["start"]][[el]][dvars.cols]==0)){
         bad.ts=c(bad.ts,i)
       }
@@ -102,12 +125,12 @@ is.marssMLE <- function(MLEobj)
       dim.flag=FALSE
       if(!is.null(MLEobj[["par"]][[el]])) {
          dim.flag = isTRUE(dim(MLEobj[["par"]][[el]])[2]!=1)
-         dim.flag = dim.flag || isTRUE(dim(MLEobj[["par"]][[el]])[1]!=dim(free[[el]])[2])
+         dim.flag = dim.flag || isTRUE(dim(MLEobj[["par"]][[el]])[1]!=dim2.free)
          dim.par=c(dim.par,dim.flag)
       }
     }
     if(any(dim.par)){
-       msg = c(msg, paste("par element for", en[dim.par],"is incorrect.  Should correspond to dim 2 of free.\n"))
+       msg = c(msg, paste("par element for", en[dim.par],"is incorrect.  Should correspond to dim 2 of free (in 3D format).\n"))
     }
   }
   
