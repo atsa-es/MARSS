@@ -457,31 +457,36 @@ mystrsplit=function(x){
   return(stre)
 }
 
-convert.model.mat=function(param.matrix){
+convert.model.mat=function(param.matrix, TwoD=TRUE){
   #uses the list matrix version of a parameter to make the fixed(f) and free(D) matrices; vec(param)=f+D*p
   #will take a numeric, character or list matrix
   #returns fixed and free matrices that are 3D as required for a marssMODEL form=marss model
   #if param.matrix is 3D then dim3 of f and D will equal dim3 of model.matrix
   #if param.matrix is 2D then dim3 of f and D will equal 1
+  #TwoD=TRUE means to specifiy the fixed and free as 2D matrixes as class Matrix
   if(!is.array(param.matrix)) stop("convert.model.mat: function requires a 2D or 3D matrix")
   if(!(length(dim(param.matrix)) %in% c(2,3))) stop("convert.model.mat: arg must be a 2D or 3D matrix")
   Tmax=1
   if(length(dim(param.matrix))==3) Tmax=dim(param.matrix)[3]
   dim.f1=dim(param.matrix)[1]*dim(param.matrix)[2]
-  fixed=array(0,dim=c(dim.f1,1,Tmax))
-  #for(t in 1:Tmax){
+
+    #for(t in 1:Tmax){
   c=param.matrix
   varnames=c()
   d=array(sapply(c,is.character),dim=dim(c))
   f=array(list(0),dim=dim(c))
   f[!d]=c[!d]
   f=vec(f)
-  f=array(unlist(f),dim=c(dim.f1,1,Tmax))
+  if(TwoD){
+    f=Matrix(unlist(f),dim.f1,Tmax)
+  }else{
+    f=array(unlist(f),dim=c(dim.f1,1,Tmax))
+  }
   
   is.char=c()
   if(any(d)){ #any character? otherwise all numeric
     is.char=which(d)
-    if(any(grepl("[*]",c) | grepl("[+]",c))){  #any * or +, then do this really slow code to find the fixed bits
+    if(any(grepl("[*]",c) | grepl("[+]",c))){  #any * or +? then do this really slow code to find the fixed bits
       for(i in is.char){
         e=mystrsplit(c[[i]])
         firstel=suppressWarnings(as.numeric(e[1]))
