@@ -37,13 +37,14 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   # Check that fixed and free are either both Matrix or not
   # and are 3D if not in 2D vec form
   ###########################
+  free = MODELobj[["free"]]
+  fixed = MODELobj[["fixed"]]
   ok = FALSE
-  elem = names(MODELobj[["free"]])
-  isMd = unlist(lapply(MODELobj[["free"]], is, "Matrix"))
-  isMf = unlist(lapply(MODELobj[["fixed"]], is, "Matrix"))
+  isMd = unlist(lapply(free, is, "Matrix"))
+  isMf = unlist(lapply(fixed, is, "Matrix"))
   if(all(isMd)&all(isMf)){ ok=TRUE; isM=TRUE }
-  isAd = unlist(lapply(MODELobj[["free"]], function(x){ class(x)=="array" & length(dim(x))==3}))
-  isAf = unlist(lapply(MODELobj[["fixed"]], function(x){ class(x)=="array" & length(dim(x))==3}))
+  isAd = unlist(lapply(free, function(x){ class(x)=="array" & length(dim(x))==3}))
+  isAf = unlist(lapply(fixed, function(x){ class(x)=="array" & length(dim(x))==3}))
   if(all(isAd)&all(isAf)){ ok=TRUE; isM=FALSE }
   if(!ok) msg = c(msg, "MODELobj$free and MODELobj$fixed for must all be 3D array or 2D vec format.\n")
 
@@ -51,15 +52,15 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   # Check that free and fixed are numeric matrices with no NA or Infs
   ###########################
   fun = function(x){ any(is.na(x)) || any(is.infinite(x)) }
-    if(any(unlist(lapply(MODELobj[["free"]], fun )))) 
+    if(any(unlist(lapply(free, fun )))) 
       msg = c(msg, "MODELobj$free must have no NAs or Infs.\n")
-    if(any(unlist(lapply(MODELobj[["fixed"]], fun )))) 
+    if(any(unlist(lapply(fixed, fun )))) 
        msg = c(msg, "MODELobj$fixed must have no NAs or Infs.\n")
-  if(!isM){ # Matrix class is always numeric
+  if(!isM){ # Matrix class is always numeric so don't need to check that case
     fun = function(x){ mode(x) != "numeric" }
-    if(any(unlist(lapply(MODELobj[["free"]], fun )))) 
+    if(any(unlist(lapply(free, fun )))) 
       msg = c(msg, "MODELobj$free must be numeric with no NAs or Infs.\n")
-    if(any(unlist(lapply(MODELobj[["fixed"]], fun )))) 
+    if(any(unlist(lapply(fixed, fun )))) 
       msg = c(msg, "MODELobj$fixed must be numeric.\n")
   }
   
