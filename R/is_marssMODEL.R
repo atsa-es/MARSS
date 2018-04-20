@@ -23,24 +23,45 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     msg=c("\nErrors were caught in is.marssMODEL()\n", msg)
     return(msg)
   }
-  
-  ## Check that free and fixed are numeric matrices with no NA or Infs
-  for(mat in c("fixed","free")){
-    if (!is.list(MODELobj[[mat]])) msg = c(msg, paste("MODELobj$",mat," must be a list of matrices.\n",sep="")) 
-    for (i in 1:length(MODELobj[[mat]])) {
-      if(class(MODELobj[[mat]][[i]]) != "array" || length(dim(MODELobj[[mat]][[i]]))!=3){ 
-        msg = c(msg, paste("MODELobj$",mat,"$",names(MODELobj[[mat]])[i]," must be a 3D matrix.\n", sep=""))
-      }
-      if(mode(MODELobj[[mat]][[i]]) != "numeric" || any(is.na(MODELobj[[mat]][[i]])) || any(is.infinite(MODELobj[[mat]][[i]])) ) 
-        msg = c(msg, paste("MODELobj$",mat,"$",names(MODELobj[[mat]])[i]," must be numeric, have no NAs, and no Infs.\n", sep=""))  
-    }
-  }
-  
+
+  ###########################
+  # Check the data
+  ###########################
   if( length(dim(MODELobj$data)) != 2)
     msg = c(msg, "Data is not a 2D matrix.\n")
   ## check for T=1
   if( !is.numeric(MODELobj$data ) ) msg = c(msg, "Data must be numeric.\n")
   if( dim(MODELobj$data)[2] == 1 ) msg = c(msg, "Data has only one time point.\n")
+  
+  ###########################
+  # Check that fixed and free are either both Matrix or not
+  # and are 3D if not in 2D vec form
+  ###########################
+  ok = FALSE
+  elem = names(MODELobj[["free"]])
+  isMd = unlist(lapply(MODELobj[["free"]], is, "Matrix"))
+  isMf = unlist(lapply(MODELobj[["fixed"]], is, "Matrix"))
+  if(all(isMd)&all(isMf)){ ok=TRUE; isM=TRUE }
+  isAd = unlist(lapply(MODELobj[["free"]], function(x){ class(x)=="array" & length(dim(x))==3}))
+  isAf = unlist(lapply(MODELobj[["fixed"]], function(x){ class(x)=="array" & length(dim(x))==3}))
+  if(all(isAd)&all(isAf)){ ok=TRUE; isM=FALSE }
+  if(!ok) msg = c(msg, "MODELobj$free and MODELobj$fixed for must all be 3D array or 2D vec format.\n")
+
+  ###########################
+  # Check that free and fixed are numeric matrices with no NA or Infs
+  ###########################
+  fun = function(x){ any(is.na(x)) || any(is.infinite(x)) }
+    if(any(unlist(lapply(MODELobj[["free"]], fun )))) 
+      msg = c(msg, "MODELobj$free must have no NAs or Infs.\n")
+    if(any(unlist(lapply(MODELobj[["fixed"]], fun )))) 
+       msg = c(msg, "MODELobj$fixed must have no NAs or Infs.\n")
+  if(!isM){ # Matrix class is always numeric
+    fun = function(x){ mode(x) != "numeric" }
+    if(any(unlist(lapply(MODELobj[["free"]], fun )))) 
+      msg = c(msg, "MODELobj$free must be numeric with no NAs or Infs.\n")
+    if(any(unlist(lapply(MODELobj[["fixed"]], fun )))) 
+      msg = c(msg, "MODELobj$fixed must be numeric.\n")
+  }
   
   if(!is.null(msg)){  #rest of the tests won't work so stop now
     msg=c("\nErrors were caught in is.marssMODEL()\n", msg)
@@ -128,28 +149,6 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   }
   
   ###########################
-  # Check that fixed and free are 3D
-  ###########################
-  dim.fixed = dim.free =  NULL
-  free=MODELobj$free; fixed=MODELobj$fixed
-  for (elem in par.names) {
-    dim.fixed.flag = dim.free.flag = FALSE
-    if(length(dim(free[[elem]]))!=3){ dim.free.flag = TRUE } #3-dimensions
-    if(length(dim(fixed[[elem]]))!=3){ dim.fixed.flag = TRUE }
-    dim.fixed <- c( dim.fixed, dim.fixed.flag )
-    dim.free <- c( dim.free, dim.free.flag )
-  }
-  #stop now since the rest of the tests won't work
-  if (any(c(dim.fixed, dim.free))) {  
-    if(any(dim.fixed)) {
-      msg = c(msg, paste("fixed", par.names[dim.fixed],"is not 3D.\n"))   }
-    if(any(dim.free)) {
-      msg = c(msg, paste("free", par.names[dim.free],"is not 3D.\n"))    }
-    msg=c("\nErrors were caught in is.marssMODEL()\n", msg)
-    return(msg)
-  }
-
-  ###########################
   # Check that 1st and 2nd dims of fixed ok, and 1st dim of free are ok
   ###########################
   dim.fixed.flag = dim.free.flag = nomatch.flag = FALSE
@@ -158,9 +157,10 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   for (elem in par.names) {
     ## Check for problems in the fixed/free pairs. Problems show up as TRUE     
     # check dim
+    # isM defined at top.  Means is 2D vec form
     dim.fixed.flag = !isTRUE(all.equal( dim(fixed[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
-    dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )    
-    dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
+    if(!isM) dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )       if(!isM) dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
+    if(isM) dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2]*attr(free[[elem]],"free.dims")[2] ) )
     dim.fixed = c(dim.fixed, dim.fixed.flag)
     dim.free = c(dim.free, dim.free.flag) 
   }
@@ -171,21 +171,23 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     }
     if(any(dim.free)) {
       bad.names = par.names[dim.free]
-      msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names],"based on data and other parameters.\n"))
+      if(!isM) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names],"based on data and other parameters.\n"))
+      if(isM) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names], "x", attr(free[[elem]],"free.dims")[2], "based on data and other parameters.\n"))
     }
   }
 
   ###########################
-  # Check that 3rd dims of fixed and free are 1 or TT
+  # Check that time dims of fixed and free are 1 or TT
   ###########################
   dim.fixed=dim.free=c()
   dim.fixed.flag = dim.free.flag  = FALSE
   for (elem in par.names) {
     ## Check for problems in the fixed/free pairs. Problems show up as TRUE 
     
-    #test that dim3 is either 1 or TT
-    dim.fixed.flag = (!isTRUE( all.equal( dim(fixed[[elem]])[3], TT ) ) & !isTRUE(all.equal( dim(fixed[[elem]])[3], 1 ) )) 
-    dim.free.flag = (!isTRUE(all.equal( dim(free[[elem]])[3], TT ) ) & !isTRUE(all.equal( dim(free[[elem]])[3], 1 ) ))    
+    #test that time dim is either 1 or TT
+    if(isM) tdim = 2 else tdim = 3
+    dim.fixed.flag = (!isTRUE( all.equal( dim(fixed[[elem]])[tdim], TT ) ) & !isTRUE(all.equal( dim(fixed[[elem]])[tdim], 1 ) )) 
+    dim.free.flag = (!isTRUE(all.equal( dim(free[[elem]])[tdim], TT ) ) & !isTRUE(all.equal( dim(free[[elem]])[tdim], 1 ) ))    
     dim.fixed = c(dim.fixed, dim.fixed.flag)
     dim.free = c(dim.free, dim.free.flag) 
   }  
@@ -204,7 +206,11 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   ###########################
   # Check that free has column names since these are the parameter names
   ###########################
-  no.colnames.free=unlist(lapply(lapply(free[par.names],colnames),is.null)) & unlist(lapply(free[par.names],function(x){dim(x)[2]}))!=0
+  if(!isM){
+  no.colnames.free=unlist(lapply(free[par.names],function(x){ is.null(colnames(x)) })) & unlist(lapply(free[par.names],function(x){dim(x)[2]}))!=0
+  }else{
+    no.colnames.free=unlist(lapply(free[par.names],function(x){is.null(attr(x,"estimate.names"))})) & unlist(lapply(free[par.names],function(x){dim(x)[1]}))!=0
+  }
   if(any(no.colnames.free)) {
     msg = c(msg, paste("free", par.names[no.colnames.free], "is missing column names.\n"))
   }
@@ -213,7 +219,6 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   # Check data and missing values consistency if data present
   # as.numeric(NA) is the missing value
   ###########################
-  if(!is.numeric(MODELobj$data)) msg = paste(msg, "Data must be numeric. \n")
   for( bad.val in c(NA, NaN, Inf, -Inf)){
     if(!identical(bad.val, as.numeric(NA)) && ( bad.val %in% MODELobj$data ) ){  
       msg = c(msg, paste("Data cannot have ", bad.val,". \n",sep="")) }
@@ -236,7 +241,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   }
 
   ###########################
-  # Last Check that fixed, free, par.names are complete and consistent
+  # Check that fixed, free, par.names are complete and consistent
   # This is form dependent so the MARSS.form file needs to include a is.marssMODEL_form() function
   ###########################
   form=attr(MODELobj, "form")
