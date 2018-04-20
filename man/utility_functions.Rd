@@ -23,6 +23,7 @@
 \alias{fixed.free.to.formula }
 \alias{ matrix.power }
 \alias{ sub3D }
+\alias{ subFree2D }
 \alias{ pinv }
 \alias{ pcholinv }
 \alias{ pchol }
@@ -54,6 +55,7 @@ convert.model.mat(param.matrix, TwoD=FALSE)
 fixed.free.to.formula(fixed,free,dim,par.names=NULL)
 matrix.power(x, n)
 sub3D(x,t=1)
+subFree2D(x,t=1)
 pinv(x)
 pcholinv(x)
 pchol(x) 
@@ -97,6 +99,7 @@ vparmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"
   \item \code{ fixed.free.to.formula } takes a fixed and free pair and constructs a list matrix (or array if time-varying) with formulas in each matrix element.
   \item \code{ convert.model.mat } takes a list matrix with formulas in each element and converts to a fixed/free pair.
   \item \code{ sub3D } returns a 2D matrix after subsetting a 3D matrix on the third (time) dimension. Ensures that R always returns a matrix.
+  \item \code{ subFree2D } returns a 2D free matrix after subsetting a free matrix in 2D vec form. Ensures that R always returns a matrix.
   \item \code{ mystrsplit } is a customized string splitter used by \code{convert.model.mat}.
   \item \code{ rwishart } generates random draws from a wishart distribution.
   \item \code{ matrix.power } is a faster way to get the n-th power of a matrix.
