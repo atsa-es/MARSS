@@ -49,7 +49,7 @@ Imat(x)
 rwishart(nu, V)
 mystrsplit(x)
 convert.model.mat(param.matrix)
-fixed.free.to.formula(fixed,free,dim)
+fixed.free.to.formula(fixed,free,dim,par.names=NULL)
 matrix.power(x, n)
 sub3D(x,t=1)
 pinv(x)
@@ -58,6 +58,10 @@ pchol(x)
 is.solvable(A,y=NULL)
 all.equal.vector(x)
 parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
+       t = 1, dims = NULL, model.loc = "marss")
+aparmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
+       t = 1, dims = NULL, model.loc = "marss")
+vparmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
        t = 1, dims = NULL, model.loc = "marss")
 }
 \arguments{
@@ -79,6 +83,7 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L")
   \item{ MLEobj}{ A marssMLE object. }
   \item{ elem }{ The parameter matrix of a marss model to return. }
   \item{ model.loc }{ Whether to use the marss or model marssMODEL in the marssMLE object. }
+  \item{ par.names }{ Names of the estimated parameters. Character vector. }
 }
 \details{
 \itemize{
@@ -97,7 +102,10 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L")
   \item \code{ pchol } returns the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
-  \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a marssMLE object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
+  \item \code{ parmat } Calls \code{aparmat} or \code{vparmat} to construct the parameter matrix with both the fixed and free values from the vectorized form in a marssMLE object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
+  \item \code{ aparmat } version of \code{parmat()} for fixed and free specified as array with 3d the time dimension.
+  \item \code{ vparmat } version of \code{parmat()} for fixed and free specified as matrix with 2d the time dimension. In this case, free columns are vecs of the free matrix.
+
 } 
 }
 \value{
