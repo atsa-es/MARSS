@@ -396,8 +396,8 @@ vparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"
   if(!is.list(dims) & length(elem)==1){ tmp=dims; dims=list(); dims[[elem]]=tmp }
   for(el in elem){
     if(length(t)>1){ par.mat[[el]] = array(as.numeric(NA), dim=c(dims[[el]][1:2],length(t))) }
-    dr = dim(d[[el]])[1] # rows
-    left.side = kronecker(t(pars[[el]]), Diagonal(dr))
+    fr = dim(f[[el]])[1] # rows in f which is same as rows in d
+    left.side = kronecker(t(pars[[el]]), Diagonal(fr))
     for(i in t){
       if(dim(d[[el]])[2]==1){ delem=d[[el]] }else{ delem=d[[el]][,i,drop=FALSE] }
       if(dim(f[[el]])[2]==1){ felem=f[[el]] }else{ felem=f[[el]][,i,drop=FALSE] }
@@ -540,12 +540,64 @@ convert.model.mat=function(param.matrix){
 
 # turns a fixed/free pair to a list (possibly time-varying) matrix describing that 
 # MARSS parameter structure
-fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of the outputed list matrix
+fixed.free.to.formula=function(fixed,free,dim,par.names=NULL){ #dim is the 1st and 2nd dims of the outputed list matrix
   #this will take a 3D or 2D 
   if(length(dim)!=2) stop("fixed.free.to.formula: dim must be a length 2 vector")
   if(is.null(dim(fixed))) stop("fixed.free.to.formula: fixed must be matrix")
-  if( !(length(dim(fixed)) %in% c(2,3)) ) stop("fixed.free.to.formula: fixed must be 2 or 3D matrix")
   if(is.null(dim(free))) stop("fixed.free.to.formula: free must be matrix")
+
+  if(is(free, "Matrix")){ # then is 2D with time in columns and each col is vec(d)
+    Tmax=max(1,dim(fixed)[2],dim(free)[2])
+    np = dim(free)[1]/dim(fixed)[1] #number of parameters
+    if(np==0){
+      if(Tmax==1){
+        # done this way to create a list matrix instead of numeric
+        model=matrix(list(0),dim(fixed)[1],1) 
+        model[,1]=fixed
+        model=matrix(model,dim[1],dim[2])
+      }else{ 
+        model=array(list(0),dim=c(dim(fixed)[1],1,Tmax)) 
+        model[,1,]=fixed
+        model=array(model,dim=c(dim,Tmax))
+      }
+      return(model)
+    }
+    # np is not 0 so there are estimated parameters
+    model=array(list(0),dim=c(dim(fixed)[1],1,Tmax)) 
+    col.d = dim(free)[2]
+    col.f = dim(fixed)[2]
+    row.f = dim(fixed)[1]
+    for(t in 1:Tmax){
+      free.t = min(t,col.d)
+      fixed.t = min(t,col.f)
+      if(np==0){
+      }else{
+      for(i in 1:row.f){
+        k = i+(0:(np-1))*row.f # the ith row of free
+        if( all(free[k,,free.t]==0) ){ 
+          model[i,1,t]=fixed[i,fixed.t]
+        }else{
+          if(fixed[i,fixed.t]==0) tmp=c() else tmp=c(as.character(fixed[i,fixed.t]))
+          colnames.free=par.names
+          if(is.null(par.names)) colnames.free=as.character(1:np)
+          for(j in 1:np){
+            if(free[i+(j-1)*row.f,free.t]!=0){
+              if(is.null(tmp) & free[i+(j-1)*row.f,free.t]==1){ tmp=colnames.free[j]
+              }else{ tmp=c(tmp,"+",as.character(free[i+(j-1)*row.f,free.t]),"*",colnames.free[j]) }
+            }
+          }
+          if(tmp[1]=="+") tmp=tmp[2:length(tmp)]
+          model[i,1,t]=paste(tmp,collapse="")
+        }
+      }
+      }
+    }
+    #return 2D matrix if Tmax is 1
+    if(Tmax==1) model=array(model,dim=dim)
+    else model=array(model,dim=c(dim,Tmax))
+    return(model)
+  }else{ # then must be 2D or 3D array
+  if( !(length(dim(fixed)) %in% c(2,3)) ) stop("fixed.free.to.formula: fixed must be 2 or 3D matrix")
   if( !(length(dim(free)) %in% c(2,3)) ) stop("fixed.free.to.formula: free must be 2 or 3D matrix")
   Tmax = 1
   if(length(dim(fixed))==2) fixed=array(fixed,dim=c(dim(fixed),1))
@@ -578,6 +630,7 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
   if(Tmax==1) model=array(model,dim=dim)
   else model=array(model,dim=c(dim,Tmax))
   return(model)
+  }
 } 
 
 #From Alberto Monteiro posted in the R forum
