@@ -543,7 +543,10 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
         i = which(sapply(c,function(x){identical(x,p)})) #which(c==p); c==p fails if user uses names like "1"
         drow=i%%dim.f1
         drow[drow==0]=dim.f1
-        free[drow,which(p==varnames),ceiling(i/dim.f1)]=1
+        dcol = which(p==varnames)
+        dt = ceiling(i/dim.f1)
+        pos = drow + dim.f1*(dcol-1)+dim.f1*nvar*(dt-1)
+        free[pos]=1
       }
     }
   } #any characters?
