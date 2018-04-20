@@ -477,7 +477,7 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
   f=array(0,dim=dim(c))
   if(any(!d)) f[!d]=unlist(c[!d]) # add check so "all character" matrices don't fail
   if(TwoD){
-    f=Matrix(as.vector(f),dim.f1,Tmax)
+    f=Matrix::Matrix(as.vector(f),dim.f1,Tmax)
   }else{
     f=array(as.vector(f),dim=c(dim.f1,1,Tmax))
   }
@@ -515,7 +515,7 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
   
   nvar = length(varnames) #number of variables
   if(TwoD){
-    free=Matrix(0,dim.f1*nvar,Tmax)
+    free=Matrix::Matrix(0,dim.f1*nvar,Tmax)
   }else{
     free=array(0,dim=c(dim.f1,nvar,Tmax))
   }
