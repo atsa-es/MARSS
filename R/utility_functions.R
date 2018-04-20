@@ -129,59 +129,59 @@ is.validvarcov = function(x, method="kem"){
     vals = this.block[upper.tri(this.block, diag=TRUE)]
     if(length(block)!=1){ #Skip if 1x1 because is so block is automatically ok
       #within a block, you cannot have fixed and estimated values.  They have to be one or the other
-    if(!(all(unlist(lapply(vals, is.numeric))) | all(unlist(lapply(vals, is.character)))))
-      return(list(ok=FALSE, error="numeric (fixed) and estimated values cannot mixed within blocks in a varcov matrix "))
-    #if method="BFGS", then blocks must be diagonal or block unconstrained, if estimated
-    if(method=="BFGS" & is.character(vals[[1]])){ #only test first since all the same class
-      if(any(duplicated(unlist(vals)))) return(list(ok=FALSE, error="when method=BFGS, blocks in var-cov matrices much either be diagonal (shared values allowed) or unconstrained (no shared values) "))
-    }
-    #if the block is numeric, it must be positive definite
-    if(is.numeric(vals[[1]])){  
-      #only need to test one val since all numeric if numeric
-      pos.flag=FALSE
-      test.block = matrix(as.numeric(this.block),dim(this.block)[1],dim(this.block)[2])
-      tmp = try( eigen(test.block, only.values=TRUE), silent=TRUE )
-      if(class(tmp)=="try-error") pos.flag=TRUE
-      else if(!all(tmp$values >= 0)) pos.flag=TRUE
-      #if there is a problem
-      if(pos.flag){
-        return(list(ok=FALSE, error="One of the fixed blocks within the varcov matrix is not positive-definite "))
+      if(!(all(unlist(lapply(vals, is.numeric))) | all(unlist(lapply(vals, is.character)))))
+        return(list(ok=FALSE, error="numeric (fixed) and estimated values cannot mixed within blocks in a varcov matrix "))
+      #if method="BFGS", then blocks must be diagonal or block unconstrained, if estimated
+      if(method=="BFGS" & is.character(vals[[1]])){ #only test first since all the same class
+        if(any(duplicated(unlist(vals)))) return(list(ok=FALSE, error="when method=BFGS, blocks in var-cov matrices much either be diagonal (shared values allowed) or unconstrained (no shared values) "))
       }
-    }else{
-      #if not numeric, then it must be valid.
-      diag.vals=unlist(takediag(this.block))
-      diag.val.locs=as.numeric(as.factor(diag.vals)) #vals given unique numbers
-      diag.facs=unique(diag.val.locs) #the unique numbers w no dups
-      test.comb=rbind(diag.facs,diag.facs)
-      cov.vals=c()
-      if(length(diag.facs)!=1) test.comb=cbind(test.comb,combn(diag.facs,2))
-      num.req.cov.vals = dim(test.comb)[2]
-      for(j in 1:dim(test.comb)[2]){ #Go through each pair that needs to be identical
-        sub.block.r=which(diag.val.locs==test.comb[1,j])
-        sub.block.c=which(diag.val.locs==test.comb[2,j])
-        if(test.comb[1,j]==test.comb[2,j]){ #this is a cov within equal var
-          if(length(sub.block.r)==1){
-            num.req.cov.vals = num.req.cov.vals-1 #there is no cov for this variance since only 1
-            next #1x1 sub.block; no covs
-          }
-          this.sub.block = this.block[sub.block.r,sub.block.c,drop=FALSE]
-          sub.vals = this.sub.block[upper.tri(this.sub.block, diag=FALSE)]
-          if(length(unique(sub.vals))!=1)
-            return(list(ok=FALSE, error=" Shared variances on the diagonal must all have shared covariances on the off diagonal "))
-          cov.vals = c(cov.vals, unique(sub.vals))
-          }else{
-          this.sub.block = this.block[sub.block.r,sub.block.c,drop=FALSE]
-          cov.val = unique(as.vector(this.sub.block))
-          if(length(cov.val)!=1)
-            return(list(ok=FALSE, error=" Covariances between the same 2 variance pairs must be equal "))
-          cov.vals = c(cov.vals, cov.val)
+      #if the block is numeric, it must be positive definite
+      if(is.numeric(vals[[1]])){  
+        #only need to test one val since all numeric if numeric
+        pos.flag=FALSE
+        test.block = matrix(as.numeric(this.block),dim(this.block)[1],dim(this.block)[2])
+        tmp = try( eigen(test.block, only.values=TRUE), silent=TRUE )
+        if(class(tmp)=="try-error") pos.flag=TRUE
+        else if(!all(tmp$values >= 0)) pos.flag=TRUE
+        #if there is a problem
+        if(pos.flag){
+          return(list(ok=FALSE, error="One of the fixed blocks within the varcov matrix is not positive-definite "))
         }
+      }else{
+        #if not numeric, then it must be valid.
+        diag.vals=unlist(takediag(this.block))
+        diag.val.locs=as.numeric(as.factor(diag.vals)) #vals given unique numbers
+        diag.facs=unique(diag.val.locs) #the unique numbers w no dups
+        test.comb=rbind(diag.facs,diag.facs)
+        cov.vals=c()
+        if(length(diag.facs)!=1) test.comb=cbind(test.comb,combn(diag.facs,2))
+        num.req.cov.vals = dim(test.comb)[2]
+        for(j in 1:dim(test.comb)[2]){ #Go through each pair that needs to be identical
+          sub.block.r=which(diag.val.locs==test.comb[1,j])
+          sub.block.c=which(diag.val.locs==test.comb[2,j])
+          if(test.comb[1,j]==test.comb[2,j]){ #this is a cov within equal var
+            if(length(sub.block.r)==1){
+              num.req.cov.vals = num.req.cov.vals-1 #there is no cov for this variance since only 1
+              next #1x1 sub.block; no covs
+            }
+            this.sub.block = this.block[sub.block.r,sub.block.c,drop=FALSE]
+            sub.vals = this.sub.block[upper.tri(this.sub.block, diag=FALSE)]
+            if(length(unique(sub.vals))!=1)
+              return(list(ok=FALSE, error=" Shared variances on the diagonal must all have shared covariances on the off diagonal "))
+            cov.vals = c(cov.vals, unique(sub.vals))
+          }else{
+            this.sub.block = this.block[sub.block.r,sub.block.c,drop=FALSE]
+            cov.val = unique(as.vector(this.sub.block))
+            if(length(cov.val)!=1)
+              return(list(ok=FALSE, error=" Covariances between the same 2 variance pairs must be equal "))
+            cov.vals = c(cov.vals, cov.val)
+          }
+        }
+        if(length(unique(cov.vals))!=num.req.cov.vals)
+          return(list(ok=FALSE, error=" Covariances cannot be shared across pairs of unequal variances "))
+        if(any(diag.vals %in% cov.vals))
+          return(list(ok=FALSE, error=" Covariances and variances cannot be shared "))
       }
-      if(length(unique(cov.vals))!=num.req.cov.vals)
-        return(list(ok=FALSE, error=" Covariances cannot be shared across pairs of unequal variances "))
-      if(any(diag.vals %in% cov.vals))
-        return(list(ok=FALSE, error=" Covariances and variances cannot be shared "))
-   }
     }
     #record whether the block is diagonal; needed later
     isdiag=c(isdiag, length(block)==1)
@@ -469,8 +469,8 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
   Tmax=1
   if(length(dim(param.matrix))==3) Tmax=dim(param.matrix)[3]
   dim.f1=dim(param.matrix)[1]*dim(param.matrix)[2]
-
-    #for(t in 1:Tmax){
+  
+  #for(t in 1:Tmax){
   c=param.matrix
   varnames=c()
   d=array(sapply(c,is.character),dim=dim(c))
@@ -550,12 +550,10 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
       }
     }
   } #any characters?
-  if(TwoD){
-    attr(free, "estimate.names")=varnames
-    attr(free, "dim.free")=c(dim.f1,nvar,Tmax)
-  }else{
-    colnames(free)=varnames 
-  }
+  
+  attr(free, "estimate.names")=varnames
+  attr(free, "dim.free")=c(dim.f1,nvar,Tmax)
+  if(!TwoD) colnames(free)=varnames 
   return(list(fixed=f,free=free))
 }
 
@@ -640,7 +638,7 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
   else model=array(model,dim=c(dim,Tmax))
   return(model)
 }
- 
+
 
 #From Alberto Monteiro posted in the R forum
 matrix.power <- function(x, n)
@@ -829,7 +827,7 @@ str_trim=function(string){
 str_sub=function (string, start = 1L, end = -1L) 
 {
   if (length(string) == 0L || length(start) == 0L || length(end) == 
-        0L) {
+      0L) {
     return(vector("character", 0L))
   }
   n <- max(length(string), length(start), length(end))
