@@ -503,7 +503,7 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
         stars=which(e=="*")
         pluses=which(e=="+")
         if(length(stars)!=length(pluses)) stop("convert.model.mat: must use eqn form a+b1*p1+b2*p2...; extra p's can be left off")
-        c[[i]]=paste(e,collapse="")
+        c[i]=paste(e,collapse="")
         f[i]=as.numeric(e[1])
         varnames=c(varnames,e[stars+1])      
       }
