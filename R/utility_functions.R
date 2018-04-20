@@ -333,9 +333,9 @@ unvec = function(x,dim=NULL){
 parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
   isM = is(MLEobj[["marss"]][["free"]][["Q"]],"Matrix")
   if(isM){ 
-    return(vparmat(MLEobj, elem=elem, model.loc=model.loc)) # 2D and Matrix
+    return(vparmat(MLEobj, elem=elem, t=t, dims=dims, model.loc=model.loc)) # 2D and Matrix
   }else{
-    return(aparmat(MLEobj, elem=elem, model.loc=model.loc)) # 3D
+    return(aparmat(MLEobj, elem=elem, t=t, dims=dims, model.loc=model.loc)) # 3D
   }
 }
 
