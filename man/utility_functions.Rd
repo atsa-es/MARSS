@@ -18,6 +18,8 @@
 \alias{ mystrsplit }
 \alias{ convert.model.mat }
 \alias{ parmat }
+\alias{ aparmat }
+\alias{ vparmat }
 \alias{fixed.free.to.formula }
 \alias{ matrix.power }
 \alias{ sub3D }
@@ -48,7 +50,7 @@ is.wholenumber(x, tol = .Machine$double.eps^0.5)
 Imat(x)
 rwishart(nu, V)
 mystrsplit(x)
-convert.model.mat(param.matrix, TwoD=TRUE)
+convert.model.mat(param.matrix, TwoD=FALSE)
 fixed.free.to.formula(fixed,free,dim,par.names=NULL)
 matrix.power(x, n)
 sub3D(x,t=1)
