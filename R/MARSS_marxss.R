@@ -380,8 +380,8 @@ MARSS.marxss=function(MARSS.call){
     if(identical(tmp[[el]],"not assigned")) stop(paste("Stopped in MARSS.marxss(): tmp was not assigned for ",el,".\n",sep=""))
     tmpconst=convert.model.mat(tmp[[el]])
     free[[el]] = tmpconst$free
-    fixed[[el]] = tmpconst$fixed 
-    
+    fixed[[el]] = tmpconst$fixed
+
     #set the last dim of the model.dims since it was at a temp value to start
     model.dims[[el]][3]=max(dim(free[[el]])[3],dim(fixed[[el]])[3])
   }
