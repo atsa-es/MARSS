@@ -44,7 +44,7 @@ for(elem in names(default)){
   par.dims=list(Z=c(n,m),A=c(n,1),R=c(h1,h1),B=c(m,m),U=c(m,1),Q=c(g1,g1),x0=c(m,1),V0=c(l1,l1),G=c(m,g1),H=c(n,h1),L=c(m,l1))
 
   for(elem in names(par.dims)){
-  if(is.fixed(MODELobj$free[[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
+  if(is.fixed(MODELobj[["free"]][[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
   }else{ #not fixed
     #must be numeric
     if( !is.numeric(inits[[elem]]) ){
