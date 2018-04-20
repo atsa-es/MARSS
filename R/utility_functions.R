@@ -283,7 +283,6 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
 
 is.fixed = function(x, by.row=FALSE) { 
   #expects the D (free) matrix; can be 3D or 2D; can be a numeric list matrix
-  #attr(x, "free.dims") must be set.  It says the dims of free if in array format
   #by.row means it reports whether each row is fixed 
   isM = is(x, "Matrix")
   if(!(is.array(x) | isM)) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
@@ -293,9 +292,14 @@ is.fixed = function(x, by.row=FALSE) {
   if(!isM){ 
     if(any(is.nan(x))) stop("Stopped in MARSS internal function is.fixed(): free(D) cannot have NAs or NaNs.\n", call.=FALSE)
   }
-  # get dims from attr since free might be in vec 2D format
-  np = attr(x, "free.dims")[2]
-  nr = attr(x, "free.dims")[1]
+  # get dims from attr if free might be in vec 2D format
+  if(isM){
+    np = attr(x, "free.dims")[2]
+    nr = attr(x, "free.dims")[1]
+  }else{
+    np = dim(x)[2]
+    nr = dim(x)[1]
+  }
   if(np==0){ 
     if(!by.row){ return(TRUE) }else{ return(rep(TRUE,nr)) }
   }
@@ -560,9 +564,10 @@ convert.model.mat=function(param.matrix, TwoD=FALSE){
     }
   } #any characters?
   
-  attr(free, "estimate.names")=varnames
-  attr(free, "free.dims")=c(dim.f1,nvar,Tmax)
-  attr(f, "fixed.dims")=c(dim.f1,1,Tmax)
+  if(TwoD){
+    attr(free, "estimate.names")=varnames
+    attr(free, "free.dims")=c(dim.f1,nvar,Tmax)
+  }
   if(!TwoD) colnames(free)=varnames 
   return(list(fixed=f,free=free))
 }
@@ -719,14 +724,20 @@ sub3D=function(x,t=1){
 }
 
 # Expects a free matrix in 2D vec form
+# returns 2D free matrix in non-vec form (row.fixed,num.param)
 subFree2D=function(x,t=1){
   x.dims = attr(x, "free.dims")
+  x.names = attr(x, "estimate.names")
   if(x.dims[2]==1){
     x=x[,t,drop=FALSE]
+    attr(x, "free.dims") = x.dims[1:2]
+    attr(x, "estimate.names") = x.names
     return(x)
   }else{
     x=x[,t,drop=FALSE]
     dim(x)=x.dims[1:2]
+    attr(x, "free.dims") = x.dims[1:2]
+    attr(x, "estimate.names") = x.names
     return(x)
   }
 }
