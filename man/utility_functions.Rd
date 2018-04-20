@@ -48,7 +48,7 @@ is.wholenumber(x, tol = .Machine$double.eps^0.5)
 Imat(x)
 rwishart(nu, V)
 mystrsplit(x)
-convert.model.mat(param.matrix)
+convert.model.mat(param.matrix, TwoD=TRUE)
 fixed.free.to.formula(fixed,free,dim,par.names=NULL)
 matrix.power(x, n)
 sub3D(x,t=1)
@@ -84,6 +84,7 @@ vparmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"
   \item{ elem }{ The parameter matrix of a marss model to return. }
   \item{ model.loc }{ Whether to use the marss or model marssMODEL in the marssMLE object. }
   \item{ par.names }{ Names of the estimated parameters. Character vector. }
+  \item{ TwoD }{ TRUE/FALSE.  Whether fixed/free are specified using 2D matrix instead of array. }
 }
 \details{
 \itemize{
