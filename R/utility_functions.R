@@ -474,13 +474,12 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
   c=param.matrix
   varnames=c()
   d=array(sapply(c,is.character),dim=dim(c))
-  f=array(list(0),dim=dim(c))
-  f[!d]=c[!d]
-  f=vec(f)
+  f=array(0,dim=dim(c))
+  f[!d]=unlist(c[!d])
   if(TwoD){
-    f=Matrix(unlist(f),dim.f1,Tmax)
+    f=Matrix(as.vector(f),dim.f1,Tmax)
   }else{
-    f=array(unlist(f),dim=c(dim.f1,1,Tmax))
+    f=array(as.vector(f),dim=c(dim.f1,1,Tmax))
   }
   
   is.char=c()
@@ -505,7 +504,7 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
         pluses=which(e=="+")
         if(length(stars)!=length(pluses)) stop("convert.model.mat: must use eqn form a+b1*p1+b2*p2...; extra p's can be left off")
         c[[i]]=paste(e,collapse="")
-        f[[i]]=as.numeric(e[1])
+        f[i]=as.numeric(e[1])
         varnames=c(varnames,e[stars+1])      
       }
       varnames=unique(varnames)
