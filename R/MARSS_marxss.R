@@ -565,16 +565,19 @@ marxss_to_marss=function(x, only.par=FALSE){
   }
   #marxss.model is a marssMODEL in marxss form and x is the original marssMLE object
   #if only.par updating was requested, return x
+  #par element of x was updated in for loop above
   if(class.x == "marssMLE" & only.par & !is.null(x[["marss"]])) return(x)
   
   #else construct a marss model object from marxss.model and put in $marss
   
-  marxss.dims=attr(marxss.model,"model.dims")  
+  marxss.dims=attr(marxss.model, "model.dims")  
   fixed=marxss.model[["fixed"]]  #fixed and free will be modified, so these are holders not shortcuts
   free=marxss.model[["free"]]
   #marss.dims will be modified, so this is a holder not a shortcut
   marss.dims=marxss.dims
   n=marss.dims[["y"]][1]; m=marss.dims[["x"]][1]; TT=marss.dims[["x"]][2]
+  isM = is(free[["Q"]], "Matrix") # is.marssMODEL tests that all elem are Matrix
+    
   #This step converts U+Cc into equivalent Uu and A+Dd into Aa
   #So U --> [C U] and u --> [c \\ 1]; A --> [D A] and a --> [d \\ 1]
   #This code adds fixed$u and fixed$a, and changes fixed$U and fixed$A; otherwise all stays the same
@@ -582,7 +585,8 @@ marxss_to_marss=function(x, only.par=FALSE){
     if(el=="C") el2="U" else el2="A"
     #if el all zero (fixed and all zero), it doesn't appear in the equation and U-->U and u-->1
     if(!is.fixed(marxss.model[["free"]][[el]]) | !all(sapply(marxss.model[["fixed"]][[el]],function(x){isTRUE(all.equal(x,0))}))){      
-      #create fixed$u or fixed$a by add 1 to bottom of fixed$c or fixed$d
+      #create fixed$u or fixed$a by adding 1 to bottom of fixed$c or fixed$d
+      if(!isM){
       #since fixed$c is a 3D array, we need to do this in an odd way:
       fixed[[tolower(el2)]]=array(apply(fixed[[tolower(el)]],3,rbind,1),dim=dim(fixed[[tolower(el)]])+c(1,0,0))
       #this fixed$u is just an input so we set the free to not estimated
@@ -613,23 +617,56 @@ marxss_to_marss=function(x, only.par=FALSE){
       free[[el2]]=tmp.free
       #settign U and A dims
       marss.dims[[el2]][2]=marxss.dims[[el]][2]+marxss.dims[[el2]][2]
+      }else{ # is 2D vec form
+        #u = [c \\ 1]; a = [d \\ 1]
+        fixed[[tolower(el2)]]=rbind(fixed[[tolower(el)]],1)
+        #this fixed$u is just an input so we set the free to not estimated
+        free[[tolower(el2)]]=Matrix(0,0,1) #not estimated so 0 rows
+        
+        #next change U to [C U] and A to [D A]; need to figure out the dims since
+        #C or U might be time-varying
+        Tmax.fixed=max(dim(fixed[[el]])[2],dim(fixed[[el2]])[2])
+        Tmax.free=max(dim(free[[el]])[2],dim(free[[el2]])[2])
+        #dim. is c(dim 1 of C, dim 2 of C, dim 1 of U, dim 2 of U)
+        dim.fixed=c(dim(fixed[[el]])[1],dim(fixed[[el]])[2],dim(fixed[[el2]])[1],dim(fixed[[el2]])[2])
+        dim.free=c(dim(free[[el]])[1],dim(free[[el]])[2],dim(free[[el2]])[1],dim(free[[el2]])[2])
+        #now that the dimensions are known, create a holder for fixed$U and fixed$A
+        tmp.fixed=Matrix(0,dim.fixed[1]+dim.fixed[3],Tmax.fixed)
+        tmp.free=Matrix(0,(dim.free[1]+dim.free[3])*(dim.free[2]+dim.free[4]),Tmax.free)
+        #the first rows of fixed$U are fixed$C
+        tmp.fixed=rbind(fixed[[el]],fixed[[el2]])
+        #Now create the new free$U.  If C estimated, free$C appears in the top
+        tmp.free=rbind(free[[el]],free[[el2]])
+        #retain the column names (estimated parameter names)
+        attr(tmp.free,"estimate.names")=c(attr(free[[el]],"estimate.names"), attr(free[[el2]],"estimate.names"))
+        #assign the new fixed$U and free$U to fixed and free
+        fixed[[el2]]=tmp.fixed
+        free[[el2]]=tmp.free
+        #settign U and A dims
+        marss.dims[[el2]][2]=marxss.dims[[el]][2]+marxss.dims[[el2]][2]
+        }
     }else{  #Both C and U are all zero (fixed and all zero) 
       #so u is just 1 (a 1x1 matrix)
-      fixed[[tolower(el2)]]=array(1,dim=c(1,1,1))
-      free[[tolower(el2)]]=array(0,dim=c(1,0,1)) #not estimated
+      fixed[[tolower(el2)]]=matrix(1,1,1)
+      free[[tolower(el2)]]=matrix(0,0,1) #not estimated
     }
   }
   
   #Now the fixed/free specify x=Bx+U(t)u(t)+w(t) and y=Zx+A(t)a(t)+v(t)
   #this part converts U(t)u(t) to U(t) and A(t)a(t) to A(t)
   #This requires making a vec(U(t)) that is specified by (rhs at end):
-  #vec(Uu)=Uu=(t.u kron I_m)vec(U)=fixed+free*p=(t.u kron I_m)f+(t.u kron I_m)Dp
+  #Uu=vec(Uu)=(t.u kron I_m)vec(U)=(t.u kron I_m)(fixed+free*p)
+  # =(t.u kron I_m)f+(t.u kron I_m)Dp
   #where f and D are fixed$U and free$U for U(t)u(t) form
-  #the small case are inputs and the large case are estimated parameters  
+  #the small case are inputs and the large case are estimated parameters 
+  # u is (q+1)x1 q is rows in c
+  # U is m x (q+1)
+  # (t.u kron I_m) is (1x(q+1)) kron (m x m) = m x (q+1)xm
+  # vec(U) is ((q+1)xm) x 1
   for(el in c("U","A")){
     #if c or d NOT passed in, u and a will be array(1,dim=c(1,1,1))
     #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c or d is 1
-    if(!identical(unname(fixed[[tolower(el)]]), array(1,dim=c(1,1,1)))){
+    if(!identical(unname(fixed[[tolower(el)]]), matrix(1,dim=c(1,1)))){
       #hold onto fixed$U and free$U (not marxss.model$fixed and free but the new ones)
       free.orig=free[[el]]; fixed.orig=fixed[[el]]
       dim.free2=dim(free.orig)[2]; dim.free3=dim(free.orig)[3];  dim.fixed3=dim(fixed.orig)[3]; 
@@ -639,6 +676,7 @@ marxss_to_marss=function(x, only.par=FALSE){
       free[[el]]=array(0,dim=c(marss.dims[[el]][1],dim.free2,Tmax))
       colnames(free[[el]])=colnames(free.orig)
       fixed[[el]]=array(0,dim=c(marss.dims[[el]][1],1,Tmax))
+      free[[el]]=crossprod(t(ua.t)%x%diag(1,marss.dims[[el]][1]))%*%d.t
       for(t in 1:Tmax){
         #the f and D of U (or A)
         f.t=sub3D(fixed.orig,t=min(t,dim.fixed3))
