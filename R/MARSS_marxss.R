@@ -540,7 +540,7 @@ marxss_to_marss=function(x, only.par=FALSE){
   
   if(class.x=="marssMLE"){ #Then set the par elements to correspond to marss if they are in marxss form
     #check that the model element they passed in is marxss
-    if(!("marxss" %in% attr(x[["model"]], "form"))) stop("Stopped in marss_to_marxss(): x$model must be in marxss form.",call.=FALSE)
+    if(!("marxss" %in% attr(x[["model"]], "form"))) stop("Stopped in marxss_to_marss(): x$model must be in marxss form.",call.=FALSE)
     
     x.marss = list()
     
@@ -623,12 +623,12 @@ marxss_to_marss=function(x, only.par=FALSE){
   #Now the fixed/free specify x=Bx+U(t)u(t)+w(t) and y=Zx+A(t)a(t)+v(t)
   #this part converts U(t)u(t) to U(t) and A(t)a(t) to A(t)
   #This requires making a vec(U(t)) that is specified by (rhs at end):
-  #vec(Uu)=(t.u kron I_m)vec(U)=fixed+free*p=(t.u kron I_m)f+(t.u kron I_m)Dp
+  #vec(Uu)=Uu=(t.u kron I_m)vec(U)=fixed+free*p=(t.u kron I_m)f+(t.u kron I_m)Dp
   #where f and D are fixed$U and free$U for U(t)u(t) form
   #the small case are inputs and the large case are estimated parameters  
   for(el in c("U","A")){
-    #if c or a passed in. If not will be array(1,dim=c(1,1,1))
-    #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c is 1
+    #if c or d NOT passed in, u and a will be array(1,dim=c(1,1,1))
+    #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c or d is 1
     if(!identical(unname(fixed[[tolower(el)]]), array(1,dim=c(1,1,1)))){
       #hold onto fixed$U and free$U (not marxss.model$fixed and free but the new ones)
       free.orig=free[[el]]; fixed.orig=fixed[[el]]
