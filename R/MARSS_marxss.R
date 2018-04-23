@@ -646,9 +646,15 @@ marxss_to_marss=function(x, only.par=FALSE){
         marss.dims[[el2]][2]=marxss.dims[[el]][2]+marxss.dims[[el2]][2]
         }
     }else{  #Both C and U are all zero (fixed and all zero) 
-      #so u is just 1 (a 1x1 matrix)
+      if(!isM){
+        #so u is just 1 (a 1x1 matrix)
+        fixed[[tolower(el2)]]=array(1,dim=c(1,1,1))
+        free[[tolower(el2)]]=array(0,dim=c(1,0,1)) #not estimated
+      }else{
+      #2D vec form
       fixed[[tolower(el2)]]=matrix(1,1,1)
       free[[tolower(el2)]]=matrix(0,0,1) #not estimated
+      }
     }
   }
   
