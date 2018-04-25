@@ -48,7 +48,7 @@ is.marssMLE <- function(MLEobj)
   par.dims=attr(model,"model.dims")
   en=attr(model,"par.names")
   dat = model[["data"]]
-  isM = is(free, "Matrix")
+  isM = is(free[["Q"]], "Matrix")
   if(!isM) num.ests = lapply(free,function(x){dim(x)[2]})
   if(isM) num.ests = lapply(free,function(x){attr(x, "free.dims")[2]})
   
