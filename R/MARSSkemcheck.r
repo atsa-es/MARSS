@@ -18,9 +18,9 @@ msg=NULL
     }
 
   ############ Check that if fixed, B is within the unit circle
-   for(t in 1:max(dim(free$B)[3],dim(fixed$B)[3])){
-    ifixed=min(t,dim(fixed$B)[3])
-    if( is.fixed(free$B[,,ifixed,drop=FALSE]) ){  #works on 3D matrices
+   for(t in 1:par.dims[["B"]][3]){
+    ifixed=min(t, dim3(fixed$B))
+    if( is.fixed(subFree(free$B, t=ifixed)) ){  
     #parmat needs MODELobj and par list
       if(is.null(MLEobj$par$B)) tmpparB=MLEobj$start$B else tmpparB=MLEobj$par$B
     tmp.MLEobj=list( marss=MODELobj,par=list(B=tmpparB) ) #B is fixed but par might have cols from other times
@@ -38,7 +38,7 @@ msg=NULL
    diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
    Tmax=0
    for(par.test in c("R","Z","A")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]])
    }
 
    if(is.null(MLEobj[["par"]])) MLEobj$par=MLEobj$start
@@ -48,8 +48,11 @@ msg=NULL
    MLEobj$Ey=MARSShatyt(MLEobj)
    msg.tmp=NULL
    for(i in 1:TT){
-      ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3]) 
-      zero.diags=is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,ifixed,drop=FALSE]==0,1,all) #fixed rows and 0
+      ifixed=min(i,dim3(fixed[[el]])); ifree=min(i,dim3(free[[el]]))
+      free.elem.i = subFree(free[[el]], t=ifree)
+      fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+      # zeros on the diagonals
+      zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
       if(any(zero.diags)){
         II0 = makediag(as.numeric(zero.diags))
         if(i<=Tmax){
@@ -86,14 +89,16 @@ msg=NULL
    # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
    Tmax=0
    for(par.test in c("Q")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]])
    }
    II0=list()
    for(i in 1:Tmax){
       for(el in c("Q")){
-        ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3]) 
-        diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
-        zero.diags=is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,ifixed,drop=FALSE]==0,1,all) #fixed rows
+        ifixed=min(i,dim3(fixed[[el]])); ifree=min(i,dim3(free[[el]])) 
+        free.elem.i = subFree(free[[el]], t=ifree)
+        fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+        # zeros on the diagonals
+        zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
         II0Q = makediag(as.numeric(zero.diags))
         II0Q = unname(II0[[el]])
       }
@@ -112,20 +117,22 @@ msg=NULL
    # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
    Tmax=0
    for(par.test in c("R","Q","U","B","Z")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]][3])
    }
    II0=list()
    for(i in 1:Tmax){
       for(el in c("R","Q")){
-        ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3]) 
-        diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
-        zero.diags=is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,ifixed,drop=FALSE]==0,1,all) #fixed rows
+        ifixed=min(i,dim3(fixed[[el]])); ifree=min(i,dim3(free[[el]])) 
+        free.elem.i = subFree(free[[el]], t=ifree)
+        fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+        # zeros on the diagonals
+        zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
         II0[[el]] = makediag(as.numeric(zero.diags))
       }
       for( el in c("B","U")){
-          ifree=min(i,dim(free[[el]])[3])
+          ifree=min(i,dim3(free[[el]]))
           #I don't know what par$Z will be.  I want to create a par$Z where there is a non-zero value for any potentially non-zero Z's
-          tmp.MLEobj=list(marss=MODELobj, par=list(Z=matrix(1,dim(free$Z)[2],1)))
+          tmp.MLEobj=list(marss=MODELobj, par=list(Z=matrix(1,dim2(free$Z),1)))
           tmp.MLEobj$marss$fixed$Z[tmp.MLEobj$marss$fixed$Z!=0]=1
           tmp.MLEobj$marss$free$Z[tmp.MLEobj$marss$free$Z!=0]=1
           parZ=parmat(tmp.MLEobj,"Z",t=i)$Z
@@ -145,18 +152,20 @@ msg=NULL
    # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
    Tmax=0
    for(par.test in c("B")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]][3])
    }
    II0=list()
    for(i in 1:Tmax){
       for(el in c("Q")){
-        ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3]) 
-        diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
-        zero.diags = is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,ifixed,drop=FALSE]==0,1,all) #fixed rows
+        ifixed=min(i,dim3(fixed[[el]])); ifree=min(i,dim3(free[[el]])) 
+        free.elem.i = subFree(free[[el]], t=ifree)
+        fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+        # zeros on the diagonals
+        zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
         II0[[el]] = makediag(as.numeric(zero.diags))
       }
       for( el in c("B")){
-          ifree=min(i,dim(free[[el]])[3])
+          ifree=min(i,dim3(free[[el]]))
           II = diag(1,par.dims[[el]][2])
           dpart = sub3D(free[[el]],t=ifree)
           par.not.fixed = any( ((II %x% II0$Q)%*%dpart)!=0 )
@@ -173,32 +182,36 @@ msg=NULL
    # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
    Tmax=0
    for(par.test in c("U")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]][3])
    }
+   # location of zeros on Q matrix must be time constant so doesn't matter what t is used
+   t=1
    II0=list()
    el="Q"
-   ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3])
-   diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
-   zero.diags = is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,1,drop=FALSE]==0,1,all) #fixed rows
+   ifixed=1; ifree=1
+   free.elem.i = subFree(free[[el]], t=ifree)
+   fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+   # zeros on the diagonals
+   zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
    II0[[el]] = makediag(as.numeric(zero.diags))
 
    dpart=sub3D(free$x0,t=1)
    test.adj = any( (II0$Q%*%dpart)!=0 )
    for(i in 1:Tmax){
-    dpart=sub3D(free$U,t=1)
+    dpart=sub3D(free$U,t=i)
     test.adj = test.adj & any( (II0$Q%*%dpart)!=0 )  #II0$Q required to be time constant above
    }
    
    if(test.adj){ #means x0^{0} or u^{0} being estimated
    Tmax=0
    for(par.test in c("U", "B")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]][3])
    }
    for(i in 1:Tmax){
       el="B"
-      ifree=min(i,dim(free[[el]])[3])
+      ifree=min(i,dim3(free[[el]]))
       #I don't know what par$B will be.  I want to create a par$B where there is a non-zero value for any potentially non-zero B's
-      tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim(free$B)[2],1)))
+      tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim2(free$B),1)))
       tmp.MLEobj$marss$fixed[[el]][tmp.MLEobj$marss$fixed[[el]]!=0]=1
       tmp.MLEobj$marss$free[[el]][tmp.MLEobj$marss$free[[el]]!=0]=1
       adjB=parmat(tmp.MLEobj,el,t=i)[[el]]
@@ -218,21 +231,23 @@ msg=NULL
    # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
    Tmax=0
    for(par.test in c("Q")){
-     Tmax = max(Tmax, dim(fixed[[par.test]])[3],dim(free[[par.test]])[3])
+     Tmax = max(Tmax, par.dims[[par.test]][3])
    }
    IIz=IIp=OMGz=OMGp=IId=IIis=list()
    for(i in 1:Tmax){
       el="Q"
-        ifixed=min(i,dim(fixed[[el]])[3]); ifree=min(i,dim(free[[el]])[3]) 
-        diag.rows = 1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
-        zero.diags=is.fixed(free[[el]][diag.rows,,ifree,drop=FALSE],by.row=TRUE) & apply(fixed[[el]][diag.rows,,ifixed,drop=FALSE]==0,1,all) #fixed rows
-        IIz[[el]] = makediag(as.numeric(zero.diags))
+      ifixed=min(i,dim3(fixed[[el]])); ifree=min(i,dim3(free[[el]])) 
+      free.elem.i = subFree(free[[el]], t=ifree)
+      fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
+      # zeros on the diagonals
+      zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
+      IIz[[el]] = makediag(as.numeric(zero.diags))
         IIp[[el]] = diag(1,par.dims[[el]][1])-IIz[[el]]
         OMGz[[el]] = diag(1,par.dims[[el]][1])[diag(IIz[[el]])==1,,drop=FALSE]
         OMGp[[el]] = diag(1,par.dims[[el]][1])[diag(IIp[[el]])==1,,drop=FALSE]
         
         #I don't know what par$B will be.  I want to create a par$B where there is a non-zero value for any potentially non-zero B's
-        tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim(free$B)[2],1)))
+        tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim2(free$B),1)))
         tmp.MLEobj$marss$fixed$B[tmp.MLEobj$marss$fixed$B!=0]=1
         tmp.MLEobj$marss$free$B[tmp.MLEobj$marss$free$B!=0]=1
         Adj.mat=parmat(tmp.MLEobj,"B",t=i)$B
