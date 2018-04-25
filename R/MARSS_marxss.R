@@ -114,32 +114,32 @@ MARSS.marxss=function(MARSS.call){
   
   ## Set m based on Z specification IF Z was specified; errors will be reported later if m conflicts with other parameters
   m = NA
-  if (identical(model$Z, "unconstrained")) m = n
-  if (identical(model$Z, "equalvarcov")) m = n
-  if (identical(model$Z, "diagonal and equal")) m = n
-  if (identical(model$Z, "diagonal and unequal")) m = n
-  if (identical(model$Z, "onestate")) m = 1
-  if (identical(model$Z, "identity")) m = n
-  if (is.factor(model$Z)) m = length(levels(model$Z)) 
-  if (is.array(model$Z)) m = dim(model$Z)[2] 
+  if (identical(model[["Z"]], "unconstrained")) m = n
+  if (identical(model[["Z"]], "equalvarcov")) m = n
+  if (identical(model[["Z"]], "diagonal and equal")) m = n
+  if (identical(model[["Z"]], "diagonal and unequal")) m = n
+  if (identical(model[["Z"]], "onestate")) m = 1
+  if (identical(model[["Z"]], "identity")) m = n
+  if (is.factor(model[["Z"]])) m = length(levels(model[["Z"]])) 
+  if (is.array(model[["Z"]])) m = dim(model[["Z"]])[2] 
   
   X.names=NULL
   if(!(is.null(model[["X.names"]]))) X.names = model[["X.names"]]
-  if(is.null(X.names) & identical(model$Z,"identity"))
+  if(is.null(X.names) & identical(model[["Z"]],"identity"))
     X.names=paste("X.",Y.names,sep="")
-  if( is.null(X.names) & is.array(model$Z)){
-    if(length(dim(model$Z))==3)
+  if( is.null(X.names) & is.array(model[["Z"]])){
+    if(length(dim(model[["Z"]]))==3)
       if(dim(model$Z)[3]==1)
-        if(is.design(model$Z) & !is.null(colnames(model$Z)))
-          X.names=colnames(model$Z)
+        if(is.design(model[["Z"]]) & !is.null(colnames(model[["Z"]])))
+          X.names=colnames(model[["Z"]])
   }
-  if( is.null(X.names) & is.factor(model$Z)){
-    X.names=unique(as.character(model$Z))
+  if( is.null(X.names) & is.factor(model[["Z"]])){
+    X.names=unique(as.character(model[["Z"]]))
   }
-  if(is.null(X.names) & is.matrix(model$Z))
-    if(is.design(model$Z) & !is.null(colnames(model$Z)))X.names=colnames(model$Z)
-  if(is.null(X.names) & is.matrix(model$Z))
-    if(is.identity(model$Z)) 
+  if(is.null(X.names) & is.matrix(model[["Z"]]))
+    if(is.design(model[["Z"]]) & !is.null(colnames(model[["Z"]])))X.names=colnames(model$Z)
+  if(is.null(X.names) & is.matrix(model[["Z"]]))
+    if(is.identity(model[["Z"]])) 
       X.names = paste("X.",Y.names,sep="")
   if(is.null(X.names)) X.names = paste("X",seq(1, m),sep="") #paste(seq(1, m),sep="")  #
   
@@ -188,25 +188,25 @@ MARSS.marxss=function(MARSS.call){
   } # end for (el in model.elem)
   
   #if el == Z then factor needs to have m levels
-  if( is.factor(model$Z) ) {
-    if(length(levels(model$Z)) != m) {
+  if( is.factor(model[["Z"]]) ) {
+    if(length(levels(model[["Z"]])) != m) {
       problem=TRUE
       msg=c(msg," When Z is a factor, the number of levels must equal the number of state processes (m).\n")
     } }
   
   #Check that if A is scaling, then Z spec must lead to a design matrix
   if(identical(model$A,"scaling")){
-    if(is.array(model$Z) & length(dim(model$Z))==3)
-      if(dim(model$Z)[3]!=1 && !is.design(model$Z, zero.cols.ok = TRUE)) { #if it is a matrix
+    if(is.array(model[["Z"]]) & length(dim(model[["Z"]]))==3)
+      if(dim(model[["Z"]])[3]!=1 && !is.design(model[["Z"]], zero.cols.ok = TRUE)) { #if it is a matrix
         problem=TRUE
         msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou can construct a scaling A matrix and pass that in.\n")
       }
-    if((!is.array(model$Z) & !is.factor(model$Z))) #if it is a string
-      if(!(model$Z %in% c("onestate","identity"))){
+    if((!is.array(model[["Z"]]) & !is.factor(model[["Z"]]))) #if it is a string
+      if(!(model[["Z"]] %in% c("onestate","identity"))){
         problem=TRUE
         msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
       }
-    if(is.matrix(model$Z) && !is.design(model$Z, zero.cols.ok = TRUE)) { #if it is a matrix, won't be array due to first test
+    if(is.matrix(model[["Z"]]) && !is.design(model[["Z"]], zero.cols.ok = TRUE)) { #if it is a matrix, won't be array due to first test
       problem=TRUE
       msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
     }
@@ -297,11 +297,11 @@ MARSS.marxss=function(MARSS.call){
   for(el in model.elem) {
     if(MARSS.call$silent==2) cat(paste("  Building fixed and free matrices for ",el,".\n",sep=""))
     tmp[[el]]="not assigned"
-    if(el=="Z" & is.factor(model$Z)) { 
-      tmp[[el]] = matrix(0,model.dims$Z[1], model.dims$Z[2])  
-      for(i in X.names) tmp[[el]][which(model$Z==i), which(as.vector(X.names)==i)] = 1
+    if(el=="Z" & is.factor(model[["Z"]])) { 
+      tmp[[el]] = matrix(0,model.dims[["Z"]][1], model.dims[["Z"]][2])  
+      for(i in X.names) tmp[[el]][which(model[["Z"]]==i), which(as.vector(X.names)==i)] = 1
     }
-    if(el=="Z" & identical(model$Z,"onestate")) {   #m=1
+    if(el=="Z" & identical(model[["Z"]],"onestate")) {   #m=1
       tmp[[el]] = matrix(1, n, 0)
     }
     if( identical(model[[el]],"identity") ) { 
@@ -381,9 +381,10 @@ MARSS.marxss=function(MARSS.call){
     tmpconst=convert.model.mat(tmp[[el]])
     free[[el]] = tmpconst$free
     fixed[[el]] = tmpconst$fixed
-    
+    time.dim = ifelse(is(free[[el]], "Matrix"), 2, 3)
+
     #set the last dim of the model.dims since it was at a temp value to start
-    model.dims[[el]][3]=max(dim(free[[el]])[3],dim(fixed[[el]])[3])
+    model.dims[[el]][3]=max(dim(free[[el]])[time.dim],dim(fixed[[el]])[time.dim])
   }
   
   #save the row names for the inputs by setting in fixed
@@ -735,7 +736,7 @@ marxss_to_marss=function(x, only.par=FALSE){
     for(el in c("U","A")){
       #if c NOT passed in, u will be matrix(1,dim=c(1,1))
       #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c or d is 1
-      if(!identical(unname(fixed[[tolower(el)]]), matrix(1,dim=c(1,1)))){
+      if(!identical(unname(fixed[[tolower(el)]]), matrix(1,1,1))){
         #hold onto fixed$U and free$U (not marxss.model$fixed and free but the new ones)
         free.orig=free[[el]]; fixed.orig=fixed[[el]]
         num.p = attr(free[[el]],"free.dims")[2]
@@ -815,8 +816,9 @@ MARSSinits_marxss = function(MLEobj, inits){
     stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }else{
     if(class(MLEobj[["model"]])!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
-    if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)    
+    if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }
+  isM = is(MLEobj[["model"]][["free"]][["Q"]], "Matrix") # is.marssMODEL tests that all elem are Matrix
   
   #B, Z, R, Q, x0 and V0 stay the same
   #U and A change
@@ -824,7 +826,11 @@ MARSSinits_marxss = function(MLEobj, inits){
   if(is.null(inits)) inits=list()
   elems=c("U","A","C","D")
   for(elem in elems){
-    tmp.dim=dim(MLEobj$model$free[[elem]])[2] #how many estimated pars in marxss vers
+    if(isM){
+      tmp.dim=attr(MLEobj[["model"]][["free"]][[elem]],"free.dims")[2]
+    }else{
+      tmp.dim=dim(MLEobj[["model"]][["free"]][[elem]])[2] #how many estimated pars in marxss vers
+    }
     if(!is.null(inits[[elem]]) & !(tmp.dim==0)){ #tmp.dim==0 means no estimated
       if(!(length(inits[[elem]]) %in% c(tmp.dim,1))) 
         stop(paste("Stopped in MARSSinits_marxss(): ", elem," inits must be either a scalar (dim=NULL) or a matrix with 1 col and rows equal to the num of est values in ",elem,".",sep=""), call.=FALSE )
@@ -1190,7 +1196,9 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
     return(msg)
   }  
   
-  fixed=MODELobj$fixed; free=MODELobj$free
+  fixed=MODELobj[["fixed"]]; free=MODELobj[["free"]]
+  isM = is(free$Q, "Matrix")
+  time.dim = ifelse(isM, 2, 3)
   
   ###########################
   # Check that x0, V0 and L are not time-varying
@@ -1199,9 +1207,10 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
   time.var = NULL
   for (elem in en) {
     time.var.flag = FALSE
-    time.var.flag = dim(fixed[[elem]])[3]!=1 | dim(free[[elem]])[3]!=1
+    time.var.flag = dim(fixed[[elem]])[time.dim]!=1 | dim(free[[elem]])[time.dim]!=1
     time.var <- c(time.var, time.var.flag)
   }
+
   if(any(time.var)) {  #There's a problem
     msg = c(msg, paste(en[time.var], "cannot be time-varying.  3rd dim of fixed and free must equal 1.\n"))
     msg=c("\nErrors were caught in is.marssMODEL_marxss()\n", msg)
@@ -1217,18 +1226,23 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
   neg = bad.var = not.design = NULL
   for (elem in en) {
     neg.flag = bad.var.flag = not.design.flag = FALSE
-    for(i in 1:max(dim(free[[elem]])[3],dim(fixed[[elem]])[3])){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
-      if(is.fixed(free[[elem]][,,min(i,dim(free[[elem]])[3]),drop=FALSE])){ #this works on 3D mats
+    elem.dim = c(correct.dim1[[elem]], correct.dim2[[elem]])
+    if(isM) free.dim = attr(free[[elem]], "free.dims")[1:2]
+    for(i in 1:model.dims[[elem]][3]){
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
+      free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+      fixed.elem.i = subFixed(fixed[[elem]],t=i1)
+      if(is.fixed(free.elem.i)){ #this works on 3D mats
         zero.free.rows = matrix(TRUE,correct.dim1[[elem]]*correct.dim2[[elem]],1)
       }else{
-        zero.free.rows=apply(free[[elem]][,,i2,drop=FALSE]==0,1,all) #works on 3D mat
+        #zero.free.rows = apply(free.elem.i==0, 1, all)
+        zero.free.rows = is.fixed(free.elem.i, by.row=TRUE)
         #the requirement is that each estimated element (in p) appears only in one place in the varcov mat, but fixed rows (0 rows) are ok
-        not.design.flag = !is.design(free[[elem]][,,i2,drop=FALSE],strict=FALSE,zero.rows.ok=TRUE,zero.cols.ok=TRUE) #works on 3D if dim3=1
+        not.design.flag = !is.design(free.elem.i, strict=FALSE,zero.rows.ok=TRUE,zero.cols.ok=TRUE) #works on 3D if dim3=1
       }
-      zero.fixed.rows=apply(fixed[[elem]][,,i1,drop=FALSE]==0,1,all) #works on 3D
-      fixed.mat = unvec(fixed[[elem]][,,i1],dim=c(correct.dim1[[elem]],correct.dim2[[elem]]))
+      zero.fixed.rows=apply(fixed.elem.i==0,1,all) 
+      fixed.mat = unvecM(fixed.elem.i,dim=elem.dim)
       if( any(!zero.fixed.rows & !zero.free.rows) ){
         bad.var.flag = TRUE   #no f+Dq rows
       }
@@ -1257,10 +1271,11 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
     varcov.flag = TRUE; varcov.msg=""
     var.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
     for(i in 1:model.dims[[elem]][3]){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
-      #works on 3D if dim3=1
-      par.as.list = fixed.free.to.formula(fixed[[elem]][,,i1,drop=FALSE],free[[elem]][,,i2,drop=FALSE],var.dim) #coverts the fixed,free pair to a list matrix
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
+      free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+      fixed.elem.i = subFixed(fixed[[elem]],t=i1)
+par.as.list = fixed.free.to.formula(fixed.elem.i,free.elem.i,var.dim) #converts the fixed,free pair to a list matrix
       tmp=is.validvarcov(par.as.list, method=method)
       varcov.flag=varcov.flag & tmp$ok
       if(!tmp$ok) varcov.msg = c(varcov.msg, paste(" ", tmp$error, "at t=", i, "\n",sep=""))
@@ -1279,12 +1294,13 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
     varcov.flag = TRUE; varcov.msg=""
     var.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
     for(i in 1:model.dims[[elem]][3]){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
-      #works on 3D if dim3=1
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
+      free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+      fixed.elem.i = subFixed(fixed[[elem]],t=i1)
       #since G, H, and L are numeric, par.as.list will be a numeric matrix not list
-      par.as.list = fixed.free.to.formula(fixed[[elem]][,,i1,drop=FALSE],free[[elem]][,,i2,drop=FALSE],var.dim) #coverts the fixed,free pair to a list matrix
-      #this requirement is mention in 4.4 in EM Derivation
+      par.as.list = fixed.free.to.formula(fixed.elem.i,free.elem.i,var.dim) #coverts the fixed,free pair to a list matrix
+      #this requirement is mentionrf in 4.4 in EM Derivation
       #simple test for invertibility via condition number
       condition.limit=1E10
       tmp=kappa(crossprod(as.numeric(par.as.list))) < condition.limit #TRUE is good
