@@ -43,6 +43,7 @@ for(elem in names(default)){
   l1=dim(MODELobj$fixed$L)[1]/m
   par.dims=list(Z=c(n,m),A=c(n,1),R=c(h1,h1),B=c(m,m),U=c(m,1),Q=c(g1,g1),x0=c(m,1),V0=c(l1,l1),G=c(m,g1),H=c(n,h1),L=c(m,l1))
 
+  isM = is(MODELobj[["free"]][["Q"]],"Matrix")
   for(elem in names(par.dims)){
   if(is.fixed(MODELobj[["free"]][[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
   }else{ #not fixed
@@ -50,11 +51,16 @@ for(elem in names(default)){
     if( !is.numeric(inits[[elem]]) ){
       stop(paste("Stopped in MARSSinits(): ",elem," inits must be numeric.",sep=""),call.=FALSE)
     }
-    #must be either length 1 or same length as the number of estimated values for elem
-    if( !((is.null(dim(inits[[elem]])) & length(inits[[elem]])==1) | isTRUE(all.equal(dim(inits[[elem]]),c(dim(MODELobj$free[[elem]])[2],1)))) ){
+    if(isM){
+      np = attr(MODELobj$free[[elem]], "free.dims")[2]
+    }else{
+      np = dim(MODELobj$free[[elem]])[2]
+    }
+    #must be either length 1 or a matrix that is same shape as par
+    if( !((is.null(dim(inits[[elem]])) & length(inits[[elem]])==1) | isTRUE(all.equal(dim(inits[[elem]]),c(np,1)))) ){
       stop(paste("Stopped in MARSSinits(): ",elem," inits must be either a scalar (dim=NULL) or the same size as the par$",elem," element.",sep=""),call.=FALSE)
       }
-    parlist[[elem]]=matrix(inits[[elem]],dim(MODELobj$free[[elem]])[2],1)
+    parlist[[elem]]=matrix(inits[[elem]],np,1)
   
     if(elem %in% c("B","Q","R","V0") & is.null(dim(inits[[elem]]))) {  
       #if inits is a scalar, make init a diagonal matrix
@@ -62,17 +68,33 @@ for(elem in names(default)){
       tmp=vec(makediag( inits[[elem]], nrow=par.dims[[elem]][1] ))
 
       # replace any fixed elements with their fixed values
-      fixed.row=apply(d[[elem]]==0,1,all) #fixed over all t
-      tmp[fixed.row]=f[[elem]][fixed.row,1,1] #replace with fix value at time t
+      #fixed.row=apply(d[[elem]]==0,1,all) #fixed over all t
+      fixed.row=is.fixed(d[[elem]], by.row=TRUE) #fixed over all t
+      if(!isM) fixed.tmp = f[[elem]][fixed.row,1,1]
+      if(isM) fixed.tmp = f[[elem]][fixed.row,1]
+      tmp[fixed.row]=fixed.tmp #replace with fix value at time t
       #The funky colSum code sums a 3D matrix over the 3rd dim
       #I want to apply this tmp to all the variances and use an average over the d and f if they are time-varying
       #otherwise I could end up with 0s on the diagonal
+      if(!isM){
       numvals=colSums(aperm(d[[elem]],c(3,1,2))!=0,dims=1)
       delem=colSums(aperm(d[[elem]],c(3,1,2)),dims=1)/numvals; delem[numvals==0]=0
       numvals=colSums(aperm(f[[elem]],c(3,1,2))!=0,dims=1)
       felem=colSums(aperm(f[[elem]],c(3,1,2)),dims=1)/numvals; felem[numvals==0]=0
       #use a pseudoinverse here so D's with 0 columns don't fail
       parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
+      }
+      if(isM){
+        numvals=rowSums(d[[elem]]!=0,dims=1)
+        delem=rowSums(d[[elem]],dims=1)/numvals 
+        delem[numvals==0]=0
+        dim(delem)=attr(d[[elem]],"free.dims")[1:2]
+        numvals=rowSums(f[[elem]]!=0,dims=1)
+        felem=rowSums(f[[elem]],dims=1)/numvals
+        felem[numvals==0]=0
+        #use a pseudoinverse here so D's with 0 columns don't fail
+        parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
+      }
     } #c("Q","R","B","V0")
 
     if(elem=="x0"){
@@ -81,14 +103,14 @@ for(elem in names(default)){
     if(identical(unname(inits$x0),-99)) {  #get estimate of x0
       y1=y[,1,drop=FALSE]
       #replace NAs (missing vals) with 0s
-      y1[ is.na(y1) ] = 0 
-      Zmat=sub3D(f$Z,t=1)+sub3D(d$Z,t=1)%*%parlist$Z
+      y1[ is.na(y1) ] = 0
+      Zmat=subFixed(f$Z,t=1)+subFree2D(d$Z,t=1)%*%parlist$Z
       Zmat=unvec(Zmat,dim=c(n,m))
-      Amat=sub3D(f$A,t=1)+sub3D(d$A,t=1)%*%parlist$A
+      Amat=subFixed(f$A,t=1)+subFree2D(d$A,t=1)%*%parlist$A
       if(MODELobj$tinitx==0){ #y=Z*(B*pi+U)+A
-        Bmat=sub3D(f$B,t=1)+sub3D(d$B,t=1)%*%parlist$B
+        Bmat=subFixed(f$B,t=1)+subFree2D(d$B,t=1)%*%parlist$B
         Bmat=unvec(Bmat,dim=c(m,m))
-        Umat=sub3D(f$U,t=1)+sub3D(d$U,t=1)%*%parlist$U 
+        Umat=subFixed(f$U,t=1)+subFree2D(d$U,t=1)%*%parlist$U 
       }else{ #y=Z*pi + A
         Bmat=diag(1,m)
         Umat=matrix(0,m,1)
