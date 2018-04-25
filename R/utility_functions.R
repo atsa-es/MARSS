@@ -74,7 +74,7 @@ is.identity = function(x, dim=NULL) {
     if(!is.numeric(dim)) stop("Stopped in MARSS internal function is.identity(): dim must be numeric.\n", call.=FALSE)
     if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("Stopped in MARSS internal function is.identity(): dim must be positive whole number.\n", call.=FALSE)
     if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.identity(): dim is not the right size.  length(x)=dim1*dim2", call.=FALSE)
-    x=unvec(x,dim=dim)
+    if(is.null(dim(x))) x=unvec(x,dim=dim) # matrix so make it one
   }
   if(!is.matrix(x) & !is(x, "Matrix"))
     stop("Stopped in MARSS internal function is.identity(): argument must be a matrix.\n", call.=FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
@@ -505,7 +505,7 @@ mystrsplit=function(x){
   return(stre)
 }
 
-convert.model.mat=function(param.matrix, TwoD=FALSE){
+convert.model.mat=function(param.matrix, TwoD=TRUE){
   #uses the list matrix version of a parameter to make the fixed(f) and free(D) matrices; vec(param)=f+D*p
   #will take a numeric, character or list matrix
   #returns fixed and free matrices that are 3D as required for a marssMODEL form=marss model
@@ -784,6 +784,29 @@ subFree = function(x,t=1){
 subFixed = function(x,t=1){
   if(is(x,"Matrix")) return( x[,t,drop=FALSE] )
   return( sub3D(x, t=t) )
+}
+
+dim3 = function(x){
+  if(is(x, "Matrix")) return( attr(x, "free.dims") )[3]
+  return(dim(x)[3])
+}
+
+# x is a free matrix
+dim2 = function(x){
+  if(is(x, "Matrix")) return( attr(x, "free.dims") )[2]
+  return(dim(x)[2])
+}
+
+# ids the diagonals in matrix that are zeros from the fixed free pair
+# nrow is the nrow in the original symmetric matrix
+zeroDiags = function(fixed, free, nrow){
+  diag.rows = 1 + 0:(nrow - 1)*(nrow + 1)
+  Tmax = max(dim3(fixed), dim3(free))
+  all.fixed.zero = fixed[diag.rows,1]==0
+  if(is(free,"Matrix")) dim(free) = attr(free, "free.dims")[1:2]
+  free.diag.rows.fixed = is.fixed(free,by.row=TRUE)[diag.rows]
+  zero.diags = free.diag.rows.fixed & all.fixed.zero
+  return(zero.diags)
 }
 
 #replace 0 diags with 0 row/cols; no error checking.  Need square symm matrix
