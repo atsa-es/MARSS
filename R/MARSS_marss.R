@@ -343,8 +343,9 @@ describe_marss = function(MODELobj, model.elem=NULL){
   names(constr.type)=model.elem
   constr.type[model.elem]="none"
   
+  time.dim = ifelse(is(free[["Q"]],"Matrix"),2,3)
   for(elem in model.elem){
-    TT.max = max( dim(fixed[[elem]])[3], dim(free[[elem]])[3])
+    TT.max = max( dim(fixed[[elem]])[time.dim], dim(free[[elem]])[time.dim])
     if(TT.max > 1) constr.type[[elem]]="time-varying"
   }  
   # For everything below, elem is time constant however tests are written to take a 3D matrix and it is not req that t=1
@@ -356,14 +357,15 @@ describe_marss = function(MODELobj, model.elem=NULL){
     dimc = model.dims[[elem]][2]
     while(identical(constr.type[[elem]],"none")) {
       #Z is not time varying and is a design matrix; note test above would have ensured Z is time constant
-      if( elem=="Z" & is.fixed(free[[elem]]) & dim(fixed[[elem]])[3]==1 ){
-        if( all(apply(fixed[[elem]],3,is.design,dim=c(dimm,dimc))) ) { 
+      if( elem=="Z" & is.fixed(free[[elem]]) & dim(fixed[[elem]])[time.dim]==1 ){
+        if( all(apply(fixed[[elem]],time.dim,is.design,dim=c(dimm,dimc))) ) { 
           Z.names = c()
           X.names=attr(MODELobj,"X.names")
           if(is.null(X.names)) X.names=as.character(1:m)
           for(i in 1:n) Z.names = c(Z.names, X.names[as.logical(fixed$Z[i,,1])]) #fixed$Z will be time constant
           constr.type[[elem]] = paste("design matrix with rows:",paste(Z.names,collapse=" "))
-          break }} #break out of the while for elem
+          break }
+        } #break out of the while for elem
       if(is.fixed(free[[elem]])) { #it's fixed
         if(all(fixed[[elem]]==0))  { constr.type[[elem]] = "fixed and zero"; break }
         if(all(fixed[[elem]]==1))  { constr.type[[elem]] = "fixed and all one"; break }
@@ -486,7 +488,9 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
     return(msg)
   }  
   
-  fixed=MODELobj$fixed; free=MODELobj$free
+  fixed=MODELobj[["fixed"]]; free=MODELobj[["free"]]
+  isM = is(free[["Q"]],"Matrix")
+  time.dim = ifelse(isM,2,3)
   
   ###########################
   # Check that x0, V0 and L are not time-varying
@@ -495,11 +499,11 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   time.var = NULL
   for (elem in en) {
     time.var.flag = FALSE
-    time.var.flag = dim(fixed[[elem]])[3]!=1 | dim(free[[elem]])[3]!=1
+    time.var.flag = dim(fixed[[elem]])[time.dim]!=1 | dim(free[[elem]])[time.dim]!=1
     time.var <- c(time.var, time.var.flag)
   }
   if(any(time.var)) {  #There's a problem
-    msg = c(msg, paste(en[time.var], "cannot be time-varying.  3rd dim of fixed and free must equal 1.\n"))
+    msg = c(msg, paste(en[time.dim], "cannot be time-varying.  3rd dim of fixed and free must equal 1.\n"))
     msg=c("\nErrors were caught in is.marssMODEL_marss()\n", msg)
     return(msg)
   }
@@ -513,18 +517,28 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   neg = bad.var = not.design = NULL
   for (elem in en) {
     neg.flag = bad.var.flag = not.design.flag = FALSE
-    for(i in 1:max(dim(free[[elem]])[3],dim(fixed[[elem]])[3])){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
-      if(is.fixed(free[[elem]][,,min(i,dim(free[[elem]])[3]),drop=FALSE])){ #this works on 3D mats
+    elem.dim = c(correct.dim1[[elem]], correct.dim2[[elem]])
+    for(i in 1:model.dims[[elem]][3]){
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
+      if(isM){
+        # 2D format
+        free.elem.i = subFree2D(free[[elem]],t=i2)
+        fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
+      }else{
+        free.elem.i = sub3D(free[[elem]],i2)
+        fixed.elem.i = sub3D(fixed[[elem]],i1)
+      }
+      if(is.fixed(free.elem.i)){ #this works on 3D mats
         zero.free.rows = matrix(TRUE,correct.dim1[[elem]]*correct.dim2[[elem]],1)
       }else{
-        zero.free.rows=apply(free[[elem]][,,i2,drop=FALSE]==0,1,all) #works on 3D mat
+        #zero.free.rows = apply(free.elem.i==0, 1, all)
+        zero.free.rows = is.fixed(free.elem.i, by.row=TRUE)
         #the requirement is that each estimated element (in p) appears only in one place in the varcov mat, but fixed rows (0 rows) are ok
-        not.design.flag = !is.design(free[[elem]][,,i2,drop=FALSE],strict=FALSE,zero.rows.ok=TRUE,zero.cols.ok=TRUE) #works on 3D if dim3=1
+        not.design.flag = !is.design(free.elem.i,strict=FALSE,zero.rows.ok=TRUE,zero.cols.ok=TRUE) #works on 3D if dim3=1
       }
-      zero.fixed.rows=apply(fixed[[elem]][,,i1,drop=FALSE]==0,1,all) #works on 3D
-      fixed.mat = unvec(fixed[[elem]][,,i1],dim=c(correct.dim1[[elem]],correct.dim2[[elem]]))
+      zero.fixed.rows=apply(fixed.elem.i==0,1,all) #works on 3D
+      fixed.mat = unvecM(fixed.elem.i,dim=elem.dim)
       if( any(!zero.fixed.rows & !zero.free.rows) ) bad.var.flag = TRUE   #no f+Dq rows
       if(any(takediag(fixed.mat)<0,na.rm=TRUE)) neg.flag=TRUE      #no negative diagonals
     } #end the for loop over time
@@ -549,12 +563,20 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   pos = symm = NULL
   for (elem in en) {
     varcov.flag = TRUE; varcov.msg=""
-    var.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
+    elem.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
+    if(isM){
+      # 2D format
+      free.elem.i = subFree2D(free[[elem]],t=i2)
+      fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
+    }else{
+      free.elem.i = sub3D(free[[elem]],i2)
+      fixed.elem.i = sub3D(fixed[[elem]],i1)
+    }
     for(i in 1:model.dims[[elem]][3]){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
       #works on 3D if dim3=1
-      par.as.list = fixed.free.to.formula(fixed[[elem]][,,i1,drop=FALSE],free[[elem]][,,i2,drop=FALSE],var.dim) #coverts the fixed,free pair to a list matrix
+      par.as.list = fixed.free.to.formula(fixed.elem.i,free.elem.i,elem.dim) #coverts the fixed,free pair to a list matrix
       tmp=is.validvarcov(par.as.list, method=method)
       varcov.flag=varcov.flag & tmp$ok
       if(!tmp$ok) varcov.msg = c(varcov.msg, paste(" ", tmp$error, "at t=", i, "\n",sep=""))
@@ -571,13 +593,21 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   pos = symm = NULL
   for (elem in en) {
     varcov.flag = TRUE; varcov.msg=""
-    var.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
+    elem.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
+    if(isM){
+      # 2D format
+      free.elem.i = subFree2D(free[[elem]],t=i2)
+      fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
+    }else{
+      free.elem.i = sub3D(free[[elem]],i2)
+      fixed.elem.i = sub3D(fixed[[elem]],i1)
+    }
     for(i in 1:model.dims[[elem]][3]){
-      if(dim(fixed[[elem]])[3]==1){i1=1}else{i1=i}
-      if(dim(free[[elem]])[3]==1){i2=1}else{i2=i}
+      if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
+      if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
       #works on 3D if dim3=1
       #since G, H, and L are numeric, par.as.list will be a numeric matrix not list
-      par.as.list = fixed.free.to.formula(fixed[[elem]][,,i1,drop=FALSE],free[[elem]][,,i2,drop=FALSE],var.dim) #coverts the fixed,free pair to a list matrix
+      par.as.list = fixed.free.to.formula(fixed.elem.i,free.elem.i,elem.dim) #coverts the fixed,free pair to a list matrix
       #this requirement is mention in 4.4 in EM Derivation
       #simple test for invertibility via condition number
       condition.limit=1E10
