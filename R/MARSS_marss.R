@@ -333,17 +333,19 @@ predict_marss = function(x, newdata, n.ahead, t.start){
 describe_marss = function(MODELobj, model.elem=NULL){
   #This returns the structure of a model using text strings; works for form=marss or marxss
   #You can pass in model.elem to have is drop some elements of marxss (if you don't want these to print)
-  fixed = MODELobj$fixed
-  free = MODELobj$free
+  fixed = MODELobj[["fixed"]]
+  free = MODELobj[["free"]]
   model.dims=attr(MODELobj,"model.dims")
   m=model.dims$x[1]; n=model.dims$y[1]
   model.elem=attr(MODELobj,"par.names")
+  isM = is(free[["Q"]], "Matrix")
+  time.dim = ifelse(isM, 2, 3)
+
   #set up the constr type list with an element for each par name and init val of "none"
   constr.type=vector("list",length(model.elem))
   names(constr.type)=model.elem
   constr.type[model.elem]="none"
   
-  time.dim = ifelse(is(free[["Q"]],"Matrix"),2,3)
   for(elem in model.elem){
     TT.max = max( dim(fixed[[elem]])[time.dim], dim(free[[elem]])[time.dim])
     if(TT.max > 1) constr.type[[elem]]="time-varying"
@@ -355,6 +357,7 @@ describe_marss = function(MODELobj, model.elem=NULL){
   for(elem in model.elem){
     dimm = model.dims[[elem]][1]
     dimc = model.dims[[elem]][2]
+    if(isM) free.dim = attr(free[[elem]], "free.dims") else free.dim = dim(free[[elem]])
     while(identical(constr.type[[elem]],"none")) {
       #Z is not time varying and is a design matrix; note test above would have ensured Z is time constant
       if( elem=="Z" & is.fixed(free[[elem]]) & dim(fixed[[elem]])[time.dim]==1 ){
@@ -369,15 +372,15 @@ describe_marss = function(MODELobj, model.elem=NULL){
       if(is.fixed(free[[elem]])) { #it's fixed
         if(all(fixed[[elem]]==0))  { constr.type[[elem]] = "fixed and zero"; break }
         if(all(fixed[[elem]]==1))  { constr.type[[elem]] = "fixed and all one"; break }
-        if(length(unique(fixed[[elem]]))==1)
+        if(length(unique(as.vector(fixed[[elem]])))==1)
         { constr.type[[elem]] = paste("fixed and all",fixed[[elem]][1]); break }
-        if( all(apply(fixed[[elem]],3,is.identity,dim=c(dimm,dimc)))) constr.type[[elem]] = "identity"
+        if( all(apply(fixed[[elem]],time.dim,is.identity,dim=c(dimm,dimc)))) constr.type[[elem]] = "identity"
         else constr.type[[elem]] = "fixed"
         break #break out of while
       }
       if(length(free[[elem]])==1)  { constr.type[[elem]] = "scalar"; break }
-      if(length(unique(as.vector(free[[elem]])))==1 & dim(free[[elem]])[2]==1) { constr.type[[elem]] = "all equal"; break }
-      if(all(apply(free[[elem]],3,is.identity))) { constr.type[[elem]] = "unconstrained"; break }
+      if(length(unique(as.vector(free[[elem]])))==1 & free.dim[2]==1) { constr.type[[elem]] = "all equal"; break }
+      if(all(apply(free[[elem]],time.dim,is.identity,dim=free.dim[1:2]))) { constr.type[[elem]] = "unconstrained"; break }
       tmp.free = free[[elem]] 
       
       #The next parts are only for parameters that are not column vectors, so dim 2 !=1
@@ -521,14 +524,8 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
     for(i in 1:model.dims[[elem]][3]){
       if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
       if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
-      if(isM){
-        # 2D format
-        free.elem.i = subFree2D(free[[elem]],t=i2)
-        fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
-      }else{
-        free.elem.i = sub3D(free[[elem]],i2)
-        fixed.elem.i = sub3D(fixed[[elem]],i1)
-      }
+      free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+      fixed.elem.i = subFixed(fixed[[elem]],t=i1)
       if(is.fixed(free.elem.i)){ #this works on 3D mats
         zero.free.rows = matrix(TRUE,correct.dim1[[elem]]*correct.dim2[[elem]],1)
       }else{
@@ -564,14 +561,8 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   for (elem in en) {
     varcov.flag = TRUE; varcov.msg=""
     elem.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
-    if(isM){
-      # 2D format
-      free.elem.i = subFree2D(free[[elem]],t=i2)
-      fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
-    }else{
-      free.elem.i = sub3D(free[[elem]],i2)
-      fixed.elem.i = sub3D(fixed[[elem]],i1)
-    }
+    free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+    fixed.elem.i = subFixed(fixed[[elem]],t=i1)
     for(i in 1:model.dims[[elem]][3]){
       if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
       if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
@@ -594,14 +585,8 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   for (elem in en) {
     varcov.flag = TRUE; varcov.msg=""
     elem.dim = c(correct.dim1[[elem]],correct.dim2[[elem]])
-    if(isM){
-      # 2D format
-      free.elem.i = subFree2D(free[[elem]],t=i2)
-      fixed.elem.i = fixed[[elem]][,i1,drop=FALSE]
-    }else{
-      free.elem.i = sub3D(free[[elem]],i2)
-      fixed.elem.i = sub3D(fixed[[elem]],i1)
-    }
+    free.elem.i = subFree(free[[elem]],t=i2) # subFree does not make 2D vec into 2D non-vec
+    fixed.elem.i = subFixed(fixed[[elem]],t=i1)
     for(i in 1:model.dims[[elem]][3]){
       if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
       if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
