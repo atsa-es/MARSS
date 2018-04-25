@@ -38,8 +38,10 @@ MARSSkfss = function( MLEobj ) {
     #Note diff in param names from S&S;B=Phi, Z=A, A not in S&S
     model.elem = names(MODELobj$fixed)
     time.varying = c()
+    isM = is(MODELobj[["free"]][["Q"]], "Matrix")
+    time.dim = ifelse(isM, 2, 3)
     for(elem in model.elem){
-      if( (dim(MODELobj$free[[elem]])[3] != 1) | (dim(MODELobj$fixed[[elem]])[3] != 1))  #not time-varying
+      if( (dim(MODELobj[["free"]][[elem]])[time.dim] != 1) | (dim(MODELobj[["fixed"]][[elem]])[time.dim] != 1))  #not time-varying
            time.varying = c(time.varying, elem)
     }
     pari=parmat(MLEobj,t=1)
