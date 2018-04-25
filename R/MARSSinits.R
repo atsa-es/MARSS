@@ -85,12 +85,12 @@ for(elem in names(default)){
       parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
       }
       if(isM){
-        numvals=rowSums(d[[elem]]!=0,dims=1)
-        delem=rowSums(d[[elem]],dims=1)/numvals 
+        numvals=apply(d[[elem]]!=0,1,sum)
+        delem=apply(d[[elem]],1,sum)/numvals 
         delem[numvals==0]=0
         dim(delem)=attr(d[[elem]],"free.dims")[1:2]
-        numvals=rowSums(f[[elem]]!=0,dims=1)
-        felem=rowSums(f[[elem]],dims=1)/numvals
+        numvals=apply(f[[elem]]!=0,1,sum)
+        felem=apply(f[[elem]],1,sum)/numvals
         felem[numvals==0]=0
         #use a pseudoinverse here so D's with 0 columns don't fail
         parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
@@ -129,6 +129,7 @@ for(elem in names(default)){
     } #inits$x0=-99 means solve for x0 
    } #elem == x0
   rownames( parlist[[elem]] )=colnames( d[[elem]] )
+  parlist[[elem]] = as.matrix(parlist[[elem]]) # not Matrix class
   } #if elem not fixed
   } #for across elems
   
