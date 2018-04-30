@@ -56,7 +56,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
       msg = c(msg, "MODELobj$free must have no NAs or Infs.\n")
     if(any(unlist(lapply(fixed, fun )))) 
        msg = c(msg, "MODELobj$fixed must have no NAs or Infs.\n")
-  if(!isM){ # Matrix class is always numeric so don't need to check that case
+  if(!isMatrix){ # Matrix class is always numeric so don't need to check that case
     fun = function(x){ mode(x) != "numeric" }
     if(any(unlist(lapply(free, fun )))) 
       msg = c(msg, "MODELobj$free must be numeric with no NAs or Infs.\n")
@@ -160,7 +160,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     # check dim
     # isM defined at top.  Means is 2D vec form
     dim.fixed.flag = !isTRUE(all.equal( dim(fixed[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
-    if(!isM){
+    if(!isMatrix){
       dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )       
       dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
     }else{
@@ -176,8 +176,8 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     }
     if(any(dim.free)) {
       bad.names = par.names[dim.free]
-      if(!isM) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names],"based on data and other parameters.\n"))
-      if(isM) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names], "x", attr(free[[elem]],"free.dims")[2], "based on data and other parameters.\n"))
+      if(!isMatrix) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names],"based on data and other parameters.\n"))
+      if(isMatrix) msg = c(msg, paste("free", bad.names, "dims are incorrect. Dim 1 be ", model.dims[bad.names], "x", model.dims[bad.names], "x", attr(free[[elem]],"free.dims")[2], "based on data and other parameters.\n"))
     }
   }
 
@@ -190,7 +190,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     ## Check for problems in the fixed/free pairs. Problems show up as TRUE 
     
     #test that time dim is either 1 or TT
-    if(isM) tdim = 2 else tdim = 3
+    if(isMatrix) tdim = 2 else tdim = 3
     dim.fixed.flag = (!isTRUE( all.equal( dim(fixed[[elem]])[tdim], TT ) ) & !isTRUE(all.equal( dim(fixed[[elem]])[tdim], 1 ) )) 
     dim.free.flag = (!isTRUE(all.equal( dim(free[[elem]])[tdim], TT ) ) & !isTRUE(all.equal( dim(free[[elem]])[tdim], 1 ) ))    
     dim.fixed = c(dim.fixed, dim.fixed.flag)
@@ -211,7 +211,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   ###########################
   # Check that free has column names since these are the parameter names
   ###########################
-  if(!isM){
+  if(!isMatrix){
   no.colnames.free=unlist(lapply(free[par.names],function(x){ is.null(colnames(x)) })) & unlist(lapply(free[par.names],function(x){dim(x)[2]}))!=0
   }else{
     no.colnames.free=unlist(lapply(free[par.names],function(x){is.null(attr(x,"estimate.names"))})) & unlist(lapply(free[par.names],function(x){dim(x)[1]}))!=0

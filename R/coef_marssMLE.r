@@ -46,7 +46,7 @@ if(!(type %in% c("vector", "list", "par", "matrix", par.names, model.names)))
       paramvector = NULL
       for(elem in par.names){
         if(dim(pars[[elem]])[1]>0){ #there are estimates
-          if(is(free[[elem]], "Matrix")){
+          if(isMatrix){
             mat.names = attr(free[[elem]], "estimate.names")
           }else{
             mat.names = colnames(free[[elem]])

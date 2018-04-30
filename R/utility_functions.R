@@ -8,26 +8,26 @@ takediag = function(x)
   ############# Function to take the diagonal; deals with R trying to think too much with diag()
 {
   if(length(x)==1) return(x)
-  if(!is.matrix(x) & !is(x,"Matrix")) stop("Stopped in MARSS internal function takediag(): function requires a 2D matrix.\n", call.=FALSE)
+  if(!is.matrix(x) & !isMatrix) stop("Stopped in MARSS internal function takediag(): function requires a 2D matrix.\n", call.=FALSE)
   d1=dim(x)[1]
   return(x[1 + 0:(d1 - 1)*(d1 + 1)])  #faster diag
 }
 
 makediag = function(x,nrow=NA){
   ############# Function to make a diagonal matrix; deals with R trying to think too much with diag()
-    if(!is.null(dim(x)))
-      if(!(dim(x)[1]==1 | dim(x)[2]==1))  stop("Stopped in MARSS internal function makediag(): error in call to makediag; x is not vector.\n", call.=FALSE)
-    if(is.na(nrow)) nrow=length(x)
-    tmp = matrix(0,nrow,nrow)
-    tmp[1 + 0:(nrow - 1)*(nrow + 1)] = x
-    return(tmp)
-  }
+  if(!is.null(dim(x)))
+    if(!(dim(x)[1]==1 | dim(x)[2]==1))  stop("Stopped in MARSS internal function makediag(): error in call to makediag; x is not vector.\n", call.=FALSE)
+  if(is.na(nrow)) nrow=length(x)
+  tmp = matrix(0,nrow,nrow)
+  tmp[1 + 0:(nrow - 1)*(nrow + 1)] = x
+  return(tmp)
+}
 
 ############ The following functions are for testing the shapes of matrices
 # these functions use as.character(x) to deal with the "feature" that in R (.01 + .14) == .15 is FALSE!!
 is.equaltri = function(x) {
   #requires 2D matrix ; works on numeric, character or list matrices
-  if(!is.matrix(x) & !is(x,"Matrix")) return(FALSE)
+  if(!is.matrix(x) & !isMatrix) return(FALSE)
   #warning this returns TRUE if x is 1x1
   x = as.matrix(unname(x))
   if(dim(x)[1]==1 & dim(x)[2]==1) return(TRUE)
@@ -51,7 +51,7 @@ is.diagonal = function(x, na.rm=FALSE) {
   #works on numeric matrices or list matrices
   #na.rm=TRUE means that NAs on the DIAGONAL are ignored
   #ok if there are 0s on diagonal
-  if(!is.matrix(x) & !is(x,"Matrix")) return(FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
+  if(!is.matrix(x) & !isMatrix) return(FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
   x=as.matrix(unname(x))
   if(na.rm==FALSE && any(is.na(x))) return(FALSE)
   nr = dim(x)[1]; nc = dim(x)[2];
@@ -76,7 +76,7 @@ is.identity = function(x, dim=NULL) {
     if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.identity(): dim is not the right size.  length(x)=dim1*dim2", call.=FALSE)
     if(is.null(dim(x))) x=unvec(x,dim=dim) # matrix so make it one
   }
-  if(!is.matrix(x) & !is(x, "Matrix"))
+  if(!is.matrix(x) & !isMatrix)
     stop("Stopped in MARSS internal function is.identity(): argument must be a matrix.\n", call.=FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
   if(!is.diagonal(x)) return(FALSE)
   if(!all(sapply(takediag(x),identical,1))) return(FALSE)
@@ -86,7 +86,7 @@ is.identity = function(x, dim=NULL) {
 is.validvarcov = function(x, method="kem"){
   #works on numeric and list matrices
   #x must be 2D matrix; is.matrix returns false for 3D array
-  if(!is.matrix(x) & !is(x, "Matrix")) return(list(ok=FALSE, error="not a matrix "))
+  if(!is.matrix(x) & !isMatrix) return(list(ok=FALSE, error="not a matrix "))
   x=as.matrix(unname(x))
   #no NAs
   if(any(is.na(x))) return(list(ok=FALSE, error="NAs are not allowed in varcov matrix "))
@@ -215,7 +215,7 @@ is.validvarcov = function(x, method="kem"){
 
 is.blockdiag = function(x) {
   #works on numeric and list matrices
-  if(!is.matrix(x) & !is(x, "Matrix")) return(FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
+  if(!is.matrix(x) & !isMatrix) return(FALSE) #x must be 2D matrix; is.matrix returns false for 3D array
   x=as.matrix(unname(x))
   if(any(is.na(x))) return(FALSE)
   nr = dim(x)[1]; nc = dim(x)[2];
@@ -243,7 +243,7 @@ is.blockdiag = function(x) {
 }
 
 is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=FALSE) {  
-  #can be 2D or 3D with t=1; if Matrix, then it assumes x is in 2D vec format
+  #can be 2D or 3D; if Matrix, then it assumes x is in 2D vec format
   #strict means only 0,1; not strict means 1s can be other numbers
   #zero.rows.ok means that the rowsums can be 0 (if that row is fixed, say)
   #if dim not null it means a vec-ed version of the matrix was passed in so dim is dim of orig matrix
@@ -252,44 +252,44 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
     if(is.vector(x) & !is.null(dim)){
       x=unvec(x,dim=dim)
     }else{
-    stop("Stopped in MARSS internal function is.design(): function requires a 2D or 3D matrix.\n", call.=FALSE) #x can be 2D or 3D matrix
+      stop("Stopped in MARSS internal function is.design(): function requires a 2D or 3D matrix.\n", call.=FALSE) #x can be 2D or 3D matrix
     }
   }
-  isM = is(x, "Matrix")
-  if(!isM){
-  if(length(dim(x))==3)
-    if(dim(x)[3]!=1){ stop("Stopped in MARSS internal function is.design(): if 3D, 3rd dim of matrix must be 1.\n", call.=FALSE)
-    }else{ 
+  if(!isMatrix){
+    if(length(dim(x))==3)
+      if(dim(x)[3]!=1){ stop("Stopped in MARSS internal function is.design(): if 3D, 3rd dim of matrix must be 1.\n", call.=FALSE)
+      }else{ 
         x=matrix(x, dim(x)[1], dim(x)[2])
       }
-  if(!is.null(dim)){
-    if(length(dim)!=2) stop("Stopped in MARSS internal function is.design(): dim must be length 2 vector.\n", call.=FALSE)
-    if(!is.numeric(dim)) stop("is.design: dim must be numeric")
-    if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("Stopped in MARSS internal function is.design(): dim must be positive whole number.\n", call.=FALSE)
-    if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.design(): dim is not the right size.  length(x)=dim1*dim2.\n", call.=FALSE)
-    x=unvec(x,dim=dim)
+    if(!is.null(dim)){
+      if(length(dim)!=2) stop("Stopped in MARSS internal function is.design(): dim must be length 2 vector.\n", call.=FALSE)
+      if(!is.numeric(dim)) stop("is.design: dim must be numeric")
+      if(!all(sapply(dim, is.wholenumber)) | !all(dim>=0)) stop("Stopped in MARSS internal function is.design(): dim must be positive whole number.\n", call.=FALSE)
+      if(length(x)!=(dim[1]*dim[2])) stop("Stopped in MARSS internal function is.design(): dim is not the right size.  length(x)=dim1*dim2.\n", call.=FALSE)
+      x=unvec(x,dim=dim)
+    }
+    x=as.matrix(unname(x)) #so that all.equal doesn't fail
+    if(any(is.na(x))) return(FALSE)
+    if(!is.numeric(x)) return(FALSE)  #must be numeric
+    if(any(is.nan(x))) return(FALSE)
+    if(!strict){
+      is.zero = !x
+      #     is.zero = sapply(lapply(x,all.equal,0),isTRUE) #funky to use near equality
+      x[!is.zero]=1 
+    } 
+    if(!all(x %in% c(1,0))) return(FALSE)  #above ensured that all numeric
+    if(!zero.cols.ok & dim(x)[1]<dim(x)[2]) return(FALSE) #if fewer rows than columns then not design
+    if(is.list(x)) x=matrix(unlist(x),dim(x)[1],dim(x)[2])
+    tmp = rowSums(x)
+    if(!zero.rows.ok & !isTRUE(all.equal(tmp,rep(1,length(tmp))))) return(FALSE)
+    if(zero.rows.ok & !isTRUE(all(tmp %in% c(0,1)))) return(FALSE)
+    tmp = colSums(x)
+    if(!zero.cols.ok & any(tmp==0) ) return(FALSE)
+    return( TRUE )
   }
-  x=as.matrix(unname(x)) #so that all.equal doesn't fail
-  if(any(is.na(x))) return(FALSE)
-  if(!is.numeric(x)) return(FALSE)  #must be numeric
-  if(any(is.nan(x))) return(FALSE)
-  if(!strict){
-    is.zero = !x
-    #     is.zero = sapply(lapply(x,all.equal,0),isTRUE) #funky to use near equality
-    x[!is.zero]=1 
-  } 
-  if(!all(x %in% c(1,0))) return(FALSE)  #above ensured that all numeric
-  if(!zero.cols.ok & dim(x)[1]<dim(x)[2]) return(FALSE) #if fewer rows than columns then not design
-  if(is.list(x)) x=matrix(unlist(x),dim(x)[1],dim(x)[2])
-  tmp = rowSums(x)
-  if(!zero.rows.ok & !isTRUE(all.equal(tmp,rep(1,length(tmp))))) return(FALSE)
-  if(zero.rows.ok & !isTRUE(all(tmp %in% c(0,1)))) return(FALSE)
-  tmp = colSums(x)
-  if(!zero.cols.ok & any(tmp==0) ) return(FALSE)
-  return( TRUE )
-  }
-  if(isM){
-    dim(x) = attr(x, "free.dims")[1:2] # reform to 2D matrix
+  if(isMatrix){
+    if(!is.null(attr(x, "free.dims")))
+      dim(x) = attr(x, "free.dims")[1:2] # reform to 2D free matrix
     #strip all the error-checking; assume is numeric since Matrix
     if(!strict){
       is.zero = !x
@@ -309,16 +309,15 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
 is.fixed = function(x, by.row=FALSE) { 
   #expects the D (free) matrix; can be 3D or 2D; can be a numeric list matrix
   #by.row means it reports whether each row is fixed 
-  isM = is(x, "Matrix")
-  if(!(is.array(x) | isM)) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
+  if(!(is.array(x) | isMatrix)) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
   if(!(length(dim(x)) %in% c(2,3))) stop("Stopped in MARSS internal function is.fixed(): function requires a 2D or 3D free(D) matrix.\n", call.=FALSE)
-  if(!(is.numeric(x) | isM)) stop("Stopped in MARSS internal function is.fixed(): free(D) must be numeric.\n", call.=FALSE)  #must be numeric
+  if(!(is.numeric(x) | isMatrix)) stop("Stopped in MARSS internal function is.fixed(): free(D) must be numeric.\n", call.=FALSE)  #must be numeric
   if(any(is.na(x))) stop("Stopped in MARSS internal function is.fixed(): free(D) cannot have NAs or NaNs.\n", call.=FALSE)
-  if(!isM){ 
+  if(!isMatrix){ 
     if(any(is.nan(x))) stop("Stopped in MARSS internal function is.fixed(): free(D) cannot have NAs or NaNs.\n", call.=FALSE)
   }
   # get dims from attr if free might be in vec 2D format
-  if(isM){
+  if(isMatrix){
     np = attr(x, "free.dims")[2]
     nr = attr(x, "free.dims")[1]
   }else{
@@ -331,8 +330,8 @@ is.fixed = function(x, by.row=FALSE) {
   if(all(x==0)) return(TRUE)
   if(by.row){
     # if isM, then in 2D vec form and need to reform to get rows
-    if(isM){ dim(x)=c(nr,np*dim(x)[2]); return( apply(x==0,1,all) )}
-    return( apply(x==0,1,all) )
+    if(isMatrix){ dim(x)=c(nr,np*dim(x)[2]); return( rowSums(x!=0)==0 )} # apply(x==0,1,all)
+    return( rowSums(x!=0)==0 ) # apply(x==0,1,all)
   }
   return(FALSE)
 }
@@ -379,9 +378,8 @@ unvecM = function(x, dim){
 }
 
 parmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
-  isM = is(MLEobj[["marss"]][["free"]][["Q"]],"Matrix")
-  if(isM){ 
-    return(vparmat(MLEobj, elem=elem, t=t, dims=dims, model.loc=model.loc)) # 2D and Matrix
+  if(isMatrix){ 
+    return(vparmat2(MLEobj, elem=elem, t=t, dims=dims, model.loc=model.loc)) # 2D and Matrix
   }else{
     return(aparmat(MLEobj, elem=elem, t=t, dims=dims, model.loc=model.loc)) # 3D
   }
@@ -439,20 +437,67 @@ vparmat = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"
   d=model[["free"]]
   if(!all(elem %in% names(f))) stop("sparmat: one of the elem is not one of the marss parameter names.")
   par.mat=list()
+  Diags = get("Diags", pkg_globals)
   if(is.null(dims)) dims = attr(model, "model.dims")
   if(!is.list(dims) & length(elem)!=1) stop("sparmat: dims needs to be a list if more than one elem passed in")
   if(!is.list(dims) & length(elem)==1){ tmp=dims; dims=list(); dims[[elem]]=tmp }
   for(el in elem){
     if(length(t)>1){ par.mat[[el]] = array(as.numeric(NA), dim=c(dims[[el]][1:2],length(t))) }
-    fr = dim(f[[el]])[1] # rows in f which is same as rows in d
-    left.side = kronecker(t(pars[[el]]), Diagonal(fr))
+    fr = dim(f[[el]])[1] # rows in d 2D form
+    par0 = length(pars[[el]])==0
+    if(!par0){
+      t.par = matrix( pars[[el]], nrow=1 )
+      left.side = kronecker(t.par, Diags[[as.character(fr)]])
+    }
     for(i in t){
-      if(dim(d[[el]])[2]==1){ delem=d[[el]] }else{ delem=d[[el]][,i,drop=FALSE] }
       if(dim(f[[el]])[2]==1){ felem=f[[el]] }else{ felem=f[[el]][,i,drop=FALSE] }
+      if(par0){ val = felem }else{
+        if(dim(d[[el]])[2]==1){ delem=d[[el]] }else{ delem=d[[el]][,i,drop=FALSE] }
+        val = (felem + left.side %*% delem)[,1] }
       if(length(t)==1){
-        par.mat[[el]] = matrix(felem + left.side %*% delem,dims[[el]][1],dims[[el]][2])
-      }else{ 
-        par.mat[[el]][,,i] = matrix(felem + left.side %*% delem,dims[[el]][1],dims[[el]][2])
+        par.mat[[el]] = matrix(val,dims[[el]][1],dims[[el]][2])
+      }else{
+        par.mat[[el]][,,i] = matrix(val,dims[[el]][1],dims[[el]][2])
+      }
+    }
+  }
+  return(par.mat)
+}
+
+vparmat2 = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L"), t=1, dims=NULL, model.loc="marss" ){
+  #returns a list where each el in elem is an element.  Returns a 2D matrix.
+  #needs MLEobj$marss and MLEobj$par
+  #dims is an optional argument to pass in to tell parmat the dimension of elem (if it is not a MARSS model)
+  #f=MLEobj$marss$fixed
+  model=MLEobj[[model.loc]]
+  pars=MLEobj[["par"]]
+  f=model[["fixed"]]
+  d=model[["free"]]
+  if(!all(elem %in% names(f))) stop("parmat: one of the elem is not one of the marss parameter names.")
+  par.mat=list()
+  if(is.null(dims)) dims = attr(model, "model.dims")
+  if(!is.list(dims) & length(elem)!=1) stop("parmat: dims needs to be a list if more than one elem passed in")
+  if(!is.list(dims) & length(elem)==1){ tmp=dims; dims=list(); dims[[elem]]=tmp }
+  for(el in elem){
+    if(length(t)>1){ par.mat[[el]] = array(as.numeric(NA), dim=c(dims[[el]][1:2],length(t))) }
+    for(i in t){
+      if(dim3(f[[el]])==1){
+        felem=f[[el]]
+        #attr(felem,"dim")=attr(felem,"dim")[1:2]
+      }else{ felem=subFixed(f[[el]],t=i) }
+      if(dim(d[[el]])[1]==0){ # no estimated vals
+        val = felem[,1]
+      }else{
+        if(dim2(d[[el]])==1){ # one time step
+          delem=d[[el]]
+          #attr(delem,"dim")=attr(delem,"dim")[1:2]
+        }else{ delem= subFree2D(d[[el]],t=i) }
+        val = felem[,1] + (delem%*%pars[[el]])[,1] # [,1] is to change to a vector
+      }
+      if(length(t)==1){
+        par.mat[[el]] = matrix(val,dims[[el]][1],dims[[el]][2])
+      }else{
+        par.mat[[el]][,,i] = matrix(val,dims[[el]][1],dims[[el]][2])
       }
     }
   }
@@ -505,13 +550,12 @@ mystrsplit=function(x){
   return(stre)
 }
 
-convert.model.mat=function(param.matrix, TwoD=TRUE){
+convert.model.mat=function(param.matrix){
   #uses the list matrix version of a parameter to make the fixed(f) and free(D) matrices; vec(param)=f+D*p
   #will take a numeric, character or list matrix
   #returns fixed and free matrices that are 3D as required for a marssMODEL form=marss model
   #if param.matrix is 3D then dim3 of f and D will equal dim3 of model.matrix
   #if param.matrix is 2D then dim3 of f and D will equal 1
-  #TwoD=TRUE means to specifiy the fixed and free as 2D matrixes as class Matrix
   if(!is.array(param.matrix)) stop("convert.model.mat: function requires a 2D or 3D matrix")
   if(!(length(dim(param.matrix)) %in% c(2,3))) stop("convert.model.mat: arg must be a 2D or 3D matrix")
   Tmax=1
@@ -524,7 +568,7 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
   d=array(sapply(c,is.character),dim=dim(c))
   f=array(0,dim=dim(c))
   if(any(!d)) f[!d]=unlist(c[!d]) # add check so "all character" matrices don't fail
-  if(TwoD){
+  if(isMatrix){
     f=Matrix::Matrix(as.vector(f),dim.f1,Tmax)
   }else{
     f=array(as.vector(f),dim=c(dim.f1,1,Tmax))
@@ -562,7 +606,7 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
   } 
   
   nvar = length(varnames) #number of variables
-  if(TwoD){
+  if(isMatrix){
     free=Matrix::Matrix(0,dim.f1*nvar,Tmax)
   }else{
     free=array(0,dim=c(dim.f1,nvar,Tmax))
@@ -599,11 +643,11 @@ convert.model.mat=function(param.matrix, TwoD=TRUE){
     }
   } #any characters?
   
-  if(TwoD){
+  if(isMatrix){
     attr(free, "estimate.names")=varnames
     attr(free, "free.dims")=c(dim.f1,nvar,Tmax)
   }
-  if(!TwoD) colnames(free)=varnames 
+  if(!isMatrix) colnames(free)=varnames 
   return(list(fixed=f,free=free))
 }
 
@@ -619,10 +663,9 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
   if( !(length(dim(fixed)) %in% c(2,3)) ) stop("fixed.free.to.formula: fixed must be 2 or 3D matrix")
   if( !(length(dim(free)) %in% c(2,3)) ) stop("fixed.free.to.formula: free must be 2 or 3D matrix")
   
-  isM = is(free, "Matrix") # is Matrix class
   row.f = dim(fixed)[1]
   
-  if(isM){ # then is 2D with time in columns and each col is vec(d)
+  if(isMatrix){ # then is 2D with time in columns and each col is vec(d)
     tmax.free = dim(free)[2]
     tmax.fixed = dim(fixed)[2]
     Tmax=max(1,tmax.fixed,tmax.free)
@@ -659,7 +702,7 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
     free.t = min(t,tmax.free)
     fixed.t = min(t,tmax.fixed)
     # free.2d and fixed.2d are the matrices at time t
-    if(isM){
+    if(isMatrix){
       free.2d = free[,free.t,drop=FALSE]
       dim(free.2d) = c(row.f, np)
       fixed.2d = fixed[,fixed.t,drop=FALSE]
@@ -669,19 +712,19 @@ fixed.free.to.formula=function(fixed,free,dim){ #dim is the 1st and 2nd dims of 
       dim(free.2d) = c(row.f, np)
       dim(fixed.2d) = c(row.f, 1)
     }
-    for(i in 1:row.f){
-      if(all(free.2d[i,]==0)){ model[i,1,t]=fixed.2d[i,1]
-      }else{
-        if(fixed.2d[i,1]==0) tmp=c() else tmp=c(as.character(fixed.2d[i,1]))
-        for(j in 1:np){
-          if(free.2d[i,j]!=0){
-            if(is.null(tmp) & free.2d[i,j]==1){ tmp=colnames.free[j]
-            }else{ tmp=c(tmp,"+",as.character(free.2d[i,j]),"*",colnames.free[j]) }
-          }
+    all.0.free.2d.row = rowSums(free.2d!=0)==0 # no non-zero vals
+    all.0.fixed.row = rowSums(fixed.2d!=0)==0 # no non-zero vals
+    model[all.0.free.2d.row,1,t]=fixed.2d[all.0.free.2d.row,1]
+    for(i in which(!all.0.free.2d.row)){
+      if(all.0.fixed.row[i]) tmp=c() else tmp=c(as.character(fixed.2d[i,1]))
+      for(j in 1:np){
+        if(free.2d[i,j]!=0){
+          if(is.null(tmp) & free.2d[i,j]==1){ tmp=colnames.free[j]
+          }else{ tmp=c(tmp,"+",as.character(free.2d[i,j]),"*",colnames.free[j]) }
         }
-        if(tmp[1]=="+") tmp=tmp[2:length(tmp)]
-        model[i,1,t]=paste(tmp,collapse="")
       }
+      if(tmp[1]=="+") tmp=tmp[2:length(tmp)]
+      model[i,1,t]=paste(tmp,collapse="")
     }
   }
   #return 2D matrix if Tmax is 1
@@ -761,17 +804,18 @@ sub3D=function(x,t=1){
 
 # Returns a free matrix in 2D format
 subFree2D=function(x,t=1){
-  if(!is(x,"Matrix")) return( sub3D(x, t=t) )
-    x.dims = attr(x, "free.dims")
-    x.names = attr(x, "estimate.names")
-    x=x[,t,drop=FALSE]
-    dim(x) = x.dims[1:2]
-    colnames(x) = x.names
-    return(x)
+  if(!isMatrix) return( sub3D(x, t=t) )
+  x.dims = attr(x, "free.dims")
+  x.names = attr(x, "estimate.names")
+  x=x[,t,drop=FALSE]
+  dim(x) = x.dims[1:2]
+  colnames(x) = x.names
+  return(x)
 }
 
+# keeps free in whatever form it started as
 subFree = function(x,t=1){
-  if(!is(x,"Matrix")) return( sub3D(x, t=t) )
+  if(!isMatrix) return( sub3D(x, t=t) )
   # else is Matrix in 2D vec form
   x.dims = attr(x, "free.dims")
   x.names = attr(x, "estimate.names")
@@ -782,18 +826,18 @@ subFree = function(x,t=1){
 }
 
 subFixed = function(x,t=1){
-  if(is(x,"Matrix")) return( x[,t,drop=FALSE] )
+  if(isMatrix) return( x[,t,drop=FALSE] )
   return( sub3D(x, t=t) )
 }
 
 dim3 = function(x){
-  if(is(x, "Matrix")) return( attr(x, "free.dims") )[3]
+  if(isMatrix) return(dim(x)[2])
   return(dim(x)[3])
 }
 
 # x is a free matrix
 dim2 = function(x){
-  if(is(x, "Matrix")) return( attr(x, "free.dims") )[2]
+  if(isMatrix) return( attr(x, "free.dims")[2] )
   return(dim(x)[2])
 }
 
@@ -803,7 +847,6 @@ zeroDiags = function(fixed, free, nrow){
   diag.rows = 1 + 0:(nrow - 1)*(nrow + 1)
   Tmax = max(dim3(fixed), dim3(free))
   all.fixed.zero = fixed[diag.rows,1]==0
-  if(is(free,"Matrix")) dim(free) = attr(free, "free.dims")[1:2]
   free.diag.rows.fixed = is.fixed(free,by.row=TRUE)[diag.rows]
   zero.diags = free.diag.rows.fixed & all.fixed.zero
   return(zero.diags)

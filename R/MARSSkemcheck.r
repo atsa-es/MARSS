@@ -54,12 +54,14 @@ msg=NULL
       # zeros on the diagonals
       zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
       if(any(zero.diags)){
-        II0 = makediag(as.numeric(zero.diags))
+        #II0 = makediag(as.numeric(zero.diags))
+        II0 = Diagonal(x=as.numeric(zero.diags)) # x is 0s and 1s
         if(i<=Tmax){
           for( par.test in c("Z","A")){
-            II = diag(1,par.dims[[par.test]][2])
+            #II = diag(1,par.dims[[par.test]][2])
+            II = Diagonal(1,par.dims[[par.test]][2])
             ifree.par=min(i,dim(free[[par.test]])[3])
-            dpart = sub3D(free[[par.test]],t=ifree.par)
+            dpart = subFree2D(free[[par.test]],t=ifree.par)
             par.not.fixed = any( ((II %x% II0)%*%dpart)!=0 )
       
             if(par.not.fixed){
@@ -99,8 +101,9 @@ msg=NULL
         fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
         # zeros on the diagonals
         zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
-        II0Q = makediag(as.numeric(zero.diags))
-        II0Q = unname(II0[[el]])
+        #II0Q = makediag(as.numeric(zero.diags))
+        #II0Q = unname(II0[[el]])
+        II0Q = Diagonal(x=as.numeric(zero.diags))
       }
       if(i==1){
          II0Q.1=II0Q
@@ -127,7 +130,8 @@ msg=NULL
         fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
         # zeros on the diagonals
         zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
-        II0[[el]] = makediag(as.numeric(zero.diags))
+        #II0[[el]] = makediag(as.numeric(zero.diags))
+        II0[[el]] = Diagonal(x=as.numeric(zero.diags))
       }
       for( el in c("B","U")){
           ifree=min(i,dim3(free[[el]]))
@@ -135,10 +139,11 @@ msg=NULL
           tmp.MLEobj=list(marss=MODELobj, par=list(Z=matrix(1,dim2(free$Z),1)))
           tmp.MLEobj$marss$fixed$Z[tmp.MLEobj$marss$fixed$Z!=0]=1
           tmp.MLEobj$marss$free$Z[tmp.MLEobj$marss$free$Z!=0]=1
+          if(isMatrix) attr(tmp.MLEobj$marss$free$Z, "free.dims")=attr(MODELobj$free$Z, "free.dims")
           parZ=parmat(tmp.MLEobj,"Z",t=i)$Z
-          II = diag(1,par.dims[[el]][2])
-          
-          dpart = sub3D(free[[el]],t=ifree)
+          #II = diag(1,par.dims[[el]][2])
+          II = Diagonal(par.dims[[el]][2])
+          dpart = subFree2D(free[[el]],t=ifree) #subFree2D ensures that if 2D vec form, then the matrix ret is 2D
           par.not.fixed = any( ((II %x% (II0$R%*%parZ%*%II0$Q))%*%dpart)!=0 )
       
           if(par.not.fixed){
@@ -162,12 +167,13 @@ msg=NULL
         fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
         # zeros on the diagonals
         zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
-        II0[[el]] = makediag(as.numeric(zero.diags))
+        #II0[[el]] = makediag(as.numeric(zero.diags))
+        II0[[el]] = Diagonal(x=as.numeric(zero.diags))
       }
       for( el in c("B")){
           ifree=min(i,dim3(free[[el]]))
-          II = diag(1,par.dims[[el]][2])
-          dpart = sub3D(free[[el]],t=ifree)
+          II = Diagonal(par.dims[[el]][2])
+          dpart = subFree2D(free[[el]],t=ifree)
           par.not.fixed = any( ((II %x% II0$Q)%*%dpart)!=0 )
       
           if(par.not.fixed){
@@ -193,12 +199,13 @@ msg=NULL
    fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
    # zeros on the diagonals
    zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
-   II0[[el]] = makediag(as.numeric(zero.diags))
-
-   dpart=sub3D(free$x0,t=1)
+   #II0[[el]] = makediag(as.numeric(zero.diags))
+   II0[[el]] = Diagonal(x=as.numeric(zero.diags))
+   
+   dpart=subFree2D(free$x0,t=1)
    test.adj = any( (II0$Q%*%dpart)!=0 )
    for(i in 1:Tmax){
-    dpart=sub3D(free$U,t=i)
+    dpart=subFree2D(free$U,t=i)
     test.adj = test.adj & any( (II0$Q%*%dpart)!=0 )  #II0$Q required to be time constant above
    }
    
@@ -214,6 +221,7 @@ msg=NULL
       tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim2(free$B),1)))
       tmp.MLEobj$marss$fixed[[el]][tmp.MLEobj$marss$fixed[[el]]!=0]=1
       tmp.MLEobj$marss$free[[el]][tmp.MLEobj$marss$free[[el]]!=0]=1
+      if(isMatrix) attr(tmp.MLEobj$marss$free[[el]], "free.dims")=attr(MODELobj$free[[el]], "free.dims")
       adjB=parmat(tmp.MLEobj,el,t=i)[[el]]
       adjB[adjB!=0]=1; adjB=unname(adjB)
       if(i==1){
@@ -241,15 +249,20 @@ msg=NULL
       fixed.elem.i = subFixed(fixed[[el]], t=ifixed)
       # zeros on the diagonals
       zero.diags = zeroDiags(fixed.elem.i, free.elem.i, par.dims[[el]][1]) 
-      IIz[[el]] = makediag(as.numeric(zero.diags))
-        IIp[[el]] = diag(1,par.dims[[el]][1])-IIz[[el]]
-        OMGz[[el]] = diag(1,par.dims[[el]][1])[diag(IIz[[el]])==1,,drop=FALSE]
-        OMGp[[el]] = diag(1,par.dims[[el]][1])[diag(IIp[[el]])==1,,drop=FALSE]
+      # IIz[[el]] = makediag(as.numeric(zero.diags))
+      # IIp[[el]] = diag(1,par.dims[[el]][1])-IIz[[el]]
+      # OMGz[[el]] = diag(1,par.dims[[el]][1])[diag(IIz[[el]])==1,,drop=FALSE]
+      # OMGp[[el]] = diag(1,par.dims[[el]][1])[diag(IIp[[el]])==1,,drop=FALSE]
+      IIz[[el]] = Diagonal(x=as.numeric(zero.diags))
+      IIp[[el]] = Diagonal(par.dims[[el]][1])-IIz[[el]]
+      OMGz[[el]] = Diagonal(par.dims[[el]][1])[diag(IIz[[el]])==1,,drop=FALSE]
+      OMGp[[el]] = Diagonal(par.dims[[el]][1])[diag(IIp[[el]])==1,,drop=FALSE]
         
         #I don't know what par$B will be.  I want to create a par$B where there is a non-zero value for any potentially non-zero B's
         tmp.MLEobj=list(marss=MODELobj, par=list(B=matrix(1,dim2(free$B),1)))
         tmp.MLEobj$marss$fixed$B[tmp.MLEobj$marss$fixed$B!=0]=1
         tmp.MLEobj$marss$free$B[tmp.MLEobj$marss$free$B!=0]=1
+        if(isMatrix) attr(tmp.MLEobj$marss$free$B, "free.dims")=attr(MODELobj$free$B, "free.dims")
         Adj.mat=parmat(tmp.MLEobj,"B",t=i)$B
         Adj.mat[Adj.mat!=0]=1; Adj.mat=unname(Adj.mat)
         Adj.mat.pow.m = matrix.power(Adj.mat, m) #to find all the linkages
@@ -261,11 +274,15 @@ msg=NULL
         #which rows of the + columns are all zero
         if(dim(Q.0.rows.of.Adj.mat)[1]!=0) tmp=apply(Q.0.rows.of.Adj.mat%*%t(OMGp[[el]])==0,1,all) 
         tmp=t(OMGz[[el]])%*%matrix(as.numeric(tmp),ncol=1) #expand back outl 1s where the deterministic x's are
-        IId[[el]]=makediag(tmp); IId[[el]]=unname(IId[[el]])
-        IIis[[el]]=diag(1,m)-IId[[el]]-IIp[[el]]; IIis[[el]]=unname(IIis[[el]])
+        #IId[[el]]=makediag(tmp); IId[[el]]=unname(IId[[el]])
+        #IIis[[el]]=diag(1,m)-IId[[el]]-IIp[[el]]; IIis[[el]]=unname(IIis[[el]])
+        IId[[el]]=Diagonal(x=tmp[,1]) # [,1] to vectorize
+        IIis[[el]]=Diagonal(m)-IId[[el]]-IIp[[el]]
         }else{ #Q all 0
-         IId[[el]]=diag(1,par.dims[[el]][1])
-         IIis[[el]]=diag(0,par.dims[[el]][1])
+         # IId[[el]]=diag(1,par.dims[[el]][1])
+         # IIis[[el]]=diag(0,par.dims[[el]][1])
+         IId[[el]]=Diagonal(par.dims[[el]][1])
+         IIis[[el]]=Diagonal(par.dims[[el]][1],0)
         }
         if(i==1){
           IId.1=IId[[el]]

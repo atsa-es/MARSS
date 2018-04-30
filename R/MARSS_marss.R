@@ -303,7 +303,19 @@ MARSS.marss=function(MARSS.call){
   
   #Put the marss model into model and marss
   MARSS.call$model = marss_object
-  MARSS.call$marss=marss_object
+  MARSS.call$marss = marss_object
+  
+  #assign the diagonals that will be needed
+  if(isMatrix){
+    Diags = list()
+    vals = unique(unlist(lapply(marss_object$fixed, nrow)),
+    unlist(lapply(model_object$fixed, nrow)))
+    valnames = as.character(vals)
+    for(i in 1:length(valnames)){
+      Diags[[valnames[i]]] = Diagonal(vals[i])
+    }
+    assign("Diags", Diags, pkg_globals)
+  }
     
   ## Return MARSS call list with $marss and $model added
   MARSS.call
@@ -338,8 +350,7 @@ describe_marss = function(MODELobj, model.elem=NULL){
   model.dims=attr(MODELobj,"model.dims")
   m=model.dims$x[1]; n=model.dims$y[1]
   model.elem=attr(MODELobj,"par.names")
-  isM = is(free[["Q"]], "Matrix")
-  time.dim = ifelse(isM, 2, 3)
+  time.dim = ifelse(isMatrix, 2, 3)
 
   #set up the constr type list with an element for each par name and init val of "none"
   constr.type=vector("list",length(model.elem))
@@ -357,11 +368,18 @@ describe_marss = function(MODELobj, model.elem=NULL){
   for(elem in model.elem){
     dimm = model.dims[[elem]][1]
     dimc = model.dims[[elem]][2]
-    if(isM) free.dim = attr(free[[elem]], "free.dims") else free.dim = dim(free[[elem]])
+    if(isMatrix) free.dim = attr(free[[elem]], "free.dims") else free.dim = dim(free[[elem]])
     while(identical(constr.type[[elem]],"none")) {
       #Z is not time varying and is a design matrix; note test above would have ensured Z is time constant
       if( elem=="Z" & is.fixed(free[[elem]]) & dim(fixed[[elem]])[time.dim]==1 ){
-        if( all(apply(fixed[[elem]],time.dim,is.design,dim=c(dimm,dimc))) ) { 
+        # use for loop so that the sparseness is not abandoned
+        if(!isMatrix) all.is.design = all(apply(fixed[[elem]],time.dim,is.design,dim=c(dimm,dimc)))
+        if(isMatrix){
+          all.is.design = TRUE
+          for(i in 1:dim(fixed[[elem]])[2])
+            all.is.design = all.is.design & is.design( subFixed(fixed[[elem]], t=i), dim=c(dimm,dimc) )
+        }
+        if( all.is.design ) { 
           Z.names = c()
           X.names=attr(MODELobj,"X.names")
           if(is.null(X.names)) X.names=as.character(1:m)
@@ -374,7 +392,12 @@ describe_marss = function(MODELobj, model.elem=NULL){
         if(all(fixed[[elem]]==1))  { constr.type[[elem]] = "fixed and all one"; break }
         if(length(unique(as.vector(fixed[[elem]])))==1)
         { constr.type[[elem]] = paste("fixed and all",fixed[[elem]][1]); break }
-        if( all(apply(fixed[[elem]],time.dim,is.identity,dim=c(dimm,dimc)))) constr.type[[elem]] = "identity"
+        if(!isMatrix) all.is.identity = all(apply(fixed[[elem]],time.dim,is.identity,dim=c(dimm,dimc)))
+        if(isMatrix){
+          all.is.identity = TRUE
+          for(i in 1:dim(fixed[[elem]])[2]) all.is.identity = all.is.identity & is.identity( subFixed(fixed[[elem]], t=i), dim=c(dimm,dimc) )
+        }
+        if( all.is.identity ) constr.type[[elem]] = "identity"
         else constr.type[[elem]] = "fixed"
         break #break out of while
       }
@@ -492,8 +515,7 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   }  
   
   fixed=MODELobj[["fixed"]]; free=MODELobj[["free"]]
-  isM = is(free[["Q"]],"Matrix")
-  time.dim = ifelse(isM,2,3)
+  time.dim = ifelse(isMatrix,2,3)
   
   ###########################
   # Check that x0, V0 and L are not time-varying

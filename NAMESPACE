@@ -30,6 +30,7 @@ export(
 import(stats)
 import(utils)
 import(graphics)
+import(Matrix)
 
 ## register S3 methods
 S3method(print, marssMODEL)

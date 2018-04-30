@@ -48,15 +48,14 @@ is.marssMLE <- function(MLEobj)
   par.dims=attr(model,"model.dims")
   en=attr(model,"par.names")
   dat = model[["data"]]
-  isM = is(free[["Q"]], "Matrix")
-  if(!isM) num.ests = lapply(free,function(x){dim(x)[2]})
-  if(isM) num.ests = lapply(free,function(x){attr(x, "free.dims")[2]})
+  if(!isMatrix) num.ests = lapply(free,function(x){dim(x)[2]})
+  if(isMatrix) num.ests = lapply(free,function(x){attr(x, "free.dims")[2]})
   
   ##### If model is OK, check start
   init.null = dim.init = NULL
   #make sure each element of start is present and is numeric
   for (el in en) {
-    dim2.free = ifelse(isM,attr(free[[el]],"free.dims")[2],dim(free[[el]])[2])
+    dim2.free = ifelse(isMatrix,attr(free[[el]],"free.dims")[2],dim(free[[el]])[2])
     
     init.null.flag <- ( is.null(MLEobj[["start"]][[el]]) || !is.numeric(MLEobj[["start"]][[el]]) )
 
@@ -87,7 +86,7 @@ is.marssMLE <- function(MLEobj)
     # these are the rows of fixed that correspond to diag values of the Q, R or V0
     drows=1 + 0:(par.dims[[el]][1] - 1)*(par.dims[[el]][1] + 1)
     # dvars are the rows of free corresponding to those diagonal vals
-    if(isM){
+    if(isMatrix){
       #isM then each col is the vec of the 2D free matrix; each col is time
       dvars=free[[el]][drows+0:(np-1),,drop=FALSE]
       Tmax=max(dim(fixed[[el]])[2],dim(free[[el]])[2])
@@ -102,7 +101,7 @@ is.marssMLE <- function(MLEobj)
     # if none of the start values assoc. with diagonals is 0, move on
     if(!any(MLEobj[["start"]][[el]][dvars.cols]==0)) next
     for(i in 1:Tmax){
-      if(isM){ 
+      if(isMatrix){ 
         d=subFree2D(free[[el]],t=min(i,dim(free[[el]])[2]))
         }else{ 
         d=sub3D(free[[el]],t=min(i,dim(free[[el]])[3])) 

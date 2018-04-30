@@ -43,7 +43,6 @@ for(elem in names(default)){
   l1=dim(MODELobj$fixed$L)[1]/m
   par.dims=list(Z=c(n,m),A=c(n,1),R=c(h1,h1),B=c(m,m),U=c(m,1),Q=c(g1,g1),x0=c(m,1),V0=c(l1,l1),G=c(m,g1),H=c(n,h1),L=c(m,l1))
 
-  isM = is(MODELobj[["free"]][["Q"]],"Matrix")
   for(elem in names(par.dims)){
   if(is.fixed(MODELobj[["free"]][[elem]])){ parlist[[elem]]=matrix(0,0,1) #always this when fixed
   }else{ #not fixed
@@ -51,7 +50,7 @@ for(elem in names(default)){
     if( !is.numeric(inits[[elem]]) ){
       stop(paste("Stopped in MARSSinits(): ",elem," inits must be numeric.",sep=""),call.=FALSE)
     }
-    if(isM){
+    if(isMatrix){
       np = attr(MODELobj$free[[elem]], "free.dims")[2]
     }else{
       np = dim(MODELobj$free[[elem]])[2]
@@ -70,13 +69,13 @@ for(elem in names(default)){
       # replace any fixed elements with their fixed values
       #fixed.row=apply(d[[elem]]==0,1,all) #fixed over all t
       fixed.row=is.fixed(d[[elem]], by.row=TRUE) #fixed over all t
-      if(!isM) fixed.tmp = f[[elem]][fixed.row,1,1]
-      if(isM) fixed.tmp = f[[elem]][fixed.row,1]
+      if(!isMatrix) fixed.tmp = f[[elem]][fixed.row,1,1]
+      if(isMatrix) fixed.tmp = f[[elem]][fixed.row,1]
       tmp[fixed.row]=fixed.tmp #replace with fix value at time t
       #The funky colSum code sums a 3D matrix over the 3rd dim
       #I want to apply this tmp to all the variances and use an average over the d and f if they are time-varying
       #otherwise I could end up with 0s on the diagonal
-      if(!isM){
+      if(!isMatrix){
       numvals=colSums(aperm(d[[elem]],c(3,1,2))!=0,dims=1)
       delem=colSums(aperm(d[[elem]],c(3,1,2)),dims=1)/numvals; delem[numvals==0]=0
       numvals=colSums(aperm(f[[elem]],c(3,1,2))!=0,dims=1)
@@ -84,7 +83,7 @@ for(elem in names(default)){
       #use a pseudoinverse here so D's with 0 columns don't fail
       parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
       }
-      if(isM){
+      if(isMatrix){
         numvals=apply(d[[elem]]!=0,1,sum)
         delem=apply(d[[elem]],1,sum)/numvals 
         delem[numvals==0]=0
@@ -98,8 +97,8 @@ for(elem in names(default)){
     } #c("Q","R","B","V0")
 
     if(elem=="x0"){
-    dx0=sub3D(d$x0,t=1)
-    fx0=sub3D(f$x0,t=1)
+    dx0=subFree2D(d$x0,t=1)
+    fx0=subFixed(f$x0,t=1)
     if(identical(unname(inits$x0),-99)) {  #get estimate of x0
       y1=y[,1,drop=FALSE]
       #replace NAs (missing vals) with 0s

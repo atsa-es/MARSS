@@ -38,8 +38,7 @@ MARSSkfss = function( MLEobj ) {
     #Note diff in param names from S&S;B=Phi, Z=A, A not in S&S
     model.elem = names(MODELobj$fixed)
     time.varying = c()
-    isM = is(MODELobj[["free"]][["Q"]], "Matrix")
-    time.dim = ifelse(isM, 2, 3)
+    time.dim = ifelse(isMatrix, 2, 3)
     for(elem in model.elem){
       if( (dim(MODELobj[["free"]][[elem]])[time.dim] != 1) | (dim(MODELobj[["fixed"]][[elem]])[time.dim] != 1))  #not time-varying
            time.varying = c(time.varying, elem)
@@ -344,8 +343,8 @@ MARSSkfss = function( MLEobj ) {
             #when R(i,i) is 0 then vt_t(i) will be zero and Sigma[i,i,1] will be 0 if V0=0.
             #OmgF1 makes sure we don't try to take 1/0 
             if(length(OmgF1%*%Ft[,,t]%*%t(OmgF1))==1)
-              detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
-            else detFt = det(OmgF1%*%Ft[,,t]%*%t(OmgF1))
+              detFt = OmgF1%*%tcrossprod(Ft[,,t], OmgF1) #detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
+            else detFt = det(OmgF1%*%tcrossprod(Ft[,,t],OmgF1))
           }
           #get the inv of Ft
           if(n==1){ Ftinv=pcholinv(matrix(Ft[,,t],1,1)) 

@@ -381,7 +381,7 @@ MARSS.marxss=function(MARSS.call){
     tmpconst=convert.model.mat(tmp[[el]])
     free[[el]] = tmpconst$free
     fixed[[el]] = tmpconst$fixed
-    time.dim = ifelse(is(free[[el]], "Matrix"), 2, 3)
+    time.dim = ifelse(isMatrix, 2, 3)
 
     #set the last dim of the model.dims since it was at a temp value to start
     model.dims[[el]][3]=max(dim(free[[el]])[time.dim],dim(fixed[[el]])[time.dim])
@@ -435,6 +435,18 @@ MARSS.marxss=function(MARSS.call){
   ## Create marssMODEL(form=marss) object added to call
   #when called with a marssMODEL object (as here), marxss_to_marss returns a marssMODEL object
   MARSS.call$marss=marxss_to_marss(marxss_object)
+  
+  #assign the diagonals that will be needed for subFree2D
+  if(isMatrix){
+    Diags = list()
+    vals = unique(unlist(lapply(MARSS.call$marss$fixed, nrow)),
+                  unlist(lapply(MARSS.call$model$fixed, nrow)))
+    valnames = as.character(vals)
+    for(i in 1:length(valnames)){
+      Diags[[valnames[i]]] = Diagonal(vals[i])
+    }
+    assign("Diags", Diags, pkg_globals)
+  }
   
   ## Return MARSS call list with $marss and $model added
   MARSS.call
@@ -496,7 +508,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
   #got here, so class of x is marssMLE
   for(val in c("par","start","par.se","par.bias","par.upCI","par.lowCI")){
     if(!is.null(x[[val]])){
-      tmp.dim=dim(marxss.model$free$C)[2] #how many C parameters
+      tmp.dim=dim2(marxss.model[["free"]][["C"]]) #how many C parameters
       if(tmp.dim==0){
         x[[val]][["C"]] = matrix(0,0,1)
       }else{
@@ -504,7 +516,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
         x[[val]][["C"]] = x[[val]][["U"]][1:tmp.dim,, drop=FALSE]
         x[[val]][["U"]] = x[[val]][["U"]][-(1:tmp.dim),, drop=FALSE]
       }
-      tmp.dim=dim(marxss.model$free$D)[2] #how many D parameters
+      tmp.dim=dim2(marxss.model[["free"]][["D"]]) #how many D parameters
       if(tmp.dim==0){
         x[[val]][["D"]] = matrix(0,0,1)
       }else{
@@ -577,8 +589,7 @@ marxss_to_marss=function(x, only.par=FALSE){
   #marss.dims will be modified, so this is a holder not a shortcut
   marss.dims=marxss.dims
   n=marss.dims[["y"]][1]; m=marss.dims[["x"]][1]; TT=marss.dims[["x"]][2]
-  isM = is(free[["Q"]], "Matrix") # is.marssMODEL tests that all elem are Matrix
-  
+
   #This step converts U+Cc into equivalent U'u and A+Dd into A'a
   #So U' --> [C U] and u --> [c \\ 1]; A' --> [D A] and a --> [d \\ 1]
   #This code adds fixed$u and fixed$a, and changes fixed$U and fixed$A; otherwise all stays the same
@@ -587,7 +598,7 @@ marxss_to_marss=function(x, only.par=FALSE){
     #if el all zero (fixed and all zero), it doesn't appear in the equation and U'-->U and u-->1
     if(!is.fixed(marxss.model[["free"]][[el]]) | !all(sapply(marxss.model[["fixed"]][[el]],function(x){isTRUE(all.equal(x,0))}))){      
       #create fixed$u or fixed$a by adding 1 to bottom of fixed$c or fixed$d
-      if(!isM){
+      if(!isMatrix){
         #since fixed$c is a 3D array, we need to do this in an odd way:
         fixed[[tolower(el2)]]=array(apply(fixed[[tolower(el)]],3,rbind,1),dim=dim(fixed[[tolower(el)]])+c(1,0,0))
         #this fixed$u is just an input so we set the free to not estimated
@@ -663,7 +674,7 @@ marxss_to_marss=function(x, only.par=FALSE){
         marss.dims[[el2]][2]=marxss.dims[[el]][2]+marxss.dims[[el2]][2]
       }
     }else{  #Both C and U are all zero (fixed and all zero) 
-      if(!isM){
+      if(!isMatrix){
         #so u is just 1 (a 1x1 matrix)
         fixed[[tolower(el2)]]=array(1,dim=c(1,1,1))
         free[[tolower(el2)]]=array(0,dim=c(1,0,1)) #not estimated
@@ -686,7 +697,7 @@ marxss_to_marss=function(x, only.par=FALSE){
   # U is m x (q+1)
   # (t.u kron I_m) is (1x(q+1)) kron (m x m) = m x (q+1)xm
   # vec(U) is ((q+1)xm) x 1
-  if(!isM){
+  if(!isMatrix){
     for(el in c("U","A")){
       #if c or a passed in. If not will be array(1,dim=c(1,1,1))
       #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c is 1
@@ -714,7 +725,7 @@ marxss_to_marss=function(x, only.par=FALSE){
       }
     }
   }
-  if(isM){
+  if(isMatrix){
     #Now the fixed/free specify x=Bx+U(t)u(t)+w(t) and y=Zx+A(t)a(t)+v(t)
     #this part converts U(t)u(t) to U(t) (mx1) and A(t)a(t) to A(t)
     #This requires making a vec(U(t)) that is specified by (rhs at end):
@@ -736,7 +747,8 @@ marxss_to_marss=function(x, only.par=FALSE){
     for(el in c("U","A")){
       #if c NOT passed in, u will be matrix(1,dim=c(1,1))
       #this if statement is just avoiding unneccesary code.  The math should still hold whether or not c or d is 1
-      if(!identical(unname(fixed[[tolower(el)]]), matrix(1,1,1))){
+      # test if equal to Matrix(1,1,1) without calling Matrix()
+      if(!(length(fixed[[tolower(el)]])==1 & fixed[[tolower(el)]][1]==1)){
         #hold onto fixed$U and free$U (not marxss.model$fixed and free but the new ones)
         free.orig=free[[el]]; fixed.orig=fixed[[el]]
         num.p = attr(free[[el]],"free.dims")[2]
@@ -771,7 +783,7 @@ marxss_to_marss=function(x, only.par=FALSE){
   marss.elem = c("Z","A","R","B","U","Q","x0","V0","G","H","L")
   free=free[marss.elem]
   fixed=fixed[marss.elem]
-  if(!isM){
+  if(!isMatrix){
   dim3s=apply(rbind(unlist(lapply(free[marss.elem],function(x){dim(x)[3]})), unlist(lapply(fixed[marss.elem],function(x){dim(x)[3]}))),2,max)
   }else{
     dim3s=apply(rbind(unlist(lapply(free[marss.elem],function(x){dim(x)[2]})), unlist(lapply(fixed[marss.elem],function(x){dim(x)[2]}))),2,max)
@@ -818,15 +830,14 @@ MARSSinits_marxss = function(MLEobj, inits){
     if(class(MLEobj[["model"]])!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
     if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }
-  isM = is(MLEobj[["model"]][["free"]][["Q"]], "Matrix") # is.marssMODEL tests that all elem are Matrix
-  
+
   #B, Z, R, Q, x0 and V0 stay the same
   #U and A change
   #this function will return a U and A element for inits
   if(is.null(inits)) inits=list()
   elems=c("U","A","C","D")
   for(elem in elems){
-    if(isM){
+    if(isMatrix){
       tmp.dim=attr(MLEobj[["model"]][["free"]][[elem]],"free.dims")[2]
     }else{
       tmp.dim=dim(MLEobj[["model"]][["free"]][[elem]])[2] #how many estimated pars in marxss vers
@@ -1197,8 +1208,7 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
   }  
   
   fixed=MODELobj[["fixed"]]; free=MODELobj[["free"]]
-  isM = is(free$Q, "Matrix")
-  time.dim = ifelse(isM, 2, 3)
+  time.dim = ifelse(isMatrix, 2, 3)
   
   ###########################
   # Check that x0, V0 and L are not time-varying
@@ -1227,7 +1237,7 @@ is.marssMODEL_marxss <- function(MODELobj, method="kem"){
   for (elem in en) {
     neg.flag = bad.var.flag = not.design.flag = FALSE
     elem.dim = c(correct.dim1[[elem]], correct.dim2[[elem]])
-    if(isM) free.dim = attr(free[[elem]], "free.dims")[1:2]
+    if(isMatrix) free.dim = attr(free[[elem]], "free.dims")[1:2]
     for(i in 1:model.dims[[elem]][3]){
       if(dim(fixed[[elem]])[time.dim]==1){i1=1}else{i1=i}
       if(dim(free[[elem]])[time.dim]==1){i2=1}else{i2=i}
