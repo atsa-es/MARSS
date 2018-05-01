@@ -286,7 +286,7 @@ MARSSkfss = function( MLEobj ) {
       }
       J0 = V0%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
       x0T = x0 + J0%*%(xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE]);          # eqn 6.47
-      V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])*t(J0)   # eqn 6.48
+      V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])%*%t(J0)   # eqn 6.48
       V0T = symm(V0T) #enforce symmetry
     }
     if(init.state=="x10") { #Ghahramani treatment of initial states; LAM and pi defined for x_1
