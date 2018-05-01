@@ -114,8 +114,8 @@ MARSSkfss = function( MLEobj ) {
     if(any(YM[,t]==0)){
       Mt = I.n; Mt[YM[,t]==0,]=0  #much faster than makediag(YM)
       I.2 = I.n-Mt  
-      Zt = Mt%*%Z #If Y missing, that row is 0 in Zt
-      At = Mt%*%A
+      Zt = Z; Zt[YM[,TT]==0,]=0     #much faster than Zt = Mt%*%Z; If Y missing, that row is 0 in Zt
+      At = A; At[YM[,TT]==0,]=0     #faster than At = Mt%*%A
       Omg1=I.n[YM[,t]==1,,drop=FALSE]
       t.Omg1 = I.n[,YM[,t]==1,drop=FALSE] 
       #per 6.78 in Shumway and Stoffer
@@ -128,21 +128,24 @@ MARSSkfss = function( MLEobj ) {
     if(t==1) {
         if(init.state=="x00") {
           xtt1[,1] = B%*%x0 + U   #Shumway and Stoffer treatment of initial states # eqn 6.19   (pi is defined as t=0)
-          Vtt1[,,1] = B%*%V0%*%t.B + Q          # eqn 6.20
+          #Vtt1[,,1] = B%*%V0%*%t.B + Q          # eqn 6.20
+          Vtt1[,,1] = B%*%tcrossprod(V0, B) + Q          # eqn 6.20
         }
         if(init.state=="x10") {    #Ghahramani treatment of initial states uses x10 and has no x00 (pi is defined as t=1)
          xtt1[,1] = x0         
          Vtt1[,,1] = V0
         }
     }else {   #t!=1
-       xtt1[,t] = B%*%xtt[,t-1,drop=FALSE] + U  #xtt1 denotes x_t^(t-1), eqn 6.19; B here is B[t]
-       Vtt1[,,t] = B%*%Vtt[,,t-1]%*%t.B + Q     #eqn 6.20; B here is B[t]
+       xtt1[,t] = B %*% xtt[,t-1,drop=FALSE] + U  #xtt1 denotes x_t^(t-1), eqn 6.19; B here is B[t]
+       #Vtt1[,,t] = B%*%Vtt[,,t-1]%*%t.B + Q     #eqn 6.20; B here is B[t]
+       Vtt1[,,t] = B %*% tcrossprod(Vtt[,,t-1], B) + Q     #eqn 6.20; B here is B[t]
     }
     if(m!=1) Vtt1[,,t] = symm(Vtt1[,,t])   #in general Vtt1 is not symmetric but here it is since Vtt and Q are
 
     #Set up the inverse needed in Kt (part corresponding to no missing values)
     #This is used in Kt, if Vtt1=0, then no info from y on those xt and corrs Kt rows =0 since Kt=Vtt1*t.Z*siginv
-    siginv1 = Zt%*%Vtt1[,,t]%*%t.Zt + Rt
+    #siginv1 = Zt%*%Vtt1[,,t]%*%t.Zt + Rt
+    siginv1 = Zt %*% tcrossprod(Vtt1[,,t], Zt) + Rt
     # bracketed piece of eqn 6.23 modified per 6.78
     # Because R diag might be 0, the bracketed bit might have 0 diagonals.  Inv by pcholinv deals with this
     # by putting 0 row/cols where 0s appear on diagonal
@@ -160,7 +163,8 @@ MARSSkfss = function( MLEobj ) {
           }
           msg2=""
           if(any(diag.R!=0) & (t==1 || "R"%in%time.varying) ){
-            Ck4 = try(kappa((diag(1,n)[diag.R!=0,])%*%R%*%t(diag(1,n)[diag.R!=0,]))) 
+            #Ck4 = try(kappa((diag(1,n)[diag.R!=0,])%*%R%*%t(diag(1,n)[diag.R!=0,]))) 
+            Ck4 = try(kappa((I.n[diag.R!=0,]) %*% tcrossprod(R, I.n[diag.R!=0,]))) 
             Ck4 = ifelse(class(Ck4)=="try-error","Inf",round(Ck4))
             msg2=paste("Condition num. of R = ",Ck4," ",sep="")
           }
@@ -170,7 +174,8 @@ MARSSkfss = function( MLEobj ) {
     ####### End of Error-checking for this section
     
     if(n!=1) siginv =symm(siginv)
-    Kt[,,t] =  Vtt1[,,t]%*%t.Zt%*%siginv
+    #Kt[,,t] =  Vtt1[,,t]%*%t.Zt%*%siginv
+    Kt[,,t] =  Vtt1[,,t] %*% crossprod(Zt, siginv)
     Kt.tmp = sub3D(Kt,t=t) # stop R from changing matrix dim; drop=FALSE won't work here
 
     vt[,t] = y[,t,drop=FALSE] - (Zt%*%xtt1[,t,drop=FALSE]+At) #need to hold on to this for loglike calc; will be 0 when y is missing
@@ -184,8 +189,9 @@ MARSSkfss = function( MLEobj ) {
     Vtt[,,t] = OmgRVtt.t%*%Vtt[,,t]%*%OmgRVtt.t  
     
     # Variables needed for the likelihood calculation; see comments above
-    R_mod = (I.n-Mt) + Mt%*%R%*%Mt #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
-    Ft[,,t] = Zt%*%Vtt1[,,t]%*%t.Zt+R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
+    R_mod = (I.n-Mt) + Mt%*% tcrossprod(R, Mt) #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
+    #Ft[,,t] = Zt%*%Vtt1[,,t]%*%t.Zt+R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
+    Ft[,,t] = Zt %*% tcrossprod(Vtt1[,,t], Zt) + R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
     if(n!=1) Ft[,,t] = symm(Ft[,,t]) #to ensure its symetric
        
     ####### Attach warnings to output if filter is becoming numerically unstable
@@ -252,11 +258,13 @@ MARSSkfss = function( MLEobj ) {
         Vinv=pcholinv(Vtt1[,,t])
         Vinv = symm(Vinv)  #to enforce symmetry after chol2inv call
       }
-      J[,,t-1] = Vtt[,,t-1]%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
+      #J[,,t-1] = Vtt[,,t-1]%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
+      J[,,t-1] = Vtt[,,t-1]%*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
 
       xtT[,t-1] = xtt[,t-1,drop=FALSE] + J[,,t-1]%*%(xtT[,t,drop=FALSE]-xtt1[,t,drop=FALSE])     # eqn 6.47
       if(m==1) t.J = J[,,t-1] else t.J = matrix(J[,,t-1],m,m,byrow=TRUE) #faster transpose
-      VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1]%*%(VtT[,,t]-Vtt1[,,t])%*%t.J  # eqn 6.48
+      #VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1]%*%(VtT[,,t]-Vtt1[,,t])%*%t.J  # eqn 6.48
+      VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1] %*% tcrossprod((VtT[,,t]-Vtt1[,,t]), J)  # eqn 6.48
       #VtT[,,t-1] = (VtT[,,t-1]+matrix(VtT[,,t-1],m,m,byrow=TRUE))/2     #should not be necessary here
     } #end of the smoother
  
@@ -285,9 +293,11 @@ MARSSkfss = function( MLEobj ) {
         Vinv=pcholinv(Vtt1[,,1])
         Vinv = symm(Vinv)  #to enforce symmetry after chol2inv call
       }
-      J0 = V0%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+      #J0 = V0%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+      J0 = V0 %*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
       x0T = x0 + J0%*%(xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE]);          # eqn 6.47
-      V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])*t(J0)   # eqn 6.48
+      #V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])*t(J0)   # eqn 6.48
+      V0T = V0 + J0%*% tcrossprod( (VtT[,,1]-Vtt1[,,1]),J0)   # eqn 6.48
       V0T = symm(V0T) #enforce symmetry
     }
     if(init.state=="x10") { #Ghahramani treatment of initial states; LAM and pi defined for x_1
