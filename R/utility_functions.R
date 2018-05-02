@@ -341,13 +341,14 @@ is.zero=function (x)
   (abs(x) < .Machine$double.eps)
 }
 
-vec=function (x) 
+vec = function (x) 
 {
   if (is.null(dim(x))) stop("vec:arg must be a 2D or 3D matrix")
   len.dim.x=length(dim(x))
   if (!(len.dim.x==2 | len.dim.x==3)) stop("vec: arg must be a 2D or 3D matrix")
   if (len.dim.x == 2){
-    attr(x,"dim")=c(length(x),1)
+    #attr(x,"dim")=c(length(x),1)
+    dim(x) = c(length(x), 1) # slower but works for matrix
     return(x)
   }
   #else it is an array
@@ -473,26 +474,27 @@ vparmat2 = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L
   pars=MLEobj[["par"]]
   f=model[["fixed"]]
   d=model[["free"]]
-  if(!all(elem %in% names(f))) stop("parmat: one of the elem is not one of the marss parameter names.")
   par.mat=list()
   if(is.null(dims)) dims = attr(model, "model.dims")
   if(!is.list(dims) & length(elem)!=1) stop("parmat: dims needs to be a list if more than one elem passed in")
   if(!is.list(dims) & length(elem)==1){ tmp=dims; dims=list(); dims[[elem]]=tmp }
   for(el in elem){
+    dim1 = dims[[el]][1]; dim2 = dims[[el]][2]
     if(length(t)>1){ par.mat[[el]] = array(as.numeric(NA), dim=c(dims[[el]][1:2],length(t))) }
     for(i in t){
-      if(dim3(f[[el]])==1){
+      if(dim(f[[el]])[2]==1){
         felem=f[[el]]
         #attr(felem,"dim")=attr(felem,"dim")[1:2]
       }else{ felem=subFixed(f[[el]],t=i) }
       if(dim(d[[el]])[1]==0){ # no estimated vals
-        val = felem[,1]
+        #val = felem[,1]
+        val = felem
       }else{
-        if(dim2(d[[el]])==1){ # one time step
-          delem=d[[el]]
-          #attr(delem,"dim")=attr(delem,"dim")[1:2]
+        if(dim2(d[[el]])==1){ # one estimated val
+          if(dim(d[[el]])[2]==1){ delem=d[[el]] }else{ delem=d[[el]][,t] }
         }else{ delem= subFree2D(d[[el]],t=i) }
-        val = felem[,1] + (delem%*%pars[[el]])[,1] # [,1] is to change to a vector
+          #val = felem[,1] + (delem%*%pars[[el]])[,1] # [,1] is to change to a vector
+          val = as.vector(felem) + as.vector(delem%*%pars[[el]]) # [,1] is to change to a vector
       }
       if(length(t)==1){
         par.mat[[el]] = matrix(val,dims[[el]][1],dims[[el]][2])
@@ -807,8 +809,8 @@ subFree2D=function(x,t=1){
   if(!isMatrix) return( sub3D(x, t=t) )
   x.dims = attr(x, "free.dims")
   x.names = attr(x, "estimate.names")
-  x=x[,t,drop=FALSE]
-  dim(x) = x.dims[1:2]
+  if(dim(x)[2]!=1) x=x[,t,drop=FALSE]
+  if(x.dims[2]!=1) dim(x) = x.dims[1:2]
   colnames(x) = x.names
   return(x)
 }

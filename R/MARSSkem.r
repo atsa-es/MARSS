@@ -33,7 +33,7 @@ MARSSkem = function( MLEobj ) {
   model.dims = attr(MODELobj, "model.dims")
   n =  model.dims[["data"]][1]; TT = model.dims[["data"]][2]; m = model.dims[["x"]][1]
   Id = list(m = diag(1,m), n = diag(1,n)); IIm=diag(1,m) # identity matrices
-  
+
   control = MLEobj$control
   stopped.with.errors=FALSE; kf=NULL; condition.limit=1E10
   
@@ -402,7 +402,7 @@ MARSSkem = function( MLEobj ) {
     # Get new x0 subject to its constraints
     ################################################################
     if( !fixed[["x0"]] ){  # some element needs estimating
-      f.x0=subFixed(f$x0,t=1) 
+      f.x0=subFixed(f$x0,t=1); f.x0 = as.matrix(f.x0) #speed up - ops
       d.x0=subFree2D(d$x0,t=1) 
       A=par1$A; Z=par1$Z; B=par1$B; U=par1$U
       Qinv = sub3D(star$Q,t=1); diag.Q=1-takediag(IIz$Q[,,1]) 
@@ -611,6 +611,7 @@ MARSSkem = function( MLEobj ) {
       numer = matrix(0,m,1); denom = matrix(0,m,m) #this is the start if kf.x0="x10"
       fU=subFixed(f$U,t=1); dU=subFree2D(d$U,t=1)
       fU=as.matrix(fU) # to speed up + and - computations with Matrix class
+      dU=as.matrix(dU) # to speed up + and - computations with Matrix class
       B=par1$B; Z=par1$Z; A=par1$A   #reset
       Qinv = star$Q[,,1]; Rinv = star$R[,,1]
       #U.degen.update = FALSE #CUT?
@@ -648,7 +649,9 @@ MARSSkem = function( MLEobj ) {
         denom = denom + as.matrix(crossprod(Delta2, Rinv%*%Delta2))
       }
       for(t in 2:TT){ 
-        if(time.varying$U){ fU=subFixed(f$U,t=t); dU=subFree2D(d$U,t=t) }
+        if(time.varying$U){ 
+          fU=as.matrix(subFixed(f$U,t=t)); 
+          dU=as.matrix(subFree2D(d$U,t=t)) }
         if(time.varying$B) B = parmat(MLEobj.iter,c("B"),t=t)$B
         if(time.varying$A) A = parmat(MLEobj.iter,c("A"),t=t)$A
         if(time.varying$Z) Z = parmat(MLEobj.iter,c("Z"),t=t)$Z
@@ -675,7 +678,8 @@ MARSSkem = function( MLEobj ) {
           denom = denom + as.matrix(crossprod(Delta2, Rinv%*%Delta2))
         }
         Delta3 = kf$xtT[,t,drop=FALSE]-B%*%((IIm-IId.tm)%*%kf$xtT[,t-1,drop=FALSE])-B%*%(IId.tm%*%(Bstar.tm%*%E.x0+fstar.tm))-fU
-        Delta4 = dU + B%*%IId.tm%*%Dstar.tm
+        #Delta4 = dU + B%*%IId.tm%*%Dstar.tm
+        Delta4 = dU + tcrossprod(B, IId.tm)%*%Dstar.tm
         numer = numer + as.matrix(crossprod(Delta4, Qinv%*%Delta3))
         denom = denom + as.matrix(crossprod(Delta4, Qinv%*%Delta4))
       } #for i
