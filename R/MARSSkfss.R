@@ -226,9 +226,10 @@ MARSSkfss = function( MLEobj ) {
         B = parmat(MLEobj, "B", t=t)$B  #t since in 6.49, B[t] appears
         if(m==1) t.B=B else t.B = matrix(B,m,m,byrow=TRUE) 
       }
-      if("Q" %in% time.varying){
-        Q = parmat(MLEobj, "Q", t=t)$Q
-        if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] } 
+      if("Q" %in% time.varying | "G" %in% time.varying){
+        Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
+        Q=tcrossprod(G %*% Q, G)
+        if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
       }
       #deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
       #0s on diag of Vtt1 will break the Kalman smoother if t>1
