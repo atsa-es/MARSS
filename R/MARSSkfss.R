@@ -189,8 +189,10 @@ MARSSkfss = function( MLEobj ) {
     if(m!=1) Vtt[,,t] = symm(Vtt[,,t]) #to ensure its symetric
     #zero out rows cols as needed when R diag = 0
     OmgRVtt.t = OmgRVtt
-    if(any(diag.OmgRVtt==0)) diag(OmgRVtt.t) = diag.OmgRVtt + t(!(Z==0))%*%(diag.R==0 & YM[,t]==0)
-    Vtt[,,t] = OmgRVtt.t%*%Vtt[,,t]%*%OmgRVtt.t  
+    # if(any(diag.OmgRVtt==0)) diag(OmgRVtt.t) = diag.OmgRVtt + t(!(Z==0))%*%(diag.R==0 & YM[,t]==0)
+    # Vtt[,,t] = OmgRVtt.t%*%Vtt[,,t]%*%OmgRVtt.t  
+    if(any(diag.OmgRVtt==0)) diag.OmgRVtt.t = diag.OmgRVtt + t(!(Z==0))%*%(diag.R==0 & YM[,t]==0)
+    Vtt[!diag.OmgRVtt.t,,t] = 0;  Vtt[,!diag.OmgRVtt.t,t] = 0
     
     # Variables needed for the likelihood calculation; see comments above
     R_mod = (I.n-Mt) + Mt%*% tcrossprod(R, Mt) #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
@@ -233,7 +235,7 @@ MARSSkfss = function( MLEobj ) {
   for(i in 1:(TT-1)) {
     t=s[i]
     # Zt = Z; Zt[YM[,t]==0,]=0   #MUCH faster than defining Mt using diag(YM); commented out since doesn't seem to be used
-    if( B.time.varying){
+    if( B.time.varying ){
       B = parmat(MLEobj, "B", t=t)$B  #t since in 6.49, B[t] appears
       #if(m==1) t.B=B else t.B = matrix(B,m,m,byrow=TRUE) 
     }
@@ -275,10 +277,7 @@ MARSSkfss = function( MLEobj ) {
   
   #define J0
   if(init.state=="x00") { #Shumway and Stoffer treatment of initial conditions; LAM and pi defined for x_0
-    if("B" %in% time.varying){
-      B = parmat(MLEobj, "B", t=1)$B
-      #if(m==1) t.B=B else t.B = matrix(B,m,m,byrow=TRUE) 
-    }    
+    if( B.time.varying ) B = parmat(MLEobj, "B", t=1)$B
     if( QG.time.varying ){
       Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
       Q=tcrossprod(G %*% Q, G)
@@ -316,13 +315,13 @@ MARSSkfss = function( MLEobj ) {
   #run another backward recursion to get E[x(t)x(t-1)|y(T)]
   if("Z" %in% time.varying){ Z = parmat(MLEobj, "Z", t=TT)$Z }  #in 6.55, Z[TT] appears
   Zt = Z; Zt[YM[,TT]==0,]=0     #much faster than Mt%*%Z
-  if("B" %in% time.varying){ B = parmat(MLEobj, "B", t=TT)$B }  #in 6.55, B[TT] appears
+  if( B.time.varying){ B = parmat(MLEobj, "B", t=TT)$B }  #in 6.55, B[TT] appears
   KT = matrix(Kt[,,TT], m, n); #funny array call to prevent R from restructuring dims
   Vtt1T[,,TT] = (I.m - KT%*%Zt)%*%B%*%Vtt[,,TT-1] #eqn. 6.55 this is Var(x(T)x(T-1)|y(T)); not symmetric
   s = seq(TT,3)
   for (i in 1:(TT-2)) {
     t = s[i]
-    if("B" %in% time.varying){ B = parmat(MLEobj, "B", t=t)$B } #in 6.56, B[t] appears
+    if( B.time.varying ){ B = parmat(MLEobj, "B", t=t)$B } #in 6.56, B[t] appears
     #if(m==1) t.J = J[,,t-2] else t.J = matrix(J[,,t-2],m,m,byrow=TRUE) #faster transpose
     #Vtt1T[,,t-1] = Vtt[,,t-1]%*%t.J + J[,,t-1]%*%(Vtt1T[,,t]-B%*%Vtt[,,t-1])%*%t.J   #eqn 6.56
     Vtt1T[,,t-1] = tcrossprod(Vtt[,,t-1], J[,,t-2]) + J[,,t-1] %*% tcrossprod((Vtt1T[,,t]-B%*%Vtt[,,t-1]), J[,,t-2])   #eqn 6.56
