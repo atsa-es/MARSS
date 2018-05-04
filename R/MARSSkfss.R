@@ -49,9 +49,12 @@ MARSSkfss = function( MLEobj ) {
   
   pari=parmat(MLEobj,t=1)
   Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; x0=pari$x0; 
-  R=tcrossprod(pari$H %*% pari$R, pari$H) 
-  Q=tcrossprod(pari$G %*% pari$Q, pari$G)
-  V0=tcrossprod(pari$L%*%pari$V0, pari$L)
+  # R=tcrossprod(pari$H %*% pari$R, pari$H) 
+  # Q=tcrossprod(pari$G %*% pari$Q, pari$G)
+  # V0=tcrossprod(pari$L%*%pari$V0, pari$L)
+  R=eigenABtC(pari$H, pari$R, pari$H)
+  Q=eigenABtC(pari$G, pari$Q, pari$G)
+  V0=eigenABtC(pari$L, pari$V0, pari$L)
   if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
   #Check that if any R are 0 then model is solveable
   OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -89,7 +92,8 @@ MARSSkfss = function( MLEobj ) {
       pari[time.varying]=parmat(MLEobj,time.varying,t=t)
       Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; #update
       if(RH.time.varying){
-        R=tcrossprod(pari$H %*% pari$R, pari$H) 
+        #R=tcrossprod(pari$H %*% pari$R, pari$H)
+        R=eigenABtC(pari$H, pari$R, pari$H)
         if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
         #Check that if any R are 0 then model is solveable
         OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -109,7 +113,8 @@ MARSSkfss = function( MLEobj ) {
         }
       } #if R in time.varying
       if( QG.time.varying ){
-        Q=tcrossprod(pari$G %*% pari$Q, pari$G)
+        #Q=tcrossprod(pari$G %*% pari$Q, pari$G)
+        Q=eigenABtC(pari$G, pari$Q, pari$G)
         if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
       }
       #if("B" %in% time.varying) t.B = matrix(B,m,m,byrow=TRUE)   #faster transpose
@@ -133,23 +138,26 @@ MARSSkfss = function( MLEobj ) {
       if(init.state=="x00") {
         xtt1[,1] = B%*%x0 + U   #Shumway and Stoffer treatment of initial states # eqn 6.19   (pi is defined as t=0)
         #Vtt1[,,1] = B%*%V0%*%t.B + Q          # eqn 6.20
-        Vtt1[,,1] = B%*%tcrossprod(V0, B) + Q          # eqn 6.20
+        #Vtt1[,,1] = B%*%tcrossprod(V0, B) + Q          # eqn 6.20
+        Vtt1[,,1] = eigenABtC(B, V0, B) + Q          # eqn 6.20
       }
       if(init.state=="x10") {    #Ghahramani treatment of initial states uses x10 and has no x00 (pi is defined as t=1)
         xtt1[,1] = x0
         Vtt1[,,1] = V0
       }
     }else {   #t!=1
-      xtt1[,t] = B %*% xtt[,t-1,drop=FALSE] + U  #xtt1 denotes x_t^(t-1), eqn 6.19; B here is B[t]
-      #Vtt1[,,t] = B%*%Vtt[,,t-1]%*%t.B + Q     #eqn 6.20; B here is B[t]
-      Vtt1[,,t] = B %*% tcrossprod(Vtt[,,t-1], B) + Q     #eqn 6.20; B here is B[t]
+      #xtt1[,t] = B %*% xtt[,t-1,drop=FALSE] + U  #xtt1 denotes x_t^(t-1), eqn 6.19; B here is B[t]
+      xtt1[,t] = eigenAb(B, xtt[,t-1,drop=FALSE]) + U #Vtt1[,,t] = B%*%Vtt[,,t-1]%*%t.B + Q     #eqn 6.20; B here is B[t]
+      #Vtt1[,,t] = B %*% tcrossprod(Vtt[,,t-1], B) + Q     #eqn 6.20; B here is B[t]
+      Vtt1[,,t] = eigenABtC(B, Vtt[,,t-1], B) + Q
     }
     if(m!=1) Vtt1[,,t] = symm(Vtt1[,,t])   #in general Vtt1 is not symmetric but here it is since Vtt and Q are
     
     #Set up the inverse needed in Kt (part corresponding to no missing values)
     #This is used in Kt, if Vtt1=0, then no info from y on those xt and corrs Kt rows =0 since Kt=Vtt1*t.Z*siginv
     #siginv1 = Zt%*%Vtt1[,,t]%*%t.Zt + Rt
-    siginv1 = Zt %*% tcrossprod(Vtt1[,,t], Zt) + Rt
+    #siginv1 = Zt %*% tcrossprod(Vtt1[,,t], Zt) + Rt
+    siginv1 = eigenABtC(Zt, Vtt1[,,t], Zt) + Rt
     # bracketed piece of eqn 6.23 modified per 6.78
     # Because R diag might be 0, the bracketed bit might have 0 diagonals.  Inv by pcholinv deals with this
     # by putting 0 row/cols where 0s appear on diagonal
@@ -179,25 +187,35 @@ MARSSkfss = function( MLEobj ) {
     
     if(n!=1) siginv =symm(siginv)
     #Kt[,,t] =  Vtt1[,,t]%*%t.Zt%*%siginv
-    Kt[,,t] =  Vtt1[,,t] %*% crossprod(Zt, siginv)
+    #Kt[,,t] =  Vtt1[,,t] %*% crossprod(Zt, siginv)
+    Kt[,,t] =  eigenAtBC(Vtt1[,,t],Zt, siginv)
     Kt.tmp = sub3D(Kt,t=t) # stop R from changing matrix dim; drop=FALSE won't work here
     
-    vt[,t] = y[,t,drop=FALSE] - (Zt%*%xtt1[,t,drop=FALSE]+At) #need to hold on to this for loglike calc; will be 0 when y is missing
+    #vt[,t] = y[,t,drop=FALSE] - (Zt%*%xtt1[,t,drop=FALSE]+At) #need to hold on to this for loglike calc; will be 0 when y is missing
+    vt[,t] = y[,t,drop=FALSE] - (eigenAb(Zt, xtt1[,t,drop=FALSE])+At)
     # eqn 6.21
-    xtt[,t]=xtt1[,t,drop=FALSE] + Kt.tmp%*%vt[,t,drop=FALSE]     
-    Vtt[,,t] = Vtt1[,,t]-Kt.tmp%*%Zt%*%Vtt1[,,t]  # eqn 6.22, detail after 6.28, modified Z per 6.78
+    #xtt[,t]=xtt1[,t,drop=FALSE] + Kt.tmp%*%vt[,t,drop=FALSE]     
+    xtt[,t]=xtt1[,t,drop=FALSE] + eigenAb(Kt.tmp, vt[,t,drop=FALSE])
+    #Vtt[,,t] = Vtt1[,,t]-Kt.tmp%*%Zt%*%Vtt1[,,t]  # eqn 6.22, detail after 6.28, modified Z per 6.78
+    Vtt[,,t] = Vtt1[,,t] - eigenABC(Kt.tmp, Zt, Vtt1[,,t])
     if(m!=1) Vtt[,,t] = symm(Vtt[,,t]) #to ensure its symetric
     #zero out rows cols as needed when R diag = 0
     OmgRVtt.t = OmgRVtt
+    diag.OmgRVtt.t = diag.OmgRVtt
     # if(any(diag.OmgRVtt==0)) diag(OmgRVtt.t) = diag.OmgRVtt + t(!(Z==0))%*%(diag.R==0 & YM[,t]==0)
     # Vtt[,,t] = OmgRVtt.t%*%Vtt[,,t]%*%OmgRVtt.t  
     if(any(diag.OmgRVtt==0)) diag.OmgRVtt.t = diag.OmgRVtt + t(!(Z==0))%*%(diag.R==0 & YM[,t]==0)
-    Vtt[!diag.OmgRVtt.t,,t] = 0;  Vtt[,!diag.OmgRVtt.t,t] = 0
+    if(any(diag.OmgRVtt.t==0)){
+    Vtt[!diag.OmgRVtt.t,,t] = 0
+    Vtt[,!diag.OmgRVtt.t,t] = 0
+    }
     
     # Variables needed for the likelihood calculation; see comments above
-    R_mod = (I.n-Mt) + Mt%*% tcrossprod(R, Mt) #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
+    #R_mod = (I.n-Mt) + Mt%*% tcrossprod(R, Mt) #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
+    R_mod = (I.n-Mt) + eigenABtC(Mt, R, Mt)
     #Ft[,,t] = Zt%*%Vtt1[,,t]%*%t.Zt+R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
-    Ft[,,t] = Zt %*% tcrossprod(Vtt1[,,t], Zt) + R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
+    #Ft[,,t] = Zt %*% tcrossprod(Vtt1[,,t], Zt) + R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
+    Ft[,,t] = eigenABtC(Zt, Vtt1[,,t], Zt) + R_mod
     if(n!=1) Ft[,,t] = symm(Ft[,,t]) #to ensure its symetric
     
     ####### Attach warnings to output if filter is becoming numerically unstable
@@ -241,7 +259,8 @@ MARSSkfss = function( MLEobj ) {
     }
     if( QG.time.varying ){
       Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
-      Q=tcrossprod(G %*% Q, G)
+      #Q=tcrossprod(G %*% Q, G)
+      Q=eigenABtC(G, Q, G)
       if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
     }
     #deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
@@ -266,12 +285,15 @@ MARSSkfss = function( MLEobj ) {
       Vinv = symm(Vinv)  #to enforce symmetry after chol2inv call
     }
     #J[,,t-1] = Vtt[,,t-1]%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
-    J[,,t-1] = Vtt[,,t-1]%*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
+    #J[,,t-1] = Vtt[,,t-1]%*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
+    J[,,t-1] = eigenAtBC(Vtt[,,t-1], B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
     
-    xtT[,t-1] = xtt[,t-1,drop=FALSE] + J[,,t-1]%*%(xtT[,t,drop=FALSE]-xtt1[,t,drop=FALSE])     # eqn 6.47
+    #xtT[,t-1] = xtt[,t-1,drop=FALSE] + J[,,t-1]%*%(xtT[,t,drop=FALSE]-xtt1[,t,drop=FALSE])     # eqn 6.47
+    xtT[,t-1] = xtt[,t-1,drop=FALSE] + eigenAb(J[,,t-1], (xtT[,t,drop=FALSE]-xtt1[,t,drop=FALSE]))
     #if(m==1) t.J = J[,,t-1] else t.J = matrix(J[,,t-1],m,m,byrow=TRUE) #faster transpose
     #VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1]%*%(VtT[,,t]-Vtt1[,,t])%*%t.J  # eqn 6.48
-    VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1] %*% tcrossprod((VtT[,,t]-Vtt1[,,t]), J[,,t-1])  # eqn 6.48
+    #VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1] %*% tcrossprod((VtT[,,t]-Vtt1[,,t]), J[,,t-1])  # eqn 6.48
+    VtT[,,t-1] = Vtt[,,t-1] + eigenABtC(J[,,t-1], (VtT[,,t]-Vtt1[,,t]), J[,,t-1])
     #VtT[,,t-1] = (VtT[,,t-1]+matrix(VtT[,,t-1],m,m,byrow=TRUE))/2     #should not be necessary here
   } #end of the smoother
   
@@ -280,7 +302,8 @@ MARSSkfss = function( MLEobj ) {
     if( B.time.varying ) B = parmat(MLEobj, "B", t=1)$B
     if( QG.time.varying ){
       Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
-      Q=tcrossprod(G %*% Q, G)
+      #Q=tcrossprod(G %*% Q, G)
+      Q=eigenABtC(G, Q, G)
       if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
     }
     #deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
@@ -299,10 +322,13 @@ MARSSkfss = function( MLEobj ) {
       Vinv = symm(Vinv)  #to enforce symmetry after chol2inv call
     }
     #J0 = V0%*%t.B%*%Vinv  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
-    J0 = V0 %*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
-    x0T = x0 + J0%*%(xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE]);          # eqn 6.47
+    #J0 = V0 %*% crossprod(B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+    J0 = eigenAtBC(V0, B, Vinv)  # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+    #x0T = x0 + J0%*%(xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE]);          # eqn 6.47
+    x0T = x0 + eigenAb(J0, (xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE])) 
     #V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])*t(J0)   # eqn 6.48
-    V0T = V0 + J0%*% tcrossprod( (VtT[,,1]-Vtt1[,,1]),J0)   # eqn 6.48
+    #V0T = V0 + J0%*% tcrossprod( (VtT[,,1]-Vtt1[,,1]),J0)   # eqn 6.48
+    V0T = V0 + eigenABtC(J0, (VtT[,,1]-Vtt1[,,1]), J0)
     V0T = symm(V0T) #enforce symmetry
   }
   if(init.state=="x10") { #Ghahramani treatment of initial states; LAM and pi defined for x_1
@@ -317,19 +343,22 @@ MARSSkfss = function( MLEobj ) {
   Zt = Z; Zt[YM[,TT]==0,]=0     #much faster than Mt%*%Z
   if( B.time.varying){ B = parmat(MLEobj, "B", t=TT)$B }  #in 6.55, B[TT] appears
   KT = matrix(Kt[,,TT], m, n); #funny array call to prevent R from restructuring dims
-  Vtt1T[,,TT] = (I.m - KT%*%Zt)%*%B%*%Vtt[,,TT-1] #eqn. 6.55 this is Var(x(T)x(T-1)|y(T)); not symmetric
+  #Vtt1T[,,TT] = (I.m - KT%*%Zt)%*%B%*%Vtt[,,TT-1] #eqn. 6.55 this is Var(x(T)x(T-1)|y(T)); not symmetric
+  Vtt1T[,,TT] = eigenABC((I.m - eigenAB(KT, Zt)), B, Vtt[,,TT-1])
   s = seq(TT,3)
   for (i in 1:(TT-2)) {
     t = s[i]
     if( B.time.varying ){ B = parmat(MLEobj, "B", t=t)$B } #in 6.56, B[t] appears
     #if(m==1) t.J = J[,,t-2] else t.J = matrix(J[,,t-2],m,m,byrow=TRUE) #faster transpose
     #Vtt1T[,,t-1] = Vtt[,,t-1]%*%t.J + J[,,t-1]%*%(Vtt1T[,,t]-B%*%Vtt[,,t-1])%*%t.J   #eqn 6.56
-    Vtt1T[,,t-1] = tcrossprod(Vtt[,,t-1], J[,,t-2]) + J[,,t-1] %*% tcrossprod((Vtt1T[,,t]-B%*%Vtt[,,t-1]), J[,,t-2])   #eqn 6.56
+    #Vtt1T[,,t-1] = tcrossprod(Vtt[,,t-1], J[,,t-2]) + J[,,t-1] %*% tcrossprod((Vtt1T[,,t]-B%*%Vtt[,,t-1]), J[,,t-2])   #eqn 6.56
+    Vtt1T[,,t-1] = eigenAtB(Vtt[,,t-1], J[,,t-2]) + eigenABtC(J[,,t-1],(Vtt1T[,,t] - eigenAB(B, Vtt[,,t-1])), J[,,t-2])
   }
   if(init.state=="x00"){
     if("B" %in% time.varying){ B = parmat(MLEobj, "B", t=2)$B }
     #Vtt1T[,,1] = Vtt[,,1]%*%t(J0) + J[,,1]%*%(Vtt1T[,,2]-B%*%Vtt[,,1])%*%t(J0)
-    Vtt1T[,,1] = tcrossprod(Vtt[,,1], J0) + J[,,1]%*%tcrossprod(Vtt1T[,,2]-B%*%Vtt[,,1],J0)
+    #Vtt1T[,,1] = tcrossprod(Vtt[,,1], J0) + J[,,1]%*%tcrossprod(Vtt1T[,,2]-B%*%Vtt[,,1],J0)
+    Vtt1T[,,1] = eigenAtB(Vtt[,,1], J0) + eigenABtC(J[,,1], Vtt1T[,,2]-eigenAB(B,Vtt[,,1]),J0)
   }
   if(init.state=="x10") Vtt1T[,,1] = NA
   
@@ -358,10 +387,10 @@ MARSSkfss = function( MLEobj ) {
           detFt=1 #means R and diag(Ft[,,1] all 0; will become 0 when logged
         }else{
           #when R(i,i) is 0 then vt_t(i) will be zero and Sigma[i,i,1] will be 0 if V0=0.
-          #OmgF1 makes sure we don't try to take 1/0 
-          if(length(OmgF1 %*% tcrossprod( Ft[,,t], OmgF1))==1)
-            detFt = OmgF1%*%tcrossprod(Ft[,,t], OmgF1) #detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
-          else detFt = det(OmgF1%*%tcrossprod(Ft[,,t],OmgF1))
+          #OmgF1 makes sure we don't try to take 1/0
+          #detFt = OmgF1%*%tcrossprod(Ft[,,t], OmgF1) #detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
+          detFt = eigenABtC(OmgF1, Ft[,,t], OmgF1)
+          if(length(detFt)!=1) detFt = getDeterminant(detFt) #detFt = det(detFt)
         }
         #get the inv of Ft
         if(n==1){ Ftinv=pcholinv(matrix(Ft[,,t],1,1)) 
@@ -373,9 +402,10 @@ MARSSkfss = function( MLEobj ) {
     }else{ #not any diag of Ft==0
       if(n==1){ 
         detFt=Ft[,,t]
-        Ftinv=1/Ft[,,t]
+        Ftinv=1/detFT #1/Ft[,,t]
       }else{
-        detFt=det(Ft[,,t])
+        #detFt=det(Ft[,,t])
+        detFt = getDeterminant(Ft[,,t])
         Ftinv = chol2inv(chol(Ft[,,t])) #don't use pcholinv since it is slower
         Ftinv = symm(Ftinv)  #to enforce symmetry after chol2inv call
       }
@@ -385,7 +415,8 @@ MARSSkfss = function( MLEobj ) {
     
     #matrix call here is a transpose
     #loglike = loglike - (1/2) %*% matrix(vt[,t],1,n) %*% Ftinv %*% vt[,t,drop=FALSE] - (1/2)*log(detFt)
-    loglike = loglike - (1/2) * crossprod(vt[,t], Ftinv) %*% vt[,t,drop=FALSE] - (1/2)*log(detFt)
+    #loglike = loglike - (1/2) * crossprod(vt[,t], Ftinv) %*% vt[,t,drop=FALSE] - (1/2)*log(detFt)
+    loglike = loglike - (1/2) * eigenaBa(vt[,t], Ftinv) - (1/2)*log(detFt)
     loglike = as.vector(loglike)
   }
   if( !is.finite(loglike) ) return(c(rtn.list,list(ok=FALSE, errors=paste("Stopped in MARSSkfss: loglike computed to NA.\n")) ) )
@@ -394,7 +425,8 @@ MARSSkfss = function( MLEobj ) {
 }
 
 symm = function(x){
-  t.x = matrix(x,dim(x)[2],dim(x)[1],byrow=TRUE)
-  x=(x+t.x)/2
-  x
+  # t.x = matrix(x,dim(x)[2],dim(x)[1],byrow=TRUE)
+  # x=(x+t.x)/2
+  # x
+  eigenSymm(x)
 }
