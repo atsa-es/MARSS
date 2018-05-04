@@ -31,7 +31,6 @@ export(
 import(stats)
 import(utils)
 import(graphics)
-import(RcppEigen) 
 
 ## register S3 methods
 S3method(print, marssMODEL)
