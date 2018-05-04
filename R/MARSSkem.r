@@ -59,7 +59,7 @@ MARSSkem = function( MLEobj ) {
   set.degen=list(Q=FALSE, R=FALSE, V0=FALSE)
   #define a couple constants that come up a lot
   #this is L%*V0%*%t(L)
-  tmpV=tcrossprod(parmat(MLEobj.iter, "L", t=1)$L %*% parmat(MLEobj.iter, "V0", t=1)$V0, parmat(MLEobj.iter, "L", t=1)$L)
+  tmpV=base::tcrossprod(parmat(MLEobj.iter, "L", t=1)$L %*% parmat(MLEobj.iter, "V0", t=1)$V0, parmat(MLEobj.iter, "L", t=1)$L)
   IIzV0=diag(as.numeric(diag(tmpV)==0),m)
   IImIIzV0 = (IIm-IIzV0)
   
@@ -189,16 +189,16 @@ MARSSkem = function( MLEobj ) {
         if(time.varying[["A"]] & i>1){ A = parmat(MLEobj.iter, "A", t=i)$A }
         if(time.varying[["R"]] | i==1){ 
           dR = subFree2D(d[["R"]],t=i) #by def, i goes to TT if time-varying
-          if(isMatrix) t.dR.dR = t.dR.dR + as.matrix(crossprod(dR)) else t.dR.dR = t.dR.dR + crossprod(dR)
+          if(isMatrix) t.dR.dR = t.dR.dR + as.matrix(Matrix::crossprod(dR)) else t.dR.dR = t.dR.dR + base::crossprod(dR)
         }
         hatyt = Ey[["ytT"]][,i,drop=FALSE]; hatyxt=sub3D(Ey[["yxtT"]],t=i); hatOt = sub3D(Ey[["OtT"]],t=i)
-        hatPt = kf[["VtT"]][,,i]+tcrossprod(kf[["xtT"]][,i,drop=FALSE])
         hatxt = kf[["xtT"]][,i,drop=FALSE]
-        sum1a = (hatOt - tcrossprod(hatyxt, Z) - tcrossprod(Z, hatyxt)- tcrossprod(hatyt, A) - tcrossprod(A, hatyt) + 
-                   tcrossprod(Z%*%hatPt, Z) + tcrossprod(Z%*%hatxt, A) + tcrossprod(A, Z%*%hatxt) + tcrossprod(A)) #A%*%t.A
+        hatPt = kf[["VtT"]][,,i]+base::tcrossprod(hatxt)
+        sum1a = (hatOt - base::tcrossprod(hatyxt, Z) - base::tcrossprod(Z, hatyxt)- base::tcrossprod(hatyt, A) - base::tcrossprod(A, hatyt) + 
+                   base::tcrossprod(Z%*%hatPt, Z) + base::tcrossprod(Z%*%hatxt, A) + base::tcrossprod(A, Z%*%hatxt) + base::tcrossprod(A)) #A%*%t.A
         sum1a = symm(sum1a) #enforce symmetry function from MARSSkf
         # if dR is Matrix class, the + is very slow
-        if(isMatrix) sum1 = sum1 + as.matrix(crossprod(dR, vec(sum1a))) else sum1 = sum1 + crossprod(dR, vec(sum1a))
+        if(isMatrix) sum1 = sum1 + as.matrix(Matrix::crossprod(dR, vec(sum1a))) else sum1 = sum1 + base::crossprod(dR, vec(sum1a))
       }
       if(time.varying[["R"]]){ 
         if(length(t.dR.dR)==1){ inv.dR=1/t.dR.dR }else{ inv.dR = pcholinv(t.dR.dR) }
@@ -268,15 +268,15 @@ MARSSkem = function( MLEobj ) {
         TT.numer = TT; 
         # IImIIzV0 = (IIm-IIz$V0[,,1]); IIzV0 = IIz$V0[,,1]      
         X0 =  IImIIzV0%*%kf$x0T + IIzV0%*%par1$x0
-        S00 = kf$V0T + tcrossprod(X0)
-        S10 = kf$Vtt1T[,,1] + tcrossprod(kf$xtT[,1,drop=FALSE], X0);  #where diag.V0=0 kf$Vtt1T[,,1]=0 since x at t-1 is fixed
-        S11 = kf$VtT[,,1] + tcrossprod(kf$xtT[,1,drop=FALSE])
+        S00 = kf$V0T + base::tcrossprod(X0)
+        S10 = kf$Vtt1T[,,1] + base::tcrossprod(kf$xtT[,1,drop=FALSE], X0);  #where diag.V0=0 kf$Vtt1T[,,1]=0 since x at t-1 is fixed
+        S11 = kf$VtT[,,1] + base::tcrossprod(kf$xtT[,1,drop=FALSE])
         X1 = kf$xtT[,1,drop=FALSE]
-        sum1a = (S11 - tcrossprod(B, S10) - tcrossprod(S10, B) + tcrossprod(B%*%S00, B)
-                 - tcrossprod(U, X1) - tcrossprod(X1, U) + tcrossprod(U, B%*%X0) + tcrossprod(B%*%X0, U) + tcrossprod(U)) #U%*%t.U
+        sum1a = (S11 - base::tcrossprod(B, S10) - base::tcrossprod(S10, B) + base::tcrossprod(B%*%S00, B)
+                 - base::tcrossprod(U, X1) - base::tcrossprod(X1, U) + base::tcrossprod(U, B%*%X0) + base::tcrossprod(B%*%X0, U) + base::tcrossprod(U)) #U%*%t.U
         sum1a = symm(sum1a) #symmetry function from MARSSkf
-        if(isMatrix) sum1 = as.matrix(crossprod(dQ, vec(sum1a))) else sum1 = crossprod(dQ, vec(sum1a))
-        if(isMatrix) t.dQ.dQ = as.matrix(crossprod(dQ)) else t.dQ.dQ = crossprod(dQ)
+        if(isMatrix) sum1 = as.matrix(Matrix::crossprod(dQ, vec(sum1a))) else sum1 = base::crossprod(dQ, vec(sum1a))
+        if(isMatrix) t.dQ.dQ = as.matrix(Matrix::crossprod(dQ)) else t.dQ.dQ = base::crossprod(dQ)
       }
       if(kf.x0=="x10"){
         sum1 = 0; t.dQ.dQ=0; TT.numer = TT-1
@@ -284,28 +284,28 @@ MARSSkem = function( MLEobj ) {
       }
       
       for (i in 2:TT) {
-        S00 = kf[["VtT"]][,,i-1] + tcrossprod(kf[["xtT"]][,i-1,drop=FALSE]) #sum 2:T E(xt1T%*%t(xt1T))
-        S10 = kf[["Vtt1T"]][,,i] + tcrossprod(kf[["xtT"]][,i,drop=FALSE],kf[["xtT"]][,i-1,drop=FALSE])  #sum 2:T E(xtT%*%t(xt1T))
-        S11 = kf[["VtT"]][,,i] + tcrossprod(kf[["xtT"]][,i,drop=FALSE])   #sum 2:T E(xtT%*%t(xt1T))
+        S00 = kf[["VtT"]][,,i-1] + base::tcrossprod(kf[["xtT"]][,i-1,drop=FALSE]) #sum 2:T E(xt1T%*%t(xt1T))
+        S10 = kf[["Vtt1T"]][,,i] + base::tcrossprod(kf[["xtT"]][,i,drop=FALSE],kf[["xtT"]][,i-1,drop=FALSE])  #sum 2:T E(xtT%*%t(xt1T))
+        S11 = kf[["VtT"]][,,i] + base::tcrossprod(kf[["xtT"]][,i,drop=FALSE])   #sum 2:T E(xtT%*%t(xt1T))
         X0 = kf[["xtT"]][,i-1,drop=FALSE]      #sum 2:T E(xt1T)
         X1 = kf[["xtT"]][,i,drop=FALSE]        #sum 2:T E(xtT)
         if(time.varying[["B"]] ){ B = parmat(MLEobj.iter, "B", t=i)$B }
         if(time.varying[["U"]] ){ U = parmat(MLEobj.iter, "U", t=i)$U }
         if(time.varying[["Q"]] ){ 
           dQ = subFree2D(d[["Q"]],t=i)
-          if(isMatrix) t.dQ.dQ = t.dQ.dQ + as.matrix(crossprod(dQ)) else t.dQ.dQ = t.dQ.dQ + crossprod(dQ) 
+          if(isMatrix) t.dQ.dQ = t.dQ.dQ + as.matrix(Matrix::crossprod(dQ)) else t.dQ.dQ = t.dQ.dQ + base::crossprod(dQ) 
         }
-        sum1a = (S11 - tcrossprod(B,S10) - tcrossprod(S10, B) + tcrossprod(B%*%S00,B)
-                 - tcrossprod(U, X1) - tcrossprod(X1, U) + tcrossprod(U,B%*%X0) + tcrossprod(B%*%X0, U) + tcrossprod(U))
+        sum1a = (S11 - base::tcrossprod(B,S10) - base::tcrossprod(S10, B) + base::tcrossprod(B%*%S00,B)
+                 - base::tcrossprod(U, X1) - base::tcrossprod(X1, U) + base::tcrossprod(U,B%*%X0) + base::tcrossprod(B%*%X0, U) + base::tcrossprod(U))
         sum1a = symm(sum1a) #enforce symmetry function from MARSSkf
-        if(isMatrix) sum1 = sum1 + as.matrix(crossprod(dQ, vec(sum1a))) else sum1 = sum1 + crossprod(dQ, vec(sum1a))
+        if(isMatrix) sum1 = sum1 + as.matrix(Matrix::crossprod(dQ, vec(sum1a))) else sum1 = sum1 + base::crossprod(dQ, vec(sum1a))
       }
       
       #pcholinv because there might be all zero cols in dQ; won't equal matrix(0,1,1) since !is.fixed
       if(time.varying[["Q"]]){ 
         if(length(t.dQ.dQ)==1){ inv.dQ=1/t.dQ.dQ }else{ inv.dQ = pcholinv(t.dQ.dQ) }
       }else{
-        if(isMatrix) t.dQ.dQ = as.matrix(crossprod(dQ)) else t.dQ.dQ = crossprod(dQ)
+        if(isMatrix) t.dQ.dQ = as.matrix(Matrix::crossprod(dQ)) else t.dQ.dQ = base::crossprod(dQ)
         if(length(t.dQ.dQ)==1){ inv.dQ=(1/t.dQ.dQ)/TT.numer }else{ inv.dQ = pcholinv(t.dQ.dQ)/TT.numer }
       }
       #0 will appear in par where there are all 0 cols in d since inv.dQ will be 0 row/col there      
@@ -371,7 +371,7 @@ MARSSkem = function( MLEobj ) {
           if(maxT!=1)   QRV = parmat(MLEobj.iter,elem,t=i)[[elem]]
           if(maxT1!=1)  GHL = parmat(MLEobj.iter,elem1,t=i)[[elem1]]
           #this is being done to find the zeros on the diagonal
-          pari = tcrossprod(GHL %*% QRV, GHL)
+          pari = base::tcrossprod(GHL %*% QRV, GHL)
           #These are the identity matrices used to identify the location of deterministic rows of x;
           #section 7.2 in EM Derivations "Idntifying the fully deterministic x rows"
           #IIz means location of 0s on diagonal of var-cov matrix GHL%*%QRV%*%t(GHL)
@@ -385,8 +385,8 @@ MARSSkem = function( MLEobj ) {
             }
           }
           #this is defining the bolded Q, R and K in section 4.4 and 5 of the EM Derivation
-          starmultiplier = tcrossprod(pcholinv(crossprod(GHL)),GHL)
-          star[[elem]][,,i] = crossprod(starmultiplier, pcholinv(QRV)%*%starmultiplier)
+          starmultiplier = base::tcrossprod(pcholinv(base::crossprod(GHL)),GHL)
+          star[[elem]][,,i] = base::crossprod(starmultiplier, pcholinv(QRV)%*%starmultiplier)
         }
         set.degen[[elem]]=FALSE #reset so this code is not run again
         if(elem=="V0" & (iter==1 | set.degen$V0)){ #then 0 location in V0 has potentially changed (via degen.test(V0))
@@ -403,7 +403,7 @@ MARSSkem = function( MLEobj ) {
     ################################################################
     if( !fixed[["x0"]] ){  # some element needs estimating
       f.x0=subFixed(f$x0,t=1); if(isMatrix) f.x0 = as.matrix(f.x0) #speed up - ops
-      d.x0=subFree2D(d$x0,t=1) 
+      d.x0=subFree2D(d$x0,t=1); if(isMatrix) d.x0 = as.matrix(d.x0)
       A=par1$A; Z=par1$Z; B=par1$B; U=par1$U
       Qinv = sub3D(star$Q,t=1); diag.Q=1-takediag(IIz$Q[,,1]) 
       Rinv = sub3D(star$R,t=1); diag.R1=1-takediag(IIz$R[,,1]); 
@@ -415,9 +415,13 @@ MARSSkem = function( MLEobj ) {
       numer=denom=0
       if(kf.x0=="x00") hatxt0=kf$x0T else hatxt0=kf$xtT[,1,drop=FALSE]
       if(any(diag.V0==1)){ #meaning some V0 positive
-        denom = crossprod( d.x0, star$V0[,,1]%*%d.x0)
-        numer = crossprod( d.x0, hatxt0-f.x0)
-        if(isMatrix){ denom=as.matrix(denom); numer=as.matrix(numer) }
+        if(isMatrix){
+          denom = as.matrix(Matrix::crossprod( d.x0, star$V0[,,1]%*%d.x0))
+          numer = as.matrix(Matrix::crossprod( d.x0, hatxt0-f.x0))
+        }else{
+          denom = base::crossprod( d.x0, star$V0[,,1]%*%d.x0)
+          numer = base::crossprod( d.x0, hatxt0-f.x0)
+        }
       }
       
       if(any(diag.V0==0)){
@@ -434,11 +438,11 @@ MARSSkem = function( MLEobj ) {
           Delta7 = kf$xtT[,1,drop=FALSE]-B%*%(IImIIzV0%*%hatxt0 + IIzV0%*%f.x0)-U
           Delta8 = B%*%IIzV0%*%d.x0 #since IId.tm and Bstar.tm are IIm
           if(isMatrix){
-          numer = numer + as.matrix(crossprod(Delta8, Qinv%*%Delta7))
-          denom = denom + as.matrix(crossprod(Delta8, Qinv%*%Delta8))
+            numer = numer + as.matrix(Matrix::crossprod(Delta8, Qinv%*%Delta7))
+            denom = denom + as.matrix(Matrix::crossprod(Delta8, Qinv%*%Delta8))
           }else{
-            numer = numer + crossprod(Delta8, Qinv%*%Delta7)
-            denom = denom + crossprod(Delta8, Qinv%*%Delta8)
+            numer = numer + base::crossprod(Delta8, Qinv%*%Delta7)
+            denom = denom + base::crossprod(Delta8, Qinv%*%Delta8)
           }
         }else{  #x10
           Bstar=IIm; Ustar=0*U
@@ -449,18 +453,18 @@ MARSSkem = function( MLEobj ) {
           Delta5=Ey$ytT[,1,drop=FALSE]-Z%*%((IIm-IId)%*%kf$xtT[,1,drop=FALSE])-Z%*%IId%*%(Bstar%*%(IImIIzV0%*%hatxt0 + IIzV0%*%f.x0)+Ustar)-A
           Delta6=Z%*%IId%*%Bstar%*%(IIzV0%*%d.x0)         
           if(any(diag.R1==0)){
-            if(any(crossprod(Delta6,IIz.R)%*%Delta6 !=0)){
+            if(any(base::crossprod(Delta6,IIz.R)%*%Delta6 !=0)){
               stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo(\"x0R0\") for help.\n", sep="")
               stopped.with.errors=TRUE
               break
             }
           }
           if(isMatrix){
-            numer = numer + as.matrix(crossprod(Delta6, Rinv%*%Delta5))
-            denom = denom + as.matrix(crossprod(Delta6, Rinv%*%Delta6))
+            numer = numer + as.matrix(Matrix::crossprod(Delta6, Rinv%*%Delta5))
+            denom = denom + as.matrix(Matrix::crossprod(Delta6, Rinv%*%Delta6))
           }else{
-            numer = numer + crossprod(Delta6, Rinv%*%Delta5)
-            denom = denom + crossprod(Delta6, Rinv%*%Delta6)
+            numer = numer + base::crossprod(Delta6, Rinv%*%Delta5)
+            denom = denom + base::crossprod(Delta6, Rinv%*%Delta6)
           }
         }
         #t>1 will break out as soon as no IId=1
@@ -488,29 +492,29 @@ MARSSkem = function( MLEobj ) {
             Delta6=Z%*%IId%*%Bstar%*%(IIzV0%*%d.x0)
             #Deal with Delta6=0 and Rinv=Inf, so 0*Inf
             if(any(diag.R1==0)){
-              if(any(crossprod(Delta6, IIz.R)%*%Delta6 !=0)){
+              if(any(base::crossprod(Delta6, IIz.R)%*%Delta6 !=0)){
                 stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update.\n There are 0s on R diagonal. x0 assoc with these must be fixed (not estimated)\n when using the EM algorithm. Try method=\"BFGS\".  Type MARSSinfo(\"x0R0\") for help.\n", sep="")
                 stopped.with.errors=TRUE
                 break
               }
             }
             if(isMatrix){
-              numer = numer + as.matrix(crossprod(Delta6, Rinv%*%Delta5))
-              denom = denom + as.matrix(crossprod(Delta6, Rinv%*%Delta6))
+              numer = numer + as.matrix(Matrix::crossprod(Delta6, Rinv%*%Delta5))
+              denom = denom + as.matrix(Matrix::crossprod(Delta6, Rinv%*%Delta6))
             }else{
-              numer = numer + crossprod(Delta6, Rinv%*%Delta5)
-              denom = denom + crossprod(Delta6, Rinv%*%Delta6)
+              numer = numer + base::crossprod(Delta6, Rinv%*%Delta5)
+              denom = denom + base::crossprod(Delta6, Rinv%*%Delta6)
             }
           }
           if(any(IId.tm==1)){
             Delta7 = kf$xtT[,t,drop=FALSE]-B%*%(IIm-IId.tm)%*%kf$xtT[,t-1,drop=FALSE]-B%*%IId.tm%*%(Bstar.tm%*%(IImIIzV0%*%hatxt0 + IIzV0%*%f.x0)+Ustar.tm)-U
             Delta8 = B%*%IId.tm%*%Bstar.tm%*%(IIzV0%*%d.x0)
             if(isMatrix){
-              numer = numer + as.matrix(crossprod(Delta8, Qinv%*%Delta7))
-              denom = denom + as.matrix(crossprod(Delta8, Qinv%*%Delta8))
+              numer = numer + as.matrix(Matrix::crossprod(Delta8, Qinv%*%Delta7))
+              denom = denom + as.matrix(Matrix::crossprod(Delta8, Qinv%*%Delta8))
             }else{
-              numer = numer + crossprod(Delta8, Qinv%*%Delta7)
-              denom = denom + crossprod(Delta8, Qinv%*%Delta8)
+              numer = numer + base::crossprod(Delta8, Qinv%*%Delta7)
+              denom = denom + base::crossprod(Delta8, Qinv%*%Delta8)
             }
           }
         } #for t
@@ -549,7 +553,12 @@ MARSSkem = function( MLEobj ) {
     ################################################################
     if( !fixed[["V0"]] ){  # some element needs estimating (obviously V0!=0)
       dV0=subFree2D(d$V0,t=1)
-      V0.update = chol2inv(chol(crossprod(dV0)))%*%crossprod(dV0, vec(kf$V0T))
+      if(isMatrix){
+      V0.update = chol2inv(chol(Matrix::crossprod(dV0)))%*%Matrix::crossprod(dV0, vec(kf$V0T))
+      V0.update = as.matrix(V0.update)
+      }else{
+        V0.update = chol2inv(chol(base::crossprod(dV0)))%*%base::crossprod(dV0, vec(kf$V0T))
+      }
 
       MLEobj.iter$par$V0 = V0.update
       par1$V0=parmat(MLEobj.iter,"V0",t=1)$V0
@@ -595,13 +604,14 @@ MARSSkem = function( MLEobj ) {
           fA=subFixed(f$A,t=i); if(isMatrix) fA = as.matrix(fA) # to speed up + with Matrix class
         }
         if(time.varying[["R"]]) starR=star[["R"]][,,i]
-        crossA1 = crossprod(dA, starR%*%(Ey[["ytT"]][,i,drop=FALSE]-Z%*%kf[["xtT"]][,i,drop=FALSE]-fA))
         if(isMatrix){
+          crossA1 = Matrix::crossprod(dA, starR%*%(Ey[["ytT"]][,i,drop=FALSE]-Z%*%kf[["xtT"]][,i,drop=FALSE]-fA))
           numer = numer + as.matrix(crossA1)
-          denom = denom + as.matrix(crossprod(dA, starR%*%dA))
+          denom = denom + as.matrix(Matrix::crossprod(dA, starR%*%dA))
         }else{
+          crossA1 = base::crossprod(dA, starR%*%(Ey[["ytT"]][,i,drop=FALSE]-Z%*%kf[["xtT"]][,i,drop=FALSE]-fA))
           numer = numer + crossA1
-          denom = denom + crossprod(dA, starR%*%dA)
+          denom = denom + base::crossprod(dA, starR%*%dA)
         }
       }
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ))) }
@@ -664,11 +674,11 @@ MARSSkem = function( MLEobj ) {
         Delta3 = kf$xtT[,1,drop=FALSE]-B%*%E.x0-fU
         Delta4 = dU #since IId.tm and Bstar.tm are IIm
         if(isMatrix){
-          numer = numer + as.matrix(crossprod(Delta4, Qinv%*%Delta3))
-          denom = denom + as.matrix(crossprod(Delta4, Qinv%*%Delta4))
+          numer = numer + as.matrix(Matrix::crossprod(Delta4, Qinv%*%Delta3))
+          denom = denom + as.matrix(Matrix::crossprod(Delta4, Qinv%*%Delta4))
         }else{
-          numer = numer + crossprod(Delta4, Qinv%*%Delta3)
-          denom = denom + crossprod(Delta4, Qinv%*%Delta4)
+          numer = numer + base::crossprod(Delta4, Qinv%*%Delta3)
+          denom = denom + base::crossprod(Delta4, Qinv%*%Delta4)
         }
       }else{  #x10
         Bstar=IIm; fstar=0*fU; Dstar=0*dU
@@ -679,11 +689,11 @@ MARSSkem = function( MLEobj ) {
         Delta1=Ey$ytT[,1,drop=FALSE]-Z%*%((IIm-IId)%*%kf$xtT[,1,drop=FALSE])-Z%*%(IId%*%(Bstar%*%E.x0+fstar))-A
         Delta2=Z%*%IId%*%Dstar
         if(isMatrix){
-          numer = numer + as.matrix(crossprod(Delta2, Rinv%*%Delta1))
-          denom = denom + as.matrix(crossprod(Delta2, Rinv%*%Delta2))
+          numer = numer + as.matrix(Matrix::crossprod(Delta2, Rinv%*%Delta1))
+          denom = denom + as.matrix(Matrix::crossprod(Delta2, Rinv%*%Delta2))
         }else{
-          numer = numer + crossprod(Delta2, Rinv%*%Delta1)
-          denom = denom + crossprod(Delta2, Rinv%*%Delta2)
+          numer = numer + base::crossprod(Delta2, Rinv%*%Delta1)
+          denom = denom + base::crossprod(Delta2, Rinv%*%Delta2)
         }
       }
       for(t in 2:TT){ 
@@ -715,22 +725,22 @@ MARSSkem = function( MLEobj ) {
           Delta1=Ey$ytT[,t,drop=FALSE]-Z%*%((IIm-IId)%*%kf$xtT[,t,drop=FALSE])-Z%*%(IId%*%(Bstar%*%E.x0+fstar))-A
           Delta2=Z%*%IId%*%Dstar
           if(isMatrix){
-            numer = numer + as.matrix(crossprod(Delta2, Rinv%*%Delta1)) 
-            denom = denom + as.matrix(crossprod(Delta2, Rinv%*%Delta2))
+            numer = numer + as.matrix(Matrix::crossprod(Delta2, Rinv%*%Delta1)) 
+            denom = denom + as.matrix(Matrix::crossprod(Delta2, Rinv%*%Delta2))
           }else{
-            numer = numer + crossprod(Delta2, Rinv%*%Delta1)
-            denom = denom + crossprod(Delta2, Rinv%*%Delta2)
+            numer = numer + base::crossprod(Delta2, Rinv%*%Delta1)
+            denom = denom + base::crossprod(Delta2, Rinv%*%Delta2)
           }
         }
         Delta3 = kf$xtT[,t,drop=FALSE]-B%*%((IIm-IId.tm)%*%kf$xtT[,t-1,drop=FALSE])-B%*%(IId.tm%*%(Bstar.tm%*%E.x0+fstar.tm))-fU
         #Delta4 = dU + B%*%IId.tm%*%Dstar.tm
-        Delta4 = dU + tcrossprod(B, IId.tm)%*%Dstar.tm
+        Delta4 = dU + base::tcrossprod(B, IId.tm)%*%Dstar.tm
         if(isMatrix){
-          numer = numer + as.matrix(crossprod(Delta4, Qinv%*%Delta3))
-          denom = denom + as.matrix(crossprod(Delta4, Qinv%*%Delta4))
+          numer = numer + as.matrix(Matrix::crossprod(Delta4, Qinv%*%Delta3))
+          denom = denom + as.matrix(Matrix::crossprod(Delta4, Qinv%*%Delta4))
         }else{
-          numer = numer + crossprod(Delta4, Qinv%*%Delta3)
-          denom = denom + crossprod(Delta4, Qinv%*%Delta4)
+          numer = numer + base::crossprod(Delta4, Qinv%*%Delta3)
+          denom = denom + base::crossprod(Delta4, Qinv%*%Delta4)
         }
       } #for i
       problem = FALSE
@@ -776,11 +786,17 @@ MARSSkem = function( MLEobj ) {
         hatxtm =  IImIIzV0%*%kf$x0T + IIzV0%*%par1$x0
         hatVtm = IImIIzV0%*%kf$V0T%*%IImIIzV0 + IIzV0%*%par1$V0%*%IIzV0
         hatxt = kf$xtT[,1,drop=FALSE]
-        Ptm = hatVtm + tcrossprod(hatxtm,kf$x0T) #note def of t.hatxtm = kf$x0T not t(hatxtm)
-        Pttm = kf$Vtt1T[,,1] + tcrossprod(hatxt,kf$x0T) #note def of t.hatstm for t=0
+        Ptm = hatVtm + base::tcrossprod(hatxtm,kf$x0T) #note def of t.hatxtm = kf$x0T not t(hatxtm)
+        Pttm = kf$Vtt1T[,,1] + base::tcrossprod(hatxt,kf$x0T) #note def of t.hatstm for t=0
         kronPtmQ = kronecker(Ptm,starQ)
-        denom = crossprod(dB, kronPtmQ%*%dB)
-        numer = crossprod(dB, (vec(starQ%*%(Pttm - tcrossprod(U,kf$x0T))) - kronPtmQ%*%fB))
+        if(isMatrix){
+          denom = Matrix::crossprod(dB, kronPtmQ%*%dB)
+          numer = Matrix::crossprod(dB, (vec(starQ%*%(Pttm - base::tcrossprod(U,kf$x0T))) - kronPtmQ%*%fB))
+          denom=as.matrix(denom); numer=as.matrix(numer)
+        }else{
+          denom = base::crossprod(dB, kronPtmQ%*%dB)
+          numer = base::crossprod(dB, (vec(starQ%*%(Pttm - base::tcrossprod(U,kf$x0T))) - kronPtmQ%*%fB))
+        }
       }else{ #prior is defined as being E[x(t=1)|y(t=0)]; xtt1[1]=x0; Vtt1[1]=V0
         denom = numer = 0 #see Ghahramani and Hinton treatment.  Summation starts at t=2
       }        
@@ -789,8 +805,8 @@ MARSSkem = function( MLEobj ) {
         hatxtm = kf$xtT[,i-1,drop=FALSE]
         hatVtm = kf$VtT[,,i-1] 
         hatxt = kf$xtT[,i,drop=FALSE]
-        Ptm = hatVtm + tcrossprod(hatxtm) 
-        Pttm = kf$Vtt1T[,,i] + tcrossprod(hatxt,hatxtm) 
+        Ptm = hatVtm + base::tcrossprod(hatxtm) 
+        Pttm = kf$Vtt1T[,,i] + base::tcrossprod(hatxt,hatxtm) 
         if(time.varying$Q) starQ=sub3D(star$Q,t=i)
         kronPtmQ = kronecker(Ptm,starQ)
         if(time.varying$B){
@@ -799,11 +815,11 @@ MARSSkem = function( MLEobj ) {
         }
         if(time.varying$U) U = parmat(MLEobj.iter,"U",t=i)$U
         if(isMatrix){
-          denom = denom + as.matrix(crossprod(dB, kronPtmQ%*%dB))
-          numer = numer + as.matrix(crossprod(dB, vec(starQ%*%(Pttm - tcrossprod(U, hatxtm) )) - kronPtmQ%*%fB ))
+          denom = denom + as.matrix(Matrix::crossprod(dB, kronPtmQ%*%dB))
+          numer = numer + as.matrix(Matrix::crossprod(dB, vec(starQ%*%(Pttm - base::tcrossprod(U, hatxtm) )) - kronPtmQ%*%fB ))
         }else{
-          denom = denom + crossprod(dB, kronPtmQ%*%dB)
-          numer = numer + crossprod(dB, vec(starQ%*%(Pttm - tcrossprod(U, hatxtm) )) - kronPtmQ%*%fB )
+          denom = denom + base::crossprod(dB, kronPtmQ%*%dB)
+          numer = numer + base::crossprod(dB, vec(starQ%*%(Pttm - base::tcrossprod(U, hatxtm) )) - kronPtmQ%*%fB )
         }
       } #for i
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ) )) }
@@ -850,7 +866,7 @@ MARSSkem = function( MLEobj ) {
       starR=star$R[,,1]
       for (i in 1:TT) {
         hatxt = kf$xtT[,i,drop=FALSE]
-        Pt = kf$VtT[,,i] + tcrossprod(hatxt) 
+        Pt = kf$VtT[,,i] + base::tcrossprod(hatxt) 
         hatyxt = Ey$yxtT[,,i]
         if(time.varying$A & i>1) A=parmat(MLEobj.iter,"A",t=i)$A
         if(time.varying$R) starR=star$R[,,i]
@@ -860,11 +876,11 @@ MARSSkem = function( MLEobj ) {
         }
         PkronR = kronecker( Pt, starR )
         if(isMatrix){
-          numer = numer + as.matrix(crossprod(dZ, vec(starR%*%(hatyxt-tcrossprod(A, hatxt))) - PkronR%*%fZ))
-          denom = denom + as.matrix(crossprod(dZ, PkronR%*%dZ))
+          numer = numer + as.matrix(Matrix::crossprod(dZ, vec(starR%*%(hatyxt-base::tcrossprod(A, hatxt))) - PkronR%*%fZ))
+          denom = denom + as.matrix(Matrix::crossprod(dZ, PkronR%*%dZ))
         }else{
-          numer = numer + crossprod(dZ, vec(starR%*%(hatyxt-tcrossprod(A, hatxt))) - PkronR%*%fZ)
-          denom = denom + crossprod(dZ, PkronR%*%dZ)
+          numer = numer + base::crossprod(dZ, vec(starR%*%(hatyxt-base::tcrossprod(A, hatxt))) - PkronR%*%fZ)
+          denom = denom + base::crossprod(dZ, PkronR%*%dZ)
         }
       } #for i
       if(length(denom)==1){ denom = try(1/denom) }else{ denom=try(chol2inv(chol( denom ) )) }
