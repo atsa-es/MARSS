@@ -34,7 +34,10 @@ The master branch on GitHub has work leading up to a GitHub release.  The code h
 ```
 install_github("nwfsc-timeseries/MARSS")
 ```
-
+If you are on a Windows machine and get an error saying 'loading failed for i386' or similar, then try
+```
+options(devtools.install.args = "--no-multiarch")
+```
 
 ### DOCUMENTATION and TUTORIALS
 
