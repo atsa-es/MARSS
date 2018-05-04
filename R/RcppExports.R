@@ -57,6 +57,14 @@ eigenMapABC <- function(A, B, C) {
     .Call('_MARSS_eigenMapABC', PACKAGE = 'MARSS', A, B, C)
 }
 
+eigenABtA <- function(AA, BB) {
+    .Call('_MARSS_eigenABtA', PACKAGE = 'MARSS', AA, BB)
+}
+
+eigenABtAA <- function(AA, BB) {
+    .Call('_MARSS_eigenABtAA', PACKAGE = 'MARSS', AA, BB)
+}
+
 eigenABtC <- function(AA, BB, CC) {
     .Call('_MARSS_eigenABtC', PACKAGE = 'MARSS', AA, BB, CC)
 }

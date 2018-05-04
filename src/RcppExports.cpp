@@ -7,13 +7,13 @@
 using namespace Rcpp;
 
 // eigenAB
-SEXP eigenAB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB);
+SEXP eigenAB(SEXP AA, SEXP BB);
 RcppExport SEXP _MARSS_eigenAB(SEXP AASEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenAB(AA, BB));
     return rcpp_result_gen;
 END_RCPP
@@ -31,13 +31,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenAtB
-SEXP eigenAtB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB);
+SEXP eigenAtB(SEXP AA, SEXP BB);
 RcppExport SEXP _MARSS_eigenAtB(SEXP AASEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenAtB(AA, BB));
     return rcpp_result_gen;
 END_RCPP
@@ -55,13 +55,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenAb
-SEXP eigenAb(Rcpp::NumericMatrix AA, Rcpp::NumericVector bb);
+SEXP eigenAb(SEXP AA, SEXP bb);
 RcppExport SEXP _MARSS_eigenAb(SEXP AASEXP, SEXP bbSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type bb(bbSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type bb(bbSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenAb(AA, bb));
     return rcpp_result_gen;
 END_RCPP
@@ -79,13 +79,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenaBa
-SEXP eigenaBa(Rcpp::NumericVector aa, Rcpp::NumericMatrix BB);
+SEXP eigenaBa(SEXP aa, SEXP BB);
 RcppExport SEXP _MARSS_eigenaBa(SEXP aaSEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type aa(aaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type aa(aaSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenaBa(aa, BB));
     return rcpp_result_gen;
 END_RCPP
@@ -103,13 +103,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigentAB
-SEXP eigentAB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB);
+SEXP eigentAB(SEXP AA, SEXP BB);
 RcppExport SEXP _MARSS_eigentAB(SEXP AASEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
     rcpp_result_gen = Rcpp::wrap(eigentAB(AA, BB));
     return rcpp_result_gen;
 END_RCPP
@@ -127,14 +127,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenAtBC
-SEXP eigenAtBC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC);
+SEXP eigenAtBC(SEXP AA, SEXP BB, SEXP CC);
 RcppExport SEXP _MARSS_eigenAtBC(SEXP AASEXP, SEXP BBSEXP, SEXP CCSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type CC(CCSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type CC(CCSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenAtBC(AA, BB, CC));
     return rcpp_result_gen;
 END_RCPP
@@ -153,14 +153,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenABC
-SEXP eigenABC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC);
+SEXP eigenABC(SEXP AA, SEXP BB, SEXP CC);
 RcppExport SEXP _MARSS_eigenABC(SEXP AASEXP, SEXP BBSEXP, SEXP CCSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type CC(CCSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type CC(CCSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenABC(AA, BB, CC));
     return rcpp_result_gen;
 END_RCPP
@@ -178,15 +178,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// eigenABtC
-SEXP eigenABtC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC);
-RcppExport SEXP _MARSS_eigenABtC(SEXP AASEXP, SEXP BBSEXP, SEXP CCSEXP) {
+// eigenABtA
+SEXP eigenABtA(SEXP AA, SEXP BB);
+RcppExport SEXP _MARSS_eigenABtA(SEXP AASEXP, SEXP BBSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenABtA(AA, BB));
+    return rcpp_result_gen;
+END_RCPP
+}
+// eigenABtAA
+SEXP eigenABtAA(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB);
+RcppExport SEXP _MARSS_eigenABtAA(SEXP AASEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type BB(BBSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type CC(CCSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenABtAA(AA, BB));
+    return rcpp_result_gen;
+END_RCPP
+}
+// eigenABtC
+SEXP eigenABtC(SEXP AA, SEXP BB, SEXP CC);
+RcppExport SEXP _MARSS_eigenABtC(SEXP AASEXP, SEXP BBSEXP, SEXP CCSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type BB(BBSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type CC(CCSEXP);
     rcpp_result_gen = Rcpp::wrap(eigenABtC(AA, BB, CC));
     return rcpp_result_gen;
 END_RCPP
@@ -205,12 +229,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenSymm
-SEXP eigenSymm(Rcpp::NumericMatrix AA);
+SEXP eigenSymm(SEXP AA);
 RcppExport SEXP _MARSS_eigenSymm(SEXP AASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type AA(AASEXP);
+    Rcpp::traits::input_parameter< SEXP >::type AA(AASEXP);
     rcpp_result_gen = Rcpp::wrap(eigenSymm(AA));
     return rcpp_result_gen;
 END_RCPP
@@ -277,6 +301,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MARSS_eigenMapAtBC", (DL_FUNC) &_MARSS_eigenMapAtBC, 3},
     {"_MARSS_eigenABC", (DL_FUNC) &_MARSS_eigenABC, 3},
     {"_MARSS_eigenMapABC", (DL_FUNC) &_MARSS_eigenMapABC, 3},
+    {"_MARSS_eigenABtA", (DL_FUNC) &_MARSS_eigenABtA, 2},
+    {"_MARSS_eigenABtAA", (DL_FUNC) &_MARSS_eigenABtAA, 2},
     {"_MARSS_eigenABtC", (DL_FUNC) &_MARSS_eigenABtC, 3},
     {"_MARSS_eigenMapABtC", (DL_FUNC) &_MARSS_eigenMapABtC, 3},
     {"_MARSS_eigenSymm", (DL_FUNC) &_MARSS_eigenSymm, 1},

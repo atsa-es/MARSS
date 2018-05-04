@@ -52,9 +52,9 @@ MARSSkfss = function( MLEobj ) {
   # R=tcrossprod(pari$H %*% pari$R, pari$H) 
   # Q=tcrossprod(pari$G %*% pari$Q, pari$G)
   # V0=tcrossprod(pari$L%*%pari$V0, pari$L)
-  R=eigenABtC(pari$H, pari$R, pari$H)
-  Q=eigenABtC(pari$G, pari$Q, pari$G)
-  V0=eigenABtC(pari$L, pari$V0, pari$L)
+  R=eigenABtA(pari$H, pari$R)
+  Q=eigenABtA(pari$G, pari$Q)
+  V0=eigenABtA(pari$L, pari$V0)
   if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
   #Check that if any R are 0 then model is solveable
   OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -93,7 +93,7 @@ MARSSkfss = function( MLEobj ) {
       Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; #update
       if(RH.time.varying){
         #R=tcrossprod(pari$H %*% pari$R, pari$H)
-        R=eigenABtC(pari$H, pari$R, pari$H)
+        R=eigenABtA(pari$H, pari$R)
         if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
         #Check that if any R are 0 then model is solveable
         OmgRVtt = I.m; diag.OmgRVtt = rep(1,m)
@@ -114,7 +114,7 @@ MARSSkfss = function( MLEobj ) {
       } #if R in time.varying
       if( QG.time.varying ){
         #Q=tcrossprod(pari$G %*% pari$Q, pari$G)
-        Q=eigenABtC(pari$G, pari$Q, pari$G)
+        Q=eigenABtA(pari$G, pari$Q)
         if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
       }
       #if("B" %in% time.varying) t.B = matrix(B,m,m,byrow=TRUE)   #faster transpose
@@ -139,7 +139,7 @@ MARSSkfss = function( MLEobj ) {
         xtt1[,1] = B%*%x0 + U   #Shumway and Stoffer treatment of initial states # eqn 6.19   (pi is defined as t=0)
         #Vtt1[,,1] = B%*%V0%*%t.B + Q          # eqn 6.20
         #Vtt1[,,1] = B%*%tcrossprod(V0, B) + Q          # eqn 6.20
-        Vtt1[,,1] = eigenABtC(B, V0, B) + Q          # eqn 6.20
+        Vtt1[,,1] = eigenABtA(B, V0) + Q          # eqn 6.20
       }
       if(init.state=="x10") {    #Ghahramani treatment of initial states uses x10 and has no x00 (pi is defined as t=1)
         xtt1[,1] = x0
@@ -149,7 +149,7 @@ MARSSkfss = function( MLEobj ) {
       #xtt1[,t] = B %*% xtt[,t-1,drop=FALSE] + U  #xtt1 denotes x_t^(t-1), eqn 6.19; B here is B[t]
       xtt1[,t] = eigenAb(B, xtt[,t-1,drop=FALSE]) + U #Vtt1[,,t] = B%*%Vtt[,,t-1]%*%t.B + Q     #eqn 6.20; B here is B[t]
       #Vtt1[,,t] = B %*% tcrossprod(Vtt[,,t-1], B) + Q     #eqn 6.20; B here is B[t]
-      Vtt1[,,t] = eigenABtC(B, Vtt[,,t-1], B) + Q
+      Vtt1[,,t] = eigenABtA(B, Vtt[,,t-1]) + Q
     }
     if(m!=1) Vtt1[,,t] = symm(Vtt1[,,t])   #in general Vtt1 is not symmetric but here it is since Vtt and Q are
     
@@ -157,7 +157,7 @@ MARSSkfss = function( MLEobj ) {
     #This is used in Kt, if Vtt1=0, then no info from y on those xt and corrs Kt rows =0 since Kt=Vtt1*t.Z*siginv
     #siginv1 = Zt%*%Vtt1[,,t]%*%t.Zt + Rt
     #siginv1 = Zt %*% tcrossprod(Vtt1[,,t], Zt) + Rt
-    siginv1 = eigenABtC(Zt, Vtt1[,,t], Zt) + Rt
+    siginv1 = eigenABtA(Zt, Vtt1[,,t]) + Rt
     # bracketed piece of eqn 6.23 modified per 6.78
     # Because R diag might be 0, the bracketed bit might have 0 diagonals.  Inv by pcholinv deals with this
     # by putting 0 row/cols where 0s appear on diagonal
@@ -212,10 +212,10 @@ MARSSkfss = function( MLEobj ) {
     
     # Variables needed for the likelihood calculation; see comments above
     #R_mod = (I.n-Mt) + Mt%*% tcrossprod(R, Mt) #not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
-    R_mod = (I.n-Mt) + eigenABtC(Mt, R, Mt)
+    R_mod = (I.n-Mt) + eigenABtA(Mt, R)
     #Ft[,,t] = Zt%*%Vtt1[,,t]%*%t.Zt+R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
     #Ft[,,t] = Zt %*% tcrossprod(Vtt1[,,t], Zt) + R_mod #need to hold on to this for loglike calc ; 1 on diagonal when y is missing
-    Ft[,,t] = eigenABtC(Zt, Vtt1[,,t], Zt) + R_mod
+    Ft[,,t] = eigenABtA(Zt, Vtt1[,,t]) + R_mod
     if(n!=1) Ft[,,t] = symm(Ft[,,t]) #to ensure its symetric
     
     ####### Attach warnings to output if filter is becoming numerically unstable
@@ -260,7 +260,7 @@ MARSSkfss = function( MLEobj ) {
     if( QG.time.varying ){
       Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
       #Q=tcrossprod(G %*% Q, G)
-      Q=eigenABtC(G, Q, G)
+      Q=eigenABtA(G, Q)
       if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
     }
     #deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
@@ -293,7 +293,7 @@ MARSSkfss = function( MLEobj ) {
     #if(m==1) t.J = J[,,t-1] else t.J = matrix(J[,,t-1],m,m,byrow=TRUE) #faster transpose
     #VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1]%*%(VtT[,,t]-Vtt1[,,t])%*%t.J  # eqn 6.48
     #VtT[,,t-1] = Vtt[,,t-1] + J[,,t-1] %*% tcrossprod((VtT[,,t]-Vtt1[,,t]), J[,,t-1])  # eqn 6.48
-    VtT[,,t-1] = Vtt[,,t-1] + eigenABtC(J[,,t-1], (VtT[,,t]-Vtt1[,,t]), J[,,t-1])
+    VtT[,,t-1] = Vtt[,,t-1] + eigenABtA(J[,,t-1], (VtT[,,t]-Vtt1[,,t]))
     #VtT[,,t-1] = (VtT[,,t-1]+matrix(VtT[,,t-1],m,m,byrow=TRUE))/2     #should not be necessary here
   } #end of the smoother
   
@@ -303,7 +303,7 @@ MARSSkfss = function( MLEobj ) {
     if( QG.time.varying ){
       Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
       #Q=tcrossprod(G %*% Q, G)
-      Q=eigenABtC(G, Q, G)
+      Q=eigenABtA(G, Q)
       if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
     }
     #deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
@@ -328,7 +328,7 @@ MARSSkfss = function( MLEobj ) {
     x0T = x0 + eigenAb(J0, (xtT[,1,drop=FALSE]-xtt1[,1,drop=FALSE])) 
     #V0T = V0 + J0%*%(VtT[,,1]-Vtt1[,,1])*t(J0)   # eqn 6.48
     #V0T = V0 + J0%*% tcrossprod( (VtT[,,1]-Vtt1[,,1]),J0)   # eqn 6.48
-    V0T = V0 + eigenABtC(J0, (VtT[,,1]-Vtt1[,,1]), J0)
+    V0T = V0 + eigenABtA(J0, (VtT[,,1]-Vtt1[,,1]))
     V0T = symm(V0T) #enforce symmetry
   }
   if(init.state=="x10") { #Ghahramani treatment of initial states; LAM and pi defined for x_1
@@ -351,14 +351,16 @@ MARSSkfss = function( MLEobj ) {
     if( B.time.varying ){ B = parmat(MLEobj, "B", t=t)$B } #in 6.56, B[t] appears
     #if(m==1) t.J = J[,,t-2] else t.J = matrix(J[,,t-2],m,m,byrow=TRUE) #faster transpose
     #Vtt1T[,,t-1] = Vtt[,,t-1]%*%t.J + J[,,t-1]%*%(Vtt1T[,,t]-B%*%Vtt[,,t-1])%*%t.J   #eqn 6.56
-    #Vtt1T[,,t-1] = tcrossprod(Vtt[,,t-1], J[,,t-2]) + J[,,t-1] %*% tcrossprod((Vtt1T[,,t]-B%*%Vtt[,,t-1]), J[,,t-2])   #eqn 6.56
-    Vtt1T[,,t-1] = eigenAtB(Vtt[,,t-1], J[,,t-2]) + eigenABtC(J[,,t-1],(Vtt1T[,,t] - eigenAB(B, Vtt[,,t-1])), J[,,t-2])
+    #Vtt1T[,,t-1] = tcrossprod(Vtt[,,t-1], J[,,t-2]) + J[,,t-1] %*% tcrossprod((Vtt1T[,,t]-B%*%Vtt[,,t-1]), J[,,t-2])   #eqn 6.56 
+    BVtt1 = eigenAB(B, Vtt[,,t-1])
+    Vtt1T[,,t-1] = eigenAtB(Vtt[,,t-1], J[,,t-2]) + eigenABtC(J[,,t-1],(Vtt1T[,,t] - BVtt1), J[,,t-2])
   }
   if(init.state=="x00"){
     if("B" %in% time.varying){ B = parmat(MLEobj, "B", t=2)$B }
     #Vtt1T[,,1] = Vtt[,,1]%*%t(J0) + J[,,1]%*%(Vtt1T[,,2]-B%*%Vtt[,,1])%*%t(J0)
     #Vtt1T[,,1] = tcrossprod(Vtt[,,1], J0) + J[,,1]%*%tcrossprod(Vtt1T[,,2]-B%*%Vtt[,,1],J0)
-    Vtt1T[,,1] = eigenAtB(Vtt[,,1], J0) + eigenABtC(J[,,1], Vtt1T[,,2]-eigenAB(B,Vtt[,,1]),J0)
+    BVtt = eigenAB(B,Vtt[,,1])
+    Vtt1T[,,1] = eigenAtB(Vtt[,,1], J0) + eigenABtC(J[,,1], Vtt1T[,,2]-BVtt,J0)
   }
   if(init.state=="x10") Vtt1T[,,1] = NA
   
@@ -389,7 +391,7 @@ MARSSkfss = function( MLEobj ) {
           #when R(i,i) is 0 then vt_t(i) will be zero and Sigma[i,i,1] will be 0 if V0=0.
           #OmgF1 makes sure we don't try to take 1/0
           #detFt = OmgF1%*%tcrossprod(Ft[,,t], OmgF1) #detFt = OmgF1%*%Ft[,,t]%*%t(OmgF1)
-          detFt = eigenABtC(OmgF1, Ft[,,t], OmgF1)
+          detFt = eigenABtA(OmgF1, Ft[,,t])
           if(length(detFt)!=1) detFt = getDeterminant(detFt) #detFt = det(detFt)
         }
         #get the inv of Ft

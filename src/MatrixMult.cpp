@@ -3,11 +3,10 @@
 // [[Rcpp::depends(RcppEigen)]]
 
 // [[Rcpp::export]]
-SEXP eigenAB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB){
+SEXP eigenAB(SEXP AA, SEXP BB){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::MatrixXd C = A * B;
-  
   return Rcpp::wrap(C);
 }
 
@@ -19,7 +18,7 @@ SEXP eigenMapAB(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd>
 }
 
 // [[Rcpp::export]]
-SEXP eigenAtB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB){
+SEXP eigenAtB(SEXP AA, SEXP BB){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::MatrixXd C = A * B.adjoint();
@@ -33,7 +32,7 @@ SEXP eigenMapAtB(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd
 }
 
 // [[Rcpp::export]]
-SEXP eigenAb(Rcpp::NumericMatrix AA, Rcpp::NumericVector bb){
+SEXP eigenAb(SEXP AA, SEXP bb){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::VectorXd> b = Rcpp::as<Eigen::Map<Eigen::VectorXd> >(bb);
   Eigen::VectorXd C = A * b;
@@ -47,7 +46,7 @@ SEXP eigenMapAb(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::VectorXd>
 }
 
 // [[Rcpp::export]]
-SEXP eigenaBa(Rcpp::NumericVector aa, Rcpp::NumericMatrix BB){
+SEXP eigenaBa(SEXP  aa, SEXP BB){
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::Map<Eigen::VectorXd> a = Rcpp::as<Eigen::Map<Eigen::VectorXd> >(aa);
   Eigen::MatrixXd C = a.adjoint() * (B * a);
@@ -62,7 +61,7 @@ SEXP eigenMapaBa(const Eigen::Map<Eigen::VectorXd> a, Eigen::Map<Eigen::MatrixXd
 }
 
 // [[Rcpp::export]]
-SEXP eigentAB(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB){
+SEXP eigentAB(SEXP  AA, SEXP BB){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::MatrixXd C = A.adjoint() * B;
@@ -76,7 +75,7 @@ SEXP eigenMaptAB(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd
 }
 
 // [[Rcpp::export]]
-SEXP eigenAtBC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC){
+SEXP eigenAtBC(SEXP AA, SEXP BB, SEXP CC){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::Map<Eigen::MatrixXd> C = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(CC);
@@ -91,7 +90,7 @@ SEXP eigenMapAtBC(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixX
 }
 
 // [[Rcpp::export]]
-SEXP eigenABC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC){
+SEXP eigenABC(SEXP AA, SEXP BB, SEXP CC){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::Map<Eigen::MatrixXd> C = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(CC);
@@ -107,7 +106,23 @@ SEXP eigenMapABC(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd
 }
 
 // [[Rcpp::export]]
-SEXP eigenABtC(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB, Rcpp::NumericMatrix CC){
+SEXP eigenABtA(SEXP AA, SEXP BB){
+  Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
+  Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
+  Eigen::MatrixXd D = A * B * A.adjoint();
+  return Rcpp::wrap(D);
+}
+
+// [[Rcpp::export]]
+SEXP eigenABtAA(Rcpp::NumericMatrix AA, Rcpp::NumericMatrix BB){
+  Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
+  Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
+  Eigen::MatrixXd D = A * B * A.adjoint();
+  return Rcpp::wrap(D);
+}
+
+// [[Rcpp::export]]
+SEXP eigenABtC(SEXP AA, SEXP BB, SEXP CC){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::Map<Eigen::MatrixXd> B = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(BB);
   Eigen::Map<Eigen::MatrixXd> C = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(CC);
@@ -122,7 +137,7 @@ SEXP eigenMapABtC(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixX
 }
 
 // [[Rcpp::export]]
-SEXP eigenSymm(Rcpp::NumericMatrix AA){
+SEXP eigenSymm(SEXP AA){
   Eigen::Map<Eigen::MatrixXd> A = Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(AA);
   Eigen::MatrixXd D = (A + A.adjoint())/2;
   return Rcpp::wrap(D);
