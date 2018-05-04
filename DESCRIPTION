@@ -11,8 +11,7 @@ Imports:
     mvtnorm, 
     nlme, 
     stats, 
-    utils,
-    Matrix
+    utils
 Suggests: 
     broom,
     Formula, 
