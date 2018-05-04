@@ -4,3 +4,5 @@ MARSS.Rproj
 .Rbuildignore
 .RData
 .Rhistory
+src/*.o
+src/*.dll
