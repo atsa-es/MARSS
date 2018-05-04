@@ -123,8 +123,8 @@ MARSSkfss = function( MLEobj ) {
     if(any(YM[,t]==0)){
       Mt = I.n; Mt[YM[,t]==0,]=0  #much faster than makediag(YM)
       I.2 = I.n-Mt  
-      Zt = Z; Zt[YM[,TT]==0,]=0     #much faster than Zt = Mt%*%Z; If Y missing, that row is 0 in Zt
-      At = A; At[YM[,TT]==0,]=0     #faster than At = Mt%*%A
+      Zt = Z; Zt[YM[,t]==0,]=0     #much faster than Zt = Mt%*%Z; If Y missing, that row is 0 in Zt
+      At = A; At[YM[,t]==0,]=0     #faster than At = Mt%*%A
       Omg1=I.n[YM[,t]==1,,drop=FALSE]
       t.Omg1 = I.n[,YM[,t]==1,drop=FALSE] 
       #per 6.78 in Shumway and Stoffer
