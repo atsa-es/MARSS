@@ -11,7 +11,7 @@ MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package 
 
 Issues? [https://github.com/nwfsc-timeseries/MARSS/issues]()
 
-Wiki [https://nwfsc-timeseries.github.io/MARSS-wiki/]()
+Wiki and Current Projects [https://nwfsc-timeseries.github.io/MARSS-wiki/]()
 
 ### INSTALL
 
