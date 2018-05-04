@@ -1,3 +1,4 @@
+useDynLib(MARSS) #for Rcpp
 
 ## export functions
 export(
@@ -30,6 +31,7 @@ export(
 import(stats)
 import(utils)
 import(graphics)
+import(RcppEigen) 
 
 ## register S3 methods
 S3method(print, marssMODEL)
@@ -49,3 +51,4 @@ importFrom(mvtnorm, rmvnorm)
 importFrom(nlme, fdHess)
 importFrom(KFAS, SSModel, SSMcustom, KFS)
 importFrom("grDevices", "contourLines")
+importFrom(Rcpp, sourceCpp)
