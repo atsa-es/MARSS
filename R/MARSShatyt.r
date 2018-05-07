@@ -26,8 +26,8 @@ MARSShatyt = function( MLEobj ) {
   hatxtp=cbind(kfList$xtT[,2:TT,drop=FALSE],NA)
   hatVt=kfList$VtT
   hatVtt1=kfList$Vtt1T
-  hatVtpt = array(NA,dim=dim(kfList$Vtt1T))
-  hatVtpt[,,1:(TT-1)] = kfList$Vtt1T[,,2:TT,drop=FALSE]
+  #hatVtpt = array(NA,dim=dim(kfList$Vtt1T))
+  #hatVtpt[,,1:(TT-1)] = kfList$Vtt1T[,,2:TT,drop=FALSE]
   
   msg=NULL
   
@@ -51,8 +51,8 @@ MARSShatyt = function( MLEobj ) {
   #initialize - these are for the forward, Kalman, filter
   # for notation purposes, 't' represents current point in time, 'TT' represents the length of the series
   #notation bad.  should be hatytT
-  hatyt = hatytt1 = matrix(0,n,TT)     
-  hatOt = array(0,dim=c(n,n,TT))     
+  hatyt = hatytt1 = y # faster than matrix(0,n,TT)     
+  hatOt = hatVt # faster than array(0,dim=c(n,n,TT))     
   hatyxt = hatyxtt1 = hatyxttp = array(0,dim=c(n,m,TT))
   
   for (t in 1:TT) {
@@ -97,13 +97,15 @@ MARSShatyt = function( MLEobj ) {
       hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
       #t.DZ = matrix(Delta.r%*%pari$Z,m,n,byrow=TRUE)
       DZ = Delta.r%*%pari$Z
-      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R + DZ%*%tcrossprod(hatVt[,,t], DZ))%*%I.2 + tcrossprod(hatyt[,t,drop=FALSE])
+      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R + DZ%*%base::tcrossprod(hatVt[,,t], DZ))%*%I.2 + tcrossprod(hatyt[,t,drop=FALSE])
 #      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + hatyt[,t,drop=FALSE]%*%t(hatyt[,t,drop=FALSE],1,n)
       hatyxt[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE], hatxt[,t,drop=FALSE])+DZ%*%hatVt[,,t]
 #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%t(hatxt[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVt[,,t]
       hatyxtt1[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxt1[,t,drop=FALSE])+DZ%*%hatVtt1[,,t]
 #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%t(hatxt1[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVtt1[,,t]
-      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE]) + base::tcrossprod(DZ, hatVtpt[,,t])
+      if(t==TT){ hatyxttp[,,t] = NA }else{
+      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE]) + base::tcrossprod(DZ, Vtt1T[,,t+1])
+      }
       #hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%pari$Z%*%t(hatVtpt[,,t])
     }
   } #for loop over time
