@@ -247,7 +247,8 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
   #strict means only 0,1; not strict means 1s can be other numbers
   #zero.rows.ok means that the rowsums can be 0 (if that row is fixed, say)
   #if dim not null it means a vec-ed version of the matrix was passed in so dim is dim of orig matrix
-  #can be a list matrix; 
+  #can be a list matrix;
+  isM = is(x, "Matrix") # this function might be used of matrix or Matrix
   if(is.null(dim(x))){ #not array or Matrix
     if(is.vector(x) & !is.null(dim)){
       x=unvec(x,dim=dim)
@@ -255,7 +256,7 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
       stop("Stopped in MARSS internal function is.design(): function requires a 2D or 3D matrix.\n", call.=FALSE) #x can be 2D or 3D matrix
     }
   }
-  if(!isMatrix){
+  if(!isM){
     if(length(dim(x))==3)
       if(dim(x)[3]!=1){ stop("Stopped in MARSS internal function is.design(): if 3D, 3rd dim of matrix must be 1.\n", call.=FALSE)
       }else{ 
@@ -287,7 +288,7 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
     if(!zero.cols.ok & any(tmp==0) ) return(FALSE)
     return( TRUE )
   }
-  if(isMatrix){
+  if(isM){ # Then x is a free matrix
     if(!is.null(attr(x, "free.dims")))
       dim(x) = attr(x, "free.dims")[1:2] # reform to 2D free matrix
     #strip all the error-checking; assume is numeric since Matrix
@@ -295,12 +296,17 @@ is.design = function(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=
       is.zero = !x
       x[!is.zero]=1 
     } 
-    if(!all(x==1 | x==0)) return(FALSE)
+    # below is faster than if(!all(x==1 | x==0)) return(FALSE)
+    # for a large sparse matrix
+    if(!all(apply(x,1,function(xx){all(xx==0 | xx==1)}))) return(FALSE)
+    
     if(!zero.cols.ok & dim(x)[1]<dim(x)[2]) return(FALSE) #if fewer rows than columns then not design
-    tmp = apply(x,1,sum)
+    tmp = rowSums(x) # faster than apply(x,1,sum)
+    # the test is done using all.equal to protect against cases where R reports that 1==1 is false due to near.equality
     if(!zero.rows.ok & !isTRUE(all.equal(tmp,rep(1,length(tmp))))) return(FALSE)
-    if(zero.rows.ok & !isTRUE(all(tmp %in% c(0,1)))) return(FALSE)
-    tmp = apply(x,2,sum)
+    #if(zero.rows.ok & !isTRUE(all(tmp %in% c(0,1)))) return(FALSE)
+    if(zero.rows.ok & !all(tmp==0 | tmp==1)) return(FALSE)
+    tmp = colSums(x) # faster than apply(x,2,sum)
     if(!zero.cols.ok & any(tmp==0) ) return(FALSE)
     return( TRUE )
   }
@@ -327,11 +333,17 @@ is.fixed = function(x, by.row=FALSE) {
   if(np==0){ 
     if(!by.row){ return(TRUE) }else{ return(rep(TRUE,nr)) }
   }
-  if(all(x==0)) return(TRUE)
+  if(sum(x)==0){ 
+    if(!by.row){ return(TRUE) }else{ return(rep(TRUE,nr)) }
+  }
   if(by.row){
     # if isM, then in 2D vec form and need to reform to get rows
-    if(isMatrix){ dim(x)=c(nr,np*dim(x)[2]); return( rowSums(x!=0)==0 )} # apply(x==0,1,all)
-    return( rowSums(x!=0)==0 ) # apply(x==0,1,all)
+    # !rowSums(abs(x)) is faster than rowSums(x!=0)==0
+    if(isMatrix){ 
+      dim(x)=c(nr,np*dim(x)[2])
+      return( !Matrix::rowSums(abs(x)) )
+    } # apply(x==0,1,all)
+    return( base::rowSums(x!=0)==0 ) # apply(x==0,1,all)
   }
   return(FALSE)
 }
