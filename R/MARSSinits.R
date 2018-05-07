@@ -73,9 +73,10 @@ for(elem in names(default)){
       if(isMatrix) fixed.tmp = f[[elem]][fixed.row,1]
       tmp[fixed.row]=fixed.tmp #replace with fix value at time t
       #The funky colSum code sums a 3D matrix over the 3rd dim
-      #I want to apply this tmp to all the variances and use an average over the d and f if they are time-varying
+      #I want to apply this tmp to all the variances and use an average d and f matrix (average over time)
       #otherwise I could end up with 0s on the diagonal
       if(!isMatrix){
+        #sum over the T dim/numvals in T dim
       numvals=colSums(aperm(d[[elem]],c(3,1,2))!=0,dims=1)
       delem=colSums(aperm(d[[elem]],c(3,1,2)),dims=1)/numvals; delem[numvals==0]=0
       numvals=colSums(aperm(f[[elem]],c(3,1,2))!=0,dims=1)
@@ -84,15 +85,16 @@ for(elem in names(default)){
       parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
       }
       if(isMatrix){
-        numvals=apply(d[[elem]]!=0,1,sum)
-        delem=apply(d[[elem]],1,sum)/numvals 
+        numvals=Matrix::rowSums(d[[elem]]!=0)
+        delem=Matrix::rowSums(d[[elem]])/numvals 
         delem[numvals==0]=0
         dim(delem)=attr(d[[elem]],"free.dims")[1:2]
-        numvals=apply(f[[elem]]!=0,1,sum)
-        felem=apply(f[[elem]],1,sum)/numvals
+        numvals=Matrix::rowSums(f[[elem]]!=0)
+        felem=Matrix::rowSums(f[[elem]])/numvals
         felem[numvals==0]=0
         #use a pseudoinverse here so D's with 0 columns don't fail
-        parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
+        #parlist[[elem]]=pinv(t(delem)%*%delem)%*%t(delem)%*%(tmp-felem)
+        parlist[[elem]]=pinv(crossprod(delem))%*%crossprod(delem, tmp-felem)
       }
     } #c("Q","R","B","V0")
 
