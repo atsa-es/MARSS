@@ -95,14 +95,15 @@ MARSShatyt = function( MLEobj ) {
       }
       hatyt[,t]=y[,t,drop=FALSE] - Delta.r%*%(y[,t,drop=FALSE]-pari$Z%*%hatxt[,t,drop=FALSE]-pari$A)
       hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
-      t.DZ = matrix(Delta.r%*%pari$Z,m,n,byrow=TRUE)
-      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + tcrossprod(hatyt[,t,drop=FALSE])
-#      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n)
-      hatyxt[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE], hatxt[,t,drop=FALSE])+Delta.r%*%pari$Z%*%hatVt[,,t]
+      #t.DZ = matrix(Delta.r%*%pari$Z,m,n,byrow=TRUE)
+      DZ = Delta.r%*%pari$Z
+      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R + DZ%*%tcrossprod(hatVt[,,t], DZ))%*%I.2 + tcrossprod(hatyt[,t,drop=FALSE])
+#      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + hatyt[,t,drop=FALSE]%*%t(hatyt[,t,drop=FALSE],1,n)
+      hatyxt[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE], hatxt[,t,drop=FALSE])+DZ%*%hatVt[,,t]
 #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%t(hatxt[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVt[,,t]
-      hatyxtt1[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxt1[,t,drop=FALSE])+Delta.r%*%pari$Z%*%hatVtt1[,,t]
+      hatyxtt1[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxt1[,t,drop=FALSE])+DZ%*%hatVtt1[,,t]
 #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%t(hatxt1[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVtt1[,,t]
-      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%base::tcrossprod(pari$Z, hatVtpt[,,t])
+      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE]) + base::tcrossprod(DZ, hatVtpt[,,t])
       #hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%pari$Z%*%t(hatVtpt[,,t])
     }
   } #for loop over time
