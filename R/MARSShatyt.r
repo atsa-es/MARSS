@@ -52,7 +52,7 @@ MARSShatyt = function( MLEobj ) {
   # for notation purposes, 't' represents current point in time, 'TT' represents the length of the series
   #notation bad.  should be hatytT
   hatyt = hatytt1 = y # faster than matrix(0,n,TT)     
-  hatOt = hatVt # faster than array(0,dim=c(n,n,TT))     
+  hatOt = array(0,dim=c(n,n,TT))     
   hatyxt = hatyxtt1 = hatyxttp = array(0,dim=c(n,m,TT))
   
   for (t in 1:TT) {
