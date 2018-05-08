@@ -531,6 +531,13 @@ apermM = function(x, r, c){
   return(x)
 }
 
+#add dense and sparse vectors (matrix and Matrix column vecs)
+addxm = function(x, m){
+  row = m@i
+  x[row] = x[row] + m@x
+  return(x)
+}
+
 is.wholenumber = function(x, tol = .Machine$double.eps^0.5) {
   if(!is.numeric(x)) return(FALSE)
   test = abs(x - round(x)) < tol
