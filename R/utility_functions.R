@@ -634,7 +634,7 @@ convert.model.mat=function(param.matrix){
   
   nvar = length(varnames) #number of variables
   if(isMatrix){
-    free=Matrix::Matrix(0,dim.f1*nvar,Tmax)
+    free=Matrix::Matrix(0,dim.f1*nvar,Tmax,sparse=TRUE)
   }else{
     free=array(0,dim=c(dim.f1,nvar,Tmax))
   }
