@@ -189,7 +189,7 @@ MARSSkem = function( MLEobj ) {
         if(time.varying[["A"]] & i>1){ A = parmat(MLEobj.iter, "A", t=i)$A }
         if(time.varying[["R"]] | i==1){ 
           dR = subFree2D(d[["R"]],t=i) #by def, i goes to TT if time-varying
-          if(isMatrix) t.dR.dR = t.dR.dR + as.matrix(Matrix::crossprod(dR)) else t.dR.dR = t.dR.dR + base::crossprod(dR)
+          if(isMatrix) t.dR.dR = t.dR.dR + as.matrix(crossprod(dR)) else t.dR.dR = t.dR.dR + base::crossprod(dR)
         }
         hatyt = Ey[["ytT"]][,i,drop=FALSE]; hatyxt=sub3D(Ey[["yxtT"]],t=i); hatOt = sub3D(Ey[["OtT"]],t=i)
         hatxt = kf[["xtT"]][,i,drop=FALSE]
@@ -276,7 +276,7 @@ MARSSkem = function( MLEobj ) {
                  - base::tcrossprod(U, X1) - base::tcrossprod(X1, U) + base::tcrossprod(U, B%*%X0) + base::tcrossprod(B%*%X0, U) + base::tcrossprod(U)) #U%*%t.U
         sum1a = symm(sum1a) #symmetry function from MARSSkf
         if(isMatrix) sum1 = as.matrix(Matrix::crossprod(dQ, vec(sum1a))) else sum1 = base::crossprod(dQ, vec(sum1a))
-        if(isMatrix) t.dQ.dQ = as.matrix(Matrix::crossprod(dQ)) else t.dQ.dQ = base::crossprod(dQ)
+        if(isMatrix) t.dQ.dQ = as.matrix(crossprod(dQ)) else t.dQ.dQ = base::crossprod(dQ)
       }
       if(kf.x0=="x10"){
         sum1 = 0; t.dQ.dQ=0; TT.numer = TT-1
@@ -293,7 +293,7 @@ MARSSkem = function( MLEobj ) {
         if(time.varying[["U"]] ){ U = parmat(MLEobj.iter, "U", t=i)$U }
         if(time.varying[["Q"]] ){ 
           dQ = subFree2D(d[["Q"]],t=i)
-          if(isMatrix) t.dQ.dQ = t.dQ.dQ + as.matrix(Matrix::crossprod(dQ)) else t.dQ.dQ = t.dQ.dQ + base::crossprod(dQ) 
+          if(isMatrix) t.dQ.dQ = t.dQ.dQ + as.matrix(crossprod(dQ)) else t.dQ.dQ = t.dQ.dQ + base::crossprod(dQ) 
         }
         sum1a = (S11 - base::tcrossprod(B,S10) - base::tcrossprod(S10, B) + base::tcrossprod(B%*%S00,B)
                  - base::tcrossprod(U, X1) - base::tcrossprod(X1, U) + base::tcrossprod(U,B%*%X0) + base::tcrossprod(B%*%X0, U) + base::tcrossprod(U))
@@ -885,8 +885,8 @@ MARSSkem = function( MLEobj ) {
         }
         PkronR = kronecker( Pt, starR )
         if(isMatrix){
-          numer = numer + as.matrix(Matrix::crossprod(dZ, vec(starR%*%(hatyxt-base::tcrossprod(A, hatxt))) - PkronR%*%fZ))
-          denom = denom + as.matrix(Matrix::crossprod(dZ, PkronR%*%dZ))
+          numer = numer + as.matrix(crossprod(dZ, vec(starR%*%(hatyxt-base::tcrossprod(A, hatxt))) - PkronR%*%fZ))
+          denom = denom + as.matrix(crossprod(dZ, PkronR%*%dZ))
         }else{
           numer = numer + base::crossprod(dZ, vec(starR%*%(hatyxt-base::tcrossprod(A, hatxt))) - PkronR%*%fZ)
           denom = denom + base::crossprod(dZ, PkronR%*%dZ)
