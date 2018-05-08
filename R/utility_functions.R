@@ -835,7 +835,7 @@ subFree2D=function(x,t=1){
   x.dims = attr(x, "free.dims")
   x.names = attr(x, "estimate.names")
   if(dim(x)[2]!=1) x=x[,t,drop=FALSE]
-  if(x.dims[2]!=1) dim(x) = x.dims[1:2]
+  if(x.dims[2]!=1) x = apermM(x, x.dims[1], x.dims[2]) #dim(x) = x.dims[1:2]
   colnames(x) = x.names
   return(x)
 }
