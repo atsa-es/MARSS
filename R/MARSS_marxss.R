@@ -655,15 +655,18 @@ marxss_to_marss=function(x, only.par=FALSE){
         # in 2D vec form, we need the vec of this D_U, but we don't have D_C OR D_U
         # we have vD_C and vD_U (2D vec form)
         # we will do this by reforming D_C and D_U from vD_C and vD_U
-        tmp.free=Matrix(0,(dim.free[1]+dim.free[3])*(dim.free[2]+dim.free[4]),Tmax.free,sparse=TRUE)
+        # need to ensure that a dgCMatrix is created not dsCMatrix
+        tmp.free=Matrix::sparseMatrix(i=integer(0),j=integer(0),x=numeric(0),dims=c((dim.free[1]+dim.free[3])*(dim.free[2]+dim.free[4]),Tmax.free))
         attr(tmp.free,"estimate.names")=c(attr(free[[el]],"estimate.names"), attr(free[[el2]],"estimate.names"))
         attr(tmp.free,"free.dims")=c(dim.free[1]+dim.free[3], dim.free[2]+dim.free[4], Tmax.free)
         # need for reconstructing
         dim.free.el = attr(free[[el]], "free.dims")
         dim.free.el2 = attr(free[[el2]], "free.dims")
         for(t in 1:Tmax.free){
-          tmp.el = Matrix(free[[el]][,min(t,dim.free.el[3])], dim.free.el[1], dim.free.el[2],sparse=TRUE)
-          tmp.el2 = Matrix(free[[el2]][,min(t,dim.free.el2[3])], dim.free.el2[1], dim.free.el2[2],sparse=TRUE)
+          #tmp.el = Matrix(free[[el]][,min(t,dim.free.el[3])], dim.free.el[1], dim.free.el[2],sparse=TRUE)
+          tmp.el = perm.sparse(free[[el]][,min(t,dim.free.el[3]),drop=FASE], dim.free.el[1], dim.free.el[2])
+          #tmp.el2 = Matrix(free[[el2]][,min(t,dim.free.el2[3])], dim.free.el2[1], dim.free.el2[2],sparse=TRUE)
+          tmp.el2 = perm.sparse(free[[el2]][,min(t,dim.free.el2[3]),drop=FALSE], dim.free.el2[1], dim.free.el2[2])
           tmp.free[,t]=as.vector(bdiag(tmp.el, tmp.el2))
         }
 
@@ -761,10 +764,11 @@ marxss_to_marss=function(x, only.par=FALSE){
         Im = Diagonal(nm)
         Ip = Diagonal(num.p)
         #need the new marss U and A dims here which were defined above
-        free[[el]]=Matrix(0,nm*num.p,Tmax,sparse=TRUE)
+        #need to ensure that a dgCMatrix is created
+        free[[el]]=Matrix::sparseMatrix(i=integer(0),j=integer(0),x=numeric(0),dims=c(nm*num.p,Tmax))
         attr(free[[el]],"estimate.names")=attr(free.orig,"estimate.names")
         attr(free[[el]],"free.dims")=c(nm, num.p, Tmax)
-        fixed[[el]]=Matrix(0,nm,Tmax)
+        fixed[[el]]=Matrix::sparseMatrix(i=integer(0),j=integer(0),x=numeric(0), dims=c(nm,Tmax))
         for(t in 1:Tmax){
           #the f and D of U (or A)
           f.t=fixed.orig[,t=min(t,dim.fixed3),drop=FALSE]
