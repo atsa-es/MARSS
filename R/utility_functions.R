@@ -518,7 +518,7 @@ vparmat2 = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L
   return(par.mat)
 }
 
-# x is a r*c x 1 free matrix
+# x is a r*c x 1 dgCMatrix
 perm.sparse = function(x, r, c){
   row = x@i %% r
   col = x@i %/% r
@@ -531,31 +531,29 @@ perm.sparse = function(x, r, c){
   return(x)
 }
 
-# x is a r*c x 1 free matrix
-vec.sparse = function(x, r, c){
-  row = x@i %% r
-  col = x@i %/% r
-  tmp = rep(0,c+1)
-  for(i in col+2) tmp[i] = tmp[i]+1
-  p = cumsum(tmp)
-  x@i = as.integer(row)
+# x is a r, c dgCMatrix matrix
+vec.sparse = function(x){
+  col=x@Dim[2]; row=x@Dim[1]
+  p = c(0, x@p[col+1])
+  i=(row*(0:(col-1)))[as.logical(diff(x@p))]
+  x@i = as.integer(i+x@i)
   x@p = as.integer(p)
-  x@Dim = as.integer(c(r,c))
+  x@Dim = as.integer(c(row*col,1))
   return(x)
 }
-#add dense and sparse vectors (matrix and Matrix column vecs)
+
+#add dense and dgCMatrix col vec (matrix and Matrix column vecs)
 addxm = function(x, m){
   row = m@i
   x[row] = x[row] + m@x
   return(x)
 }
 
-addXM = function(x, m){
-  row = m@i
-  rowvals = unique(row)
-  for(i in rowvals) x
-  x[row] = x[row] + m@x
-  return(x)
+addXM = function(X, M){
+  x = vec(X)
+  m = vec.sparse(M)
+  xm = addxm(x, m)
+  return(unvec(xm,dim=dim(X)))
 }
 
 is.wholenumber = function(x, tol = .Machine$double.eps^0.5) {
@@ -661,7 +659,7 @@ convert.model.mat=function(param.matrix){
   
   nvar = length(varnames) #number of variables
   if(isMatrix){
-    free=Matrix::Matrix(0,dim.f1*nvar,Tmax,sparse=TRUE)
+    free=Matrix::sparseMatrix(i=integer(0), j=integer(0), x=numeric(0), dims=c(dim.f1*nvar,Tmax))
   }else{
     free=array(0,dim=c(dim.f1,nvar,Tmax))
   }
