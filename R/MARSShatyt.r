@@ -104,7 +104,7 @@ MARSShatyt = function( MLEobj ) {
       hatyxtt1[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxt1[,t,drop=FALSE])+DZ%*%hatVtt1[,,t]
 #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%t(hatxt1[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVtt1[,,t]
       if(t==TT){ hatyxttp[,,t] = NA }else{
-      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE]) + base::tcrossprod(DZ, Vtt1T[,,t+1])
+      hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE]) + base::tcrossprod(DZ, hatVtt1[,,t+1])
       }
       #hatyxttp[,,t]=base::tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%pari$Z%*%t(hatVtpt[,,t])
     }
