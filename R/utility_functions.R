@@ -519,7 +519,7 @@ vparmat2 = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L
 }
 
 # x is a r*c x 1 free matrix
-apermM = function(x, r, c){
+perm.sparse = function(x, r, c){
   row = x@i %% r
   col = x@i %/% r
   tmp = rep(0,c+1)
@@ -531,9 +531,29 @@ apermM = function(x, r, c){
   return(x)
 }
 
+# x is a r*c x 1 free matrix
+vec.sparse = function(x, r, c){
+  row = x@i %% r
+  col = x@i %/% r
+  tmp = rep(0,c+1)
+  for(i in col+2) tmp[i] = tmp[i]+1
+  p = cumsum(tmp)
+  x@i = as.integer(row)
+  x@p = as.integer(p)
+  x@Dim = as.integer(c(r,c))
+  return(x)
+}
 #add dense and sparse vectors (matrix and Matrix column vecs)
 addxm = function(x, m){
   row = m@i
+  x[row] = x[row] + m@x
+  return(x)
+}
+
+addXM = function(x, m){
+  row = m@i
+  rowvals = unique(row)
+  for(i in rowvals) x
   x[row] = x[row] + m@x
   return(x)
 }
@@ -842,7 +862,7 @@ subFree2D=function(x,t=1){
   x.dims = attr(x, "free.dims")
   x.names = attr(x, "estimate.names")
   if(dim(x)[2]!=1) x=x[,t,drop=FALSE]
-  if(x.dims[2]!=1) x = apermM(x, x.dims[1], x.dims[2]) #dim(x) = x.dims[1:2]
+  if(x.dims[2]!=1) x = perm.sparse(x, x.dims[1], x.dims[2]) #dim(x) = x.dims[1:2]
   colnames(x) = x.names
   return(x)
 }
