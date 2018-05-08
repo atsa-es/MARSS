@@ -532,27 +532,51 @@ perm.sparse = function(x, r, c){
 }
 
 # x is a r, c dgCMatrix matrix
-vec.sparse = function(x){
+vec.sparse2 = function(x){
   col=x@Dim[2]; row=x@Dim[1]
   p = c(0, x@p[col+1])
-  i=(row*(0:(col-1)))[as.logical(diff(x@p))]
-  x@i = as.integer(i+x@i)
+  nr=(row*(0:(col-1)))
+  i = x@i
+  j = as(x,"TsparseMatrix")@j
+  i = i+nr[j+1]
+  x@i = as.integer(i)
   x@p = as.integer(p)
   x@Dim = as.integer(c(row*col,1))
   return(x)
 }
 
-#add dense and dgCMatrix col vec (matrix and Matrix column vecs)
+# uglier than vec.sparse2 but 2x as fast
+vec.sparse = function(x){
+  col=x@Dim[2]; row=x@Dim[1]
+  i = x@i
+  one = as.integer(1)
+  pp = (one:col)[diff(x@p)!=0]
+  np = c(0,x@p[pp+1])
+  nr=(pp-one)*row
+  for(ii in 2:length(np)) i[(np[ii-1]+1):np[ii]]=i[(np[ii-1]+1):np[ii]]+nr[ii-1]
+  x@i = i
+  x@p = c(integer(1), x@p[col+1])
+  x@Dim = c(row*col,one)
+  return(x)
+}
+
+#add dense + dgeCMatrix or dgCMatrix col vec
 addxm = function(x, m){
-  row = m@i
+  if(is(m,"dgeMatrix")) return(x+m@x)
+  row = m@i + 1
   x[row] = x[row] + m@x
   return(x)
 }
 
+# Add a dense + dgeMatrix or dense + dgCMatrix
 addXM = function(X, M){
   x = vec(X)
+  if(is(M,"dgeMatrix")){ 
+    xm = x+M@x
+  }else{
   m = vec.sparse(M)
   xm = addxm(x, m)
+  }
   return(unvec(xm,dim=dim(X)))
 }
 
