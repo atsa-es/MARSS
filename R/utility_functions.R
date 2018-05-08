@@ -518,6 +518,19 @@ vparmat2 = function( MLEobj, elem=c("B","U","Q","Z","A","R","x0","V0","G","H","L
   return(par.mat)
 }
 
+# x is a r*c x 1 free matrix
+apermM = function(x, r, c){
+  row = x@i %% r
+  col = x@i %/% r
+  tmp = rep(0,c+1)
+  for(i in col+2) tmp[i] = tmp[i]+1
+  p = cumsum(tmp)
+  x@i = as.integer(row)
+  x@p = as.integer(p)
+  x@Dim = as.integer(c(r,c))
+  return(x)
+}
+
 is.wholenumber = function(x, tol = .Machine$double.eps^0.5) {
   if(!is.numeric(x)) return(FALSE)
   test = abs(x - round(x)) < tol
