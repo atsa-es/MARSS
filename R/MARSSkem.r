@@ -298,7 +298,8 @@ MARSSkem = function( MLEobj ) {
         sum1a = (S11 - base::tcrossprod(B,S10) - base::tcrossprod(S10, B) + base::tcrossprod(B%*%S00,B)
                  - base::tcrossprod(U, X1) - base::tcrossprod(X1, U) + base::tcrossprod(U,B%*%X0) + base::tcrossprod(B%*%X0, U) + base::tcrossprod(U))
         sum1a = symm(sum1a) #enforce symmetry function from MARSSkf
-        if(isMatrix) sum1 = sum1 + as.matrix(Matrix::crossprod(dQ, vec(sum1a))) else sum1 = sum1 + base::crossprod(dQ, vec(sum1a))
+        if(isMatrix) sum1 = addxm(sum1, crossprod(dQ, vec(sum1a))) else sum1 = sum1 + base::crossprod(dQ, vec(sum1a))
+        #if(isMatrix) sum1 = sum1 + as.matrix(Matrix::crossprod(dQ, vec(sum1a))) else sum1 = sum1 + base::crossprod(dQ, vec(sum1a))
       }
       
       #pcholinv because there might be all zero cols in dQ; won't equal matrix(0,1,1) since !is.fixed
