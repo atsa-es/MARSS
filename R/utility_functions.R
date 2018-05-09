@@ -548,12 +548,15 @@ vec.sparse2 = function(x){
 # uglier than vec.sparse2 but 2x as fast
 vec.sparse = function(x){
   col=x@Dim[2]; row=x@Dim[1]
+  if(col==1) return(x)
   i = x@i
   one = as.integer(1)
+  if(length(i)!=0){
   pp = (one:col)[diff(x@p)!=0]
   np = c(0,x@p[pp+1])
   nr=(pp-one)*row
   for(ii in 2:length(np)) i[(np[ii-1]+1):np[ii]]=i[(np[ii-1]+1):np[ii]]+nr[ii-1]
+  }
   x@i = i
   x@p = c(integer(1), x@p[col+1])
   x@Dim = c(row*col,one)
@@ -570,13 +573,20 @@ addxm = function(x, m){
 
 # Add a dense + dgeMatrix or dense + dgCMatrix
 addXM = function(X, M){
-  x = vec(X)
-  if(is(M,"dgeMatrix")){ 
+  Xdge = is(X, "dgeMatrix")
+  Mdge = is(M,"dgeMatrix")
+  if(Xdge){
+    x = X@x
+  }else{
+    if(is.null(dim(X))) x=X else x = vec(X)
+  }
+  if(Mdge){ 
     xm = x+M@x
   }else{
-  m = vec.sparse(M)
-  xm = addxm(x, m)
+    m = vec.sparse(M)
+    xm = addxm(x, m)
   }
+  if(Xdge){ X@x=xm; return(X) }
   return(unvec(xm,dim=dim(X)))
 }
 
