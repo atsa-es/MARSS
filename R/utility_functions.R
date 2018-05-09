@@ -590,6 +590,45 @@ addXM = function(X, M){
   return(unvec(xm,dim=dim(X)))
 }
 
+## Other approaches to adding 2 matrices but not faster
+
+# Add a dense + dgeMatrix or dense + dgCMatrix
+addXM2 = function(X, M){
+  col = dim(X)[2]
+  i = 1:(col*2)
+  j = rep(1:col,2)
+  B = sparseMatrix(i=i, j=j, x=1) # rbind(Diagonal(col), Diagonal(col))
+  A = cbind(X, M)
+  return(A%*%B)
+}
+
+addXM3 = function(X, M){
+  col = dim(X)[2]
+  A = cbind(X, M)
+  i = rep(c(0,col),col)+rep(0:(col-1),each=2)
+  B = A
+  B@i = as.integer(i)
+  B@p = as.integer(seq(0,2*col,by=2))
+  B@x = rep(1,col*2)
+  B@Dim = as.integer(c(2*col,col))
+  return(A%*%B)
+}
+
+addXM4 = function(X, M, X2, M2){
+  nm = 4
+  col = dim(X)[2]
+  A = cbind(X, M, X2, M2)
+  i = rep(seq(0,col*(nm-1),col),col)+rep(0:(col-1),each=nm)
+  B = A
+  B@i = as.integer(i)
+  B@p = as.integer(seq(0,nm*col,by=nm))
+  B@x = rep(1,col*nm)
+  B@Dim = as.integer(c(nm*col,col))
+  return(A%*%B)
+}
+
+##################################################
+
 is.wholenumber = function(x, tol = .Machine$double.eps^0.5) {
   if(!is.numeric(x)) return(FALSE)
   test = abs(x - round(x)) < tol
