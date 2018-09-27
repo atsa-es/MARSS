@@ -8,6 +8,7 @@ MARSS = function(y,
                  silent = FALSE,
                  control = NULL,
                  fun.kf = "MARSSkfas",
+                 use.cpp = FALSE,
                  ... 
 ) 
 {
@@ -157,7 +158,14 @@ MARSS = function(y,
       }else{ #there is something to estimate
         if(silent==2 ) cat(paste("Fitting model with ",method,".\n",sep=""))
         ## Fit and add param estimates to the object
-        if(method %in% kem.methods) MLEobj = MARSSkem(MLEobj)
+          ## choose C++ or R version of MARSSkem()
+        if(method %in% kem.methods)
+          MLEobj = if(use.cpp) {
+            library(KFAS)
+            marsskem(MLEobj)
+          } else {
+            MARSSkem(MLEobj)
+          }
         if(method %in% optim.methods) MLEobj = MARSSoptim(MLEobj)
       }
       
