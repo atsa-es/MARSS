@@ -1,3 +1,6 @@
+## Rcpp support
+useDynLib(MARSS)
+importFrom(Rcpp, evalCpp)
 
 ## export functions
 export(
@@ -23,7 +26,8 @@ export(
   zscore,
   augment.marssMLE,
   tidy.marssMLE,
-  glance.marssMLE
+  glance.marssMLE,
+  marsskem
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
@@ -49,3 +53,4 @@ importFrom(mvtnorm, rmvnorm)
 importFrom(nlme, fdHess)
 importFrom(KFAS, SSModel, SSMcustom, KFS)
 importFrom("grDevices", "contourLines")
+

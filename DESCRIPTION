@@ -11,7 +11,9 @@ Imports:
     mvtnorm, 
     nlme, 
     stats, 
-    utils
+    utils,
+    Rcpp (>= 0.12.5),
+    RcppArmadillo
 Suggests: 
     broom,
     Formula, 
@@ -32,3 +34,4 @@ BuildVignettes: yes
 ByteCompile: TRUE
 URL: https://nwfsc-timeseries.github.io/MARSS
 BugReports: https://github.com/nwfsc-timeseries/MARSS/issues
+LinkingTo: Rcpp, RcppArmadillo
