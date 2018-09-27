@@ -1030,7 +1030,7 @@ rerun.kf = function(elem, MLEobj, iter){    #Start~~~~~~~~Error checking
 
 degen.test = function(elem, MLEobj, iter){
   if( is.fixed(MLEobj$marss$free[[elem]]) ) return(list(MLEobj=MLEobj, msg=NULL, set.degen=FALSE))
-  if( MLEobj$constr.type[[elem]]=="time-varying" ) return(list(MLEobj=MLEobj, msg=NULL, set.degen=FALSE))
+  if( startsWith(MLEobj$constr.type[[elem]],"time-varying" )) return(list(MLEobj=MLEobj, msg=NULL, set.degen=FALSE))
   if( !MLEobj$control$allow.degen ) return(list(MLEobj=MLEobj, msg=NULL, set.degen=FALSE))
   if( iter<=MLEobj$control$min.degen.iter ) return(list(MLEobj=MLEobj, msg=NULL, set.degen=FALSE))
   if( !is.design(MLEobj$marss$free[[elem]], zero.rows.ok=TRUE) )
