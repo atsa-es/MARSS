@@ -3,6 +3,18 @@ MARSS Development site
 New work on MARSS before posting to CRAN is at ``https://nwfsc-timeseries.github.io/MARSS/''.  Notes on known issues are also posted there.
 
 
+CHANGES IN MARSS 3.10.10
+------------------------------------
+Minor update to declare S3 objects if user has broom package installed.
+
+* is.validvarcov() is expensive.  Minimize use in MARSSaic, MARSSboot, MARSSoptim, MARSSparamCIs, MARSSsimulate, MARSS_marxss.
+* Add is.diagonal() util function
+* MARSSkfss had bug on V0T line.  * instead of %*%.  This code is almost never called.
+* MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
+* Add if statement to declare S3 objects in NAMESPACE if user has broom package installed.
+* Typo in User Guide Chapter 2.  R was supposed to be "diagonal and equal" in the first example.
+
+
 CHANGES IN MARSS 3.10
 ------------------------------------
 
