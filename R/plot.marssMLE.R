@@ -4,9 +4,9 @@ plot.marssMLE <-
            form=c("marxss", "marss", "dfa"), 
            conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
   {
-
+    
     # Argument checks
-    plot.type = match.arg(plot.type, several.ok = FALSE)
+    plot.type = match.arg(plot.type, several.ok = TRUE)
     if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if(!(conf.int%in%c(TRUE,FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     
@@ -30,8 +30,6 @@ plot.marssMLE <-
     # End Argument checks
     
     alpha = 1-conf.level
-    plts = list()
-    
     
     if("states" %in% plot.type) {
       # make plot of states and CIs
@@ -48,14 +46,27 @@ plot.marssMLE <-
       }else{
         states$term = paste0("State ",states$term)
       }
-      p1 = ggplot2::ggplot(data=states, ggplot2::aes_(~t, ~estimate))
-      if(conf.int) p1 = p1 + ggplot2::geom_ribbon(data=states, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), alpha=0.3, col="grey")
-      p1 = p1 +
-        ggplot2::geom_line() + 
-        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~term, scale="free_y")
-      plts[["states"]] = p1
-      if(identical(plot.type, "states")) return(p1)
+      
+      nX = min(9,attr(x$model, "model.dims")$x[1])
+      plot.nrow = round(sqrt(nX))
+      plot.ncol = ceiling(nX/plot.nrow)
+      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
+      for(plt in unique(states$term)){
+        with(subset(states, term==plt), {
+          ylims=c(min(estimate,conf.low,na.rm=TRUE),max(estimate,conf.high,na.rm=TRUE))
+          plot(t, estimate, type="l", xlab="", ylab="Estimate", ylim=ylims)
+          title(plt)
+          if(conf.int) polygon(c(t, rev(t)), c(conf.low, rev(conf.high)),col="grey",border=FALSE)
+          lines(t,estimate)
+          box()
+        })
+      }
+      plot.type = plot.type[plot.type!="states"]
+      cat(paste("plot type = Estimated States\n"))
+      if(length(plot.type) != 0){
+        ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
+        if(tolower(ans)=="q") return()
+      }
     }
     
     if("observations" %in% plot.type) {
@@ -63,20 +74,26 @@ plot.marssMLE <-
       df = augment.marssMLE(x, "observations", form=model_form)
       df$ymin = df$.fitted - qnorm(alpha/2)*df$.se.fit
       df$ymax = df$.fitted + qnorm(alpha/2)*df$.se.fit
-      nY = attr(x$model, "model.dims")$y[1]
+      nY = min(9,attr(x$model, "model.dims")$y[1])
       plot.ncol = round(sqrt(nY))
       plot.nrow = ceiling(nY/plot.ncol)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in levels(df$.rownames)){
         with(subset(df, .rownames==plt), {
           ylims=c(min(.fitted,y,ymin,ymax,na.rm=TRUE),max(.fitted,y,ymin,ymax,na.rm=TRUE))
-        plot(t,.fitted, type="l",xlab="",ylab="Estimate",ylim=ylims)
-        title(plt)
-      if(conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)),col="grey",border=FALSE)
-        lines(t,.fitted)
-        points(t,y,col="blue",pch=19)
-        box()
+          plot(t,.fitted, type="l",xlab="",ylab="Estimate",ylim=ylims)
+          title(plt)
+          if(conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)),col="grey",border=FALSE)
+          lines(t,.fitted)
+          points(t,y,col="blue",pch=19)
+          box()
         })
+      }
+      plot.type = plot.type[plot.type!="observations"]
+      cat(paste("plot type = Observations with Fitted Values\n"))
+      if(length(plot.type) != 0){
+        ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
+        if(tolower(ans)=="q") return()
       }
     }
     
@@ -84,7 +101,7 @@ plot.marssMLE <-
       # make plot of observation residuals
       df = augment.marssMLE(x, "observations", form="marxss")
       df$.resids[is.na(df$y)]=NA
-      nY = attr(x$model, "model.dims")$y[1]
+      nY = min(9,attr(x$model, "model.dims")$y[1])
       plot.ncol = round(sqrt(nY))
       plot.nrow = ceiling(nY/plot.ncol)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
@@ -105,7 +122,7 @@ plot.marssMLE <-
           if(decorate){ 
             polygon(c(t, rev(t)), 
                     c(ymin, rev(ymax)),
-                      col="grey",border=FALSE)
+                    col="grey",border=FALSE)
             lines(t,lo$fit, col="blue")
           }
           points(t,.resids,col="blue",pch=19)
@@ -114,22 +131,55 @@ plot.marssMLE <-
         })
         mtext("Observation residuals, y - E[y]",side=2,outer=TRUE,line=-1)
       }
+      plot.type = plot.type[plot.type!="model.residuals"]
+      cat(paste("plot type = Model Residuals\n"))
+      if(length(plot.type) != 0){
+        ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
+        if(tolower(ans)=="q") return()
+      }
     }
-
+    
     if("state.residuals" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
       df = augment.marssMLE(x, "states", form="marxss")
       df$.rownames = paste0("State ",df$.rownames)
-      p1 = ggplot2::ggplot(df[!is.na(df$.resids),], ggplot2::aes_(~t, ~.resids)) + 
-        ggplot2::geom_point(col="blue") + 
-        ggplot2::xlab("Time") + 
-        ggplot2::ylab("State residuals, xtT - E[x]") +
-        ggplot2::facet_wrap(~.rownames, scale="free_y") + 
-        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3)
-      if(decorate) p1 = p1 + ggplot2::stat_smooth(method="loess", se=conf.int, level=conf.level, na.rm=TRUE)
-      plts[["state.residuals"]] = p1
-      if(identical(plot.type, "state.residuals")) return(p1)
-    }  
+      nX = min(9,attr(x$model, "model.dims")$x[1])
+      plot.nrow = round(sqrt(nX))
+      plot.ncol = ceiling(nX/plot.nrow)
+      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
+      for(plt in unique(df$.rownames)){
+        with(subset(df, .rownames==plt), {
+          ylims=c(min(.resids,na.rm=TRUE),max(.resids,na.rm=TRUE))
+          if(decorate){ 
+            lo = predict(loess(.resids~t), newdata=data.frame(t=t),se=TRUE)
+            lo.t=names(lo$fit)
+            alp=qnorm((1-conf.level)/2)*lo$se.fit
+            ymin=alp + lo$fit
+            ymax=-1*alp + lo$fit
+            ylims=c(min(.resids,ymin,na.rm=TRUE),max(.resids,ymax,na.rm=TRUE))
+          }
+          plot(t,.resids, type="p", xlab="",
+               ylab="",col="blue",ylim=ylims)
+          title(plt)
+          if(decorate){ 
+            polygon(c(t, rev(t)), 
+                    c(ymin, rev(ymax)),
+                    col="grey",border=FALSE)
+            lines(t,lo$fit, col="blue")
+          }
+          points(t,.resids,col="blue",pch=19)
+          box()
+          abline(h=0, lty=3)
+        })
+        mtext("State residuals, xtT - E[x]",side=2,outer=TRUE,line=-1)
+      }
+      plot.type = plot.type[plot.type!="state.residuals"]
+      cat(paste("plot type = State Residuals\n"))
+      if(length(plot.type) != 0){
+        ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
+        if(tolower(ans)=="q") return()
+      }
+    }
     
     slp = function(yy){
       y <- quantile(yy[!is.na(yy)], c(0.25, 0.75))
@@ -150,15 +200,22 @@ plot.marssMLE <-
       df = augment.marssMLE(x, "observations", form="marxss")
       slope=tapply(df$.std.resid,df$.rownames,slp)
       intercept=tapply(df$.std.resid,df$.rownames,int)
-      abline.dat=data.frame(.rownames=names(slope), slope=slope, intercept=intercept)
-      p1 = ggplot2::ggplot(df) +
-        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
-        ggplot2::xlab("Theoretical Quantiles") + 
-        ggplot2::ylab("Standardized Model Residuals") +
-        ggplot2::facet_wrap(~.rownames, scale="free_y")
-      if(decorate) p1 = p1 + ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue")
-      plts[["model.residuals.qqplot"]] = p1
-      if(identical(plot.type, "model.residuals.qqplot")) return(p1)
+      nY = min(9,attr(x$model, "model.dims")$y[1])
+      plot.ncol = round(sqrt(nY))
+      plot.nrow = ceiling(nY/plot.ncol)
+      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
+      for(plt in levels(df$.rownames)){
+        with(subset(df, .rownames==plt), {
+          qqnorm(.std.resid, main=plt)
+          abline(a=intercept[plt], b=slope[plt], col="blue")
+        })
+      }
+      plot.type = plot.type[plot.type!="model.residuals.qqplot"]
+      cat(paste("plot type = Model Standardized Residuals\n"))
+      if(length(plot.type) != 0){
+        ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
+        if(tolower(ans)=="q") return()
+      }
     }  
     
     if("state.residuals.qqplot" %in% plot.type) {
@@ -167,24 +224,22 @@ plot.marssMLE <-
       df$.rownames = paste0("State ",df$.rownames)
       slope=tapply(df$.std.resid,df$.rownames,slp)
       intercept=tapply(df$.std.resid,df$.rownames,int)
-      abline.dat=data.frame(.rownames=names(slope), slope=slope, intercept=intercept)
-      p1 = ggplot2::ggplot(df) +
-        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
-        ggplot2::xlab("Theoretical Quantiles") + 
-        ggplot2::ylab("Standardized State Residuals") +
-        ggplot2::facet_wrap(~.rownames, scales="free_y")
-      if(decorate) p1 = p1 + ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue")
-      plts[["state.residuals.qqplot"]] = p1
-      if(identical(plot.type, "state.residuals.qqplot")) return(p1)
-    }    
-    for(i in plot.type){
-      print(plts[[i]])
-      if(i != plot.type[length(plot.type)]){
-        cat(paste("plot.type =",i,"\n"))
+      nX = min(9,attr(x$model, "model.dims")$x[1])
+      plot.nrow = round(sqrt(nX))
+      plot.ncol = ceiling(nX/plot.nrow)
+      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
+      for(plt in unique(df$.rownames)){
+        with(subset(df, .rownames==plt), {
+          qqnorm(.std.resid, main=plt)
+          abline(a=intercept[plt], b=slope[plt], col="blue")
+        })
+      }
+      plot.type = plot.type[plot.type!="state.residuals.qqplot"]
+      cat(paste("plot type = Standardized State Residuals\n"))
+      if(length(plot.type) != 0){
         ans <- readline(prompt="Hit <Return> to see next plot (q to exit): ")
         if(tolower(ans)=="q") return()
-      }else{
-        cat("Finished plots.\n")
       }
     }
+    
   }
