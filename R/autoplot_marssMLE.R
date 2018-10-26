@@ -1,12 +1,15 @@
-plot.marssMLE <- 
+autoplot.marssMLE <- 
   function(x, 
            plot.type=c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot"), 
            form=c("marxss", "marss", "dfa"), 
            conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
   {
+    if (!requireNamespace("ggplot2", quietly = TRUE)) {
+      stop("Package \"ggplot2\" needed for plot.marssMLE. Please install it.", call. = FALSE)
+    } 
 
     # Argument checks
-    plot.type = match.arg(plot.type, several.ok = FALSE)
+    plot.type = match.arg(plot.type, several.ok = TRUE)
     if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if(!(conf.int%in%c(TRUE,FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     
@@ -31,7 +34,6 @@ plot.marssMLE <-
     
     alpha = 1-conf.level
     plts = list()
-    
     
     if("states" %in% plot.type) {
       # make plot of states and CIs
@@ -63,59 +65,32 @@ plot.marssMLE <-
       df = augment.marssMLE(x, "observations", form=model_form)
       df$ymin = df$.fitted - qnorm(alpha/2)*df$.se.fit
       df$ymax = df$.fitted + qnorm(alpha/2)*df$.se.fit
-      nY = attr(x$model, "model.dims")$y[1]
-      plot.ncol = round(sqrt(nY))
-      plot.nrow = ceiling(nY/plot.ncol)
-      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
-      for(plt in levels(df$.rownames)){
-        with(subset(df, .rownames==plt), {
-          ylims=c(min(.fitted,y,ymin,ymax,na.rm=TRUE),max(.fitted,y,ymin,ymax,na.rm=TRUE))
-        plot(t,.fitted, type="l",xlab="",ylab="Estimate",ylim=ylims)
-        title(plt)
-      if(conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)),col="grey",border=FALSE)
-        lines(t,.fitted)
-        points(t,y,col="blue",pch=19)
-        box()
-        })
-      }
+      p1 = ggplot2::ggplot(data=df, ggplot2::aes_(~t, ~.fitted))
+      if(conf.int) p1 = p1 +
+        ggplot2::geom_ribbon(data=df, ggplot2::aes_(ymin = ~ymin, ymax= ~ymax), alpha=0.3, col="grey")
+      p1 = p1 +
+        ggplot2::geom_line() + 
+        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
+        ggplot2::facet_wrap(~.rownames, scale="free_y") + 
+        ggplot2::geom_point(data=df[!is.na(df$y),], ggplot2::aes_(~t, ~y), col="blue")
+      plts[["observations"]] = p1
+      if(identical(plot.type, "observations")) return(p1)
     }
     
     if("model.residuals" %in% plot.type) {
       # make plot of observation residuals
       df = augment.marssMLE(x, "observations", form="marxss")
-      df$.resids[is.na(df$y)]=NA
-      nY = attr(x$model, "model.dims")$y[1]
-      plot.ncol = round(sqrt(nY))
-      plot.nrow = ceiling(nY/plot.ncol)
-      par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
-      for(plt in levels(df$.rownames)){
-        with(subset(df, .rownames==plt), {
-          ylims=c(min(.resids,na.rm=TRUE),max(.resids,na.rm=TRUE))
-          if(decorate){ 
-            lo = predict(loess(.resids~t), newdata=data.frame(t=t),se=TRUE)
-            lo.t=names(lo$fit)
-            alp=qnorm((1-conf.level)/2)*lo$se.fit
-            ymin=alp + lo$fit
-            ymax=-1*alp + lo$fit
-            ylims=c(min(.resids,ymin,na.rm=TRUE),max(.resids,ymax,na.rm=TRUE))
-          }
-          plot(t,.resids, type="p", xlab="",
-               ylab="",col="blue",ylim=ylims)
-          title(plt)
-          if(decorate){ 
-            polygon(c(t, rev(t)), 
-                    c(ymin, rev(ymax)),
-                      col="grey",border=FALSE)
-            lines(t,lo$fit, col="blue")
-          }
-          points(t,.resids,col="blue",pch=19)
-          box()
-          abline(h=0, lty=3)
-        })
-        mtext("Observation residuals, y - E[y]",side=2,outer=TRUE,line=-1)
-      }
-    }
-
+      p1 = ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)),], ggplot2::aes_(~t, ~.resids)) + 
+        ggplot2::geom_point(col="blue") +
+        ggplot2::xlab("Time") + 
+        ggplot2::ylab("Observation residuals, y - E[y]") +
+        ggplot2::facet_wrap(~.rownames, scale="free_y") + 
+        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3)
+      if(decorate) p1 = p1 + ggplot2::stat_smooth(method="loess", se=conf.int, level=conf.level, na.rm=TRUE)
+      plts[["model.residuals"]] = p1
+      if(identical(plot.type, "model.residuals")) return(p1)
+    }  
+    
     if("state.residuals" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
       df = augment.marssMLE(x, "states", form="marxss")

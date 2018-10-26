@@ -20,10 +20,7 @@ export(
   MARSSparamCIs,
   MARSSsimulate,
   MARSSFisherI,
-  zscore,
-  augment.marssMLE,
-  tidy.marssMLE,
-  glance.marssMLE
+  zscore
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
@@ -54,4 +51,5 @@ if(getRversion() >= "3.6.0") {
        S3method(broom::augment, marssMLE)
        S3method(broom::glance, marssMLE)
        S3method(broom::tidy, marssMLE)
+       S3method(ggplot2::autoplot, marssMLE)
    }

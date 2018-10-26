@@ -13,7 +13,8 @@ Minor update to declare S3 objects if user has broom package installed.
 * MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
 * Add if statement to declare S3 objects in NAMESPACE if user has broom package installed.
 * Typo in User Guide Chapter 2.  R was supposed to be "diagonal and equal" in the first example.
-
+* changed plot.marssMLE to autoplot since it is ggplot2 based
+* created plot.marssMLE that uses only base R graphics
 
 CHANGES IN MARSS 3.10
 ------------------------------------
