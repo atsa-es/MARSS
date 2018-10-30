@@ -79,7 +79,7 @@ plot.marssMLE <-
       plot.nrow = ceiling(nY/plot.ncol)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in levels(df$.rownames)){
-        with(subset(df, .rownames==plt), {
+        with(subset(df, df$.rownames==plt), {
           ylims=c(min(.fitted,y,ymin,ymax,na.rm=TRUE),max(.fitted,y,ymin,ymax,na.rm=TRUE))
           plot(t,.fitted, type="l",xlab="",ylab="Estimate",ylim=ylims)
           title(plt)
@@ -106,7 +106,7 @@ plot.marssMLE <-
       plot.nrow = ceiling(nY/plot.ncol)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in levels(df$.rownames)){
-        with(subset(df, .rownames==plt), {
+        with(subset(df, df$.rownames==plt), {
           ylims=c(min(.resids,na.rm=TRUE),max(.resids,na.rm=TRUE))
           if(decorate){ 
             lo = predict(loess(.resids~t), newdata=data.frame(t=t),se=TRUE)
@@ -148,7 +148,7 @@ plot.marssMLE <-
       plot.ncol = ceiling(nX/plot.nrow)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in unique(df$.rownames)){
-        with(subset(df, .rownames==plt), {
+        with(subset(df, df$.rownames==plt), {
           ylims=c(min(.resids,na.rm=TRUE),max(.resids,na.rm=TRUE))
           if(decorate){ 
             lo = predict(loess(.resids~t), newdata=data.frame(t=t),se=TRUE)
@@ -229,7 +229,7 @@ plot.marssMLE <-
       plot.ncol = ceiling(nX/plot.nrow)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in unique(df$.rownames)){
-        with(subset(df, .rownames==plt), {
+        with(subset(df, df$.rownames==plt), {
           qqnorm(.std.resid, main=plt)
           abline(a=intercept[plt], b=slope[plt], col="blue")
         })
