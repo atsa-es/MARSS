@@ -41,6 +41,7 @@ data(harborSealWA)
 fit <- MARSS(t(harborSealWA[,-1]), model=list(Z=as.factor(c(1,1,1,1,2)), R="diagonal and equal"))
 plot(fit, plot.type="observations")
 
+require(ggplot2)
 autoplot(fit, plot.type="observations")
 
 \dontrun{
