@@ -52,7 +52,7 @@ plot.marssMLE <-
       plot.ncol = ceiling(nX/plot.nrow)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in unique(states$term)){
-        with(subset(states, term==plt), {
+        with(subset(states, states$term==plt), {
           ylims=c(min(estimate,conf.low,na.rm=TRUE),max(estimate,conf.high,na.rm=TRUE))
           plot(t, estimate, type="l", xlab="", ylab="Estimate", ylim=ylims)
           title(plt)
@@ -205,7 +205,7 @@ plot.marssMLE <-
       plot.nrow = ceiling(nY/plot.ncol)
       par(mfrow=c(plot.nrow, plot.ncol), mar=c(2, 4, 2, 1) + 0.1)
       for(plt in levels(df$.rownames)){
-        with(subset(df, .rownames==plt), {
+        with(subset(df, df$.rownames==plt), {
           qqnorm(.std.resid, main=plt)
           abline(a=intercept[plt], b=slope[plt], col="blue")
         })
