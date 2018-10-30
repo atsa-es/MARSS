@@ -28,6 +28,14 @@ import(stats)
 import(utils)
 import(graphics)
 
+## Imports; I am only using these functions from these packages
+importFrom(mvtnorm, rmvnorm)
+importFrom(nlme, fdHess)
+importFrom(KFAS, SSModel, SSMcustom, KFS)
+importFrom("grDevices", "contourLines")
+importFrom(broom, augment, glance, tidy)
+importFrom(ggplot2, autoplot)
+
 ## register S3 methods
 S3method(print, marssMODEL)
 S3method(print, marssMLE)
@@ -40,16 +48,9 @@ S3method(coef, marssMLE)
 S3method(residuals, marssMLE)
 S3method(model.frame, marssMODEL)
 S3method(model.frame, marssMLE)
+S3method(augment, marssMLE)
+S3method(glance, marssMLE)
+S3method(tidy, marssMLE)
+S3method(autoplot, marssMLE)
 
-## Imports; I am only using these functions from these packages
-importFrom(mvtnorm, rmvnorm)
-importFrom(nlme, fdHess)
-importFrom(KFAS, SSModel, SSMcustom, KFS)
-importFrom("grDevices", "contourLines")
 
-if(getRversion() >= "3.6.0") {
-       S3method(broom::augment, marssMLE)
-       S3method(broom::glance, marssMLE)
-       S3method(broom::tidy, marssMLE)
-       S3method(ggplot2::autoplot, marssMLE)
-   }

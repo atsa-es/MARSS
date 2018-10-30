@@ -11,11 +11,11 @@ Imports:
     mvtnorm, 
     nlme, 
     stats, 
-    utils
-Suggests: 
+    utils,
     broom,
+    ggplot2
+Suggests: 
     Formula, 
-    ggplot2, 
     Hmisc, 
     lattice, 
     lme4, 
