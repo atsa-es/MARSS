@@ -499,7 +499,10 @@ The log-likelihood that is returned by MARSS will include the log-likelihood of 
 \yy^{(c)}_t = \ZZ^{(c)}\xx_t^{(c)} + \aa^{(c)}  + \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR^{(c)}) 
 \end{gathered}
 \end{equation}
-An easy way to get this log-likelihood for the covariate data only is use the augmented model (Equation \ref{eqn:marss.covar} with terms defined as in Equation \ref{eqn:marsscovarparams}) but pass in missing values for the non-covariate data.  The following code shows how to do this.
+An easy way to get this log-likelihood for the covariate data only is use
+the augmented model (Equation \ref{eqn:marss.covar} with terms defined as
+in Equation \ref{eqn:marsscovarparams}) but pass in missing values for the
+non-covariate data.  The following code shows how to do this.
 <<get-LL-aug, eval=FALSE>>=
 y.aug = rbind(data,covariates)
 fit.aug = MARSS(y.aug, model=model.aug)
