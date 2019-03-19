@@ -98,9 +98,9 @@ for(elem in names(default)){
       tmp=Zmat%*%Bmat%*%dx0
       if(is.solvable(tmp)=="underconstrained"){
           if(MODELobj$tinitx==0){
-            stop("Stopped in MARSSinits(): Z B d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
+            stop("Stopped in MARSSinits(): Z B d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...). \n This is not an error. It is simply a constraint of the method used to compute x0 inits in MARSSinits().")
           }else{
-            stop("Stopped in MARSSinits(): Z d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).")
+            stop("Stopped in MARSSinits(): Z d_x0 is underconstrained and inits for x0 cannot be computed.  \n Pass in inits$x0 manually using inits=list(x0=...).  \n This is not an error. It is simply a constraint of the method used to compute x0 inits in MARSSinits().")
           }
       }
       parlist$x0 = pinv(tmp)%*%(y1-Zmat%*%Bmat%*%fx0-Zmat%*%Umat-Amat)
