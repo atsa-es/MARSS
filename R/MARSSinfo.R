@@ -4,7 +4,7 @@ cat("Pass in a label (in quotes) to get info on a MARSS error or warning message
      convergence: Non-convergence warnings
      denominv: An error related to denom not invertible
      degenvarcov: Warnings about degenerate variance-covariance matrices or variance going to 0
-     diag0blocked: Warning: setting diagonal to 0 blocked at iter=X. logLik was lower in attempt to set 0 diagonals on X. See also R0blocked
+     diag0blocked: Warning: setting diagonal to 0 blocked at iter=X. logLik was lower in attempt to set 0 diagonals on X. See also R0blocked.
      HessianNA: Warning: There are NAs in the Hessian matrix.
      is.marssMLE: Error from is.marssMLE
      kferrors: Stopped at iter=xx in MARSSkem() because numerical errors were generated in MARSSkf
@@ -211,28 +211,26 @@ if(number=="LLunstable")
       )))
 
   if(number==10)
-    cat( writeLines(strwrap(
+    writeLines(
 "Note, this warning is often associated with warnings about the log-likelihood dropping.  The log-likelihood is entering an unstable area, likely a region where it is going steeply to infinity (correctly, probably).
-\n\n
-The EM algorithm is generally quite robust but it requires inverting the variance-covariance matrices and when those inverses inverses become numerically unstable, the log-likelihood can drop.  The 
-first thing to try however is to set safe=TRUE in the control list.  This tells MARSS to run the Kalman smoother after each parameter update.  This slows things down, but is a more robust algorithm.  The default is to only run the smoother after all parameters are updated.  If that fails, set maxit (in control) to something smaller than when the LL dropping warning starts and see what is happening to Q and R.  Which one is becoming hard to invert? Think about why this is happening.  Very likely, something about the way you set up the problem is logically forcing this to happen.
-\n\n
+
+The EM algorithm is generally quite robust but it requires inverting the variance-covariance matrices and when those inverses inverses become numerically unstable, the log-likelihood can drop.  The first thing to try however is to set safe=TRUE in the control list.  This tells MARSS to run the Kalman smoother after each parameter update.  This slows things down, but is a more robust algorithm.  The default is to only run the smoother after all parameters are updated.  If that fails, set maxit (in control) to something smaller than when the LL dropping warning starts and see what is happening to Q and R.  Which one is becoming hard to invert? Think about why this is happening.  Very likely, something about the way you set up the problem is logically forcing this to happen.
+
 It may be that you are trying to fit a model that is mathematically inconsistent with your data. Are you fitting a mean-reverting model but the mean implied by the model is different than the mean of the data? That won't work.  Are you trying to fit a MARSS model, which w(t) and v(t) errors are a random-walk in time and drawn from a multivariate normal, to binned data where you have multiple time steps at one bin level? Like this, 1,1,1,1,2,2,2,10,10,10,1,1,1,.  That's not remotely random-walk through time.  The binning is not so much the problem.  It's the strings of 1's and 2's in a row that are the problem.  For that kind of binned data, you need some kind of thresholding observation model.
-\n\n
-If your are fitting models with R=0 or some of the diagonals of R=0, then EM can really struggle.  Try BFGS.  If you are fitting AR-p models with R!=0 and rewritten as a MARSS model, then try using a vague prior on x0.  Set x0=matrix(0,1,m) (or some other appropriate fixed value instead of 0.) and V0=diag(1,m), where m=number of x's.  That can make it easier to estimate these AR-p with error models.\n"
-)))
+
+If your are fitting models with R=0 or some of the diagonals of R=0, then EM can really struggle.  Try BFGS.  If you are fitting AR-p models with R!=0 and rewritten as a MARSS model, then try using a vague prior on x0.  Set x0=matrix(0,1,m) (or some other appropriate fixed value instead of 0.) and V0=diag(1,m), where m=number of x's.  That can make it easier to estimate these AR-p with error models.
+")
 
 if(number=="slowconvergence")
-    cat( writeLines(strwrap(
-"First thing to do is set silent=2, so you see where MARSS() is taking a long time.  This will
-give you an idea of how long each EM iteration is taking so you can estimate how long it will take to get to a
-certain number of iterations.  When we get a comment about why the algorithm takes 10,000 iterations to converge, the user is either doing Dynamic
-Factor Analysis or they are estimating many variances and they set allow.degen=FALSE.  We'll talk about those two cases.
-\n\n
+    writeLines(
+"First thing to do is set silent=2, so you see where MARSS() is taking a long time.  This will give you an idea of how long each EM iteration is taking so you can estimate how long it will take to get to a certain number of iterations.  
+
+When we get a comment about why the algorithm takes 10,000 iterations to converge, usually the user is either doing Dynamic Factor Analysis or they are estimating many variances and they set allow.degen=FALSE.  We'll talk about those two cases.
+
 Dynamic Factor Analysis (DFA): Why does this take so long?  By its nature DFA is often a difficult estimation problem because there are two almost equivalent solutions.  The model has a component that looks like this y=z*trend. This is equivalent to y=(z/a)*(a*trend).  That is there exist an an infinite number of trends (a*trend) that will give you the same answer.  However, the likelihood of the (a*trend)'s are not the same since we have a model for the trends---a random walk with variance = 1.  That's pretty flat though for a range of a.  When we have a fairly flat 2D likelihood surface---in this case (z/a)*(a*trend)---EM algorithms take a long time to converge.
-\n\n
-Variances going to zero: If you set allow.degen=FALSE, and one of your variances is going to zero then it its log is going to negative infinitity and it will take infinite number of iterations to get there (but MARSS() will complain about numerical instability before that).  The log-log convergence test in MARSS is checking for convergence of the log of all the parameters, and clearly the variance going to 0 will not pass this test.  However, you log-likelihood has long converged. So, you want to 'turn off' the convergence test for the parameters and use only the abstol test---which tests if the log-likelihood increased by less than  than some tolerance between iterations.  To do this, pass in a huge value for the slope of the log-log convergence test.  Pass this into your MARSS call: control=list(conv.test.slope.tol=1000)\n"
-)))
+
+Variances going to zero: If you set allow.degen=FALSE, and one of your variances is going to zero then its log is going to negative infinitity and it will take infinite number of iterations to get there (but MARSS() will complain about numerical instability before that).  The log-log convergence test in MARSS is checking for convergence of the log of all the parameters, and clearly the variance going to 0 will not pass this test.  However, actually if you looked at your log-likelihood plot, you would see that it actually has converged. So, you want to 'turn off' the convergence test for the parameters and use only the abstol test---which tests if the log-likelihood increased by less than  than some tolerance between iterations.  To do this, pass in a large value for the slope of the log-log convergence test.  Pass this into your MARSS call: control=list(conv.test.slope.tol=1000).
+")
 
 if(number=="modelobject")
     writeLines(
@@ -265,54 +263,62 @@ attr(x$model,"X.names")=x$marss$X.names
 coef(x, type="matrix")
 ')
 
-if(number==23)
-    cat( writeLines(strwrap(
-"This is the same error as number 22 except that the 0s on the diagonal of R are arising because allow.degen=TRUE (this is the default setting in the control list) and R is getting very small.  MARSS attempts to set R to 0, but the constraint that x0 associated with R=0 comes into play.  MARSS then blocks the setting of R to 0 and warns you.  You can set allow.degen=FALSE, but it is just an informational warning.  There is nothing wrong per se.\n"
-)))
+if(number=="R0blocked")
+  writeLines(
+'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting one of the R diagonals to 0 introduces constraints on what x0 values can be estimated. If setting an R diagonal to 0 would lead to x0 being unidentifable, then setting the diagonal to 0 is blocked. 
 
+Thus this is not an error but rather an alert, often annoying. You can stop the annoying warning messages by passing in control(allow.degen=FALSE). However, the EM algorithm will slow down dramatically as the R diagonals shrink to 0 because the step size in the alrogithm is affected by the R variance terms, which are now close to 0.
+
+You should evaluate why the R diagonals are going to 0. Often there is a structural or logical problem between your model and data.  For example, you have specified a model which is logially inconsistent with your data, like a stationary model with mean 0 trying to be fit to non-stationary data with non-zero mean.
+
+See also the info under MARSSinfo("x0R0").
+')
+
+if(number=="diag0blocked")
+    writeLines(
+'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting diagonals to 0 changes the model and the likelihood of a model with the diagonal very close to 0 is not necessarily the same as one with the diagonal equal to 0. If setting a diagonal to 0 would lead to the likelihood dropping (you want it to increase), then setting the diagonal to 0 is blocked. 
+      
+Thus this is not an error but rather an alert. You can stop the annoying warning messages by passing in control(allow.degen=FALSE). However, the EM algorithm will slow down dramatically as the diagonals shrink to 0 because the step size in the alrogithm is affected by the variance terms, which are now close to 0.
+      
+You should aways evaluate why variance terms are going to 0. This may be perfectly fine, meaning that this degenerate model with some variance terms equal to 0 has the highest likelihood. But often it indicates that there is a structural or logical problem between your model and data.  For example, you have specified a model which is logially inconsistent with your data, like a stationary model with mean 0 trying to be fit to non-stationary data with non-zero mean.
+      
+See also the info under MARSSinfo("x0R0") and MARSSinfo("R0blocked").
+')
+  
 if(number=="residvarinv")
   cat( writeLines(strwrap(
 "The computation of the standardized residuals requires taking the Cholesky decomposition of the joint variance-covariance matrix of the observation and state residuals.  This is matrix is not invertible for some reason.  If you have missing data and a non-diagonal Q or R, try Harvey=FALSE (if you set Harvey=TRUE).  This will compute the exact joint variance-covariance matrix.  However, in some cases, the exact matrix is also not invertible.  This could occur is say Q is non-diagonal and all the data are missing in the last time-step.  When the matrix is not invertible, the standardized residuals for that time-step are set to NAs.\n"
 )))
 
 if(number=="varcovstruc")
-  cat( writeLines(strwrap(
-    "The structure of variance-covariance matrices have many constraints. These constraints arise
-     due to the nature of variance-covariance matrices and their estimation, not due to MARSS per se.
-     They must be symmetric.  If numeric (meaning no estimated values), they must be positive definite. 
-     You cannot fix the covariances and estimate the variances; or vis-a-versa.  There are many 
-     constraints on shared values. You cannot have shared estimated values across variances and covariances.
-     Within a block with a shared variance, the covariances must be equal (or 0).  Across pairs of 
-     different shared variances, the covariances must all be equal.  So if there are 3 variances of 'a' and 
-     another of 'b', the covariances between all the 'a' and 'b' must be the same.  The covariances cannot
-     be shared across different pairs.  So if there is another variance of 'c', the covariance between it and
-     the 'a' and 'b' must be different.  If there are blocks within the matrix (so it is a block diagonal
-     matrix), there can be no shared values across blocks unless the blocks are identical.
-     If you set method=BFGS, however, there are extra constraints.  In this case, the code
-     requires that the matrices be diagonal, unconstrained, or equalvarcov.  This is due to the fact
-     that the code use a Cholesky decomposition to ensure that the matrices stay positive definite
-     during the estimation iterations.\n"
-  )))
+  writeLines(
+"The structure of variance-covariance matrices have many constraints. These constraints arise due to the nature of variance-covariance matrices and their estimation, not due to MARSS per se.
+* They must be symmetric.
+* If numeric (meaning no estimated values), they must be positive definite. 
+* You cannot fix the covariances and estimate the variances; or vis-a-versa.  
 
-  if(number=="HessianNA")
-    cat( writeLines(strwrap(
-      "The variance-covariance matrix can be estimated (large sample estimator) from
-      the inverse of the Hessian of the log-likelihood function at the MLE parameter
-      values.  The Hessian is the second partial derivative of a matrix function.
-      The Hessian
-      of the log-likelihood function at the MLEs is the observed Fisher information.
-      The observed Fisher information is an estimator of large-sample 
-      variance-covariance
-      matrix of the estimated parameters.  The MARSS package provides 3 ways to 
-      compute the Hessian: the recursive algorithm by Harvey (1989), a numerical 
-      estimate using the dfHess() function from the nmle package, and a numerical
-      estimate from the optim() function.  The calculation of the Hessian 
-      associated with the variance terms (Q & R) is prone to numerical errors.
-      When this happens, an NA is put on the diagonal of the Hessian for that
-      parameter value. No standard errors or CIs can be computed for that value.
-      A Hessian with many NAs is probably a sign that you have a poor model
-      (meaning your model is not a good description of the data) or you do not
-      have enough data given the complexity of your model.\n"
-  )))
+There are many constraints on shared values.
+* You cannot have shared estimated values across variances and covariances.
+* Within a block with a shared variance, the covariances must be equal (or 0).  
+* Across pairs of different shared variances, the covariances must all be equal.  So if there are 3 variances of 'a' and another of 'b', the covariances between all the 'a' and 'b' must be the same.  
+* The covariances cannot be shared across different pairs.  So if there is another variance of 'c', the covariance between it andthe 'a' and 'b' must be different.  
+* If there are blocks within the matrix (so it is a block diagonal matrix), there can be no shared values across blocks unless the blocks are identical.
+
+If you set method=BFGS, however, there are extra constraints. In this case, the code requires that the matrices be diagonal, unconstrained, or equalvarcov.  This is due to the fact that the code uses a Cholesky decomposition to ensure that the matrices stay positive definite during the estimation iterations.
+")
+
+if(number=="HessianNA")
+    writeLines(
+"The variance-covariance matrix can be estimated (large sample estimator) from the inverse of the Hessian of the log-likelihood function at the MLE parameter values.  The Hessian is the second partial derivative of a matrix function. The Hessian of the log-likelihood function at the MLEs is the observed Fisher information. The observed Fisher information is an estimator of large-sample variance-covariance matrix of the estimated parameters.  
+
+The MARSS package provides 3 ways to compute the Hessian: 
+1. The recursive algorithm by Harvey (1989)
+2. a numerical estimate using the dfHess() function from the nmle package, and 
+3. a numerical estimate from the optim() function.  
+
+The calculation of the Hessian associated with the variance terms (Q & R) is prone to numerical errors. When this happens, an NA is put on the diagonal of the Hessian for that parameter value. No standard errors or CIs can be computed for that value.
+
+A Hessian with many NAs is probably a sign that you have a poor model (meaning your model is not a good description of the data) or you do not have enough data given the complexity of your model.
+")
 
 }
