@@ -65,6 +65,9 @@ MARSSharveyobsFI = function( MLEobj ) {
   dpari = dparmat(MLEobj, t=1)
   dZ=dpari$Z; dA=dpari$A; dB=dpari$B; dU=dpari$U; dx0=dpari$x0;
   dR=dpari$R; dH=dpari$H; dQ=dpari$Q; dG=pari$G; dV0=dpari$V0; dL=dpari$L
+  #which par are time.varying
+  time.varying.par = time.varying[time.varying %in% names(dpari)]
+    
   #set up an all zero dpar
   dpar0 = list()
   for(el in model.elem) dpar0[[el]]=matrix(0,dims[[el]][1],dims[[el]][2])
