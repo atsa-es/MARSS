@@ -82,7 +82,7 @@ MARSSharveyobsFI = function( MLEobj ) {
       pari[time.varying]=parmat(MLEobj,time.varying,t=t)
       Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; #update
       
-      dpari[time.varying] = dparmat(MLEobj,time.varying,t=t)
+      dpari[time.varying.par] = dparmat(MLEobj,time.varying.par,t=t)
     }
     
     pcntr = 0 #counter
