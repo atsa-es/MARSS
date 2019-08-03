@@ -63,8 +63,6 @@ MARSSharveyobsFI = function( MLEobj ) {
   V0=tcrossprod(pari$L%*%pari$V0, pari$L)
   # set up the partial d par mats
   dpari = dparmat(MLEobj, t=1)
-  dZ=dpari$Z; dA=dpari$A; dB=dpari$B; dU=dpari$U; dx0=dpari$x0;
-  dR=dpari$R; dH=dpari$H; dQ=dpari$Q; dG=pari$G; dV0=dpari$V0; dL=dpari$L
   #which par are time.varying
   time.varying.par = time.varying[time.varying %in% names(dpari)]
     
