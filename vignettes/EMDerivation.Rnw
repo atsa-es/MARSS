@@ -2012,7 +2012,7 @@ The Kalman smoother and lag-1 covariance smoother compute the expectations condi
 \begin{subequations}\label{eq:kfsmoother}
 \begin{align}
 &\xx_{t-1}^T=\xx_{t-1}^{t-1}+\JJ_{t-1}(\xx_t^T-\xx_t^{t-1})\label{eq:xt1T}\\
-&\VV_{t-1}^T=\VV_{t-1}^{t-1}+\JJ_{t-1}(\VV_t^T-\VV_t^{t-1})\JJ_t^\top\label{eq:Vt1T}\\
+&\VV_{t-1}^T=\VV_{t-1}^{t-1}+\JJ_{t-1}(\VV_t^T-\VV_t^{t-1})\JJ_{t-1}^\top\label{eq:Vt1T}\\
 &\JJ_{t-1}=\VV_{t-1}^{t-1}\BB_t^\top(\VV_t^{t-1})^{-1}\label{eq:Jt}\\
 \\
 &\VV_{T,T-1}^T=(\II-\KK_T\ZZ_T)\BB_T\VV_{T-1}^{T-1}\label{eq:VTT1T}\\
