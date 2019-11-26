@@ -25,8 +25,7 @@
   <li><a href="#license">License</a></li>
 </ul>
 
-MARSS <img src="logot.png" align="right" />
-=====================================================
+<img src="logot.png" align="right" />
 
 [![cran version](http://www.r-pkg.org/badges/version/MARSS)](https://cran.r-project.org/package=MARSS)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/metacran/cranlogs.app)
