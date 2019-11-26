@@ -71,7 +71,7 @@ To install an R package from Github, you need to be able to build an R package o
 - [Wiki](https://nwfsc-timeseries.github.io/MARSS-wiki/) - The MARSS wiki has misc and random projects and code.
 
 
-### Issues and bug reports {#bugs}
+### ISSUES and BUG REPORTS {#bugs}
 
 Issues? [https://github.com/nwfsc-timeseries/MARSS/issues]()
 
