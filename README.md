@@ -1,34 +1,27 @@
 <style>
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333;
+.nav{
+    border:1px solid #ccc;
+    border-width:1px 0;
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
 }
-
-li {
-  float: left;
+.nav li{
+    display:inline-block;
 }
-
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-li a:hover {
-  background-color: #111;
+.nav a{
+    display:inline-block;
+    padding:10px;
 }
 </style>
 
-<ul>
-  <li><a class="active" href="#home">Home</a></li>
-  <li><a href="#news">News</a></li>
-  <li><a href="#contact">Contact</a></li>
-  <li><a href="#about">About</a></li>
+<ul class="nav">
+  <li><a href="/">Home</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="/work/">Work</a></li>
+  <li><a href="/clients/">Clients</a></li>
+  <li><a href="/contact/">Contact</a></li>
 </ul>
 
 MARSS <img src="logot.png" align="right" />
