@@ -64,17 +64,12 @@ To install an R package from Github, you need to be able to build an R package o
 
 ### DOCUMENTATION and TUTORIALS  {#documentation}
 
-Quick start guide:
-[here](https://cran.r-project.org/web/packages/MARSS/vignettes/Quick_Start.pdf).
+- [Quick Start Guide](https://cran.r-project.org/web/packages/MARSS/vignettes/Quick_Start.pdf).
+- [User Manual](https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf) - The extensive user manual included in the package has many examples of how to fit MARSS models to a variety of data sets.
+- [ATSA lab book](https://nwfsc-timeseries.github.io/atsa-labs/) - Many applications are also covered in our Applied Time Series Analysis book developed from the labs in our course.
+- [ATSA course website](https://nwfsc-timeseries.github.io/atsa/) - We have lectures and all material from our course on our course website.
+- [Wiki](https://nwfsc-timeseries.github.io/MARSS-wiki/) - The MARSS wiki has misc and random projects and code.
 
-There is an extensive user manual included in the package which has many examples:
-[here](https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf).
-
-Many example applications are also covered in our Applied Time Series Analysis book from our course: [here](https://nwfsc-timeseries.github.io/atsa-labs/).
-
-We have lectures on our course website: [here](https://nwfsc-timeseries.github.io/atsa/).
-
-Wiki for misc. projects: [here](https://nwfsc-timeseries.github.io/MARSS-wiki/)
 
 ### Issues and bug reports {#bugs}
 
