@@ -1,15 +1,10 @@
 <style>
-body {margin:0;}
-
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
   background-color: #333;
-  position: fixed;
-  top: 0;
-  width: 100%;
 }
 
 li {
@@ -24,12 +19,8 @@ li a {
   text-decoration: none;
 }
 
-li a:hover:not(.active) {
+li a:hover {
   background-color: #111;
-}
-
-.active {
-  background-color: #4CAF50;
 }
 </style>
 
@@ -39,8 +30,6 @@ li a:hover:not(.active) {
   <li><a href="#contact">Contact</a></li>
   <li><a href="#about">About</a></li>
 </ul>
-
-#
 
 MARSS <img src="logot.png" align="right" />
 =====================================================
