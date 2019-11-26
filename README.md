@@ -12,16 +12,17 @@
 }
 .nav a{
     display:inline-block;
-    padding:10px;
+    padding:5px;
 }
 </style>
 
 <ul class="nav">
-  <li><a href="/">Home</a></li>
-  <li><a href="/about/">About</a></li>
-  <li><a href="/work/">Work</a></li>
-  <li><a href="/clients/">Clients</a></li>
-  <li><a href="/contact/">Contact</a></li>
+  <li><a href="#install">Install</a></li>
+  <li><a href="#documentation">Documentation</a></li>
+  <li><a href="#bugs">Issues</a></li>
+  <li><a href="#cite">Citation</a></li>
+  <li><a href="#pubs">Publications</a></li>
+  <li><a href="#license">License</a></li>
 </ul>
 
 MARSS <img src="logot.png" align="right" />
@@ -33,12 +34,6 @@ MARSS <img src="logot.png" align="right" />
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
 
 MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
-
-### Collaborate {#collaborate}
-
-Issues? [https://github.com/nwfsc-timeseries/MARSS/issues]()
-
-Wiki and Current Projects [https://nwfsc-timeseries.github.io/MARSS-wiki/]()
 
 ### INSTALL {#install}
 
@@ -76,6 +71,11 @@ Many applications are also covered in our Applied Time Series Analysis book: [he
 
 We have lectures on our course website: [here](https://nwfsc-timeseries.github.io/atsa/).
 
+Wiki for misc. projects: [here](https://nwfsc-timeseries.github.io/MARSS-wiki/)
+
+### Issues and bug reports {#bugs}
+
+Issues? [https://github.com/nwfsc-timeseries/MARSS/issues]()
 
 ### CITATION  {#cite}
 
@@ -91,7 +91,7 @@ Update the version number and year if you use a more recent version on GitHub.
 
 ### PUBLICATIONS {#pubs}
 
-To see our publications using MARSS models, see the [NWFSC Time-Series Analysis website](https://nwfsc-timeseries.github.io/).
+To see our publications using MARSS models, see the [Applied Time Series Analysis website](https://nwfsc-timeseries.github.io/).
 
 
 ### LICENSE {#license}
