@@ -7,6 +7,13 @@
     padding:0;
     text-align:center;
 }
+.nav ul{
+    margin-before: 1em;
+    margin-after: 1em;
+    margin-start: 0;
+    margin-end: 0;
+    padding:0;
+}
 .nav li{
     display:inline-block;
 }
