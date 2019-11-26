@@ -27,12 +27,13 @@
 
 <img src="logot.png" align="right" />
 
+MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
+
 [![cran version](http://www.r-pkg.org/badges/version/MARSS)](https://cran.r-project.org/package=MARSS)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/metacran/cranlogs.app)
 [![](https://cranlogs.r-pkg.org/badges/MARSS?color=FFD700)](https://www.r-pkg.org/pkg/MARSS)
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
 
-MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
 
 ### INSTALL {#install}
 
@@ -63,10 +64,13 @@ To install an R package from Github, you need to be able to build an R package o
 
 ### DOCUMENTATION and TUTORIALS  {#documentation}
 
-There is an extensive user manual included in the package:
+Quick start guide:
+[here](https://cran.r-project.org/web/packages/MARSS/vignettes/Quick_Start.pdf).
+
+There is an extensive user manual included in the package which has many examples:
 [here](https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf).
 
-Many applications are also covered in our Applied Time Series Analysis book: [here](https://nwfsc-timeseries.github.io/atsa-labs/).
+Many example applications are also covered in our Applied Time Series Analysis book from our course: [here](https://nwfsc-timeseries.github.io/atsa-labs/).
 
 We have lectures on our course website: [here](https://nwfsc-timeseries.github.io/atsa/).
 
