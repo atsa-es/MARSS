@@ -22,7 +22,7 @@
 
 }
 \description{
-Return a data.frame with the observations or states fitted values, residuals, and upper and lower confidence intervals if requested.
+Return a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the observations or states. \code{augment} is concerned with predictions of the states or observations at time $t$, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals. \code{tidy} is concerned with estimates of values (parameters or states) conditioned on all the data.
 }
 \details{
 
@@ -33,7 +33,7 @@ The reported CIs are the approximate CIs computed using the standard deviations:
 
 This returns a familiar model predicted value of the response (y) and the difference between the model prediction and the actual data y(t) is the residual.  If there is no data point, then the residual is NA.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the user guide.
 
-In the literature on state-space models, it is very common to use the one-step ahead predicted values of the data.  The fitted values returned by augment are NOT the one-step ahead values and the residuals are not the one-step ahead residuals (called Innovations in the state-space literature).  If you want the one-step ahead fitted values, you can use \code{fitted(x, one.step.ahead=TRUE)}.  The innovations are returned by \code{\link{MARSSkf}}.
+In the literature on state-space models, it is very common to use the one-step ahead predicted values of the data.  The fitted values returned by augment are NOT the one-step ahead values and the residuals are NOT the one-step ahead residuals (called Innovations in the state-space literature).  If you want the one-step ahead fitted values, you can use \code{fitted(x, one.step.ahead=TRUE)}.  The innovations are returned by \code{\link{MARSSkf}}.
 
 \strong{type.predict states}
 
