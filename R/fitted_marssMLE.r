@@ -14,13 +14,14 @@ fitted.marssMLE <- function (object, ..., one.step.ahead=FALSE, type=c("observat
   n = model.dims[["y"]][1]
   m = model.dims[["x"]][1]
   
-  if(!one.step.ahead){ 
-    hatxt = MLEobj[["states"]]
-  }else{
-    hatxt = MARSSkf(MLEobj)[["xtt1"]]
-  }
   
   if(type=="observations"){
+
+    if(!one.step.ahead){ 
+      hatxt = MLEobj[["states"]]
+    }else{
+      hatxt = MARSSkf(MLEobj)[["xtt1"]]
+    }
     
     val = matrix(NA, n, TT)
     rownames(val) = attr(MLEobj$marss,"Y.names")
@@ -36,13 +37,20 @@ fitted.marssMLE <- function (object, ..., one.step.ahead=FALSE, type=c("observat
   
   if(type=="states"){
     
+    if(!one.step.ahead){ 
+      hatxt = MLEobj[["states"]]
+    }else{
+      hatxt = MARSSkfss(MLEobj)[["xtt"]]
+    }
+    
     val = matrix(NA, m, TT)
     rownames(val) = attr(MLEobj$marss,"X.names")
     
     x0 = coef(MLEobj, type="matrix")[["x0"]]
     Bt=parmat(MLEobj,"B",t=1)[["B"]]
     Ut=parmat(MLEobj,"U",t=1)[["U"]]    
-    val[,1] = Bt%*%x0+Ut
+    if(MLEobj$model$tinitx==0) val[,1] = Bt%*%x0+Ut
+    if(MLEobj$model$tinitx==1) val[,1] = x0
     for(t in 2:TT){
       Bt=parmat(MLEobj,"B",t=t)[["B"]]
       Ut=parmat(MLEobj,"U",t=t)[["U"]]    
