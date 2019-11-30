@@ -2,9 +2,9 @@
 \alias{tidy.marssMLE}
 \title{Return estimated parameters and states with summary information}
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states","observations"),
+  tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
                 interval = TRUE,
-                interval.type = c("confidence","quantile","prediction","residual"),
+                interval.type = c("confidence","quantile","residual"),
                 smoothing = c("T", "t1", "t"),
                 alpha = 0.05,
                 interval.type = 
@@ -17,7 +17,7 @@
   
   \item{interval}{ Whether to compute intervals on the estimates. }
   
-  \item{interval.type}{ Type of interval if interval==TRUE. If type=="parmeters", the only allowed interval type is "confidence". If type is states, the only option is "quantile". If type is observations, the options are "residual", "prediction" or "quantile". Default is "residual". See details for discussion of intervals for non-parameters.}
+  \item{interval.type}{ Type of interval if interval==TRUE. If type=="parmeters", the only allowed interval type is "confidence". If type is states, the only option is "quantile". If type is observations, the options are "residual", "prediction" or "quantile". Default is "residual". See details for discussion of intervals for states and model fits.}
   
   \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T (T), using only data up to t-1 (t1), or using only data up to t (t). If smoothing="t1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
 
@@ -33,11 +33,11 @@
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. The \code{tidy.marssMLE} functions returns the parameter estimates. It will also return the estimated state (X) at time t conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t. Lastly, it will return the fitted Y estimate at time t, conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t.
 }
 \return{
-\strong{type=="parameters"} A data.frame with estimates, sample standard errors, and confidence intervals (unless interval=FALSE).
+\strong{type="parameters"} A data.frame with estimates, sample standard errors, and confidence intervals (unless interval=FALSE).
 
-\strong{type in "states", "xtT", "xtt1", "xtt"} A data.frame with estimates of xtT, xtt1 or xtt with the standard deviation and quantiles (unless interval=FALSE) computed using the estimated model parameters.
+\strong{type="states"} A data.frame with estimates of x with the standard deviation and quantiles (unless interval=FALSE) computed using the estimated model parameters. The state returned depends on the smoothing specification. If smoothing="T", the expected value of x(t) conditioned on all the data is returned. If smoothing="t1", it is conditioned on the data up to t-1. These are called one-step-ahead predictions. If smoothing="t", it is conditioned on data up to t. 
 
-\strong{type in "observations", "ytT", "ytt1", "ytt"} A data.frame with the fitted Y computed using the right side of the Y equation in the MARSS model using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. Intervals are included if interval=TRUE. For residuals analysis (outlier detection), you want to use the "residual" intervals. If you want the distribution of data that were not used in fitting, you want the "prediction" intervals. See details below. If you want the distribution of the model fit (the distribution of ytT, ytt1, or ytt), then you want the "quantile" intervals. This gives you the quantiles of ytT, ytt1, or ytt.
+\strong{type in "observations", "y"} A data.frame of the fitted y. This is the  the right side of the y equation (minus the \eqn{v_t}) using for \eqn{x_t} either xtT, xtt1, or xtt for respectively smoothing = "T", "t1", "t". Intervals are included if interval=TRUE. For residuals analysis (outlier detection), you want to use the "residual" intervals. If you want the distribution of data that were not used in fitting, you want the "quantile" intervals. Confidence and prediction intervals for fitted y are not provided at this time. See details below. 
 }
 
 \details{
@@ -48,13 +48,13 @@ The tidy function is designed to work with the \code{broom} package and you will
   
   If interval=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
-\strong{type="states", "xtT", "xtt1", or "xtt"}
+\strong{type="states"}
 
-Currently \code{tidy.marssMLE} does not return the confidence intervals for the estimated states. Instead only the quantiles of the states at time t using the estimated model parameters are returned. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the X). However, see the comments below on confidence intervals for the expected value of the states.
+Currently \code{tidy.marssMLE} does not return the confidence intervals for the estimated states. Instead only the quantiles of the states at time t using the estimated model parameters are returned. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the x). However, see the comments below on confidence intervals for the expected value of the states.
 
-\strong{Quantiles} The state \eqn{X_t} in a MARSS model is a random variable. In Holmes (2012, Eqn. 11) notation,its expected value conditioned on all the observed data and the model parameters \eqn{\Theta} is \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t}. In \code{\link{MARSSkf}} notation, this is \code{xtT[,t]}. The the variance of \eqn{\mathbf{X}_t}{X_t} conditioned on all the observed data and \eqn{\Theta}, i.e. \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} or \code{VtT[,,t]}. Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
+\strong{Quantiles} The state \eqn{X_t} in a MARSS model is a random variable. In Holmes (2012, Eqn. 11) notation, its expected value conditioned on all the observed data (1:T) and the model parameters \eqn{\Theta} is \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t}. In \code{\link{MARSSkf}} notation, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} (\code{VtT[,,t]}). Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
 
-For states, \code{tidy.marssMLE} returns the empirical, i.e. estimated, quantiles of \eqn{\mathbf{X}_t}{X_t} based on one of the estimated conditional variance-covariance matrices and corresponding expected value of \eqn{\mathbf{X}_t}{X_t}. These are the estimated values since we do not know the true \eqn{\Theta} but rather its estimate \eqn{\hat{\Theta}}. Let's denote the former as \code{Vx} (which is either \code{VtT}, \code{Vtt1} or \code{Vtt}) and the latter as \code{Ex} (which is either \code{xtT}, \code{xtt1}, or \code{xtt}). Let \code{sd.xt} denote the sqrt of the diagonal of \code{Vx}.  The equation for the \eqn{\alpha/2} quantile is (\code{qnorm(alpha/2)*sd.xt + Ex}). To emphasize that these are intervals for \eqn{\mathbf{X}_t}{X_t} not E[X(t)], the column headings are \code{.quant.low} and \code{.quant.up} and the column on its standard deviation is labelled \code{.std.dev} not \code{.std.error}. A standard error is a measure of the variability of some estimated value from a sample and this variability shrinks as the sample size increases. The standard deviation does not shrink with more data; it is simply a function of the model parameters.
+For states, \code{tidy.marssMLE} returns the empirical, i.e. estimated, quantiles of \eqn{\mathbf{X}_t}{X_t} based on one of the estimated conditional variance-covariance matrices and corresponding expected value of \eqn{\mathbf{X}_t}{X_t}. These are the estimated values since we do not know the true \eqn{\Theta} but rather its estimate \eqn{\hat{\Theta}}. Let's denote the former as \code{Vx} (which is either \code{VtT}, \code{Vtt1} or \code{Vtt}) and the latter as \code{Ex} (which is either \code{xtT}, \code{xtt1}, or \code{xtt}). Let \code{sd.xt} denote the sqrt of the diagonal of \code{Vx}.  The equation for the \eqn{\alpha/2} quantile is (\code{qnorm(alpha/2)*sd.xt + Ex}). To emphasize that these are quantile intervals on \eqn{X_t} and not confidence intervals on \eqn{E[X_t]}, the column headings are \code{.quant.low} and \code{.quant.up} and the column on its standard deviation is labelled \code{.std.dev} not \code{.std.error}. A standard error is a measure of the variability of some estimated value from a sample and this variability shrinks as the sample size increases. The standard deviation does not shrink with more data; it is simply a function of the model parameters.
   
 If you have a DFA model (form='dfa'), you can pass in \code{rotate=TRUE} to return the rotated trends.  If you want the rotated loadings, you will need to compute those yourself:
 \preformatted{
@@ -64,13 +64,15 @@ H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
 
-\strong{type="observations", "ytT", "ytt1", or "ytt"}
+What about confidence and prediction intervals? These are intervals that incorporate the uncertainty in the estimated model parameters. If the interval is for \eqn{E[X_t]} then it is called a confidence interval. If it is for \eqn{X_t} (not its expected value) then it is called a prediction interval. Currently these are not included in the MARSS R package. But see the notes below for how one would compute these.
 
-The fitted Y means the right side of the y equation in the MARSS model without the \eqn{\mathbf{v_t}}{v_t}. The fitted y can be computed using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. The model residuals are difference between the y (data) and the fitted y.  For residuals analysis (outlier detection), you want to use the "residual" intervals. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT, xtt1, and xtt).  If you want the distribution of data that were NOT used in fitting, you want the "prediction" intervals. "prediction" intervals are the unconditional quantiles of data that can be generated from the model and are computed using VtT, Vtt1, or Vtt. These are for data that are not included in the model (and thus not included in estimation of xtT, xtt1, and xtt). Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}.
+\strong{type="observations"}
+
+The fitted Y means the right side of the y equation in the MARSS model without the \eqn{\mathbf{v_t}}{v_t}. The fitted y can be computed using either xtT, xtt1, or xtt depending on whether you want the fitted y using all the data, using only data up to t-1, or using data up to t. The model residuals are difference between the y (data) and the fitted y.  For residuals analysis (outlier detection), you want to use the "residual" intervals. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT, xtt1, and xtt).  If you want the distribution of data that were NOT used in fitting, you want the "prediction" intervals. "prediction" intervals are the unconditional quantiles of data that can be generated from the model. These are for data that are not included in the model (and thus not included in estimation of xtT, xtt1, and xtt). Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}.
 
 Why are residual and prediction intervals different? Here is a simple example. Say you observe 100 data points (y) from a Normal distribution with mean u and variance q. The estimate of u is the mean of y. Let's call that \eqn{\hat{u}}. The estimate of q is the variance of the sample residuals: \eqn{var(y-\hat{u})}, but q is not the variance of \eqn{y-\hat{u}}! q is the variance of \eqn{y-u}. The variance of \eqn{y-\hat{u}} is smaller than q because y were used to estimate \eqn{\hat{u}}. The y are closer (on average) to the sample mean (mean of y) than y is to u (population mean). That is why residual intervals are narrower than prediction intervals. If you are doing residual analysis (looking for outliers), then you uses the residual intervals.
 
-What about quantile intervals versus prediction intervals? The quantile intervals are the intervals for ytT, ytt1 or ytt, i.e. for the fitted y. 
+Currently confidence and prediction intervals on fitted y and y are not included in the MARSS R package. Read the notes about how to conceptually compute these for the states in the notes below. The process is similar for the fitted y and y.
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applications. Edition 4. Springer-Verlag, New York.
