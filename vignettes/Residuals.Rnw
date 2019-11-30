@@ -170,12 +170,12 @@ Define the smoothations $\hat{\vv}_t$ as:
 \begin{equation}
 \hat{\vv}_t = \yy_t - \ZZ_t\hatxt - \aa_t,
 \end{equation}
-where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$ and is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$; the unobserved $\yy$ will be termed $\yy^{(2)}$. 
+where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$ and is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$. $\yy^{(1)} is a sample from the random variable $\YY^{(1)}$. The unobserved $\yy$ will be termed $\yy^{(2)}$ and is a sample from the random variable $\YY^{(2)}$. When $\YY$ appears without a superscript, it means both $\YY^{(1)}$ and $\YY^{(2)}$ together.
 $\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy$, both $\yy^{(1)}$ and $\yy^{(2)}$, might take.  The mean is 0 and we are concerned only with computing the variance:
 \begin{equation}
 \var[\hat{\VV}_t] = \var_Y[\YY_t - \ZZ_t\E[\XX_t|\yy^{(1)}] - \aa_t]
 \end{equation}
-Notice we have an unconditional variance over $\YY$ on the outside and a conditional variance over a specific value of $\yy^{(1)}$ on the inside.
+Notice we have an unconditional variance over $\YY$ on the outside (that subscript on $\var$) and a conditional variance over a specific value of $\yy^{(1)}$ on the inside (in the $\E[]$).
 
 To compute this, I will use the ``law of total variance'':
 \begin{equation}
@@ -185,7 +185,7 @@ The subscripts on the inner expectations make it explicit that the expectations 
 \begin{equation}
 \var[A] = \var_B[\E[A|b]] + \E_B[\var[A|b]]
 \end{equation}
-It is understood that $\E[A|b]$ is the conditional expectation conditioned on $B=b$ and $\var(A|b)$ is the conditional variance.
+It is understood that $\E[A|b]$ is the conditional expectation conditioned on $B=b$ and $\var[A|b]$ is the conditional variance.
 
 From the law of total variance , we can write
 \begin{equation}\label{varvvtgeneral}
@@ -208,7 +208,7 @@ From Equation \ref{eqn:unconditiondistofVt}, $\var[\VV_t]=\RR_t$.  The second te
 \var[\VV_t|\yy^{(1)}] = \var[ \YY_t - \ZZ_t\XX_t-\aa_t | \yy^{(1)} ].
 \end{equation}
 where $\aa_t$ is a fixed value and can be dropped. 
-Equation \ref{eqn:varvtcondy} can then be written as
+Equation \ref{eqn:varvtcondy} can then be written as\footnote{If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUt$ and $\hatSt$ would be zero and this would reduce to $\ZZ_t \hatVt \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.}
 \begin{equation}
 \begin{split}
 \var[\VV_t|\yy^{(1)}] &= \var[ \YY_t - \ZZ_t\XX_t | \yy^{(1)} ]\\
@@ -216,7 +216,7 @@ Equation \ref{eqn:varvtcondy} can then be written as
 &=\ZZ_t \hatVt \ZZ_t^\top + \hatUt - \hatSt\ZZ_t^\top - \ZZ_t\hatSt^\top
 \end{split}
 \end{equation}
-$\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package.
+$\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and can be computed from the output by the \verb@MARSShatyt@ function in the MARSS R package.
 
 $\hatVt$, $\hatUt$ and $\hatSt$ do not depend on the actual values of $\yy$; the conditional is merely indicating that we are concerned with the variances of the conditional values.  They depend instead on the parameters values, $\QQ$, $\BB$, $\RR$, etc., in the MARSS equation. Thus $\E_Y[\var[\VV_t|\yy^{(1)}]] = \var[\VV_t|\yy^{(1)}]$ and 
 \begin{equation}\label{eqn:conditionalvtfinal}
