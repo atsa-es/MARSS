@@ -15,18 +15,29 @@
 
   \item{alpha}{ Confidence level if confidence interval is returned otherwise the quantile level for quantiles.}
 
-  \item{form}{If you want the augment function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set.}
+  \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normall just ignore and let the function use the "form" set in the attributes.}
   
   \item{...}{Optional arguments.  If \code{interval=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
 
 }
 \description{
 
-The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}.
+The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. The \code{tidy.marssMLE} functions returns the parameter estimates. It will also return the estimated state (X) at time t conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t. Lastly, it will return the fitted Y estimate at time t, conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t.
+}
+\return{
+\strong{type=="parameters"} A data.frame with estimates, sample standard errors, and confidence intervals (if requested).
+
+\strong{type in "states", "xtT", "xtt1", "xtt"} A data.frame with estimates of xtT, xtt1 or xtt with the standard deviation and quantiles (if requested) computed using the estimated model parameters.
+
+\strong{type in "observations", "ytT", "ytt1", "ytt"} A data.frame with the fitted Y computed using the right side of the Y equation in the MARSS model using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. The UNCONDITIONAL quantiles of the fitted values are computed using VtT, Vtt1, or Vtt. Do not use these for residuals diagnotics (outlier detection).
+
+}
+
+\details{
 
 \strong{type=="parameters"}
 
-  If type=="parameters", this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the print and coef functions into a data.frame that summarizes the estimates.
+  If \code{type=="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the print and coef functions into a data.frame that summarizes the estimates.
   
   If interval=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
