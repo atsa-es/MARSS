@@ -171,7 +171,7 @@ Define the smoothations $\hat{\vv}_t$ as:
 \hat{\vv}_t = \yy_t - \ZZ_t\hatxt - \aa_t,
 \end{equation}
 where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$ and is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$; the unobserved $\yy$ will be termed $\yy^{(2)}$. 
-$\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy$, both $\yy^{(1)}$ and $\yy^{(1)}$, might take.  The mean is 0 and we are concerned only with computing the variance:
+$\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy$, both $\yy^{(1)}$ and $\yy^{(2)}$, might take.  The mean is 0 and we are concerned only with computing the variance:
 \begin{equation}
 \var[\hat{\VV}_t] = \var_Y[\YY_t - \ZZ_t\E[\XX_t|\yy^{(1)}] - \aa_t]
 \end{equation}
