@@ -1,6 +1,6 @@
 \name{tidy.marssMLE}
 \alias{tidy.marssMLE}
-\title{Return estimated parameters and states with summary information}
+\title{Return estimated parameters, states, and observations with summary information}
 \usage{
   tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
                 interval = TRUE,
@@ -37,7 +37,8 @@ The tidy function is designed to work with the \code{broom} package and you will
 
 \strong{type="states"} A data.frame with estimates of x with the standard deviation and quantiles (unless interval=FALSE) computed using the estimated model parameters. The state returned depends on the smoothing specification. If smoothing="T", the expected value of x(t) conditioned on all the data is returned. If smoothing="t1", it is conditioned on the data up to t-1. These are called one-step-ahead predictions. If smoothing="t", it is conditioned on data up to t. 
 
-\strong{type in "observations", "y"} A data.frame of the fitted y. This is the  the right side of the y equation (minus the \eqn{v_t}) using for \eqn{x_t} either xtT, xtt1, or xtt for respectively smoothing = "T", "t1", "t". Intervals are included if interval=TRUE. For residuals analysis (outlier detection), you want to use the "residual" intervals. If you want the distribution of data that were not used in fitting, you want the "quantile" intervals. Confidence and prediction intervals for fitted y are not provided at this time. See details below. 
+\strong{type in "observations", "y"} A data.frame of the fitted y. This is the  the right side of the y equation (minus the \eqn{v_t}). Intervals are included if interval=TRUE. For residuals analysis (outlier detection), you want to use the "residual" intervals. If you want the estimate and distribution of your missing data (if any), you also want the "residual" intervals. If you want the distribution of new data sets, you want the "quantile" intervals---this would be the sort of distribution you get if you simulated new data sets from your estimated model. Are these prediction intervals? No. Prediction intervals include the uncertainty in the estimated model parameters.
+Confidence and prediction intervals for fitted y are not provided at this time. See details below. 
 }
 
 \details{
@@ -68,7 +69,9 @@ What about confidence and prediction intervals? These are intervals that incorpo
 
 \strong{type="observations"}
 
-The fitted Y means the right side of the y equation in the MARSS model without the \eqn{\mathbf{v_t}}{v_t}. The fitted y can be computed using either xtT, xtt1, or xtt depending on whether you want the fitted y using all the data, using only data up to t-1, or using data up to t. The model residuals are difference between the y (data) and the fitted y.  For residuals analysis (outlier detection), you want to use the "residual" intervals. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT, xtt1, and xtt).  If you want the distribution of data that were NOT used in fitting, you want the "prediction" intervals. "prediction" intervals are the unconditional quantiles of data that can be generated from the model. These are for data that are not included in the model (and thus not included in estimation of xtT, xtt1, and xtt). Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}.
+The fitted Y means the right side of the y equation in the MARSS model without the \eqn{\mathbf{v_t}}{v_t}. The fitted y can be computed using either xtT, xtt1, or xtt depending on whether you want the fitted y using all the data, using only data up to t-1, or using data up to t. The model residuals are difference between the y (data) and the fitted y.  For residuals analysis (outlier detection), you want to use the "residual" intervals. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}. If you want the distribution of new data sets, you want the "quantile" intervals. "quantile" intervals are the unconditional quantiles of data that can be generated from the model. These are for de novo data like you get if you simulated from your estimated model. 
+
+What about getting the estimate and distribution for missing data? If your y is missing data, you might want an estimate of those values. In this case, you want to include all the other data that you have, that is you want the estimate to be conditioned on all the data. So in this case you also want the "residual" intervals. If you use the "quantile" intervals, then you are not using all the information in your observed data. For example, say you have 3 y observations for one x and you are missing one of the y observations at time t. The residual interval for the missing y will include the information from the other 2 y but the quantile interval will not.
 
 Why are residual and prediction intervals different? Here is a simple example. Say you observe 100 data points (y) from a Normal distribution with mean u and variance q. The estimate of u is the mean of y. Let's call that \eqn{\hat{u}}. The estimate of q is the variance of the sample residuals: \eqn{var(y-\hat{u})}, but q is not the variance of \eqn{y-\hat{u}}! q is the variance of \eqn{y-u}. The variance of \eqn{y-\hat{u}} is smaller than q because y were used to estimate \eqn{\hat{u}}. The y are closer (on average) to the sample mean (mean of y) than y is to u (population mean). That is why residual intervals are narrower than prediction intervals. If you are doing residual analysis (looking for outliers), then you uses the residual intervals.
 
