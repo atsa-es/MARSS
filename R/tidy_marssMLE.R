@@ -1,28 +1,29 @@
 ###############################################################################################################################################
 #  tidy method for class marssMLE
 ##############################################################################################################################################
-tidy.marssMLE = function (x,  type = c("parameters", "states"), 
-                          conf.int = TRUE, conf.level = 0.95,
+tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "xtT", "xtt1", "xtt", "ytT"), 
+                          interval = TRUE, alpha = 0.05,
                           form=attr(x[["model"]], "form")[1], ...)
 { 
   ## Argument checking
   type = match.arg(type)
-  if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
-  if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
+  if(!is.numeric(alpha) | alpha > 1 | alpha < 0) stop("tidy.marssMLE: alpha must be between 0 and 1.", call. = FALSE)
+  if(!(interval%in%c(TRUE,FALSE))) stop("tidy.marssMLE: interval must be TRUE/FALSE", call. = FALSE)
+  if(type=="states") type="xtT"
+  if(type=="observations") type="ytT"
   ## End Argument checking
   
-  alpha = 1-conf.level
   extras=list()
   
   rerun.MARSSparamCIs = FALSE
   model.has.cis = all(c("par.se", "par.lowCI", "par.upCI")%in%names(x))
-  if(conf.int & type=="parameters") rerun.MARSSparamCIs = ifelse(model.has.cis, FALSE, TRUE)
+  if(interval & type=="parameters") rerun.MARSSparamCIs = ifelse(model.has.cis, FALSE, TRUE)
   if(!missing(...)){
     extras=list(...)
     if(!all(names(extras)%in%c("rotate", "method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
   }
   
-  if(type=="parameters" & conf.int & (!missing(...) | !missing(conf.level))){
+  if(type=="parameters" & interval & (!missing(...) | !missing(alpha))){
     if(model.has.cis) warning("tidy.marssMLE: Your marssMLE object has par.se and CIs, but you have passed in arguments for calculating CIs.  MARSSparamCIs() will be re-run with these values.\n")
     rerun.MARSSparamCIs = TRUE
   }
@@ -47,7 +48,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
         term = names(ests),
         estimate = ests
       )
-      if( conf.int ){
+      if( interval ){
         if(rerun.MARSSparamCIs) x = MARSSparamCIs(x, alpha=alpha, ...)
         ret = cbind(ret, 
                     std.error = coef(x, type="vector", what="par.se"),
@@ -58,33 +59,65 @@ tidy.marssMLE = function (x,  type = c("parameters", "states"),
     }
     rownames(ret)=NULL
   }
-  if(type=="states"){
+  if(type%in%c("xtt1","xtT","xtt")){
     model=x[["model"]]
     state.names = attr(model, "X.names")
     state.dims = attr(model, "model.dims")[["x"]]
     mm = state.dims[1]
     TT = state.dims[2]
+    kfss=MARSSkfss(x)
+    states = kfss[[type]]
+    vtype = str_replace(type,"x","V")
+    states.se = apply(kfss[[vtype]],3,function(x){takediag(x)})
+    states.se[states.se<0]=NA
+    states.se=sqrt(states.se)
+    if(m==1) states.se=matrix(states.se,1,TT)
+    rownames(states.se)=attr(MLEobj$marss, "X.names")
     #if user specified rotate
     if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
       Z.est = coef(x, type="matrix")[["Z"]]
       H = 1
       if(ncol(Z.est)>1){
         H = solve(varimax(Z.est)[["rotmat"]])
-        x[["states"]] = H %*% x[["states"]] #rotated states
+        states = H %*% states #rotated states
         TT = attr(x$model, "model.dims")[["data"]][2]
-        VtT=MARSSkf(x)[["VtT"]]
+        states.var=MARSSkf(x)[[vtype]]
         for(t in 1:TT){
-          x[["states.se"]][,t] = sqrt(takediag(H%*%VtT[,,t]%*%t(H)))
+          states.se[,t] = sqrt(takediag(H%*%states.var[,,t]%*%t(H)))
         }
       }
     }
     ret = data.frame(
       term=rep(state.names,each=TT), 
       t=rep(1:TT,mm), 
-      estimate = vec(t(x[["states"]])),
-      std.error = vec(t(x[["states.se"]]))
+      estimate = vec(t(states)),
+      std.error = vec(t(states.se))
     )
-    if( conf.int ){
+    if( interval ){
+      conf.low = qnorm(alpha/2)*ret$std.error + ret$estimate
+      conf.up = qnorm(1-alpha/2)*ret$std.error + ret$estimate
+      ret = cbind(ret, 
+                  conf.low = conf.low,
+                  conf.high = conf.up
+      )
+    }
+    rownames(ret)=NULL
+  }
+  if(type%in%c("ytT")){
+    model=x[["model"]]
+    Y.names = attr(model, "Y.names")
+    Y.dims = attr(model, "model.dims")[["y"]]
+    nn = Y.dims[1]
+    TT = Y.dims[2]
+    aug <- broom::augment(x, type.predict="observations")
+
+    ret = data.frame(
+      term=rep(Y.names,each=TT), 
+      t=rep(1:TT,nn), 
+      estimate = aug$.fitted,
+      std.error = aug$.se.fit
+    )
+    if( interval ){
       conf.low = qnorm(alpha/2)*ret$std.error + ret$estimate
       conf.up = qnorm(1-alpha/2)*ret$std.error + ret$estimate
       ret = cbind(ret, 
