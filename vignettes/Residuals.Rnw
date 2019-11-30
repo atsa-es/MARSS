@@ -139,6 +139,15 @@
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Computation of Standardized Residuals for MARSS Models}
 \maketitle
+\begin{abstract}
+This report shows how to compute the variance of the joint conditional model and state residuals for multivariate autoregressive Gaussian state-space (MARSS) models. The MARSS model can be written: $\mathbf{x}_t=\mathbf{B}\mathbf{x}_{t-1}+\mathbf{u}+\mathbf{w}_t$, $\mathbf{y}_t=\mathbf{Z}\mathbf{x}_t+\mathbf{a}+\mathbf{v}_t$, where $\mathbf{w}_t$ and $\mathbf{v}_t$ are multivariate normal error-terms with variance-covariance matrices $\mathbf{Q}$ and \mathbf{R} respectively. The joint conditional residuals are the $\mathbf{w}_t$ and $\mathbf{v}_t$ conditioned on a set of, possibly incomplete, data $\mathbf{y}$. Harvey, Koopman and Penzer (1998) show a recursive algorithm for these residuals. I show the equation for the residuals using the conditional variances of the states and the conditional covariance between unobserved data and states. This allows one to compute the variance of un-observed residuals, which needed for leave-one-out cross-validation tests and to compute the conditional variance of the missing data. I show how to modify the Harvey et al. algorithm in the case of missing values and how to modify it to return the non-normalized conditional residuals.
+\end{abstract}
+Keywords: Time-series analysis, Kalman filter, residuals, maximum-likelihood, vector autoregressive model, dynamic linear model, parameter estimation, state-space
+\vfill
+{\noindent \small citation: Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045 }
+ \newpage
+ 
+\section{Overview}
 
 This report discusses the computation of the variance of the conditional model (and state) residuals for MARSS models of the  form:
 \begin{equation}\label{eq:residsMARSS}
