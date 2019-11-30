@@ -146,7 +146,7 @@ This report presents an Expectation-Maximization (EM) algorithm for estimation o
 \end{abstract}
 Keywords: Time-series analysis, Kalman filter, EM algorithm, maximum-likelihood, vector autoregressive model, dynamic linear model, parameter estimation, state-space
 \vfill
-{\noindent \tiny citation: Holmes, E. E. 2012. Derivation of an EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models. }
+{\noindent \small citation: Holmes, E. E. 2013. Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models. Technical Report. arXiv:1302.3919 }
  \newpage
 \section{Overview}
 
