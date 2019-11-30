@@ -2,20 +2,28 @@
 \alias{tidy.marssMLE}
 \title{Return estimated parameters and states with summary information}
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states"),
-                interval = TRUE, alpha = 0.05,
+  tidy.marssMLE(x, type = c("parameters", "states","observations"),
+                interval = TRUE,
+                interval.type = c("confidence","quantile","prediction","residual"),
+                smoothing = c("T", "t1", "t"),
+                alpha = 0.05,
+                interval.type = 
                 form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
   \item{x}{a marssMLE object}
   
-  \item{type}{Estimates for the parameters or for the states.}
+  \item{type}{What you want estimates and intervals for. Parameters, states (x) or observations(y).}
   
-  \item{interval}{ Whether to include a confidence interval if type="parameters" and quantiles if type is "states", "observations", or any of the x or y variables. See details for discussion of intervals for non-parameters.}
+  \item{interval}{ Whether to compute intervals on the estimates. }
+  
+  \item{interval.type}{ Type of interval if interval==TRUE. If type=="parmeters", the only allowed interval type is "confidence". If type is states, the only option is "quantile". If type is observations, the options are "residual", "prediction" or "quantile". Default is "residual". See details for discussion of intervals for non-parameters.}
+  
+  \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T (T), using only data up to t-1 (t1), or using only data up to t (t). If smoothing="t1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
 
-  \item{alpha}{ Confidence level if confidence interval is returned otherwise the quantile level for quantiles.}
+  \item{alpha}{ Confidence level if confidence interval is returned otherwise the quantile level for quantiles and prediction intervals.}
 
-  \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normall just ignore and let the function use the "form" set in the attributes.}
+  \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normally just ignore and let the function use the "form" set in the attributes.}
   
   \item{...}{Optional arguments.  If \code{interval=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
 
@@ -25,12 +33,11 @@
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. The \code{tidy.marssMLE} functions returns the parameter estimates. It will also return the estimated state (X) at time t conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t. Lastly, it will return the fitted Y estimate at time t, conditioned on all the data, the data up to t-1 (one-step-ahead), or the data up t.
 }
 \return{
-\strong{type=="parameters"} A data.frame with estimates, sample standard errors, and confidence intervals (if requested).
+\strong{type=="parameters"} A data.frame with estimates, sample standard errors, and confidence intervals (unless interval=FALSE).
 
-\strong{type in "states", "xtT", "xtt1", "xtt"} A data.frame with estimates of xtT, xtt1 or xtt with the standard deviation and quantiles (if requested) computed using the estimated model parameters.
+\strong{type in "states", "xtT", "xtt1", "xtt"} A data.frame with estimates of xtT, xtt1 or xtt with the standard deviation and quantiles (unless interval=FALSE) computed using the estimated model parameters.
 
-\strong{type in "observations", "ytT", "ytt1", "ytt"} A data.frame with the fitted Y computed using the right side of the Y equation in the MARSS model using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. The UNCONDITIONAL quantiles of the fitted values and are computed using VtT, Vtt1, or Vtt. Do not use these for residuals diagnotics (outlier detection). 
-
+\strong{type in "observations", "ytT", "ytt1", "ytt"} A data.frame with the fitted Y computed using the right side of the Y equation in the MARSS model using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. Intervals are included if interval=TRUE. For residuals analysis (outlier detection), you want to use the "residual" intervals. If you want the distribution of data that were not used in fitting, you want the "prediction" intervals. See details below. If you want the distribution of the model fit (the distribution of ytT, ytt1, or ytt), then you want the "quantile" intervals. This gives you the quantiles of ytT, ytt1, or ytt.
 }
 
 \details{
@@ -41,7 +48,7 @@ The tidy function is designed to work with the \code{broom} package and you will
   
   If interval=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
-\strong{type=="states"}
+\strong{type="states", "xtT", "xtt1", or "xtt"}
 
 Currently \code{tidy.marssMLE} does not return the confidence intervals for the estimated states. Instead only the quantiles of the states at time t using the estimated model parameters are returned. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the X). However, see the comments below on confidence intervals for the expected value of the states.
 
@@ -56,6 +63,14 @@ Z.est <- coef(dfa, type="matrix")$Z
 H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
+
+\strong{type="observations", "ytT", "ytt1", or "ytt"}
+
+The fitted Y means the right side of the y equation in the MARSS model without the \eqn{\mathbf{v_t}}{v_t}. The fitted y can be computed using either xtT, xtt1, or xtt for respectively ytT, ytt1, or ytt. The model residuals are difference between the y (data) and the fitted y.  For residuals analysis (outlier detection), you want to use the "residual" intervals. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT, xtt1, and xtt).  If you want the distribution of data that were NOT used in fitting, you want the "prediction" intervals. "prediction" intervals are the unconditional quantiles of data that can be generated from the model and are computed using VtT, Vtt1, or Vtt. These are for data that are not included in the model (and thus not included in estimation of xtT, xtt1, and xtt). Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}.
+
+Why are residual and prediction intervals different? Here is a simple example. Say you observe 100 data points (y) from a Normal distribution with mean u and variance q. The estimate of u is the mean of y. Let's call that \eqn{\hat{u}}. The estimate of q is the variance of the sample residuals: \eqn{var(y-\hat{u})}, but q is not the variance of \eqn{y-\hat{u}}! q is the variance of \eqn{y-u}. The variance of \eqn{y-\hat{u}} is smaller than q because y were used to estimate \eqn{\hat{u}}. The y are closer (on average) to the sample mean (mean of y) than y is to u (population mean). That is why residual intervals are narrower than prediction intervals. If you are doing residual analysis (looking for outliers), then you uses the residual intervals.
+
+What about quantile intervals versus prediction intervals? The quantile intervals are the intervals for ytT, ytt1 or ytt, i.e. for the fitted y. 
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applications. Edition 4. Springer-Verlag, New York.
