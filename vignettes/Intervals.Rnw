@@ -174,6 +174,12 @@ Why are residual and prediction intervals different? Here is a simple example. S
 
 \section{Confidence intervals for the estimate of \eqn{E[X_t]}}
 
+After going around in circles, I settled on just adding ytT to tidy. I also decided that VtT is an estimate of the standard error of E[X(t)|data]-x(t), where x(t) is true state.  As you have more and more replicates of Y(t), VtT does shrink and xtT approaches x(t).  So VtT is behaving like a standard error where the thing being estimated is x(t) and its estimate is E[X(t)].  Not sure how to prove this, but since everything is normal, VtT should be an estimate of variance_Y|x E[X(t)|Y=y]-x(t).  So imagine many Y generated from Zx(t)+u+v(t) and then estimate E[X(t)]. The variance of E[X(t)]-x(t) should be VtT.  That variance may be over both X and Y|x however. So 
+var_Y|x E[X(t)|Y=y]-x(t) or var_X E[X(t)|Y=y]-X(t) 
+or E_X var_Y|x E[X(t)|Y=y]-x(t)
+
+Below is the going around in circles part.
+
 This is for the confidence interval of \hat{E[X(t)]}-E[X(t)] which is not really what we want. We want the interval for E[X(t)]-x(t), i.e. how far are we from the true x(t) or how certain are we about the true x(t)? Idea I think is that E[X(t)]-X(t)|\hat{\Theta} is a decent estimate of E[X(t)]-X(t)|\Theta.  But maybe I want E[X(t)]-x(t)|\hat{\Theta} where \hat{\Theta} is a random variable drawn from its var-cov matrix and x(t) is the true x(t).
 
 Currently the confidence and prediction intervals for the states (the x(t)) and observations (the y(t)) use the point estimates of the model parameters, and thus treat these as known. Computation of the intervals with parameter uncertainty is conceptually straight forward. Let's start with a review of computing the standard error of a sample statistic.
