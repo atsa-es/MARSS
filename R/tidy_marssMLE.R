@@ -118,7 +118,9 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     hatyt <- MARSShatyt(x)
     Ey <- hatyt[[ytype]]
     vtype <- str_replace(ytype,"y","O")
-    Ey.se <- apply(hatyt[[vtype]],3,function(x){takediag(x)})
+    Ey.var <- hatyt[[vtype]]
+    for(t in 1:TT) Ey.var[,,t] <- Ey.var[,,t] - tcrossprod(Ey[,t])
+    Ey.se <- apply(Ey.var,3,function(x){takediag(x)})
     Ey.se[Ey.se<0] <- NA
     Ey.se <- sqrt(Ey.se)
     
