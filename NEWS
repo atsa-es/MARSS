@@ -2,38 +2,38 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at ``https://nwfsc-timeseries.github.io/MARSS/''.  Notes on known issues are also posted there.
 
-CHANGES IN MARSS 3.10.12
+CHANGES IN MARSS 3.10.12 (current state of master 12-2-2019)
 ------------------------------------
 
 BUGS
-
 * fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
 
 ENHANCEMENTS
-
 * added E[Y(t)|Y(t)=y(t)] to tidy.marssMLE so ytT. Not very useful unless one needs an estimate of a missing value when y is multivariate and R is not diagonal.  Also added E[Y(t)|Y(t-1)=y(t-1)], one-step-ahead predictions for Y which is more useful.
 * added Ott1 (expected value of Y(t)|Y(1,1:t-1)) to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t)
 * added smoothing argument to tidy.marssMLE which allows the xtt1 and xtt states (with CIs) to be output.
 * added plot of ytT to autoplot.marssMLE
 
 DOCUMENTATION and MAN FILES
-
 * added abstract to Residuals report.
 * added more info to tidy.marssMLE about how the intervals are computed.
 
-CHANGES IN MARSS 3.10.11
+CHANGES IN MARSS 3.10.11 (released on GitHub 8-3-2019)
 ------------------------------------
-Version 3.10.11 has some edits to speed up the code by minimizing calls to expensive checking functions and fixes a bug in MARSSharveyobsFI() that appeared if a parameter was fixed and time-varying and MARSSparamCIs() was called.
+Minor update. Version 3.10.11 has some edits to speed up the code by minimizing calls to expensive checking functions and fixes a bug in MARSSharveyobsFI() that appeared if a parameter was fixed and time-varying and MARSSparamCIs() was called.
 
+ENHANCEMENTS
 * is.validvarcov is expensive. minimize calls to it. If called with a diagonal matrix, it should automatically pass so added a check to is.validvarcov() to see if matrix is diagonal.
 * is.marssMLE is expensive. Replace with a call to class().
-* MARSSkfss had a bug * used in place of %*% with J0. Would never show up unless V0 estimated.
 * Add S3 methods for broom functions if broom is loaded.
 * Add autoplot function and updated plot documentation to cover autoplot functions.
 * Fixed typos in Case Study 4 and Derivation eq 143b.
+
+BUGS
+* MARSSkfss had a bug "*" was used in place of %*% with J0. Would never show up unless V0 estimated.
 * Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
 
-CHANGES IN MARSS 3.10.10
+CHANGES IN MARSS 3.10.10 (released on CRAN 11-2-2018)
 ------------------------------------
 Minor update to declare S3 objects if user has broom package installed.  A few minor changes also made.
 
@@ -46,10 +46,9 @@ Minor update to declare S3 objects if user has broom package installed.  A few m
 * Changed plot.marssMLE to autoplot since it is ggplot2 based
 * Created plot.marssMLE that uses only base R graphics
 
-CHANGES IN MARSS 3.10
+CHANGES IN MARSS 3.10.8 (released 4-14-2018 on CRAN)
 ------------------------------------
-
-The main changes have to do with residuals and confidence intervals calculations.  
+Major update over 3.9. The main changes have to do with residuals and confidence intervals calculations.  
 
 BUGS
 
@@ -127,12 +126,13 @@ MISC
 * Poor name choice. y.se was not the standardard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
 
 
-CHANGES IN MARSS 3.9
+CHANGES IN MARSS 3.9 (released 3-21-2014 on CRAN)
 ------------------------------------
 none. resubmission due to missing file
 
-CHANGES IN MARSS 3.8
+CHANGES IN MARSS 3.8 (released 3-18-2014 on CRAN)
 ------------------------------------
+ENHANCEMENTS
 * added check for fun.kf value in checkMARSSinputs()
 * added check to print.marssMLE to make sure models are class marssMODEL.  Added info to MARSSinfo() to give the user some code to convert pre-3.5 marssMLE object to the 3.5+ form.
 * changed summary.marssMODEL to return the list matrix instead of the marssMODEL passed in. Added tinitx to the returned (and printed) list.
@@ -149,7 +149,7 @@ CHANGES IN MARSS 3.8
 * The OR and CA years for the harborSeal dataset were off.  Fixed and added references to the man file for harborSeal.  Removed the harborSealnomiss dataset as that is no longer used in the User Guide.
 * Rewrote the Seal Population Structure chapter and MAR(p) chapter.
 
-- bugs
+BUGS
 * in MARSSkfss. When Z was not square (num rows > num cols), OmgRVtt was not getting set.  OmgRVtt sets Vtt diagonals (and corresponding cols and row) to zero when R had 0s on the diagonal.
 * in MARSSkfas. Was returning $Innov and $Sigma using $v and $F, but as detailed in the KFS help page (KFAS package), the ones returned by KFS are not the same as the standard innovations and Sigma for multivariate data.  Now, MARSSkfas() returns a text message to use MARSSkfss to get these.
 * residuals.marssMLE & MARSSinnovationsboot were not running MARSSkfss to get Innov, Kt, and Sigma when R was not diagonal.  Problem occurred after I changed MARSSkfss() to return text error instead of NULL for these.
@@ -163,10 +163,11 @@ CHANGES IN MARSS 3.8
 * X names were not getting applied to states in MARSS(); default X.names would be odd for non-design Z matrices. MARSS_marss() and MARSS_marxss().
 
 
-CHANGES IN MARSS 3.7
+CHANGES IN MARSS 3.7 (released on CRAN 12-14-2013)
 ------------------------------------
 3.7 update required due to new version of KFAS that changed its API.
 
+ENHANCEMENTS
 - Changed dependency to new version of KFAS.  Updated NAMESPACE to only import the 3 KFAS functions used.
 - Created a versiontest.R file for comparing output from two different versions of MARSS.  It's in the doc directory.
 - Changes to the documentation. Mark made a few changes to the DFA chapter.  Got rid of Bluegreens in the example since that was mostly missing data.  Moved the info on the general MARSS equation from the Quick_Start guide to the chapter on algorithms.  Added a 'Tips and Tricks' section to the Quick_Start guide.
@@ -174,13 +175,13 @@ CHANGES IN MARSS 3.7
 - The index file was out of date with old names for R scripts. Made some minor updates to the MARSS man file.
 - Exported the toLatex method for making a LaTex version (and pdf) of a marssMODEL object.
 
-bugs
+BUGS
 - fixed allow.degen bug that would set elements to zero, leading to non positive definite matrices. Test if Q and R are diagonal.  If not, don't allow degens to be set since that is likely to lead to non-pos def matrices.  I could test if the row/col covariance are 0s but that would be costly.
 - fixed loglog.conv.test bug that returned NAs when logLik > 720 due to exp(LL) call.  Changed to exp(LL-mean(LL))
 
-CHANGES IN MARSS 3.6
+CHANGES IN MARSS 3.6  (released on CRAN 11-26-2013)
 ------------------------------------
-3.6 is mainly concerned with speeding up MARSS() for problems with large number of time series (n > 100) and where many R elements are being estimated (e.g. R="diagonal and unequal").  This comes up in dynamic factor analyses often.  The changes also improve speed for small R problems by about 25%, but speed increase is 10 fold for problems with R matrices that are 100x100 with 100 estimated R elements.
+3.6 update is mainly concerned with speeding up MARSS() for problems with large number of time series (n > 100) and where many R elements are being estimated (e.g. R="diagonal and unequal").  This comes up in dynamic factor analyses often.  The changes also improve speed for small R problems by about 25%, but speed increase is 10 fold for problems with R matrices that are 100x100 with 100 estimated R elements.
 
 - changed MARSS.marxss to speed up conversion of "unconstrained" shortcut to a matrix.  Only matters if m or n is big.
 - speed up convert.model.matrix().  Old version was always using slow code to deal with * and + in character matrix.  This made formation of the free and fixed matrices very, very slow when the matrix got big (100x100, say).
