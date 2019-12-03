@@ -32,7 +32,7 @@ ENHANCEMENTS
 BUGS
 * MARSSkfss had a bug "*" was used in place of %*% with J0. Would never show up unless V0 estimated.
 * Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
-* dparmat() did not return values if it was time-varying and fixed. Caused error above.
+* dparmat() did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
 
 CHANGES IN MARSS 3.10.10 (released on CRAN 11-2-2018)
 ------------------------------------
