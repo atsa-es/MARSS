@@ -67,11 +67,13 @@ Z.rot <- Z.est \%*\% H.inv
 
 \strong{The estimate and distribution for missing data} If your y is missing data and you want an estimate of those values, use \code{tidy.marssMLE}. The standard error and confidence interval for the missing value takes into account all the information in the data. Do not use \code{\link{augment.marssMLE}} as that returns the standard errors for the model residuals for missing data, which will be quite different if the R matrix is not diagonal. Also do not use "prediction" intervals for interpolating missing data, as that is for entire new data sets and thus will ignore relevant information if Y(t) is multivariate, not all Y(t) are missing, and the R matrix is not diagonal.
 
-\strong{Fitted Y(t)} For the fitted values of Y(t), which is the right side of the Y(t) equation WITHOUT the \eqn{v_t}, use \code{\link{fitted.marssMLE}} and \code{\link{augment.marssMLE}} to get model fits, residuals, and the residual variances (for outlier analysis).
+\strong{Output that augment.marssMLE provides and tidy.marssMLE does not}
+
+\strong{titted Y(t)} For the fitted values of Y(t), which is the right side of the Y(t) equation WITHOUT the \eqn{v_t}, use \code{\link{fitted.marssMLE}} and \code{\link{augment.marssMLE}} to get model fits, residuals, and the residual variances (for outlier analysis).
 
 \strong{Residual intervals} For residuals analysis (outlier detection), you want to use the "residual" intervals provided with \code{\link{augment.marssMLE}}. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}. The residuals intervals are also what you want to evaluate data that you leave out, for example for a leave-one-out-cross-validation.
 
-\strong{Prediction intervals} The prediction interval is for new independent data which observe the same X(t) as the data which were used to fit the model.
+\strong{Prediction intervals} The prediction interval is for new independent data which observe the same x(t) as the data which were used to fit the model. Use \code{\link{augment.marssMLE}} for these.
 
 Currently the intervals calculations for the states and observations uses the point estimates of the model parameters and thus solve the intervals for the 'known' parameters case.
 }
