@@ -16,7 +16,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   if(type=="y" & smoothing!="T") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T'.", call. = FALSE)
   ## End Argument checking
   
-  alpha <- 1-conf.int
+  alpha <- 1-conf.level
   smoothing <- switch(smoothing, T="tT", `t-1`="tt1", t="tt")
   extras=list()
   
@@ -77,8 +77,8 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     states.se <- apply(kfss[[vtype]],3,function(x){takediag(x)})
     states.se[states.se<0] <- NA
     states.se <- sqrt(states.se)
-    if(m==1) states.se <- matrix(states.se,1,TT)
-    rownames(states.se) <- attr(MLEobj$marss, "X.names")
+    if(mm==1) states.se <- matrix(states.se,1,TT)
+
     #if user specified rotate
     if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
       Z.est <- coef(x, type="matrix")[["Z"]]
@@ -123,10 +123,12 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     Ey.se <- apply(Ey.var,3,function(x){takediag(x)})
     Ey.se[Ey.se<0] <- NA
     Ey.se <- sqrt(Ey.se)
-    
+    if(nn==1) Ey.se <- matrix(Ey.se,1,TT)
+
     ret = data.frame(
       term=rep(Y.names,each=TT), 
       t=rep(1:TT,nn), 
+      y = vec(t(x[["model"]][["data"]])),
       estimate = vec(t(Ey)),
       std.error = vec(t(Ey.se))
     )
