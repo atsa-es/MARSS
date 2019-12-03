@@ -10,10 +10,10 @@ If you want the fitted values of Y, use \code{\link{fitted.marssMLE}} or \code{\
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states", observations", "X", "Y"),
-                interval = TRUE,
+  tidy.marssMLE(x, type = c("parameters", "states", observations", "x", "y"),
+                conf.int = TRUE,
+                conf.level = 0.95,
                 smoothing = c("T", "t-1", "t"),
-                alpha = 0.05,
                 form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
@@ -21,15 +21,15 @@ The tidy function is designed to work with the \code{broom} package and you will
   
   \item{type}{What you want estimates and intervals for. Parameters, states (X) or observations (Y).}
   
-  \item{interval}{ Whether to compute intervals on the estimates. }
+  \item{conf.int}{ Whether to compute intervals on the estimates. }
   
-  \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T ("T"), using only data up to t-1 ("t-1"), or using only data up to t ("t"). If smoothing="t-1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
+  \item{conf.level}{ Confidence level. alpha=1-conf.int}
 
-  \item{alpha}{ Confidence level.}
+  \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T ("T"), using only data up to t-1 ("t-1"), or using only data up to t ("t"). If smoothing="t-1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
 
   \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normally just ignore and let the function use the "form" set in the attributes.}
   
-  \item{...}{Optional arguments.  If \code{interval=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
+  \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
 
 }
 
@@ -41,7 +41,7 @@ A data.frame with estimates, sample standard errors, and confidence (or predicti
 
 \strong{type=="parameters"}
 
-  If \code{type=="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If interval=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
+  If \code{type=="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
 \strong{type="states"}
 
