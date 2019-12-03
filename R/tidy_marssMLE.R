@@ -93,7 +93,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
       }
     }
     ret <- data.frame(
-      term=rep(state.names,each=TT), 
+      .rownames=rep(state.names,each=TT), 
       t=rep(1:TT,mm), 
       estimate = vec(t(states)),
       std.error = vec(t(states.se))
@@ -126,7 +126,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     if(nn==1) Ey.se <- matrix(Ey.se,1,TT)
 
     ret = data.frame(
-      term=rep(Y.names,each=TT), 
+      .rownames=rep(Y.names,each=TT), 
       t=rep(1:TT,nn), 
       y = vec(t(x[["model"]][["data"]])),
       estimate = vec(t(Ey)),
