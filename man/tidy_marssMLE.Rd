@@ -1,42 +1,56 @@
 \name{tidy.marssMLE}
 \alias{tidy.marssMLE}
-\title{Return estimated parameters and states with summary information}
+\title{Return estimated parameters, expected value of X(t) and Y(t) with summary information}
+\description{
+
+For parameters, \code{tidy.marssMLE} returns their estimates and their confidence intervals. For states (X) and observations (Y), it returns the expected values (mean value) and intervals for the complete right side of the MARSS X and Y equations (including the error terms) conditioned on all the data, data up to t or data up to t-1. 
+
+If you want the fitted values of Y, use \code{\link{fitted.marssMLE}} or \code{\link{augment.marssMLE}}. \code{\link{augment.marssMLE}} is  also what you want for residuals analysis (for outlier analysis). See details.
+
+The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
+}
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states"),
-                interval = TRUE, alpha = 0.05,
+  tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
+                conf.int = TRUE,
+                conf.level = 0.95,
+                smoothing = c("T", "t-1", "t"),
                 form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
   \item{x}{a marssMLE object}
   
-  \item{type}{Estimates for the parameters or for the states.}
+  \item{type}{What you want estimates and intervals for. Parameters, states (X) or observations (Y).}
   
-  \item{interval}{ Whether to include a confidence interval if type="parameters" and quantiles if type is "states", "observations", or any of the x or y variables. See details for discussion of intervals for non-parameters.}
-
-  \item{alpha}{ Confidence level if confidence interval is returned otherwise the quantile level for quantiles.}
-
-  \item{form}{If you want the augment function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set.}
+  \item{conf.int}{ Whether to compute intervals on the estimates. }
   
-  \item{...}{Optional arguments.  If \code{interval=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
+  \item{conf.level}{ Confidence level. alpha=1-conf.int}
+
+  \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T ("T"), using only data up to t-1 ("t-1"), or using only data up to t ("t"). If smoothing="t-1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
+
+  \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normally just ignore and let the function use the "form" set in the attributes.}
+  
+  \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not Z matrix).}
 
 }
-\description{
 
-The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}.
+\value{
+A data.frame with estimates, sample standard errors, and confidence (or prediction) intervals.
+}
 
-\strong{type=="parameters"}
+\details{
 
-  If type=="parameters", this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the print and coef functions into a data.frame that summarizes the estimates.
+\strong{type="parameters"}  
+
+If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
-  If interval=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
-  
-\strong{type=="states"}
+\strong{type="states"}
 
-Currently \code{tidy.marssMLE} does not return the confidence intervals for the estimated states. Instead only the quantiles of the states at time t using the estimated model parameters are returned. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the X). However, see the comments below on confidence intervals for the expected value of the states.
+\code{tidy.marssMLE} returns the confidence intervals of the states at time t using the estimated model parameters. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the x). However, these intervals do not include parameter uncertainty. If you want state residiuals (for residuals analysis), use \code{\link{residuals.marssMLE}} or \code{\link{augment.marssMLE}}.
 
-\strong{Quantiles} The state \eqn{X_t} in a MARSS model is a random variable. In Holmes (2012, Eqn. 11) notation,its expected value conditioned on all the observed data and the model parameters \eqn{\Theta} is \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t}. In \code{\link{MARSSkf}} notation, this is \code{xtT[,t]}. The the variance of \eqn{\mathbf{X}_t}{X_t} conditioned on all the observed data and \eqn{\Theta}, i.e. \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} or \code{VtT[,,t]}. Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
 
-For states, \code{tidy.marssMLE} returns the empirical, i.e. estimated, quantiles of \eqn{\mathbf{X}_t}{X_t} based on one of the estimated conditional variance-covariance matrices and corresponding expected value of \eqn{\mathbf{X}_t}{X_t}. These are the estimated values since we do not know the true \eqn{\Theta} but rather its estimate \eqn{\hat{\Theta}}. Let's denote the former as \code{Vx} (which is either \code{VtT}, \code{Vtt1} or \code{Vtt}) and the latter as \code{Ex} (which is either \code{xtT}, \code{xtt1}, or \code{xtt}). Let \code{sd.xt} denote the sqrt of the diagonal of \code{Vx}.  The equation for the \eqn{\alpha/2} quantile is (\code{qnorm(alpha/2)*sd.xt + Ex}). To emphasize that these are intervals for \eqn{\mathbf{X}_t}{X_t} not E[X(t)], the column headings are \code{.quant.low} and \code{.quant.up} and the column on its standard deviation is labelled \code{.std.dev} not \code{.std.error}. A standard error is a measure of the variability of some estimated value from a sample and this variability shrinks as the sample size increases. The standard deviation does not shrink with more data; it is simply a function of the model parameters.
+\strong{Quantiles} The state \eqn{X_t} in a MARSS model is a random variable. In Holmes (2012, Eqn. 11) notation, its expected value conditioned on all the observed data (1:T) and the model parameters \eqn{\Theta} is \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t}. In \code{\link{MARSSkf}} notation, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} (\code{VtT[,,t]}). Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
+
+Denote the variance as \code{Vx} (which is either \code{VtT}, \code{Vtt1} or \code{Vtt}) and the expected value as \code{Ex} (which is either \code{xtT}, \code{xtt1}, or \code{xtt}). Let \code{se.xt} denote the sqrt of the diagonal of \code{Vx}. The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.xt + Ex}). 
   
 If you have a DFA model (form='dfa'), you can pass in \code{rotate=TRUE} to return the rotated trends.  If you want the rotated loadings, you will need to compute those yourself:
 \preformatted{
@@ -45,6 +59,21 @@ Z.est <- coef(dfa, type="matrix")$Z
 H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
+
+
+\strong{type="observations"}
+
+\code{tidy.marssMLE} returns the expected value and variance of Y(t), conditioned on all the data or only the data up to t-1 (conditioning on data up to t is not provided). The former is what you want for interpolating missing data (see below) and the latter is what you want for a one-step-ahead prediction. These values are returned by \code{\link{MARSShatyt}}. The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.yt + Ey}). Note that Ey is not the same as the fitted Y(t), and if there are no missing values, the variance of Y(t) conditioned on the data will be 0. See below.  
+
+\strong{The estimate and distribution for missing data} If your y is missing data and you want an estimate of those values, use \code{tidy.marssMLE}. The standard error and confidence interval for the missing value takes into account all the information in the data. Do not use \code{\link{augment.marssMLE}} as that returns the standard errors for the model residuals for missing data, which will be quite different if the R matrix is not diagonal. Also do not use "prediction" intervals for interpolating missing data, as that is for entire new data sets and thus will ignore relevant information if Y(t) is multivariate, not all Y(t) are missing, and the R matrix is not diagonal.
+
+\strong{Fitted Y(t)} For the fitted values of Y(t), which is the right side of the Y(t) equation WITHOUT the \eqn{v_t}, use \code{\link{fitted.marssMLE}} and \code{\link{augment.marssMLE}} to get model fits, residuals, and the residual variances (for outlier analysis).
+
+\strong{Residual intervals} For residuals analysis (outlier detection), you want to use the "residual" intervals provided with \code{\link{augment.marssMLE}}. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}. The residuals intervals are also what you want to evaluate data that you leave out, for example for a leave-one-out-cross-validation.
+
+\strong{Prediction intervals} The prediction interval is for new independent data which observe the same X(t) as the data which were used to fit the model.
+
+Currently the intervals calculations for the states and observations uses the point estimates of the model parameters and thus solve the intervals for the 'known' parameters case.
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applications. Edition 4. Springer-Verlag, New York.
@@ -54,7 +83,8 @@ Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and uncons
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11,12),]
-  MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
+  # model allowing correlation between x states
+  MLEobj <- MARSS(dat, model=list(Q="unconstrained"))
 
 library(broom)
 library(ggplot2)
@@ -63,33 +93,26 @@ library(ggplot2)
  tidy(MLEobj)
  
 # Make a plot of the estimated states
-# Don't use augment.  States are not data.
+library(ggplot2)
 d <- tidy(MLEobj, type="states")
 ggplot(data = d) + 
   geom_line(aes(t, estimate)) +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.1) +
+  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
   facet_grid(~term) +
   xlab("Time Step") + ylab("Count")
-}
-\note{
-\section{Confidence intervals for the estimate of \eqn{E[X_t]}}
-
-Although \code{tidy.marssMLE} does not return these CIs currently, computation of them is conceptually straight forward. Let's start with a review of computing the standard error of a sample statistic.
-
-\strong{Standard error} The standard error of the estimate of \eqn{E[X_t]}---whether conditioned on all the data (\code{xtT}), data up to t-1 (\code{xtt1}) or data up to t (\code{xtt})---is a measure of the how far the estimate (using the estimate \eqn{\hat{\Theta}}) is from the true \eqn{E[X_t]} using the true \eqn{\Theta}. The standard error of the estimate of \eqn{E[X_t]}} uses the information about our uncertainty in \eqn{\hat{\Theta}}. With more data, i.e. a longer time series or multiple \eqn{y_t} at each t, the uncertainty in our estimated \eqn{\Theta} shrinks and the standard error of the estimate of \eqn{E[X_t]}} shrinks. This is the standard notion of the standard error of a sample statistic.
-
-So how do you get the standard error of the estimate of \eqn{E[X_t]}}? This can be computed analytically for MARSS models, but let's imagine doing this with a parametric bootstrap.  If \eqn{\Theta} is known (say you are doing a computer simulation and specify \eqn{\Theta}), the standard error can be computed from the variance-covariance matrix of \eqn{\hat{\Theta}}. The latter is computed from the Fisher Information matrix (see \code{\link{MARSShessian}}). Then we use a parametric bootstrap to get the distribution of estimates of \eqn{E[X_t]} from a time-series of a specific length, number of missing values, and structure. 
-
-The process is: draw \eqn{\Theta_b}'s from the variance-covariance matrix, simulate a time-series from that \eqn{\Theta_b}, compute \code{xtT} (or \code{xtt} or \code{xtt1}), and repeat 1000s of times. The function \code{\link{MARSSsimulate}} will do most of this process for you, everything but running the bootstrap data through \code{\link{MARSSkf}} to get \code{xtT} (or \code{xtt} or \code{xtt1}).  That is the general concept of how one gets the distribution of sample statistics and computes their standard error when working in a frequentist framework with maximum-likelihood parameter estimates (the statistical framework that the MARSS package operates within). From that distribution, you can get the standard error at time t, which is the square root of the variance of the estimates at time t.
-
-\strong{Sample standard error} So that was the case where \eqn{\Theta} is known. If we only have an estimate of \eqn{\Theta} from one data set, then the above procedure yields the sample standard error of the estimate of \eqn{E[X_t]}. Notice that the standard error is not the square root of the diagonal of \code{VtT}. The latter is the variance of \eqn{X_t} not \eqn{E[X_t]}. For the standard error, \code{VtT} needs to be adjusted by the sample size. For a MARSS model, sample size is not the number of data points. Rather we need the a measure of the information in the data on each \eqn{X_t} and that depends on the structure of our MARSS model and the structure of our data set.
-
-\strong{Confidence interval} A confidence interval is associated with a specific sample. It is an interval of a statistic (like mean or in our case \eqn{E[X_t]}), computed from a sample. This interval is constructed such that it covers the true value of the statistic for \eqn{1-\alpha} percent of all samples. So for our bootstrapped data sets from the true \eqn{\Theta}, we could construct an interval for each bootstrap data set and if constructed correctly, the interval would include \eqn{E[X_t]} in \eqn{1-\alpha} percent of the bootstrapped data sets. There are an infinite number of ways that you could contruct this interval. The one used overwhelmingly in frequentist statistics is one that has nice compact properties.
-
-How do we construct the confidence interval? MARSS models are in the class of multivariate Gaussian models and we can compute the confidence interval from the sample standard error of the estimate of \eqn{E[X_t]}. \eqn{E[X_t]} is multivariate. We can compute univariate confidence intervals that apply to only one of the X, we can compute multivariate confidence regions, and we can compute the simultaneous univariate confidence regions. The latter mean an interval such that if the interval for one \eqn{E[X_t]} then all cover (all or none).  
-
-The univariate confidence intervals are the easy ones to compute. Let's use \code{se.xt} for the sample standard errors of the estimate of \eqn{E[X_t]}---the square root of the diagonal of the variance-covariance matrix for the estimates of \eqn{E[X_t]}. The approximate CIs by \code{qnorm(alpha/2)*se.xt + Ex}, where \code{Ex} is \code{xtT}, \code{xtt} or \code{xtt1} depending on what \eqn{E[X_t]} we are interested in.
-
-Using \code{qnorm()} is an approximation and is treating the \eqn{\Theta} as known instead of as an estimate. The Normal approximation does not have heavy enough tails and is too narrow. In a univariate Normal case, you'd use a t-distribution and \code{qt(alpha/2, df)}. For a MARSS model, the degrees of freedom can be different for different x_t in X_t (different rows) and just depends on your model structure. You can construct bootstrap CIs but that is incredibly slow since you have to bootstrap your bootstraps. This type of normal approximation is commonly used for more complex models, but just aware that is does mean that the confidence intervals are a bit narrow. 
-
+  
+# Make a plot of the estimates for the missing values
+# Use augment() to plot the fitted y(t)
+# i.e., to put a line through the points
+library(ggplot2)
+d <- tidy(MLEobj, type="observations")
+ggplot(data = d) + 
+  geom_point(aes(t, estimate)) +
+  geom_line(aes(t, estimate)) +
+  geom_point(aes(t, y), color="blue") +
+  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
+  facet_grid(~term) +
+  xlab("Time Step") + ylab("Count") +
+  ggtitle("Blue=data, Black=estimate of missing data point")
+  
 }

@@ -1,6 +1,6 @@
 autoplot.marssMLE <- 
   function(x, 
-           plot.type=c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot"), 
+           plot.type=c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations"), 
            form=c("marxss", "marss", "dfa"), 
            conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
   {
@@ -55,7 +55,8 @@ autoplot.marssMLE <-
       p1 = p1 +
         ggplot2::geom_line() + 
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~term, scale="free_y")
+        ggplot2::facet_wrap(~.rownames, scale="free_y") +
+        ggplot2::ggtitle("States")
       plts[["states"]] = p1
       if(identical(plot.type, "states")) return(p1)
     }
@@ -72,10 +73,30 @@ autoplot.marssMLE <-
         ggplot2::geom_line() + 
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale="free_y") + 
-        ggplot2::geom_point(data=df[!is.na(df$y),], ggplot2::aes_(~t, ~y), col="blue")
+        ggplot2::geom_point(data=df[!is.na(df$y),], ggplot2::aes_(~t, ~y), col="blue") +
+        ggplot2::ggtitle("Model fitted values for Y")
       plts[["observations"]] = p1
       if(identical(plot.type, "observations")) return(p1)
     }
+    
+    if("expected.value.observations" %in% plot.type) {
+      # make plot of observation residuals
+      df = tidy.marssMLE(MLEobj, type="observations", form="marxss")
+      df$ymin = df$conf.low
+      df$ymax = df$conf.high
+      p1 = ggplot2::ggplot(data=df, ggplot2::aes_(~t, ~estimate)) + 
+        ggplot2::geom_line()
+      if(conf.int) p1 = p1 +
+        ggplot2::geom_ribbon(data=df, ggplot2::aes_(ymin = ~ymin, ymax= ~ymax), alpha=0.3, col="grey")
+      p1 = p1 +
+        ggplot2::geom_line() + 
+        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
+        ggplot2::facet_wrap(~.rownames, scale="free_y") + 
+        ggplot2::geom_point(data=df[!is.na(df$y),], ggplot2::aes_(~t, ~y), col="blue") +
+        ggplot2::ggtitle("Expected value of Y conditioned on data")
+      plts[["expected.value.observations"]] = p1
+      if(identical(plot.type, "expected.value.observations")) return(p1)
+    } 
     
     if("model.residuals" %in% plot.type) {
       # make plot of observation residuals
@@ -85,7 +106,8 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + 
         ggplot2::ylab("Observation residuals, y - E[y]") +
         ggplot2::facet_wrap(~.rownames, scale="free_y") + 
-        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3)
+        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3) +
+        ggplot2::ggtitle("Model residual")
       if(decorate) p1 = p1 + ggplot2::stat_smooth(method="loess", se=conf.int, level=conf.level, na.rm=TRUE)
       plts[["model.residuals"]] = p1
       if(identical(plot.type, "model.residuals")) return(p1)
@@ -100,7 +122,8 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + 
         ggplot2::ylab("State residuals, xtT - E[x]") +
         ggplot2::facet_wrap(~.rownames, scale="free_y") + 
-        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3)
+        ggplot2::geom_hline(ggplot2::aes(yintercept=0), linetype=3) +
+        ggplot2::ggtitle("State residuals")
       if(decorate) p1 = p1 + ggplot2::stat_smooth(method="loess", se=conf.int, level=conf.level, na.rm=TRUE)
       plts[["state.residuals"]] = p1
       if(identical(plot.type, "state.residuals")) return(p1)
@@ -130,7 +153,8 @@ autoplot.marssMLE <-
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
         ggplot2::xlab("Theoretical Quantiles") + 
         ggplot2::ylab("Standardized Model Residuals") +
-        ggplot2::facet_wrap(~.rownames, scale="free_y")
+        ggplot2::facet_wrap(~.rownames, scale="free_y") +
+        ggplot2::ggtitle("Model residuals")
       if(decorate) p1 = p1 + ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue")
       plts[["model.residuals.qqplot"]] = p1
       if(identical(plot.type, "model.residuals.qqplot")) return(p1)
@@ -147,7 +171,8 @@ autoplot.marssMLE <-
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid),na.rm=TRUE) +
         ggplot2::xlab("Theoretical Quantiles") + 
         ggplot2::ylab("Standardized State Residuals") +
-        ggplot2::facet_wrap(~.rownames, scales="free_y")
+        ggplot2::facet_wrap(~.rownames, scales="free_y") +
+        ggplot2::ggtitle("State residuals")
       if(decorate) p1 = p1 + ggplot2::geom_abline(data=abline.dat, ggplot2::aes_(slope=~slope, intercept=~intercept),color="blue")
       plts[["state.residuals.qqplot"]] = p1
       if(identical(plot.type, "state.residuals.qqplot")) return(p1)
