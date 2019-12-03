@@ -13,7 +13,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if(type=="states") type="x"
   if(type=="observations") type="y"
-  if(type=="y" & smoothing!="T") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T'.", call. = FALSE)
+  if(type=="y" & smoothing=="t") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T' or 't-1'.", call. = FALSE)
   ## End Argument checking
   
   alpha <- 1-conf.level
