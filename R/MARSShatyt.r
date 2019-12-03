@@ -37,7 +37,7 @@ MARSShatyt = function( MLEobj ) {
   time.varying = c(); pari=list()
   for(elem in c("R","Z","A")){  #only params needed for this function
     if( model.dims[[elem]][3] == 1 ){  #not time-varying
-      pari[[elem]]=parmat(MLEobj, elem, t=1)[[elem]]
+      pari[[elem]]=parmat(MLEobj, elem, t=1)[[elem]] #by default parmat uses marss form
       if(elem=="R"){ 
         if(length(pari$R)==1) diag.R=unname(pari$R) else diag.R = takediag(unname(pari$R))
         #isDiagonal is rather expensive; this test is faster
@@ -49,9 +49,12 @@ MARSShatyt = function( MLEobj ) {
   
   #initialize - these are for the forward, Kalman, filter
   # for notation purposes, 't' represents current point in time, 'TT' represents the length of the series
-  #notation bad.  should be hatytT
+  #notation is horrible and leaves off the time conditioning. 
+  #In most, not all cases, it is 1:TT. If the last time is the conditioning, notation should be
+  #hatyt = hatytT, hatyxt = hatytxtT, hatyxtt1=hatytxt1T, hatyxttp=hatytxtpT
+  #hatOt - hatOtT, hatOtt1=is ok,
   hatyt = hatytt1 = matrix(0,n,TT)     
-  hatOt = array(0,dim=c(n,n,TT))     
+  hatOt = hatOtt1 = array(0,dim=c(n,n,TT))     
   hatyxt = hatyxtt1 = hatyxttp = array(0,dim=c(n,m,TT))
   
   for (t in 1:TT) {
@@ -64,11 +67,15 @@ MARSShatyt = function( MLEobj ) {
         #is.R.diagonal = isDiagonal(pari$R)
       }
     }
+    # For conditioning on data up to t-1, the data at time t do not factor in
+    hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
+    t.Z = matrix(pari$Z,m,n,byrow=TRUE)
+    hatOtt1[,,t]=pari$R+pari$Z%*%kfList[["Vtt1"]][,,t]%*%t.Z + tcrossprod(hatytt1[,t,drop=FALSE])
+
     if(all(YM[,t]==1)){  #none missing
       hatyt[,t]=y[,t,drop=FALSE]
-      hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
       hatOt[,,t]=tcrossprod(hatyt[,t,drop=FALSE]) #matrix() is faster than t()
-#      hatOt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n) #matrix() is faster than t()
+#     hatOt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n) #matrix() is faster than t()
       hatyxt[,,t]=tcrossprod(hatyt[,t,drop=FALSE], hatxt[,t,drop=FALSE])
 #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt[,t,drop=FALSE],1,m)
       hatyxtt1[,,t]=tcrossprod(hatyt[,t,drop=FALSE], hatxt1[,t,drop=FALSE])
@@ -92,7 +99,6 @@ MARSShatyt = function( MLEobj ) {
         Delta.r = I.n- pari$R%*%t.mho.r%*%Rinv%*%mho.r
       }
       hatyt[,t]=y[,t,drop=FALSE] - Delta.r%*%(y[,t,drop=FALSE]-pari$Z%*%hatxt[,t,drop=FALSE]-pari$A)
-      hatytt1[,t]=pari$Z%*%hatxtt1[,t,drop=FALSE]+pari$A
       t.DZ = matrix(Delta.r%*%pari$Z,m,n,byrow=TRUE)
       hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + tcrossprod(hatyt[,t,drop=FALSE])
 #      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n)
@@ -103,6 +109,6 @@ MARSShatyt = function( MLEobj ) {
       hatyxttp[,,t]=tcrossprod(hatyt[,t,drop=FALSE],hatxtp[,t,drop=FALSE])+Delta.r%*%pari$Z%*%t(hatVtpt[,,t])
     }
   } #for loop over time
-  rtn.list=list(ytT = hatyt, OtT = hatOt, yxtT=hatyxt, yxt1T=hatyxtt1, yxttpT = hatyxttp, ytt1 = hatytt1) 
-  return(c(rtn.list,list(ok=TRUE, errors = msg)))
+  rtn.list=list(ytT=hatyt, OtT=hatOt, Ott1=hatOtt1, yxtT=hatyxt, yxt1T=hatyxtt1, yxttpT=hatyxttp, ytt1=hatytt1) 
+  return(c(rtn.list, list(ok=TRUE, errors = msg)))
 }
