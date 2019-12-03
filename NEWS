@@ -2,6 +2,27 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at ``https://nwfsc-timeseries.github.io/MARSS/''.  Notes on known issues are also posted there.
 
+CHANGES IN MARSS 3.10.12
+------------------------------------
+
+* fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
+* added E[Y(t)|Y(t)=y(t)] to tidy.marssMLE so ytT. Not very useful unless one needs an estimate of a missing value when y is multivariate and R is not diagonal.
+* added more info to tidy.marssMLE about how the intervals are computed.
+* added the xtt1 and xtt states (with CIs) to tidy output.
+* added plot of ytT to autoplot.
+* added abstract to Residuals report.
+
+CHANGES IN MARSS 3.10.11
+------------------------------------
+Version 3.10.11 has some edits to speed up the code by minimizing calls to expensive checking functions and fixes a bug in MARSSharveyobsFI() that appeared if a parameter was fixed and time-varying and MARSSparamCIs() was called.
+
+* is.validvarcov is expensive. minimize calls to it. If called with a diagonal matrix, it should automatically pass so added a check to is.validvarcov() to see if matrix is diagonal.
+* is.marssMLE is expensive. Replace with a call to class().
+* MARSSkfss had a bug * used in place of %*% with J0. Would never show up unless V0 estimated.
+* Add S3 methods for broom functions if broom is loaded.
+* Add autoplot function and updated plot documentation to cover autoplot functions.
+* Fixed typos in Case Study 4 and Derivation eq 143b.
+* Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
 
 CHANGES IN MARSS 3.10.10
 ------------------------------------
