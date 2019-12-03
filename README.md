@@ -30,7 +30,7 @@
   <li><a href="#cite">Citation</a></li>
   <li><a href="#pubs">Publications</a></li>
   <li><a href="#license">License</a></li>
-  <li><a href="https://raw.githubusercontent.com/nwfsc-timeseries/MARSS/master/NEWS">NEWS</a>
+  <li><a href="https://raw.githubusercontent.com/nwfsc-timeseries/MARSS/master/NEWS">NEWS</a></li>
 </ul>
 
 <img src="logot.png" align="right" />
