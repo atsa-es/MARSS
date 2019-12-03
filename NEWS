@@ -32,19 +32,23 @@ ENHANCEMENTS
 BUGS
 * MARSSkfss had a bug "*" was used in place of %*% with J0. Would never show up unless V0 estimated.
 * Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
+* dparmat() did not return values if it was time-varying and fixed. Caused error above.
 
 CHANGES IN MARSS 3.10.10 (released on CRAN 11-2-2018)
 ------------------------------------
 Minor update to declare S3 objects if user has broom package installed.  A few minor changes also made.
 
+ENHANCEMENTS
 * Add if statement to declare S3 objects in NAMESPACE if user has broom package installed.  Allows delayed loading of S3 methods for broom.
 * is.validvarcov() is expensive.  Minimize use in MARSSaic, MARSSboot, MARSSoptim, MARSSparamCIs, MARSSsimulate, MARSS_marxss.
 * Added is.diagonal() utility function
-* MARSSkfss had bug on V0T line.  * instead of %*%.  This code is almost never called.
-* MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
 * Typo in User Guide Chapter 2.  R was supposed to be "diagonal and equal" in the first example.
 * Changed plot.marssMLE to autoplot since it is ggplot2 based
 * Created plot.marssMLE that uses only base R graphics
+
+BUGS
+* MARSSkfss had bug on V0T line.  "*" instead of %*%.  This code is almost never called.
+* MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
 
 CHANGES IN MARSS 3.10.8 (released 4-14-2018 on CRAN)
 ------------------------------------
