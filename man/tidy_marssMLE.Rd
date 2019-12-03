@@ -10,7 +10,7 @@ If you want the fitted values of Y, use \code{\link{fitted.marssMLE}} or \code{\
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states", observations", "x", "y"),
+  tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
                 conf.int = TRUE,
                 conf.level = 0.95,
                 smoothing = c("T", "t-1", "t"),
@@ -33,20 +33,20 @@ The tidy function is designed to work with the \code{broom} package and you will
 
 }
 
-\return{
+\value{
 A data.frame with estimates, sample standard errors, and confidence (or prediction) intervals.
 }
 
 \details{
 
-\strong{type="parameters"}
+\strong{type="parameters"}  
 
-  If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
+If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
 \strong{type="states"}
 
 \code{tidy.marssMLE} returns the confidence intervals of the states at time t using the estimated model parameters. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the x). However, these intervals do not include parameter uncertainty. If you want state residiuals (for residuals analysis), use \code{\link{residuals.marssMLE}} or \code{\link{augment.marssMLE}}.
-}
+
 
 \strong{Quantiles} The state \eqn{X_t} in a MARSS model is a random variable. In Holmes (2012, Eqn. 11) notation, its expected value conditioned on all the observed data (1:T) and the model parameters \eqn{\Theta} is \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t}. In \code{\link{MARSSkf}} notation, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} (\code{VtT[,,t]}). Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
 
@@ -83,7 +83,8 @@ Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and uncons
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11,12),]
-  MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
+  # model allowing correlation between x states
+  MLEobj <- MARSS(dat, model=list(Q="unconstrained"))
 
 library(broom)
 library(ggplot2)
@@ -92,11 +93,26 @@ library(ggplot2)
  tidy(MLEobj)
  
 # Make a plot of the estimated states
-# Don't use augment.  States are not data.
+library(ggplot2)
 d <- tidy(MLEobj, type="states")
 ggplot(data = d) + 
   geom_line(aes(t, estimate)) +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.1) +
+  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
   facet_grid(~term) +
   xlab("Time Step") + ylab("Count")
+  
+# Make a plot of the estimates for the missing values
+# Use augment() to plot the fitted y(t)
+# i.e., to put a line through the points
+library(ggplot2)
+d <- tidy(MLEobj, type="observations")
+ggplot(data = d) + 
+  geom_point(aes(t, estimate)) +
+  geom_line(aes(t, estimate)) +
+  geom_point(aes(t, y), color="blue") +
+  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
+  facet_grid(~term) +
+  xlab("Time Step") + ylab("Count") +
+  ggtitle("Blue=data, Black=estimate of missing data point")
+  
 }
