@@ -4,7 +4,7 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at ``https://nwfsc-timeseries.github.io/MARSS/''.  Notes on known issues are also posted there.
+New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known issues are also posted there.
 
 CHANGES IN MARSS 3.10.12 (current state of master 12-2-2019)
 ------------------------------------
@@ -15,8 +15,8 @@ BUGS
 
 ENHANCEMENTS
 
-* added E[Y(t)|Y(t)=y(t)] to tidy.marssMLE so ytT. Not very useful unless one needs an estimate of a missing value when y is multivariate and R is not diagonal.  Also added E[Y(t)|Y(t-1)=y(t-1)], one-step-ahead predictions for Y which is more useful.
-* added Ott1 (expected value of Y(t)|Y(1,1:t-1)) to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t)
+* added E[Y(t)\|Y(t)=y(t)] to tidy.marssMLE so ytT. Not very useful unless one needs an estimate of a missing value when y is multivariate and R is not diagonal.  Also added E[Y(t)\|Y(t-1)=y(t-1)], one-step-ahead predictions for Y which is more useful.
+* added Ott1 (expected value of Y(t)\|Y(1,1:t-1)) to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t)
 * added smoothing argument to tidy.marssMLE which allows the xtt1 and xtt states (with CIs) to be output.
 * added plot of ytT to autoplot.marssMLE
 
