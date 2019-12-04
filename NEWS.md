@@ -25,7 +25,7 @@ DOCUMENTATION and MAN FILES
 * added abstract to Residuals report.
 * added more info to tidy.marssMLE about how the intervals are computed.
 
-CHANGES IN MARSS 3.10.11 (released on GitHub 8-3-2019)
+CHANGES IN MARSS 3.10.11 (GitHub 8-3-2019)
 ------------------------------------
 Minor update. Version 3.10.11 has some edits to speed up the code by minimizing calls to expensive checking functions and fixes a bug in MARSSharveyobsFI() that appeared if a parameter was fixed and time-varying and MARSSparamCIs() was called.
 
@@ -43,7 +43,7 @@ BUGS
 * Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
 * dparmat() did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
 
-CHANGES IN MARSS 3.10.10 (released on CRAN 11-2-2018)
+CHANGES IN MARSS 3.10.10 (CRAN 11-2-2018)
 ------------------------------------
 Minor update to declare S3 objects if user has broom package installed.  A few minor changes also made.
 
@@ -61,7 +61,7 @@ BUGS
 * MARSSkfss had bug on V0T line.  "\*" instead of %\*%.  This code is almost never called.
 * MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
 
-CHANGES IN MARSS 3.10.8 (released 4-14-2018 on CRAN)
+CHANGES IN MARSS 3.10.8 (CRAN 4-14-2018)
 ------------------------------------
 Major update over 3.9. The main changes have to do with residuals and confidence intervals calculations.  
 
@@ -110,10 +110,10 @@ Misc minor bugs
 
 IMPROVEMENTS
 
-* w(t) and v(t) can be specified as G(t)*w(t) and H(t)*v(t) where G and H are fixed matrices (not estimated).  In version 3.10, G and H are restricted to being 0 or identity, however the code is in place for other values.
+* w(t) and v(t) can be specified as G(t)\*w(t) and H(t)\*v(t) where G and H are fixed matrices (not estimated).  In version 3.10, G and H are restricted to being 0 or identity, however the code is in place for other values.
   - changes to MARSS.marxss and MARSS.marss to allow G, H, and L passed in
   - change to MARSSkem to specifiy star lists with G, H, and L (mathbb(elem) in EM Derivation)
-  - changed MARSSkss to use Q*=G Q t(G), R*=H R t(H) and V0*=L V0 t(L)
+  - changed MARSSkss to use Q\*=G Q t(G), R\*=H R t(H) and V0\*=L V0 t(L)
 * added Multivariate linear regression chapter
 * added chapter on estimating a Leslie matrix from stage time series using a MARSS model.
 * removed the function MARSSmcinits and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, MARSSmcinits was increasing obsolete and it was impossible to come up with good searching distributions.  Because MARSSmcinits was removed, control$MCInits list item was removed also from defaults and from accepted input.
@@ -145,11 +145,11 @@ MISC
 * Poor name choice. y.se was not the standardard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
 
 
-CHANGES IN MARSS 3.9 (released 3-21-2014 on CRAN)
+CHANGES IN MARSS 3.9 (CRAN 3-21-2014)
 ------------------------------------
 none. resubmission due to missing file
 
-CHANGES IN MARSS 3.8 (released 3-18-2014 on CRAN)
+CHANGES IN MARSS 3.8 (CRAN 3-18-2014)
 ------------------------------------
 
 ENHANCEMENTS
@@ -185,7 +185,7 @@ BUGS
 * X names were not getting applied to states in MARSS(); default X.names would be odd for non-design Z matrices. MARSS_marss() and MARSS_marxss().
 
 
-CHANGES IN MARSS 3.7 (released on CRAN 12-14-2013)
+CHANGES IN MARSS 3.7 (CRAN 12-14-2013)
 ------------------------------------
 3.7 update required due to new version of KFAS that changed its API.
 
@@ -203,7 +203,7 @@ BUGS
 * fixed allow.degen bug that would set elements to zero, leading to non positive definite matrices. Test if Q and R are diagonal.  If not, don't allow degens to be set since that is likely to lead to non-pos def matrices.  I could test if the row/col covariance are 0s but that would be costly.
 * fixed loglog.conv.test bug that returned NAs when logLik > 720 due to exp(LL) call.  Changed to exp(LL-mean(LL))
 
-CHANGES IN MARSS 3.6  (released on CRAN 11-26-2013)
+CHANGES IN MARSS 3.6  (CRAN 11-26-2013)
 ------------------------------------
 3.6 update is mainly concerned with speeding up MARSS() for problems with large number of time series (n > 100) and where many R elements are being estimated (e.g. R="diagonal and unequal").  This comes up in dynamic factor analyses often.  The changes also improve speed for small R problems by about 25%, but speed increase is 10 fold for problems with R matrices that are 100x100 with 100 estimated R elements.
 
@@ -259,7 +259,7 @@ BUGS
 - MARSSboot was out of date with newest version of MARSShessian's returned arguments.
 - fixed bug in is.blockunconst which made it break on certain diagonal list matrices
 
-CHANGES IN MARSS 3.3 and 3.4  (1-16-2013)
+CHANGES IN MARSS 3.3 and 3.4  (CRAN 1-16-2013)
 ------------------------------------
 This version update is mainly concerned with adding generic functions (coef, residuals, predict), hooking back up KFAS package filters into MARSS functions, and customizing print functions for different model forms.
 
@@ -290,7 +290,7 @@ BUGS
 - fixed bug in MARSS_marxss that caused error when Z was passed in as a matrix and A="scaling"
 - fixed bug in describe.marss that caused diagonal matrices with 1 estimated value and fixed values to not be identified as diagonal
 
-CHANGES IN MARSS 3.2  (08-28-2012)
+CHANGES IN MARSS 3.2  (CRAN 08-28-2012)
 ------------------------------------
 
 - some edits to the case studies and the User Guide to fix typos and stuff noted in the August workshop
@@ -300,7 +300,7 @@ CHANGES IN MARSS 3.2  (08-28-2012)
 - moved .Rinstignore to the top-level
 - fixed misspelling in DESCRIPTION
 
-CHANGES IN MARSS 3.0  (07-10-2012)
+CHANGES IN MARSS 3.0  (CRAN 07-10-2012)
 ------------------------------------
 
 Note, the changes are extensive but are internal and should be largely invisible to users of MARSS 2.X.  The MARSS() 3.0 call is backwards compatible to 2.9 except that kf.x0 changed to tinitx and moved from control list to model list.   Use of KFAS remains disabled until I can update to the new version of KFAS.  This slows down method="BFGS", but does not affect method="kem".
@@ -367,7 +367,7 @@ CHANGES IN MARSS 2.8 (2012-01-23)
 - added NEWS file, .Rinstignore in inst\doc
 - added example of lag-p model to the manual.
 - fixed bug in MARSSkf when R=0, kf.x0=x10, and V0=0. The algorithm was not setting x(1) via y(1) in this special case.
-- In MARSSinits, got rid of the linear regression to get inits for x0; using instead solution of pi from y(1)=Z*(D*pi+f)+A; This stops MARSS from complaining about no inits when Z is not a design matrix.  NOTE NB: This means the default initial x0 are different for 2.7 and 2.8, which leads to slightly different answers for MARSS(dat) in 2.7 and 2.8. The answers are not really different, just they started with slightly different initial values so have slightly different values when the algorithm reaches its convergence limit.
+- In MARSSinits, got rid of the linear regression to get inits for x0; using instead solution of pi from y(1)=Z\*(D\*pi+f)+A; This stops MARSS from complaining about no inits when Z is not a design matrix.  NOTE NB: This means the default initial x0 are different for 2.7 and 2.8, which leads to slightly different answers for MARSS(dat) in 2.7 and 2.8. The answers are not really different, just they started with slightly different initial values so have slightly different values when the algorithm reaches its convergence limit.
 - added warning in the covariate section. The error-free covariate section in the manual did not clarify that the log-likelihood of the covariates with the dummy state model would be included in the MARSS output.  MARSS version 2.9 will allow error-free covariates in a more standard manner.
 - removed dependency on time package. The progressBar function was moved into MARSS since the time package is no longer maintained.
 - changed MARSSkemcheck to allow lag-p models. I worked on the derivation of the degenerate models (with 0 on diag of Q) to better define the needed constraints on B.0 and B.plus sub matrices.  This led to changes in MARSSkemcheck.r so that lag-p models written as MARSS model are now allowed.  There are still problems though in x0 estimation in the EM algorithm when there are zeros on R and B diagonals, so best to method=``BFGS'' until I redo the degenerate EM algorithm.
@@ -440,7 +440,7 @@ CHANGES between MARSS 1.0 and 1.1
 - added more info to ?MARSS and help(``MARSS-package''). Changed MARSS.Rd and MARSS-package to have reference to user guide, index, and MARSS-package help page.
 - changed convergence test. In the convergence diagnostics test, we check that the slope of logLik vs (log iteration num) is close to zero.  This is a standard convergence test.  But Shumway and Stoffers code uses a delta logLik test which checks that the logLik.new-logLik.old is less than some absolute (user specified) tolerance.  This turns out to be a bad convergence test because the log-log plot (described above) can still have a fairly clear slope.  I switched over to using the log-log test as the default test, but I allow the user to specify a abstol (delta logLik) if they want that instead.  This change slows down model fitting considerably but model fits that are actually converged.\
 - fixed is.design() function. A design matrix must have more or equal rows than columns.
-- R was changing dims on some matrices in MARSSkf. R has a flaw in terms of how it behaves when you subscript a matrix and the new matrix has a dimension length of 1 for one (or more dimensions).  For example, if a=array(0,dim=c(1,2,4)), then a[,,1] is no longer a matrix but instead is a vector and dim(a[,,1]) is NULL.  This can cause all sorts of mysterious bugs.  Sometimes adding drop=FALSE will prevent this unpleasant behavior.  If b=matrix(0,2,2), dim(b[,1,drop=FALSE]) is c(2,1) while dim(b[,1]) is NULL.  drop=FALSE works great with 2-dimensional matrices, but with 3-dimensional matrices it doesn't work.  If a=array(0,dim=c(1,2,4)), dim(a[,,1,drop=FALSE]) is c(1,2,1) instead of c(1,2) which is what you want if a[,,1] is what is going to appear in some matrix operation. This problem came up in the Kt[, , t] \%\*\% innov[, t] line in MARSSkf.  Normally Kt[,,t] is square and a square matrix or a scalar is returned, but if Kt[,,t] happened to be something like dim=c(1,3,20) then Kt[,,t] returned a VECTOR of length 3.  In this case, Kt[, , t] \%\*\% innov[, t] crashed the code.  I had to use a kluge to force R to keep the dimensions after subscripting. This bug only occurred in models where Z is not a design matrix.
+- R was changing dims on some matrices in MARSSkf. R has a flaw in terms of how it behaves when you subscript a matrix and the new matrix has a dimension length of 1 for one (or more dimensions).  For example, if a=array(0,dim=c(1,2,4)), then a[,,1] is no longer a matrix but instead is a vector and dim(a[,,1]) is NULL.  This can cause all sorts of mysterious bugs.  Sometimes adding drop=FALSE will prevent this unpleasant behavior.  If b=matrix(0,2,2), dim(b[,1,drop=FALSE]) is c(2,1) while dim(b[,1]) is NULL.  drop=FALSE works great with 2-dimensional matrices, but with 3-dimensional matrices it doesn't work.  If a=array(0,dim=c(1,2,4)), dim(a[,,1,drop=FALSE]) is c(1,2,1) instead of c(1,2) which is what you want if a[,,1] is what is going to appear in some matrix operation. This problem came up in the Kt[,,t] %\*% innov[,t] line in MARSSkf.  Normally Kt[,,t] is square and a square matrix or a scalar is returned, but if Kt[,,t] happened to be something like dim=c(1,3,20) then Kt[,,t] returned a VECTOR of length 3.  In this case, Kt[, , t] %\*% innov[, t] crashed the code.  I had to use a kluge to force R to keep the dimensions after subscripting. This bug only occurred in models where Z is not a design matrix.
 - fixed formatting issues in summary(marssm object). The naming of elements in the model matrices did not match summary(marssMLE object).
 - added function MARSSoptions(). This allows you to change the defaults for the MARSS() function.  See ?MARSSoptions.
 - added function MARSSLLprofile(). This allows you to plot some basic log-likelihood profiles.  See ?MARSSLLprofile.
