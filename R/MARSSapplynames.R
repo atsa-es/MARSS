@@ -1,6 +1,6 @@
 MARSSapplynames=function(MLEobj){
 ## Helper function to put names on the elements in a marssMLE object
-  if( !("marssMLE" %in% class(MLEobj)) )
+  if( !inherits( MLEobj, "marssMLE") )
      stop("Stopped in MARSSapplynames() because this function is for marssMLE objects only.\n", call.=FALSE)
 
   MODELobj=MLEobj[["marss"]]

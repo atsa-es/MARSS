@@ -21,9 +21,8 @@ MARSSaic = function(MLEobj, output=c("AIC","AICc"), Options=list(nboot=1000, ret
   if(is.null(Options[["nboot"]])) Options$nboot = 1000
   if(is.null(Options[["return.logL.star"]])) Options$return.logL.star = FALSE
   if(is.null(Options[["silent"]])) Options$silent = FALSE
-  if( !("marssMLE" %in% class(MLEobj)) ) {
+  if( !inherits( MLEobj, "marssMLE") )
     stop("Stopped in MARSSaic(). An object of class marssMLE is required.\n", call.=FALSE)
-    }
     
   if(is.null(MLEobj[["logLik"]])){
     msg = " No log likelihood.  This function expects a model fitted via maximum-likelihood.\n"
@@ -38,7 +37,7 @@ MARSSaic = function(MLEobj, output=c("AIC","AICc"), Options=list(nboot=1000, ret
   loglike = MLEobj$logLik
   
   ##### AIC and AICc calculations
-  if("AIC" %in% output | "AICc" %in% output){
+  if("AIC" %in% output || "AICc" %in% output){
     K = 0
     for (elem in c("Z", "A", "B", "U", "x0", "R", "Q","V0" )) {
       pars = dim(model$free[[elem]])[2]

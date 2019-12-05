@@ -263,7 +263,7 @@ noise=rnorm(TT,0,sqrt(true.2ss[1]))
 noisy.data=sim.ar+noise
 noisy.data=as.vector(noisy.data-mean(noisy.data)) #demean
 test.it=try(arima(noisy.data[2:TT],order=c(2,0,2),include.mean=FALSE))
-while("try-error" %in% class(test.it)){
+while(inherits(test.it, "try-error")){
 temp=arima.sim(n=TT,list(ar=true.2ss[2:3]),sd=sqrt(true.2ss[4]))
 sim.ar=matrix(temp,nrow=1)
 noise=rnorm(TT,0,sqrt(true.2ss[1]))

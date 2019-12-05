@@ -6,7 +6,7 @@
 MARSSparamCIs = function(MLEobj, method="hessian", alpha=0.05, nboot=1000, silent=TRUE, hessian.fun="Harvey1989") {
   #this function expects a marssMLE object
   #it will add standard errors, biases, low/up CIs to MLEobj
-  if( !("marssMLE" %in% class(MLEobj)) )
+  if( !inherits( MLEobj, "marssMLE") )
     stop("Stopped in MARSSparamCIs(). This function needs a marssMLE object.\n", call.=FALSE)
 
     if(!(method %in% c("hessian","parametric","innovations"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, innovations.\n", call.=FALSE)

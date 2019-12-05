@@ -1,6 +1,6 @@
 #This defines the describe.marssMODEL which calls in turn describe_form functions
 describe.marssMODEL = function(x){
-  if( !("marssMODEL" %in% class(x)) ) stop("Stopped in describe.marssMODEL(): x must be a marssMODEL object.\n",call.=FALSE)
+  if( !inherits(x, "marssMODEL") ) stop("Stopped in describe.marssMODEL(): x must be a marssMODEL object.\n",call.=FALSE)
   
   form=attr(x,"form")
   #First make sure specified equation form has a corresponding function to do the conversion to marssMODEL (form=marss) object

@@ -11,7 +11,7 @@ MARSSinnovationsboot = function(MLEobj, nboot=1000, minIndx=3 ) {
    # The following need to be present in model: parameter estimates + Sigma, Kt, Innov; the latter 3 are part of $kf
    if(any(is.null(MLEobj[["par"]]), is.null(MLEobj[["marss"]][["data"]])))
       stop("Stopped in MARSSinnovationsboot(). The passed in marssMLE object is missing par or model$data elements.\n", call.=FALSE)
-   if(is.null(MLEobj[["kf"]]) | !is.array(MLEobj[["kf"]][["Innov"]]) | !is.array(MLEobj[["kf"]][["Sigma"]])){ kf=MARSSkfss(MLEobj)
+   if(is.null(MLEobj[["kf"]]) || !is.array(MLEobj[["kf"]][["Innov"]]) || !is.array(MLEobj[["kf"]][["Sigma"]])){ kf=MARSSkfss(MLEobj)
    }else{ kf=MLEobj[["kf"]] } 
    
    ## Rename things for code readability

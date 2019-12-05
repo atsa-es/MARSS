@@ -39,7 +39,7 @@ MARSSkfss = function( MLEobj ) {
     model.elem = names(MODELobj$fixed)
     time.varying = c()
     for(elem in model.elem){
-      if( (dim(MODELobj$free[[elem]])[3] != 1) | (dim(MODELobj$fixed[[elem]])[3] != 1))  #not time-varying
+      if( (dim(MODELobj$free[[elem]])[3] != 1) || (dim(MODELobj$fixed[[elem]])[3] != 1))  #not time-varying
            time.varying = c(time.varying, elem)
     }
     pari=parmat(MLEobj,t=1)
@@ -54,7 +54,7 @@ MARSSkfss = function( MLEobj ) {
       Z.R0=Z[diag.R==0,,drop=FALSE]; Z.R0.n0=Z.R0[,colSums(Z.R0)!=0,drop=FALSE] # The Z cols where there is a val
       if(dim(Z.R0.n0)[1]==dim(Z.R0.n0)[2]){ #then it must be invertible
          Ck=try(solve(Z.R0.n0))
-         if( class(Ck)[1]=="try-error" ){
+         if( class(Ck)[1]=="try-error" ){ # inherits is slow and this function called often
            return(list(ok=FALSE,errors="Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
          }else{ OmgRVtt = diag(ifelse(colSums(Z.R0)!=0,0,1),m) }#mxm; sets the p elem of Vtt to 0 because these are determined by data
       }else{ #then num rows must be greater than num cols
@@ -83,7 +83,7 @@ MARSSkfss = function( MLEobj ) {
         #update the time.varying ones
         pari[time.varying]=parmat(MLEobj,time.varying,t=t)
         Z=pari$Z; A=pari$A; B=pari$B; U=pari$U; #update
-        if("R" %in% time.varying | "H" %in% time.varying){
+        if("R" %in% time.varying || "H" %in% time.varying){
           R=tcrossprod(pari$H %*% pari$R, pari$H) 
           if(n==1){ diag.R=unname(R) }else{ diag.R = unname(R)[1 + 0:(n - 1)*(n + 1)] }
           #Check that if any R are 0 then model is solveable
@@ -103,7 +103,7 @@ MARSSkfss = function( MLEobj ) {
           diag.OmgRVtt = takediag(OmgRVtt)
           }
         } #if R in time.varying
-        if("Q" %in% time.varying | "G" %in% time.varying){
+        if("Q" %in% time.varying || "G" %in% time.varying){
           Q=tcrossprod(pari$G %*% pari$Q, pari$G)
           if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }
         }
@@ -226,7 +226,7 @@ MARSSkfss = function( MLEobj ) {
         B = parmat(MLEobj, "B", t=t)$B  #t since in 6.49, B[t] appears
         if(m==1) t.B=B else t.B = matrix(B,m,m,byrow=TRUE) 
       }
-      if("Q" %in% time.varying | "G" %in% time.varying){
+      if("Q" %in% time.varying || "G" %in% time.varying){
         Q = parmat(MLEobj, "Q", t=t)$Q; G = parmat(MLEobj, "G", t=t)$G
         Q=tcrossprod(G %*% Q, G)
         if(m==1){ diag.Q=unname(Q) }else{ diag.Q = unname(Q)[1 + 0:(m - 1)*(m + 1)] }

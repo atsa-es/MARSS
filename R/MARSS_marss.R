@@ -105,7 +105,7 @@ MARSS.marss=function(MARSS.call){
   if(!(is.null(model[["X.names"]]))) X.names = model[["X.names"]]
   if(is.null(X.names) & identical(model$Z,"identity"))
     X.names=paste("X.",Y.names,sep="")
-  if( is.null(X.names) & is.array(model$Z)){
+  if( is.null(X.names) && is.array(model$Z)){
     if(length(dim(model$Z))==3)
       if(dim(model$Z)[3]==1)
         if(is.design(model$Z) & !is.null(colnames(model$Z)))
@@ -161,12 +161,12 @@ MARSS.marss=function(MARSS.call){
   
   #Check that if A is scaling, then Z spec must lead to a design matrix
   if(identical(model$A,"scaling")){
-    if(is.array(model$Z) & length(dim(model$Z))==3)
+    if(is.array(model$Z) && length(dim(model$Z))==3)
       if(dim(model$Z)[3]!=1 && !is.design(model$Z, zero.cols.ok = TRUE)) { #if it is a matrix
         problem=TRUE
         msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou can construct a scaling A matrix and pass that in.")
       }
-    if((!is.array(model$Z) & !is.factor(model$Z))) #if it is a string
+    if(!is.array(model$Z) && !is.factor(model$Z)) #if it is a string
       if(!(model$Z %in% c("onestate","identity"))){
         problem=TRUE
         msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
@@ -176,17 +176,17 @@ MARSS.marss=function(MARSS.call){
       msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
     }
   }  
-  if(is.array(model$x0) & length(dim(model$x0))==3)
+  if(is.array(model$x0) && length(dim(model$x0))==3)
     if(dim(model$x0)[3]!=1){
       problem=TRUE
       msg = c(msg, " x0 cannot be time-varying thus if x0 in model arg is 3D, the 3rd dim must equal 1.\n")
     } 
-  if(is.array(model$V0) & length(dim(model$V0))==3)
+  if(is.array(model$V0) && length(dim(model$V0))==3)
     if(dim(model$V0)[3]!=1){
       problem=TRUE
       msg = c(msg, " V0 cannot be time-varying thus if V0 in model arg is 3D, the 3rd dim must equal 1.\n")
     } 
-  if(is.array(model$L) & length(dim(model$L))==3)
+  if(is.array(model$L) && length(dim(model$L))==3)
     if(dim(model$L)[3]!=1){
       problem=TRUE
       msg = c(msg, " V0 cannot be time-varying thus if V0 in model arg is 3D, the 3rd dim must equal 1.\n")
@@ -235,7 +235,7 @@ MARSS.marss=function(MARSS.call){
       diag(tmp[[el]])=paste("(",el.labs,",", el.labs,")",sep="") #paste(el,"(",as.character(1:dim.mat),",",as.character(1:dim.mat),")",sep="")
       if(length(tmp[[el]])==1) tmp[[el]][1,1]=el
     }
-    if(identical(model[[el]],"unconstrained") | identical(model[[el]],"unequal")){
+    if(identical(model[[el]],"unconstrained") || identical(model[[el]],"unequal")){
       tmp[[el]]=array(NA,dim=c(model.dims[[el]][1],model.dims[[el]][2])) 
       if(el %in% c("Q","R","V0")){  #variance-covariance matrices
         dim.mat = model.dims[[el]][1]
@@ -495,7 +495,7 @@ is.marssMODEL_marss <- function(MODELobj, method="kem"){
   time.var = NULL
   for (elem in en) {
     time.var.flag = FALSE
-    time.var.flag = dim(fixed[[elem]])[3]!=1 | dim(free[[elem]])[3]!=1
+    time.var.flag = dim(fixed[[elem]])[3]!=1 || dim(free[[elem]])[3]!=1
     time.var <- c(time.var, time.var.flag)
   }
   if(any(time.var)) {  #There's a problem

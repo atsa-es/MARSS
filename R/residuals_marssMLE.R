@@ -21,10 +21,10 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
   var.et = array(0,dim=c(n+m,n+m,TT))
   
   #MARSSkfas doesn't output Innov, Sigma or Kt so might need to run MARSSkfss to get those
-  if(is.null(MLEobj[["kf"]]) | is.null(MLEobj$kf$Innov) | is.null(MLEobj$kf$Sigma) | is.null(MLEobj$kf$Kt)) 
+  if(is.null(MLEobj[["kf"]]) || is.null(MLEobj$kf$Innov) || is.null(MLEobj$kf$Sigma) || is.null(MLEobj$kf$Kt)) 
     kf=MARSSkfss(MLEobj)
   #MARSSkfas sets these to a character warning, so not NULL; add this to catch that
-  if(!is.array(MLEobj$kf$Innov) | is.array(MLEobj$kf$Sigma) | is.array(MLEobj$kf$Kt)) 
+  if(!is.array(MLEobj$kf$Innov) || !is.array(MLEobj$kf$Sigma) || !is.array(MLEobj$kf$Kt)) 
     kf=MARSSkfss(MLEobj)
   Ey = MARSShatyt(MLEobj)
   
@@ -163,13 +163,13 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
     #psolve and pchol deal with 0s on diagonal
     #wrapped in try to prevent crashing if inversion not possible
     tmpchol=try(pchol(tmpvar), silent=TRUE)
-    if(class(tmpchol)[1]=="try-error"){ 
+    if( inherits(tmpchol, "try-error") ){ 
       st.et[,t]=NA
       cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =",t,". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
     tmpcholinv=try(psolve(tmpchol), silent=TRUE)
-    if(class(tmpcholinv)[1]=="try-error"){
+    if(inherits(tmpcholinv, "try-error")){
       st.et[,t]=NA
       cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =",t,"\n"))
       next

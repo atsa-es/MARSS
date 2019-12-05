@@ -7,7 +7,7 @@
 # that the fixed and free matrices fit the specified attributes (internally consistent)
 ########################################################################
 is.marssMODEL <- function(MODELobj, method="kem") {
-  if( !("marssMODEL" %in% class(MODELobj)) ) stop("Stopped in is.marssMODEL() because object class is not marssMODEL.\n", call.=FALSE)
+  if( !inherits(MODELobj ,"marssMODEL") ) stop("Stopped in is.marssMODEL() because object class is not marssMODEL.\n", call.=FALSE)
   msg = NULL
   
   ###########################
@@ -28,7 +28,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   for(mat in c("fixed","free")){
     if (!is.list(MODELobj[[mat]])) msg = c(msg, paste("MODELobj$",mat," must be a list of matrices.\n",sep="")) 
     for (i in 1:length(MODELobj[[mat]])) {
-      if( !("array" %in% class(MODELobj[[mat]][[i]])) || length(dim(MODELobj[[mat]][[i]]))!=3 ){ 
+      if( !is.array(MODELobj[[mat]][[i]]) && length(dim(MODELobj[[mat]][[i]]))!=3 ){ 
         msg = c(msg, paste("MODELobj$",mat,"$",names(MODELobj[[mat]])[i]," must be a 3D matrix.\n", sep=""))
       }
       if(mode(MODELobj[[mat]][[i]]) != "numeric" || any(is.na(MODELobj[[mat]][[i]])) || any(is.infinite(MODELobj[[mat]][[i]])) ) 
@@ -62,7 +62,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   el=c("par.names","form","X.names","Y.names","equation")
   for(elem in el){
     fattr=attr(MODELobj,elem)
-    if(!is.vector(fattr) | !is.character(fattr)){
+    if(!is.vector(fattr) || !is.character(fattr)){
       msg=c("The ", elem, " attribute of the marssMODEL object needs to be a character vector.\nErrors were caught in is.marssMODEL()\n", msg, sep="")
       return(msg)   #the rest of the tests will hang so stop now 
     }
@@ -118,8 +118,8 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   # Check that 2nd dim of model.dims$x and model.dims$y equals the 2nd dim of data
   ###########################
   TT=dim(MODELobj$data)[2]
-  if(attr(MODELobj,"model.dims")$y[2]!=TT | attr(MODELobj,"model.dims")$x[2]!=TT |
-       attr(MODELobj,"model.dims")$w[2]!=TT | attr(MODELobj,"model.dims")$v[2]!=TT )
+  if(attr(MODELobj,"model.dims")$y[2]!=TT || attr(MODELobj,"model.dims")$x[2]!=TT ||
+       attr(MODELobj,"model.dims")$w[2]!=TT || attr(MODELobj,"model.dims")$v[2]!=TT )
     msg=c(msg,"The 2nd element of the model.dims attribute for x, y, w, and v must equal the number of time points in the data.\n")
 
   if(!is.null(msg)){  #rest of the tests won't work so stop now
@@ -159,7 +159,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
     ## Check for problems in the fixed/free pairs. Problems show up as TRUE     
     # check dim
     dim.fixed.flag = !isTRUE(all.equal( dim(fixed[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
-    dim.fixed.flag = dim.fixed.flag | !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )    
+    dim.fixed.flag = dim.fixed.flag || !isTRUE( all.equal( dim(fixed[[elem]])[2], 1 ) )    
     dim.free.flag = !isTRUE(all.equal( dim(free[[elem]])[1], model.dims[[elem]][1]*model.dims[[elem]][2] ) )
     dim.fixed = c(dim.fixed, dim.fixed.flag)
     dim.free = c(dim.free, dim.free.flag) 

@@ -23,7 +23,7 @@ model.frame.marssMODEL <- function (formula, ...) {
   }
   if(model.form=="marxss"){
     for(el in c("d","c")){
-    if(!all(f[[toupper(el)]]==0) | !all(f[[el]]==0)){ #there is el
+    if(!all(f[[toupper(el)]]==0) || !all(f[[el]]==0)){ #there is el
       elval = f[[el]]
       eldims = model.dims[[el]]
       elval = matrix(elval,eldims[1],eldims[3])

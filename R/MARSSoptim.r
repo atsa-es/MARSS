@@ -41,7 +41,7 @@ MARSSoptim = function(MLEobj) {
     -1*negLL
   }
   
-  if( !("marssMLE" %in% class(MLEobj)) ) {
+  if( !inherits( MLEobj, "marssMLE") ) {
     stop("Stopped in MARSSoptim(). Object of class marssMLE is required.\n", call.=FALSE)
     }
   for(elem in c("Q","R")){
@@ -112,7 +112,7 @@ MARSSoptim = function(MLEobj) {
   kf.function=MLEobj$fun.kf #used for printing
   optim.output = try(optim(pars, neglogLik, MLEobj=tmp.MLEobj, method = optim.method, lower = lower, upper = upper, control = optim.control, hessian = FALSE), silent=TRUE  )
 
-  if(class(optim.output)[1]=="try-error"){ #try MARSSkfss if the user did not use it
+  if(inherits(optim.output,"try-error")){ #try MARSSkfss if the user did not use it
     if( MLEobj$fun.kf!="MARSSkfss" ){  #if user did not request MARSSkf
     cat("MARSSkfas returned error.  Trying MARSSkfss.\n")
     tmp.MLEobj$fun.kf="MARSSkfss"
@@ -122,7 +122,7 @@ MARSSoptim = function(MLEobj) {
   }
   
   #error returned
-  if(class(optim.output)[1]=="try-error"){
+  if(inherits(optim.output,"try-error")){
     optim.output = list(convergence=53, message=c("MARSSkfas and MARSSkfss tried to compute log likelihood and encountered numerical problems.\n", sep=""))
    }
 

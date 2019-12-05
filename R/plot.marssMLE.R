@@ -7,7 +7,7 @@ plot.marssMLE <-
     
     # Argument checks
     plot.type = match.arg(plot.type, several.ok = TRUE)
-    if(!is.numeric(conf.level) | conf.level>1 | conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+    if(!is.numeric(conf.level) || length(conf.level)!=1 || conf.level>1 || conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if(!(conf.int%in%c(TRUE,FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     
     if(missing(form)){

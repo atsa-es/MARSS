@@ -72,7 +72,7 @@ MARSS.dfa=function(MARSS.call){
       problem=TRUE
       msg = c(msg, "model$m must be an integer between 1 and n.\n")
     }else{
-      if( !is.numeric(MARSS.call[["model"]][["m"]]) | !is.wholenumber(MARSS.call$model$m) ){
+      if( !is.numeric(MARSS.call[["model"]][["m"]]) || !is.wholenumber(MARSS.call$model$m) ){
         problem=TRUE
         msg = c(msg, "model$m must be an integer between 1 and n.\n")
       }else{

@@ -187,7 +187,7 @@ MARSSkem = function( MLEobj ) {
       for (i in 1:TT) {
         if(time.varying[["Z"]] & i>1){ Z = parmat(MLEobj.iter, "Z", t=i)$Z }
         if(time.varying[["A"]] & i>1){ A = parmat(MLEobj.iter, "A", t=i)$A }
-        if(time.varying[["R"]] | i==1){ 
+        if(i==1 || time.varying[["R"]]){ 
           dR = sub3D(d[["R"]],t=i) #by def, i goes to TT if time-varying
           t.dR.dR = t.dR.dR + crossprod(dR)
         }
@@ -340,7 +340,7 @@ MARSSkem = function( MLEobj ) {
     
     #This code sets up the IIz and star (inverse) matrices needed
     #This only needs to be done at iter=1 or if Q, R or V0 might have changed
-    if( !fixed[["Q"]] | !fixed[["R"]] | !fixed[["V0"]] | set.degen[["Q"]] | set.degen[["R"]] | iter==1 ){
+    if( iter==1 || set.degen[["Q"]] || set.degen[["R"]] || !fixed[["Q"]] || !fixed[["R"]] || !fixed[["V0"]] ){
       #Set up the variance matrices needed for the degenerate case
       if(iter==1){ 
         IIz=star=list()  #IIz location of 0s on diagonal
@@ -374,7 +374,7 @@ MARSSkem = function( MLEobj ) {
           #These are the identity matrices used to identify the location of deterministic rows of x;
           #section 7.2 in EM Derivations "Idntifying the fully deterministic x rows"
           #IIz means location of 0s on diagonal of var-cov matrix GHL%*%QRV%*%t(GHL)
-          if(set.degen[[elem]] | iter==1){
+          if(iter==1 || set.degen[[elem]] ){
             IIz[[elem]][,,i]  = diag(as.numeric(diag(pari)==0),thedim)
             #I the locations of 0s on diagonal of Q are time-constant; see section 7.2
             if(elem=="Q" & max(maxT, maxT1) !=1){
@@ -388,9 +388,9 @@ MARSSkem = function( MLEobj ) {
           star[[elem]][,,i] = crossprod(starmultiplier, pcholinv(QRV)%*%starmultiplier)
         }
         set.degen[[elem]]=FALSE #reset so this code is not run again
-        if(elem=="V0" & (iter==1 | set.degen$V0)){ #then 0 location in V0 has potentially changed (via degen.test(V0))
+        if(elem=="V0" && (iter==1 || set.degen[["V0"]])){ #then 0 location in V0 has potentially changed (via degen.test(V0))
           #set up the diag matrices needed often
-          IIzV0=sub3D(IIz$V0,t=1)
+          IIzV0=sub3D(IIz[["V0"]],t=1)
           IImIIzV0 = (IIm-IIzV0)
         }      
       }  #for over elems
@@ -567,9 +567,9 @@ MARSSkem = function( MLEobj ) {
       starR=star[["R"]][,,1]
       for(i in 1:TT){
         if(time.varying[["Z"]] & i>1) Z = parmat(MLEobj.iter,"Z",t=i)$Z
-        if(time.varying[["A"]] | i==1){
+        if(i==1 || time.varying[["A"]]){
           dA=sub3D(d[["A"]],t=i)
-          fA=sub3D(f$A,t=i)
+          fA=sub3D(f[["A"]],t=i)
         }
         if(time.varying[["R"]]) starR=star[["R"]][,,i]
         numer = numer + crossprod(dA, starR%*%(Ey[["ytT"]][,i,drop=FALSE]-Z%*%kf[["xtT"]][,i,drop=FALSE]-fA))
@@ -791,7 +791,7 @@ MARSSkem = function( MLEobj ) {
         hatyxt = Ey$yxtT[,,i]
         if(time.varying$A & i>1) A=parmat(MLEobj.iter,"A",t=i)$A
         if(time.varying$R) starR=star$R[,,i]
-        if(time.varying$Z | i==1){
+        if(i==1 || time.varying$Z){
           fZ=sub3D(f$Z,t=i)
           dZ=sub3D(d$Z,t=i)
         }

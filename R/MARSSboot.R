@@ -83,9 +83,9 @@ MARSSboot = function(MLEobj, nboot=1000, output="parameters", sim="parametric",
   }
 
   # Check for marssMLE properness; check that MLEobj$marss$data exists
-  if( !("marssMLE" %in% class(MLEobj)) ) {
+  if( !inherits( MLEobj, "marssMLE") )
     stop("Stopped in MARSSboot(). Object must be class marssMLE.\n", call.=FALSE)
-  }
+
   # Check that it has par added on
   if(is.null(MLEobj[["par"]])){
       msg=" MLE object is missing parameter estimates.\n"

@@ -10,7 +10,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
   return.obj=list()
   what.to.print = what
   orig.x=x
-  if(class(x$model)[1]!="marssMODEL"){
+  if(!inherits(x$model, "marssMODEL")){
     cat("\nThe model element of your marssMLE object is not class marssMODEL.\n")
     cat("Are you using a marssMLE object from a MARSS version before 3.5?\n")
     cat("Type MARSSinfo(\"modelclass\") for help.\n")
@@ -28,7 +28,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
       x=eval(call(print.fun, x))
     }else{ x = print_null(x) } #if print_form is missing use print_marss
 
-  if("marssMLE" %in% class(x)){ #use x to print; if print.fun returns NULL, say, nothing happens
+  if(inherits(x, "marssMLE")){ #use x to print; if print.fun returns NULL, say, nothing happens
    if(identical(what.to.print,"fit")){
       ## all parameters were fixed
       if(all(unlist(lapply(x$model$free,is.fixed)))){
@@ -127,7 +127,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
   if(is.null(x[["par.se"]])) cat("Standard errors have not been calculated. \n")
   if(!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])){
     cat(paste("CIs calculated at alpha = ", x$par.CI.info$alpha, " via method=", x$par.CI.info$method, sep=""), "\n")
-    if( x$par.CI.info$method=="hessian" & ( any(is.na(x[["par.lowCI"]])) | any(is.na(x[["par.upCI"]])) | any(is.na(x[["par.se"]])) ) ){
+    if( x$par.CI.info$method=="hessian" && ( any(is.na(x[["par.lowCI"]])) || any(is.na(x[["par.upCI"]])) | any(is.na(x[["par.se"]])) ) ){
       cat("There are NAs in the Hessian matrix. Type MARSSinfo(\"HessianNA\") for details.\n")
     }
     }else cat("Use MARSSparamCIs to compute CIs and bias estimates.\n")

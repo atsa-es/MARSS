@@ -109,7 +109,7 @@ for(unittestfile in unittestfiles){
   for(ii in 1:length(names(testNew))){
     if(!identical(testNew[[ii]], testOld[[ii]])){
       good[ii] = FALSE
-      if("marssMLE" %in% class(testNew[[ii]])){
+      if(inherits(testNew[[ii]], "marssMLE")){
         for(iii in names(testNew[[ii]][["par"]])){
           if(iii %in% c("G","H","L")) next
           if(!identical(testNew[[ii]][["par"]][iii], testOld[[ii]][["par"]][iii])){

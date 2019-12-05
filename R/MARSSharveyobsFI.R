@@ -53,7 +53,7 @@ MARSSharveyobsFI = function( MLEobj ) {
   dims = attr(MODELobj, "model.dims")
   time.varying = c()
   for(el in model.elem){
-    if( (dim(MODELobj$free[[el]])[3] != 1) | (dim(MODELobj$fixed[[el]])[3] != 1))  
+    if( (dim(MODELobj$free[[el]])[3] != 1) || (dim(MODELobj$fixed[[el]])[3] != 1))  
       time.varying = c(time.varying, el)
   }
   pari=parmat(MLEobj,t=1)

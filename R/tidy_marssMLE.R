@@ -9,7 +9,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   ## Argument checking
   type = match.arg(type)
   smoothing = match.arg(smoothing)
-  if(!is.numeric(conf.level) | conf.level > 1 | conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+  if(!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
   if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if(type=="states") type="x"
   if(type=="observations") type="y"
@@ -30,7 +30,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     if(!all(names(extras)%in%c("rotate", "method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
   }
   
-  if(type=="parameters" & conf.int & (!missing(...) | !missing(alpha))){
+  if(type=="parameters" && conf.int && (!missing(...) || !missing(conf.level))){
     if(model.has.cis) warning("tidy.marssMLE: Your marssMLE object has par.se and CIs, but you have passed in arguments for calculating CIs.  MARSSparamCIs() will be re-run with these values.\n")
     rerun.MARSSparamCIs = TRUE
   }

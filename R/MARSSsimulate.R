@@ -10,7 +10,7 @@ MARSSsimulate = function(MLEobj, tSteps=NULL, nsim=1, silent=TRUE, miss.loc=NULL
   # tSteps is the number of time steps to do in each bootstrap of the data
   # miss.loc is an optional (n x tSteps x nsim) matrix specifying where to put missing values
   # if miss.loc is the same for all nsim, can pass in dim=c(n, tSteps)
-  if( !("marssMLE" %in% class(MLEobj)) | is.null(MLEobj$par))     
+  if( !inherits( MLEobj, "marssMLE") || is.null(MLEobj$par))     
     stop("Stopped in MARSSsimulate(). The function requires a marssMLE object with the par element.\n", call.=FALSE)
   MARSSobj=MLEobj[["marss"]]
   n = dim(MARSSobj$fixed$A)[1]

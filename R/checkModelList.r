@@ -59,7 +59,7 @@ msg=NULL
         if(length(model[[el]])!=1) bad.str=TRUE
         if(!bad.str){
           testit = try(model[[el]] %in% this.form.allows[[el]])
-          if(class(testit)[1]=="try-error" ){ bad.str=TRUE
+          if(inherits(testit,"try-error") ){ bad.str=TRUE
           }else{ if(!testit ) bad.str=TRUE }
         }
     }
@@ -79,7 +79,7 @@ msg=NULL
       }     
     #if matrix then no NAs if character or list; this would be caught in is.marssMODEL but would be hard for user to understand problem
     if(is.array(model[[el]]) && (el %in% this.form.allows$matrices)){
-      if( any(is.na(model[[el]])) | any(unlist(lapply(model[[el]],is.infinite))) ){
+      if( any(is.na(model[[el]])) || any(unlist(lapply(model[[el]],is.infinite))) ){
         problem=TRUE
         msg = c(msg, paste(" model$",el," is a matrix. No NAs or Infs allowed in this case.\n", sep=""))
         }

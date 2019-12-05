@@ -127,19 +127,18 @@ MARSS.marxss=function(MARSS.call){
   if(!(is.null(model[["X.names"]]))) X.names = model[["X.names"]]
     if(is.null(X.names) & identical(model$Z,"identity"))
       X.names=paste("X.",Y.names,sep="")
-  if( is.null(X.names) & is.array(model$Z)){
+  if( is.null(X.names) && is.array(model$Z)){
     if(length(dim(model$Z))==3)
       if(dim(model$Z)[3]==1)
         if(is.design(model$Z) & !is.null(colnames(model$Z)))
           X.names=colnames(model$Z)
   }
-  if( is.null(X.names) & is.factor(model$Z)){
+  if( is.null(X.names) && is.factor(model$Z)){
     X.names=unique(as.character(model$Z))
   }
-  if(is.null(X.names) & is.matrix(model$Z))
-    if(is.design(model$Z) & !is.null(colnames(model$Z)))X.names=colnames(model$Z)
-  if(is.null(X.names) & is.matrix(model$Z))
-    if(is.identity(model$Z)) 
+  if(is.null(X.names) && is.matrix(model$Z))
+    if(is.design(model$Z) && !is.null(colnames(model$Z))) X.names=colnames(model$Z)
+  if(is.null(X.names) && is.matrix(model$Z) && is.identity(model$Z)) 
       X.names = paste("X.",Y.names,sep="")
   if(is.null(X.names)) X.names = paste("X",seq(1, m),sep="") #paste(seq(1, m),sep="")  #
   
@@ -227,20 +226,20 @@ MARSS.marxss=function(MARSS.call){
       msg = c(msg, " V0 and thus L cannot be time-varying. If L in model arg is 3D, the 3rd dim must equal 1.\n")
     }
   #if C is diagonal and equal or diagonal and unequal, then d1=m
-  if(identical(model$C,"diagonal and equal") | identical(model$C,"diagonal and unequal"))
+  if(identical(model$C,"diagonal and equal") || identical(model$C,"diagonal and unequal"))
     if(c1!=m){
       problem=TRUE
       msg = c(msg, " If C is diagonal, it must be square and c must be m x 1.\n")
     }
   #if D is diagonal and equal or diagonal and unequal, then d1=n
-  if(identical(model$D,"diagonal and equal") | identical(model$D,"diagonal and unequal"))
+  if(identical(model$D,"diagonal and equal") || identical(model$D,"diagonal and unequal"))
     if(d1!=n){
       problem=TRUE
       msg = c(msg, " If D is diagonal, it must be square and d must be n x 1.\n")
     }
   #if c and d can't have any NAs or Infs
   for(el in c("c","d"))
-    if(any(is.na(model[[el]])) | !is.numeric(model[[el]]) | any(is.infinite(model[[el]]))){
+    if(any(is.na(model[[el]])) || !is.numeric(model[[el]]) || any(is.infinite(model[[el]]))){
       problem=TRUE
       msg = c(msg, paste(" ",el,"must be numeric and have no NAs, NaNs, or Infs.\n"))
     }
@@ -255,12 +254,12 @@ MARSS.marxss=function(MARSS.call){
           problem=TRUE
           msg = c(msg, paste(" if",el,"is 3D, 2nd dim must be 1 and time is in 3rd dim.\n"))
         }
-        if( !(dim(model[[el]])[3] == 1 | dim(model[[el]])[3] == TT) ){
+        if( !(dim(model[[el]])[3] == 1 || dim(model[[el]])[3] == TT) ){
           problem=TRUE
-          msg = c(msg, paste(" if",el,"is 3D, 3rdd dim equal to 1 or T (length of data).\n"))
+          msg = c(msg, paste(" if",el,"is 3D, 3rd dim equal to 1 or T (length of data).\n"))
         }
       }else{ #is matrix
-        if( !(dim(model[[el]])[2] == 1 | dim(model[[el]])[2] == TT) ){
+        if( !(dim(model[[el]])[2] == 1 || dim(model[[el]])[2] == TT) ){
         problem=TRUE
         msg = c(msg, paste(" ",el,"must be a 2D matrix with 2nd dim equal to 1 or T (length of data).\n"))
         }
@@ -321,7 +320,7 @@ MARSS.marxss=function(MARSS.call){
       diag(tmp[[el]])=paste("(",el.labs,",", el.labs,")",sep="") #paste(el,"(",as.character(1:dim.mat),",",as.character(1:dim.mat),")",sep="")
       if(length(tmp[[el]])==1) tmp[[el]][1,1]=el
     }
-    if(identical(model[[el]],"unconstrained") | identical(model[[el]],"unequal")){
+    if(identical(model[[el]],"unconstrained") || identical(model[[el]],"unequal")){
       tmp[[el]]=array(NA,dim=c(model.dims[[el]][1],model.dims[[el]][2])) 
       if(el %in% c("Q","R","V0")){  #variance-covariance matrices
         dim.mat = model.dims[[el]][1]
@@ -440,14 +439,14 @@ MARSS.marxss=function(MARSS.call){
 }
 
 marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
-  if(!(class(x)[1] %in% c("marssMODEL","marssMLE"))) stop("Stopped in marss_to_marxss(): this function needs a marssMODEL or marssMLE object")
+  if(!(inherits(x, "marssMLE") || inherits(x, "marssMODEL"))) stop("Stopped in marss_to_marxss(): this function needs a marssMODEL or marssMLE object")
   #This function returns a MLE object where the model and par parts of the MLE object are in marxss form for printing purposes.
   #This function needs a marxss marssMODEL object and will break otherwise
   #You cannot back construct a marxss from the marss model
   #The function will also work is x is a model object, but then it just returns marxss.marssMODEL
   #written this way so it doesn't crash if x happens to be a marssMODEL in case I later dynamically write function names/calls
   
-  if(class(x)[1]=="marssMODEL"){
+  if(inherits(x, "marssMODEL")){
     marss.model=x
     if(!("marss" %in% attr(marss.model,"form"))) stop("Stopped in marss_to_marxss(): this function requires a marssMODEL object in marss form.\n",call.=FALSE)
   }else{ 
@@ -456,7 +455,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
   }
   
   if(!C.and.D.are.zero){
-    if(class(x)[1]=="marssMODEL"){ 
+    if(inherits(x, "marssMODEL")){ 
       stop("Stopped in marss_to_marxss(: function was called with a marss model object instead of MLE object, so needs a marxss model passed in.")
     }else{ 
       marxss.model=x[["model"]] #should be model since we want the marxss form
@@ -487,7 +486,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
     attr(marxss.model, "par.names")=c("Z","A","R","B","U","Q","x0","V0","D","C","d","c","G","H","L")
     attr(marxss.model, "equation")="x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
   }
-  if(class(x)[1]=="marssMODEL") return(marxss.model) #in marxss form
+  if(inherits(x, "marssMODEL")) return(marxss.model) #in marxss form
 
   x[["model"]]=marxss.model #now in marxss form
   marxss.dims = attr(marxss.model, "model.dims")
@@ -694,7 +693,7 @@ MARSSinits_marxss = function(MLEobj, inits){
   if(is.null(MLEobj[["model"]])){
     stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }else{
-    if(class(MLEobj[["model"]])[1]!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
+    if(!inherits(MLEobj[["model"]],"marssMODEL")) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
     if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)    
   }
     
@@ -766,7 +765,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
     newdata[["data"]]=newdata$data[Y.names]
     newdata[["data"]]=t(as.matrix(newdata[["data"]])) #time across columns
     
-    if(!(dim(newdata)[1]==n.ahead | dim(newdata)[1]!=1)){
+    if(!(dim(newdata)[1]==n.ahead || dim(newdata)[1]!=1)){
       stop("Stopped in predict_marxss(): The number of rows in the newdata dataframe must be 1 or n.ahead.",call.=FALSE)
     }
     
