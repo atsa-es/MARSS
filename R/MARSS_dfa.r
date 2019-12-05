@@ -160,7 +160,7 @@ MARSS.dfa=function(MARSS.call){
     dat = dat * (1/Sigma)
   }
   
-  MARSS.call = list(data=dat, inits=MARSS.call$inits, control=MARSS.call$control, method=MARSS.call$method, form="dlm", silent=MARSS.call$silent, fit=MARSS.call$fit, fun.kf=MARSS.call$fun.kf)
+  MARSS.call = list(data=dat, inits=MARSS.call$inits, control=MARSS.call$control, method=MARSS.call$method, form="dfa", silent=MARSS.call$silent, fit=MARSS.call$fit, fun.kf=MARSS.call$fun.kf)
   
   #dfa is a type of marxss model, so use MARSS.marxss to test it and set up the marss object
   tmp = MARSS.marxss(list(data=dat,model=dfa.model,method=MARSS.call$method,silent=MARSS.call$silent))
