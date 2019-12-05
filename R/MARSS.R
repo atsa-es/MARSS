@@ -164,12 +164,12 @@ MARSS = function(y,
       ## Add AIC and AICc and coef to the object
       ## Return as long as something was estimated and there are no errors, but might not be converged
       # If all params fixed (so no fitting), convergence==3
-      if((MLEobj$convergence%in%c(0,1)) | (MLEobj$convergence%in%c(10,11) && method %in% kem.methods) ){
+      if((MLEobj$convergence%in%c(0,1)) || (MLEobj$convergence%in%c(10,11) && method %in% kem.methods) ){
         MLEobj = MARSSaic(MLEobj)
         MLEobj$coef = coef(MLEobj,type="vector")
       }
       ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
-      if((MLEobj$convergence%in%c(0,1,3)) | (MLEobj$convergence%in%c(10,11) && method %in% kem.methods) ){
+      if((MLEobj$convergence%in%c(0,1,3)) || (MLEobj$convergence%in%c(10,11) && method %in% kem.methods) ){
         kf=MARSSkf(MLEobj) #use function requested by user
         if(fun.kf=="MARSSkfas") kfss=MARSSkfss(MLEobj) else kfss=kf
         MLEobj$states=kf$xtT

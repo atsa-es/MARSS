@@ -158,7 +158,7 @@ MARSSkfss = function( MLEobj ) {
             msg1=paste("Condition num. of siginv1[t=",t,"] = ",Ck1," ",sep="")
           }
           msg2=""
-          if(any(diag.R!=0) & (t==1 || "R"%in%time.varying) ){
+          if(any(diag.R!=0) && (t==1 || "R"%in%time.varying) ){
             Ck4 = try(kappa((diag(1,n)[diag.R!=0,])%*%R%*%t(diag(1,n)[diag.R!=0,]))) 
             Ck4 = ifelse(class(Ck4)[1]=="try-error","Inf",round(Ck4))
             msg2=paste("Condition num. of R = ",Ck4," ",sep="")
@@ -325,7 +325,7 @@ MARSSkfss = function( MLEobj ) {
     for (t in 1:TT) {
       if(n==1) diag.Ft=Ft[,,t] else diag.Ft=unname(Ft[,,t])[1 + 0:(n - 1)*(n + 1)]
       if( any(diag.Ft==0)){
-        if(t>1 || (t==1 & init.state=="x00")){
+        if(t>1 || (t==1 && init.state=="x00")){
          return(c(rtn.list,list(ok=FALSE, logLik = NaN,
          errors = paste("One of the diagonal elements of Sigma[,,",t,"]=0. That should never happen when t>1 or t=1 and tinitx=0.  \n Are both Q[i,i] and R[i,i] being set to 0?\n",sep=""))))
         }else{ #t=1 so ok. get the det of Ft and deal with 0s that might appear on diag of Ft when t=1 and V0=0 and R=0 and tinitx=1

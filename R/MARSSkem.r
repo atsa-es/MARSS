@@ -494,7 +494,7 @@ MARSSkem = function( MLEobj ) {
         } #for t
       } #any diag.LAM=0
       if(length(denom)==1){ denom = 1/denom }else{ denom=try(pcholinv( denom ) ) }
-      if(inherits(denom, "try-error") | (length(denom)==1 && denom==Inf)){
+      if(inherits(denom, "try-error") || (length(denom)==1 && denom==Inf)){
         stop.msg = paste("Stopped at iter=",iter," in MARSSkem at x0 update. denom is not invertible. \n This means that some of the x0 cannot be estimated. Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE
         break
@@ -678,7 +678,7 @@ MARSSkem = function( MLEobj ) {
         denom = denom + crossprod(Delta4, Qinv%*%Delta4) 
       } #for i
       if(length(denom)==1){ denom = 1/denom }else{ denom=try(chol2inv(chol( denom ) ),silent=TRUE) }
-      if(inherits(denom, "try-error") | (length(denom)==1 && denom==0)){
+      if(inherits(denom, "try-error") || (length(denom)==1 && denom==0)){
         stop.msg = paste("Stopped at iter=",iter," in MARSSkem at U update. denom is not invertible.\n This means some of the U (+ C) terms cannot be estimated.\n Type MARSSinfo('denominv') for more info. \n", sep="")
         stopped.with.errors=TRUE
         break
@@ -870,7 +870,7 @@ MARSSkem = function( MLEobj ) {
   #  MLEobj.iter$conv.test$convergence==0  means abstol reached and log-log test passed (=CONVERGED)
   #  MLEobj.iter$conv.test$convergence==1  means stopped by hitting maxit; abstol reached but NOT log-log
   #  MLEobj.iter$conv.test$convergence==-1 or -2  means log-log test returned errors
-  catinfo=!control$silent || control$silent==2
+  catinfo <- !control$silent || control$silent==2
   MLEobj.return$convergence = 72  #debugging should be changed below
   if(MLEobj.iter$conv.test$convergence==72){
     MLEobj.return$convergence = 52
