@@ -14,6 +14,8 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   if(type=="states") type="x"
   if(type=="observations") type="y"
   if(type=="y" & smoothing=="t") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T' or 't-1'.", call. = FALSE)
+  if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call.=FALSE)
+  if(length(form)!=1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call.=FALSE)
   ## End Argument checking
   
   alpha <- 1-conf.level
@@ -34,7 +36,6 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   }
   
   #set rotate
-  if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call.=FALSE)
   rotate = FALSE
   if(form=="dfa" & "rotate"%in%names(extras)){
     rotate=extras[["rotate"]]
