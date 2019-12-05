@@ -12,6 +12,7 @@ CHANGES IN MARSS 3.10.12 (current state of master 12-2-2019)
 BUGS
 
 * fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
+* MARSS_dfa() used form="dfa" in MARSS.call list. Just info. Never used.
 
 ENHANCEMENTS
 
@@ -19,6 +20,7 @@ ENHANCEMENTS
 * added Ott1 (expected value of Y(t)\|Y(1,1:t-1)) to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t)
 * added smoothing argument to tidy.marssMLE which allows the xtt1 and xtt states (with CIs) to be output.
 * added plot of ytT to autoplot.marssMLE
+* Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 
 DOCUMENTATION and MAN FILES
 
