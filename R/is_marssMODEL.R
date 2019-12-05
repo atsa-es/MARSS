@@ -7,7 +7,7 @@
 # that the fixed and free matrices fit the specified attributes (internally consistent)
 ########################################################################
 is.marssMODEL <- function(MODELobj, method="kem") {
-  if(class(MODELobj) != "marssMODEL") stop("Stopped in is.marssMODEL() because object class is not marssMODEL.\n", call.=FALSE)
+  if( !("marssMODEL" %in% class(MODELobj)) ) stop("Stopped in is.marssMODEL() because object class is not marssMODEL.\n", call.=FALSE)
   msg = NULL
   
   ###########################
@@ -28,7 +28,7 @@ is.marssMODEL <- function(MODELobj, method="kem") {
   for(mat in c("fixed","free")){
     if (!is.list(MODELobj[[mat]])) msg = c(msg, paste("MODELobj$",mat," must be a list of matrices.\n",sep="")) 
     for (i in 1:length(MODELobj[[mat]])) {
-      if(class(MODELobj[[mat]][[i]]) != "array" || length(dim(MODELobj[[mat]][[i]]))!=3){ 
+      if( !("array" %in% class(MODELobj[[mat]][[i]])) || length(dim(MODELobj[[mat]][[i]]))!=3 ){ 
         msg = c(msg, paste("MODELobj$",mat,"$",names(MODELobj[[mat]])[i]," must be a 3D matrix.\n", sep=""))
       }
       if(mode(MODELobj[[mat]][[i]]) != "numeric" || any(is.na(MODELobj[[mat]][[i]])) || any(is.infinite(MODELobj[[mat]][[i]])) ) 

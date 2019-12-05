@@ -47,7 +47,7 @@ for(el in req.args)
   if(is.null(MARSS.inputs[[el]])) MARSS.inputs[[el]]=defaults[[el]]
 
 ## Now deal with case that inits passed in is a marssMLE object
-if(class(MARSS.inputs[["inits"]])=="marssMLE"){
+if("marssMLE" %in% class(MARSS.inputs[["inits"]])){
   if(is.null(MARSS.inputs[["inits"]])){ stop("Stopped in checkMARSSInputs() because inits must have the par element if class marssMLE.\n", call.=FALSE)
   }else{
     MARSS.inputs[["inits"]]=coef(MARSS.inputs[["inits"]], what="par")

@@ -28,7 +28,7 @@ print.marssMLE <- function (x, digits = max(3, getOption("digits")-4), ..., what
       x=eval(call(print.fun, x))
     }else{ x = print_null(x) } #if print_form is missing use print_marss
 
-  if(class(x)=="marssMLE"){ #use x to print; if print.fun returns NULL, say, nothing happens
+  if("marssMLE" %in% class(x)){ #use x to print; if print.fun returns NULL, say, nothing happens
    if(identical(what.to.print,"fit")){
       ## all parameters were fixed
       if(all(unlist(lapply(x$model$free,is.fixed)))){

@@ -92,7 +92,7 @@ MARSShatyt = function( MLEobj ) {
         t.mho.r = I.r[,YM[,t]==1 & diag.R!=0,drop=FALSE]
         Rinv = try(chol(mho.r%*%pari$R%*%t.mho.r))
         #Catch errors before entering chol2inv
-        if(class(Rinv)=="try-error") {
+        if( class(Rinv)[1]=="try-error" ) {
           return(list(ok=FALSE, errors="Stopped in MARSShatyt: chol(R) error.\n" ) )      
         }
         Rinv=chol2inv(Rinv) 

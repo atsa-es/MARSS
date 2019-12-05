@@ -6,7 +6,7 @@
 coef.marssMLE <- function (object, ..., type="list", form=NULL, what="par") {
 #First make sure specified equation form has a corresponding function to do the conversion form=marss object
   return.obj=list()
-  if(class(object)!="marssMLE"){
+  if( !("marssMLE" %in% class(object)) ){
     stop("Stopped in coef.marssMLE() because the function needs a marssMLE object.\n", call.=FALSE)
   }
   if(!(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start")))

@@ -397,57 +397,57 @@ MARSS.marxss=function(MARSS.call){
   #This is the f+Dp form for the MARXSS model used for user displays, printing and such
   marxss_object = list(fixed=fixed, free=free, data=dat, tinitx=model$tinitx, diffuse=model$diffuse)
   #set the attributes
-  class(marxss_object) = "marssMODEL"
-  attr(marxss_object, "obj.elements")=c("fixed","free","data","tinitx","diffuse")
-  attr(marxss_object, "form")="marxss"
-  attr(marxss_object, "model.dims")=model.dims
+  class(marxss_object) <- "marssMODEL"
+  attr(marxss_object, "obj.elements") <- c("fixed","free","data","tinitx","diffuse")
+  attr(marxss_object, "form") <- "marxss"
+  attr(marxss_object, "model.dims") <- model.dims
   #par.names are what needs to be in fixed/free pair
-  attr(marxss_object, "par.names")=c("Z","A","R","B","U","Q","x0","V0","D","C","d","c","G","H","L")
-  attr(marxss_object, "X.names")=X.names
-  attr(marxss_object, "Y.names")=Y.names
-  attr(marxss_object, "equation")="x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+  attr(marxss_object, "par.names") <- c("Z","A","R","B","U","Q","x0","V0","D","C","d","c","G","H","L")
+  attr(marxss_object, "X.names") <- X.names
+  attr(marxss_object, "Y.names") <- Y.names
+  attr(marxss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
 
   #Change alldefaults global to match the form
   #first load the defaults
-  alldefaults=get("alldefaults", envir=pkg_globals)
-  alldefaults[[MARSS.call$method]][["inits"]][["C"]]=0
-  alldefaults[[MARSS.call$method]][["inits"]][["D"]]=0
+  alldefaults <- get("alldefaults", envir=pkg_globals)
+  alldefaults[[MARSS.call$method]][["inits"]][["C"]] <- 0
+  alldefaults[[MARSS.call$method]][["inits"]][["D"]] <- 0
   #c and d and G and H inits won't be used but assigned defaults so users can pass in inits as coef(fit)
-  alldefaults[[MARSS.call$method]][["inits"]][["c"]]=0
-  alldefaults[[MARSS.call$method]][["inits"]][["d"]]=0
-  alldefaults[[MARSS.call$method]][["inits"]][["G"]]=0
-  alldefaults[[MARSS.call$method]][["inits"]][["H"]]=0
-  alldefaults[[MARSS.call$method]][["inits"]][["L"]]=0
+  alldefaults[[MARSS.call$method]][["inits"]][["c"]] <- 0
+  alldefaults[[MARSS.call$method]][["inits"]][["d"]] <- 0
+  alldefaults[[MARSS.call$method]][["inits"]][["G"]] <- 0
+  alldefaults[[MARSS.call$method]][["inits"]][["H"]] <- 0
+  alldefaults[[MARSS.call$method]][["inits"]][["L"]] <- 0
   assign("alldefaults", alldefaults, pkg_globals)
   
   ## Check that the marssMODEL object output by MARSS.form() is ok since marxss_to_marss will go south otherwise
   if(MARSS.call$silent==2) cat(paste("  Running is.marssMODEL on the marxss model.\n",sep=""))
-  tmp = is.marssMODEL(marxss_object, method=MARSS.call$method)
+  tmp <- is.marssMODEL(marxss_object, method=MARSS.call$method)
   if(!isTRUE(tmp)) {
     cat(tmp) 
     stop("Stopped in MARSS.marxss() due to problem(s) with model specification.", call.=FALSE)
   }
   
   #Put the marxss model into $model since model holds the model in the 'form' form
-  MARSS.call$model = marxss_object
+  MARSS.call$model <- marxss_object
   
   ## Create marssMODEL(form=marss) object added to call
   #when called with a marssMODEL object (as here), marxss_to_marss returns a marssMODEL object
-  MARSS.call$marss=marxss_to_marss(marxss_object)
+  MARSS.call$marss <- marxss_to_marss(marxss_object)
   
   ## Return MARSS call list with $marss and $model added
   MARSS.call
 }
 
 marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
-  if(!(class(x) %in% c("marssMODEL","marssMLE"))) stop("Stopped in marss_to_marxss(): this function needs a marssMODEL or marssMLE object")
+  if(!(class(x)[1] %in% c("marssMODEL","marssMLE"))) stop("Stopped in marss_to_marxss(): this function needs a marssMODEL or marssMLE object")
   #This function returns a MLE object where the model and par parts of the MLE object are in marxss form for printing purposes.
   #This function needs a marxss marssMODEL object and will break otherwise
   #You cannot back construct a marxss from the marss model
   #The function will also work is x is a model object, but then it just returns marxss.marssMODEL
   #written this way so it doesn't crash if x happens to be a marssMODEL in case I later dynamically write function names/calls
   
-  if(class(x)=="marssMODEL"){
+  if(class(x)[1]=="marssMODEL"){
     marss.model=x
     if(!("marss" %in% attr(marss.model,"form"))) stop("Stopped in marss_to_marxss(): this function requires a marssMODEL object in marss form.\n",call.=FALSE)
   }else{ 
@@ -456,7 +456,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
   }
   
   if(!C.and.D.are.zero){
-    if(class(x)=="marssMODEL"){ 
+    if(class(x)[1]=="marssMODEL"){ 
       stop("Stopped in marss_to_marxss(: function was called with a marss model object instead of MLE object, so needs a marxss model passed in.")
     }else{ 
       marxss.model=x[["model"]] #should be model since we want the marxss form
@@ -487,7 +487,7 @@ marss_to_marxss=function(x, C.and.D.are.zero=FALSE){
     attr(marxss.model, "par.names")=c("Z","A","R","B","U","Q","x0","V0","D","C","d","c","G","H","L")
     attr(marxss.model, "equation")="x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
   }
-  if(class(x)=="marssMODEL") return(marxss.model) #in marxss form
+  if(class(x)[1]=="marssMODEL") return(marxss.model) #in marxss form
 
   x[["model"]]=marxss.model #now in marxss form
   marxss.dims = attr(marxss.model, "model.dims")
@@ -694,7 +694,7 @@ MARSSinits_marxss = function(MLEobj, inits){
   if(is.null(MLEobj[["model"]])){
     stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
   }else{
-    if(class(MLEobj[["model"]])!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
+    if(class(MLEobj[["model"]])[1]!="marssMODEL") stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)
     if(!("marxss" %in% attr(MLEobj[["model"]],"form"))) stop("Stopped in MARSSinits_marxss(): this function needs a marssMODEL in marxss form in $model",call.=FALSE)    
   }
     
@@ -735,7 +735,7 @@ predict_marxss = function(x, newdata, n.ahead, t.start){
   form="marxss"
   allow.in=c("data","c","d") #allowed in newdata
   
-  if(!(class(newdata) %in% c("list","data.frame")))
+  if(!(class(newdata)[1] %in% c("list","data.frame")))
     stop("Stopped predict_marxss(): newdata must be a list or dataframe.",call.=FALSE)
   
   #next interpret newdata;

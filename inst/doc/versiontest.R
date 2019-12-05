@@ -51,7 +51,7 @@ for(unittestfile in unittestfiles){
   try(source(unittestfile))
   sink()
   #make a list of objects created by the test code
-  funs=sapply(ls(),function(x){isTRUE(class(get(x))=="function")})
+  funs=sapply(ls(),function(x){isTRUE(class(get(x))[1]=="function")})
   ls.not.funs = ls()[ls()!="funs"]
   test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testNew = mget(test.these)
@@ -77,7 +77,7 @@ for(unittestfile in unittestfiles){
   set.seed(10)
   try(source(unittestfile))
   sink()
-  funs=sapply(ls(),function(x){isTRUE(class(get(x))=="function")})
+  funs=sapply(ls(),function(x){isTRUE(class(get(x))[1]=="function")})
   ls.not.funs = ls()[ls()!="funs"]
   test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testOld = mget(test.these)
@@ -109,7 +109,7 @@ for(unittestfile in unittestfiles){
   for(ii in 1:length(names(testNew))){
     if(!identical(testNew[[ii]], testOld[[ii]])){
       good[ii] = FALSE
-      if(class(testNew[[ii]])=="marssMLE"){
+      if("marssMLE" %in% class(testNew[[ii]])){
         for(iii in names(testNew[[ii]][["par"]])){
           if(iii %in% c("G","H","L")) next
           if(!identical(testNew[[ii]][["par"]][iii], testOld[[ii]][["par"]][iii])){

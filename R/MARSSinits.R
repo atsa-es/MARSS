@@ -8,7 +8,7 @@ MARSSinits <- function(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, R=0.05, x0
 MODELobj=MLEobj[["marss"]]
 method=MLEobj[["method"]]
 if(is.null(inits)) inits=list()
-if(class(inits)=="marssMLE"){
+if( "marssMLE" %in% class(inits) ){
   if(is.null(inits[["par"]])){ stop("Stopped in MARSSinits() because inits must have the par element if class marssMLE.\n", call.=FALSE)
   }else{
     inits=inits$par

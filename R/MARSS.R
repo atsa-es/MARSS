@@ -91,7 +91,7 @@ MARSS = function(y,
     # This is a helper function to set simple inits for a marss MLE model object
     MLEobj$start = MARSSinits(MLEobj, MARSS.inputs$inits)
     
-    class(MLEobj) = "marssMLE"
+    class(MLEobj) <- "marssMLE"
     
     ## Check the marssMLE object
     ## is.marssMLE() calls is.marssMODEL() to check the model,

@@ -59,7 +59,7 @@ msg=NULL
         if(length(model[[el]])!=1) bad.str=TRUE
         if(!bad.str){
           testit = try(model[[el]] %in% this.form.allows[[el]])
-          if(class(testit)=="try-error" ){ bad.str=TRUE
+          if(class(testit)[1]=="try-error" ){ bad.str=TRUE
           }else{ if(!testit ) bad.str=TRUE }
         }
     }

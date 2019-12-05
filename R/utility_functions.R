@@ -141,7 +141,7 @@ is.validvarcov = function(x, method="kem"){
       pos.flag=FALSE
       test.block = matrix(as.numeric(this.block),dim(this.block)[1],dim(this.block)[2])
       tmp = try( eigen(test.block, only.values=TRUE), silent=TRUE )
-      if(class(tmp)=="try-error") pos.flag=TRUE
+      if(class(tmp)[1]=="try-error") pos.flag=TRUE
       else if(!all(tmp$values >= 0)) pos.flag=TRUE
       #if there is a problem
       if(pos.flag){

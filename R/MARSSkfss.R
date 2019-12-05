@@ -54,7 +54,7 @@ MARSSkfss = function( MLEobj ) {
       Z.R0=Z[diag.R==0,,drop=FALSE]; Z.R0.n0=Z.R0[,colSums(Z.R0)!=0,drop=FALSE] # The Z cols where there is a val
       if(dim(Z.R0.n0)[1]==dim(Z.R0.n0)[2]){ #then it must be invertible
          Ck=try(solve(Z.R0.n0))
-         if(class(Ck)=="try-error"){
+         if( class(Ck)[1]=="try-error" ){
            return(list(ok=FALSE,errors="Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
          }else{ OmgRVtt = diag(ifelse(colSums(Z.R0)!=0,0,1),m) }#mxm; sets the p elem of Vtt to 0 because these are determined by data
       }else{ #then num rows must be greater than num cols
@@ -92,7 +92,7 @@ MARSSkfss = function( MLEobj ) {
             Z.R0=Z[diag.R==0,,drop=FALSE]; Z.R0.n0=Z.R0[,colSums(Z.R0)!=0,drop=FALSE] # The Z cols where there is a val
             if(dim(Z.R0.n0)[1]==dim(Z.R0.n0)[2]){ #then it must be invertible
               Ck=try(solve(Z.R0.n0))
-              if(class(Ck)=="try-error"){
+              if( class(Ck)[1]=="try-error" ){
                return(list(ok=FALSE,errors="Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
               }else{ OmgRVtt = diag(ifelse(colSums(Z.R0)!=0,0,1),m) }#mxm; sets the p elem of Vtt to 0 because these are determined by data
             }else{ 
@@ -151,16 +151,16 @@ MARSSkfss = function( MLEobj ) {
         siginv=try(pcholinv(siginv1), silent = TRUE)      
         if(n==1) diag.siginv1 = unname(siginv1) else diag.siginv1=unname(siginv1)[1 + 0:(n - 1)*(n + 1)]   #much faster way to get the diagonal
         #Catch errors before entering chol2inv
-        if(class(siginv)=="try-error") {
+        if(class(siginv)[1]=="try-error") {
           if(any(diag.siginv1!=0)){
             Ck1 = try(kappa(siginv1[diag.siginv1!=0,diag.siginv1!=0,drop=FALSE]))
-            Ck1 = ifelse(class(Ck1)=="try-error","Inf",round(Ck1))
+            Ck1 = ifelse(class(Ck1)[1]=="try-error","Inf",round(Ck1))
             msg1=paste("Condition num. of siginv1[t=",t,"] = ",Ck1," ",sep="")
           }
           msg2=""
           if(any(diag.R!=0) & (t==1 || "R"%in%time.varying) ){
             Ck4 = try(kappa((diag(1,n)[diag.R!=0,])%*%R%*%t(diag(1,n)[diag.R!=0,]))) 
-            Ck4 = ifelse(class(Ck4)=="try-error","Inf",round(Ck4))
+            Ck4 = ifelse(class(Ck4)[1]=="try-error","Inf",round(Ck4))
             msg2=paste("Condition num. of R = ",Ck4," ",sep="")
           }
           return(list(ok=FALSE, errors=paste("Stopped in MARSSkfss: chol(Z%*%Vtt1[,,",t,"]%*%t(Z)+R) error. ",msg1," ", msg2,"\n",sep="") ) )       

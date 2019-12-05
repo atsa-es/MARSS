@@ -238,26 +238,26 @@ if(number=="modelobject")
               
 # x is a pre 3.5 marssMLE object from a MARSS call.  x=MARSS(....)
 x$marss=x$model
-class(x$marss)="marssMODEL"
-attr(x$marss,"form")="marss"
-attr(x$marss,"par.names")=names(x$marss$fixed)
-tmp=x$marss$model.dims
-for(i in names(tmp)) if(length(tmp[[i]])==2) tmp[[i]]=cbind(tmp[[i]],1)
-tmp$x=c(sqrt(dim(kemz$model$fixed$Q)[1]), dim(kemz$model$data)[2])
-tmp$y=c(sqrt(dim(kemz$model$fixed$R)[1]), dim(kemz$model$data)[2])
-attr(x$marss,"model.dims")=tmp
-attr(x$marss,"X.names")=x$marss$X.names
+class(x$marss) <- "marssMODEL"
+attr(x$marss,"form") <- "marss"
+attr(x$marss,"par.names") <- names(x$marss$fixed)
+tmp <- x$marss$model.dims
+for(i in names(tmp)) if(length(tmp[[i]])==2) tmp[[i]] <- cbind(tmp[[i]],1)
+tmp$x <- c(sqrt(dim(kemz$model$fixed$Q)[1]), dim(kemz$model$data)[2])
+tmp$y <- c(sqrt(dim(kemz$model$fixed$R)[1]), dim(kemz$model$data)[2])
+attr(x$marss,"model.dims") <- tmp
+attr(x$marss,"X.names") <- x$marss$X.names
               
-class(x$model)="marssMODEL"
-x$model=x$form.info$marxss
-attr(x$model,"form")=x$form.info$form
-attr(x$model,"par.names")=names(x$model$fixed)
-tmp=x$form.info$model.dims
-for(i in names(tmp)) if(length(tmp[[i]])==2) tmp[[i]]=cbind(tmp[[i]],1)
-tmp$x=c(sqrt(dim(kemz$model$fixed$Q)[1]), dim(kemz$model$data)[2])
-tmp$y=c(sqrt(dim(kemz$model$fixed$R)[1]), dim(kemz$model$data)[2])
-attr(x$model,"model.dims")=tmp
-attr(x$model,"X.names")=x$marss$X.names
+class(x$model) <- "marssMODEL"
+x$model <- x$form.info$marxss
+attr(x$model,"form") <- x$form.info$form
+attr(x$model,"par.names") <- names(x$model$fixed)
+tmp <- x$form.info$model.dims
+for(i in names(tmp)) if(length(tmp[[i]])==2) tmp[[i]] <- cbind(tmp[[i]],1)
+tmp$x <- c(sqrt(dim(kemz$model$fixed$Q)[1]), dim(kemz$model$data)[2])
+tmp$y <- c(sqrt(dim(kemz$model$fixed$R)[1]), dim(kemz$model$data)[2])
+attr(x$model,"model.dims") <- tmp
+attr(x$model,"X.names") <- x$marss$X.names
               
 #now this should work
 coef(x, type="matrix")

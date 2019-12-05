@@ -291,15 +291,15 @@ MARSS.marss=function(MARSS.call){
   #This is the f+Dp form for the MARSS model used for user displays, printing and such
   marss_object = list(fixed=fixed, free=free, data=dat, tinitx=model$tinitx, diffuse=model$diffuse)
   #set the attributes
-  class(marss_object) = "marssMODEL"
-  attr(marss_object, "obj.elements")=c("fixed","free","data","tinitx","diffuse")
-  attr(marss_object, "form")="marss"
-  attr(marss_object, "model.dims")=model.dims
+  class(marss_object) <- "marssMODEL"
+  attr(marss_object, "obj.elements") <- c("fixed","free","data","tinitx","diffuse")
+  attr(marss_object, "form") <- "marss"
+  attr(marss_object, "model.dims") <- model.dims
   #par.names are what needs to be in fixed/free pair
-  attr(marss_object, "par.names")=c("Z","A","R","B","U","Q","x0","V0","G","H","L")
-  attr(marss_object, "X.names")=X.names
-  attr(marss_object, "Y.names")=Y.names
-  attr(marss_object, "equation")="x_{t}=B_{t}*x_{t-1}+U_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+  attr(marss_object, "par.names") <- c("Z","A","R","B","U","Q","x0","V0","G","H","L")
+  attr(marss_object, "X.names") <- X.names
+  attr(marss_object, "Y.names") <- Y.names
+  attr(marss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
   
   #Put the marss model into model and marss
   MARSS.call$model = marss_object

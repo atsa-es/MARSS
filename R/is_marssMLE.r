@@ -5,7 +5,7 @@
 #####
 is.marssMLE <- function(MLEobj) 
 {
-  if(class(MLEobj) != "marssMLE") stop("Stopped in is.marssMLE() because object class is not marssMLE.\n", call.=FALSE)
+  if( !("marssMLE" %in% class(MLEobj)) ) stop("Stopped in is.marssMLE() because object class is not marssMLE.\n", call.=FALSE)
   
   msg = c()
  ## Check for required components

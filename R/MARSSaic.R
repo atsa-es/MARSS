@@ -21,7 +21,7 @@ MARSSaic = function(MLEobj, output=c("AIC","AICc"), Options=list(nboot=1000, ret
   if(is.null(Options[["nboot"]])) Options$nboot = 1000
   if(is.null(Options[["return.logL.star"]])) Options$return.logL.star = FALSE
   if(is.null(Options[["silent"]])) Options$silent = FALSE
-  if(class(MLEobj)[1]!="marssMLE") {
+  if( !("marssMLE" %in% class(MLEobj)) ) {
     stop("Stopped in MARSSaic(). An object of class marssMLE is required.\n", call.=FALSE)
     }
     
