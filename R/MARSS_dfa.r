@@ -1,11 +1,11 @@
 ###################################################################################
-# Helper functions to create and work with a DLM model sensu Zuur
+# Helper functions to create and work with a DFA model sensu Zuur
 # x(t)=x(t-1) + w(t), W~MVN(0,1)
 # y(t)=Z x(t) + A(t) + D(t) d(t) + v(t), V~MVN(0,R)
 # x(t0) = x0 + l, L ~ MVN(0,5)
 
 # MARSS.dfa: The conversion functions have 2 parts
-# Part 1 Set up the DLM model in MARSS.marxss form
+# Part 1 Set up the DFA model in MARSS.marxss form
 # Part 2 Call MARSS.marxss to finish the set-up and checking
 
 # Functions that are called by the generic functions print.marssMLE, residuals.marssMLE,
@@ -134,9 +134,9 @@ MARSS.dfa=function(MARSS.call){
   model=MARSS.call[["model"]]
   
   if(!(MARSS.call$z.score %in% c(TRUE,FALSE)))
-    stop("Stopped in MARSS.dlm(): z.score must be TRUE/FALSE.\n", call.=FALSE)
+    stop("Stopped in MARSS.dfa(): z.score must be TRUE/FALSE.\n", call.=FALSE)
   if(!(MARSS.call$demean %in% c(TRUE,FALSE)))
-    stop("Stopped in MARSS.dlm(): demean must be TRUE/FALSE.\n", call.=FALSE)
+    stop("Stopped in MARSS.dfa(): demean must be TRUE/FALSE.\n", call.=FALSE)
   
   #Set up U; always 0 for dfa
   U=matrix(0,m,1)
