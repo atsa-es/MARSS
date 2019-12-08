@@ -19,8 +19,8 @@ fitted.marssMLE <- function (object, ...,
     stop("fitted.marssMLE: Only conditioning = 'T' and 't-1' allowed for type='states'. ")
   
   
-  model.dims=attr(MLEobj[["model"]],"model.dims")
-  form=attr(MLEobj[["model"]],"form")
+  #need the model dims in marss form with c in U and d in A
+  model.dims=attr(MLEobj[["marss"]],"model.dims")
   TT = model.dims[["x"]][2]
   n = model.dims[["y"]][1]
   m = model.dims[["x"]][1]
@@ -41,7 +41,7 @@ fitted.marssMLE <- function (object, ...,
     At=parmat(MLEobj,"A",t=1)$A    
 
     for(t in 1:TT){
-      # parmat return marss form
+      # parmat returns marss form
       if(Z.time.varying) Zt=parmat(MLEobj,"Z",t=t)$Z
       if(A.time.varying) At=parmat(MLEobj,"A",t=t)$A    
       val[,t] = Zt%*%hatxt[,t,drop=FALSE]+At
