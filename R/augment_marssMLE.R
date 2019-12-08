@@ -4,20 +4,22 @@
 #  the base function is augment_marxss below
 #  augment_dfa uses the optional rotate argument
 ##############################################################################################################################################
-augment.marssMLE <- function(x, type.predict = c("observations", "states"),
+augment.marssMLE <- function(x, type = c("observations", "states"),
                              interval = c("none", "confidence"),
                              conf.level = 0.95,
-                             form = attr(x[["model"]], "form")) {
+                             conditioning = c("T", "t", "t-1"),
+                             form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
-  type.predict <- match.arg(type.predict)
+  type <- match.arg(type)
   interval <- match.arg(interval)
-  if (!is.numeric(conf.level) || length(conf.level)>1 || conf.level > 1 || conf.level < 0) stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+  conditioning <- match.arg(conditioning)
+  if (!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   ## End argument checking
 
-  augment.fun <- paste("augment_", form[1], sep = "")
+  augment.fun <- paste("augment_", form, sep = "")
   tmp <- try(exists(augment.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(augment.fun, x, type.predict = type.predict, interval = interval, conf.level = conf.level))
+    ret <- eval(call(augment.fun, x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning ))
   } else {
     ret <- paste("No augment_", form[1], " is available.\n", sep = "")
   }
@@ -29,19 +31,19 @@ augment.marssMLE <- function(x, type.predict = c("observations", "states"),
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
 ##############################################################################################################################################
-augment_marxss <- function(x, type.predict, interval, conf.level) {
+augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
   resids <- residuals(x)
-  se.resids <- sqrt(apply(resids$var.residuals, 3, function(x) {
+  se.resids <- sqrt(apply(resi?ds$var.residuals, 3, function(x) {
     takediag(x)
   }))
   data.dims <- attr(model, "model.dims")[["y"]]
   nn <- data.dims[1]
   TT <- data.dims[2]
   alpha <- 1 - conf.level
-  if (type.predict == "observations") {
+  if (type == "observations") {
     data.names <- attr(model, "Y.names")
     ret <- data.frame(
       .rownames = rep(data.names, each = TT),
@@ -59,7 +61,7 @@ augment_marxss <- function(x, type.predict, interval, conf.level) {
       )
     }
   }
-  if (type.predict == "states") {
+  if (type == "states") {
     # line up the residuals so that xtT(t) has residuals for xtT(t)-f(xtT(t-1))
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
@@ -86,8 +88,8 @@ augment_marxss <- function(x, type.predict, interval, conf.level) {
   ret
 }
 
-augment_dfa <- function(x, type.predict, interval, conf.level) {
-  ret <- augment_marxss(x, type.predict = type.predict, interval = interval, conf.level = conf.level)
+augment_dfa <- function(x, type, interval, conf.level, conditioning) {
+  ret <- augment_marxss(x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning)
 
   ret
 }
