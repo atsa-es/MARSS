@@ -13,7 +13,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if(type=="states") type="x"
   if(type=="observations") type="y"
-  if(type=="y" & smoothing=="t") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T' or 't-1'.", call. = FALSE)
+  if(type=="y" && smoothing=="t") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T' or 't-1'.", call. = FALSE)
   if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call.=FALSE)
   if(length(form)!=1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call.=FALSE)
   ## End Argument checking
@@ -47,7 +47,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
   if(type=="parameters"){
     ests = coef(x, type="vector")
     if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n", call.=FALSE)
-    if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
+    if(form=="dfa" && rotate && length(x[["par"]][["Z"]])!=0){
       stop("tidy.marssMLE: You are requesting the parameters for a DFA \n and requested that the Z matrix be rotated. You need to do the rotation yourself.  See ?tidy.marssMLE for the code.\n", call.=FALSE)
     }else{
       ret = data.frame(
@@ -81,7 +81,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     if(mm==1) states.se <- matrix(states.se,1,TT)
 
     #if user specified rotate
-    if(form=="dfa" & rotate & length(x[["par"]][["Z"]])!=0){
+    if(form=="dfa" && rotate && length(x[["par"]][["Z"]])!=0){
       Z.est <- coef(x, type="matrix")[["Z"]]
       H <- 1
       if(ncol(Z.est)>1){
