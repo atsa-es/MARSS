@@ -3,23 +3,23 @@
 ##############################################################################################################################################
 tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "x", "y"), 
                           conf.int = TRUE, conf.level = 0.95,
-                          smoothing = c("T", "t-1", "t"),
+                          conditioning = c("T", "t-1", "t"),
                           form=attr(x[["model"]], "form")[1], ...)
 { 
   ## Argument checking
   type = match.arg(type)
-  smoothing = match.arg(smoothing)
+  conditioning = match.arg(conditioning)
   if(!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
   if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if(type=="states") type="x"
   if(type=="observations") type="y"
-  if(type=="y" && smoothing=="t") stop("tidy.marssMLE: if type='observations' or 'y', smoothing must be 'T' or 't-1'.", call. = FALSE)
+  if(type=="y" && conditioning=="t") stop("tidy.marssMLE: if type='observations' or 'y', conditioning must be 'T' or 't-1'.", call. = FALSE)
   if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call.=FALSE)
   if(length(form)!=1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call.=FALSE)
   ## End Argument checking
   
   alpha <- 1-conf.level
-  smoothing <- switch(smoothing, T="tT", `t-1`="tt1", t="tt")
+  conditioning <- switch(conditioning, T="tT", `t-1`="tt1", t="tt")
   extras=list()
   
   rerun.MARSSparamCIs = FALSE
@@ -66,7 +66,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     rownames(ret)=NULL
   }
   if(type=="x"){
-    xtype <- paste0(type,smoothing)
+    xtype <- paste0(type,conditioning)
     model <- x[["model"]]
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
@@ -110,7 +110,7 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     rownames(ret)=NULL
   }
   if(type=="y"){
-    ytype <- paste0(type,smoothing)
+    ytype <- paste0(type,conditioning)
     model=x[["model"]]
     Y.names = attr(model, "Y.names")
     Y.dims = attr(model, "model.dims")[["y"]]

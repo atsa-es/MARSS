@@ -13,7 +13,7 @@ The tidy function is designed to work with the \code{broom} package and you will
   tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
                 conf.int = TRUE,
                 conf.level = 0.95,
-                smoothing = c("T", "t-1", "t"),
+                conditioning = c("T", "t-1", "t"),
                 form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
@@ -25,7 +25,7 @@ The tidy function is designed to work with the \code{broom} package and you will
   
   \item{conf.level}{ Confidence level. alpha=1-conf.level}
 
-  \item{smoothing}{ If type is states or observations, how should the estimates be computed: using all data 1:T ("T"), using only data up to t-1 ("t-1"), or using only data up to t ("t"). If smoothing="t-1", then you get the one-step-ahead predictions (and their quantiles). If smoothing="T", then you get the smoothed state and model fits (and their quantiles). }
+  \item{conditioning}{ If type is states or observations, how should the estimates be computed: using all data 1:T ("T"), using only data up to t-1 ("t-1"), or using only data up to t ("t"). If conditioning="t-1", then you get the one-step-ahead predictions (and their quantiles). If conditioning="T", then you get the smoothed state and model fits (and their quantiles). If type="observations", then only the values "T" and "t-1" are allowed.}
 
   \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normally just ignore and let the function use the "form" set in the attributes.}
   
@@ -71,7 +71,7 @@ Z.rot <- Z.est \%*\% H.inv
 
 \strong{The estimate and distribution for missing data} If your \eqn{\mathbf{y}_t}{y_t} is missing data and you want an estimate of those values, use \code{tidy.marssMLE}. The standard error and confidence interval for the missing value takes into account all the information in the data. Do not use \code{\link{augment.marssMLE}} as that returns the standard errors for the model residuals for missing data, which will be quite different if the R matrix is not diagonal (though identical if R is diagonal). Also do not use "prediction" intervals for interpolating missing data, as those are for entire new data sets and thus will ignore relevant information if \eqn{\mathbf{y}_t}{y_t} is multivariate, not all \eqn{\mathbf{y}_t}{y_t} are missing, and the R matrix is not diagonal.
 
-\strong{One step ahead predictions} Use \code{smoothing="t-1"} for the one-step-ahead predictions of \eqn{\mathbf{y}_t}{y_t}, using only data up to t-1. This is the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} conditioned on the data up to t-1. These are one-step-ahead prediction intervals.
+\strong{One step ahead predictions} Use \code{conditioning="t-1"} for the one-step-ahead predictions of \eqn{\mathbf{y}_t}{y_t}, using only data up to t-1. This is the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} conditioned on the data up to t-1. These are one-step-ahead prediction intervals.
 
 \strong{Output that \code{augment.marssMLE} provides and \code{tidy.marssMLE} does not}
 
