@@ -4,16 +4,21 @@
 #  the base function is augment_marxss below
 #  augment_dfa uses the optional rotate argument
 ##############################################################################################################################################
-augment.marssMLE <- function(x, type = c("observations", "states"),
+augment.marssMLE <- function(x, type = c("observations", "states", "y", "x"),
                              interval = c("none", "confidence"),
                              conf.level = 0.95,
                              conditioning = c("T", "t", "t-1"),
                              form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
+  if(type=="y") type="observations"
+  if(type=="x") type="states"
   interval <- match.arg(interval)
   conditioning <- match.arg(conditioning)
-  if (!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+  if(conditioning!="T")
+    stop("augment.marssMLE: Only conditioning='T' allowed currently.", call. = FALSE)
+  if (!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) 
+    stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   ## End argument checking
 
   augment.fun <- paste("augment_", form, sep = "")
@@ -36,7 +41,7 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
   resids <- residuals(x)
-  se.resids <- sqrt(apply(resi?ds$var.residuals, 3, function(x) {
+  se.resids <- sqrt(apply(resids$var.residuals, 3, function(x) {
     takediag(x)
   }))
   data.dims <- attr(model, "model.dims")[["y"]]

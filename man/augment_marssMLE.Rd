@@ -5,19 +5,23 @@
 \alias{augmentmarxss}
 \title{Return the model predicted values, residuals, and optionally confidence intervals}
 \usage{
-  augment.marssMLE(x, type.predict = c("observations", "states"),
+  augment.marssMLE(x, type = c("observations", "states", "y", "x"),
                               interval = c("none", "confidence"), 
-                              conf.level = 0.95, form=attr(x[["model"]], "form"))
+                              conditioning = c("T", "t", "t-1"),
+                              conf.level = 0.95, 
+                              form=attr(x[["model"]], "form"))
 }
 \arguments{
   \item{x}{a marssMLE object}
   
-  \item{type.predict}{Type of prediction: for the observations (y) or for the states (x).  Read the details below for states.  \code{tidy} would be the more common function for returning state estimates.}
+  \item{type}{Type of prediction: for the observations (y) or for the states (x).  Read the details below for states.  \code{tidy} would be the more common function for returning state estimates.}
   
   \item{interval}{Type of interval: none or confidence interval.  If the latter, approximate intervals from the standard errors of the fitted values is given.}
   
   \item{conf.level}{Confidence level.}
   
+  \item{conditioning}{ If "T", then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead". Currently, only the value "T" is allowed.}
+
   \item{form}{If you want the augment function to use a different augment function than augment_form.  This might be useful if you manually specified a DFA model and want to use augment.dfa for rotating.}
 
 }

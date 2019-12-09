@@ -6,13 +6,13 @@
   The MARSS fitting function, \code{\link{MARSS}}, outputs marssMLE objects.  \code{fitted(marssMLE)}, where marssMLE is the output from a \code{\link{MARSS}} call,   will return the modeled value of \eqn{y(t)} or \eqn{x(t)}.  See details.
 }
   \usage{
-  \method{fitted}{marssMLE}(object, ..., one.step.ahead=FALSE, type=c("observations", "states"))
+  \method{fitted}{marssMLE}(object, ..., type=c("observations", "states", "y", "x"),   conditioning = c("T", "t", "t-1"))
   }
   \arguments{
   \item{object}{ A marssMLE object.  }
   \item{...}{ Other arguments, not used. }
-  \item{one.step.ahead}{ If TRUE, expected value of the states is computed conditioned on the data up to t-1}
-  \item{type}{ Fitted values for the observations or the states.}
+  \item{type}{ Fitted values for the observations (y) or the states (x).}
+  \item{conditioning}{ If "T", then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead".}
   }
 \value{
   A T column matrix of the fitted values with one row for each observation (or state) time series.
@@ -22,15 +22,15 @@
 
 The model predicted (fitted) y at time t is \eqn{Z(t)\hat{x}(t)+a(t)}{Z(t)\hat{x}(t)+a(t)}, where the model is written in marss form. See \code{\link{MARSS.marxss}} for a discussion of the conversion of MARSS models with covariates (c and d) into marss form (which is how models are written in the internal MARSS algorithms).
   
-\eqn{\hat{x}(t)} is the expected value of the states at time t. If \code{one.step.ahead=FALSE}, \eqn{\hat{x}(t)} is the expected value conditioned on all the data, i.e. xtT returned by \code{\link{MARSSkf}}.  If \code{one.step.ahead=TRUE}, then the predictions of the observations or states at time t use only the data up to time t-1.  These are commonly known as the one step ahead predictions for a state-space model.
+\eqn{\hat{x}(t)} is the expected value of the states at time t. If \code{conditioning="T"}, \eqn{\hat{x}(t)} is the expected value conditioned on all the data, i.e. \code{xtT} returned by \code{\link{MARSSkf}}.  If \code{conditioning="t-1"}, then expected value uses only the data up to time t-1, i.e. \code{xtt1} returned by \code{\link{MARSSkf}}.  These are commonly known as the one step ahead predictions for a state-space model. If \code{conditioning="t"}, then the expected value uses the data up to time t, i.e. \code{xtt} returned by \code{\link{MARSSkf}}. 
 
 \strong{state fitted values}
 
 The model predicted \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)} is \eqn{B(t)\hat{x}(t-1)+u(t)}, where the model is written in marss form. This type of state fitted value is used for process outlier detection and shock detection.  See \code{\link{residuals.marssMLE}} and read the references cited.
   
-\eqn{\hat{x}(t-1)} used in the prediction is the expected value of the states at time t-1. If \code{one.step.ahead=FALSE}, \eqn{\hat{x}(t-1)} is the expected value conditioned on all the data, i.e. xtT returned by \code{\link{MARSSkf}}.  If \code{one.step.ahead=TRUE}, \eqn{\hat{x}(t-1)} is the expected value conditioned on the data up to time t-1, i.e. xtt (returned by \code{\link{MARSSkf}}) evaluated at time t-1.  
+\eqn{\hat{x}(t-1)} used in the prediction is the expected value of the states at time t-1. If \code{conditioning="T"}, \eqn{\hat{x}(t-1)} is the expected value at time t-1 conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}}.  If \code{conditioning="t-1"}, \eqn{\hat{x}(t-1)} is the expected value conditioned on the data up to time t-1, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}}. The fitted state values conditioned on data up to $t$ is not provided. This would require the expected value of states at time t conditioned on data up to time t+1, and this is not output by the Kalman filter. Only conditioning on data up to t-1, t, and T are output.
 
-If you want estimates of the states, then you'll want either the states estimate conditioned on all the data (or conditioned on the data up to time t-1 or up to time t).  These are returned by \code{\link{MARSSkf}} in \code{xtT} (and \code{xtt1} and \code{xtt}) respectively.  Which one you want depends on your objective and application.  You can also use the \code{\link{tidy.marssMLE}} function to return a data.frame with the states, standard errors and intervals. \code{\link{tidy.marssMLE}} has much more information on interval calculation for MARSS models.
+If you want estimates of the states, rather than the model predictions based on \eqn{x_{t-1}} then you'll want either the states estimate conditioned on all the data (or conditioned on the data up to time t-1 or up to time t).  These are returned by \code{\link{MARSSkf}} in \code{xtT}, \code{xtt1} and \code{xtt} respectively.  Which one you want depends on your objective and application.  You can also use the \code{\link{tidy.marssMLE}} function to return a data.frame with the states (conditioned on data up to T, t, or t-1) with standard errors and intervals. \code{\link{tidy.marssMLE}} has much more information on interval calculation for MARSS models.
 }
 \seealso{ \code{\link{MARSSkf}}, \code{\link{tidy.marssMLE}}}
 \author{ 

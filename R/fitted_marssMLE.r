@@ -3,9 +3,11 @@
 #  returns the fitted value of y conditioned on all the data or data up to t-1 if one.step.ahead=TRUE
 ##############################################################################################################################################
 fitted.marssMLE <- function (object, ..., 
-  type=c("observations", "states"),
+  type=c("observations", "states", "y", "x"),
   conditioning = c("T", "t", "t-1")) {
   type = match.arg(type)
+  if(type=="y") type="observations"
+  if(type=="x") type="states"
   conditioning = match.arg(conditioning)
   MLEobj=object
   if(is.null(MLEobj[["par"]]))

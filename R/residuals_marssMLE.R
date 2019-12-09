@@ -32,7 +32,7 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
   #For debugging purposes I leave in the Harvey et al 1998 algorithm but default is to not use that
   if(!Harvey){
     #model.et will be 0 where no data E(y)-modeled(y)
-    model.et = Ey$ytT-fitted(MLEobj) #model residuals
+    model.et = Ey$ytT-fitted(MLEobj, type="y", conditioning="T") #model residuals
     et[1:n,]=model.et
     
     for(t in 1:TT){
