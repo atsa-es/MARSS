@@ -1,4 +1,5 @@
 residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
+  #These are the residuals and their variance conditioned on all the data
   #Harvey=TRUE uses Harvey et al (1998) algorithm to compute these
   #Harvey=FALSE uses the straight smoother output
   # model.residuals y(t|yT)-Zx(t|yT)-a
