@@ -70,7 +70,7 @@ autoplot.marssMLE <-
     
     if ("observations" %in% plot.type) {
       # make plot of observations
-      df <- augment.marssMLE(x, "observations", form = model_form)
+      df <- augment.marssMLE(x, type="observations", form = model_form)
       df$ymin <- df$.fitted - qnorm(alpha / 2) * df$.se.fit
       df$ymax <- df$.fitted + qnorm(alpha / 2) * df$.se.fit
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
@@ -91,7 +91,7 @@ autoplot.marssMLE <-
     }
     
     if ("expected.value.observations" %in% plot.type) {
-      # make plot of observation residuals
+      # make plot of expected value of Y condtioned on y(1)
       df <- tidy.marssMLE(MLEobj, type = "observations", form = "marxss")
       df$ymin <- df$conf.low
       df$ymax <- df$conf.high
@@ -115,7 +115,7 @@ autoplot.marssMLE <-
     
     if ("model.residuals" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, "observations", form = "marxss")
+      df <- augment.marssMLE(x, type="observations", form = "marxss")
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(col = "blue") +
         ggplot2::xlab("Time") +
@@ -132,7 +132,7 @@ autoplot.marssMLE <-
     
     if ("state.residuals" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- augment.marssMLE(x, "states", form = "marxss")
+      df <- augment.marssMLE(x, type="states", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(col = "blue") +
@@ -164,7 +164,7 @@ autoplot.marssMLE <-
     
     if ("model.residuals.qqplot" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, "observations", form = "marxss")
+      df <- augment.marssMLE(x, type="observations", form = "marxss")
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       abline.dat <- data.frame(.rownames = names(slope), slope = slope, intercept = intercept)
@@ -183,7 +183,7 @@ autoplot.marssMLE <-
     
     if ("state.residuals.qqplot" %in% plot.type) {
       # make qqplot of state residuals
-      df <- augment.marssMLE(x, "states", form = "marxss")
+      df <- augment.marssMLE(x, type="states", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
