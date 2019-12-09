@@ -140,7 +140,9 @@
 \title{Computation of Standardized Residuals for MARSS Models}
 \maketitle
 \begin{abstract}
-This report shows how to compute the variance of the joint conditional model and state residuals for multivariate autoregressive Gaussian state-space (MARSS) models. The MARSS model can be written: $\mathbf{x}_t=\mathbf{B}\mathbf{x}_{t-1}+\mathbf{u}+\mathbf{w}_t$, $\mathbf{y}_t=\mathbf{Z}\mathbf{x}_t+\mathbf{a}+\mathbf{v}_t$, where $\mathbf{w}_t$ and $\mathbf{v}_t$ are multivariate normal error-terms with variance-covariance matrices $\mathbf{Q}$ and \mathbf{R} respectively. The joint conditional residuals are the $\mathbf{w}_t$ and $\mathbf{v}_t$ conditioned on a set of, possibly incomplete, data $\mathbf{y}$. Harvey, Koopman and Penzer (1998) show a recursive algorithm for these residuals. I show the equation for the residuals using the conditional variances of the states and the conditional covariance between unobserved data and states. This allows one to compute the variance of un-observed residuals, which needed for leave-one-out cross-validation tests and to compute the conditional variance of the missing data. I show how to modify the Harvey et al. algorithm in the case of missing values and how to modify it to return the non-normalized conditional residuals.
+This report shows how to compute the variance of the joint conditional model and state residuals for multivariate autoregressive Gaussian state-space (MARSS) models. The bulk of the report focuses on 'smoothations', which are the residuals conditioned on all the data $t=1$ to $T$. The final part of the report covers 'innovations', which are residuals conditioned on the data $t=1$ to $t-1$.  
+
+The MARSS model can be written: $\mathbf{x}_t=\mathbf{B}\mathbf{x}_{t-1}+\mathbf{u}+\mathbf{w}_t$, $\mathbf{y}_t=\mathbf{Z}\mathbf{x}_t+\mathbf{a}+\mathbf{v}_t$, where $\mathbf{w}_t$ and $\mathbf{v}_t$ are multivariate normal error-terms with variance-covariance matrices $\mathbf{Q}$ and \mathbf{R} respectively. The joint conditional residuals are the $\mathbf{w}_t$ and $\mathbf{v}_t$ conditioned on the observed data, which maybe be incomplete (missing values). Harvey, Koopman and Penzer (1998) show a recursive algorithm for the smoothation residuals (conditioned on all the data). I show an alternate way to compute these residuals using the conditional variances of the states and the conditional covariance between unobserved data and states. This allows one to compute the variance of un-observed residuals (residuals associated with missing data), which is needed for leave-one-out cross-validation tests and to compute the conditional variance of the missing data. I show how to modify the Harvey et al. algorithm in the case of missing values and how to modify it to return the non-normalized conditional residuals. The main report is on the smoothation residuals (conditioned on all the data). The final section shows the innovations residuals (conditioned on the data up to $t-1$).
 \end{abstract}
 Keywords: Time-series analysis, Kalman filter, residuals, maximum-likelihood, vector autoregressive model, dynamic linear model, parameter estimation, state-space
 \vfill
@@ -165,23 +167,23 @@ The unconditional\footnote{meaning not conditioning on any particular set of obs
 \end{equation}
 based on the definition of $\VV_t$.  
 
-Once we have data, $\RR_t$ is not the variance of our model residuals because our residuals are now conditioned on a set of observed data.
+Once we have data, $\RR_t$ is not the variance of our model residuals because our residuals are now conditioned\footnote{'conditioned' means that the probability distribution of the residual has changed. The distribution is now the distribution given that $\YY(1)=\yy(1)$. Expectations $\E[ ]$ and variances $\var[ ]$ are integrals over the value that a random variable might take multiplied by the probability of that value. When presenting an 'expectation', the probability distribution is normally implicit but for derivations involving conditional expectiations, it is important to be explicit about the distribution that is being integrated over.} on a set of observed data.
 There are two types of conditional model residuals used in MARSS analyses: innovations and smoothations.  Innovations are the model residuals at time $t$ using the expected value of $\XX_t$ conditioned on the data from 1 to $t-1$.  Smoothations  are the model residuals using the expected value of $\xx_t$ conditioned on all the data, $t=1$ to $T$.  Smoothations are used in computing standardized residuals for outlier and structural break detection \citep{Harveyetal1998, deJongPenzer1998, CommandeurKoopman2007}.  
 
-\section{Distribution of the MARSS conditional residuals}
+\section{Distribution of the MARSS smoothation residuals}\label{sec:smoothations}
 
-This report discusses computation of the variance of the model and state residuals conditioned on all the data from $t=1$ to $T$.  MARSS residuals are often used for outlier detection and shock detection, and in this case you only need the distribution of the model residuals for the observed values.  However if you wanted to do a leave-one-out cross-validation, you would need to know the distribution of the residuals for data points you left out (treated as unobserved).  The equations in this report give you the former and the later, while the algorithm by \citet{Harveyetal1998} gives only the former.
+This section discusses computation of the variance of the model and state residuals conditioned on all the data from $t=1$ to $T$.  MARSS residuals are often used for outlier detection and shock detection, and in this case you only need the distribution of the model residuals for the observed values.  However if you wanted to do a leave-one-out cross-validation, you would need to know the distribution of the residuals for data points you left out (treated as unobserved).  The equations in this report give you the former and the later, while the algorithm by \citet{Harveyetal1998} gives only the former.
 
-Throughout, I follow the convention that capital letters are random variables and small letters are a realization from the random variable.  This only applies to random variables; parameters are not random variables\footnote{in a frequentist framework}.
+Throughout, I follow the convention that capital letters are random variables and small letters are a realization from the random variable.  This only applies to random variables; parameters are not random variables\footnote{in a frequentist framework}. In this report, the distribution over which the integration is done in an expectation $\E[ ]$ or variance $\var[ ]$ is given by the subscript, e.g. $\E_A[ ]$ indicates an unconditional expectation over the distribution of $\AA$ without conditioning on another random variable while $\E_{A|b}[ ]$ would indicate an expectation over the conditional distribution of $\AA$ conditioned on $\BB=\bb$. A joint expectation of $f(\AA,\BB)$ would be $\E_{AB}[f(\AA,\BB)]$, where 'AB' denotes the joint probability distribution. This can be written in terms of the conditional expectation as $\E_B[\E_{A|b}[f(\AA,\BB)|\BB=\bb]]$.
 
 \subsection{Model residuals conditioned on all the data}
 Define the smoothations $\hat{\vv}_t$ as:
-\begin{equation}
+\begin{equation}\label{eq:vtT}
 \hat{\vv}_t = \yy_t - \ZZ_t\hatxt - \aa_t,
 \end{equation}
 where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$ and is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$. $\yy^{(1)} is a sample from the random variable $\YY^{(1)}$. The unobserved $\yy$ will be termed $\yy^{(2)}$ and is a sample from the random variable $\YY^{(2)}$. When $\YY$ appears without a superscript, it means both $\YY^{(1)}$ and $\YY^{(2)}$ together.
 $\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy$, both $\yy^{(1)}$ and $\yy^{(2)}$, might take.  The mean is 0 and we are concerned only with computing the variance:
-\begin{equation}
+\begin{equation}\label{eq:var.vtT}
 \var[\hat{\VV}_t] = \var_Y[\YY_t - \ZZ_t\E[\XX_t|\yy^{(1)}] - \aa_t]
 \end{equation}
 Notice we have an unconditional variance over $\YY$ on the outside (that subscript on $\var$) and a conditional variance over a specific value of $\yy^{(1)}$ on the inside (in the $\E[]$).
@@ -435,6 +437,233 @@ The standardized residuals are computed by multiplying $\hat{\varepsilon}_t$ by 
 \end{equation}
 Notice that the missing values modified $\hat{\varepsilon}_t^*$ and $\Sigma_t^*$ are used. if the $i$-th row of $\yy_t$ is missing, the $i$-th row of $\hat{\varepsilon}_t$ is set to 0 and the $i$-th row and column of $\Sigma_t$ is set to all 0.
 There will be 0s on the diagonal of $\Sigma_t^*$ so your code will need to deal with these.
+
+\section{Distribution of the MARSS innovation residuals}
+
+One-step-ahead predictions (innovations) are often shown for MARSS models and these are used for likelihood calculations. Innovations are the prediction of $\mathbf{y}$ given data up to $t-1$. Although not termed 'innovations', we can also compute the predictions of $\mathbf{x}$ conditioned on the data up the $t-1$. This section gives the residual variance for these one-step-ahead predictions. I walk through the derivation of the variance matrix very pendantically following the procedures in Section \ref{sec:smoothations}. In texts on state-space models, this derivation would be written simply as 'it follows obviously that' because in this case the $\yy_t$ is independent of the model preditions (which use only data up to $t-1$) and the variance-covariance matrix is indeed 'obvious'.
+
+\subsubsection{Variance of the one-step-ahead model residuals}
+
+Define the innovations $\hat{\vv}_t$ as:
+\begin{equation}\label{eq:vtt1}
+\hat{\vv}_t = \yy_t - \ZZ_t\hatxt - \aa_t,
+\end{equation}
+where  $\hatxt$ is now $\E[\XX_t|\yy^{(1)}_{1:t-1}]$ and is output by the Kalman filter. The difference between the smoothation (Equation \ref{eq:vtT}) and innovation is that the former is conditioned on all the data $t=1$ to $T$ and the latter is conditioned on $t=1$ to $t-1$ ($\yy^{(1)}_{1:t-1}$). As before $(1)$ denotes the observed data (non-missing) and $(2)$ denotes the missing data.  $\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}_{1:t-1}$ is a random variable and the data we have collected $\yy^{(1)}_{1:t-1}$ is a sample from that. 
+
+As before, we want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy_{1:t-1}$, both $\yy^{(1)}_{1:t-1}$ and $\yy^{(2)}_{1:t-1}$, might take:
+\begin{equation}\label{eq:var.vtt1}
+\var[\hat{\VV}_t] = \var_{Y_{1:t-1}}[\YY_t - \ZZ_t\E[\XX_t|\yy^{(1)}_{1:t-1}] - \aa_t]
+\end{equation}
+While this looks similar to the smoothation case (Equation \ref{eq:var.vtT}), it is different in that $\yy_t$ does not appear in $\E[\XX_t|\yy^{(1)}_{1:t-1}]$; the conditioning is only on data up to $t-1$. Looking at Equation \ref{eq:var.vtt1}, you might guess that $\var[\hat{\VV}_t] = \RR_t - \ZZ_t\var[ \XX_t | \yy^{(1)}_{1:t-1}] ]\ZZ_t^\top$ but that is not the case. The "-" should be a "+". Let's walk throught the derivation to see why that is.
+
+As before, I will use the ``law of total variance'':
+\begin{equation}
+\var_A[A] = \var_B[\E_{A|b}[A|b]] + \E_B[\var_{A|b}[A|b]]
+\end{equation}
+which again I write more succinctly as
+\begin{equation}
+\var_A[A] = \var_B[\E[A|b]] + \E_B[\var[A|b]]
+\end{equation}
+From the law of total variance , we can write
+\begin{equation}\label{var.vvt1.totalvar}
+\var_{V_t}[\hat{\VV}_t] = \var_{Y_{1:t-1}}[\E[\hat{\VV}_t|\yy^{(1)}_{1:t-1}]] + \E_{Y_{1:t-1}}[\var[\hat{\VV}_t|\yy^{(1)}_{1:t-1}]]
+\end{equation}
+$\var_{Y_{1:t-1}}$ and $\E_{Y_{1:t-1}}$ are expectations over both $\YY^{(1)}_{1:t-1}$ and $\YY^{(2)}_{1:t-1}$, so all possible values of $\YY_{1:t-1}$. Notice that we are not conditioning on any data after $t-1$.
+
+\subsubsection{First term in Equation \ref{var.vvt1.totalvar}}
+
+Because $\yy_t$ does not appear in the conditional of $\E[\hat{\VV}_t|\yy^{(1)}_{1:t-1}]$, it may be obvious that this is equal to $\E[\hat{\VV}_t]$ and thus 0. However, let's walk through this since it is due to the structure of the model not a general property.
+
+Using the equation for $\hat{\vv}_t$ (Equation \ref{eq:vtt1}), we can write
+\begin{equation}\label{eq:Evtt1}
+\E[\hat{\VV}_t|\yy^{(1)}_{1:t-1}]=\E[\YY_t|\yy^{(1)}_{1:t-1}] - \ZZ_t\E[\XX_t|\yy^{(1)}_{1:t-1}] - \aa_t
+\end{equation}
+Because $\yy_t$ does not appear in $\E[\YY_t|\yy^{(1)}_{1:t-1}]$,
+\begin{equation}
+\E[\YY_t|\yy^{(1)}_{1:t-1}] = \ZZ_t\E[\XX_t|\yy^{(1)}_{1:t-1}] + \aa_t
+\end{equation}
+So the right side of Equation \ref{eq:Evtt1} is 0 and the first term in Equation \ref{var.vvt1.totalvar} is 0:
+\begin{equation}
+\var_{Y_{1:t-1}}[\E[\hat{\VV}_t|\yy^{(1)}_{1:t-1}]] = 0
+\end{equation}
+
+\subsubsection{Second term in Equation \ref{var.vvt1.totalvar}}
+
+This term is 
+\begin{equation}
+\E_{Y_{1:t-1}}[\var[\hat{\VV}_t|\yy^{(1)}_{1:t-1}] =
+\E_{Y_{1:t-1}}[\var[\YY_t-\ZZ_t\E[\XX_t|\yy^{(1)}_{1:t-1}]-\aa_t|\yy^{(1)}_{1:t-1}]]
+\end{equation}
+
+$\E[\XX_t|\yy^{(1)}_{1:t-1}]$ is a fixed value, it is not $\XX_t$ but its expected value, and it appears inside a conditional variance not the unconditional variance. If the variance was over $\YY_{1:t-1}$, the expectation would be a random variable but the variance is conditioned on $\YY_{1:t-1}=\yy_{1:t-1}$ so the expectation is a fixed value.  Thus the second term reduces to $\E_{Y_{1:t-1}}[\var[\YY_t|\yy^{(1)}_{1:t-1}]]$. The conditional variance of $\YY_t$ is from Equation \ref{eq:residsMARSS}
+\begin{equation}
+\var[\YY_t|\yy^{(1)}_{1:t-1}] = \var[\ZZ_t \XX_t + \aa_t + \VV_t|\yy^{(1)}_{1:t-1}] \\
+= \ZZ_t \var[\XX_t||\yy^{(1)}_{1:t-1}] \ZZ_t^\top + \var[\VV_t|\yy^{(1)}_{1:t-1}].
+\end{equation}
+
+
+$\hatUt$ is not a function of $\yy$ is is only a function of the MARSS parameters.  Thus the second term in Equation \ref{varvvtgeneral} is simply $\hatUt$.
+
+\subsubsection{Putting together the two terms}
+\begin{equation}
+\begin{split}
+\var[\hat{\VV}_t] &= \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top + \hatUt\\
+&= \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
+\end{split}
+\end{equation}
+This will reduce to $\RR_t - \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ has no missing values and to $\RR_t + \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ is all missing values.
+
+\subsection{State residuals conditioned on the data}
+The state residuals are $\xx_t - (\BB_t \xx_{t-1} + \uu_t)=\ww_t$.  The unconditional expected value of the state residuals is $\E(\XX_t - (\BB_t \XX_{t-1} + \uu_t)) = \E(\WW_t) = 0$ and the unconditional variance of the state residuals is
+\begin{equation}
+\var[\XX_t - (\BB_t \XX_{t-1} + \uu_t)] = \var[\WW_t] = \QQ_t
+\end{equation}
+based on the definition of $\WW_t$.
+The conditional state residuals (conditioned on the full data) are defined as
+\begin{equation}
+\hat{\ww}_t = \hatxt - \BB_t\hatxtm - \uu_t.
+\end{equation}
+It is a sample from the random variable $\hat{\WW}_t$; random over different possible data sets.  The expected value of $\hat{\WW}_t$ is 0, and we can compute $\var_Y[\hat{\WW}_t]$ from the law of total variance using the observation that $\hat{\ww}_t=\E[\WW_t|\yy^{(1)}]$.
+\begin{equation}
+\var[\WW_t] = \var_Y[\E[\WW_t|\yy^{(1)}]] + \E_Y[\var[\WW_t|\yy^{(1)}]]
+\end{equation}
+Thus,
+\begin{equation}\label{eqn:varwwt}
+\var_Y[\hat{\ww}_t] = \var_Y[\E[\WW_t|\yy^{(1)}]] = \var(\WW_t) - \E_Y[\var[\WW_t|\yy^{(1)}]]
+\end{equation}
+
+The variance in the expectation on the far right is
+\begin{equation}
+\begin{split}
+\var[\WW_t&|\yy^{(1)}] = \var[ \XX_t - \BB_t\XX_{t-1}-\uu_t | \yy^{(1)} ]\\
+&\uu\mbox{ is not a random variable and can be dropped}\\
+& = \var[ \XX_t - \BB_t\XX_{t-1} | \yy^{(1)} ] \\
+& = \var[ \XX_t | \yy^{(1)} ] + \var[\BB_t\XX_{t-1} | \yy^{(1)} ] + \cov[\XX_t, -\BB_t\XX_{t-1} | \yy^{(1)} ] + \cov[ -\BB_t\XX_{t-1}, \XX_t | \yy^{(1)} ]\\
+& = \hatVt + \BB_t \hatVtm \BB_t^\top - \hatVttm \BB_t^\top - \BB_t\widetilde{\VV}_{t-1,t}
+\end{split}
+\end{equation}
+This conditional variance does not depend on the actual values of $\yy$.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc.
+Using the above and $\var[\WW_t]=\QQ_t$ in Equation \ref{eqn:varwwt}, the variance of the conditional state residuals is
+\begin{equation}
+\var_Y[\hat{\WW}_t]  =  \QQ_t - \hatVt - \BB_t \hatVtm \BB_t^\top + \hatVttm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}
+\end{equation}
+
+\subsection{Covariance of the conditional model and state residuals}
+The unconditional model and state residuals, $\VV_t$ and $\WW_t$, are independent (by definition), i.e. $\cov[\VV_t,\WW_t]=0$.  However the conditional model and state residuals, $\cov[\hat{\VV}_t,\hat{\WW}_t]$, are not independent since both depend on $\yy^{(1)}$.  
+Using the law of total covariance, we can write
+\begin{equation}\label{eqn:covhatVtWt1}
+\cov[\hat{\VV}_t,\hat{\WW}_t] = 
+\cov_Y[\E[\hat{\VV}_t|\yy^{(1)}],\E[\hat{\WW}_t|\yy^{(1)}]] + \E_Y[\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]]
+\end{equation}
+The covariance in the second term on the right can be written out as
+\begin{equation}
+\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}] =  \E_Y[\cov[\YY_t-\ZZ_t\E[\XX_t|\yy^{(1)}]-\aa_t, \E[\XX_{t-1}|\yy^{(1)}]-\BB_t\E[\XX_{t-1}|\yy^{(1)}]-\uu_t|\yy^{(1)}]]
+\end{equation}
+The $\E[\XX_t|\yy^{(1)}]$ are fixed values for a given set of data. The covariance of a random variable with a fixed value is 0, thus $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$ is 0.  Thus Equation \ref{eqn:covhatVtWt1} reduces to
+\begin{equation}\label{eqn:covhatVtWt2}
+\cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_Y[\E[\hat{\VV}_t|\yy^{(1)}],\E[\hat{\WW}_t|\yy^{(1)}]] + 0 = \cov_Y[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]
+\end{equation}
+Since $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$ and $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$.
+In the same way we used the law of total variance, we can use the law of total covariance  to obtain $\cov_Y[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]$:
+\begin{equation}\label{eqn:covhatVtWt3}
+\cov[\VV_t, \WW_t] = \E_Y[\cov[\VV_t, \WW_t|\yy^{(1)}]] + \cov_Y[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]\\ 
+\end{equation}
+The unconditional covariance of $\VV_t$ and $\WW_t$ is 0. Thus the right side of Equation \ref{eqn:covhatVtWt3} is 0 and combining Equation \ref{eqn:covhatVtWt2} and \ref{eqn:covhatVtWt3},
+\begin{equation}\label{eqn:conditionalcovvtwt}
+\cov[\hat{\VV}_t,\hat{\WW}_t] = - \E_Y[ \cov[\VV_t, \WW_t|\yy^{(1)}] ] 
+\end{equation}
+and our problem reduces to solving for the conditional covariance of the model and state residuals.  
+
+The conditional covariance $\cov[\VV_t, \WW_t|\yy^{(1)}]$ can be written out as
+\begin{equation}
+\cov[\VV_t, \WW_t|\yy^{(1)}] = \cov[\YY_t-\ZZ_t\XX_t-\aa_t, \XX_t-\BB_t\XX_{t-1}-\uu_t|\yy^{(1)}]
+\end{equation}
+$\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus
+\begin{equation}
+\begin{split}
+\cov&[\VV_t, \WW_t|\yy^{(1)}] =\cov[\YY_t-\ZZ_t\XX_t, \XX_t-\BB_t\XX_{t-1}|\yy^{(1)}y] \\
+& =\cov[\YY_t,\XX_t|\yy^{(1)}] + \cov[\YY_t,-\BB_t\XX_{t-1}|\yy^{(1)}] + \cov[-\ZZ_t\XX_t,\XX_t] + \cov[-\ZZ_t\XX_t,-\BB_t\XX_{t-1}]\\
+& = \hatSt - \hatSttm\BB_t^\top - \ZZ_t\hatVt + \ZZ_t\hatVttm\BB_t^\top
+\end{split}
+\end{equation}
+where $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttm=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatSt$ and $\hatSttm$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package.
+$\hatVt$, $\hatVttm$, $\hatSt$ and $\hatSttm$ are only functions of the MARSS parameters not of $\yy$.  Thus 
+\begin{equation}
+\E_Y[ \cov[\VV_t, \WW_t|\yy^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatSt - \hatSttm\BB_t^\top + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt
+\end{equation}
+$\cov[\hat{\VV}_t,\hat{\WW}_t]$ is the negative of this (Equation \ref{eqn:conditionalcovvtwt}), thus
+\begin{equation}
+\cov[\hat{\VV}_t,\hat{\WW}_t] = - \hatSt + \hatSttm\BB_t^\top - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt
+\end{equation}
+
+The Harvey et al. algorithm shown below gives the joint distribution of the model residuals at time $t$ and state residuals at time $t+1$.  Using the law of total covariance as above The covariance in this case is
+\begin{equation}
+\cov_Y[\E[\VV_t|\yy^{(1)}],\E[\WW_{t+1}|\yy^{(1)}]] = - \E_Y[ \cov[\VV_t, \WW_{t+1}|\yy^{(1)}] ] 
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+\cov[\VV_t, \WW_{t+1}|\yy^{(1)}] & =\cov[\YY_t-\ZZ_t\XX_t-\aa_t, \XX_{t+1}-\BB_{t+1}\XX_t-\uu_{t+1}|\yy^{(1)}] \\
+& =\cov[\YY_t-\ZZ_t\XX_t, \XX_{t+1}-\BB_{t+1}\XX_t|\yy^{(1)}] \\
+& = \hatSttp - \hatSt\BB_{t+1}^\top - \ZZ_t\widetilde{\VV}_{t,t+1} + \ZZ_t\hatVt\BB_{t+1}^\top
+\end{split}
+\end{equation}
+Thus,
+$$\cov_Y[\E[\VV_t|\yy],\E[\WW_{t+1}|\yy^{(1)}]] = - \E_Y[ \cov[\VV_t, \WW_{t+1}|\yy^{(1)}] ] = - \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top.$$
+
+\subsection{Joint distribution of the conditional residuals}
+We now the write the variance of the joint distribution of the conditional residuals. Define
+\begin{equation}
+\hat{\varepsilon}_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_t\end{bmatrix} =
+\begin{bmatrix}\yy_t - \ZZ_t\hatxt-\aa_t\\ \hatxt - \BB_t\hatxtm-\uu_t \end{bmatrix}.
+\end{equation}
+where $\hatxt$ and $\hatxtm$ are conditioned on $\yy{(1)}$, the observed $\yy$.
+$\hat{\varepsilon}_t$ is a sample drawn from the distribution of $\hat{\mathcal{E}}_t$ conditioned on observations at the $(1)$ locations in $\YY$.  The expected value of $\hat{\mathcal{E}}_t$ over all possible $\yy$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
+\begin{equation}\label{eqn:jointcondresid1general}
+ \begin{bmatrix}[c|c]
+ \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top+\ZZ_t\hatSt^\top&
+ \hatSt - \hatSttm\BB_t^\top  + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt \\
+ \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
+ (\hatSt - \hatSttm\BB_t^\top  + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt)^\top& 
+ \QQ_t - \hatVt - \BB_t \hatVtm \BB_t^\top + \hatVttm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t} \end{bmatrix}
+\end{equation}
+
+If the residuals are defined as in \citet{Harveyetal1998},
+\begin{equation}
+\hat{\varepsilon}_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_{t+1}\end{bmatrix} =
+\begin{bmatrix}\yy_t - \ZZ_t\hatxt-\aa_t\\ \tilde{\xx}_{t+1} - \BB_{t+1}\hatxt-\uu_{t+1} \end{bmatrix}
+\end{equation}
+and the variance of $\hat{\mathcal{E}}_t$ is
+\begin{equation}\label{eqn:jointcondresid2}
+\begin{bmatrix}[c|c]
+\RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top&
+- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top \\
+\rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
+(- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top)^\top& 
+\QQ_{t+1} - \widetilde{\VV}_{t+1} - \BB_{t+1} \hatVt \BB_{t+1}^\top + \widetilde{\VV}_{t+1,t} \BB_{t+1}^\top + \BB_{t+1}\widetilde{\VV}_{t,t+1} \end{bmatrix}
+\end{equation}
+
+The above gives the variance of both `observed' model residuals (the ones associated with $\yy^{(1)}$) and the unobserved model residuals (the ones associated with $\yy^{(2)}$).  
+When there are no missing values in $\yy_t$, the $\hatSt$ and $\hatSttm$ terms equal 0 and drop out.
+
+
+
+Thus we write Equation \ref{eq:vtt1} directly as:
+\begin{equation}\label{eq:vtt1.2}
+\var[\hat{\VV}_t] = \var_Y[\YY_t] - \ZZ_t\E[\XX_t|\yy^{(1,1:t-1)}]
+\end{equation}
+$\aa_t$ drops out because it is not a random variable.
+
+
+
+\begin{equation}
+\begin{split}
+\var[\hat{\VV}_t] &= \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top + \hatUt\\
+&= \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
+\end{split}
+\end{equation}
+This will reduce to $\RR_t - \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ has no missing values and to $\RR_t + \ZZ_t \hatVt \ZZ_t^\top$ if $\yy_t$ is all missing values.
+
 
 
 \bibliography{./EMDerivation}
