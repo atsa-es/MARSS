@@ -21,6 +21,14 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
   et = st.et = matrix(0,n+m,TT)
   var.et = array(0,dim=c(n+m,n+m,TT))
   
+  #### make a list of time-varying parameters
+  time.varying = list()
+  for(elem in attr(MLEobj[["marss"]],"par.names")) {
+    if( model.dims[[elem]][3]==1 ){
+      time.varying[[elem]] = FALSE
+    }else{ time.varying[[elem]] = TRUE }
+  }
+  
   #MARSSkfas doesn't output Innov, Sigma or Kt so might need to run MARSSkfss to get those
   if(is.null(MLEobj[["kf"]]) || is.null(MLEobj$kf$Innov) || is.null(MLEobj$kf$Sigma) || is.null(MLEobj$kf$Kt)) 
     kf=MARSSkfss(MLEobj)
@@ -90,7 +98,8 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
     #Reference page 112-133 in Messy Time Series
     #Reference de Jong and Penzer 1998; with model transformed so sigma^2 = 1
     #refs in man file
-    #NOTATION here uses that in Messy Time Series (Harvey et al 1998)
+    #NOTATION here uses that in Messy Time Series (Harvey et al 1998) with some differences
+    #MARSS uses Koopman's terminology where w_t = G%*%w, Harvey uses H%*%w
     #By definition residual = 0 at time t, where x_0 is defined at t=0 or t=1, **when x_0 is estimated**
     #because x_0 is estimated and the max L will be when residual is 0
     #x_TT = Bx_{TT-1}+u_{TT-1}+w_{TT-1}, so w_TT cannot be computed (you'd need X_{TT+1}
@@ -102,15 +111,28 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
     Mt = array(0,dim=c(n,n,TT))
     Jt = matrix(0,m,TT)
     vt = kf$Innov
+    # If they are time-varying, Q, G and B at t=T will not appear (cancelled out by r_T and N_T = 0). 
+    # Set for t=1. Will update in for loop if time-varying.
+    pari = parmat(MLEobj,t=1)
+    Qtp = pari[["Q"]]
+    Gtp = pari[["G"]]
+    Ttp = pari[["B"]]
+    Z = pari[["Z"]] # base, will be modified if missing values
+    R = pari[["R"]] # base, will be modified if missing values
+    Ht = pari[["H"]]
     for(t in seq(TT,1,-1)){
       #define all the, potential time-varying, parameters
-      Qtp=parmat(MLEobj,"Q",t=t+1)$Q
-      Gtp=parmat(MLEobj,"G",t=t+1)$G  #MARSS uses Koopman's terminology where w_t = G%*%w, Harvey uses H%*%w
-      Zt = parmat(MLEobj,"Z",t=t)$Z
-      Rt=parmat(MLEobj,"R",t=t)$R
-      Ht=parmat(MLEobj,"H",t=t)$H
-      Ttp = parmat(MLEobj,"B",t=t+1)$B
-      
+      if(t<TT){
+        if(time.varying[["Q"]]) Qtp=parmat(MLEobj,"Q",t=t+1)$Q
+        if(time.varying[["G"]]) Gtp=parmat(MLEobj,"G",t=t+1)$G
+        if(time.varying[["B"]]) Ttp = parmat(MLEobj,"B",t=t+1)$B
+      }
+      # Zt and Rt modified in missing values case below so reset even
+      # if time-varying
+      if(time.varying[["Z"]]){ Zt = parmat(MLEobj,"Z",t=t)$Z }else{ Zt = Z }
+      if(time.varying[["R"]]){ Rt=parmat(MLEobj,"R",t=t)$R }else{ Rt = R }
+      if(time.varying[["H"]]) Ht=parmat(MLEobj,"H",t=t)$H
+
       #implement missing values modifications per Shumway and Stoffer
       diag.Rt=diag(Rt)
       Rt[is.na(y[,t]),]=0
@@ -127,6 +149,7 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
         Rstar[,1:n] = Ht%*%Rt%*%t(Ht)
       }
       Qpstar = matrix(0,m,n+m)
+      #MARSS uses Koopman's terminology where w_t = G%*%w, Harvey uses H%*%w
       if(normalize){ 
         Qpstar[,(n+1):(n+m)] = Gtp%*%t(pchol(Qtp))
       }else{
