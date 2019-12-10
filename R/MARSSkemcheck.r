@@ -60,7 +60,8 @@ msg=NULL
             par.not.fixed = any( ((II %x% II0)%*%dpart)!=0 )
       
             if(par.not.fixed){
-              msg=c(msg, paste("t=",i,": For method=kem (EM), if an element of the diagonal of R is 0, the corresponding row of ", par.test, " must be fixed.\n",sep=""))
+              if (par.test == "Z") msg=c(msg, paste("t=",i,": For method=kem (EM), if an element of the diagonal of R is 0, the corresponding row of Z must be fixed. See MARSSinfo('AZR0').\n",sep=""))
+              if (par.test == "A") msg=c(msg, paste("t=",i,": For method=kem (EM), if an element of the diagonal of R is 0, the corresponding row of both A and D must be fixed. See MARSSinfo('AZR0').\n",sep=""))
             }
            } #for par.test
         } #if par needs to be tested; don't need to do over all TT just up to Tmax
