@@ -117,8 +117,8 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
     Qtp = pari[["Q"]]
     Gtp = pari[["G"]]
     Ttp = pari[["B"]]
-    Zt = pari[["Z"]]
-    Rt = pari[["R"]]
+    Z = pari[["Z"]] # base, will be modified if missing values
+    R = pari[["R"]] # base, will be modified if missing values
     Ht = pari[["H"]]
     for(t in seq(TT,1,-1)){
       #define all the, potential time-varying, parameters
@@ -127,8 +127,10 @@ residuals.marssMLE = function(object,..., Harvey=FALSE, normalize=FALSE){
         if(time.varying[["G"]]) Gtp=parmat(MLEobj,"G",t=t+1)$G
         if(time.varying[["B"]]) Ttp = parmat(MLEobj,"B",t=t+1)$B
       }
-      if(time.varying[["Z"]]) Zt = parmat(MLEobj,"Z",t=t)$Z
-      if(time.varying[["R"]]) Rt=parmat(MLEobj,"R",t=t)$R
+      # Zt and Rt modified in missing values case below so reset even
+      # if time-varying
+      if(time.varying[["Z"]]){ Zt = parmat(MLEobj,"Z",t=t)$Z }else{ Zt = Z }
+      if(time.varying[["R"]]){ Rt=parmat(MLEobj,"R",t=t)$R }else{ Rt = R }
       if(time.varying[["H"]]) Ht=parmat(MLEobj,"H",t=t)$H
 
       #implement missing values modifications per Shumway and Stoffer
