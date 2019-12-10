@@ -102,7 +102,7 @@ MARSS.dfa=function(MARSS.call){
     diffuse=c(TRUE,FALSE),
     m=1:n,
     #This line says what is allowed to be a matrix
-    matrices = c("Z","A","R","D","x0","V0")
+    matrices = c("Z","A","R","D","x0","V0","Q","B")
   )
   
   if(is.null(MARSS.call[["model"]][["m"]])) m=1 else m=MARSS.call[["model"]][["m"]]
@@ -134,9 +134,9 @@ MARSS.dfa=function(MARSS.call){
   model=MARSS.call[["model"]]
   
   if(!(MARSS.call$z.score %in% c(TRUE,FALSE)))
-    stop("Stopped in MARSS.dfa(): z.score must be TRUE/FALSE.\n", call.=FALSE)
+    stop("Stopped in MARSS.dfa: z.score must be TRUE/FALSE.\n", call.=FALSE)
   if(!(MARSS.call$demean %in% c(TRUE,FALSE)))
-    stop("Stopped in MARSS.dfa(): demean must be TRUE/FALSE.\n", call.=FALSE)
+    stop("Stopped in MARSS.dfa: demean must be TRUE/FALSE.\n", call.=FALSE)
   
   #Set up U; always 0 for dfa
   U=matrix(0,m,1)
@@ -145,10 +145,27 @@ MARSS.dfa=function(MARSS.call){
   if(is.null(MARSS.call[["covariates"]])) d=matrix(0,1,1) else d=MARSS.call$covariates
   
   #Set up Q  & B; always fixed for dfa
-  Q=diag(1,m); B=diag(1,m)
+  #Allow user to use diagonal matrices
+  #Q=diag(1,m); B=diag(1,m)
+  Q = model$Q
+  if(is.array(Q)){ # 2D or 3D
+    if(length(dim(Q))==3) 
+      Q.is.diagonal = all(apply(Q,3,is.diagonal))
+    if(length(dim(Q))==2) 
+      Q.is.diagonal = is.diagonal(Q)
+    if(!Q.is.diagonal) stop("Stopped in MARSS.dfa: Q must be diagonal.\n", call.=FALSE)
+  }
+  B=model$B
+  if(is.array(B)){ # 2D or 3D
+    if(length(dim(B))==3) 
+      B.is.diagonal = all(apply(B,3,is.diagonal))
+    if(length(dim(B))==2) 
+      B.is.diagonal = is.diagonal(B)
+    if(!B.is.diagonal) stop("Stopped in MARSS.dfa: B must be diagonal.\n", call.=FALSE)
+  }
   
   # set up list of model components for a marxss model
-  dfa.model = list(Z=Z, A=model$A, D=model$D, d=d, R=model$R, B=B, U=U, Q=Q, x0=model$x0, V0=model$V0, tinitx=model$tinitx)
+  dfa.model = list(Z=Z, A=model$A, D=model$D, d=d, R=model$R, B=model$B, U=U, Q=model$Q, x0=model$x0, V0=model$V0, tinitx=model$tinitx)
   
   dat=MARSS.call[["data"]]
   if(MARSS.call$demean){
