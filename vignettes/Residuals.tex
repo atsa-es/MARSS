@@ -135,8 +135,9 @@
 \setcounter{tocdepth}{1} %no subsections in toc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{Sweave}
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+\input{Residuals-concordance}
 \author{E. E. Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Computation of Standardized Residuals for MARSS Models}
@@ -187,9 +188,9 @@ where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$ and is output by the Kalman smoother. $
 
 $\hat{\vv}_t$ exists for both $\yy^{(1)}$ and $\yy^{(2)}$. $\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\yy$, both $\yy^{(1)}$ and $\yy^{(2)}$, might take.  The mean is 0 and we are concerned only with computing the variance:
 \begin{equation}\label{eq:var.vtT}
-\var[\hat{\VV}_t] = \var_{Y^{(1)}}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}=\yy^{(1)}] - \aa_t]
+\var[\hat{\VV}_t] = \var_{Y^{(1)}}[\YY_t - \ZZ_t\E[\XX_t|\YY^(1)=\yy^{(1)}] - \aa_t]
 \end{equation}
-Notice we have an unconditional variance over $\YY^{(1)}$ on the outside (that subscript on $\var$) and a conditional variance over a specific value of $\YY^{(1)}$ on the inside (in the $\E[]$).
+Notice we have an unconditional variance over $\YY$ on the outside (that subscript on $\var$) and a conditional variance over a specific value of $\YY^{(1)}$ on the inside (in the $\E[]$).
 
 To compute this, I will use the ``law of total variance'':
 \begin{equation}
@@ -203,9 +204,9 @@ It is understood that $\E[A|b]$ is the conditional expectation of $A$ conditione
 
 From the law of total variance, we can write
 \begin{equation}\label{varvvtgeneral}
-\var[\hat{\VV}_t] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^{(1)}]] + \E_{Y^{(1)}}[\var[\hat{\VV}_t|\yy^{(1)}]]
+\var[\hat{\VV}_t] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^(1)]] + \E_{Y^{(1)}}[\var[\hat{\VV}_t|\yy^(1)]]
 \end{equation}
-The $\var$ and $\E$ are expectations over  all possible values of $\YY^{(1)}$.
+The $\var$ and $\E$ are expectations over  all possible values of $\YY^(1)$.
 
 \subsubsection{First term in Equation \ref{varvvtgeneral}}
 
@@ -242,7 +243,7 @@ $\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hat
 
 $\hatVt$, $\hatUt$ and $\hatSt$ are conditional multivariate Normal variances and their values do not depend on the values of $\yy^{(1)}$.  They only depend on the parameters values, $\QQ$, $\BB$, $\RR$, etc., in the MARSS equation. Thus $\E_{Y^{(1)}}[\var[\VV_t|\yy^{(1)}]] = \var[\VV_t|\yy^{(1)}]$. Putting this all together, we can write the variance of $\hat{\VV}_t$ as
 \begin{equation}\label{eqn:conditionalvtfinal}
-\var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^{(1)})]]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
+\var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^(1)]]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
 \end{equation}
 
 \subsubsection{Second term in Equation \ref{varvvtgeneral}}
