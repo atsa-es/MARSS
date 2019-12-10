@@ -17,6 +17,7 @@ ENHANCEMENTS
 * added smoothing argument to tidy.marssMLE which allows the xtt1 and xtt states (with CIs) to be output.
 * added plot of ytT to autoplot.marssMLE
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
+* Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
 
 DOCUMENTATION and MAN FILES
 * added abstract to Residuals report.
