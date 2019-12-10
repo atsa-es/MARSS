@@ -7,6 +7,8 @@ CHANGES IN MARSS 3.10.12 (current state of master 12-2-2019)
 
 BUGS
 * fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
+* degen.test() in MARSSkem() was not catching when R or Q was time-varying (and thus degeneracy should not be allowed). Changed to test the 3D of model.dims == 1 or not.
+* residuals.marssMLE(..., Harvey=TRUE) would fail if Q, B, or G was time-varying because parmat() called with t+1. Changed to only call parmat() when t<TT. Q, B, and G do not appear in the recursion when t=TT so parmat() with t=t+1 is never needed.
 * MARSS_dfa() used form="dfa" in MARSS.call list. Just info. Never used.
 
 ENHANCEMENTS
