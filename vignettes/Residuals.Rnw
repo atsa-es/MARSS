@@ -419,7 +419,10 @@ $$\varepsilon_t=\begin{bmatrix}\HH_t\epsilon_t\\ \GG_{t+1}\epsilon_t\end{bmatrix
 
 The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, and $\widetilde{\VV}_t^{t-1}=\var[\XX_t|\yy^{(1,1:{t-1}}]$. These are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, and \texttt{Vtt1}.
 
-Starting from $t=T$ and working backwards to $t=1$ and using $r_T=0$ and $N_T=0$, the algorithm is 
+\section{Algorithm}
+
+Start from $t=T$ and work backwards to $t=1$. At time $T$, $r_T=0_{1 \times m}$ and $N_T=0_{m \times m}$. $\BB_{t+1}$ and $\QQ_{t+1}$ can be set to NA or 0. They will not appear in the algorithm at time $T$ since $r_T=0$ and $N_T=0$. Note that the $\ww$ residual and its associated variance and covariance with $\vv$ at time $T$ is NA since this residual would be for $\xx_T$ to $\xx_{T+1}$.
+
 % algorithm with \GG_t and \HH_t
 % \begin{equation}\label{eqn:Harveyalgo}
 % \begin{gathered}
@@ -432,18 +435,18 @@ Starting from $t=T$ and working backwards to $t=1$ and using $r_T=0$ and $N_T=0$
 
 \begin{equation}\label{eqn:Harveyalgo}
 \begin{gathered}
-\QQ^*_{t}=\begin{bmatrix}\QQ_{t}&0_{m \times n}\end{bmatrix}, \mbox{    } \RR^*_t=\begin{bmatrix}0_{n \times m}&\RR_t^*\end{bmatrix}\\
-\FF_t = \ZZ_t^*\widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top+\RR_t^*\mbox{,   } K_t = \BB_{t}\KK_t = \BB_t \widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top \FF_t^{-1}  \\
-L_t = \BB_{t} - K_t\ZZ_t^*, \mbox{    } J_t= \QQ^*_{t+1} - K_t \RR^*_t, \mbox{    } u_t = \FF_t^{-1} \hat{\vv}_t - K_t^\top r_t\\
-r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t \\
+\QQ^*_{t+1}=\begin{bmatrix}\QQ_{t+1}&0_{m \times n}\end{bmatrix}, \mbox{    } \RR^*_t=\begin{bmatrix}0_{n \times m}&\RR_t^*\end{bmatrix}\\
+\FF_t = \ZZ_t^*\widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top+\RR_t^*\mbox{,   } K_t = \BB_{t+1}\KK_t = \BB_{t+1} \widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top \FF_t^{-1}  \\
+L_t = \BB_{t+1} - K_t\ZZ_t^*, \mbox{    } J_t= \QQ^*_{t+1} - K_t \RR^*_t, \mbox{    } u_t = \FF_t^{-1} \hat{\vv}_t - K_t^\top r_t\\
+r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t \\
 \mtext{repeat for }$t-1$
 \end{gathered}
 \end{equation}
 Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2012}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
 
-The residuals are
+The residuals \citep[eqn 24]{Harveyetal1998} are
 \begin{equation}\label{eqn:Harveyresiduals}
-\hat{\varepsilon}^*_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_{t+1}\end{bmatrix} =({\RR^*_t})^\top u_t + ({\QQ^*_{t}})^\top r_t
+\hat{\varepsilon}^*_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_{t+1}\end{bmatrix} =({\RR^*_t})^\top u_t + ({\QQ^*_{t+1}})^\top r_t
 \end{equation}
 with mean of 0 ($\E_{Y^{(1)}}(\hat{\varepsilon}_t)=0$) and variance
 \begin{equation}\label{eqn:Harveyvariance}
@@ -452,10 +455,11 @@ with mean of 0 ($\E_{Y^{(1)}}(\hat{\varepsilon}_t)=0$) and variance
 The * signifies that these are the missing values modified $\hat{\varepsilon}_t$ and $\Sigma_t$; see comments above.
 
 \subsection{Difference in notation}
-If you compare their state equation (their Equation 20) with my state equation (Equation \ref{eqn:residsMARSSHarvey}), you will notice that my time indexing on $\BB$ and $\QQ$ matches the left $\xx$ while in theirs, $T$ and $H$ indexing matches the right $\xx$. Their $T_t$ is my $\BB_{t+1}$ and $H_t H_t^\top$ is my $\QQ_{t+1}$.  If you are trying to replicate a model with time-varying $\BB$, $\QQ$ or $\GG$ in my code versus theirs, you need to shift your indexing on these parameters. This means the $T_t$ in Harvey et al. code would need to be entered as $\BB$ at $t+1$ for the MARSS functions.
+In Equation 20 in \citet{Harveyetal1998}, their $T_t$ is my $\BB_{t+1}$ and their $H_t H_t^\top$ is my $\QQ_{t+1}$.  Notice the difference in the time indexing. My time indexing on $\BB$ and $\QQ$ matches the left $\xx$ while in theirs, $T$ and $H$ indexing matches the right $\xx$. Thus in my implementation of their algorithm \citep[eqns. 21-24]{Harveyetal1998}, $\BB_{t+1}$ appears in place of $T_t$ and $\QQ_{t+1}$ appears in place of $H_t$. See comments below on normalization and the difference between $\QQ$ and $H$. 
 
 \citet[eqns. 19, 20]{Harveyetal1998} use $G_t$ to refer to the $\chol(\RR_t)^\top$ (essentially) and $H_t$ to refer to $\chol(\QQ_t)^\top$.  I have replaced these with $\RR_t^*$ and $\QQ_t^*$, respectively, which causes my variant of their algorithm (Equation \ref{eqn:Harveyalgo}) to give the `non-normalized' variance of the residuals. The residuals function in the MARSS package has an option to give either normalized or non-normalized residuals.
-$\KK_t$ is the Kalman gain output by the MARSS package.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$ (Kalman gain). This is the covariance of the state and observation errors, which is allowed given the what they write the errors in their Equations 19 and 20. The way the MARSS package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and drops out.
+
+$\KK_t$ is the Kalman gain output by the MARSS package.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$ (Kalman gain). This is the covariance of the state and observation errors, which is allowed given the way they write the errors in their Equations 19 and 20. The way the MARSS package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $\KK_t$ equation.
 
 \subsection{Computing the standardized residuals}
 The standardized residuals are computed by multiplying $\hat{\varepsilon}_t$ by the inverse of the square root of the variance-covariance matrix from which $\hat{\varepsilon}_t$ is ``drawn'':
