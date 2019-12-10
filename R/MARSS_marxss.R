@@ -195,19 +195,19 @@ MARSS.marxss=function(MARSS.call){
   
   #Check that if A is scaling, then Z spec must lead to a design matrix
   if(identical(model$A,"scaling")){
-    if(is.array(model$Z) & length(dim(model$Z))==3)
-      if(dim(model$Z)[3]!=1 && !is.design(model$Z, zero.cols.ok = TRUE)) { #if it is a matrix
+    if(is.array(model$Z) && length(dim(model$Z))==3 && dim(model$Z)[3]!=1){ 
+      #Z is time-varying
         problem=TRUE
-        msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou can construct a scaling A matrix and pass that in.\n")
+        msg = c(msg, " If A=\"scaling\" (the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1. Since your Z is time-varying (array with 3rd dimension != 1), you need to construct A and pass that into the model argument in MARSS.\n")
       }
     if((!is.array(model$Z) & !is.factor(model$Z))) #if it is a string
-      if(!(model$Z %in% c("onestate","identity"))){
+      if(!(model$Z %in% c("onestate","identity","zero"))){
         problem=TRUE
         msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
       }
     if(is.matrix(model$Z) && !is.design(model$Z, zero.cols.ok = TRUE)) { #if it is a matrix, won't be array due to first test
       problem=TRUE
-      msg = c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
+      msg = c(msg, " If A is scaling (the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
     }
   }  
   if(is.array(model$x0) & length(dim(model$x0))==3)
