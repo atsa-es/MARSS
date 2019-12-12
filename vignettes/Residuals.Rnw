@@ -384,8 +384,9 @@ With $\cov[\hat{\VV}_t, \hat{\WW}_t|\YY^{(1)}] = 0$, Equation \ref{eqn:covhatVtW
 \cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}],\E[\hat{\WW}_t|\YY^{(1)}]]
 \end{equation}
 
-############# NOT TRUE
-We know that $\E[\hat{\WW}_t|\yy^{(1)}]=\hat{\ww}_t$ (that's the $\hat{\ww}_t$ definition) and we know that $\hat{\ww}_t = \E[\WW_t|\yy^{(1)}]$ (as shown above). Thus $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$. This applies for all $\yy^{(1)}$ so $\E[\hat{\WW}_t|\YY^{(1)}]=\E[\WW_t|\YY^{(1)}]$.  In the same way, we can show that $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$.
+$\E_{\hat{X}|\yy^{(1)}}[\E[\XX_t|\YY^{(1)}]|\yy^{(1)}]=\E_{X|\yy^{(1)}}[\XX_t|\yy^{(1)}]$ since conditioned on $\yy^{(1)}$, $\E[\XX_t|\YY_t]$ is fixed\footnote{This would not be the case if the inner and outer expectations were not conditioning on the same random variable.} at $\E[\XX_t|\yy_t]$ ($\hatxt$). Because the only random variables in $\hat{\WW}_t$ are $\hatxt$ and $\hatxtm$, this means  $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$. $\E_{\hat{W}|y}[\hat{\WW}_t|\yy^{(1)}]=\E_{W|y}[\WW_t|\yy^{(1)}]$
+
+Since $\E_{\hatxt|\yy^{(1)}}[\E[\XX_t|\YY_t]|\yy^{(1)}]=\E_{X|\yy^{(1)}}[\XX_t|\yy^{(1)}]$ (and same for $\XX_{t-1}), we know that $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$. Since this applies for all $\yy^{(1)}$, In the same way, we can show that $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$.
 #####################
 
 Thus Equation \ref{eqn:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$:
