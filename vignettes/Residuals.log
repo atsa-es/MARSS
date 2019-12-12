@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6210 64-bit) (preloaded format=pdflatex 2017.3.21)  10 DEC 2019 22:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6210 64-bit) (preloaded format=pdflatex 2017.3.21)  11 DEC 2019 16:56
 entering extended mode
 **./Residuals.tex
 (Residuals.tex
@@ -378,76 +378,73 @@ tle, WA 98112, eli.holmes@noaa.gov,
 
 {C:/Users/Eli.Holmes/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
 ! Extra }, or forgotten $.
-l.183 ...h the random variables, $\E_{A|B}[f(A)|B}
-                                                  $ or $\var_{A|B}[f(A)|B}$,...
+l.190 ...h the random variables, $\E_{A|B}[f(A)|B}
+                                                  $ or $\var_{A|B}[f(A)|B]$,...
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
 you forgot something else, as in `\hbox{$x}'. In such cases
 the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
-! Extra }, or forgotten $.
-l.183 ...$\E_{A|B}[f(A)|B}$ or $\var_{A|B}[f(A)|B}
-                                                  $, inside an expectation o...
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-[2]
-! Undefined control sequence.
-<argument> \mtext 
-                  {random variable}
-l.221 ...xt{random variable}}{\E[\YY_t|\yy^{(1)}]}
-                                                   - \ZZ_t \underset{\mtext{...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> \mtext 
-                  {fixed} |\yy ^{(1)}
-l.221 ...t{fixed} |\yy^{(1)}}{\E[\XX_t|\yy^{(1)}]}
-                                                   - \E[\underset{fixed}{\aa...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-[3]
-LaTeX Font Info:    Try loading font information for T1+aett on input line 253.
+[2] [3]
+LaTeX Font Info:    Try loading font information for T1+aett on input line 279.
 
  ("C:\Program Files\MiKTeX 2.9\tex\latex\ae\t1aett.fd"
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
-)
-
-LaTeX Warning: Reference `varvvtgeneral' on page 4 undefined on input line 264.
-
-
-
-LaTeX Warning: Reference `varvvtgeneral' on page 4 undefined on input line 266.
-
-
-! Extra }, or forgotten $.
-l.271 ...ance and is not a function of $\yy^{(1)}}
-                                                  $. It is only a function o...
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
+) [4]
+! Display math should end with $$.
+<to be read again> 
+                    
+l.326 ...^{(1)}]] = \var[\YY|\yy^{(1)}]] = \hatUt$
+                                                  
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
 
 
-LaTeX Warning: Reference `varvvtgeneral' on page 4 undefined on input line 271.
+! LaTeX Error: Bad math environment delimiter.
 
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.327 \end{equation}
+                    
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
 
-[4] [5] [6]
+! You can't use `\eqno' in horizontal mode.
+\endmathdisplay@a ...\df@tag \@empty \else \veqno 
+                                                  \alt@tag \df@tag \fi \ifx ...
+l.327 \end{equation}
+                    
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.327 \end{equation}
+                    
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Display math should end with $$.
+<to be read again> 
+                   \endgroup 
+l.327 \end{equation}
+                    
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+[5] [6] [7]
 ! Undefined control sequence.
-l.458 \mtext
+l.518 \mtext
             {repeat for }$t-1$
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -456,28 +453,28 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Package natbib Warning: Citation `Holmes2012' on page 7 undefined on input line
- 461.
+Package natbib Warning: Citation `Holmes2012' on page 8 undefined on input line
+ 521.
 
-[7] [8]
+[8] [9]
 
-LaTeX Warning: Reference `varvvtgeneral' on page 9 undefined on input line 552.
+LaTeX Warning: Reference `varvvtgeneral' on page 10 undefined on input line 612
+.
 
-
-[9] [10] [11] (Residuals.bbl)
+[10] [11] [12] (Residuals.bbl)
 
 Package natbib Warning: There were undefined citations.
 
-[12] (Residuals.aux)
+[13] (Residuals.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4153 strings out of 493333
- 55086 string characters out of 3139179
- 144986 words of memory out of 3000000
- 7535 multiletter control sequences out of 15000+200000
+ 4154 strings out of 493333
+ 55097 string characters out of 3139179
+ 144997 words of memory out of 3000000
+ 7536 multiletter control sequences out of 15000+200000
  51092 words of font info for 116 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  39i,22n,25p,1248b,328s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -506,13 +503,14 @@ r9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><
 C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Progra
 m Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Program Files/M
 iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9
-/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files/MiKTeX 2.9/fonts/ty
-pe1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publ
-ic/amsfonts/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfo
-nts/cm/cmtt8.pfb>
-Output written on Residuals.pdf (12 pages, 380758 bytes).
+/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/ty
+pe1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
+c/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
+ts/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
+tt8.pfb>
+Output written on Residuals.pdf (13 pages, 393519 bytes).
 PDF statistics:
- 168 PDF objects out of 1000 (max. 8388607)
+ 176 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  5 words of extra memory for PDF output out of 10000 (max. 10000000)
 

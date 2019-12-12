@@ -161,13 +161,20 @@ This report discusses the computation of the variance of the conditional model a
 \XX_0 \sim \MVN(\xixi,\LAM)
 \end{gathered}
 \end{equation}
+The state and model residuals are respectively
+\begin{equation}\label{eq:resids}
+\begin{gathered}
+\ww_t = \xx_t - \BB_t\xx_{t-1} - \uu_t\\
+\vv_t = \yy_t - \ZZ_t\xx_t - \aa_t
+\end{gathered}
+\end{equation}
 
-Given a set of observed data $\yy_t$ and states $\xx_t$, the model residuals are $\yy_t - (\ZZ_t \xx_t + \aa_t)=\vv_t$.  The model residual is a random variable since $\yy_t$ and $\xx_t$ are drawn from the joint multivariate distribution of $\YY_t$ and $\XX_t$ defined by the MARSS equations (Equation \ref{eq:residsMARSS}.
+Given a set of observed data $\yy_t$ and states $\xx_t$, the model residuals are $\yy_t - (\ZZ_t \xx_t + \aa_t)=\vv_t$.  The model residual is a random variable since $\yy_t$ and $\xx_t$ are drawn from the joint multivariate distribution of $\YY_t$ and $\XX_t$ defined by the MARSS equations (Equation \ref{eq:residsMARSS}).
 The unconditional\footnote{meaning not conditioning on any particular set of observed data but rather taking the expectation across all possible values of $\yy_t$ and $\xx_t$.} variance of the model residuals is
 \begin{equation}\label{eqn:unconditiondistofVt}
-\var_{XY}[\YY_t - (\ZZ_t \XX_t + \aa_t)] = \var[\VV_t] = \RR_t\\
+\var_V[\VV_t] = \var_{XY}[\YY_t - (\ZZ_t \XX_t + \aa_t)] = \RR_t\\
 \end{equation}
-based on the definition of $\VV_t$.  $\var_{XY}$ indicates that the integration is over the joint-unconditional distribution of $\XX$ and $\YY$ (over all time not just $t$).
+based on the distribution of $\VV_t$ in Equation \ref{eq:residsMARSS}.  $\var_{XY}$ indicates that the integration is over the joint-unconditional distribution of $\XX$ and $\YY$.
 
 Once we have data, $\RR_t$ is not the variance-covariance matrix of our model residuals because our residuals are now conditioned\footnote{`conditioned' means that the probability distribution of the residual has changed. The distribution is now the distribution given that $\YY=\yy$, say. Expectations and variances $\var[ ]$ are integrals over the value that a random variable might take multiplied by the probability of that value. When presenting an   `expectation', the probability distribution is normally implicit but for derivations involving conditional expectiations, it is important to be explicit about the distribution that is being integrated over.} on a set of observed data. There are two types of conditional model residuals used in MARSS analyses: innovations and smoothations.  Innovations are the model residuals at time $t$ using the expected value of $\XX_t$ conditioned on the data from 1 to $t-1$.  Smoothations  are the model residuals using the expected value of $\XX_t$ conditioned on all the data, $t=1$ to $T$.  Smoothations are used in computing standardized residuals for outlier and structural break detection \citep{Harveyetal1998, deJongPenzer1998, CommandeurKoopman2007}.  
 
@@ -179,7 +186,7 @@ This section discusses computation of the variance of the model and state residu
 
 Throughout, I follow the convention that capital letters are random variables and small letters are a realization from the random variable.  This only applies to random variables; parameters are not random variables\footnote{in a frequentist framework}. Parameters are shown in Roman font while while random variables are bold slanted font. Parameters written as capital letters are matrices, while parameters written in small letters are strictly column matrices. 
 
-In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript, e.g. $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value of when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable of all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B}$ or $\var_{A|B}[f(A)|B}$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$. 
+In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript, e.g. $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable over all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B}$ or $\var_{A|B}[f(A)|B]$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$. 
 
 % A joint expectation of $f(\AA,\BB)$ would be $\E_{AB}[f(\AA,\BB)]$, where 'AB' denotes the joint probability distribution. This can be written in terms of the conditional expectation using the law of total expectation $\E_B[\E_{A|b}[f(\AA,\BB)|\BB=\bb]]$.
 
@@ -189,58 +196,77 @@ Define the smoothations $\hat{\vv}_t$ as:
 \begin{equation}\label{eq:vtT}
 \hat{\vv}_t = \yy_t - \ZZ_t\hatxt - \aa_t,
 \end{equation}
-where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$. $\hatxt$ is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$. $\yy^{(1)}$ is a sample from the random variable $\YY^{(1)}$. The unobserved $\yy$ will be termed $\yy^{(2)}$ and is a sample from the random variable $\YY^{(2)}$. When $\YY$ appears without a superscript, it means both $\YY^{(1)}$ and $\YY^{(2)}$ together. Similarly $\yy$ means both $\yy^{(1)}$ and $\yy^{(2)}$ together---the observed data that we use to estimate $\hatxt$ and the unobserved data that we do not use and may or may not know. $\hat{\vv}_t$ exists for both $\yy^{(1)}$ and $\yy^{(2)}$, though we might not know $\yy^{(2)}$ and thus might not know its corresponding $\hat{\vv}_t$. In some cases, however, we do know $\yy^{(2)}$; they are data that we left out of our model fitting, in say a k-fold or leave-one-out cross-validation.
+where  $\hatxt$ is $\E[\XX_t|\yy^{(1)}]$. The smoothation is different from $\vv_t$ because it uses $\hatxt$ not $\xx_t$; $\xx_t$ is not known, $\hatxt$ is its estimate. $\hatxt$ is output by the Kalman smoother. $\yy^{(1)}$ means all the observed data from $t=1$ to $T$. $\yy^{(1)}$ is a sample from the random variable $\YY^{(1)}$. The unobserved $\yy$ will be termed $\yy^{(2)}$ and is a sample from the random variable $\YY^{(2)}$. When $\YY$ appears without a superscript, it means both $\YY^{(1)}$ and $\YY^{(2)}$ together. Similarly $\yy$ means both $\yy^{(1)}$ and $\yy^{(2)}$ together---the observed data that we use to estimate $\hatxt$ and the unobserved data that we do not use and may or may not know. $\hat{\vv}_t$ exists for both $\yy^{(1)}$ and $\yy^{(2)}$, though we might not know $\yy^{(2)}$ and thus might not know its corresponding $\hat{\vv}_t$. In some cases, however, we do know $\yy^{(2)}$; they are data that we left out of our model fitting, in say a k-fold or leave-one-out cross-validation.
 
-$\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY^{(1)}$ is a random variable and the data we have collected $\yy^{(1)}$ is a sample from that.  We want to compute the unconditional mean and variance of this random variable $\hat{\VV}_t$; unconditional here means we take the expectations over all possibles values that $\XX$ and $\YY$, both $\YY^{(1)}$ and $\YY^{(2)}$, might take. The mean of $\hat{\VV}_t$ is 0 and we are concerned only with computing the variance:
+$\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY$ is a random variable.  We want to compute the mean and variance of this random variable $\hat{\VV}_t$ over all possibles values that $\XX$ and $\YY$ might take. The mean of $\hat{\VV}_t$ is 0 and we are concerned only with computing the variance:
 \begin{equation}\label{eq:var.vtT}
-\var[\hat{\VV}_t] = \var_{XY}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}=\yy^{(1)}] - \aa_t]
+\var[\hat{\VV}_t] = \var_{XY}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}] - \aa_t]
 \end{equation}
-Notice we have an unconditional variance over $XY$ on the outside (that subscript on $\var$) and a conditional variance over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
+Notice we have an unconditional variance over $XY$ on the outside (that subscript on $\var$) and a conditional expectation over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
 
 To compute this, I will use the ``law of total variance'':
 \begin{equation}
-\var[A] = \var_B[\E_{A|b}[A|B]] + \E_B[\var_{A|b}[A|B]]
+\var_A[A] = \var_B[\E_{A|B}[A|B]] + \E_B[\var_{A|B}[A|B]]
 \end{equation}
-The subscripts on the inner expectations make it explicit that the expectations are being taken over the conditional distributions.  $\var_{A|b}[A|B]$ and $\E_{A|b}[A|B=b]$ are random variables because the $B$ in the conditional is a random variable. We take the expectation or variance with it fixed at one value, $b$, but $B$ can take other values of $b$ also.  Going forward, I will write this more succinctly as
+The subscripts on the inner expectations make it explicit that the expectations are being taken over the conditional distributions.  $\var_{A|B}[A|B]$ and $\E_{A|B}[A|B]$ are random variables because the $B$ in the conditional is a random variable. We take the expectation or variance with it fixed at one value, $b$, but $B$ can take other values of $b$ also.  Going forward, I will write this more succinctly as
 \begin{equation}
 \var[A] = \var_B[\E[A|B]] + \E_B[\var[A|B]]
 \end{equation}
-It is understood that $\E[A|B]$ is the conditional expectation of $A$ conditioned on $B=b$ and $\var[A|B]$ is the conditional variance.
+It is important to note that $\E_{A|b}[A|b]$ and $\var_{A|b}[A|b]$ are fixed values while $\E_{A|B}[A|B]$ and $\var_{A|B}[A|B]$ are random variables. When computing $\var[\E_{A|B}[A|B]]$, we will compute $\E_{A|b}[A|b]$ and compute the variance of that over all possible values of $b$. 
 
-From the law of total variance, we can write
+From the law of total variance, we can write the variance of the model residuals as
 \begin{equation}\label{eq:varvvtgeneral}
 \var[\hat{\VV}_t] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\var[\hat{\VV}_t|\YY^{(1)}]]
 \end{equation}
-The outer $\var$ and $\E$ are expectations over  all possible values of $\YY^{(1)}$.
 
 \subsubsection{First term in Equation \ref{eq:varvvtgeneral}}
 
-Notice that 
+Notice that the random variable inside the $\var[\;]$ in the first term is
 \begin{equation}
-\E[\hat{\VV}_t|\yy^{(1)}]= \underset{\mtext{random variable}}{\E[\YY_t|\yy^{(1)}]} - \ZZ_t \underset{\mtext{fixed} |\yy^{(1)}}{\E[\XX_t|\yy^{(1)}]} - \E[\underset{fixed}{\aa_t}|\yy^{(1)}] \\
-=\E[(\YY_t + \ZZ_t \XX_t + \aa_t)|\yy^{(1)}] = \E[\VV_t|\yy^{(1)}] 
+\E[\hat{\VV}_t|\YY^{(1)}]= \E[(\YY_t + \ZZ_t \E[\XX_t|\YY^{(1)}] + \aa_t)|\YY^{(1)}] 
+\end{equation}
+Let's consider this for a specific value $\YY^{(1)}=\yy^{(1)}$:
+\begin{equation}
+\E[\hat{\VV}_t|\yy^{(1)}]= \E[(\YY_t + \ZZ_t \E[\XX_t|\yy^{(1)}] + \aa_t)|\yy^{(1)}] =
+\E[\YY_t|\yy^{(1)}] + \ZZ_t \E[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}] + \E[\aa_t|\yy^{(1)}]
+\end{equation}
+$\E[\XX_t|\yy^{(1)}]$ is a fixed value, and the expected value of a fixed value is itself. So
+$\E[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=\E[\XX_t|\yy^{(1)}]$.
+Thus,
+\begin{equation}
+\E[\hat{\VV}_t|\yy^{(1)}]= \E[\YY_t|\yy^{(1)}] + \ZZ_t \E[\XX_t|\yy^{(1)}] + \E[\aa_t|\yy^{(1)}]
+\end{equation}
+and this applies for all $\yy^{(1)}$. So
+\begin{equation}
+\E[\hat{\VV}_t|\YY^{(1)}]= \E[\YY_t|\YY^{(1)}] + \ZZ_t \E[\XX_t|\YY^{(1)}] + \E[\aa_t|\YY^{(1)}].
+\end{equation}
+We can move the conditional out and write
+\begin{equation}
+\E[\hat{\VV}_t|\YY^{(1)}]= \E[(\YY_t + \ZZ_t \XX_t + \aa_t)|\YY^{(1)}].
+\end{equation}
+The right side is $\E[\VV_t|\YY^{(1)}]$, no `hat' on the $\VV_t$. This means that the first term in Equation \ref{eq:varvvtgeneral} can be written with no hat on $\VV$:
+\begin{equation}\label{eq:no.hat.on.V}
+\var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}]] = \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]]
 \end{equation}
 
-So the first term in Equation \ref{eq:varvvtgeneral} can be written with no hat on $\VV$:
-\begin{equation}\label{eq:no.hat.on.V}
-\var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^{(1)}]] = \var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}]]
-\end{equation}
-Using the law of total variance, we can re-write $\var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}]]$ in terms of other variables:
+Using the law of total variance, we can re-write $\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]]$ as:
 \begin{equation}\label{eqn:varianceVt}
-\var[\VV_t] = \var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}]] + \E_{Y^{(1)}}[\var[\VV_t|\yy^{(1)}]]
+\var[\VV_t] = \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]
 \end{equation}
-From Equation \ref{eqn:varianceVt}, we can solve for $\var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}]]$:
+From Equation \ref{eqn:varianceVt}, we can solve for $\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]]$:
 \begin{equation}\label{eq:var.E.vtT}
-\var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}]] = \var[\VV_t] - \E_{Y^{(1)}}[\var[\VV_t|\yy^{(1)}]]
+\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] = \var[\VV_t] - \E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]
 \end{equation}
-From Equation \ref{eqn:unconditiondistofVt}, we know that $\var[\VV_t]=\RR_t$ (this is the unconditional variance).  The second term to the right of the equal sign and inside the expectation, $\var[\VV_t|\yy^{(1)}]$, is the variance of $\VV_t$ holding $\yy^{(1)}$ fixed. The variability comes from $\XX_t$ (and the rest of the $\XX$) and $\YY^{(2)}$ which are random variables:
+From Equation \ref{eqn:unconditiondistofVt}, we know that $\var[\VV_t]=\RR_t$ (this is the unconditional variance).  
+
+The second term in Equation \ref{eq:var.E.vtT} to the right of the equal sign and inside the expectation, $\var[\VV_t|\YY^{(1)}]$, is the variance of $\VV_t$ with $\YY^{(1)}$ held at a specific fixed $\yy^{(1)}$. The variability in $\var[\VV_t|\yy^{(1)}]$ (notice $\yy^{(1)}$ not $\YY^{(1)}$ now) comes from $\XX_t$ (and the rest of the $\XX$) and $\YY^{(2)}$ which are random variables. Let's compute this variance for a specific $\yy^{(1)}$ value.
 \begin{equation}\label{eqn:varvtcondy}
 \var[\VV_t|\yy^{(1)}] = \var[ \YY_t - \ZZ_t\XX_t-\aa_t | \yy^{(1)} ].
 \end{equation}
 Notice that there is no $\E$ (expectation) on the $\XX_t$; this is $\VV_t$ not $\hat{\VV}_t$. $\aa_t$ is a fixed value and can be dropped; the $\YY_t$ and $\XX_t$ are random variables.
 
-Equation \ref{eqn:varvtcondy} can then be written as\footnote{$var(A+B)=var(A)+var(B)+cov(A,B)+cov(B,A)$}:
-\begin{equation}
+Equation \ref{eqn:varvtcondy} can then be written as\footnote{$\var(A+B)=\var(A)+\var(B)+\cov(A,B)+\cov(B,A)$}:
+\begin{equation}\label{eq:var.Vt.yy}
 \begin{split}
 \var[\VV_t|\yy^{(1)}] &= \var[ \YY_t - \ZZ_t\XX_t | \yy^{(1)} ]\\
 &=\var[ - \ZZ_t\XX_t | \yy^{(1)} ] + \var[ \YY_t|\yy^{(1)}] + \cov[ \YY_t, - \ZZ_t\XX_t | \yy^{(1)} ] + \cov[ - \ZZ_t\XX_t, \YY_t | \yy^{(1)} ]\\
@@ -250,26 +276,38 @@ Equation \ref{eqn:varvtcondy} can then be written as\footnote{$var(A+B)=var(A)+v
 If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUt$ and $\hatSt$ would be zero and this would reduce to $\ZZ_t \hatVt \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
 $\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package\footnote{$\hatUt$ is \texttt{ytT} and $\hatSt$ is \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.
+So we now know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value of all possible values of $\yy^{(1)}$. $\hatVt$, $\hatUt$ and $\hatSt$ are multivariate normal random variables. The conditional variance of a multivariate normal does not depend on the value that you are conditioning on\footnote{Let the $\AA$ be a N-dimensional multivariate normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
+\Sigma_1 & \Sigma_{12} \\
+\Sigma_21 & \Sigma_{2}
+\end{bmatrix}$.  The variance-covariance matrix of $\AA$ conditioned on $\AA_1=\aa$ is $\Sigma = \begin{bmatrix}
+0 & 0 \\
+0 & \Sigma_2 - \Sigma_{12}\Sigma_{1}\Sigma_{21}
+\end{bmatrix}$. Notice that $\aa$ does not appear in the conditional variance matrix.}. This means that $\hatVt$, $\hatUt$ and $\hatSt$ do not depend on $\yy^{(1)}. They only depend on the MARSS model parameters.
 
-$\hatVt$, $\hatUt$ and $\hatSt$ are conditional multivariate Normal variances and their values do not depend on the values of $\yy^{(1)}$.  They only depend on the parameters values, $\QQ$, $\BB$, $\RR$, etc., in the MARSS equations. Thus the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\yy^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$. Putting this into Equation \ref{eq:var.E.vtT}, we have
+Because $\hatVt$, $\hatUt$ and $\hatSt$ only depend on the MARSS parameters values, $\QQ$, $\BB$, $\RR$, etc., the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$ (Equation \ref{eq:var.Vt.yy}). Putting this into Equation \ref{eq:var.E.vtT}, we have
 \begin{equation}\label{eqn:conditionalvtfinala}
-\var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)})]]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
+\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
 \end{equation}
-Since $\var_{Y^{(1)}}[\E[\VV_t|\yy^{(1)})]] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^{(1)})]]$ (Equation \ref{eq:no.hat.on.V}), the first term in Equation \ref{eq:varvvtgeneral} is
+Since $\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)})]]$ (Equation \ref{eq:no.hat.on.V}), this means that the first term in Equation \ref{eq:varvvtgeneral} is
 \begin{equation}\label{eqn:conditionalvtfinal}
-\var_{Y^{(1)}}[\E[\hat{\VV}_t|\yy^{(1)})]]  =  \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
+\var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)})]]  =  \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top
 \end{equation}
 
-\subsubsection{Second term in Equation \ref{varvvtgeneral}}
+\subsubsection{Second term in Equation \ref{eq:varvvtgeneral}}
 
-Consider the second term in Equation \ref{varvvtgeneral}.  This term is 
+Consider the second term in Equation \ref{eq:varvvtgeneral}.  This term is 
 \begin{equation}
-\E_{Y^{(1)}}[\var[(\YY_t-\ZZ_t\E[\XX_t|\yy^{(1)}]-\aa_t)|\yy^{(1)}]]
+\E_{Y^{(1)}}[\var[(\YY_t-\ZZ_t\E[\XX_t|\YY^{(1)}]-\aa_t)|\YY^{(1)}]]
 \end{equation}
-Conditional on $\YY^{(1)}=\yy^{(1)}$ (that outer conditional in the variance), $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Normally, it would be a random variable; it is not $\XX_t$ but its expected value. $\aa_t$ is also fixed. Thus the second term reduces to $\E_{Y^{(1)}}[\var[\YY|\yy^{(1)}]]=\E_{Y^{(1)}}[\hatUt]$.  
-$\hatUt$ is a variance and is not a function of $\yy^{(1)}}$. It is only a function of the MARSS parameters.  Thus the second term in Equation \ref{varvvtgeneral} is simply $\hatUt$.
+The middle term is a conditional expectation inside a conditional variance inside an unconditional expectation:
+\begin{equation}
+\E_{Y^{(1)}}[\var[\E[\XX_t|\YY^{(1)}]|\YY^{(1)}]]
+\end{equation}
 
-\subsubsection{Putting together the two terms}
+Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$. The variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. Thus the second term reduces to $\E_{Y^{(1)}}[\var[\YY|\YY^{(1)}]] = \hatUt$. As noted in the previous section, $\hatUt$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUt$.
+
+\subsubsection{Putting together the first and second terms}
+We can now put the first and second terms in Equation \ref{eq:varvvtgeneral} together and write out the equation for the variance of the model residuals:
 \begin{equation}
 \begin{split}
 \var[\hat{\VV}_t] &= \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t\hatSt^\top + \hatUt\\
@@ -291,7 +329,7 @@ The conditional state residuals (conditioned on the data from $t=1$ to $t=T$) ar
 \end{equation}
 It is a sample from the random variable $\hat{\WW}_t$; random over different possible data sets.  The expected value of $\hat{\WW}_t$ is 0, and we can compute $\var_{Y^{(1)}}[\hat{\WW}_t]$ from the law of total variance.
 \begin{equation}
-\var[\WW_t] = \var_{Y^{(1)}}[\E[\WW_t|\yy^{(1)}]] + \E_{Y^{(1)}}[\var[\WW_t|\yy^{(1)}]]
+\var[\WW_t] = \var_{Y^{(1)}}[\E[\WW_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]]
 \end{equation}
 Using the observation that $\hat{\WW}_t=\E[\WW_t|\YY^{(1)}=\yy^{(1)}]$, we can write:
 \begin{equation}
