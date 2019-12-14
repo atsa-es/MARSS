@@ -384,34 +384,34 @@ For a specific value of $\YY^{(1)}=\yy^{(1)}$, the covariance in the second term
 \begin{equation}
 \hatxt - \BB_t\hatxtm - \uu_t = \E[\XX_t|\yy^{(1)}] - \BB_t \E[\XX_{t-1}|\yy^{(1)}] - \uu_t
 \end{equation}
-Conditioned on $\yy^{(1)}$, $\hatxt$ and $\hatxtm$ are fixed values and $\uu_t$ is fixed because it is a parameter. Thus conditioned on any $\yy^{(1)}$, $\hat{\WW}_t$ is a fixed value.  $\hat{\VV}_t$ is not a fixed value because it has $\YY_t$ and that is not fixed conditioned on $\yy^{(1)}$ because the $\yy^{(2)}$ in $\YY$ are still random variables.  So $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$ is the covariance between a random variable and a fixed variable. That covariance is 0. This applies for all $\yy\yy^{(1)}$, so $\cov[\hat{\VV}_t, \hat{\WW}_t|\YY^{(1)}] = 0$ (notice $\YY^{(1)}$ in conditional not $\yy^{(1)}$ now).
+Conditioned on $\yy^{(1)}$, $\hatxt$ and $\hatxtm$ are fixed values and $\uu_t$ is fixed because it is a parameter. $\hat{\VV}_t$ is not a fixed value because it has $\YY_t^{(2)}$ and that is a random variable.  So $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$ is the covariance between a random variable and a fixed variable and that covariance is 0. So \E_{Y^{(1)}}[$\cov[\hat{\VV}_t, \hat{\WW}_t|\YY^{(1)}]] = 0$.
 
-With $\cov[\hat{\VV}_t, \hat{\WW}_t|\YY^{(1)}] = 0$, Equation \ref{eqn:covhatVtWt1} reduces to
+This eliminates the second right-side term in Equation \ref{eqn:covhatVtWt1} and it reduces to
 \begin{equation}\label{eqn:covhatVtWt3}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}],\E[\hat{\WW}_t|\YY^{(1)}]]
 \end{equation}
-
-$\E_{\hat{X}|\yy^{(1)}}[\E[\XX_t|\YY^{(1)}]|\yy^{(1)}]=\E_{X|\yy^{(1)}}[\XX_t|\yy^{(1)}]$ since conditioned on $\yy^{(1)}$, $\E[\XX_t|\YY_t]$ is fixed\footnote{This would not be the case if the inner and outer expectations were not conditioning on the same random variable.} at $\E[\XX_t|\yy_t]$ ($\hatxt$). Because the only random variables in $\hat{\WW}_t$ are $\hatxt$ and $\hatxtm$, this means  $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$. $\E_{\hat{W}|y}[\hat{\WW}_t|\yy^{(1)}]=\E_{W|y}[\WW_t|\yy^{(1)}]$
-
-Since $\E_{\hatxt|\yy^{(1)}}[\E[\XX_t|\YY_t]|\yy^{(1)}]=\E_{X|\yy^{(1)}}[\XX_t|\yy^{(1)}]$ (and same for $\XX_{t-1}), we know that $\E[\hat{\WW}_t|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$. Since this applies for all $\yy^{(1)}$, In the same way, we can show that $\E[\hat{\VV}_t|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$.
-#####################
-
-Thus Equation \ref{eqn:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$:
+The right side of Equation \ref{eqn:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$ instead of $\hat{\VV}_t$ and $\hat{\WW}_t$:
 \begin{equation}\label{eqn:covhatVtWt2}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_t|\YY^{(1)}]]
 \end{equation}
+since\footnote{$\E[\WW_t|\yy^{(1)}]= \E[\XX_t|\yy^{(1)}]-\BB_t\E[\XX_{t-1}|\yy^{(1)}] - \uu_t = \hatxt-\BB_t \hatxtm - \uu_t = \hat{\ww}_t = \E[\hat{\WW_t}|\yy^{(1)}]$ and 
+$\E[\VV_t|\yy^{(1)}]= \E[\YY_t|\yy^{(1)}]-\ZZ_t\E[\XX_{t}|\yy^{(1)}] - \aa_t = \E[\YY_t|\yy^{(1)}]-\ZZ_t \hatxt - \aa_t = \E[\hat{\VV_t}|\yy^{(1)}]$} $\E[\hat{\WW_t}|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hat{\VV_t}|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$.
 
-In the same way we used the law of total variance, we can use the law of total covariance  to obtain $\cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]$:
-\begin{equation}\label{eqn:covhatVtWt3}
+In the same way we used the law of total variance, we can use the law of total covariance  to obtain $\cov[\hat{\VV}_t,\hat{\WW}_t]$, we can use it to obtain $\cov[\VV_t, \WW_t]$:
+\begin{equation}\label{eqn:covVtWt}
 \cov[\VV_t, \WW_t] = \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\yy^{(1)}]] + \cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]\\ 
 \end{equation}
-The unconditional covariance of $\VV_t$ and $\WW_t$ is 0. Thus the right side of Equation \ref{eqn:covhatVtWt3} is 0 and combining Equation \ref{eqn:covhatVtWt2} and \ref{eqn:covhatVtWt3}, we get
+The unconditional covariance of $\VV_t$ and $\WW_t$ is 0. Thus the left side of Equation \ref{eqn:covhatVtWt3} is 0 and we can rearrange the equation as
+\begin{equation}\label{eqn:covVtWt2}
+\cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]] = - \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\yy^{(1)}]]
+\end{equation}
+Combining Equation \ref{eqn:covhatVtWt2} and \ref{eqn:covVtWt2}, we get
 \begin{equation}\label{eqn:conditionalcovvtwt}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\yy^{(1)}] ] 
 \end{equation}
 and our problem reduces to solving for the conditional covariance of the model and state residuals.  
 
-The conditional covariance $\cov[\VV_t, \WW_t|\yy^{(1)}]$ can be written out as
+For a specific $\YY^{(1)}=\yy^{(1)}$, the conditional covariance $\cov[\VV_t, \WW_t|\yy^{(1)}]$ can be written out as
 \begin{equation}
 \cov[\VV_t, \WW_t|\yy^{(1)}] = \cov[\YY_t-\ZZ_t\XX_t-\aa_t, \XX_t-\BB_t\XX_{t-1}-\uu_t|\yy^{(1)}]
 \end{equation}
@@ -425,18 +425,18 @@ $\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus
 \end{equation}
 where $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttm=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatSt$ and $\hatSttm$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package.
 
-$\hatVt$, $\hatVttm$, $\hatSt$ and $\hatSttm$ are only functions of the MARSS parameters not of $\yy^{(1)}$.  Thus 
+$\hatVt$, $\hatVttm$, $\hatSt$ and $\hatSttm$ are conditional multivariate normal and are only functions of the MARSS parameters not of $\yy^{(1)}$. Thus 
 \begin{equation}
-\E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\yy^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatSt - \hatSttm\BB_t^\top + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt
+\E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatSt - \hatSttm\BB_t^\top + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt
 \end{equation}
 $\cov[\hat{\VV}_t,\hat{\WW}_t]$ is the negative of this (Equation \ref{eqn:conditionalcovvtwt}), thus
 \begin{equation}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = - \hatSt + \hatSttm\BB_t^\top - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt
 \end{equation}
 
-The Harvey et al. algorithm shown below gives the joint distribution of the model residuals at time $t$ and state residuals at time $t+1$.  Using the law of total covariance as above, the covariance in this case is
+The Harvey et al. algorithm (shown below) gives the joint distribution of the model residuals at time $t$ and state residuals at time $t+1$.  Using the law of total covariance as above, the covariance in this case is
 \begin{equation}
-\cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_{t+1}|\yy^{(1)}]] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_{t+1}|\yy^{(1)}] ] 
+\cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_{t+1}|\YY^{(1)}]] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_{t+1}|\YY^{(1)}] ] 
 \end{equation}
 and
 \begin{equation}
@@ -447,10 +447,13 @@ and
 \end{split}
 \end{equation}
 Thus,
-$$\cov_{Y^{(1)}}[\E[\VV_t|\yy],\E[\WW_{t+1}|\yy^{(1)}]] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_{t+1}|\yy^{(1)}] ] = - \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top.$$
+\begin{equation}
+\cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_{t+1}|\YY^{(1)}]] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_{t+1}|\YY^{(1)}] ] = - \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top.
+\end{equation}
+
 
 \subsection{Joint distribution of the conditional residuals}
-We now the write the variance of the joint distribution of the conditional residuals. Define
+We now can write the variance of the joint distribution of the conditional residuals. Define
 \begin{equation}
 \hat{\varepsilon}_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_t\end{bmatrix} =
 \begin{bmatrix}\yy_t - \ZZ_t\hatxt-\aa_t\\ \hatxt - \BB_t\hatxtm-\uu_t \end{bmatrix}.
