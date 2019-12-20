@@ -86,11 +86,12 @@
 \def\diag{\,\textup{\textrm{diag}}}
 \def\trace{\,\textup{\textrm{trace}}}
 \def\hatxt{\widetilde{\xx}_t^T}
-\def\hatxttm{\widetilde{\xx}_t^{t-1}}
+\def\hatxtt1{\widetilde{\xx}_t^{t-1}}
 \def\hatxone{\widetilde{\mbox{$\xx$}}_1}
 \def\hatxzero{\widetilde{\mbox{$\xx$}}_0}
 \def\hatxtm{\widetilde{\mbox{$\xx$}}_{t-1}^T}
-\def\hatxtmtm{\widetilde{\mbox{$\xx$}}_{t-1}^{t-1}}
+\def\hatxtmt1{\widetilde{\mbox{$\xx$}}_{t-1}^{t-1}}
+\def\hatxtpt1{\widetilde{\mbox{$\xx$}}_{t+1}^{t-1}}
 \def\hatxQtm{\widetilde{\mathbb{x}}_{t-1}}
 \def\hatyt{\widetilde{\mbox{$\yy$}}_t}
 \def\hatyyt{\widetilde{\mbox{$\mathbf y$}\mbox{$\mathbf y$}^\top}_t}
@@ -111,16 +112,20 @@
 \def\hatVtT{\widetilde{\VV}_t^T}
 \def\hatVtt1{\widetilde{\VV}_t^{t-1}}
 \def\hatVtm{\widetilde{\VV}_{t-1}^T}
-\def\hatVtmtm{\widetilde{\VV}_{t-1}^{t-1}}
+\def\hatVtmt1{\widetilde{\VV}_{t-1}^{t-1}}
 \def\hatVttm{\widetilde{\VV}_{t,t-1}^T}
-\def\hatVttmtm{\widetilde{\VV}_{t,t-1}^{t-1}}
+\def\hatVttmt1{\widetilde{\VV}_{t,t-1}^{t-1}}
+\def\hatVttp{\widetilde{\VV}_{t,t+1}^T}
+\def\hatVttpt1{\widetilde{\VV}_{t,t+1}^{t-1}}
+\def\hatVtptt1{\widetilde{\VV}_{t+1,t}^{t-1}}
 \def\hatUt{\widetilde{\UU}_t^T}
+\def\hatUtt1{\widetilde{\UU}_t^{t-1}}
 \def\hatSt{\widetilde{\Ss}_t^T}
-\def\hatSttm{\widetilde{\Ss}_t^{t-1}}
+\def\hatStt1{\widetilde{\Ss}_t^{t-1}}
 \def\hatSttm{\widetilde{\Ss}_{t,t-1}^T}
-\def\hatSttmtm{\widetilde{\Ss}_{t,t-1}^{t-1}}
+\def\hatSttmt1{\widetilde{\Ss}_{t,t-1}^{t-1}}
 \def\hatSttp{\widetilde{\Ss}_{t,t+1}^T}
-\def\hatSttptm{\widetilde{\Ss}_{t,t+1}^{t-1}}
+\def\hatSttpt1{\widetilde{\Ss}_{t,t+1}^{t-1}}
 \def\hatBmt{\widetilde{\Bm}_t}
 \def\hatCat{\widetilde{\Ca}_t}
 \def\hatCbt{\widetilde{\Cb}_t}
@@ -465,12 +470,21 @@ We now can write the variance of the joint distribution of the conditional resid
 \end{equation}
 where $\hatxt$ and $\hatxtm$ are conditioned on $\yy{(1)}$, the observed $\yy$.
 $\hat{\varepsilon}_t$ is a sample drawn from the distribution of $\hat{\mathcal{E}}_t$ conditioned on observations at the $(1)$ locations in $\YY$.  The expected value of $\hat{\mathcal{E}}_t$ over all possible $\yy$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
+\begin{equation}
+ \begin{bmatrix}[c|c]
+ \var[\hat{V}_t]&
+ \cov[\hat{V}_t, \hat{W}_t] \\
+ \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
+ (\cov[\hat{V}_t, \hat{W}_t])^\top& 
+ \var[\hat{W}_t] \end{bmatrix}
+\end{equation}
+which is
 \begin{equation}\label{eqn:jointcondresid1general}
  \begin{bmatrix}[c|c]
  \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top+\ZZ_t(\hatSt)^\top&
- \hatSt - \hatSttm\BB_t^\top  + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt \\
+ - \hatSt + \hatSttm\BB_t^\top  - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt \\
  \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
- (\hatSt - \hatSttm\BB_t^\top  + \ZZ_t\hatVttm\BB_t^\top - \ZZ_t\hatVt)^\top& 
+ (- \hatSt + \hatSttm\BB_t^\top  - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt)^\top& 
  \QQ_t - \hatVt - \BB_t \hatVtm \BB_t^\top + \hatVttm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t} \end{bmatrix}
 \end{equation}
 
@@ -480,12 +494,21 @@ If the residuals are defined as in \citet{Harveyetal1998},
 \begin{bmatrix}\yy_t - \ZZ_t\hatxt-\aa_t\\ \tilde{\xx}_{t+1} - \BB_{t+1}\hatxt-\uu_{t+1} \end{bmatrix}
 \end{equation}
 and the variance of $\hat{\mathcal{E}}_t$ is
+\begin{equation}
+ \begin{bmatrix}[c|c]
+ \var[\hat{V}_t]&
+ \cov[\hat{V}_t, \hat{W}_{t+1}] \\
+ \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
+ (\cov[\hat{V}_t, \hat{W}_{t+1}])^\top& 
+ \var[\hat{W}_{t+1}] \end{bmatrix}
+\end{equation}
+which is
 \begin{equation}\label{eqn:jointcondresid2}
 \begin{bmatrix}[c|c]
 \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top&
-- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top \\
+- \hatSttp + \hatSt\BB_{t+1}^\top - \ZZ_t\hatVt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} \\
 \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
-(- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top)^\top& 
+(- \hatSttp + \hatSt\BB_{t+1}^\top - \ZZ_t\hatVt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1})^\top& 
 \QQ_{t+1} - \widetilde{\VV}_{t+1} - \BB_{t+1} \hatVt \BB_{t+1}^\top + \widetilde{\VV}_{t+1,t} \BB_{t+1}^\top + \BB_{t+1}\widetilde{\VV}_{t,t+1} \end{bmatrix}
 \end{equation}
 
@@ -564,73 +587,93 @@ One-step-ahead predictions (innovations) are often shown for MARSS models and th
 
 Define the innovations $\tilde{\vv}_t$ as:
 \begin{equation}\label{eq:vtT}
-\tilde{\vv}_t = \yy_t - \ZZ_t\hatxttm - \aa_t,
+\tilde{\vv}_t = \yy_t - \ZZ_t\hatxtt1 - \aa_t,
 \end{equation}
-The random variable over all possible $\yy_1^{t-1}$ is $\tilde{\VV}_t$. Its mean is 0 and we want to find its variance.
+where $\hatxtt1$ is the $\E[\XX_t|\yy^{(1)}_{t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_{(1),t-1}$, is $\tilde{\VV}_t$. Its mean is 0 and we want to find its variance.
 
 
-The derivation of the variance of $\tilde{\VV}_t$ follows the same steps as smoothations, $\hat{\VV}_t$, and we can write the variance as:
+The derivation of the variance of $\tilde{\VV}_t$ follows the same steps as smoothations $\hat{\VV}_t$, and we can write the variance as:
 \begin{equation}\label{eq:innov.model}
-\var[\hat{\VV}_t] = \RR_t - \ZZ_t \hatVttm \ZZ_t^\top + \hatSttm\ZZ_t^\top + \ZZ_t(\hatSttm)^\top
+\var[\tilde{\VV}_t] = \RR_t - \ZZ_t \hatVtt1 \ZZ_t^\top + \hatStt1\ZZ_t^\top + \ZZ_t(\hatStt1)^\top
 \end{equation}
-where the $\hatVttm$ and $\hatSttm$ are now conditioned on only the data from 1 to $t-1$.
+where the $\hatVtt1$ and $\hatStt1$ are now conditioned on only the data from 1 to $t-1$.
 
-$\hatSttm=\cov[\YY_t,\XX_t|\yy^{(1)}_{t-1}]$ which is $\cov[\ZZ_t \XX_t + \aa_t,\XX_t|\yy^{(1)}_{t-1} = \ZZ_t \hatVttm \ZZ_t^\top$. Similarly, $\ZZ_t(\hatSttm)^\top=\ZZ_t \hatVttm \ZZ_t^\top$. Thus Equation \ref{eq:innov.model} reduces to
+$\hatStt1=\cov[\YY_t,\XX_t|\yy^{(1), t-1}]$ which is $\cov[\ZZ_t \XX_t + \aa_t,\XX_t|\yy^{(1), t-1} = \ZZ_t \hatVtt1 \ZZ_t^\top$ and thus, $\ZZ_t(\hatStt1)^\top=\ZZ_t \hatVtt1 \ZZ_t^\top$. Thus Equation \ref{eq:innov.model} reduces to
 \begin{equation}\label{eq:innov.model2}
-\var[\hat{\VV}_t] = \RR_t + \ZZ_t \hatVttm \ZZ_t^\top
+\var[\tilde{\VV}_t] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top
 \end{equation}
 
 \subsection{State residuals conditioned on the data}
 
 Define the state residuals conditioned on the data from 1 to $t-1$ as $\tilde{\ww}_t$.
 \begin{equation}\label{eq:vtT}
-\tilde{\ww}_t = \xx_t - \BB_t\hatxttm - \uu_t,
+\tilde{\ww}_t = \xx_t - \BB_t\hatxtmt1 - \uu_t,
 \end{equation}
-The random variable over all possible $\yy_1^{t-1}$ is $\tilde{\WW}_t$. Its mean is 0 and we want to find its variance.
+where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). The random variable over all possible $\yy^{(1),t-1}$ is $\tilde{\WW}_t$. Its mean is 0 and we want to find its variance.
 
-The derivation of the variance of $\tilde{\WW}_t$ follows the same steps as for $\hat{\WW}_t$, except that we are using the variances of $\XX$ conditioned on the data from 1 to $t-1$ instead of all the data.  We can write the variance as:
+The derivation of the variance of $\tilde{\WW}_t$ follows the same steps as for $\hat{\WW}_t$, except that we are using the variances conditioned on the data from 1 to $t-1$ instead of all the data.  We can write the variance as:
 \begin{equation}
-\var[\tilde{\WW}_t]  =  \QQ_t - \hatVttm - \BB_t \hatVtmtm \BB_t^\top + \hatVttmtm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1}
+\var[\tilde{\WW}_t]  =  \QQ_t - \hatVtt1 - \BB_t \hatVtmt1 \BB_t^\top + \hatVttmt1 \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1}
 \end{equation}
 
 \subsection{Covariance of the conditional model and state residuals}
 
+Again the derivation is the same as for the smoothations.
+
 \begin{equation}
-\cov[\hat{\VV}_t,\hat{\WW}_t] = - \hatSttm + \hatSttmtm\BB_t^\top - \ZZ_t\hatVttmtm\BB_t^\top + \ZZ_t\hatVttm = 0
+\cov[\tilde{\VV}_t,\tilde{\WW}_t] = - \hatStt1 + \hatSttmt1\BB_t^\top - \ZZ_t\hatVttmt1\BB_t^\top + \ZZ_t\hatVtt1
 \end{equation}
 
-
 \begin{equation}
-\cov[\hat{\VV}_t,\hat{\WW}_{t+1}] = - \hatSttptm + \hatSttm\BB_{t+1}^\top  - \ZZ_t\hatVttm\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1}^{t-1} = 0
+\cov[\tilde{\VV}_t,\tilde{\WW}_{t+1}] = - \hatSttpt1 + \hatStt1\BB_{t+1}^\top - \ZZ_t\hatVtt1\BB_{t+1}^\top + \ZZ_t\hatVttpt1
 \end{equation}
 
 \subsection{Joint distribution of the conditional residuals}
-We now the write the variance of the joint distribution of the conditional residuals. Define
-\begin{equation}
-\hat{\varepsilon}_t = \begin{bmatrix}\tilde{\vv}_t\\ \tilde{\ww}_t\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \hatxttm - \BB_t\hatxtmtm-\uu_t \end{bmatrix}.
-\end{equation}
-where $\hatxttm$ and $\hatxtmtm$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
 
-The expected value of $\hat{\mathcal{E}}_t$ over all possible $\yy$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
+We now the write the variance of the joint distribution of the conditional one-step ahead residuals. Define
+\begin{equation}
+\tilde{\varepsilon}_t = \begin{bmatrix}\tilde{\vv}_t\\ \tilde{\ww}_t\end{bmatrix} =
+\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtt1 - \BB_t\hatxtmt1-\uu_t \end{bmatrix}.
+\end{equation}
+where $\hatxtt1$ and $\hatxtmt1$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
+
+The expected value of $\tilde{\mathcal{E}}_t$ over all possible $\yy$ up to time $t-1$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
+\begin{equation}
+ \begin{bmatrix}[c|c]
+ \var[\tilde{V}_t]&
+ \cov[\tilde{V}_t, \tilde{W}_t] \\
+ \rule[.5ex]{20ex}{0.25pt} & \rule[.5ex]{20ex}{0.25pt} \\
+ (\cov[\tilde{V}_t, \tilde{W}_t])^\top& 
+ \var[\tilde{W}_t] \end{bmatrix}
+\end{equation}
+which is
 \begin{equation}\label{eqn:jointcondresid1innovs}
  \begin{bmatrix}[c|c]
- \RR_t + \ZZ_t \hatVttm \ZZ_t^\top& 0 \\
+ \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& 0 \\
  \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
- 0 & \QQ_t - \hatVttm - \BB_t \hatVtmtm \BB_t^\top + \hatVttmtm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1} \end{bmatrix}
+ 0 & \QQ_t - \hatVtt1 - \BB_t \hatVtmt1 \BB_t^\top + \hatVttmt1 \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1} \end{bmatrix}
 \end{equation}
 
 If the residuals are defined as in \citet{Harveyetal1998},
 \begin{equation}
 \hat{\varepsilon}_t = \begin{bmatrix}\tilde{\vv}_t\\ \tilde{\ww}_{t+1}\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \tilde{\xx}_{t+1} - \BB_{t+1}\hatxttm-\uu_{t+1} \end{bmatrix}
+\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtpt1 - \BB_{t+1}\hatxtt1-\uu_{t+1} \end{bmatrix}
 \end{equation}
-and the variance of $\hat{\mathcal{E}}_t$ is
+and the variance of $\tilde{\mathcal{E}}_t$ is
+\begin{equation}
+ \begin{bmatrix}[c|c]
+ \var[\tilde{V}_t]&
+ \cov[\tilde{V}_t, \tilde{W}_{t+1}] \\
+ \rule[.5ex]{20ex}{0.25pt} & \rule[.5ex]{20ex}{0.25pt} \\
+ (\cov[\tilde{V}_t, \tilde{W}_{t+1}])^\top& 
+ \var[\tilde{W}_{t+1}] \end{bmatrix}
+\end{equation}
+which is
 \begin{equation}\label{eqn:jointcondresid2.innov.t1}
 \begin{bmatrix}[c|c]
-\RR_t + \ZZ_t \hatVttm \ZZ_t^\top& 0 \\
+\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& 0 \\
 \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
-0 & \QQ_{t+1} - \widetilde{\VV}_{t+1}^{t-1} - \BB_{t+1} \hatVttm \BB_{t+1}^\top + \widetilde{\VV}_{t+1,t}^{t-1} \BB_{t+1}^\top + \BB_{t+1}\widetilde{\VV}_{t,t+1}^{t-1} \end{bmatrix}
+0 & \QQ_{t+1} - \widetilde{\VV}_{t+1}^{t-1} - \BB_{t+1} \hatVtt1 \BB_{t+1}^\top + \hatVtptt1 \BB_{t+1}^\top + \BB_{t+1}\hatVttpt1 \end{bmatrix}
 \end{equation}
 
 
