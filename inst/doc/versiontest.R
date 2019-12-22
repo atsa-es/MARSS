@@ -5,6 +5,8 @@
 # Install a second version into the local R library R_LIBS_USER
 # RStudio will use R_LIBS_USER if it exists.  It does not by default so
 #  you might have to create this folder to hav a local library.
+#  look at Sys.getenv("R_LIBS_USER"). Click Install under Packages tab and see
+#  where it is installing
 # Open the unit test.R file
 # RShowDoc("versiontest.R", package="MARSS")
 # Change working directory to a directory where many test files can be stored (sandbox)
