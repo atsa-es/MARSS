@@ -6,7 +6,9 @@
   The MARSS fitting function, \code{\link{MARSS}}, outputs marssMLE objects.  \code{fitted(marssMLE)}, where marssMLE is the output from a \code{\link{MARSS}} call,   will return the modeled value of \eqn{y(t)} or \eqn{x(t)}.  See details.
 }
   \usage{
-  \method{fitted}{marssMLE}(object, ..., type=c("observations", "states", "y", "x"),   conditioning = c("T", "t", "t-1"))
+  \method{fitted}{marssMLE}(object, ..., 
+  type=c("observations", "states", "y", "x"),   
+  conditioning = c("T", "t", "t-1"))
   }
   \arguments{
   \item{object}{ A marssMLE object.  }
@@ -55,5 +57,5 @@ If you want estimates of the states, rather than the model predictions based on 
   fit <- MARSS(nile, model=mod.list, silent=TRUE)
   plot(nile, type="p", pch=16, col="blue")
   lines(fitted(fit)[1,], col="red", lwd=2)
-  lines(fitted(fit, one.step.ahead=TRUE)[1,], col="grey", lwd=2)
+  lines(fitted(fit, conditioning="t-1")[1,], col="grey", lwd=2)
   }

@@ -17,7 +17,7 @@
   \method{autoplot}{marssMLE}(x, 
            plot.type=c("observations", "states", "model.residuals", 
                        "state.residuals", "model.residuals.qqplot", 
-                       "state.residuals.qqplot"), 
+                       "state.residuals.qqplot", "expected.value.observations"),
            form=c("marxss", "marss", "dfa"),
            conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
   }

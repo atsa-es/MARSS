@@ -7,9 +7,9 @@
 \usage{
   augment.marssMLE(x, type = c("observations", "states", "y", "x"),
                               interval = c("none", "confidence"), 
-                              conditioning = c("T", "t", "t-1"),
                               conf.level = 0.95, 
-                              form=attr(x[["model"]], "form"))
+                              conditioning = c("T", "t", "t-1"),
+                              form=attr(x[["model"]], "form")[1])
 }
 \arguments{
   \item{x}{a marssMLE object}
@@ -33,17 +33,17 @@ Return a data.frame with fitted values, residuals, and upper and lower confidenc
 See \code{\link{residuals.marssMLE}} for a discussion of the residuals calculations for MARSS models.
 The reported CIs are the approximate CIs computed using the standard deviations: \code{qnorm(alpha/2)*se.fit + fitted}.
 
-\strong{type.predict observations}
+\strong{type observations}
 
 This returns a familiar model predicted value of the response (y) and the difference between the model prediction and the actual data y(t) is the residual.  If there is no data point, then the residual is NA.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the user guide.
 
 In the literature on state-space models, it is very common to use the one-step ahead predicted values of the data.  The fitted values returned by augment are NOT the one-step ahead values and the residuals are NOT the one-step ahead residuals (called Innovations in the state-space literature).  If you want the one-step ahead fitted values, you can use \code{fitted(x, one.step.ahead=TRUE)}.  The innovations are returned by \code{\link{MARSSkf}}.
 
-\strong{type.predict states}
+\strong{type states}
 
 The states are estimated.  If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{augment} is not what you want to use.  You want to use \code{tidy} to return the estimate of the state.
 
-\code{augment(MLEobj, type.predict="states")} returns a model prediction of \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)}.  The residuals returned are for w(t), the difference between \eqn{\hat{x}(t)} and the prediction of \eqn{\hat{x}(t)}.  These types of residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{residuals.marssMLE}} and read the references cited.
+\code{augment(MLEobj, type="states")} returns a model prediction of \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)}.  The residuals returned are for w(t), the difference between \eqn{\hat{x}(t)} and the prediction of \eqn{\hat{x}(t)}.  These types of residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{residuals.marssMLE}} and read the references cited.
 
 }
 
@@ -65,13 +65,14 @@ ggplot(data = d) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
 
-# Make a plot of the estimated states
-# Don't use augment.  States are not data.
-d <- tidy(MLEobj, type="states")
+# Make a plot of xtT versus prediction of xt from xtT[t-1]
+# This is NOT the estimate of the states with CIs. Use tidy() for that.
+d <- augment(MLEobj, type="states")
 ggplot(data = d) + 
-  geom_line(aes(t, estimate)) +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.1) +
-  facet_grid(~term) +
-  xlab("Time Step") + ylab("Count")
+  geom_point(aes(t, xtT)) +
+  geom_line(aes(x=t, .fitted)) +
+  facet_grid(~.rownames) +
+  xlab("Time Step") + ylab("Count") +
+  ggtitle("xtT (points) and predition (line)")
 
 }

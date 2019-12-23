@@ -11,7 +11,7 @@ For parameters, \code{tidy.marssMLE} returns their estimates and their confidenc
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "states", "observations", "new observations"),
+  tidy.marssMLE(x, type = c("parameters", "states", "observations", "x", "y"),
                 conf.int = TRUE,
                 conf.level = 0.95,
                 conditioning = c("T", "t-1", "t"),
@@ -134,7 +134,7 @@ d <- tidy(MLEobj, type="states")
 ggplot(data = d) + 
   geom_line(aes(t, estimate)) +
   geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
-  facet_grid(~term) +
+  facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
   
 # Make a plot of the estimates for the missing values
@@ -147,7 +147,7 @@ ggplot(data = d) +
   geom_line(aes(t, estimate)) +
   geom_point(aes(t, y), color="blue") +
   geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
-  facet_grid(~term) +
+  facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("Blue=data, Black=estimate of missing data point")
   
