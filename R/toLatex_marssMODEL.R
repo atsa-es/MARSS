@@ -4,7 +4,7 @@
 #############################################
 toLatex.marssMODEL = function(object, ..., file=NULL, digits=2, greek=TRUE, orientation="landscape", math.sty="amsmath", output=c("pdf","tex"),replace=TRUE,simplify=TRUE){
   #by default uses geometry package and amsmath
-  requireNamespace(Hmisc)
+  requireNamespace("Hmisc")
   x=object
   #set the environment of the subfunction to this function since I want them to have access to the passed in variables
   #environment(build.eqn.tex)=environment()
@@ -209,14 +209,14 @@ toLatex.marssMODEL = function(object, ..., file=NULL, digits=2, greek=TRUE, orie
   if("dvi" %in% output) latexcmd="latex"
   if("pdf" %in% output | "dvi" %in% output){
     #sys(paste(latexcmd,  "-interaction=scrollmode", shQuote(tmp)), output = FALSE)
-    sys(paste(latexcmd, shQuote(tmp)), output = FALSE)
-    sys(paste("rm", paste(str_replace(tmp,"[\\]","/"),"aux",sep=".")))
-    sys(paste("rm", paste(str_replace(tmp,"[\\]","/"),"log",sep=".")))
+    system(paste(latexcmd, shQuote(tmp)), output = FALSE)
+    system(paste("rm", paste(str_replace(tmp,"[\\]","/"),"aux",sep=".")))
+    system(paste("rm", paste(str_replace(tmp,"[\\]","/"),"log",sep=".")))
   }
   if("Rnw" %in% output)
-    sys(paste("cp", paste(str_replace(tmp,"[\\]","/"),"tex",sep="."), paste(str_replace(tmp,"[\\]","/"),"Rnw",sep=".")))
+    system(paste("cp", paste(str_replace(tmp,"[\\]","/"),"tex",sep="."), paste(str_replace(tmp,"[\\]","/"),"Rnw",sep=".")))
   if(!("tex" %in% output))
-    sys(paste("rm", paste(str_replace(tmp,"[\\]","/"),"tex",sep=".")))
+    system(paste("rm", paste(str_replace(tmp,"[\\]","/"),"tex",sep=".")))
 } #end of toLatex.marssMODEL
 
 get.mat.tex=function(x,greek,digits){
@@ -225,7 +225,7 @@ get.mat.tex=function(x,greek,digits){
   #use Hmisc util to convert to tabular form
   mat=array(list(),dim=dim(x))
   tmp.fun=function(x,digits=2,greek=greek){
-    ifelse(is.numeric(x[[1]]),round(x[[1]],digits=digits),latexTranslate(x[[1]],greek=greek))
+    ifelse(is.numeric(x[[1]]),round(x[[1]],digits=digits), Hmisc::latexTranslate(x[[1]],greek=greek))
   }
   #this will be a list matrix whether or not x is a list matrix
   mat[,]=lapply(x,tmp.fun,digits=digits,greek=greek)
@@ -246,7 +246,7 @@ get.mat.tex=function(x,greek,digits){
   mat[,]=lapply(mat,tmp.fun.2)
   
   #now use the Hmisc util to translate to tabular form
-  tmp.tex=latexTabular(mat)[[1]]
+  tmp.tex=Hmisc::latexTabular(mat)[[1]]
   #latexTabular is replacing _ with \\\\_
   tmp.tex=str_replace_all(tmp.tex,"[\\][\\]_","_")
   tmp.tex=strsplit(tmp.tex,"\n")[[1]]
