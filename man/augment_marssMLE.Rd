@@ -48,29 +48,29 @@ The states are estimated.  If you want the expected value of the states and an e
 }
 
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11,12),]
-  MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
+dat <- t(harborSeal)
+dat <- dat[c(2, 11, 12), ]
+MLEobj <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
 library(broom)
 library(ggplot2)
 theme_set(theme_bw())
 
 # Make a plot of the observations and model fits
-d <- augment(MLEobj, interval="confidence")
-ggplot(data = d) + 
+d <- augment(MLEobj, interval = "confidence")
+ggplot(data = d) +
   geom_line(aes(t, .fitted)) +
   geom_point(aes(t, y)) +
-  geom_ribbon(aes(x=t, ymin=.conf.low, ymax=.conf.up), linetype=2, alpha=0.1) +
+  geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of xtT versus prediction of xt from xtT[t-1]
 # This is NOT the estimate of the states with CIs. Use tidy() for that.
-d <- augment(MLEobj, type="states")
-ggplot(data = d) + 
+d <- augment(MLEobj, type = "states")
+ggplot(data = d) +
   geom_point(aes(t, xtT)) +
-  geom_line(aes(x=t, .fitted)) +
+  geom_line(aes(x = t, .fitted)) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("xtT (points) and predition (line)")

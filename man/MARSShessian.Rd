@@ -36,18 +36,19 @@ MARSSFisherI( MLEobj, method="Harvey1989" )
 } 
 \seealso{ \code{\link{MARSSharveyobsFI}} \code{\link{MARSShessian.numerical}} \code{\link{MARSSparamCIs}} \code{\link{marssMLE}} }
 \examples{
-  dat = t(harborSeal)
-  dat = dat[c(2,11),]
-  MLEobj = MARSS(dat)
-  MLEobj.hessian = MARSShessian(MLEobj)
+dat <- t(harborSeal)
+dat <- dat[c(2, 11), ]
+MLEobj <- MARSS(dat)
+MLEobj.hessian <- MARSShessian(MLEobj)
 
-  #show the approx Hessian
-  MLEobj.hessian$Hessian
-  
-  #generate a parameter sample using the Hessian
-  #this uses the rmvnorm function in the mvtnorm package
-  hess.params = mvtnorm::rmvnorm(1, mean=MLEobj.hessian$parMean, 
-                           sigma=MLEobj.hessian$parSigma)
-        
+# show the approx Hessian
+MLEobj.hessian$Hessian
+
+# generate a parameter sample using the Hessian
+# this uses the rmvnorm function in the mvtnorm package
+hess.params <- mvtnorm::rmvnorm(1,
+  mean = MLEobj.hessian$parMean,
+  sigma = MLEobj.hessian$parSigma
+)
 }
 

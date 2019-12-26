@@ -36,13 +36,13 @@
 \code{\link{augment.marssMLE}} \code{\link{tidy.marssMLE}} \code{\link{print.marssMLE}} 
 }
 \examples{ 
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
-  
-  coef(MLEobj)
-  coef(MLEobj,type="vector")
-  coef(MLEobj,type="matrix")
-  #to retrieve just the Q matrix
-  coef(MLEobj,type="matrix")$Q
+dat <- t(harborSeal)
+dat <- dat[c(2, 11), ]
+MLEobj <- MARSS(dat)
+
+coef(MLEobj)
+coef(MLEobj, type = "vector")
+coef(MLEobj, type = "matrix")
+# to retrieve just the Q matrix
+coef(MLEobj, type = "matrix")$Q
 }

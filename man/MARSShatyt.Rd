@@ -37,5 +37,11 @@ Holmes, E. E. (2012) Derivation of the EM algorithm for constrained and unconstr
 \seealso{ 
 \code{\link{MARSS}} \code{\link{marssMODEL}} \code{\link{MARSSkem}}
 }
+\examples{
+dat <- t(harborSeal)
+dat <- dat[2:nrow(dat), ]
+MLEobj <- MARSS(dat)
+EyList <- MARSShatyt(MLEobj)
+}
 
 

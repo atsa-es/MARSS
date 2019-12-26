@@ -37,17 +37,16 @@ MARSSsimulate(MLEobj, tSteps = NULL, nsim = 1, silent = TRUE,
   \code{\link{marssMODEL}} \code{\link{marssMLE}} \code{\link{MARSSboot}} 
 }
 \examples{
-  d = harborSeal[,c(2,11)]
-  dat = t(d)
-  MLEobj = MARSS(dat)
+d <- harborSeal[, c(2, 11)]
+dat <- t(d)
+MLEobj <- MARSS(dat)
 
-  #simulate data that are the 
-  #same length as original data and no missing data
-  sim.obj = MARSSsimulate(MLEobj, tSteps=dim(d)[1], nsim=5)
-  
-  #simulate data that are the 
-  #same length as original data and have missing data in the same location
-  sim.obj = MARSSsimulate(MLEobj, tSteps=dim(d)[1], nsim=5, miss.loc=dat)
+# simulate data that are the
+# same length as original data and no missing data
+sim.obj <- MARSSsimulate(MLEobj, tSteps = dim(d)[1], nsim = 5)
 
+# simulate data that are the
+# same length as original data and have missing data in the same location
+sim.obj <- MARSSsimulate(MLEobj, tSteps = dim(d)[1], nsim = 5, miss.loc = dat)
 }
 

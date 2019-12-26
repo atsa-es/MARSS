@@ -40,10 +40,10 @@ A object of class \code{\link{marssMLE}}.
 \seealso{ \code{\link{marssMODEL}} \code{\link{MARSS.marxss}} } 
 \examples{
 \dontrun{
-#See the MARSS man page for examples
+# See the MARSS man page for examples
 ?MARSS
 
-#and the Quick Examples chapter in the User Guide
-RShowDoc("UserGuide",package="MARSS")
+# and the Quick Examples chapter in the User Guide
+RShowDoc("UserGuide", package = "MARSS")
 }
 }

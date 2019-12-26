@@ -117,36 +117,36 @@ R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applicatio
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]
 }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11,12),]
-  # model allowing correlation between x states
-  MLEobj <- MARSS(dat, model=list(Q="unconstrained"))
+dat <- t(harborSeal)
+dat <- dat[c(2, 11, 12), ]
+# model allowing correlation between x states
+MLEobj <- MARSS(dat, model = list(Q = "unconstrained"))
 
 library(broom)
 library(ggplot2)
 
 # A data frame of the estimated parameters
- tidy(MLEobj)
- 
+tidy(MLEobj)
+
 # Make a plot of the estimated states
 library(ggplot2)
-d <- tidy(MLEobj, type="states")
-ggplot(data = d) + 
+d <- tidy(MLEobj, type = "states")
+ggplot(data = d) +
   geom_line(aes(t, estimate)) +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
-  
+
 # Make a plot of the estimates for the missing values
 # Use augment() to plot the fitted y(t)
 # i.e., to put a line through the points
 library(ggplot2)
-d <- tidy(MLEobj, type="observations")
-ggplot(data = d) + 
+d <- tidy(MLEobj, type = "observations")
+ggplot(data = d) +
   geom_point(aes(t, estimate)) +
   geom_line(aes(t, estimate)) +
-  geom_point(aes(t, y), color="blue") +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
+  geom_point(aes(t, y), color = "blue") +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("Blue=data, Black=estimate of missing data point")

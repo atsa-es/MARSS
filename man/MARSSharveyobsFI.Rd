@@ -21,10 +21,10 @@ MARSSharveyobsFI( MLEobj )
 } 
 \seealso{ \code{\link{MARSShessian}} \code{\link{MARSSparamCIs}} }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
-  MARSS:::MARSSharveyobsFI(MLEobj)
+dat <- t(harborSeal)
+dat <- dat[c(2, 11), ]
+MLEobj <- MARSS(dat)
+MARSS:::MARSSharveyobsFI(MLEobj)
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2006).  Section 6.4 (Missing Data Modifications) in Time series analysis and its applications.  Springer-Verlag, New York.

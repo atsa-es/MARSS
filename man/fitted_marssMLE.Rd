@@ -41,21 +41,22 @@ If you want estimates of the states, rather than the model predictions based on 
   eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11,12),]
-  MLEobj <- MARSS(dat, model=list(Z=factor(c("WA","OR","OR"))))
-  fitted(MLEobj)
-  
-  # Example of fitting a stochastic level model to the Nile River flow data
-  # red line is smooothed level estimate
-  # grey line is one-step-ahead prediction using xtt1
-  nile <- as.vector(datasets::Nile)
-  mod.list = list(
-  Z=matrix(1), A=matrix(0), R=matrix("r"),
-  B=matrix(1), U=matrix(0), Q=matrix("q"),
-  x0=matrix("pi") )
-  fit <- MARSS(nile, model=mod.list, silent=TRUE)
-  plot(nile, type="p", pch=16, col="blue")
-  lines(fitted(fit)[1,], col="red", lwd=2)
-  lines(fitted(fit, conditioning="t-1")[1,], col="grey", lwd=2)
+dat <- t(harborSeal)
+dat <- dat[c(2, 11, 12), ]
+MLEobj <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
+fitted(MLEobj)
+
+# Example of fitting a stochastic level model to the Nile River flow data
+# red line is smooothed level estimate
+# grey line is one-step-ahead prediction using xtt1
+nile <- as.vector(datasets::Nile)
+mod.list <- list(
+  Z = matrix(1), A = matrix(0), R = matrix("r"),
+  B = matrix(1), U = matrix(0), Q = matrix("q"),
+  x0 = matrix("pi")
+)
+fit <- MARSS(nile, model = mod.list, silent = TRUE)
+plot(nile, type = "p", pch = 16, col = "blue")
+lines(fitted(fit)[1, ], col = "red", lwd = 2)
+lines(fitted(fit, conditioning = "t-1")[1, ], col = "grey", lwd = 2)
   }
