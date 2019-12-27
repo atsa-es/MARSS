@@ -19,27 +19,32 @@
 
 # ###########################################
 
-setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2018")
+setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2019")
+setwd("~/Dropbox/MARSS unit tests 2019")
+
+lib.old <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
+lib.new <- Sys.getenv("R_LIBS_USER")
+# to install MARSS to correct locations if needed
+# install.packages("MARSS", lib.old) #install from CRAN
+# install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
 
-#One version should be in the local library
-#if building from RStudio, you can set to build to local
-lib.loc = Sys.getenv("R_LIBS_USER")
-unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
+#Load new and get the R files
+unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
-library(MARSS, lib.loc = lib.loc)
+library(MARSS, lib.loc = lib.new)
 zscore.fun = zscore #3.9 does not have this
 
 #Get whatever code files are in the doc directory; these are tested
-unittestfiles = dir(path=paste(lib.loc,"/MARSS/doc",sep=""), pattern="*[.]R$", full.names = TRUE)
-unittestfiles = unittestfiles[unittestfiles!=paste(lib.loc,"/MARSS/doc/versiontest.R",sep="")]
+unittestfiles = dir(path=paste(lib.new,"/MARSS/doc",sep=""), pattern="*[.]R$", full.names = TRUE)
+unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/doc/versiontest.R",sep="")]
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
   #clean the workspace but keep objects needed for the unit test
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old"))])
   #set up name for log files
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
@@ -62,14 +67,13 @@ for(unittestfile in unittestfiles){
 #detach the version
 detach("package:MARSS", unload=TRUE)
 
-#Old version of MARSS is in the R library (no local library)
-lib.loc = paste(Sys.getenv("R_HOME"),"/library",sep="")
-unittestvrs=packageVersion("MARSS", lib.loc = lib.loc)
+#Load old version of MARSS
+unittestvrs=packageVersion("MARSS", lib.loc = lib.old)
 unittestvrs
-library(MARSS, lib.loc = lib.loc)
+library(MARSS, lib.loc = lib.old)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old"))])
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
@@ -95,10 +99,9 @@ for(unittestfile in unittestfiles){
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
   #Load in the 2 lists, testNew and testOld
-  vrs=packageVersion("MARSS", lib.loc = Sys.getenv("R_LIBS_USER"))
+  vrs=packageVersion("MARSS", lib.loc = lib.new)
   load(file=paste(tag,vrs,".Rdata",sep=""))
-  lib.loc = paste(Sys.getenv("R_HOME"),"/library",sep="")
-  vrs=packageVersion("MARSS", lib.loc = lib.loc)
+  vrs=packageVersion("MARSS", lib.loc = lib.old)
   load(file=paste(tag,vrs,".Rdata",sep=""))
   
   #Compare the lists and report any differences
