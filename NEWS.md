@@ -15,6 +15,8 @@ BUGS
 * degen.test() in MARSSkem() was not catching when R or Q was time-varying (and thus degeneracy should not be allowed). Changed to test the 3D of model.dims == 1 or not.
 * residuals.marssMLE(..., Harvey=TRUE) would fail if Q, B, or G was time-varying because parmat() called with t+1. Changed to only call parmat() when t<TT. Q, B, and G do not appear in the recursion when t=TT so parmat() with t=t+1 is never needed.
 * MARSS_dfa() used form="dfa" in MARSS.call list. Just info. Never used.
+* Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
+* fixed some old bugs in toLatex_marssMODEL.R. This function not currently used but will be added later to allow latex output of MARSS model.
 
 ENHANCEMENTS
 
@@ -24,6 +26,7 @@ ENHANCEMENTS
 * added plot of ytT to autoplot.marssMLE
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 * Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
+* updated all code to tidyverse style
 
 DOCUMENTATION and MAN FILES
 
@@ -34,6 +37,12 @@ CHANGES IN MARSS 3.10.11 (GitHub 8-3-2019)
 ------------------------------------
 Minor update. Version 3.10.11 has some edits to speed up the code by minimizing calls to expensive checking functions and fixes a bug in MARSSharveyobsFI() that appeared if a parameter was fixed and time-varying and MARSSparamCIs() was called.
 
+BUGS
+
+* MARSSkfss had a bug "\*" was used in place of %\*% with J0. Would never show up unless V0 estimated.
+* Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying. This caused MARSSparamCIs() to fail if a parameter was fixed and time-varying.
+* dparmat() did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
+
 ENHANCEMENTS
 
 * is.validvarcov is expensive. minimize calls to it. If called with a diagonal matrix, it should automatically pass so added a check to is.validvarcov() to see if matrix is diagonal.
@@ -42,11 +51,6 @@ ENHANCEMENTS
 * Add autoplot function and updated plot documentation to cover autoplot functions.
 * Fixed typos in Case Study 4 and Derivation eq 143b.
 
-BUGS
-
-* MARSSkfss had a bug "\*" was used in place of %\*% with J0. Would never show up unless V0 estimated.
-* Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying.
-* dparmat() did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
 
 CHANGES IN MARSS 3.10.10 (CRAN 11-2-2018)
 ------------------------------------
