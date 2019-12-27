@@ -1,72 +1,72 @@
 ###############################################################################################################################################
 #  tidy method for class marssMLE
 ##############################################################################################################################################
-tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "x", "y"), 
+tidy.marssMLE <- function(x, type = c("parameters", "states", "observations", "x", "y"),
                           conf.int = TRUE, conf.level = 0.95,
                           conditioning = c("T", "t-1", "t"),
-                          form=attr(x[["model"]], "form")[1], ...)
-{ 
+                          form = attr(x[["model"]], "form")[1], ...) {
   ## Argument checking
-  type = match.arg(type)
-  conditioning = match.arg(conditioning)
-  if(!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
-  if(!(conf.int%in%c(TRUE,FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
-  if(type=="states") type="x"
-  if(type=="observations") type="y"
-  if(type=="y" && conditioning=="t") stop("tidy.marssMLE: if type='observations' or 'y', conditioning must be 'T' or 't-1'.", call. = FALSE)
-  if(!(form%in%c("marss","marxss","dfa")))  stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call.=FALSE)
-  if(length(form)!=1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call.=FALSE)
+  type <- match.arg(type)
+  conditioning <- match.arg(conditioning)
+  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+  if (!(conf.int %in% c(TRUE, FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
+  if (type == "states") type <- "x"
+  if (type == "observations") type <- "y"
+  if (type == "y" && conditioning == "t") stop("tidy.marssMLE: if type='observations' or 'y', conditioning must be 'T' or 't-1'.", call. = FALSE)
+  if (!(form %in% c("marss", "marxss", "dfa"))) stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call. = FALSE)
+  if (length(form) != 1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call. = FALSE)
   ## End Argument checking
-  
-  alpha <- 1-conf.level
-  conditioning <- switch(conditioning, T="tT", `t-1`="tt1", t="tt")
-  extras=list()
-  
-  rerun.MARSSparamCIs = FALSE
-  model.has.cis = all(c("par.se", "par.lowCI", "par.upCI")%in%names(x))
-  if(conf.int & type=="parameters") rerun.MARSSparamCIs = ifelse(model.has.cis, FALSE, TRUE)
-  if(!missing(...)){
-    extras=list(...)
-    if(!all(names(extras)%in%c("rotate", "method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
+
+  alpha <- 1 - conf.level
+  conditioning <- switch(conditioning, T = "tT", `t-1` = "tt1", t = "tt")
+  extras <- list()
+
+  rerun.MARSSparamCIs <- FALSE
+  model.has.cis <- all(c("par.se", "par.lowCI", "par.upCI") %in% names(x))
+  if (conf.int & type == "parameters") rerun.MARSSparamCIs <- ifelse(model.has.cis, FALSE, TRUE)
+  if (!missing(...)) {
+    extras <- list(...)
+    if (!all(names(extras) %in% c("rotate", "method", "hessian.fun", "nboot"))) stop("Unknown extra argument. See ?tidy.marssMLE for allowed arguments.\n")
   }
-  
-  if(type=="parameters" && conf.int && (!missing(...) || !missing(conf.level))){
-    if(model.has.cis) warning("tidy.marssMLE: Your marssMLE object has par.se and CIs, but you have passed in arguments for calculating CIs.  MARSSparamCIs() will be re-run with these values.\n")
-    rerun.MARSSparamCIs = TRUE
+
+  if (type == "parameters" && conf.int && (!missing(...) || !missing(conf.level))) {
+    if (model.has.cis) warning("tidy.marssMLE: Your marssMLE object has par.se and CIs, but you have passed in arguments for calculating CIs.  MARSSparamCIs() will be re-run with these values.\n")
+    rerun.MARSSparamCIs <- TRUE
   }
-  
-  #set rotate
-  rotate = FALSE
-  if(form=="dfa" & "rotate"%in%names(extras)){
-    rotate=extras[["rotate"]]
-    if(!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n", call.=FALSE)
+
+  # set rotate
+  rotate <- FALSE
+  if (form == "dfa" & "rotate" %in% names(extras)) {
+    rotate <- extras[["rotate"]]
+    if (!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n", call. = FALSE)
   }
-  if(form!="dfa" & "rotate"%in%names(extras)) 
-    if(rotate) stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call.=FALSE)
-  
-  if(type=="parameters"){
-    ests = coef(x, type="vector")
-    if(length(ests)==0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n", call.=FALSE)
-    if(form=="dfa" && rotate && length(x[["par"]][["Z"]])!=0){
-      stop("tidy.marssMLE: You are requesting the parameters for a DFA \n and requested that the Z matrix be rotated. You need to do the rotation yourself.  See ?tidy.marssMLE for the code.\n", call.=FALSE)
-    }else{
-      ret = data.frame(
+  if (form != "dfa" & "rotate" %in% names(extras)) {
+    if (rotate) stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
+  }
+
+  if (type == "parameters") {
+    ests <- coef(x, type = "vector")
+    if (length(ests) == 0) stop("tidy.marssMLE: No estimated parameters in your fitted model.\n", call. = FALSE)
+    if (form == "dfa" && rotate && length(x[["par"]][["Z"]]) != 0) {
+      stop("tidy.marssMLE: You are requesting the parameters for a DFA \n and requested that the Z matrix be rotated. You need to do the rotation yourself.  See ?tidy.marssMLE for the code.\n", call. = FALSE)
+    } else {
+      ret <- data.frame(
         term = names(ests),
         estimate = ests
       )
-      if( conf.int ){
-        if(rerun.MARSSparamCIs) x = MARSSparamCIs(x, alpha=alpha, ...)
-        ret = cbind(ret, 
-                    std.error = coef(x, type="vector", what="par.se"),
-                    conf.low = coef(x, type="vector", what="par.lowCI"),
-                    conf.high = coef(x, type="vector", what="par.upCI")
+      if (conf.int) {
+        if (rerun.MARSSparamCIs) x <- MARSSparamCIs(x, alpha = alpha, ...)
+        ret <- cbind(ret,
+          std.error = coef(x, type = "vector", what = "par.se"),
+          conf.low = coef(x, type = "vector", what = "par.lowCI"),
+          conf.high = coef(x, type = "vector", what = "par.upCI")
         )
       }
     }
-    rownames(ret)=NULL
+    rownames(ret) <- NULL
   }
-  if(type=="x"){
-    xtype <- paste0(type,conditioning)
+  if (type == "x") {
+    xtype <- paste0(type, conditioning)
     model <- x[["model"]]
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
@@ -74,74 +74,78 @@ tidy.marssMLE = function (x,  type = c("parameters", "states", "observations", "
     TT <- state.dims[2]
     kfss <- MARSSkfss(x)
     states <- kfss[[xtype]]
-    vtype <- str_replace(xtype,"x","V")
-    states.se <- apply(kfss[[vtype]],3,function(x){takediag(x)})
-    states.se[states.se<0] <- NA
+    vtype <- str_replace(xtype, "x", "V")
+    states.se <- apply(kfss[[vtype]], 3, function(x) {
+      takediag(x)
+    })
+    states.se[states.se < 0] <- NA
     states.se <- sqrt(states.se)
-    if(mm==1) states.se <- matrix(states.se,1,TT)
+    if (mm == 1) states.se <- matrix(states.se, 1, TT)
 
-    #if user specified rotate
-    if(form=="dfa" && rotate && length(x[["par"]][["Z"]])!=0){
-      Z.est <- coef(x, type="matrix")[["Z"]]
+    # if user specified rotate
+    if (form == "dfa" && rotate && length(x[["par"]][["Z"]]) != 0) {
+      Z.est <- coef(x, type = "matrix")[["Z"]]
       H <- 1
-      if(ncol(Z.est)>1){
+      if (ncol(Z.est) > 1) {
         H <- solve(varimax(Z.est)[["rotmat"]])
-        states <- H %*% states #rotated states
+        states <- H %*% states # rotated states
         states.var <- kfss[[vtype]]
-        for(t in 1:TT){
-          states.se[,t] = sqrt(takediag(H%*%states.var[,,t]%*%t(H)))
+        for (t in 1:TT) {
+          states.se[, t] <- sqrt(takediag(H %*% states.var[, , t] %*% t(H)))
         }
       }
     }
     ret <- data.frame(
-      .rownames=rep(state.names,each=TT), 
-      t=rep(1:TT,mm), 
+      .rownames = rep(state.names, each = TT),
+      t = rep(1:TT, mm),
       estimate = vec(t(states)),
       std.error = vec(t(states.se))
     )
-    if( conf.int ){
-      conf.low <- qnorm(alpha/2)*ret$std.error + ret$estimate
-      conf.up <- qnorm(1-alpha/2)*ret$std.error + ret$estimate
-      ret <- cbind(ret, 
-                  conf.low = conf.low,
-                  conf.high = conf.up
+    if (conf.int) {
+      conf.low <- qnorm(alpha / 2) * ret$std.error + ret$estimate
+      conf.up <- qnorm(1 - alpha / 2) * ret$std.error + ret$estimate
+      ret <- cbind(ret,
+        conf.low = conf.low,
+        conf.high = conf.up
       )
     }
-    rownames(ret)=NULL
+    rownames(ret) <- NULL
   }
-  if(type=="y"){
-    ytype <- paste0(type,conditioning)
-    model=x[["model"]]
-    Y.names = attr(model, "Y.names")
-    Y.dims = attr(model, "model.dims")[["y"]]
-    nn = Y.dims[1]
-    TT = Y.dims[2]
+  if (type == "y") {
+    ytype <- paste0(type, conditioning)
+    model <- x[["model"]]
+    Y.names <- attr(model, "Y.names")
+    Y.dims <- attr(model, "model.dims")[["y"]]
+    nn <- Y.dims[1]
+    TT <- Y.dims[2]
     hatyt <- MARSShatyt(x)
     Ey <- hatyt[[ytype]]
-    vtype <- str_replace(ytype,"y","O")
+    vtype <- str_replace(ytype, "y", "O")
     Ey.var <- hatyt[[vtype]]
-    for(t in 1:TT) Ey.var[,,t] <- Ey.var[,,t] - tcrossprod(Ey[,t])
-    Ey.se <- apply(Ey.var,3,function(x){takediag(x)})
-    Ey.se[Ey.se<0] <- NA
+    for (t in 1:TT) Ey.var[, , t] <- Ey.var[, , t] - tcrossprod(Ey[, t])
+    Ey.se <- apply(Ey.var, 3, function(x) {
+      takediag(x)
+    })
+    Ey.se[Ey.se < 0] <- NA
     Ey.se <- sqrt(Ey.se)
-    if(nn==1) Ey.se <- matrix(Ey.se,1,TT)
+    if (nn == 1) Ey.se <- matrix(Ey.se, 1, TT)
 
-    ret = data.frame(
-      .rownames=rep(Y.names,each=TT), 
-      t=rep(1:TT,nn), 
+    ret <- data.frame(
+      .rownames = rep(Y.names, each = TT),
+      t = rep(1:TT, nn),
       y = vec(t(x[["model"]][["data"]])),
       estimate = vec(t(Ey)),
       std.error = vec(t(Ey.se))
     )
-    if( conf.int ){
-      conf.low = qnorm(alpha/2)*ret$std.error + ret$estimate
-      conf.up = qnorm(1-alpha/2)*ret$std.error + ret$estimate
-      ret = cbind(ret, 
-                  conf.low = conf.low,
-                  conf.high = conf.up
+    if (conf.int) {
+      conf.low <- qnorm(alpha / 2) * ret$std.error + ret$estimate
+      conf.up <- qnorm(1 - alpha / 2) * ret$std.error + ret$estimate
+      ret <- cbind(ret,
+        conf.low = conf.low,
+        conf.high = conf.up
       )
     }
-    rownames(ret)=NULL
+    rownames(ret) <- NULL
   }
   ret
 }

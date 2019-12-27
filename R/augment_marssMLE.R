@@ -2,7 +2,7 @@
 #  augment method for class marssMLE
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the base function is augment_marxss below
-#  augment_dfa uses the optional rotate argument
+#  augment_dfa is just augment_marxss
 ##############################################################################################################################################
 augment.marssMLE <- function(x, type = c("observations", "states", "y", "x"),
                              interval = c("none", "confidence"),
@@ -11,20 +11,22 @@ augment.marssMLE <- function(x, type = c("observations", "states", "y", "x"),
                              form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
-  if(type=="y") type="observations"
-  if(type=="x") type="states"
+  if (type == "y") type <- "observations"
+  if (type == "x") type <- "states"
   interval <- match.arg(interval)
   conditioning <- match.arg(conditioning)
-  if(conditioning!="T")
+  if (conditioning != "T") {
     stop("augment.marssMLE: Only conditioning='T' allowed currently.", call. = FALSE)
-  if (!is.numeric(conf.level) || length(conf.level)!=1 || conf.level > 1 || conf.level < 0) 
+  }
+  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
     stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+  }
   ## End argument checking
 
   augment.fun <- paste("augment_", form, sep = "")
   tmp <- try(exists(augment.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(augment.fun, x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning ))
+    ret <- eval(call(augment.fun, x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning))
   } else {
     ret <- paste("No augment_", form[1], " is available.\n", sep = "")
   }

@@ -1,6 +1,6 @@
-MARSSinfo = function(number){
-  if(missing(number)){
-cat("Pass in a single label (in quotes) to get info on a MARSS error or warning message.
+MARSSinfo <- function(number) {
+  if (missing(number)) {
+    cat("Pass in a single label (in quotes) to get info on a MARSS error or warning message.
      convergence: Non-convergence warnings
      denominv: An error related to denom not invertible
      degenvarcov: Warnings about degenerate variance-covariance matrices or variance going to 0
@@ -20,59 +20,60 @@ cat("Pass in a single label (in quotes) to get info on a MARSS error or warning 
      V0init: MARSS complains about init values for V0.
      AZR0: MARSS complains that Z or A and D must be fixed for R rows with 0s on diagonal.
 ")
-return(invisible(""))
-}
-if(number=="V0init"){
-writeLines(strwrap(
-"In a variance-covariance matrix, you cannot have 0s on the diagonal. When you pass in a qxq variance-covariance matrix (Q,R or V0) with a 0 on the diagonal, MARSS rewrites this into H%*%V.  V is a pxp variance-covariance matrix made from only the non-zero row/cols in your variance-covariance matrix and H is a q x p matrix with all zero rows corresponding to the 0 diagonals in the variance-covariance matrix that you passed in. By setting, the start  variance to 0, you have forced a 0 on the diagonal of a variance-covariance matrix and that will break the EM algorithm (the BFGS algorithm will probably work since it uses start in a different way). This is probably just an accident in how you specified your start values for your variance-covariance matrices. Check the start values and compare to the model$free values.  If you did not pass in start, then MARSS's function for generating reasonable start values does not work for your model.  So just pass in your own start values for the variances. Note, matrices with a second dim equal to 0 are fine in test$start (and test$par). It just means the parameter is fixed (not estimated).
+    return(invisible(""))
+  }
+  if (number == "V0init") {
+    writeLines(strwrap(
+      "In a variance-covariance matrix, you cannot have 0s on the diagonal. When you pass in a qxq variance-covariance matrix (Q,R or V0) with a 0 on the diagonal, MARSS rewrites this into H%*%V.  V is a pxp variance-covariance matrix made from only the non-zero row/cols in your variance-covariance matrix and H is a q x p matrix with all zero rows corresponding to the 0 diagonals in the variance-covariance matrix that you passed in. By setting, the start  variance to 0, you have forced a 0 on the diagonal of a variance-covariance matrix and that will break the EM algorithm (the BFGS algorithm will probably work since it uses start in a different way). This is probably just an accident in how you specified your start values for your variance-covariance matrices. Check the start values and compare to the model$free values.  If you did not pass in start, then MARSS's function for generating reasonable start values does not work for your model.  So just pass in your own start values for the variances. Note, matrices with a second dim equal to 0 are fine in test$start (and test$par). It just means the parameter is fixed (not estimated).
 \n"
-))
-  return(invisible(number))
-}
+    ))
+    return(invisible(number))
+  }
 
-if(number=="is.marssMLE"){
-writeLines(strwrap(
-"If you got an error from is.marssMLE related to your model, then the first thing to do is look at the list that you passed into the model argument.  Often that will reveal the problem.  If not, then look at your data and make sure it is a nxT matrix (and not a Txn) and doesn't have any weird values in it.  If the problem is still not clearyou need to look at the model that MARSS thinks you are trying to fit.
+  if (number == "is.marssMLE") {
+    writeLines(strwrap(
+      "If you got an error from is.marssMLE related to your model, then the first thing to do is look at the list that you passed into the model argument.  Often that will reveal the problem.  If not, then look at your data and make sure it is a nxT matrix (and not a Txn) and doesn't have any weird values in it.  If the problem is still not clearyou need to look at the model that MARSS thinks you are trying to fit.
 
 If you used test=MARSS(foo), then test is the MLE object.  If the function exited without giving you the MLE object, try test=MARSS(...,fit=FALSE) to get it.  Type summary(test$model) to see a print out of the model.  If your model is time-varying, this will be very verbose so you'll want to divert the output to a file.  Then try this test$par=test$start, now you have filled in the par element of the MLE object. Try parmat(test,t=1) to see all the parameters at t=1 using the start as the par values.  This might reveal the problem too.  Note, matrices with a second dim equal to 0 are fine in test$start (and test$par). It just means the parameter is fixed (not estimated).
 \n"
-))
-  return(invisible(number))
-}
+    ))
+    return(invisible(number))
+  }
 
-if(number=="denominv"){
-writeLines(strwrap(
-"This is telling you that you specified a model that is logically indeterminant. First check your data and covariates (if you have them).  Make sure you didn't make a mistake when entering the data.  For example, a row of data that is all NAs or two rows of c or dthat are the same.  Then look at your model by passing in fit=FALSE to the MARSS() call.  Are you trying to estimate B butyou set Q to zero?  That won't work.  
+  if (number == "denominv") {
+    writeLines(strwrap(
+      "This is telling you that you specified a model that is logically indeterminant. First check your data and covariates (if you have them).  Make sure you didn't make a mistake when entering the data.  For example, a row of data that is all NAs or two rows of c or dthat are the same.  Then look at your model by passing in fit=FALSE to the MARSS() call.  Are you trying to estimate B butyou set Q to zero?  That won't work.  
 
 Note if you are estimating D, your error will report problems in A update. If you are estimating C, your error will report problems in U update.  This is because in the MARSS algorithms, the models with D and C are rewritten into a simpler MARSS model with time-varying A and U. If you have set R=0, you might get this error if you are trying to estimate A (or D).
 
 Did you set a VO (say, diagonal), that is inconsisent with V0T (the covariance matrix implied by the model)?  That can cause problems with the Q update.  Are you estimating C or D, but have rows of c or d that are all zero?  That won't work.  Are you estimating C or D with only one column (one time point) of c or d? Depending on your constraints in C or D that might not work.
 \n"
-))
-  return(invisible(number))
-}
+    ))
+    return(invisible(number))
+  }
 
-if(number=="convergence"){
-writeLines(strwrap(
-"MARSS tests both the convergence of the log-likelihood and of the individual parameters.  If you just want the log-likelihood, say for model selection, and don't care too much about the parameter values, then you will be concerned mainly that the log-likelihood has converged.  Set abstol to something fairly small like 0.0001  (in your MARSS call pass in control=list(abstol=0.0001) ).  Then see if a warning about logLik being converged shows up.  If it doesn't, then you are probably fine.  The parameters are not at the MLE, but the log-likelihood has converged.  This indicates ridges or flat spots in the likelihood.
+  if (number == "convergence") {
+    writeLines(strwrap(
+      "MARSS tests both the convergence of the log-likelihood and of the individual parameters.  If you just want the log-likelihood, say for model selection, and don't care too much about the parameter values, then you will be concerned mainly that the log-likelihood has converged.  Set abstol to something fairly small like 0.0001  (in your MARSS call pass in control=list(abstol=0.0001) ).  Then see if a warning about logLik being converged shows up.  If it doesn't, then you are probably fine.  The parameters are not at the MLE, but the log-likelihood has converged.  This indicates ridges or flat spots in the likelihood.
 
 If you are concerned about getting the MLEs for the parameters and they are showing up as not converged, then you'll need to run the algorithm longer (in your MARSS call pass in control=list(maxit=10000) ). But first think hard about whether you have created a model with ridges and flat spots in the likelihood.  
 
 Do you have parameters that can create essentially the same pattern in the data?  Then you may have created a model where the parameters are confounded.  Are you trying to fit a model that cannot fit the data?  That often causes problems.  It's easy to create a MARSS model that is logically inconsistent with your data.  Are you trying to estimate both B and U? That is often problematic.  Try demeaning  your data and setting U to zero.  Are you trying to estimate B and you set tinitx=0? tinit=0 is the default, so it is set to this if you did not pass in tinitx in the model list. You should set tinitx=1 when you are trying to estimate B.
-\n"))
-  return(invisible(number))
-}
+\n"
+    ))
+    return(invisible(number))
+  }
 
-if(number=="degenvarcov"){
-writeLines(strwrap(
-"This is not an error but rather an fyi.  Q or R is getting very small.  Because control$allow.degen=TRUE, the code is trying to set Q or R to 0, but in fact, the MLE Q or R is not 0 so setting to 0 is being blocked (correctly).  The code is warning you about this because when Q or R gets really small, you can have numerical problems in the algorithm.  Have you standardized the variances in your data and covariates (explanatory variables)?  In some types of models, that kind of mismatch can drive Q or R towards 0.  This is correct behavior, but you may want to standardize your data so that the variability is on similar scales.\n"
-))
-  return(invisible(number))
-}
-  
-if(number=="x0R0"){
-writeLines(strwrap(
-"Short explanation: This is a constraint imposed by the EM algorithm.  What's happening is that x0 cannot be solved for because the 0s on the diagonal of R are causing it to disappear from the likelihood.  
+  if (number == "degenvarcov") {
+    writeLines(strwrap(
+      "This is not an error but rather an fyi.  Q or R is getting very small.  Because control$allow.degen=TRUE, the code is trying to set Q or R to 0, but in fact, the MLE Q or R is not 0 so setting to 0 is being blocked (correctly).  The code is warning you about this because when Q or R gets really small, you can have numerical problems in the algorithm.  Have you standardized the variances in your data and covariates (explanatory variables)?  In some types of models, that kind of mismatch can drive Q or R towards 0.  This is correct behavior, but you may want to standardize your data so that the variability is on similar scales.\n"
+    ))
+    return(invisible(number))
+  }
+
+  if (number == "x0R0") {
+    writeLines(strwrap(
+      "Short explanation: This is a constraint imposed by the EM algorithm.  What's happening is that x0 cannot be solved for because the 0s on the diagonal of R are causing it to disappear from the likelihood.  
 
 Most likely you have set tinitx=1 and your model now has Y_1 = Z x_1. Depending on Z that might not be solvable for x_1.  If you haven't set R to 0, then pass in allow.degen=FALSE.  That will stop R being set to 0.  If you did set R to zero, then try setting tinitx=0 if that makes sense for your model.  You can also try putting a diffuse prior on x0, IF you know the implied covariance structure of x0.  However, if you know that, then setting tinitx=0 is likely ok.
 
@@ -92,76 +93,80 @@ Note if you do something like that, make sure that it is reasonable to assume th
 
 Note that these problems occur due to R = 0 (because you set it there or the algorithm is going to R = 0 because that is the MLE). Problems with estimating x00 (tinitx=0, V0=\"zero\") or x10 (tinitx=1, V0=\"zero\") are much less likely to occur when R != 0.
 \n"
-))
-  return(invisible(number))
-}
-  
-if(number=="ts"){
-writeLines(strwrap(
-"Time series objects have the frequency information embedded (quarter, month, season, etc).  There are many ways to model quarter, month, season, etc effects and MARSS() will not guess how you want to model these---there are many, many different places in the model that seasonal effects might enter.  You need to pass in the data as a matrix with time going across the columns (e.g. by using t(as.data.frame.ts(y)) ).  If you want to model quarter, month, etc effects, you need to use these as covariates in your model.  You can get the frequency information as a matrix as with the command t(as.data.frame.ts(stats:::cycle.ts(y))). Once you have the frequency information (now coded numeric by the previous command), you can use that in your model to include seasonal effect.  The  are many different ways in which seasonal effects can modeled (in the x, in the y, in different parameters, etc., etc.).
+    ))
+    return(invisible(number))
+  }
+
+  if (number == "ts") {
+    writeLines(strwrap(
+      "Time series objects have the frequency information embedded (quarter, month, season, etc).  There are many ways to model quarter, month, season, etc effects and MARSS() will not guess how you want to model these---there are many, many different places in the model that seasonal effects might enter.  You need to pass in the data as a matrix with time going across the columns (e.g. by using t(as.data.frame.ts(y)) ).  If you want to model quarter, month, etc effects, you need to use these as covariates in your model.  You can get the frequency information as a matrix as with the command t(as.data.frame.ts(stats:::cycle.ts(y))). Once you have the frequency information (now coded numeric by the previous command), you can use that in your model to include seasonal effect.  The  are many different ways in which seasonal effects can modeled (in the x, in the y, in different parameters, etc., etc.).
 
 You need to decide how to model them and how to write the model matrices to achieve that.
 \n"
-))
-  return(invisible(number))
-}
+    ))
+    return(invisible(number))
+  }
 
-if(number=="LLdropped"){
-writeLines(strwrap(
-"The EM algorithm is generally quite robust but it requires inverting the variance-covariance matrices and when those inverses become numerically unstable, the log-likelihood can drop.  The first thing to try however is to set safe=TRUE in the control list.  This tells MARSS to run the Kalman smoother after each parameter update.  This slows things down, but is a more robust algorithm.  The default is to only run the smoother after all parameters are updated.  If that fails, set maxit (in control) to something smaller than when the LL dropping warning starts and see what is happening to Q and R.  Which one is becoming hard to invert? 
+  if (number == "LLdropped") {
+    writeLines(strwrap(
+      "The EM algorithm is generally quite robust but it requires inverting the variance-covariance matrices and when those inverses become numerically unstable, the log-likelihood can drop.  The first thing to try however is to set safe=TRUE in the control list.  This tells MARSS to run the Kalman smoother after each parameter update.  This slows things down, but is a more robust algorithm.  The default is to only run the smoother after all parameters are updated.  If that fails, set maxit (in control) to something smaller than when the LL dropping warning starts and see what is happening to Q and R.  Which one is becoming hard to invert? 
 
 Think long and hard about why this is happening.  Very likely, something about the way you set up the problem is logically forcing this to happen. It may be that you are trying to fit a model that is mathematically inconsistent with your data. 
 * Are you fitting a mean-reverting model but the mean implied by the model is different than the mean of the data? That won't work.
 * Are you trying to fit a MARSS model, a random walk where w(t) and v(t) errors are drawn from a multivariate normal, to binned data where you have multiple time steps at one bin level? Like this, 1,1,1,1,2,2,2,10,10,10,1,1,1,.  That's not remotely a multivariate random-walk through time.  The binning is not so much the problem.  It's the strings of 1's and 2's in a row that are the problem.  For that kind of binned data, you need some kind of thresholding observation model.
 * If your are fitting models with R=0 or some of the diagonals of R=0, then the EM algorithm can really struggle.  Try BFGS.  If you are fitting AR-p models with R!=0 and rewritten as a MARSS model, then try using a vague prior on x0.  Set x0=matrix(0,1,m) (or some other appropriate fixed value instead of 0.) and V0=diag(1,m), where m=number of x's.  That can make it easier to estimate these AR-p with error models.
 * Lastly, try using fun.kf='MARSSkfss' in the MARSS() call.  The tells MARSS() to use the classic Kalman filter/smoother function rather than Koopman and Durbin's filter/smoother as implemented in the KFAS package.  Normally, the Koopman and Durbin's filter/smoother is more robust but maybe there is something about your problem that makes the traditional filter/smoother more robust. Note, they normally give identical answers so it would be quite odd to have them different."
-            ))
-  return(invisible(number))
-}
+    ))
+    return(invisible(number))
+  }
 
-if(number=="kferrors"){
-writeLines(strwrap(
-"This means the Kalman filter/smoother algorithm became unstable and most likely one of the variances became ill-conditioned.  When that happens the of those matrices are poor, and you will start to get negative values on the diagonals of your variance-covariance matrices.  Once that happens, the inverse of that var-covariance matrix produces an error.  If you get this error, turn on tracing with control$trace=1. This will store the error messages so you can see what is going on.  It may be that you have specified the model in such a way that some of the variances are being forced very close to 0, which makes the var-covariance matrix ill-conditioned. The output from the MARSS call will be the parameter values just before the error occurred.\n"
-))
-return(invisible(number))
-}
+  if (number == "kferrors") {
+    writeLines(strwrap(
+      "This means the Kalman filter/smoother algorithm became unstable and most likely one of the variances became ill-conditioned.  When that happens the of those matrices are poor, and you will start to get negative values on the diagonals of your variance-covariance matrices.  Once that happens, the inverse of that var-covariance matrix produces an error.  If you get this error, turn on tracing with control$trace=1. This will store the error messages so you can see what is going on.  It may be that you have specified the model in such a way that some of the variances are being forced very close to 0, which makes the var-covariance matrix ill-conditioned. The output from the MARSS call will be the parameter values just before the error occurred.\n"
+    ))
+    return(invisible(number))
+  }
 
 
-if(number=="LLunstable"){
-writeLines(strwrap(
-"This means, generally, that V0 is very small, say 0, and R is very small and very close to zero.
-\n"))
-  return(invisible(number))
-}
+  if (number == "LLunstable") {
+    writeLines(strwrap(
+      "This means, generally, that V0 is very small, say 0, and R is very small and very close to zero.
+\n"
+    ))
+    return(invisible(number))
+  }
 
-  if(number==10)
+  if (number == 10) {
     writeLines(
-"Note, this warning is often associated with warnings about the log-likelihood dropping.  The log-likelihood is entering an unstable area, likely a region where it is going steeply to infinity (correctly, probably).
+      "Note, this warning is often associated with warnings about the log-likelihood dropping.  The log-likelihood is entering an unstable area, likely a region where it is going steeply to infinity (correctly, probably).
 
 The EM algorithm is generally quite robust but it requires inverting the variance-covariance matrices and when those inverses inverses become numerically unstable, the log-likelihood can drop.  The first thing to try however is to set safe=TRUE in the control list.  This tells MARSS to run the Kalman smoother after each parameter update.  This slows things down, but is a more robust algorithm.  The default is to only run the smoother after all parameters are updated.  If that fails, set maxit (in control) to something smaller than when the LL dropping warning starts and see what is happening to Q and R.  Which one is becoming hard to invert? Think about why this is happening.  Very likely, something about the way you set up the problem is logically forcing this to happen.
 
 It may be that you are trying to fit a model that is mathematically inconsistent with your data. Are you fitting a mean-reverting model but the mean implied by the model is different than the mean of the data? That won't work.  Are you trying to fit a MARSS model, which w(t) and v(t) errors are a random-walk in time and drawn from a multivariate normal, to binned data where you have multiple time steps at one bin level? Like this, 1,1,1,1,2,2,2,10,10,10,1,1,1,.  That's not remotely random-walk through time.  The binning is not so much the problem.  It's the strings of 1's and 2's in a row that are the problem.  For that kind of binned data, you need some kind of thresholding observation model.
 
 If your are fitting models with R=0 or some of the diagonals of R=0, then EM can really struggle.  Try BFGS.  If you are fitting AR-p models with R!=0 and rewritten as a MARSS model, then try using a vague prior on x0.  Set x0=matrix(0,1,m) (or some other appropriate fixed value instead of 0.) and V0=diag(1,m), where m=number of x's.  That can make it easier to estimate these AR-p with error models.
-")
+"
+    )
+  }
 
-if(number=="slowconvergence"){
-writeLines(strwrap(
-"First thing to do is set silent=2, so you see where MARSS() is taking a long time.  This will give you an idea of how long each EM iteration is taking so you can estimate how long it will take to get to a certain number of iterations.  
+  if (number == "slowconvergence") {
+    writeLines(strwrap(
+      "First thing to do is set silent=2, so you see where MARSS() is taking a long time.  This will give you an idea of how long each EM iteration is taking so you can estimate how long it will take to get to a certain number of iterations.  
 
 When we get a comment about why the algorithm takes 10,000 iterations to converge, usually the user is either doing Dynamic Factor Analysis or they are estimating many variances and they set allow.degen=FALSE.  We'll talk about those two cases.
 
 Dynamic Factor Analysis (DFA): Why does this take so long?  By its nature DFA is often a difficult estimation problem because there are two almost equivalent solutions.  The model has a component that looks like this y=z*trend. This is equivalent to y=(z/a)*(a*trend).  That is there exist an an infinite number of trends (a*trend) that will give you the same answer.  However, the likelihood of the (a*trend)'s are not the same since we have a model for the trends---a random walk with variance = 1.  That's pretty flat though for a range of a.  When we have a fairly flat 2D likelihood surface---in this case (z/a)*(a*trend)---EM algorithms take a long time to converge.
 
 Variances going to zero: If you set allow.degen=FALSE, and one of your variances is going to zero then its log is going to negative infinitity and it will take infinite number of iterations to get there (but MARSS() will complain about numerical instability before that).  The log-log convergence test in MARSS is checking for convergence of the log of all the parameters, and clearly the variance going to 0 will not pass this test.  However, actually if you looked at your log-likelihood plot, you would see that it actually has converged. So, you want to 'turn off' the convergence test for the parameters and use only the abstol test---which tests if the log-likelihood increased by less than  than some tolerance between iterations.  To do this, pass in a large value for the slope of the log-log convergence test.  Pass this into your MARSS call: control=list(conv.test.slope.tol=1000).
-"))
-  return(invisible(number))
-}
+"
+    ))
+    return(invisible(number))
+  }
 
 
-if(number=="modelobject"){
+  if (number == "modelobject") {
     writeLines(
-'Version 3.7 uses model object with attributes while versions 3.4 and earlier did not.  In order, to view 3.4 model fits with MARSS version 3.5+, you need to add on the attributes.  Here is some code to do that.
+      'Version 3.7 uses model object with attributes while versions 3.4 and earlier did not.  In order, to view 3.4 model fits with MARSS version 3.5+, you need to add on the attributes.  Here is some code to do that.
               
 # x is a pre 3.5 marssMLE object from a MARSS call.  x=MARSS(....)
 x$marss=x$model
@@ -188,49 +193,52 @@ attr(x$model,"X.names") <- x$marss$X.names
               
 #now this should work
 coef(x, type="matrix")
-')
-  return(invisible(number))
-}
+'
+    )
+    return(invisible(number))
+  }
 
 
-if(number=="R0blocked"){
-  writeLines(strwrap(
-'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting one of the R diagonals to 0 introduces constraints on what x0 values can be estimated. If setting an R diagonal to 0 would lead to x0 being unidentifable, then setting the diagonal to 0 is blocked. 
+  if (number == "R0blocked") {
+    writeLines(strwrap(
+      'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting one of the R diagonals to 0 introduces constraints on what x0 values can be estimated. If setting an R diagonal to 0 would lead to x0 being unidentifable, then setting the diagonal to 0 is blocked. 
 
 Thus this is not an error but rather an alert, often annoying. You can stop the annoying warning messages by passing in control(allow.degen=FALSE). However, the EM algorithm will slow down dramatically as the R diagonals shrink to 0 because the step size in the alrogithm is affected by the R variance terms, which are now close to 0.
 
 You should evaluate why the R diagonals are going to 0. Often there is a structural or logical problem between your model and data.  For example, you have specified a model which is logially inconsistent with your data, like a stationary model with mean 0 trying to be fit to non-stationary data with non-zero mean.
 
 See also the info under MARSSinfo("x0R0").
-'))
-  return(invisible(number))
-}
+'
+    ))
+    return(invisible(number))
+  }
 
-if(number=="diag0blocked"){
+  if (number == "diag0blocked") {
     writeLines(strwrap(
-'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting diagonals to 0 changes the model and the likelihood of a model with the diagonal very close to 0 is not necessarily the same as one with the diagonal equal to 0. If setting a diagonal to 0 would lead to the likelihood dropping (you want it to increase), then setting the diagonal to 0 is blocked. 
+      'The default setting in the control list is allow.degen=TRUE.  See ?MARSS and scroll down to the part about the control options. This monitors if the diagonals of R or Q are going to 0 and will set them to 0 if this improves the model. However setting diagonals to 0 changes the model and the likelihood of a model with the diagonal very close to 0 is not necessarily the same as one with the diagonal equal to 0. If setting a diagonal to 0 would lead to the likelihood dropping (you want it to increase), then setting the diagonal to 0 is blocked. 
       
 Thus this is not an error but rather an alert. You can stop the annoying warning messages by passing in control(allow.degen=FALSE). However, the EM algorithm will slow down dramatically as the diagonals shrink to 0 because the step size in the alrogithm is affected by the variance terms, which are now close to 0.
       
 You should aways evaluate why variance terms are going to 0. This may be perfectly fine, meaning that this degenerate model with some variance terms equal to 0 has the highest likelihood. But often it indicates that there is a structural or logical problem between your model and data.  For example, you have specified a model which is logially inconsistent with your data, like a stationary model with mean 0 trying to be fit to non-stationary data with non-zero mean.
       
 See also the info under MARSSinfo("x0R0") and MARSSinfo("R0blocked").
-'))
-  return(invisible(number))
-}
-
-  
-if(number=="residvarinv"){
-writeLines(strwrap(
-"The computation of the standardized residuals requires taking the Cholesky decomposition of the joint variance-covariance matrix of the observation and state residuals.  This is matrix is not invertible for some reason.  If you have missing data and a non-diagonal Q or R, try Harvey=FALSE (if you set Harvey=TRUE).  This will compute the exact joint variance-covariance matrix.  However, in some cases, the exact matrix is also not invertible.  This could occur is say Q is non-diagonal and all the data are missing in the last time-step.  When the matrix is not invertible, the standardized residuals for that time-step are set to NAs.\n"
-))
-  return(invisible(number))
-}
+'
+    ))
+    return(invisible(number))
+  }
 
 
-if(number=="varcovstruc"){
-  writeLines(strwrap(
-"The structure of variance-covariance matrices have many constraints. These constraints arise due to the nature of variance-covariance matrices and their estimation, not due to MARSS per se.
+  if (number == "residvarinv") {
+    writeLines(strwrap(
+      "The computation of the standardized residuals requires taking the Cholesky decomposition of the joint variance-covariance matrix of the observation and state residuals.  This is matrix is not invertible for some reason.  If you have missing data and a non-diagonal Q or R, try Harvey=FALSE (if you set Harvey=TRUE).  This will compute the exact joint variance-covariance matrix.  However, in some cases, the exact matrix is also not invertible.  This could occur is say Q is non-diagonal and all the data are missing in the last time-step.  When the matrix is not invertible, the standardized residuals for that time-step are set to NAs.\n"
+    ))
+    return(invisible(number))
+  }
+
+
+  if (number == "varcovstruc") {
+    writeLines(strwrap(
+      "The structure of variance-covariance matrices have many constraints. These constraints arise due to the nature of variance-covariance matrices and their estimation, not due to MARSS per se.
 * They must be symmetric.
 * If numeric (meaning no estimated values), they must be positive definite. 
 * You cannot fix the covariances and estimate the variances; or vis-a-versa.  
@@ -243,13 +251,14 @@ There are many constraints on shared values.
 * If there are blocks within the matrix (so it is a block diagonal matrix), there can be no shared values across blocks unless the blocks are identical.
 
 If you set method=BFGS, however, there are extra constraints. In this case, the code requires that the matrices be diagonal, unconstrained, or equalvarcov.  This is due to the fact that the code uses a Cholesky decomposition to ensure that the matrices stay positive definite during the estimation iterations.
-"))
-  return(invisible(number))
-}
+"
+    ))
+    return(invisible(number))
+  }
 
-if(number=="HessianNA"){
+  if (number == "HessianNA") {
     writeLines(strwrap(
-"The variance-covariance matrix can be estimated (large sample estimator) from the inverse of the Hessian of the log-likelihood function at the MLE parameter values.  The Hessian is the second partial derivative of a matrix function. The Hessian of the log-likelihood function at the MLEs is the observed Fisher information. The observed Fisher information is an estimator of large-sample variance-covariance matrix of the estimated parameters.  
+      "The variance-covariance matrix can be estimated (large sample estimator) from the inverse of the Hessian of the log-likelihood function at the MLE parameter values.  The Hessian is the second partial derivative of a matrix function. The Hessian of the log-likelihood function at the MLEs is the observed Fisher information. The observed Fisher information is an estimator of large-sample variance-covariance matrix of the estimated parameters.  
 
 The MARSS package provides 3 ways to compute the Hessian: 
 1. The recursive algorithm by Harvey (1989)
@@ -259,14 +268,15 @@ The MARSS package provides 3 ways to compute the Hessian:
 The calculation of the Hessian associated with the variance terms (Q & R) is prone to numerical errors. When this happens, an NA is put on the diagonal of the Hessian for that parameter value. No standard errors or CIs can be computed for that value.
 
 A Hessian with many NAs is probably a sign that you have a poor model (meaning your model is not a good description of the data) or you do not have enough data given the complexity of your model.
-"))
-  return(invisible(number))
-}
+"
+    ))
+    return(invisible(number))
+  }
 
-  
-if(number=="AZR0"){
+
+  if (number == "AZR0") {
     writeLines(strwrap(
-'This is a constraint imposed by the EM algorithm.  What is happening is that the rows of Z, A or D matching 0s on the diagonal of R cannot be solved for because the 0s on the diagonal are causing those rows to disappear from the likelihood equation. You can still compute the likelihood, it is just that the EM algorithm needs the parameters in the equation because it differentiates with respect to them to solve for their updates.
+      'This is a constraint imposed by the EM algorithm.  What is happening is that the rows of Z, A or D matching 0s on the diagonal of R cannot be solved for because the 0s on the diagonal are causing those rows to disappear from the likelihood equation. You can still compute the likelihood, it is just that the EM algorithm needs the parameters in the equation because it differentiates with respect to them to solve for their updates.
       
 But I did not specify A at all. If you use the, default A of "scaling", you may be estimating some A. To see the form of your model, use fit <- MARSS(..., fit=FALSE) and then fit$model. 
 
@@ -275,15 +285,11 @@ What to do? This is not a bug. It is simply a constraint of the update equations
       Option 2) Set R to some fixed small value that is not 0. The EM algorithm can now run, albeit slowly.
       Option 3) This may seem counter-intuitive, but add i.i.d error to your data with a known variance. You can use rnorm(n,0,sqrt(r)) where n is the number of rows of data, just make sure to add different (independent) error to each row of data. Then pass in R=diag(r,n) in your model list to MARSS(). Do not set r too tiny. It needs to be big enough for the EM algorithm to update Z, A, and D but not too big to swamp out the signal. Try this if Options 1 and 2 do not work or compare all 3 options.
 '
-      ))
-  return(invisible(number))
+    ))
+    return(invisible(number))
+  }
+
+  writeLines(strwrap(
+    "You entered an invalid error code. Type MARSSinfo() to see the valid options."
+  ))
 }
-
-writeLines( strwrap(
-  'You entered an invalid error code. Type MARSSinfo() to see the valid options.'
-) )
-  
-
-
-}
-
