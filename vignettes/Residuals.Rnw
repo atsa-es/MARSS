@@ -252,7 +252,7 @@ Consider the second term in Equation \ref{varvvtgeneral}.  This term is
 \E_{Y^{(1)}}[\var[(\YY_t-\ZZ_t\E[\XX_t|\yy^{(1)}]-\aa_t)|\yy^{(1)}]]
 \end{equation}
 $\E[\XX_t|\yy^{(1)}]$ is a fixed value; it is not $\XX_t$ but its expected value. $\aa_t$ is also fixed. Thus the second term reduces to $\E_{Y^{(1)}}[\var[\YY|\yy^{(1)}]]=\E_{Y^{(1)}}[\hatUt]$.  
-$\hatUt$ is a variance and is not a function of $\yy^{(1)}}$. It is only a function of the MARSS parameters.  Thus the second term in Equation \ref{varvvtgeneral} is simply $\hatUt$.
+$\hatUt$ is a variance and is not a function of $\yy^{(1)}$. It is only a function of the MARSS parameters.  Thus the second term in Equation \ref{varvvtgeneral} is simply $\hatUt$.
 
 \subsubsection{Putting together the two terms}
 \begin{equation}
@@ -438,11 +438,10 @@ Start from $t=T$ and work backwards to $t=1$. At time $T$, $r_T=0_{1 \times m}$ 
 \QQ^*_{t+1}=\begin{bmatrix}\QQ_{t+1}&0_{m \times n}\end{bmatrix}, \mbox{    } \RR^*_t=\begin{bmatrix}0_{n \times m}&\RR_t^*\end{bmatrix}\\
 \FF_t = \ZZ_t^*\widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top+\RR_t^*\mbox{,   } K_t = \BB_{t+1}\KK_t = \BB_{t+1} \widetilde{\VV}_t^{t-1}{\ZZ_t^*}^\top \FF_t^{-1}  \\
 L_t = \BB_{t+1} - K_t\ZZ_t^*, \mbox{    } J_t= \QQ^*_{t+1} - K_t \RR^*_t, \mbox{    } u_t = \FF_t^{-1} \hat{\vv}_t - K_t^\top r_t\\
-r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t \\
-\mtext{repeat for }$t-1$
+r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t
 \end{gathered}
 \end{equation}
-Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2012}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
+These steps are then repeated for $t-1$ until $t=1$. Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2012}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
 
 The residuals \citep[eqn 24]{Harveyetal1998} are
 \begin{equation}\label{eqn:Harveyresiduals}
