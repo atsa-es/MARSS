@@ -5,10 +5,11 @@
 Computes the expected value of random variables involving Y for the EM algorithm.  Users can also use \code{print( MLEobj, what="Ey")} to access this output.  See \code{\link{print.marssMLE}}.
 }
 \usage{
-MARSShatyt( MLEobj )
+MARSShatyt( MLEobj, only.kem = TRUE )
 }
 \arguments{
   \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{model} element with the model description and data. }
+  \item{ only.kem }{ Return only ytT, OtT, yxtT, and yxttpT (values conditioned on the data from 1:T). If \code{only.kem=FALSE}, then also return values conditioned on data from 1 to t-1 (Ott1 and ytt1). yxt1T is also returned (E[y(t),x(t-1)|1:T]).}
   }
 \details{
 For state space models, \code{MARSShatyt()} computes the expectations involving Y.  If Y is completely observed, this entails simply replacing Y with the observed y.  When Y is only partially observed, the expectation involves the conditional expectation of a multivariate normal. 
@@ -39,7 +40,7 @@ Holmes, E. E. (2012) Derivation of the EM algorithm for constrained and unconstr
 }
 \examples{
 dat <- t(harborSeal)
-dat <- dat[2:nrow(dat), ]
+dat <- dat[2:3, ]
 MLEobj <- MARSS(dat)
 EyList <- MARSShatyt(MLEobj)
 }

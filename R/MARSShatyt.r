@@ -2,7 +2,7 @@
 #   MARSShatyt function
 #   Expectations involving hatyt
 #######################################################################################################
-MARSShatyt <- function(MLEobj) {
+MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   MODELobj <- MLEobj[["marss"]]
   if (!is.null(MLEobj[["kf"]])) {
     kfList <- MLEobj$kf
@@ -25,15 +25,17 @@ MARSShatyt <- function(MLEobj) {
   IIz$V0 <- makediag(as.numeric(takediag(parmat(MLEobj, "V0", t = 1)$V0) == 0), m)
   # bad notation; should be hatxtT
   hatxt <- kfList$xtT # 1:TT
-  hatxtt1 <- kfList$xtt1 # 1:TT
-  E.x0 <- (diag(1, m) - IIz$V0) %*% kfList$x0T + IIz$V0 %*% parmat(MLEobj, "x0", t = 1)$x0 # 0:T-1
-  hatxt1 <- cbind(E.x0, kfList$xtT[, 1:(TT - 1), drop = FALSE])
+  E.x0 <- (diag(1, m) - IIz$V0) %*% kfList$x0T + IIz$V0 %*% parmat(MLEobj, "x0", t = 1)$x0 
   hatxtp <- cbind(kfList$xtT[, 2:TT, drop = FALSE], NA)
   hatVt <- kfList$VtT
-  hatVtt1 <- kfList$Vtt1T
   hatVtpt <- array(NA, dim = dim(kfList$Vtt1T))
   hatVtpt[, , 1:(TT - 1)] <- kfList$Vtt1T[, , 2:TT, drop = FALSE]
-
+  if(!only.kem){
+    hatxtt1 <- kfList$xtt1
+    hatxt1 <- cbind(E.x0, kfList$xtT[, 1:(TT - 1), drop = FALSE])
+    hatVtt1 <- kfList$Vtt1T
+  } 
+  
   msg <- NULL
 
   # Construct needed identity matrices
@@ -61,10 +63,16 @@ MARSShatyt <- function(MLEobj) {
   # notation is horrible and leaves off the time conditioning.
   # In most, not all cases, it is 1:TT. If the last time is the conditioning, notation should be
   # hatyt = hatytT, hatyxt = hatytxtT, hatyxtt1=hatytxt1T, hatyxttp=hatytxtpT
-  # hatOt - hatOtT, hatOtt1=is ok,
-  hatyt <- hatytt1 <- matrix(0, n, TT)
-  hatOt <- hatOtt1 <- array(0, dim = c(n, n, TT))
-  hatyxt <- hatyxtt1 <- hatyxttp <- array(0, dim = c(n, m, TT))
+  # hatOt = hatOtT, hatOtt1=is ok,
+  hatyt <- matrix(0, n, TT)
+  hatOt <- array(0, dim = c(n, n, TT))
+  hatyxt <- hatyxttp <- array(0, dim = c(n, m, TT))
+  
+  if(!only.kem){
+    hatytt1 <- matrix(0, n, TT)
+    hatOtt1 <- array(0, dim = c(n, n, TT))
+    hatyxtt1 <- array(0, dim = c(n, m, TT))
+  }
 
   for (t in 1:TT) {
     for (elem in time.varying) {
@@ -76,20 +84,19 @@ MARSShatyt <- function(MLEobj) {
         # is.R.diagonal = isDiagonal(pari$R)
       }
     }
-    # For conditioning on data up to t-1, the data at time t do not factor in
-    hatytt1[, t] <- pari$Z %*% hatxtt1[, t, drop = FALSE] + pari$A
-    t.Z <- matrix(pari$Z, m, n, byrow = TRUE)
-    hatOtt1[, , t] <- pari$R + pari$Z %*% kfList[["Vtt1"]][, , t] %*% t.Z + tcrossprod(hatytt1[, t, drop = FALSE])
+    if(!only.kem){
+      # For conditioning on data up to t-1, the data at time t do not factor in
+      hatytt1[, t] <- pari$Z %*% hatxtt1[, t, drop = FALSE] + pari$A
+      t.Z <- matrix(pari$Z, m, n, byrow = TRUE)
+      hatOtt1[, , t] <- pari$R + pari$Z %*% kfList[["Vtt1"]][, , t] %*% t.Z + tcrossprod(hatytt1[, t, drop = FALSE])
+    }
 
     if (all(YM[, t] == 1)) { # none missing
       hatyt[, t] <- y[, t, drop = FALSE]
-      hatOt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE]) # matrix() is faster than t()
-      #     hatOt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n) #matrix() is faster than t()
+      hatOt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE])
       hatyxt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt[, t, drop = FALSE])
-      #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt[,t,drop=FALSE],1,m)
-      hatyxtt1[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE])
-      #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt1[,t,drop=FALSE],1,m)
       hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE])
+      if(!only.kem) hatyxtt1[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE])
     } else {
       I.2 <- I.r <- I.n
       I.2[YM[, t] == 1, ] <- 0 # 1 if YM=0 and 0 if YM=1
@@ -110,14 +117,16 @@ MARSShatyt <- function(MLEobj) {
       hatyt[, t] <- y[, t, drop = FALSE] - Delta.r %*% (y[, t, drop = FALSE] - pari$Z %*% hatxt[, t, drop = FALSE] - pari$A)
       t.DZ <- matrix(Delta.r %*% pari$Z, m, n, byrow = TRUE)
       hatOt[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2 + tcrossprod(hatyt[, t, drop = FALSE])
-      #      hatOt[,,t]=I.2%*%(Delta.r%*%pari$R+Delta.r%*%pari$Z%*%hatVt[,,t]%*%t.DZ)%*%I.2 + hatyt[,t,drop=FALSE]%*%matrix(hatyt[,t,drop=FALSE],1,n)
       hatyxt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVt[, , t]
-      #      hatyxt[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVt[,,t]
-      hatyxtt1[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVtt1[, , t]
-      #      hatyxtt1[,,t]=hatyt[,t,drop=FALSE]%*%matrix(hatxt1[,t,drop=FALSE],1,m)+Delta.r%*%pari$Z%*%hatVtt1[,,t]
       hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% t(hatVtpt[, , t])
+      
+      if(!only.kem) hatyxtt1[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVtt1[, , t]
     }
   } # for loop over time
-  rtn.list <- list(ytT = hatyt, OtT = hatOt, Ott1 = hatOtt1, yxtT = hatyxt, yxt1T = hatyxtt1, yxttpT = hatyxttp, ytt1 = hatytt1)
+  if(only.kem){
+    rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp)
+  }else{
+    rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxt1T = hatyxtt1)
+  }
   return(c(rtn.list, list(ok = TRUE, errors = msg)))
 }
