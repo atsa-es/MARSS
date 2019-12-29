@@ -118,7 +118,7 @@ tidy.marssMLE <- function(x, type = c("parameters", "states", "observations", "x
     Y.dims <- attr(model, "model.dims")[["y"]]
     nn <- Y.dims[1]
     TT <- Y.dims[2]
-    hatyt <- MARSShatyt(x)
+    hatyt <- MARSShatyt(x, only.kem=FALSE)
     Ey <- hatyt[[ytype]]
     vtype <- str_replace(ytype, "y", "O")
     Ey.var <- hatyt[[vtype]]
