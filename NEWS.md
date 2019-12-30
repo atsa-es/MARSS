@@ -26,7 +26,9 @@ ENHANCEMENTS
 * added plot of ytT to autoplot.marssMLE
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 * Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
+* Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
 * updated all code to tidyverse style
+* added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized.
 
 DOCUMENTATION and MAN FILES
 
