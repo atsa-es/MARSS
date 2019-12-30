@@ -119,11 +119,9 @@ Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and uncons
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
-# model allowing correlation between x states
-MLEobj <- MARSS(dat, model = list(Q = "unconstrained"))
+MLEobj <- MARSS(dat)
 
 library(broom)
-library(ggplot2)
 
 # A data frame of the estimated parameters
 tidy(MLEobj)
@@ -138,8 +136,7 @@ ggplot(data = d) +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of the estimates for the missing values
-# Use augment() to plot the fitted y(t)
-# i.e., to put a line through the points
+# Use augment() to plot the fitted y(t), i.e., to put a line through the points
 library(ggplot2)
 d <- tidy(MLEobj, type = "observations")
 ggplot(data = d) +
