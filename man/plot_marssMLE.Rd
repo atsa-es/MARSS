@@ -13,13 +13,15 @@
                        "state.residuals", "model.residuals.qqplot", 
                        "state.residuals.qqplot"), 
            form=c("marxss", "marss", "dfa"),
-           conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE,
+           plot.par = list(), ...)
   \method{autoplot}{marssMLE}(x, 
            plot.type=c("observations", "states", "model.residuals", 
                        "state.residuals", "model.residuals.qqplot", 
                        "state.residuals.qqplot", "expected.value.observations"),
            form=c("marxss", "marss", "dfa"),
-           conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE,
+           plot.par = list(), ...)
   }
   \arguments{
   \item{x}{ A marssMLE object.  }
@@ -28,6 +30,10 @@
   \item{conf.int}{ TRUE/FALSE. Whether to include a confidence interval. }
   \item{conf.level}{ Confidence level for CIs. }
   \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots. }
+  \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  The default is list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
+                    line.col = "black", line.size = 1, line.linetype = "solid",
+                    ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
+                    ci.linesize = 0, ci.alpha = 0.6). }
   \item{...}{ Other arguments, not used. }
   }
 \value{
