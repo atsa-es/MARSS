@@ -100,3 +100,7 @@ augment_dfa <- function(x, type, interval, conf.level, conditioning) {
 
   ret
 }
+
+augment_marss <- function(x, type, interval, conf.level, conditioning) {
+  return(augment_marxss(x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning))
+}
