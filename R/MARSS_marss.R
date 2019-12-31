@@ -696,6 +696,3 @@ is.marssMODEL_marss <- function(MODELobj, method = "kem") {
   }
 }
 
-augment_marss <- function(x, type, interval, conf.level, extra) {
-  return(augment_marxss(x, type = type, interval = interval, conf.level = conf.level))
-}
