@@ -46,7 +46,8 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   se.resids <- sqrt(apply(resids$var.residuals, 3, function(x) {
     takediag(x)
   }))
-  data.dims <- attr(model, "model.dims")[["y"]]
+  model.dims <- attr(model, "model.dims")
+  data.dims <- model.dims[["y"]]
   nn <- data.dims[1]
   TT <- data.dims[2]
   alpha <- 1 - conf.level
@@ -57,8 +58,8 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
       t = rep(1:TT, nn),
       y = vec(t(model$data)),
       .fitted = vec(t(fitted(x, type = "observations"))),
-      .se.fit = vec(t(se.resids[1:nn, , drop = FALSE])),
       .resids = vec(t(resids$model.residuals)),
+      .sigma = vec(t(se.resids[1:nn, , drop = FALSE])),
       .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE]))
     )
     if (interval == "confidence") {
