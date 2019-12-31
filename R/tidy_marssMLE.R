@@ -36,12 +36,11 @@ tidy.marssMLE <- function(x, type = c("parameters", "states", "observations", "x
 
   # set rotate
   rotate <- FALSE
-  if (form == "dfa" & "rotate" %in% names(extras)) {
+  if ("rotate" %in% names(extras)) {
+    if (form != "dfa") stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
     rotate <- extras[["rotate"]]
     if (!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n", call. = FALSE)
-  }
-  if (form != "dfa" & "rotate" %in% names(extras)) {
-    if (rotate) stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
+    if( rotate && attr(x, "model.dims")[["Z"]][3]!=1 ) stop("tidy.marssMLE: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
   }
 
   if (type == "parameters") {
@@ -82,7 +81,8 @@ tidy.marssMLE <- function(x, type = c("parameters", "states", "observations", "x
     states.se <- sqrt(states.se)
     if (mm == 1) states.se <- matrix(states.se, 1, TT)
 
-    # if user specified rotate
+    # if user specified rotate, 
+    # I specified that Z (in marxss form) must be time-constant
     if (form == "dfa" && rotate && length(x[["par"]][["Z"]]) != 0) {
       Z.est <- coef(x, type = "matrix")[["Z"]]
       H <- 1
