@@ -10,7 +10,7 @@
   type=c("observations", "states", "y", "x"),   
   conditioning = c("T", "t", "t-1"),
   interval = c("none", "confidence", "prediction"), 
-  level = 0.95)
+  conf.level = 0.95)
   }
   \arguments{
   \item{object}{ A marssMLE object.  }
@@ -18,7 +18,7 @@
   \item{type}{ Fitted values for the observations (y) or the states (x).}
   \item{conditioning}{ If "T", then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead".}
   \item{interval}{ If interval="confidence", then the standard error of the fitted value is returned. }
-  \item{level}{ Level for the intervals if interval != "none".}
+  \item{conf.level}{ Level for the intervals if interval != "none".}
   }
 \value{
   A T column matrix of the fitted values with one row for each observation (or state) time series. 
@@ -27,14 +27,14 @@ If interval = "confidence", the following are returned in a list:
 
 \item{.fitted}{Fitted values of observations or states. See details.}
 \item{.se.fit}{Standard errors of fitted values}
-\item{.conf.low}{Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
+\item{.conf.low}{Lower confidence level at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
 \item{.conf.up}{Upper confidence level. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
 
 If interval = "prediction", the following are returned in a list:
 
 \item{.fitted}{Fitted values of observations or states. See details.}
 \item{.sd.x or .sd.y}{Standard deviation of new x or y iid values.}
-\item{.lwr}{Lower range at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
+\item{.lwr}{Lower range at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
 \item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
 
 The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on these intervals. For that you need the residuals intervals provided by \code{\link{augment.marssMLE}}.

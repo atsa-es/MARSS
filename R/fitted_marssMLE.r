@@ -5,7 +5,7 @@ fitted.marssMLE <- function(object, ...,
                             type = c("observations", "states", "y", "x"),
                             conditioning = c("T", "t", "t-1"),
                             interval = c("none", "confidence", "prediction"),
-                            level = 0.95,
+                            conf.level = 0.95,
                             ...) {
   type <- match.arg(type)
   if (type == "y") type <- "observations"
@@ -16,9 +16,10 @@ fitted.marssMLE <- function(object, ...,
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
-  if (!missing(level) && interval!="none") warning("fitted.marssMLE: interval='none' thus level is ignored.", call. = FALSE)
-  if (!is.numeric(level) && level > 0 && level < 1) stop("fitted.marssMLE: level must be numeric and between 0 and 1.", call. = FALSE)
-  alpha <- 1-level
+  if (!missing(conf.level) && interval!="none") warning("fitted.marssMLE: interval='none' thus conf.level is ignored.", call. = FALSE)
+  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
+    stop("fitted.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+  alpha <- 1-conf.level
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
