@@ -21,21 +21,21 @@
   \item{conf.level}{ Level for the intervals if interval != "none".}
   }
 \value{
-  A T column matrix of the fitted values with one row for each observation (or state) time series. 
+  If interval="none" (the default), a T column matrix of the fitted values with one row for each observation (or state) time series is returned. 
 
 If interval = "confidence", the following are returned in a list:
 
 \item{.fitted}{Fitted values of observations or states. See details.}
 \item{.se.fit}{Standard errors of fitted values}
-\item{.conf.low}{Lower confidence level at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
-\item{.conf.up}{Upper confidence level. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
+\item{.conf.low}{Lower confidence level at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2)*.se.fit + .fitted. }
+\item{.conf.up}{Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*.se.fit + .fitted. }
 
 If interval = "prediction", the following are returned in a list:
 
 \item{.fitted}{Fitted values of observations or states. See details.}
 \item{.sd.x or .sd.y}{Standard deviation of new x or y iid values.}
-\item{.lwr}{Lower range at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
-\item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
+\item{.lwr}{Lower range at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2)*.sd + .fitted. }
+\item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2)*.sd + .fitted. }
 
 The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on these intervals. For that you need the residuals intervals provided by \code{\link{augment.marssMLE}}.
 
