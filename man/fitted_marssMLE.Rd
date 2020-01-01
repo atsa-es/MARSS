@@ -21,7 +21,24 @@
   \item{level}{ Level for the intervals if interval != "none".}
   }
 \value{
-  A T column matrix of the fitted values with one row for each observation (or state) time series. If interval != "none", the se of fitted (interval="confidence") or sd of x or y (interval="prediction") is returned.
+  A T column matrix of the fitted values with one row for each observation (or state) time series. 
+
+If interval = "confidence", the following are returned in a list:
+
+\item{.fitted}{Fitted values of observations or states. See details.}
+\item{.se.fit}{Standard errors of fitted values}
+\item{.conf.low}{Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
+\item{.conf.up}{Upper confidence level. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
+
+If interval = "prediction", the following are returned in a list:
+
+\item{.fitted}{Fitted values of observations or states. See details.}
+\item{.sd.x or .sd.y}{Standard deviation of new x or y iid values.}
+\item{.lwr}{Lower range at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2) + .fitted. }
+\item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2) + .fitted. }
+
+The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on these intervals. For that you need the residuals intervals provided by \code{\link{augment.marssMLE}}.
+
 }
 \details{
 \strong{observation fitted values}
@@ -40,7 +57,9 @@ If you want estimates of the states, rather than the model predictions based on 
   
 \eqn{\hat{x}(t-1)} used in the prediction is the expected value of the states at time t-1. If \code{conditioning="T"}, \eqn{\hat{x}(t-1)} is the expected value at time t-1 conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}}.  If \code{conditioning="t-1"}, \eqn{\hat{x}(t-1)} is the expected value conditioned on the data up to time t-1, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}}. The fitted state values conditioned on data up to $t$ is not provided. This would require the expected value of states at time t conditioned on data up to time t+1, and this is not output by the Kalman filter. Only conditioning on data up to t-1, t, and T are output.
 
-If interval="confidence", the standard error of the fitted values (meaning the 'expected value of X(t)' given X(t-1)) is returned.  The standard error of the fitted value is B \%*\% Vt[t-1] \%*\% t(B). If interval="prediction", the standard deviation of X(t) given X(t-1) given. The latter is B \%*\% Vt[t-1] \%*\% t(B) + Q (notice it includes Q). Vt is either conditioned on 1:T or 1:t-1 depending on \code{conditioning.}
+The intervals returned by \code{fitted.marssMLE} for the fitted states, are not typically what one uses or needs--however might be useful for simulation work. If you are doing outlier detection or shock detection, you need the intervals on the state residuals (X(t)-fitted(X(t)) which are returned by \code{\link{residuals.marssMLE}} or \code{\link{augment.marssMLE}}. If you want intervals on the states estimates (conditioned all the data or data up to t-1), use \code{\link{tidy.marssMLE}}.
+
+If interval="confidence", the standard error of the fitted values (meaning the 'expected value of X(t)' given X(t-1)) is returned.  The standard error of the fitted value is B \%*\% Vt[t-1] \%*\% t(B). If interval="prediction", the standard deviation of X(t) given X(t-1) given. The latter is B \%*\% Vt[t-1] \%*\% t(B) + Q (notice it includes Q). Vt is either conditioned on 1:T or 1:t-1 depending on \code{conditioning.} Do not plot (or compare) the estimate of X(t) to the intervals for the fitted values (expected value of X(t) conditioned on X(t-1))! You need the conditional states residuals intervals in that case; use \code{\link{augment.marssMLE}}.
 }
 \seealso{ \code{\link{MARSSkf}}, \code{\link{augment.marssMLE}}}, \code{\link{tidy.marssMLE}}}
 \author{ 

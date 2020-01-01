@@ -18,6 +18,7 @@ fitted.marssMLE <- function(object, ...,
   }
   if (!missing(level) && interval!="none") warning("fitted.marssMLE: interval='none' thus level is ignored.", call. = FALSE)
   if (!is.numeric(level) && level > 0 && level < 1) stop("fitted.marssMLE: level must be numeric and between 0 and 1.", call. = FALSE)
+  alpha <- 1-level
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
@@ -109,8 +110,29 @@ fitted.marssMLE <- function(object, ...,
     }
   }
   if (interval=="none") return(val)
-  if (interval=="confidence") return(list(.fitted=val, .se.fit=se))
+  if (interval=="confidence"){
+    return(list(
+      .fitted=val, 
+      .se.fit=se,
+      .conf.low = val + qnorm(alpha/2) * se,
+      .conf.up = val + qnorm(1- alpha/2) * se
+      ))
+  }
   # Then interval == "prediction"
-  if (type == "states") return(list(.fitted=val, .sd.x=se))
-  if (type == "observations") return(list(.fitted=val, .sd.y=se))
+  if (type == "states"){
+    return(list(
+      .fitted=val, 
+      .sd.x=se, 
+      .lwr = val + qnorm(alpha/2) * se,
+      .upr = val + qnorm(1- alpha/2) * se
+    ))
+  }
+  if (type == "observations"){
+    return(list(
+      .fitted=val,
+      .sd.y=se,
+      .lwr = val + qnorm(alpha/2) * se,
+      .upr = val + qnorm(1- alpha/2) * se
+    ))
+  }
 } # end of fitted.marssMLE
