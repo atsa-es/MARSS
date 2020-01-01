@@ -26,7 +26,30 @@
 
 }
 \description{
-Return a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the observations or states. \code{augment} is concerned with predictions of the states or observations at time $t$, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals (the v(t) or w(t)). \code{tidy} is concerned with estimates of values (parameters, states or observations) conditioned on all the data.
+Returns a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the observations or states. \code{augment} is concerned with predictions of the states or observations at time $t$, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals (the v(t) or w(t)). \code{tidy} is concerned with estimates of values (parameters, states or observations) conditioned on all the data.
+}
+\value{
+If interval = "none", the data frame has the following columns:
+
+\item{.fitted}{Fitted values of observations or states. See details.}
+\item{.resids}{Model or states residuals. See details.}
+\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .fitted.}
+\item{.std.resid}{Standardized residuals. Used for outlier detection. See \code{\link{residuals.marssMLE}}.}
+
+If interval = "confidence", the following are added to the data frame:
+
+\item{.se.fit}{Standard errors of fitted values}
+\item{.conf.low}{Lower confidence level at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2)*.se.fit + .fitted. }
+\item{.conf.up}{Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*.se.fit + .fitted. }
+
+If interval = "prediction", the following are added to the data frame:
+
+\item{.sd.x or .sd.y}{Standard deviation of new x or y iid values.}
+\item{.lwr}{Lower range at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2)*.sd + .fitted. }
+\item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2)*.sd + .fitted. }
+
+The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on these intervals. For that you need to use \code{.sigma} and construct intervals as noted above. 
+
 }
 \details{
 
