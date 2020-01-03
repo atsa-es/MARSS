@@ -16,7 +16,7 @@ BUGS
 * residuals.marssMLE(..., Harvey=TRUE) would fail if Q, B, or G was time-varying because parmat() called with t+1. Changed to only call parmat() when t<TT. Q, B, and G do not appear in the recursion when t=TT so parmat() with t=t+1 is never needed.
 * MARSS_dfa() used form="dfa" in MARSS.call list. Just info. Never used.
 * Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
-* fixed some old bugs in toLatex_marssMODEL.R. This function not currently used but will be added later to allow latex output of MARSS model.
+* fixed some old bugs in toLatex_marssMODEL.R. Added S3 class declaration in NAMESPACE for toLatex. fixed equation attribute in MARSS_marxss. G{t} was used instead of G_{t}. Only affected toLatex_marssMODEL().
 
 ENHANCEMENTS
 
@@ -27,8 +27,10 @@ ENHANCEMENTS
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 * Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
 * Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
-* updated all code to tidyverse style
-* added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized.
+* Updated all code to tidyverse style
+* Added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized.
+* Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals.
+* Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
 
 DOCUMENTATION and MAN FILES
 
