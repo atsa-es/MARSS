@@ -61,7 +61,9 @@ The intervals returned by \code{fitted.marssMLE} for the fitted states, are not 
 
 If interval="confidence", the standard error of the fitted values (meaning the 'expected value of X(t)' given X(t-1)) is returned.  The standard error of the fitted value is B \%*\% Vt[t-1] \%*\% t(B). If interval="prediction", the standard deviation of X(t) given X(t-1) given. The latter is B \%*\% Vt[t-1] \%*\% t(B) + Q (notice it includes Q). Vt is either conditioned on 1:T or 1:t-1 depending on \code{conditioning.} Do not plot (or compare) the estimate of X(t) to the intervals for the fitted values (expected value of X(t) conditioned on X(t-1))! You need the conditional states residuals intervals in that case; use \code{\link{augment.marssMLE}}.
 }
-\seealso{ \code{\link{MARSSkf}}, \code{\link{augment.marssMLE}}}, \code{\link{tidy.marssMLE}}}
+\seealso{
+\code{\link{MARSSkf}}, \code{\link{augment.marssMLE}}, \code{\link{tidy.marssMLE}}
+}
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 
