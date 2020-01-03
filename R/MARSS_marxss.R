@@ -430,7 +430,7 @@ MARSS.marxss <- function(MARSS.call) {
   attr(marxss_object, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "D", "C", "d", "c", "G", "H", "L")
   attr(marxss_object, "X.names") <- X.names
   attr(marxss_object, "Y.names") <- Y.names
-  attr(marxss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+  attr(marxss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G_{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H_{t}*v_{t}; v_{t}~MVN(0,R_{t})"
 
   # Change alldefaults global to match the form
   # first load the defaults
@@ -510,7 +510,7 @@ marss_to_marxss <- function(x, C.and.D.are.zero = FALSE) {
     attr(marxss.model, "model.dims") <- marxss.dims
     # par.names are what needs to be in fixed/free pair; order is important
     attr(marxss.model, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "D", "C", "d", "c", "G", "H", "L")
-    attr(marxss.model, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+    attr(marxss.model, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+C_{t}*c_{t}+G_{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+D_{t}*d_{t}+H_{t}*v_{t}; v_{t}~MVN(0,R_{t})"
   }
   if (inherits(x, "marssMODEL")) {
     return(marxss.model)
@@ -715,7 +715,7 @@ marxss_to_marss <- function(x, only.par = FALSE) {
   attr(marss.model, "par.names") <- marss.elem
   attr(marss.model, "X.names") <- attr(marxss.model, "X.names")
   attr(marss.model, "Y.names") <- attr(marxss.model, "Y.names")
-  attr(marss.model, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+  attr(marss.model, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+G_{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H_{t}*v_{t}; v_{t}~MVN(0,R_{t})"
   if (class.x == "marssMODEL") {
     return(marss.model) # marssMODEL of form marss
   } else {

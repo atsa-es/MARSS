@@ -323,7 +323,7 @@ MARSS.marss <- function(MARSS.call) {
   attr(marss_object, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   attr(marss_object, "X.names") <- X.names
   attr(marss_object, "Y.names") <- Y.names
-  attr(marss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+G{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H{t}*v_{t}; v_{t}~MVN(0,R_{t})"
+  attr(marss_object, "equation") <- "x_{t}=B_{t}*x_{t-1}+U_{t}+G_{t}*w_{t}; w_{t}~MVN(0,Q_{t})\ny_{t}=Z_{t}*x_{t}+A_{t}+H_{t}*v_{t}; v_{t}~MVN(0,R_{t})"
 
   # Put the marss model into model and marss
   MARSS.call$model <- marss_object
