@@ -86,22 +86,31 @@ autoplot.marssMLE <-
 
     if ("observations" %in% plot.type) {
       # make plot of observations
-      df <- augment.marssMLE(x, type = "observations", form = model_form)
-      df$ymin <- df$.fitted - qnorm(alpha / 2) * df$.se.fit
-      df$ymax <- df$.fitted + qnorm(alpha / 2) * df$.se.fit
+      tit <- "Model fitted Y"
+      if (conf.int) tit <- paste(tit, "+ fitted CIs")
+      if (decorate) tit <- paste(tit, "+ residuals CIs (dashed)")
+      df <- augment.marssMLE(x, type = "observations", interval="confidence", form = model_form)
+      df$ymin <- df$.conf.low
+      df$ymax <- df$.conf.up
+      df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
+      df$ymax.resid <- df$.fitted - qnorm(alpha / 2) * df$.sigma
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
       if (conf.int) {
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
+      if (decorate){
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.resid), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.resid), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
+                            shape = plotpar$point.pch, fill = plotpar$point.fill, 
+                            col = plotpar$point.col, size = plotpar$point.size)
+      }
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
-        ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
-                            shape = plotpar$point.pch, fill = plotpar$point.fill, 
-                            col = plotpar$point.col, size = plotpar$point.size) +
-        ggplot2::ggtitle("Model fitted values for Y")
+        ggplot2::ggtitle(tit)
       plts[["observations"]] <- p1
       if (identical(plot.type, "observations")) {
         return(p1)
