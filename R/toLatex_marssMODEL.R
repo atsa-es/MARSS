@@ -71,7 +71,7 @@ toLatex.marssMODEL <- function(object, ..., file = NULL, digits = 2, greek = TRU
     eqn.stoc.var <- str_trim(strsplit(eqn.stoc.var, ",")[[1]][2])
     # If any of the equation is time-varying then will have 1 equation for each time
     # Determine if that is necessary
-    if (!simplify & (parameters.time.varying(eqn.det, eqn.special, marssMODEL) |
+    if (!simplify && (parameters.time.varying(eqn.det, eqn.special, marssMODEL) |
       parameters.time.varying(eqn.stoc.mean, eqn.special, marssMODEL) |
       parameters.time.varying(eqn.stoc.var, eqn.special, marssMODEL))) {
       eqn.ts <- TT
@@ -271,7 +271,7 @@ get.mat.tex <- function(x, greek, digits) {
   tmp.tex <- strsplit(tmp.tex, "\n")[[1]]
   tmp.tex <- tmp.tex[-1]
   tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
-  tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
+  #tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
   tmp.tex[length(tmp.tex)] <- str_replace_all(tmp.tex[length(tmp.tex)], "[\\]", "")
 
   tmp.body <- paste(tmp.tex, collapse = "\n")
