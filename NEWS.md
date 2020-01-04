@@ -9,6 +9,8 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known 
 CHANGES IN MARSS 3.10.12 (current state of master 1-3-2020)
 ------------------------------------
 
+Version 3.10.12 update mainly has to do with the fitted() and augment() enhancements which clarify ytT, xtT and residual intervals for MARSS models. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity).
+
 BUGS
 
 * Fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
