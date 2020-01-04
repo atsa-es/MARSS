@@ -200,7 +200,7 @@ This section discusses computation of the variance of the model and state residu
 
 Throughout, I follow the convention that capital letters are random variables and small letters are a realization from the random variable.  This only applies to random variables; parameters are not random variables\footnote{in a frequentist framework}. Parameters are shown in Roman font while while random variables are bold slanted font. Parameters written as capital letters are matrices, while parameters written in small letters are strictly column matrices. 
 
-In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript, e.g. $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable over all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B]$ or $\var_{A|B}[f(A)|B]$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$
+In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript, e.g. $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable over all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B]$ or $\var_{A|B}[f(A)|B]$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$.
 
 \subsubsection{Law of total variance}
 
@@ -212,16 +212,14 @@ The subscripts on the inner expectations make it explicit that the expectations 
 \begin{equation}
 \var[A] = \var_B[\E[A|B]] + \E_B[\var[A|B]]
 \end{equation}
-It is important to note that $\E_{A|b}[A|b]$ and $\var_{A|b}[A|b]$ are fixed values while $\E_{A|B}[A|B]$ and $\var_{A|B}[A|B]$ are random variables. When computing $\var[\E_{A|B}[A|B]]$, we will typically compute $\E_{A|b}[A|b]$ and then compute (or infer) the variance or expectation of that over all possible values of $b$. 
+It is important to note that $\E_{A|b}[A|b]$ and $\var_{A|b}[A|b]$ are fixed values while $\E_{A|B}[A|B]$ and $\var_{A|B}[A|B]$ are random variables. When computing $\var_B[\E_{A|B}[A|B]]$, we will typically compute $\E_{A|b}[A|b]$ and then compute (or infer) the variance or expectation of that over all possible values of $b$. 
 
-From the law of total variance will appear in this report in the following form:
+The law of total variance will appear in this report in the following form:
 \begin{equation}
 \var_{XY_t}[f(\YY_t,\XX_t)] = \var_{Y^{(1)}}[\E_{XY_t|Y^{(1)}}[f(\YY_t,\XX_t)|\YY^{(1)}]] + \E_{Y^{(1)}}[\var_{XY_t|Y^{(1)}}[f(\YY_t,\XX_t)|\YY^{(1)}]]
 \end{equation}
 where $f(\YY_t,\XX_t)$ is some function of $\XX_t$ and $\YY_t$ and $\YY^{(1)}$ is the observed data from $t=1$ to $T$. 
 
-
-% A joint expectation of $f(\AA,\BB)$ would be $\E_{AB}[f(\AA,\BB)]$, where 'AB' denotes the joint probability distribution. This can be written in terms of the conditional expectation using the law of total expectation $\E_B[\E_{A|b}[f(\AA,\BB)|\BB=\bb]]$.
 
 \subsection{Model residuals conditioned on all the data}
 
@@ -235,20 +233,20 @@ $\hat{\vv}_t$ is sample from the random variable $\hat{\VV}_t$ since $\YY$ is a 
 \begin{equation}\label{eq:var.vtT}
 \var[\hat{\VV}_t] = \var_{XY}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}] - \aa_t]
 \end{equation}
-Notice we have an unconditional variance over $XY$ on the outside (that subscript on $\var$) and a conditional expectation over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
+Notice we have an unconditional variance over $XY$ (i.e., over all possible values that $\XX$ and $\YY$ can take) on the outside and a conditional expectation over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
 
 From the law of total variance (Equation \ref{eq:lawoftotvar}), we can write the variance of the model residuals as
 \begin{equation}\label{eq:varvvtgeneral}
 \var[\hat{\VV}_t] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\var[\hat{\VV}_t|\YY^{(1)}]]
 \end{equation}
 
-\subsubsection{First term in Equation \ref{eq:varvvtgeneral}}
+\subsubsection{First term on right hand side of Equation \ref{eq:varvvtgeneral}}
 
 Notice that the random variable inside the $\var[\;]$ in the first term is
 \begin{equation}
 \E[\hat{\VV}_t|\YY^{(1)}]= \E[(\YY_t + \ZZ_t \E[\XX_t|\YY^{(1)}] + \aa_t)|\YY^{(1)}] 
 \end{equation}
-Let's consider this for a specific value $\YY^{(1)}=\yy^{(1)}$. In the subscript the $\E$, I will put the random variable's probability distribution that is being integrated over. The only random variable in $\hat{V}_t|\yy^{(1)}$ is $\YY_t^{(2)}$. $\YY^{(1)}$ is fixed and $\XX_t$ is integrated out in the expectation $\E[\XX_t|\yy^{(1)}]$.
+Let's consider this for a specific value $\YY^{(1)}=\yy^{(1)}$. 
 \begin{equation}
 \E[\hat{\VV}_t|\yy^{(1)}]= \E[(\YY_t + \ZZ_t \E[\XX_t|\yy^{(1)}] + \aa_t)|\yy^{(1)}] =
 \E[\YY_t|\yy^{(1)}] + \ZZ_t \E[\E_{X_t|y^{(1)}}[\XX_t|\yy^{(1)}]|\yy^{(1)}] + \E[\aa_t|\yy^{(1)}]
@@ -263,13 +261,13 @@ We can move the conditional out and write
 \begin{equation}
 \E[\hat{\VV}_t|\yy^{(1)}]= \E[(\YY_t + \ZZ_t \XX_t + \aa_t)|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}].
 \end{equation}
-The right side is $\E[\VV_t|\yy^{(1)}]$, no `hat' on the $\VV_t$ and this applies for all $\yy^{(1)}$. 
+The right side is $\E[\VV_t|\yy^{(1)}]$, no `hat' on the $\VV_t$, and this applies for all $\yy^{(1)}$. 
  This means that the first term in Equation \ref{eq:varvvtgeneral} can be written with no hat on $\VV$:
 \begin{equation}\label{eq:no.hat.on.V}
 \var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}]] = \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]]
 \end{equation}
 
-Using the law of total variance, we can re-write $\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]]$ as:
+Using the law of total variance, we can re-write $\var[\VV_t]$ as:
 \begin{equation}\label{eqn:varianceVt}
 \var[\VV_t] = \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]].
 \end{equation}
@@ -277,15 +275,18 @@ From Equation \ref{eqn:varianceVt}, we can solve for $\var_{Y^{(1)}}[\E[\VV_t|\Y
 \begin{equation}\label{eq:var.E.vtT}
 \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] = \var[\VV_t] - \E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]
 \end{equation}
-From Equation \ref{eqn:unconditiondistofVt}, we know that $\var[\VV_t]=\RR_t$ (this is the unconditional variance).  
+From Equation \ref{eqn:unconditiondistofVt}, we know that $\var[\VV_t]=\RR_t$ (this is the unconditional variance). Thus,
+\begin{equation}\label{eq:var.E.vtT.R}
+\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] = \RR_t - \E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]
+\end{equation}
 
-The second term in Equation \ref{eq:var.E.vtT} to the right of the equal sign and inside the expectation, $\var[\VV_t|\YY^{(1)}]$, is the variance of $\VV_t$ with $\YY^{(1)}$ held at a specific fixed $\yy^{(1)}$. The variability in $\var[\VV_t|\yy^{(1)}]$ (notice $\yy^{(1)}$ not $\YY^{(1)}$ now) comes from $\XX_t$ (and the rest of the $\XX$) and $\YY^{(2)}$ which are random variables. Let's compute this variance for a specific $\yy^{(1)}$ value.
+The second term in Equation \ref{eq:var.E.vtT.R} to the right of the equal sign and inside the expectation is $\var[\VV_t|\YY^{(1)}]$. This is the variance of $\VV_t$ with $\YY^{(1)}$ held at a specific fixed $\yy^{(1)}$. The variability in $\var[\VV_t|\yy^{(1)}]$ (notice $\yy^{(1)}$ not $\YY^{(1)}$ now) comes from $\XX_t$ (and the rest of the $\XX$) and $\YY^{(2)}$ which are random variables. Let's compute this variance for a specific $\yy^{(1)}$ value.
 \begin{equation}\label{eqn:varvtcondy}
 \var[\VV_t|\yy^{(1)}] = \var[ \YY_t - \ZZ_t\XX_t-\aa_t | \yy^{(1)} ].
 \end{equation}
 Notice that there is no $\E$ (expectation) on the $\XX_t$; this is $\VV_t$ not $\hat{\VV}_t$. $\aa_t$ is a fixed value and can be dropped; the $\YY_t$ and $\XX_t$ are random variables.
 
-Equation \ref{eqn:varvtcondy} can then be written as\footnote{$\var(A+B)=\var(A)+\var(B)+\cov(A,B)+\cov(B,A)$}:
+Equation \ref{eqn:varvtcondy} can be written as\footnote{$\var(A+B)=\var(A)+\var(B)+\cov(A,B)+\cov(B,A)$}:
 \begin{equation}\label{eq:var.Vt.yy}
 \begin{split}
 \var[\VV_t|\yy^{(1)}] &= \var[ \YY_t - \ZZ_t\XX_t | \yy^{(1)} ]\\
@@ -293,10 +294,9 @@ Equation \ref{eqn:varvtcondy} can then be written as\footnote{$\var(A+B)=\var(A)
 &=\ZZ_t \hatVt \ZZ_t^\top + \hatUt - \hatSt\ZZ_t^\top - \ZZ_t(\hatSt)^\top
 \end{split}
 \end{equation}
-If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUt$ and $\hatSt$ would be zero and this would reduce to $\ZZ_t \hatVt \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
+$\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package\footnote{$\hatUt$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUt$ and $\hatSt$ would be zero and this would reduce to $\ZZ_t \hatVt \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
-$\hatVt = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUt=\var[\YY_t|\yy^{(1)}]$ and $\hatSt=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt@ function in the MARSS R package\footnote{$\hatUt$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.
-So we now know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value of all possible values of $\yy^{(1)}$. $\hatVt$, $\hatUt$ and $\hatSt$ are multivariate normal random variables. The conditional variance of a multivariate normal does not depend on the value that you are conditioning on\footnote{Let the $\AA$ be a N-dimensional multivariate normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
+From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$. $\hatVt$, $\hatUt$ and $\hatSt$ are multivariate normal random variables. The conditional variance of a multivariate normal does not depend on the value that you are conditioning on\footnote{Let the $\AA$ be a N-dimensional multivariate normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
 \Sigma_1 & \Sigma_{12} \\
 \Sigma_21 & \Sigma_{2}
 \end{bmatrix}$.  The variance-covariance matrix of $\AA$ conditioned on $\AA_1=\aa$ is $\Sigma = \begin{bmatrix}
@@ -304,19 +304,19 @@ So we now know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{
 0 & \Sigma_2 - \Sigma_{12}\Sigma_{1}\Sigma_{21}
 \end{bmatrix}$. Notice that $\aa$ does not appear in the conditional variance matrix.}. This means that $\hatVt$, $\hatUt$ and $\hatSt$ do not depend on $\yy^{(1)}$. They only depend on the MARSS model parameters.
 
-Because $\hatVt$, $\hatUt$ and $\hatSt$ only depend on the MARSS parameters values, $\QQ$, $\BB$, $\RR$, etc., the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$ (Equation \ref{eq:var.Vt.yy}). Putting this into Equation \ref{eq:var.E.vtT}, we have
+Because $\hatVt$, $\hatUt$ and $\hatSt$ only depend on the MARSS parameters values, $\QQ$, $\BB$, $\RR$, etc., the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$ (Equation \ref{eq:var.Vt.yy}). Putting this into Equation \ref{eq:var.E.vtT.R}, we have
 \begin{equation}\label{eqn:conditionalvtfinala}
-\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]]  = \var[\VV_t] - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top
+\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]]  = \RR_t - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top.
 \end{equation}
 Since $\var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]] = \var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)})]]$ (Equation \ref{eq:no.hat.on.V}), this means that the first term in Equation \ref{eq:varvvtgeneral} is
 \begin{equation}\label{eqn:conditionalvtfinal}
-\var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)})]]  =  \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top
+\var_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)})]]  =  \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top.
 \end{equation}
 
-\subsubsection{Second term in Equation \ref{eq:varvvtgeneral}}
+\subsubsection{Second term on right hand side of Equation \ref{eq:varvvtgeneral}}
 
 Consider the second term in Equation \ref{eq:varvvtgeneral}.  This term is 
-\begin{equation}
+\begin{equation}\label{second.term.rhs.9}
 \E_{Y^{(1)}}[\var[(\YY_t-\ZZ_t\E[\XX_t|\YY^{(1)}]-\aa_t)|\YY^{(1)}]]
 \end{equation}
 The middle term is a conditional expectation inside a conditional variance inside an unconditional expectation:
@@ -324,10 +324,14 @@ The middle term is a conditional expectation inside a conditional variance insid
 \E_{Y^{(1)}}[\var[\E[\XX_t|\YY^{(1)}]|\YY^{(1)}]]
 \end{equation}
 
-Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$. The variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. Thus the second term reduces to $\E_{Y^{(1)}}[\var[\YY|\YY^{(1)}]] = \hatUt$. As noted in the previous section, $\hatUt$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUt$.
+Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$ since the variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. Thus Equation \ref{second.term.rhs.9} reduces to $\E_{Y^{(1)}}[\var[\YY_t|\YY^{(1)}]] = \hatUt$. As noted in the previous section, $\hatUt$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUt$:
+\begin{equation}\label{second.term.rhs.9final}
+\E_{Y^{(1)}}[\var[\hat{\VV}_t|\YY^{(1)}]] = \hatUt
+\end{equation}
+
 
 \subsubsection{Putting together the first and second terms}
-We can now put the first and second terms in Equation \ref{eq:varvvtgeneral} together and write out the equation for the variance of the model residuals:
+We can now put the first and second terms in Equation \ref{eq:varvvtgeneral} together (Equations \ref{eqn:conditionalvtfinal} and \ref{second.term.rhs.9final}) and write out the equation for the variance of the model residuals:
 \begin{equation}
 \begin{split}
 \var[\hat{\VV}_t] &= \RR_t - \ZZ_t \hatVt \ZZ_t^\top - \hatUt + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top + \hatUt\\
@@ -378,37 +382,47 @@ $\uu_t$  is not a random variable and can be dropped. Thus,
 & = \hatVt + \BB_t \hatVtm \BB_t^\top - \hatVttm \BB_t^\top - \BB_t\widetilde{\VV}_{t-1,t}
 \end{split}
 \end{equation}
-Again this is conditional multivariate normal variance does not depend on the actual value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$.
+Again this is conditional multivariate normal variance, and its value does not depend on the actual value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$. Thus
+\begin{equation}\label{eq:E.var.Wt.yt}
+\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] =  \hatVt + \BB_t \hatVtm \BB_t^\top - \hatVttm \BB_t^\top - \BB_t\widetilde{\VV}_{t-1,t}
+\end{equation}
 
-Putting $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]]$ from Equation \ref{eq:var.W.cond.y1} and $\var[\WW_t]=\QQ_t$ into Equation \ref{eqn:varwwt}, the variance of the conditional state residuals is
+Putting $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]]$ from Equation \ref{eq:E.var.Wt.yt} and $\var[\WW_t]=\QQ_t$ into Equation \ref{eqn:varwwt}, the variance of the conditional state residuals is
 \begin{equation}
 \var[\hat{\WW}_t] = \QQ_t - \hatVt - \BB_t \hatVtm \BB_t^\top + \hatVttm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}
 \end{equation}
 
 \subsection{Covariance of the conditional model and state residuals}
-The unconditional model and state residuals, $\VV_t$ and $\WW_t$, are independent by definition\footnote{This independence is specific to the way I have written the MARSS model. It is possible for the model and state residuals to covary. In the MARSS model written in \citet{Harveyetal1998} form, they do covary.} (in Equation \ref{eq:residsMARSS}), i.e. $\cov[\VV_t,\WW_t]=0$.  However the conditional model and state residuals, $\cov[\hat{\VV}_t,\hat{\WW}_t]$, are not independent since both depend on $\yy^{(1)}$.  
+
+The unconditional model and state residuals, $\VV_t$ and $\WW_t$, are independent by definition\footnote{This independence is specific to the way I have written the MARSS model. It is possible for the model and state residuals to covary. In the MARSS model written in \citet{Harveyetal1998} form, they do covary.} (in Equation \ref{eq:residsMARSS}), i.e., $\cov[\VV_t,\WW_t]=0$.  However the conditional model and state residuals, $\cov[\hat{\VV}_t,\hat{\WW}_t]$, are not independent since both depend on $\yy^{(1)}$.  
 Using the law of total covariance, we can write
 \begin{equation}\label{eqn:covhatVtWt1}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = 
 \cov_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}],\E[\hat{\WW}_t|\YY^{(1)}]] + \E_{Y^{(1)}}[\cov[\hat{\VV}_t, \hat{\WW}_t|\YY^{(1)}]]
 \end{equation}
 
-For a specific value of $\YY^{(1)}=\yy^{(1)}$, the covariance in the second term on the right is $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$. Conditioned on a specific value of $\YY^{(1)}$, $\hat{\WW}_t$ is a fixed value. $\hat{\ww}_t = \hatxt - \BB_t\hatxtm - \uu_t$ and,  conditioned on $\yy^{(1)}$, $\hatxt$ and $\hatxtm$ are fixed values. $\uu_t$ is also fixed, because it is a parameter. $\hat{\VV}_t$ is not a fixed value because it has $\YY_t^{(2)}$ and that is a random variable.  So $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$ is the covariance between a random variable and a fixed variable and that covariance is 0.
+For a specific value of $\YY^{(1)}=\yy^{(1)}$, the covariance in the second term on the right is $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$. Conditioned on a specific value of $\YY^{(1)}$, $\hat{\WW}_t$ is a fixed value. $\hat{\ww}_t = \hatxt - \BB_t\hatxtm - \uu_t$ and,  conditioned on $\yy^{(1)}$, $\hatxt$ and $\hatxtm$ are fixed values. $\uu_t$ is also fixed, because it is a parameter. $\hat{\VV}_t$ is not a fixed value because it has $\YY_t^{(2)}$ and that is a random variable.  Thus $\cov[\hat{\VV}_t, \hat{\WW}_t|\yy^{(1)}]$ is the covariance between a random variable and a fixed variable and that covariance is 0.
 
-This eliminates the second right-side term in Equation \ref{eqn:covhatVtWt1} and it reduces to
+This eliminates the second right-side term in Equation \ref{eqn:covhatVtWt1} and the equation reduces to
 \begin{equation}\label{eqn:covhatVtWt3}
-\cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}],\E[\hat{\WW}_t|\YY^{(1)}]]
+\cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\hat{\VV}_t|\YY^{(1)}],\E[\hat{\WW}_t|\YY^{(1)}]].
 \end{equation}
-The right side of Equation \ref{eqn:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$ instead of $\hat{\VV}_t$ and $\hat{\WW}_t$:
+Notice that $\E[\hat{\WW_t}|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hat{\VV_t}|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$ since
+\begin{equation}
+\E[\WW_t|\yy^{(1)}]= \E[\XX_t|\yy^{(1)}]-\BB_t\E[\XX_{t-1}|\yy^{(1)}] - \uu_t = \hatxt-\BB_t \hatxtm - \uu_t = \hat{\ww}_t = \E[\hat{\WW_t}|\yy^{(1)}]
+\end{equation}
+and
+\begin{equation}
+\E[\VV_t|\yy^{(1)}]= \E[\YY_t|\yy^{(1)}]-\ZZ_t\E[\XX_{t}|\yy^{(1)}] - \aa_t = \E[\YY_t|\yy^{(1)}]-\ZZ_t \hatxt - \aa_t = \E[\hat{\VV_t}|\yy^{(1)}]
+\end{equation}
+Thus the right side of Equation \ref{eqn:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$ instead of $\hat{\VV}_t$ and $\hat{\WW}_t$:
 \begin{equation}\label{eqn:covhatVtWt2}
-\cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_t|\YY^{(1)}]]
+\cov[\hat{\VV}_t,\hat{\WW}_t] = \cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_t|\YY^{(1)}]].
 \end{equation}
-since\footnote{$\E[\WW_t|\yy^{(1)}]= \E[\XX_t|\yy^{(1)}]-\BB_t\E[\XX_{t-1}|\yy^{(1)}] - \uu_t = \hatxt-\BB_t \hatxtm - \uu_t = \hat{\ww}_t = \E[\hat{\WW_t}|\yy^{(1)}]$ and 
-$\E[\VV_t|\yy^{(1)}]= \E[\YY_t|\yy^{(1)}]-\ZZ_t\E[\XX_{t}|\yy^{(1)}] - \aa_t = \E[\YY_t|\yy^{(1)}]-\ZZ_t \hatxt - \aa_t = \E[\hat{\VV_t}|\yy^{(1)}]$} $\E[\hat{\WW_t}|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hat{\VV_t}|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$.
 
-In the same way we used the law of total variance, we can use the law of total covariance  to obtain $\cov[\hat{\VV}_t,\hat{\WW}_t]$, we can use it to obtain $\cov[\VV_t, \WW_t]$:
+Using the law of total covariance, we can write:
 \begin{equation}\label{eqn:covVtWt}
-\cov[\VV_t, \WW_t] = \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\yy^{(1)}]] + \cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]\\ 
+\cov[\VV_t, \WW_t] = \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\yy^{(1)}]] + \cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\yy^{(1)}]]
 \end{equation}
 The unconditional covariance of $\VV_t$ and $\WW_t$ is 0. Thus the left side of Equation \ref{eqn:covhatVtWt3} is 0 and we can rearrange the equation as
 \begin{equation}\label{eqn:covVtWt2}
@@ -418,7 +432,7 @@ Combining Equation \ref{eqn:covhatVtWt2} and \ref{eqn:covVtWt2}, we get
 \begin{equation}\label{eqn:conditionalcovvtwt}
 \cov[\hat{\VV}_t,\hat{\WW}_t] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\yy^{(1)}] ] 
 \end{equation}
-and our problem reduces to solving for the conditional covariance of the model and state residuals.  
+and our problem reduces to solving for the conditional covariance of the model and state residuals (right side of Equation \ref{eqn:conditionalcovvtwt}).  
 
 For a specific $\YY^{(1)}=\yy^{(1)}$, the conditional covariance $\cov[\VV_t, \WW_t|\yy^{(1)}]$ can be written out as
 \begin{equation}
@@ -462,13 +476,13 @@ Thus,
 
 
 \subsection{Joint distribution of the conditional residuals}
+
 We now can write the variance of the joint distribution of the conditional residuals. Define
 \begin{equation}
 \hat{\varepsilon}_t = \begin{bmatrix}\hat{\vv}_t\\ \hat{\ww}_t\end{bmatrix} =
 \begin{bmatrix}\yy_t - \ZZ_t\hatxt-\aa_t\\ \hatxt - \BB_t\hatxtm-\uu_t \end{bmatrix}.
 \end{equation}
-where $\hatxt$ and $\hatxtm$ are conditioned on $\yy{(1)}$, the observed $\yy$.
-$\hat{\varepsilon}_t$ is a sample drawn from the distribution of $\hat{\mathcal{E}}_t$ conditioned on observations at the $(1)$ locations in $\YY$.  The expected value of $\hat{\mathcal{E}}_t$ over all possible $\yy$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
+$\hat{\varepsilon}_t$ is a sample drawn from the distribution of the random variable $\hat{\mathcal{E}}_t$.  The expected value of $\hat{\mathcal{E}}_t$ over all possible $\yy$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
 \begin{equation}
  \begin{bmatrix}[c|c]
  \var[\hat{V}_t]&
@@ -481,9 +495,9 @@ which is
 \begin{equation}\label{eqn:jointcondresid1general}
  \begin{bmatrix}[c|c]
  \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top+\ZZ_t(\hatSt)^\top&
- - \hatSt + \hatSttm\BB_t^\top  - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt \\
+ - \hatSt + \hatSttm\BB_t^\top + \ZZ_t\hatVt - \ZZ_t\hatVttm\BB_t^\top\\
  \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
- (- \hatSt + \hatSttm\BB_t^\top  - \ZZ_t\hatVttm\BB_t^\top + \ZZ_t\hatVt)^\top& 
+ (- \hatSt + \hatSttm\BB_t^\top + \ZZ_t\hatVt  - \ZZ_t\hatVttm\BB_t^\top)^\top& 
  \QQ_t - \hatVt - \BB_t \hatVtm \BB_t^\top + \hatVttm \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t} \end{bmatrix}
 \end{equation}
 
@@ -505,9 +519,9 @@ which is
 \begin{equation}\label{eqn:jointcondresid2}
 \begin{bmatrix}[c|c]
 \RR_t - \ZZ_t \hatVt \ZZ_t^\top + \hatSt\ZZ_t^\top + \ZZ_t(\hatSt)^\top&
-- \hatSttp + \hatSt\BB_{t+1}^\top - \ZZ_t\hatVt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} \\
+- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top \\
 \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
-(- \hatSttp + \hatSt\BB_{t+1}^\top - \ZZ_t\hatVt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1})^\top& 
+(- \hatSttp + \hatSt\BB_{t+1}^\top + \ZZ_t\widetilde{\VV}_{t,t+1} - \ZZ_t\hatVt\BB_{t+1}^\top)^\top& 
 \QQ_{t+1} - \widetilde{\VV}_{t+1} - \BB_{t+1} \hatVt \BB_{t+1}^\top + \widetilde{\VV}_{t+1,t} \BB_{t+1}^\top + \BB_{t+1}\widetilde{\VV}_{t,t+1} \end{bmatrix}
 \end{equation}
 
@@ -526,7 +540,7 @@ When there are no missing values in $\yy_t$, the $\hatSt$ and $\hatSttm$ terms e
 $\GG_t$ has $m$  rows and $m+n$ columns with the last $n$ columns all 0; $\HH_t$ has $n$ rows and $m+n$ columns with the last $m$ columns all zero.  The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\HH_t\epsilon_t\\ \GG_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, and $\widetilde{\VV}_t^{t-1}=\var[\XX_t|\yy^{(1,1:{t-1}}]$. These are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, and $\widetilde{\VV}_t^{t-1}=\var[\XX_t|\yy^{(1,1:{t-1})}]$. These are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, and \texttt{Vtt1}.
 
 \section{Algorithm}
 
@@ -550,7 +564,7 @@ L_t = \BB_{t+1} - K_t\ZZ_t^*, \mbox{    } J_t= \QQ^*_{t+1} - K_t \RR^*_t, \mbox{
 r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t 
 \end{gathered}
 \end{equation}
-Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2012}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
+Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2010}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
 
 The residuals \citep[eqn 24]{Harveyetal1998} are
 \begin{equation}\label{eqn:Harveyresiduals}
@@ -575,11 +589,11 @@ The standardized residuals are computed by multiplying $\hat{\varepsilon}_t$ by 
 (\Sigma_t^*)^{-1/2}\hat{\varepsilon}_t^*
 \end{equation}
 Notice that the missing values modified $\hat{\varepsilon}_t^*$ and $\Sigma_t^*$ are used. if the $i$-th row of $\yy_t$ is missing, the $i$-th row of $\hat{\varepsilon}_t$ is set to 0 and the $i$-th row and column of $\Sigma_t$ is set to all 0.
-There will be 0s on the diagonal of $\Sigma_t^*$ so your code will need to deal with these.
+There will be 0s on the diagonal of $\Sigma_t^*$ so your code will need to deal with these when taking the inverse.
 
 \section{Distribution of the MARSS innovation residuals}
 
-One-step-ahead predictions (innovations) are often shown for MARSS models and these are used for likelihood calculations. Innovations are the prediction of $\mathbf{y}$ given data up to $t-1$. Although not termed 'innovations', we can also compute the predictions of $\mathbf{x}$ conditioned on the data up the $t-1$. This section gives the residual variance for these one-step-ahead predictions. 
+One-step-ahead predictions (innovations) are often shown for MARSS models and these are used for likelihood calculations. Innovations are the prediction of $\yy$ given data up to $t-1$. Although not termed 'innovations', we can also compute the predictions of $\xx$ conditioned on the data up the $t-1$. This section gives the residual variance for these one-step-ahead predictions. 
 
 
 \subsubsection{Variance of the one-step-ahead model residuals}
@@ -588,7 +602,7 @@ Define the innovations $\tilde{\vv}_t$ as:
 \begin{equation}\label{eq:vtT}
 \tilde{\vv}_t = \yy_t - \ZZ_t\hatxtt1 - \aa_t,
 \end{equation}
-where $\hatxtt1$ is the $\E[\XX_t|\yy^{(1)}_{t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_{(1),t-1}$, is $\tilde{\VV}_t$. Its mean is 0 and we want to find its variance.
+where $\hatxtt1$ is the $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy^{(1),t-1}$, is $\tilde{\VV}_t$. Its mean is 0 and we want to find its variance.
 
 
 The derivation of the variance of $\tilde{\VV}_t$ follows the same steps as smoothations $\hat{\VV}_t$, and we can write the variance as:
@@ -596,35 +610,25 @@ The derivation of the variance of $\tilde{\VV}_t$ follows the same steps as smoo
 \var[\tilde{\VV}_t] = \RR_t - \ZZ_t \hatVtt1 \ZZ_t^\top + \hatStt1\ZZ_t^\top + \ZZ_t(\hatStt1)^\top
 \end{equation}
 where the $\hatVtt1$ and $\hatStt1$ are now conditioned on only the data from 1 to $t-1$.
-
-$\hatStt1=\cov[\YY_t,\XX_t|\yy^{(1), t-1}]$ which is $\cov[\ZZ_t \XX_t + \aa_t,\XX_t|\yy^{(1), t-1} = \ZZ_t \hatVtt1 \ZZ_t^\top$ and thus, $\ZZ_t(\hatStt1)^\top=\ZZ_t \hatVtt1 \ZZ_t^\top$. Thus Equation \ref{eq:innov.model} reduces to
+$\hatStt1=\cov[\YY_t,\XX_t|\yy^{(1), t-1}]$ which is $\cov[\ZZ_t \XX_t + \aa_t,\XX_t|\yy^{(1), t-1} = \ZZ_t \hatVtt1$ and therefore, $\ZZ_t(\hatStt1)^\top = \hatStt1(\ZZ_t)^\top = \ZZ_t \hatVtt1 \ZZ_t^\top$. Thus Equation \ref{eq:innov.model} reduces to
 \begin{equation}\label{eq:innov.model2}
-\var[\tilde{\VV}_t] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top
+\var[\tilde{\VV}_t] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top.
 \end{equation}
 
 \subsection{State residuals conditioned on the data}
 
 Define the state residuals conditioned on the data from 1 to $t-1$ as $\tilde{\ww}_t$.
 \begin{equation}\label{eq:vtT}
-\tilde{\ww}_t = \xx_t - \BB_t\hatxtmt1 - \uu_t,
+\tilde{\ww}_t = \hatxtt1 - \BB_t\hatxtmt1 - \uu_t,
 \end{equation}
-where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). The random variable over all possible $\yy^{(1),t-1}$ is $\tilde{\WW}_t$. Its mean is 0 and we want to find its variance.
-
-The derivation of the variance of $\tilde{\WW}_t$ follows the same steps as for $\hat{\WW}_t$, except that we are using the variances conditioned on the data from 1 to $t-1$ instead of all the data.  We can write the variance as:
-\begin{equation}
-\var[\tilde{\WW}_t]  =  \QQ_t - \hatVtt1 - \BB_t \hatVtmt1 \BB_t^\top + \hatVttmt1 \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1}
-\end{equation}
+where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). However $\hatxtt1 = \E[\XX_t|\yy^{(1),t-1}] = \BB_t\hatxtmt1 + \uu_t$. Thus $\tilde{\ww}_t = 0$.
 
 \subsection{Covariance of the conditional model and state residuals}
 
-Again the derivation is the same as for the smoothations.
+Since $\tilde{\ww}_t = 0$ for all $\yy^{(1)}$:
 
 \begin{equation}
-\cov[\tilde{\VV}_t,\tilde{\WW}_t] = - \hatStt1 + \hatSttmt1\BB_t^\top - \ZZ_t\hatVttmt1\BB_t^\top + \ZZ_t\hatVtt1
-\end{equation}
-
-\begin{equation}
-\cov[\tilde{\VV}_t,\tilde{\WW}_{t+1}] = - \hatSttpt1 + \hatStt1\BB_{t+1}^\top - \ZZ_t\hatVtt1\BB_{t+1}^\top + \ZZ_t\hatVttpt1
+\cov[\tilde{\VV}_t,\tilde{\WW}_t] = 0 \,\, \text{and} \,\, \cov[\tilde{\VV}_t,\tilde{\WW}_{t+1}] = 0
 \end{equation}
 
 \subsection{Joint distribution of the conditional residuals}
@@ -635,45 +639,25 @@ We now the write the variance of the joint distribution of the conditional one-s
 \begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtt1 - \BB_t\hatxtmt1-\uu_t \end{bmatrix}.
 \end{equation}
 where $\hatxtt1$ and $\hatxtmt1$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
-
 The expected value of $\tilde{\mathcal{E}}_t$ over all possible $\yy$ up to time $t-1$ is 0 and the variance of $\hat{\mathcal{E}}_t$  is
-\begin{equation}
+\begin{equation}\label{eqn:jointcondresid1innovs}
  \begin{bmatrix}[c|c]
  \var[\tilde{V}_t]&
  \cov[\tilde{V}_t, \tilde{W}_t] \\
- \rule[.5ex]{20ex}{0.25pt} & \rule[.5ex]{20ex}{0.25pt} \\
+ \rule[.5ex]{15ex}{0.25pt} & \rule[.5ex]{15ex}{0.25pt} \\
  (\cov[\tilde{V}_t, \tilde{W}_t])^\top& 
- \var[\tilde{W}_t] \end{bmatrix}
-\end{equation}
-which is
-\begin{equation}\label{eqn:jointcondresid1innovs}
+ \var[\tilde{W}_t] \end{bmatrix} =
  \begin{bmatrix}[c|c]
  \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& 0 \\
- \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
- 0 & \QQ_t - \hatVtt1 - \BB_t \hatVtmt1 \BB_t^\top + \hatVttmt1 \BB_t^\top + \BB_t\widetilde{\VV}_{t-1,t}^{t-1} \end{bmatrix}
+ \rule[.5ex]{15ex}{0.25pt} & \rule[.5ex]{15ex}{0.25pt} \\
+ 0 & 0 \end{bmatrix}
 \end{equation}
-
 If the residuals are defined as in \citet{Harveyetal1998},
 \begin{equation}
 \hat{\varepsilon}_t = \begin{bmatrix}\tilde{\vv}_t\\ \tilde{\ww}_{t+1}\end{bmatrix} =
 \begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtpt1 - \BB_{t+1}\hatxtt1-\uu_{t+1} \end{bmatrix}
 \end{equation}
-and the variance of $\tilde{\mathcal{E}}_t$ is
-\begin{equation}
- \begin{bmatrix}[c|c]
- \var[\tilde{V}_t]&
- \cov[\tilde{V}_t, \tilde{W}_{t+1}] \\
- \rule[.5ex]{20ex}{0.25pt} & \rule[.5ex]{20ex}{0.25pt} \\
- (\cov[\tilde{V}_t, \tilde{W}_{t+1}])^\top& 
- \var[\tilde{W}_{t+1}] \end{bmatrix}
-\end{equation}
-which is
-\begin{equation}\label{eqn:jointcondresid2.innov.t1}
-\begin{bmatrix}[c|c]
-\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& 0 \\
-\rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
-0 & \QQ_{t+1} - \widetilde{\VV}_{t+1}^{t-1} - \BB_{t+1} \hatVtt1 \BB_{t+1}^\top + \hatVtptt1 \BB_{t+1}^\top + \BB_{t+1}\hatVttpt1 \end{bmatrix}
-\end{equation}
+$\tilde{W}_{t+1} = 0$, and the variance-covariance matrix is again Equation \ref{eqn:jointcondresid1innovs}.
 
 
 \bibliography{./EMDerivation}
