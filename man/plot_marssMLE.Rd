@@ -13,13 +13,15 @@
                        "state.residuals", "model.residuals.qqplot", 
                        "state.residuals.qqplot"), 
            form=c("marxss", "marss", "dfa"),
-           conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE,
+           plot.par = list(), ...)
   \method{autoplot}{marssMLE}(x, 
            plot.type=c("observations", "states", "model.residuals", 
                        "state.residuals", "model.residuals.qqplot", 
-                       "state.residuals.qqplot"), 
+                       "state.residuals.qqplot", "expected.value.observations"),
            form=c("marxss", "marss", "dfa"),
-           conf.int=TRUE, conf.level=0.95, decorate=TRUE, ...)
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE,
+           plot.par = list(), ...)
   }
   \arguments{
   \item{x}{ A marssMLE object.  }
@@ -27,7 +29,11 @@
   \item{form}{ Optional. Form of the model.  This is normally taken from the form attribute of the MLE object (x), but the user can specify a different form. }
   \item{conf.int}{ TRUE/FALSE. Whether to include a confidence interval. }
   \item{conf.level}{ Confidence level for CIs. }
-  \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots. }
+  \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots and add data points plus residuals confidence intervals to states and observations plots. }
+  \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  The default is list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
+                    line.col = "black", line.size = 1, line.linetype = "solid",
+                    ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
+                    ci.linesize = 0, ci.alpha = 0.6). }
   \item{...}{ Other arguments, not used. }
   }
 \value{
@@ -38,15 +44,18 @@
 }
 \examples{
 data(harborSealWA)
-fit <- MARSS(t(harborSealWA[,-1]), model=list(Z=as.factor(c(1,1,1,1,2)), R="diagonal and equal"))
-plot(fit, plot.type="observations")
+fit <- MARSS(t(harborSealWA[, -1]), 
+             model = list(
+                      Z = as.factor(c(1, 1, 1, 1, 2)), 
+                      R = "diagonal and equal"))
+plot(fit, plot.type = "observations")
 
 require(ggplot2)
-autoplot(fit, plot.type="observations")
+autoplot(fit, plot.type = "observations")
 
 \dontrun{
-# DFA example   
-dfa <- MARSS(t(harborSealWA[,-1]), model=list(m=2), form="dfa")
-plot(dfa, plot.type="states")
+# DFA example
+dfa <- MARSS(t(harborSealWA[, -1]), model = list(m = 2), form = "dfa")
+plot(dfa, plot.type = "states")
 }
 }

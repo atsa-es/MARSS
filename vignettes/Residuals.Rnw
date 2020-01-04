@@ -323,7 +323,6 @@ The middle term is a conditional expectation inside a conditional variance insid
 \begin{equation}
 \E_{Y^{(1)}}[\var[\E[\XX_t|\YY^{(1)}]|\YY^{(1)}]]
 \end{equation}
-
 Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$ since the variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. Thus Equation \ref{second.term.rhs.9} reduces to $\E_{Y^{(1)}}[\var[\YY_t|\YY^{(1)}]] = \hatUt$. As noted in the previous section, $\hatUt$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUt$:
 \begin{equation}\label{second.term.rhs.9final}
 \E_{Y^{(1)}}[\var[\hat{\VV}_t|\YY^{(1)}]] = \hatUt
@@ -564,7 +563,7 @@ L_t = \BB_{t+1} - K_t\ZZ_t^*, \mbox{    } J_t= \QQ^*_{t+1} - K_t \RR^*_t, \mbox{
 r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t, \mbox{    } N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t 
 \end{gathered}
 \end{equation}
-Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2010}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
+These steps are then repeated for $t-1$ until $t=1$. Bolded terms are the same as in Equation \ref{eqn:residsMARSSHarvey} or output by \texttt{MARSSkfss()}.  Unbolded terms are terms used in \citet{Harveyetal1998}.  The * on $\ZZ_t$ and $\RR_t$, indicates that they are the missing value modified versions  discussed in \citet[section 6.4]{ShumwayStoffer2006} and \citet{Holmes2012}: the rows of $\ZZ_t$ corresponding to missing rows of $\yy_t$ are set to zero and the $(i,j)$ and $(j,i)$ terms of $\RR_t$ corresponding the missing rows of $\yy_t$ are set to zero.  For the latter, this means if the $i$-th row of $\yy_t$ is missing, then then all the $(i,j)$ and $(j,i)$ terms, including $(i,i)$ are set to 0. It is assumed that a missing values modified inverse of $\FF_t$ is used: any 0's on the diagonal of $\FF_t$ are replaced with 1, the inverse is taken, and 1s on diagonals is replaced back with 0s.
 
 The residuals \citep[eqn 24]{Harveyetal1998} are
 \begin{equation}\label{eqn:Harveyresiduals}

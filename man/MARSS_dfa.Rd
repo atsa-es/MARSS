@@ -68,8 +68,8 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 }
 \examples{
 \dontrun{
-#See the Dynamic Factor Analysis chapter in the User Guide
-RShowDoc("UserGuide",package="MARSS")
+# See the Dynamic Factor Analysis chapter in the User Guide
+RShowDoc("UserGuide", package = "MARSS")
 }
 }
 

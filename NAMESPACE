@@ -46,6 +46,7 @@ S3method(coef, marssMLE)
 S3method(residuals, marssMLE)
 S3method(model.frame, marssMODEL)
 S3method(model.frame, marssMLE)
+S3method(toLatex, marssMODEL)
 if(getRversion() >= "3.6.0") {
   S3method(broom::augment, marssMLE)
   S3method(broom::glance, marssMLE)

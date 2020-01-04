@@ -4,3 +4,6 @@ MARSS.Rproj
 .Rbuildignore
 .RData
 .Rhistory
+.DS_Store
+vignettes/.DS_Store
+

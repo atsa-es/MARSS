@@ -26,9 +26,9 @@ MARSShessian.numerical(MLEobj, fun="fdHess")
 } 
 \seealso{ \code{\link{MARSSharveyobsFI}} \code{\link{MARSShessian}} \code{\link{MARSSparamCIs}} }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
-  MARSS:::MARSShessian.numerical(MLEobj)
+dat <- t(harborSeal)
+dat <- dat[c(2, 11), ]
+MLEobj <- MARSS(dat)
+MARSS:::MARSShessian.numerical(MLEobj)
 }
 

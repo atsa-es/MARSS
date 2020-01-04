@@ -25,10 +25,10 @@ MARSSvectorizeparam(MLEobj, parvec = NA, what="par")
 }
 \seealso{ \code{\link{marssMLE}} }
 \examples{
-  dat <- t(harborSealWA)
-  dat <- dat[2:4,]
-  kem <- MARSS(dat)
-  paramvec = MARSS:::MARSSvectorizeparam(kem)
-  paramvec
+dat <- t(harborSealWA)
+dat <- dat[2:4, ]
+kem <- MARSS(dat)
+paramvec <- MARSS:::MARSSvectorizeparam(kem)
+paramvec
 }
 
