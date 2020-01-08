@@ -89,7 +89,7 @@ autoplot.marssMLE <-
       tit <- "Model fitted Y"
       if (conf.int) tit <- paste(tit, "+ fitted CIs")
       if (decorate) tit <- paste(tit, "+ residuals CIs (dashed)")
-      df <- augment.marssMLE(x, type = "observations", interval="confidence", form = model_form)
+      df <- augment.marssMLE(x, type = "observations", interval="confidence", conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
       df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
