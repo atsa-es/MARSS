@@ -31,11 +31,11 @@
   eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{ 
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
+dat <- t(harborSeal)
+dat <- dat[c(2, 11), ]
+MLEobj <- MARSS(dat)
 
-  print(MLEobj$model)
-  #this is identical to 
-  print(MLEobj, what="model")
+print(MLEobj$model)
+# this is identical to
+print(MLEobj, what = "model")
 }

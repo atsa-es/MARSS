@@ -31,7 +31,7 @@ MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0,
 }
 }
 \value{
-  A list with specifying initial values for the estimated values for each parameter matrix in a MARSS model in marss form. So this will be a list with elements B, U, Q, Z, A, R, x0, V0, G, H, L.
+  A list with initial values for the estimated values for each parameter matrix in a MARSS model in marss form. So this will be a list with elements B, U, Q, Z, A, R, x0, V0, G, H, L.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  

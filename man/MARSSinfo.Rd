@@ -19,3 +19,7 @@ MARSSinfo(number)
 
   eli(dot)holmes(at)noaa(dot)gov
 }
+\examples{
+# Show all the info options
+MARSSinfo()
+}

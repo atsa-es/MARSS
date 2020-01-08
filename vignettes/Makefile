@@ -42,8 +42,8 @@ makeRfiles:
 	cat ./figures/CS1--Cs1_*.R > ../inst/doc/Chapter_PVA.R
 	cat ./figures/CS2--Cs2_*.R > ../inst/doc/Chapter_SealTrend.R
 	cat ./figures/CS3--Cs*_*.R > ../inst/doc/Chapter_SealPopStructure.R
-	cat ./figures/CS5--Cs*.R > ../inst/doc/Chapter_AnimalTracking.R
 	cat ./figures/CS4--Cs*.R > ../inst/doc/Chapter_DFA.R
+	cat ./figures/CS5--Cs*.R > ../inst/doc/Chapter_AnimalTracking.R
 	cat ./figures/CS6--Cs*.R > ../inst/doc/Chapter_StructuralBreaks.R
 	cat ./figures/CS7--Cs*.R > ../inst/doc/Chapter_SpeciesInteractions.R
 	cat ./figures/CS8--Cs*.R > ../inst/doc/Chapter_CombiningTrendData.R
@@ -78,7 +78,7 @@ clean:
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
 	$(RM) *.R
-	$(RM) ../README.md ../_config.yml ../favicon.ico ../logo.jpg ../logot.png
+	$(RM) ../README.md ../_config.yml ../favicon.ico ../logo.jpg ../logot.png ../License.md
 	$(RM) ../_layouts/*.*
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
@@ -91,5 +91,5 @@ clean:
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
-	$(RM) ../R/toLatex_marssMODEL.R ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
+	$(RM) ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
 	

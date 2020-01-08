@@ -3,9 +3,10 @@
 \title{Return estimated parameters, expected value of X(t) and Y(t) with summary information}
 \description{
 
-For parameters, \code{tidy.marssMLE} returns their estimates and their confidence intervals. For states (X) and observations (Y), it returns the expected values (mean value) and intervals for the complete right side of the MARSS X and Y equations (including the error terms) conditioned on all the data, data up to t or data up to t-1. 
+\code{tidy.marssMLE} returns summary information about the model parameters and estimated state and observation processes. 
 
-If you want the fitted values of \eqn{\mathbf{Y}_t}{Y_t}, use \code{\link{fitted.marssMLE}} or \code{\link{augment.marssMLE}}. \code{\link{augment.marssMLE}} is  also what you want for residuals analysis (for outlier analysis). See details.
+For parameters, \code{tidy.marssMLE} returns their estimates and their confidence intervals. For states (X) and observations (Y), it returns the expected values (mean value) and intervals for the complete right side of the MARSS X and Y equations (including the error terms) conditioned on all the data, data up to t or data up to t-1. For \code{type="observations", conditioning="t-1"}, the intervals are the one step-ahead prediction intervals. If you want to analyze your model residuals, you need the residuals intervals. These are the intervals for model residuals (data - model fitted value). Use \code{\link{augment.marssMLE}} for the model residuals and their intervals.
+
 
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
@@ -19,7 +20,7 @@ The tidy function is designed to work with the \code{broom} package and you will
 \arguments{
   \item{x}{a marssMLE object}
   
-  \item{type}{What you want estimates and intervals for. Parameters, states (X) or observations (Y).}
+  \item{type}{What you want estimates and intervals for. Parameters, states (x), or observations (y).}
   
   \item{conf.int}{ Whether to compute intervals on the estimates. }
   
@@ -39,11 +40,11 @@ A data.frame with estimates, sample standard errors, and confidence (or predicti
 
 \details{
 
-Below, X and Y refers to the random variable and x and y refer to the actual value (which is drawn from the distribution of the random variable).
+Below, X and Y refers to the random variable and x and y refer to a specific realization from this random variable.
 
 \strong{type="parameters"}  
 
-If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the fitted model object if these are not already added to the model object.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
+If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the model object if these are not already added.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
 \strong{type="states"}
 
@@ -56,6 +57,8 @@ If \code{type="parameters"}, this returns a data.frame with the estimated parame
 
 Analogously, we can compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t-1. Those values are \code{xtt1[,t]} and \code{Vtt1[,,t]}. We can also compute the expected value and variance of \eqn{\mathbf{X}_t}{X_t} conditioned on only the data up to t. Those are \code{xtt[,t]} and \code{Vtt[,,t]}. All these statistics are available from the Kalman filter and smoother function \code{\link{MARSSkf}}.
 
+The variances \code{VtT}, \code{Vtt} and \code{Vtt1} give information on the uncertainty of the true location of \eqn{\mathbf{x}_t} conditioned on the observed data. As more data at time t is collected (or added to the analysis), these variances will shrink since the data, especially data at time t, increases the information about the locations of \eqn{\mathbf{x}_t}. This does not affect the estimation of the model parameters, those are fixed, but rather our information about the states at time t.
+
 If you have a DFA model (form='dfa'), you can pass in \code{rotate=TRUE} to return the rotated trends.  If you want the rotated loadings, you will need to compute those yourself:
 \preformatted{
 dfa <- MARSS(t(harborSealWA[,-1]), model=list(m=2), form="dfa")
@@ -64,24 +67,49 @@ H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
 
+\strong{Intervals for the observation process}
 
-\strong{type="observations"}
+For observation process (\code{type="observations"}), the expected values and intervals are shown for either new data (\code{type="new observations"}) or the observed data set . Details on these are below after this discussion of intervals for the observation process.
 
-\code{tidy.marssMLE} returns the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t}, conditioned on all the data or data up to t-1 (conditioning on data up to t only is not provided). Note that the expected value of \eqn{\mathbf{Y}_t}{Y_t} conditioned on \eqn{\mathbf{Y}_t=\mathbf{y_t}}{Y_t=y_t}, meaning if there is no missing data, the expected value of the data is the data. However, if you have missing data, the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} is what you want.  These values are returned by \code{\link{MARSShatyt}} in \code{ytT} and \code{OtT-tcrossprod(ytT)}. The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.yt + Ey}). Note that \code{ytT} is not the same as the fitted \eqn{\mathbf{Y}_t}{Y_t}, and if there are no missing values, the variance of \eqn{\mathbf{Y}_t}{Y_t} conditioned on the data will be 0. See below.  
+The types of intervals you want for data (Y part of the MARSS equation) depends on what you are trying to do.
+\itemize{
+\item{Get the model predictions}{Use \code{\link{fitted.marssMLE}} with \code{type="observations"}. This returns the fitted values (model predictions) for \eqn{Y_t} and you can condition on all the data, data up to t, or data up to t-1. Depending on what you want to do with those fitted values, you might use \code{tidy.marssMLE} or \code{\link{augment.marssMLE}}.}
+\item{Get the distribution of new data that would be generated by the process}{Use \code{augment.marssMLE} with \code{type="observations"}.}
+\item{Compare your data to model predictions}{In this case, you want the distribution of the model residuals for the data. Use \code{\link{augment.marssMLE}} with \code{type="observations"}. You want the standard errors for the data minus the fitted values (expected value of \eqn{V_t}) which is what  \code{\link{augment.marssMLE}} gives.  }
+\item{Get estimates and variance of missing data in your data set}{Use \code{tidy.marssMLE} with \code{type="observations"} and \code{conditioning="T"}. The observed data will have expected value equal to the observed data and variance of 0, while the missing data will have their expected value and variance conditioned on all the observed data.}
+\item{Do a leave-one-out cross-validation}{In this case, you want the distribution of the model residuals for those left-out values. Use \code{augment.marssMLE} with \code{type="observations"} (and probably \code{conditioning="T"}). You want the standard errors for the left-out data minus the fitted values (so expected value of \eqn{V_t}) which is what  \code{\link{augment.marssMLE}} gives.  }
+\item{One-step-ahead predictions}{Set \code{conditioning="t-1"} for these. Both \code{\link{tidy.marssMLE}} (with \code{type="observations"} or \code{type="new observations"}) and \code{\link{augment.marssMLE}} with \code{type="observations"} give the same values in this case.  }
+}
 
-\strong{The estimate and distribution for missing data} If your \eqn{\mathbf{y}_t}{y_t} is missing data and you want an estimate of those values, use \code{tidy.marssMLE}. The standard error and confidence interval for the missing value takes into account all the information in the data. Do not use \code{\link{augment.marssMLE}} as that returns the standard errors for the model residuals for missing data, which will be quite different if the R matrix is not diagonal (though identical if R is diagonal). Also do not use "prediction" intervals for interpolating missing data, as those are for entire new data sets and thus will ignore relevant information if \eqn{\mathbf{y}_t}{y_t} is multivariate, not all \eqn{\mathbf{y}_t}{y_t} are missing, and the R matrix is not diagonal.
+\strong{type="new observations"}
 
-\strong{One step ahead predictions} Use \code{conditioning="t-1"} for the one-step-ahead predictions of \eqn{\mathbf{y}_t}{y_t}, using only data up to t-1. This is the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} conditioned on the data up to t-1. These are one-step-ahead prediction intervals.
+For \code{type="new observations"}, \code{tidy.marssMLE} returns the analogous information for the Y part of the MARSS equation for an I.I.D. NEW DATA SET  \eqn{y'}. The expected value and variance of \eqn{y'} is conditioned on the data you did observe \eqn{y}. It is important to note that \eqn{y'} is independent and identical (meaning i.i.d. in a statistical sense) to \eqn{y} except it has no missing values. Do not plot your observed data on these intervals. You need residuals intervals in that case. See \code{\link{augment.marssMLE}} for those. 
+
+The expected value of a new data set \eqn{\mathbf{Y'}_t}{Y'_t} conditioned on the observed \eqn{\mathbf{Y}_t=\mathbf{y_t}}{Y_t=y_t}, is \eqn{Z_t \hat{x}_t + D_t d_t + a_t}{Z_t hatx_t + D_t d_t + a_t}, where \eqn{\hat{x}_t}{hatx_t} is the expected value of \eqn{\mathbf{X}_t}{X_t} conditioned on the data up to T, t or t-1 (depending on the value of \code{conditioning}). See \code{\link{fitted.marssMLE}}. The variance of a new data set \eqn{\mathbf{Y'}_t}{Y'_t} conditioned on the observed \eqn{\mathbf{Y}_t=\mathbf{y_t}}{Y_t=y_t}, is \eqn{R_t + Z_t \hat{V}_t Z_t^\top}{R_t + Z_t hatV_t t(Z_t)}, where \eqn{\hat{V}_t}{hatV_t} is the variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the data up to T, t or t-1.
+
+We compute the confidence interval for y', an interval that will cover the new data for alpha/2 percent of new data sets.  The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.yt + Ey}), where \code{Ey} is the expected value of \eqn{\mathbf{Y'}_t}{Y'_t} and \code{se.yt} is the square root of the diagonal of the variance of \eqn{\mathbf{Y'}_t}{Y'_t}.
+
+\strong{type="observations" for missing data estimation}
+
+This returns the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} (the data set you DID observe) conditioned on \eqn{\mathbf{Y}_t=y_t}{Y_t=y_t}. This what you want if you want to estimate the values of missing data in your data set. The expected value of \eqn{\mathbf{Y}_t|\mathbf{Y}_t=\mathbf{y}_t}{Y_t|Y_t=y_t} is in \code{ytT} in \code{\link{MARSShatyt}} output and the variance is \code{OtT-tcrossprod(ytT)} from the \code{\link{MARSShatyt}} output. 
+
+The expected value of \eqn{\mathbf{Y}_t}{Y_t} conditioned on \eqn{\mathbf{Y}_t=\mathbf{y}_t}{Y_t=y_t} is simply \eqn{\mathbf{y}_t}{y_t}. So is not useful if you have no missing values. Its use is for the case where you have missing values scattered throughout your data set. The standard error and confidence interval reported by \code{tide.marssMLE} for the missing values takes into account all the information in the data, specifically the correlation with other data at time t if R is not diagonal. Do not use \code{\link{augment.marssMLE}} as that returns the standard errors for the model residuals for missing data, which will be quite different if the R matrix is not diagonal (though identical if R is diagonal). Also do not use "prediction" intervals for interpolating missing data (\code{type="new observations"}), as those are for entirely new data sets and thus will ignore relevant information if \eqn{\mathbf{y}_t}{y_t} is multivariate, not all \eqn{\mathbf{y}_t}{y_t} are missing, and the R matrix is not diagonal.
+
+\strong{One step ahead predictions} Use \code{conditioning="t-1"} for the one-step-ahead predictions of \eqn{\mathbf{y}_t}{y_t}, using only data up to t-1. Because the one-step-ahead predictions do not include \eqn{y_t} for calculation, you can use your data to evaluate the intervals. Thus in this case (only) it would make sense to plot your data on top of the prediction intervals. But in general use \code{\link{augment.marssMLE}} when you want statistics (such as intervals) associated with your observed data.
 
 \strong{Output that \code{augment.marssMLE} provides and \code{tidy.marssMLE} does not}
+
 
 \strong{fitted Y(t)} The fitted values of \eqn{\mathbf{Y}_t}{Y_t} is the expected value of the right side of the \eqn{\mathbf{Y}_t}{Y_t} equation WITHOUT the \eqn{v_t}. Use \code{\link{fitted.marssMLE}} and \code{\link{augment.marssMLE}} to get the fitted values, their residuals, and their residual variances (for outlier analysis).
 
 \strong{Residual intervals} For residuals analysis (outlier detection), you want to use the "residual" intervals provided with \code{\link{augment.marssMLE}}. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}. The residuals intervals are also what you want to evaluate data that you leave out, for example for a leave-one-out-cross-validation.
 
-\strong{Prediction intervals for new data} The one-step-ahead prediction intervals are not what you want if you left some of your data out or you want to compute intervals for data during 1 to TT that you didn't collect (so not in the future but contemporaneous with your data).  The 1:TT (so using all data) prediction interval is for new independent data which observe the same \eqn{\mathbf{x}_t}{x_t} as the data which were used to fit the model. Use \code{\link{augment.marssMLE}} for these prediction intervals.
+\strong{Leave-one-out analysis} The one-step-ahead prediction intervals are not what you want if you left some of your data out and want to evaluate the model residuals for the left-out-data. The residuals intervals are also what you want for this case (with the left-out-data set to NA).
 
-Currently the intervals calculations for the states and observations use the point estimates of the model parameters and thus solve the intervals for the 'known' parameters case.
+\strong{Prediction intervals for new data} The one-step-ahead prediction intervals are also not what you want if you want to compute intervals for data during 1 to TT that you didn't collect (so not in the future but contemporaneous with your data).  To compute prediction intervals for new data within 1:TT (so not forecasts past TT), you need to decide what you mean by 'new' and how these new data at time t relate to existing data at time t. Are the new data are i.i.d relative to the old data? So if you made an R matrix, it would be diagonal with the same value on the diagonal. Or are they missing data which might have a different variance and be correlated with the old data. In this case the R matrix might not be diagonal with one value on the diagonal.
+
+\strong{Parameter uncertainty} Currently the intervals calculations for the states and observations use the point estimates of the model parameters and thus solve the intervals for the 'known' parameters case.
+
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applications. Edition 4. Springer-Verlag, New York.
@@ -89,37 +117,34 @@ R. H. Shumway and D. S. Stoffer (2000).  Time series analysis and its applicatio
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]
 }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11,12),]
-  # model allowing correlation between x states
-  MLEobj <- MARSS(dat, model=list(Q="unconstrained"))
+dat <- t(harborSeal)
+dat <- dat[c(2, 11, 12), ]
+MLEobj <- MARSS(dat)
 
 library(broom)
-library(ggplot2)
 
 # A data frame of the estimated parameters
- tidy(MLEobj)
- 
+tidy(MLEobj)
+
 # Make a plot of the estimated states
 library(ggplot2)
-d <- tidy(MLEobj, type="states")
-ggplot(data = d) + 
+d <- tidy(MLEobj, type = "states")
+ggplot(data = d) +
   geom_line(aes(t, estimate)) +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
-  facet_grid(~term) +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
+  facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
-  
+
 # Make a plot of the estimates for the missing values
-# Use augment() to plot the fitted y(t)
-# i.e., to put a line through the points
+# Use augment() to plot the fitted y(t), i.e., to put a line through the points
 library(ggplot2)
-d <- tidy(MLEobj, type="observations")
-ggplot(data = d) + 
+d <- tidy(MLEobj, type = "observations")
+ggplot(data = d) +
   geom_point(aes(t, estimate)) +
   geom_line(aes(t, estimate)) +
-  geom_point(aes(t, y), color="blue") +
-  geom_ribbon(aes(x=t, ymin=conf.low, ymax=conf.high), linetype=2, alpha=0.3) +
-  facet_grid(~term) +
+  geom_point(aes(t, y), color = "blue") +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
+  facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("Blue=data, Black=estimate of missing data point")
   

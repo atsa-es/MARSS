@@ -904,3 +904,7 @@ zscore <- function(x) {
   if (ismat) rownames(x.z) <- rownames(x)
   x.z
 }
+
+MARSS.out <- function(){
+  #Null function for man file
+}

@@ -39,9 +39,9 @@ The \code{model} argument of the \code{\link{MARSS}} call is constrained in term
 \details{
 The \code{model} argument is a list. The following details what list elements can be passed in:
     \itemize{
-    \item \code{B}  "Identity". Can be "identity", "diagonal and equal", or "diagonal and unequal".
+    \item \code{B}  "Identity". The standard (and default) DFA model has B="identity". However it can be "identity", "diagonal and equal", "diagonal and unequal"  or a time-varying fixed or estimated diagonal matrix.
     \item \code{U}  "Zero". Cannot be changed or passed in via model argument.
-    \item \code{Q}  "Identity". Can be "identity", "diagonal and equal", or "diagonal and unequal".
+    \item \code{Q}  "Identity". The standard (and default) DFA model has Q="identity". However, it can be "identity", "diagonal and equal", "diagonal and unequal" or a time-varying fixed or estimated diagonal matrix.
     \item \code{Z}  Can be passed in as a (list) matrix if the user does not want a default DFA \code{Z} matrix.  There are many equivalent ways to construct a DFA \code{Z} matrix.  The default is Zuur et al.'s form (see User Guide).
     \item \code{A}  Default="zero". Can be "unequal", "zero" or a matrix.
     \item \code{R}  Default="diagonal and equal". Can be set to "identity", "zero", "unconstrained", "diagonal and unequal", "diagonal and equal", "equalvarcov", or a (list) matrix to specify general forms.
@@ -68,8 +68,8 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 }
 \examples{
 \dontrun{
-#See the Dynamic Factor Analysis chapter in the User Guide
-RShowDoc("UserGuide",package="MARSS")
+# See the Dynamic Factor Analysis chapter in the User Guide
+RShowDoc("UserGuide", package = "MARSS")
 }
 }
 
