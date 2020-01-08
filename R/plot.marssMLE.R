@@ -92,9 +92,10 @@ plot.marssMLE <-
     
     if ("observations" %in% plot.type) {
       # make plot of observations
-      df <- augment.marssMLE(x, type = "observations", form = model_form)
-      df$ymin <- df$.fitted - qnorm(alpha / 2) * df$.se.fit
-      df$ymax <- df$.fitted + qnorm(alpha / 2) * df$.se.fit
+      df <- augment.marssMLE(x, type = "observations", interval="confidence", 
+                             conf.level=conf.level, form = model_form)
+      df$ymin <- df$.conf.low
+      df$ymax <- df$.conf.up
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
