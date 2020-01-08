@@ -3,10 +3,9 @@
 \title{Return estimated parameters, expected value of X(t) and Y(t) with summary information}
 \description{
 
-\code{tidy.marssMLE} returns summary information about the model parameters and estimated state and observation processes. 
+\code{tidy.marssMLE} returns summary information about the model parameters and estimated state and observation processes. In all cases, all the data are used, thus conditioning is on the data from 1 to T.
 
-For parameters, \code{tidy.marssMLE} returns their estimates and their confidence intervals. For states (X) and observations (Y), it returns the expected values (mean value) and intervals for the complete right side of the MARSS X and Y equations (including the error terms) conditioned on all the data, data up to t or data up to t-1. For \code{type="observations", conditioning="t-1"}, the intervals are the one step-ahead prediction intervals. If you want to analyze your model residuals, you need the residuals intervals. These are the intervals for model residuals (data - model fitted value). Use \code{\link{augment.marssMLE}} for the model residuals and their intervals.
-
+For parameters, \code{tidy.marssMLE} returns their estimates and their confidence intervals. For states (X) and observations (Y), it returns the expected values (mean value) and intervals. If you want to analyze your model residuals or are doing a crossvalidation (leave-one-out or k-fold), you need the residuals intervals. These are the intervals for model residuals (data - model fitted value). Use \code{\link{augment.marssMLE}} for the model residuals and their intervals.
 
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
@@ -63,7 +62,7 @@ Z.rot <- Z.est \%*\% H.inv
 
 \strong{Intervals for the observation process}
 
-For observation process (\code{type="observations"}), the expected values and intervals are shown for either new data (\code{type="fitted.ytT"}) or the observed data set  (\code{type="ytT"}). Details on these are below after this discussion of intervals for the observation process
+For observation process, the expected values and intervals are shown for either new data (\code{type="fitted.ytT"}) or the observed data set  (\code{type="ytT"}). Details on these are below after this discussion of intervals for the observation process
 
 The types of intervals you want for data (Y part of the MARSS equation) depends on what you are trying to do.
 \itemize{
