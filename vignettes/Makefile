@@ -78,7 +78,7 @@ clean:
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
 	$(RM) *.R
-	$(RM) ../README.md ../_config.yml ../favicon.ico ../logo.jpg ../logot.png
+	$(RM) ../README.md ../_config.yml ../favicon.ico ../logo.jpg ../logot.png ../License.md
 	$(RM) ../_layouts/*.*
 	$(RM) Manual.pdf
 	$(RM) ./tables/*.*
@@ -91,5 +91,5 @@ clean:
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
-	$(RM) ../R/toLatex_marssMODEL.R ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
+	$(RM) ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd
 	
