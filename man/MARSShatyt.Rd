@@ -9,20 +9,22 @@ MARSShatyt( MLEobj, only.kem = TRUE )
 }
 \arguments{
   \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{model} element with the model description and data. }
-  \item{ only.kem }{ Return only ytT, OtT, yxtT, and yxttpT (values conditioned on the data from 1:T). If \code{only.kem=FALSE}, then also return values conditioned on data from 1 to t-1 (Ott1 and ytt1). yxt1T is also returned (E[y(t),x(t-1)|1:T]).}
+  \item{ only.kem }{ Return only ytT, OtT, yxtT, and yxttpT (values conditioned on the data from 1:T). If \code{only.kem} If TRUE, only return (and compute) values conditioned on data 1 to T needed for the EM algorithm.  If FALSE, then also return values conditioned on data from 1 to t-1 (Ott1 and ytt1) and 1 to t (Ott and ytt). yxtt1T is also returned (E[y(t),x(t-1)|1:T]) if only.kem=FALSE.}
   }
 \details{
 For state space models, \code{MARSShatyt()} computes the expectations involving Y.  If Y is completely observed, this entails simply replacing Y with the observed y.  When Y is only partially observed, the expectation involves the conditional expectation of a multivariate normal. 
  
 }
 \value{ 
-A list with the following components (n is the number of state processes). Following the notation in Holmes (2012), y(1) is the observed data (for t=1:TT) while y(2) is the unobserved data.  y(1,1:t) is the observed data from time 1 to t.
+A list with the following components (n is the number of state processes). Following the notation in Holmes (2012), y(1) is the observed data (for t=1:TT) while y(2) is the unobserved data.  y(1,1:t-1) is the observed data from time 1 to t-1.
   \item{ytT}{ Estimates E[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x T matrix). }
   \item{ytt1}{ Estimates E[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x T matrix). }
+  \item{ytt}{ Estimates E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x T matrix). }
   \item{OtT}{ Estimates E[Y(t) t(Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x n x T array). }
   \item{Ott1}{ Estimates E[Y(t) t(Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x T array). }
+  \item{Ott}{ Estimates E[Y(t) t(Y(t) | Y(1,1:t)=y(1,1:t)] (n x n x T array). }
   \item{yxtT}{ Estimates E[Y(t) t(X(t) | Y(1,1:TT)=y(1,1:TT)] (n x m x T array). }
-  \item{yxt1T}{ Estimates E[Y(t) t(X(t-1) | Y(1,1:TT)=y(1,1:TT)] (n x m x T array). }
+  \item{yxtt1T}{ Estimates E[Y(t) t(X(t-1) | Y(1,1:TT)=y(1,1:TT)] (n x m x T array). }
   \item{yxttpT}{ Estimates E[Y(t) t(X(t+1) | Y(1,1:TT)=y(1,1:TT)] (n x m x T array). }
   \item{errors}{ Any error messages due to ill-conditioned matrices. }
   \item{ok}{ (TRUE/FALSE) Whether errors were generated. }
