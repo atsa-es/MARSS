@@ -18,7 +18,7 @@ plot.marssMLE <-
     
     plotpar <- list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
                     line.col = "black", line.size = 1, line.linetype = "solid",
-                    ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
+                    ci.fill = "grey70", ci.col = "grey70", ci.border = FALSE, 
                     ci.linesize = 0, ci.alpha = 0.6)
     if (!is.list(plot.par)) stop("plot.marssMLE: plot.par must be a list.", call. = FALSE)
     if (!missing(plot.par)){
@@ -96,6 +96,8 @@ plot.marssMLE <-
                              conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
+      df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
+      df$ymax.resid <- df$.fitted - qnorm(alpha / 2) * df$.sigma
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -108,6 +110,10 @@ plot.marssMLE <-
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
           lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          if (decorate){
+            lines(t, ymin.resid, col = "black", lwd = 1, lty=2)
+            lines(t, ymax.resid, col = "black", lwd = 1, lty=2)
+          }
           box()
         })
       }
