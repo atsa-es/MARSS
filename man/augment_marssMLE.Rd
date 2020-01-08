@@ -6,7 +6,7 @@
 \title{Return the model predicted values, residuals, and optionally confidence intervals}
 \usage{
   augment.marssMLE(x, type = c("observations", "states", "y", "x"),
-                              interval = c("none", "confidence"), 
+                              interval = c("none", "confidence", "prediction"), 
                               conf.level = 0.95, 
                               conditioning = c("T", "t", "t-1"),
                               form=attr(x[["model"]], "form")[1])
