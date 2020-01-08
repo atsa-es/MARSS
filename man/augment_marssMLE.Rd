@@ -16,7 +16,7 @@
   
   \item{type}{observations (y) or states (x).  Read the details below for states.  \code{tidy} would be the more common function for returning state estimates.}
   
-  \item{interval}{Type of interval: none or confidence interval.  If the latter, approximate intervals from the standard errors of the fitted values is given.}
+  \item{interval}{Type of interval: none, confidence or prediction interval.  If the confidence, approximate intervals from the standard errors of the fitted values is given.}
   
   \item{conf.level}{Confidence level.}
   
@@ -48,7 +48,7 @@ If interval = "prediction", the following are added to the data frame:
 \item{.lwr}{Lower range at \code{alpha = 1-conf.level}. The interval is approximated using qnorm(alpha/2)*.sd + .fitted. }
 \item{.upr}{Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2)*.sd + .fitted. }
 
-The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on these intervals. For that you need to use \code{.sigma} and construct intervals as noted above. 
+The standard deviation is for new x or y, not estimated x nor y used in the model. Do not plot the observed data nor the states estimates on the confidence or prediction intervals. For that you need to use \code{.sigma} and construct intervals as noted above. \code{autoplot()} will show the residuals intervals on the observation plot.
 
 }
 \details{
