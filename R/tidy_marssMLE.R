@@ -6,19 +6,18 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
                           form = attr(x[["model"]], "form")[1], ...) {
   ## Argument checking
   type <- match.arg(type)
-  conditioning <- "T"
+  conditioning <- "T" # MARSShatyt missing needed var.ytt1 and var.Eytt1 for other cases
   if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
   if (!(conf.int %in% c(TRUE, FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if (type == "xtT") type <- "x"
   if (type == "ytT") type <- "y"
   if (type == "fitted.ytT") type <- "fitted.y"
-  if (type == "y" && conditioning == "t") stop("tidy.marssMLE: if type='observations' or 'y', conditioning must be 'T' or 't-1'.", call. = FALSE)
   if (!(form %in% c("marss", "marxss", "dfa"))) stop("tidy.marssMLE: Allowed forms are marss, marxss, and dfa.\n", call. = FALSE)
   if (length(form) != 1) stop("tidy.marssMLE: Please enter one form from marss, marxss, and dfa.\n", call. = FALSE)
   ## End Argument checking
 
   alpha <- 1 - conf.level
-  conditioning <- switch(conditioning, T = "tT", `t-1` = "tt1", t = "tt")
+  csuffix <- switch(conditioning, T = "tT", `t-1` = "tt1", t = "tt")
   extras <- list()
 
   rerun.MARSSparamCIs <- FALSE
@@ -65,7 +64,7 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     rownames(ret) <- NULL
   }
   if (type == "x") {
-    xtype <- paste0(type, conditioning)
+    xtype <- paste0(type, csuffix)
     model <- x[["model"]]
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
@@ -112,7 +111,7 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     rownames(ret) <- NULL
   }
   if (type == "y") {
-    ytype <- paste0(type, conditioning)
+    ytype <- paste0(type, csuffix)
     model <- x[["model"]]
     Y.names <- attr(model, "Y.names")
     Y.dims <- attr(model, "model.dims")[["y"]]
@@ -120,29 +119,60 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     TT <- Y.dims[2]
     hatyt <- MARSShatyt(x, only.kem=FALSE)
     Ey <- hatyt[[ytype]]
-    vtype <- str_replace(ytype, "y", "O")
+    vtype <- str_replace(ytype, "y", "var.y")
+    y.var <- hatyt[[vtype]]
+    vtype <- str_replace(ytype, "y", "var.Ey")
     Ey.var <- hatyt[[vtype]]
-    for (t in 1:TT) Ey.var[, , t] <- Ey.var[, , t] - tcrossprod(Ey[, t])
-    Ey.se <- apply(Ey.var, 3, function(x) {
-      takediag(x)
-    })
+    Ey.se <- apply(Ey.var, 3, function(x) { takediag(x) })
     Ey.se[Ey.se < 0] <- NA
     Ey.se <- sqrt(Ey.se)
+    y.sd <- apply(y.var, 3, function(x) { takediag(x) })
+    y.sd[y.sd < 0] <- NA
+    y.sd <- sqrt(y.sd)
     if (nn == 1) Ey.se <- matrix(Ey.se, 1, TT)
-
+    if (nn == 1) y.sd <- matrix(y.sd, 1, TT)
+    
     ret <- data.frame(
       .rownames = rep(Y.names, each = TT),
       t = rep(1:TT, nn),
       y = vec(t(x[["model"]][["data"]])),
       estimate = vec(t(Ey)),
-      std.error = vec(t(Ey.se))
+      std.error = vec(t(Ey.se)),
+      std.dev = vec(t(y.sd))
     )
     if (conf.int) {
-      conf.low <- qnorm(alpha / 2) * ret$std.error + ret$estimate
-      conf.up <- qnorm(1 - alpha / 2) * ret$std.error + ret$estimate
       ret <- cbind(ret,
-        conf.low = conf.low,
-        conf.high = conf.up
+        conf.low = qnorm(alpha / 2) * ret$std.error + ret$estimate,
+        conf.high = qnorm(1 - alpha / 2) * ret$std.error + ret$estimate,
+        pred.low = qnorm(alpha / 2) * ret$std.dev + ret$estimate,
+        pred.high = qnorm(1 - alpha / 2) * ret$std.dev + ret$estimate
+      )
+    }
+    rownames(ret) <- NULL
+  }
+  if (type == "fitted.y") {
+    Y.names <- attr(x[["model"]], "Y.names")
+    Y.dims <- attr(x[["model"]], "model.dims")[["y"]]
+    nn <- Y.dims[1]
+    TT <- Y.dims[2]
+    fit.y.conf <- fitted.marssMLE(x, type="observations", 
+                             conditioning=conditioning, interval="confidence", conf.level=conf.level)
+    fit.y.pred <- fitted.marssMLE(x, type="observations", 
+                             conditioning=conditioning, interval="prediction", conf.level=conf.level)
+    ret <- data.frame(
+      .rownames = rep(Y.names, each = TT),
+      t = rep(1:TT, nn),
+      y = vec(t(x[["model"]][["data"]])),
+      estimate = vec(t(fit.y.conf$.fitted)),
+      std.error = vec(t(fit.y.conf$.se.fit)),
+      std.dev = vec(t(fit.y.pred$.sd.y))
+    )
+    if (conf.int) {
+      ret <- cbind(ret,
+                   conf.low = qnorm(alpha / 2) * ret$std.error + ret$estimate,
+                   conf.high = qnorm(1 - alpha / 2) * ret$std.error + ret$estimate,
+                   pred.low = qnorm(alpha / 2) * ret$std.dev + ret$estimate,
+                   pred.high = qnorm(1 - alpha / 2) * ret$std.dev + ret$estimate
       )
     }
     rownames(ret) <- NULL

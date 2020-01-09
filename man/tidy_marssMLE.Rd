@@ -72,7 +72,6 @@ The types of intervals you want for data (Y part of the MARSS equation) depends 
 \item{Get estimates and variance of missing data in your data set}{Use \code{type="ytT"}. The observed data will have an expected value equal to the observed data and variance of 0, while the missing data will have an expected value and variance conditioned on all the observed data. Note, if R is diagonal then the missing data values (and intervals) will be the same as for \code{type="fitted.ytT"} but if R is non-diagonal and some y at time t are missing and some are not, then the expected values will be very different.}
 \item{Do a leave-one-out cross-validation}{In this case, you want the distribution of the model residuals for those left-out values. Use \code{augment.marssMLE} with \code{type="observations"}. You want the standard errors for the left-out data minus the fitted values which is what  \code{\link{augment.marssMLE}} gives.  }
 \item{One-step-ahead predictions}{Use \code{fitted.marssMLE} with \code{conditioning="t-1"}. Confidence (mean prediction) and prediction intervals (new data) are returned.  }
-}
 \item{Y prediction conditioned on data up to t-1}{Same as one-step-ahead.}
 }
 
@@ -82,7 +81,7 @@ For \code{type="fitted.ytT"}, \code{tidy.marssMLE} returns the analogous informa
 
 The expected value of a new data set \eqn{\mathbf{Y'}_t}{Y'_t} conditioned on the observed data \eqn{\mathbf{Y}=\mathbf{y(1:T)}}{Y=y(1:T)}, is \eqn{Enewy = Z_t \hat{x}_t + D_t d_t + a_t}{Enewy = Z_t hatx_t + D_t d_t + a_t}, where \eqn{\hat{x}_t}{hatx_t} is the expected value of \eqn{\mathbf{X}_t}{X_t} conditioned on the data up to T. The variance of a new data set \eqn{\mathbf{Y'}_t}{Y'_t} conditioned on the observed data 1:T, is \eqn{var.newy = R_t + Z_t \hat{V}_t Z_t^\top}{var.newy = R_t + Z_t hatV_t t(Z_t)}, where \eqn{\hat{V}_t}{hatV_t} is the variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the data up to T. The variance of the expected value of the new data set \eqn{\mathbf{Y'}_t}{Y'_t} is \eqn{var.Enewy = Z_t \hat{V}_t Z_t^\top}{var.Enewy = Z_t hatV_t t(Z_t)}.
 
-We compute the prediction interval for y', an interval that will cover the new data for alpha/2 percent of new data sets.  The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*sd.newy + Enewy}), where \code{sd.newy} is the square root of the diagonal of \eqn{var.newy}. The confidence interval for the expected value of y' is (\code{qnorm(alpha/2)*se.Enewy + Enewy}), where \code{se.Enewy} is the square root of the diagonal of \eqn{var.Enewy}.
+We compute the prediction interval for y', an interval that will cover the new data for alpha/2 percent of new data sets.  The equation for the \eqn{\alpha/2}{alpha/2} confidence interval is (\code{qnorm(alpha/2)*sd.newy + Enewy}), where \code{sd.newy} is the square root of the diagonal of \eqn{var.newy}. The confidence interval for the expected value of y' is \code{qnorm(alpha/2)*se.Enewy + Enewy}, where \code{se.Enewy} is the square root of the diagonal of \eqn{var.Enewy}.
 
 \strong{type="ytT" for missing data estimation}
 
@@ -90,7 +89,7 @@ This returns the expected value and variance of \eqn{\mathbf{Y}_t}{Y_t} (the dat
 
 The intervals reported by \code{tidy.marssMLE} for the missing values takes into account all the information in the data, specifically the correlation with other data at time t if R is not diagonal. Do not use \code{type="fitted.ytT"} for interpolating missing data as those are for entirely new data sets and thus will ignore relevant information if \eqn{\mathbf{y}_t}{y_t} is multivariate, not all \eqn{\mathbf{y}_t}{y_t} are missing, and the R matrix is not diagonal.
 
-The standard error and confidence interval for the expected value of the missing data along with the standard deviation and prediction interval for the missing data are reported. The former uses the variance of E[Y(t)] conditioned on the data while the latter uses variance of Y(t) conditioned on the data. \code{\link{MARSShatyt}} returns these variances and expected values. See Holmes (2012) for a discussion of the derivation of expectations of Y(t).
+The standard error and confidence interval for the expected value of the missing data along with the standard deviation and prediction interval for the missing data are reported. The former uses the variance of \eqn{E[Y(t)]} conditioned on the data while the latter uses variance of \eqn{Y(t)} conditioned on the data. \code{\link{MARSShatyt}} returns these variances and expected values. See Holmes (2012) for a discussion of the derivation of expectation and variance of Y(t) conditioned on the observed data (in the section 'Computing the expectations in the update equations').
 
 \strong{Parameter uncertainty} Currently the intervals calculations for the states and observations use the point estimates of the model parameters and thus solve the intervals for the 'known' parameters case.
 
@@ -112,7 +111,7 @@ tidy(MLEobj)
 
 # Make a plot of the estimated states
 library(ggplot2)
-d <- tidy(MLEobj, type = "states")
+d <- tidy(MLEobj, type = "xtT")
 ggplot(data = d) +
   geom_line(aes(t, estimate)) +
   geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
@@ -120,16 +119,33 @@ ggplot(data = d) +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of the estimates for the missing values
-# Use augment() to plot the fitted y(t), i.e., to put a line through the points
 library(ggplot2)
-d <- tidy(MLEobj, type = "observations")
+d <- tidy(MLEobj, type = "ytT")
 ggplot(data = d) +
   geom_point(aes(t, estimate)) +
   geom_line(aes(t, estimate)) +
   geom_point(aes(t, y), color = "blue") +
-  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), linetype = 2, alpha = 0.3) +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), alpha = 0.3) +
+  geom_line(aes(t, pred.low), linetype = 2) +
+  geom_line(aes(t, pred.high), linetype = 2) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
-  ggtitle("Blue=data, Black=estimate of missing data point")
-  
+  ggtitle("Blue=data, Black=estimate, grey=CI, dash=prediction interval")
+
+# Make a plot of the fitted y(t), i.e., to put a line through the points
+# Intervals are for new data not the blue dots 
+# (which were used to fit the model so are not new)
+# Use augment() for model residuals (data - fitted values)
+library(ggplot2)
+d <- tidy(MLEobj, type = "fitted.ytT")
+ggplot(data = d) +
+  geom_line(aes(t, estimate), size=1) +
+  geom_point(aes(t, y), color = "blue") +
+  geom_ribbon(aes(x = t, ymin = conf.low, ymax = conf.high), alpha = 0.3) +
+  geom_line(aes(t, pred.low), linetype = 2) +
+  geom_line(aes(t, pred.high), linetype = 2) +
+  facet_grid(~.rownames) +
+  xlab("Time Step") + ylab("Count") +
+  ggtitle("Blue=data, Black=estimate, grey=CI, dash=prediction interval") +
+  geom_text(x=15, y=7, label="The intervals are for \n new data not the blue dots")
 }
