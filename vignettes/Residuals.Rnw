@@ -88,7 +88,8 @@
 \def\trace{\,\textup{\textrm{trace}}}
 \def\hatxtT{\widetilde{\xx}_t^T}
 \def\hatxtpT{\widetilde{\xx}_{t+1}^T}
-\def\hatxtt1{\widetilde{\xx}_t^{t-1}}
+\def\hatxtt{\widetilde{\xx}_t^{t}}
+\def\hatxttm{\widetilde{\xx}_t^{t-1}}
 \def\hatxone{\widetilde{\xx}_1}
 \def\hatxzero{\widetilde{\xx}_0}
 \def\hatxtmT{\widetilde{\xx}_{t-1}^T}
@@ -561,7 +562,7 @@ The $\HH_t$ and $\GG_t$ matrices specify the variance and covariance of $\WW_t$ 
 The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\GG_t\epsilon_t\\ \HH_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxtt1=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVtt1=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVtt1=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
 
 \subsection{Algorithm}
 
@@ -584,7 +585,7 @@ Start from $t=T$ and work backwards to $t=1$. At time $T$, $r_T=0_{1 \times m}$ 
 K_t = \BB_{t+1}\KK_t = \BB_{t+1} \hatVtt1{\ZZ_t^*}^\top \FF_t^{-1}  , \,\, m \times n  \\
 L_t = \BB_{t+1} - K_t\ZZ_t^*  , \,\, m \times m \\
 J_t= \QQ^\prime_{t+1} - K_t \RR^\prime_t  , \,\, m \times (n+m) \\
-v_t = \yy_t^* - \ZZ_t\hatxtt1 - \aa_t , \,\, n \times 1 \\
+v_t = \yy_t^* - \ZZ_t\hatxttm - \aa_t , \,\, n \times 1 \\
 u_t = \FF_t^{-1} v_t - K_t^\top r_t , \,\, n \times 1 \\
 r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t , \,\, m \times 1  \\
 N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t   , \,\, m \times m .
@@ -628,9 +629,9 @@ One-step-ahead predictions (innovations) are often shown for MARSS models and th
 
 Define the innovations $\checkvt$ as\footnote{This is slightly different than the `innovations' that we normally use. Normally, we would work with the observed innovations while now we are talking about a sample from the random variable `innovations' not the specific sample that we observe. $\yy_t$ here is not the actual data that you observe. It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$.}:
 \begin{equation}\label{eq:vtt1}
-\checkvt = \yy_t - \ZZ_t\hatxtt1 - \aa_t,
+\checkvt = \yy_t - \ZZ_t\hatxttm - \aa_t,
 \end{equation}
-where $\hatxtt1$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance.
+where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance.
 
 The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, and we can write the variance as:
 \begin{equation}\label{eq:innov.model}
@@ -647,9 +648,9 @@ $\yy_t$ is not in the conditional since it only includes data up to $t-1$. Witho
 
 Define the state residuals conditioned on the data from 1 to $t-1$ as $\checkwt$.
 \begin{equation}\label{eq:wtt1}
-\checkwt = \hatxtt1 - \BB_t\hatxtmt1 - \uu_t,
+\checkwt = \hatxtt - \BB_t\hatxtmt1 - \uu_t,
 \end{equation}
-where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). However $\hatxtt1 = \E[\XX_t|\yy^{(1),t-1}] = \BB_t\hatxtmt1 + \uu_t$. Thus $\checkwt = 0$.
+where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). However $\hatxttm = \E[\XX_t|\yy^{(1),t-1}] = \BB_t\hatxtmt1 + \uu_t$. Thus $\checkwt = 0$.
 
 \subsection{Covariance of the conditional model and state residuals}
 
@@ -664,9 +665,9 @@ Since $\checkwt = 0$ for all $\yy^{(1)}$:
 We now the write the variance of the joint distribution of the conditional one-step ahead residuals. Define
 \begin{equation}
 \overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwt\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtt1 - \BB_t\hatxtmt1 - \uu_t \end{bmatrix}.
+\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \hatxttm - \BB_t\hatxtmt1 - \uu_t \end{bmatrix}.
 \end{equation}
-where $\hatxtt1$ and $\hatxtmt1$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
+where $\hatxttm$ and $\hatxtmt1$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
 The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to time $t-1$ is 0 and the variance of $\overline{\mathcal{E}}_t$  is
 \begin{equation}\label{eq:jointcondresid1innovs}
  \begin{bmatrix}[c|c]
@@ -683,7 +684,7 @@ The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to t
 If the residuals are defined as in \citet{Harveyetal1998},
 \begin{equation}
 \overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwtp\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtpt1 - \BB_{t+1}\hatxtt1-\uu_{t+1} \end{bmatrix}
+\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \hatxtpt1 - \BB_{t+1}\hatxttm-\uu_{t+1} \end{bmatrix}
 \end{equation}
 since $\checkWtp = 0$, and the variance-covariance matrix is again Equation \ref{eq:jointcondresid1innovs}.
 
