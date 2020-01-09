@@ -32,10 +32,10 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   hatVtpt[, , 1:(TT - 1)] <- kfList$Vtt1T[, , 2:TT, drop = FALSE]
   if(!only.kem){
     hatxtt1 <- kfList$xtt1
-    hatxtt <- kfList$xtt
+    hatxtt <- MARSSkfss(MLEobj)$xtt
     hatxt1 <- cbind(E.x0, kfList$xtT[, 1:(TT - 1), drop = FALSE])
     hatVtt1 <- kfList$Vtt1
-    hatVtt <- kfList$Vtt
+    hatVtt <- MARSSkfss(MLEobj)$Vtt
     hatVtt1T <- kfList$Vtt1T
   } 
   
@@ -72,9 +72,11 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   hatyxt <- hatyxttp <- array(0, dim = c(n, m, TT))
   
   if(!only.kem){
+    # hatvarEytT = variance of the expected value of ytT
     hatytt1 <- hatytt <- matrix(0, n, TT)
     hatOtt1 <- hatOtt <- array(0, dim = c(n, n, TT))
     hatyxtt1T <- array(0, dim = c(n, m, TT))
+    hatvarEytT <- hatvarytT <- array(0, dim = c(n, n, TT))
   }
 
   for (t in 1:TT) {
@@ -103,6 +105,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
         hatytt[, t] <- hatyt[, t]
         hatOtt[, , t] <- hatOt[, , t]
         hatyxtt1T[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE])
+        # don't need to update hatvarEytT[, , t] nor hatvarytT[, , t] since it will be 0
       }
     } else {
       I.2 <- I.r <- I.n
@@ -131,13 +134,15 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
         hatytt[, t] <- y[, t, drop = FALSE] - Delta.r %*% (y[, t, drop = FALSE] - pari$Z %*% hatxtt[, t, drop = FALSE] - pari$A)
         hatOtt[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVtt[, , t] %*% t.DZ) %*% I.2 + tcrossprod(hatytt[, t, drop = FALSE])
         hatyxtt1T[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVtt1T[, , t]
+        hatvarEytT[, , t] <- I.2 %*% (Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2
+        hatvarytT[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2
       }
     }
   } # for loop over time
   if(only.kem){
     rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp)
   }else{
-    rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1T = hatyxtt1T, ytt = hatytt, Ott = hatOtt)
+    rtn.list <- list(ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1T = hatyxtt1T, ytt = hatytt, Ott = hatOtt)
   }
   return(c(rtn.list, list(ok = TRUE, errors = msg)))
 }
