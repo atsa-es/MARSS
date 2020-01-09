@@ -2207,7 +2207,7 @@ If there are no observed values at time $t$, then
 When only some of the $\YY_t$ are observed, we use again the conditional probability of a multivariate normal (equation \ref{eq:cond.multi.normal}).  From this property, we know that 
 \begin{equation}
 \begin{split}
-&\var_{Y|x}[\YY_t(2)\YY_t(2)^\top|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=\ddot{\RR}_{t,22} - \ddot{\RR}_{t,21}(\ddot{\RR}_{t,11})^{-1}\ddot{\RR}_{t,12},\\
+&\var_{Y|x}[\YY_t(2)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=\ddot{\RR}_{t,22} - \ddot{\RR}_{t,21}(\ddot{\RR}_{t,11})^{-1}\ddot{\RR}_{t,12},\\
 &\var_{Y|x}[\YY_t(1)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=0\\
 \text{and }&\cov_{Y|x}[\YY_t(1),\YY_t(2)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=0\\
 \\
@@ -2233,6 +2233,13 @@ Now we can compute the $\E_{XY}[\YY_t\YY_t^\top|\YY(1)=\yy(1)]$.  The subscripts
 \end{split}
 \end{equation}
 Thus,
+\begin{equation}
+\hatOt=\IIm_t^{(2)}(\IR_t\ddot{\RR}_t + \IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top)\IIm_t^{(2)}  +  \hatyt\hatyt^\top  \\
+\end{equation}
+
+\var[\E_{X|y}[\var_{Y|x}[\YY_t(2)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]] + 
+\var_{X|y}[\E_{Y|x}[\YY_t(2)\YY_t(2)^\top|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]]
+
 \begin{equation}
 \hatOt=\IIm_t^{(2)}(\IR_t\ddot{\RR}_t + \IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top)\IIm_t^{(2)}  +  \hatyt\hatyt^\top  \\
 \end{equation}
