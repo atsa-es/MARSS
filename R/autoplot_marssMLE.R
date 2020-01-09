@@ -59,7 +59,7 @@ autoplot.marssMLE <-
         rotate <- FALSE
       }
 
-      states <- tidy.marssMLE(x, type = "states", conf.int = conf.int, conf.level = conf.level, ...)
+      states <- tidy.marssMLE(x, type = "xtT", conf.int = conf.int, conf.level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -119,7 +119,7 @@ autoplot.marssMLE <-
 
     if ("expected.value.observations" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
-      df <- tidy.marssMLE(x, type = "observations", form = "marxss")
+      df <- tidy.marssMLE(x, type = "ytT", form = "marxss")
       df$ymin <- df$conf.low
       df$ymax <- df$conf.high
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) +

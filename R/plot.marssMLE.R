@@ -49,12 +49,12 @@ plot.marssMLE <-
       
       if ("rotate" %in% names(extras)) {
         rotate <- extras[["rotate"]]
-        if (!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n")
+        if (!(rotate %in% c(TRUE, FALSE))) stop("plot.marssMLE: rotate must be TRUE/FALSE. \n")
       } else {
         rotate <- FALSE
       }
       
-      states <- tidy.marssMLE(x, type = "states", conf.int = conf.int, conf.level = conf.level, ...)
+      states <- tidy.marssMLE(x, type = "xtT", conf.int = conf.int, conf.level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
