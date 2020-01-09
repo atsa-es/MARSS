@@ -9,7 +9,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known 
 CHANGES IN MARSS 3.10.12 (current state of master 1-3-2020)
 ------------------------------------
 
-Version 3.10.12 update mainly has to do with the fitted() and augment() enhancements which clarify ytT, xtT and residual intervals for MARSS models. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity).
+Version 3.10.12 update mainly has to do with the tidy(), fitted() and augment() enhancements which clarify ytT, xtT and residual intervals for MARSS models. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity).
 
 BUGS
 
@@ -22,24 +22,21 @@ BUGS
 
 ENHANCEMENTS
 
-* Added E[Y(t)\|Y(t)=y(t)] to tidy.marssMLE so ytT. Not very useful unless one needs an estimate of a missing value when y is multivariate and R is not diagonal.  Also added E[Y(t)\|Y(t-1)=y(t-1)], one-step-ahead predictions for Y which is more useful.
-* Added Ott1 (expected value of Y(t)\|Y(1,1:t-1)) to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t)
-* Added conditioning argument to tidy.marssMLE which allows the xtt1 and xtt states (with CIs) to be output.
-* Added plot of ytT to autoplot.marssMLE
+* MARSShatyt(). Added ytt, ytt1, Ott, Ott1 to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
+* tidy.marssMLE(). Changed type for tidy() to xtT, ytT and fitted.ytT. tidy() exclusively gives estimates of things (parameters, X, Y, fitted Y) conditioned on all the data.
+* fitted.marssMLE(). Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals. Also added conditioning argument to fitted.marssMLE which gives fitted values with different conditioning.
+* augment.marssMLE(). Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
+* plot.marssMLE() and autoplot.marssMLE(). Added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized. Added plot of ytT to both functions.
+*  MARSSinfo(). Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
-* Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
-* Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
 * Updated all code to tidyverse style
-* Added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized.
-* Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals.
-* Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
 
 DOCUMENTATION and MAN FILES
 
-* Added abstract to Residuals report.
-* Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity).
+* Added derivation of var_X[E_{Y|X}[Y(t)|y, X]] to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
+* Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity). Reposted to Arxiv.
 * Added more info to tidy.marssMLE about how the intervals are computed.
-* augment and fitted man files got major update.
+* tidy, augment and fitted man files got major update.
 
 CHANGES IN MARSS 3.10.11 (GitHub 8-3-2019)
 ------------------------------------
