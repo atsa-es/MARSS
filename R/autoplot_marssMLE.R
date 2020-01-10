@@ -87,21 +87,22 @@ autoplot.marssMLE <-
     if ("observations" %in% plot.type) {
       # make plot of observations
       tit <- "Model fitted Y"
-      if (conf.int) tit <- paste(tit, "+ fitted CIs")
-      if (decorate) tit <- paste(tit, "+ residuals CIs (dashed)")
+      if (conf.int) tit <- paste(tit, "+ CI")
+      if (decorate) tit <- paste(tit, "+ PI (dashed)")
       df <- augment.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
-      df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
-      df$ymax.resid <- df$.fitted - qnorm(alpha / 2) * df$.sigma
+      df2 <- augment.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+      df$ymin.pi <- df2$.lwr
+      df$ymax.pi <- df2$.upr
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
       if (conf.int) {
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       if (decorate){
-        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.resid), linetype="dashed")
-        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.resid), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.pi), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.pi), linetype="dashed")
         p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
                             shape = plotpar$point.pch, fill = plotpar$point.fill, 
                             col = plotpar$point.col, size = plotpar$point.size)
@@ -153,7 +154,15 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("Model residual")
-      if (decorate) p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = conf.int, level = conf.level, na.rm = TRUE)
+      if (decorate){
+        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        df$sigma <- df$.sigma
+        df$sigma[is.na(df$y)] <- 0
+        df$ymin.resid <- qnorm(alpha / 2) * df$sigma
+        df$ymax.resid <- - qnorm(alpha / 2) * df$sigma
+        p1 <- p1 +
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+      } 
       plts[["model.residuals"]] <- p1
       if (identical(plot.type, "model.residuals")) {
         return(p1)
@@ -172,7 +181,13 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("State residuals")
-      if (decorate) p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = conf.int, level = conf.level, na.rm = TRUE)
+      if (decorate){
+        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        df$ymin.resid <- qnorm(alpha / 2) * df$.sigma
+        df$ymax.resid <- - qnorm(alpha / 2) * df$.sigma
+        p1 <- p1 +
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+      } 
       plts[["state.residuals"]] <- p1
       if (identical(plot.type, "state.residuals")) {
         return(p1)

@@ -61,17 +61,17 @@ plot.marssMLE <-
         } else {
           rottext <- ""
         }
-        states$term <- paste("DFA", rottext, "trend", states$term)
+        states$.rownames <- paste("DFA", rottext, "trend", states$.rownames)
       } else {
-        states$term <- paste0("State ", states$term)
+        states$.rownames <- paste0("State ", states$.rownames)
       }
       
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
       plot.ncol <- ceiling(nX / plot.nrow)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in unique(states$term)) {
-        with(subset(states, states$term == plt), {
+      for (plt in unique(states$.rownames)) {
+        with(subset(states, states$.rownames == plt), {
           ylims <- c(min(estimate, conf.low, na.rm = TRUE), max(estimate, conf.high, na.rm = TRUE))
           plot(t, estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(plt)
@@ -96,8 +96,9 @@ plot.marssMLE <-
                              conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
-      df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
-      df$ymax.resid <- df$.fitted - qnorm(alpha / 2) * df$.sigma
+      df2 <- augment.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+      df$ymin.pi <- df2$.lwr
+      df$ymax.pi <- df2$.upr
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -111,8 +112,8 @@ plot.marssMLE <-
           points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
           lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
           if (decorate){
-            lines(t, ymin.resid, col = "black", lwd = 1, lty=2)
-            lines(t, ymax.resid, col = "black", lwd = 1, lty=2)
+            lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
+            lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
           }
           box()
         })
@@ -141,9 +142,10 @@ plot.marssMLE <-
           if (decorate) {
             lo <- predict(loess(.resids ~ t), newdata = data.frame(t = t), se = TRUE)
             lo.t <- names(lo$fit)
-            alp <- qnorm((1 - conf.level) / 2) * lo$se.fit
-            ymin <- alp + lo$fit
-            ymax <- -1 * alp + lo$fit
+            sigma <- .sigma
+            sigma[is.na(y)] <- 0
+            ymin <- qnorm(alpha / 2) * sigma
+            ymax <- - qnorm(alpha / 2) * sigma
             ylims <- c(min(.resids, ymin, na.rm = TRUE), max(.resids, ymax, na.rm = TRUE))
           }
           plot(t, .resids,
@@ -189,9 +191,8 @@ plot.marssMLE <-
           if (decorate) {
             lo <- predict(loess(.resids ~ t), newdata = data.frame(t = t), se = TRUE)
             lo.t <- names(lo$fit)
-            alp <- qnorm((1 - conf.level) / 2) * lo$se.fit
-            ymin <- alp + lo$fit
-            ymax <- -1 * alp + lo$fit
+            ymin <- qnorm(alpha / 2) * .sigma
+            ymax <- - qnorm(alpha / 2) * .sigma
             ylims <- c(min(.resids, ymin, na.rm = TRUE), max(.resids, ymax, na.rm = TRUE))
           }
           plot(t, .resids,
