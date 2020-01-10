@@ -25,9 +25,9 @@ ENHANCEMENTS
 
 * `MARSShatyt()` Added ytt, ytt1, Ott, Ott1 to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
 * `tidy.marssMLE()` Changed type for tidy() to xtT, ytT and fitted.ytT. tidy() exclusively gives estimates of things (parameters, X, Y, fitted Y) conditioned on all the data.
-* `fitted.marssMLE()` Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals. Also added conditioning argument to fitted.marssMLE which gives fitted values with different conditioning.
+* `fitted.marssMLE()` Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals. Also added conditioning argument to fitted.marssMLE which gives fitted values with different conditioning. Changed default output to tibble.
 * `augment.marssMLE()` Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
-* plot.marssMLE() and autoplot.marssMLE(). Added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized. Added plot of ytT to both functions.
+* `plot.marssMLE()` and `autoplot.marssMLE()`. Added plot.par to plot.marssMLE and autoplot.marssMLE so that the plots can be customized. Added plot of ytT to both functions. Changed the residuals plots to use the CIs for the residuals not the loess CIs.
 *  `MARSSinfo()` Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 * Updated all code to tidyverse style
@@ -36,7 +36,6 @@ DOCUMENTATION and MAN FILES
 
 * Added derivation of var_X[E_{Y|X}[Y(t)|y, X]] to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
 * Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity). Reposted to Arxiv. Added innovations residuals.
-* Added more info to tidy.marssMLE about how the intervals are computed.
 * tidy, augment and fitted man files got major update.
 
 CHANGES IN MARSS 3.10.11 (GitHub 8-3-2019)
