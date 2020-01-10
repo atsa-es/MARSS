@@ -36,6 +36,7 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
 #  augment method for class marssMLE form marxss
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
+#  Set up to take other conditioning != T also
 ##############################################################################################################################################
 augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   # rotate means to rotate the Z matrix; this is used in DFA
