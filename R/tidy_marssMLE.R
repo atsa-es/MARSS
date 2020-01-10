@@ -156,16 +156,16 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     nn <- Y.dims[1]
     TT <- Y.dims[2]
     fit.y.conf <- fitted.marssMLE(x, type="observations", 
-                             conditioning=conditioning, interval="confidence", conf.level=conf.level)
+                             conditioning=conditioning, interval="confidence", 
+                             conf.level=conf.level)
     fit.y.pred <- fitted.marssMLE(x, type="observations", 
                              conditioning=conditioning, interval="prediction", conf.level=conf.level)
-    ret <- data.frame(
-      .rownames = rep(Y.names, each = TT),
-      t = rep(1:TT, nn),
-      y = vec(t(x[["model"]][["data"]])),
-      estimate = vec(t(fit.y.conf$.fitted)),
-      std.error = vec(t(fit.y.conf$.se.fit)),
-      std.dev = vec(t(fit.y.pred$.sd.y))
+
+    ret <- fit.y.conf[,c(".rownames","t","y")]
+    ret <- cbind( ret,
+      estimate = fit.y.conf$.fitted,
+      std.error = fit.y.conf$.se.fit,
+      std.dev = fit.y.pred$.sd.y
     )
     if (conf.int) {
       ret <- cbind(ret,
