@@ -10,8 +10,6 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
                              form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
-  if (substr(type, 1, 1) == "y") type <- "observations"
-  if (substr(type, 1, 1) == "x") type <- "states"
   interval <- match.arg(interval)
   conditioning <- substr(type, 3, 3)
   if (conditioning != "T") {
@@ -20,6 +18,8 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
   if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
     stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   }
+  if (substr(type, 1, 1) == "y") type <- "observations"
+  if (substr(type, 1, 1) == "x") type <- "states"
   ## End argument checking
 
   augment.fun <- paste("augment_", form, sep = "")
