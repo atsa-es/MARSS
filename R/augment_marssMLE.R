@@ -13,7 +13,7 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
   if (substr(type, 1, 1) == "y") type <- "observations"
   if (substr(type, 1, 1) == "x") type <- "states"
   interval <- match.arg(interval)
-  conditioning <- strsub(type, 3, 3)
+  conditioning <- substr(type, 3, 3)
   if (conditioning != "T") {
     stop("augment.marssMLE: Only conditioning='T' allowed currently.", call. = FALSE)
   }
