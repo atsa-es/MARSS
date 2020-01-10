@@ -10,8 +10,8 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
                              form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
-  if (strsub(type, 1, 1) == "y") type <- "observations"
-  if (strsub(type, 1, 1) == "x") type <- "states"
+  if (substr(type, 1, 1) == "y") type <- "observations"
+  if (substr(type, 1, 1) == "x") type <- "states"
   interval <- match.arg(interval)
   conditioning <- strsub(type, 3, 3)
   if (conditioning != "T") {
