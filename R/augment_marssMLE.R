@@ -54,21 +54,20 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   if (type == "observations") {
     data.names <- attr(model, "Y.names")
     fit.list <- fitted(x, type = "observations", interval=interval, conditioning=conditioning, conf.level=conf.level)
-    if(interval=="none") fit.list <- list(.fitted=fit.list)
     ret <- data.frame(
-      .rownames = rep(data.names, each = TT),
-      t = rep(1:TT, nn),
-      y = vec(t(model$data)),
-      .fitted = vec(t(fit.list$.fitted))
+      .rownames = fit.list$.rownames,
+      t = fit.list$t,
+      y = fit.list$y,
+      .fitted = fit.list$.fitted
     )
     if(interval=="confidence") ret <- cbind(ret,
-                   .se.fit = vec(t(fit.list$.se.fit)),
-                   .conf.low = vec(t(fit.list$.conf.low)),
-                   .conf.up = vec(t(fit.list$.conf.up)))
+                   .se.fit = fit.list$.se.fit,
+                   .conf.low = fit.list$.conf.low,
+                   .conf.up = fit.list$.conf.up)
     if(interval=="prediction") ret <- cbind(ret,
-                                            .sd.y = vec(t(fit.list$.sd.y)),
-                                            .lwr = vec(t(fit.list$.lwr)),
-                                            .upr = vec(t(fit.list$.upr)))
+                                            .sd.y = fit.list$.sd.y,
+                                            .lwr = fit.list$.lwr,
+                                            .upr = fit.list$.upr)
     ret <- cbind(ret,
       .resids = vec(t(resids$model.residuals)),
       .sigma = vec(t(se.resids[1:nn, , drop = FALSE])),
@@ -84,21 +83,20 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
     state.resids <- cbind(NA, resids$state.residuals[, 1:(TT - 1), drop = FALSE])
     state.std.resids <- cbind(NA, resids$std.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
     fit.list <- fitted(x, type = "states", interval=interval, conditioning=conditioning, conf.level=conf.level)
-    if(interval=="none") fit.list <- list(.fitted=fit.list)
     ret <- data.frame(
-      .rownames = rep(state.names, each = TT),
-      t = rep(1:TT, mm),
-      xtT = vec(t(x[["states"]])),
-      .fitted = vec(t(fit.list$.fitted))
+      .rownames = fit.list$.rownames,
+      t = fit.list$t,
+      xtT = fit.list$xtT,
+      .fitted = fit.list$.fitted
     )
     if(interval=="confidence") ret <- cbind(ret,
-                                            .se.fit = vec(t(fit.list$.se.fit)),
-                                            .conf.low = vec(t(fit.list$.conf.low)),
-                                            .conf.up = vec(t(fit.list$.conf.up)))
+                                            .se.fit = fit.list$.se.fit,
+                                            .conf.low = fit.list$.conf.low,
+                                            .conf.up = fit.list$.conf.up)
     if(interval=="prediction") ret <- cbind(ret,
-                                            .sd.x = vec(t(fit.list$.sd.x)),
-                                            .lwr = vec(t(fit.list$.lwr)),
-                                            .upr = vec(t(fit.list$.upr)))
+                                            .sd.x = fit.list$.sd.x,
+                                            .lwr = fit.list$.lwr,
+                                            .upr = fit.list$.upr)
     ret <- cbind(ret,
     .resids = vec(t(state.resids)),
     .sigma = vec(t(state.se.resids)),

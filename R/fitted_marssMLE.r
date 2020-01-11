@@ -134,7 +134,7 @@ fitted.marssMLE <- function(object, ...,
     ret <- data.frame(
       .rownames = rep(state.names, each = TT),
       t = rep(1:TT, mm),
-      xtT = vec(t(x[["states"]]))
+      xtT = vec(t(MLEobj[["states"]]))
     )
     }
   }
