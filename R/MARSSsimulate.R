@@ -3,13 +3,14 @@
 #   Parametrically simulates from a MARSS parameter list
 #   Only works for marss form.  marxss form needs to be converted to marss before this will work.
 #######################################################################################################
-simulate.marssMLE <- function(MLEobj, tSteps = NULL, nsim = 1, silent = TRUE, miss.loc = NULL) {
-  MARSSsimulate(MLEobj, tSteps = tSteps, nsim = nsim, silent = silent, miss.loc = miss.loc)
+simulate.marssMLE <- function(object, nsim=1, seed, ..., tSteps = NULL, silent = TRUE, miss.loc = NULL) {
+  MARSSsimulate(object, tSteps = tSteps, nsim = nsim, silent = silent, miss.loc = miss.loc)
 }
-MARSSsimulate <- function(MLEobj, tSteps = NULL, nsim = 1, silent = TRUE, miss.loc = NULL) {
+MARSSsimulate <- function(object, tSteps = NULL, nsim = 1, silent = TRUE, miss.loc = NULL) {
   # tSteps is the number of time steps to do in each bootstrap of the data
   # miss.loc is an optional (n x tSteps x nsim) matrix specifying where to put missing values
   # if miss.loc is the same for all nsim, can pass in dim=c(n, tSteps)
+  MLEobj <- object
   if (!inherits(MLEobj, "marssMLE") || is.null(MLEobj$par)) {
     stop("Stopped in MARSSsimulate(). The function requires a marssMLE object with the par element.\n", call. = FALSE)
   }

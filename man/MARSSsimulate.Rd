@@ -6,11 +6,11 @@
   Generates simulated data from a MARSS model with specified parameter estimates. This is a base function in the \code{\link{MARSS-package}}.
 }
 \usage{
-MARSSsimulate(MLEobj, tSteps = NULL, nsim = 1, silent = TRUE, 
+MARSSsimulate(object, tSteps = NULL, nsim = 1, silent = TRUE, 
   miss.loc = NULL)
 }
 \arguments{
-  \item{MLEobj}{ A fitted \code{\link{marssMLE}} object, as output by \code{\link{MARSS}}. }
+  \item{object}{ A fitted \code{\link{marssMLE}} object, as output by \code{\link{MARSS}}. }
   \item{tSteps}{ Number of time steps in each simulation. If left off, it is taken to be consistent with \code{MLEobj}.}
   \item{nsim}{ Number of simulated data sets to generate. }
   \item{silent}{ Suppresses progress bar. }
