@@ -59,7 +59,7 @@ autoplot.marssMLE <-
         rotate <- FALSE
       }
 
-      states <- tidy.marssMLE(x, type = "states", conf.int = conf.int, conf.level = conf.level, ...)
+      states <- tidy.marssMLE(x, type = "xtT", conf.int = conf.int, conf.level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -87,21 +87,22 @@ autoplot.marssMLE <-
     if ("observations" %in% plot.type) {
       # make plot of observations
       tit <- "Model fitted Y"
-      if (conf.int) tit <- paste(tit, "+ fitted CIs")
-      if (decorate) tit <- paste(tit, "+ residuals CIs (dashed)")
-      df <- augment.marssMLE(x, type = "observations", interval="confidence", conf.level=conf.level, form = model_form)
+      if (conf.int) tit <- paste(tit, "+ CI")
+      if (decorate) tit <- paste(tit, "+ PI (dashed)")
+      df <- augment.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
-      df$ymin.resid <- df$.fitted + qnorm(alpha / 2) * df$.sigma
-      df$ymax.resid <- df$.fitted - qnorm(alpha / 2) * df$.sigma
+      df2 <- augment.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+      df$ymin.pi <- df2$.lwr
+      df$ymax.pi <- df2$.upr
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
       if (conf.int) {
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       if (decorate){
-        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.resid), linetype="dashed")
-        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.resid), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.pi), linetype="dashed")
+        p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.pi), linetype="dashed")
         p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
                             shape = plotpar$point.pch, fill = plotpar$point.fill, 
                             col = plotpar$point.col, size = plotpar$point.size)
@@ -119,7 +120,7 @@ autoplot.marssMLE <-
 
     if ("expected.value.observations" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
-      df <- tidy.marssMLE(x, type = "observations", form = "marxss")
+      df <- tidy.marssMLE(x, type = "ytT", form = "marxss")
       df$ymin <- df$conf.low
       df$ymax <- df$conf.high
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) +
@@ -144,7 +145,7 @@ autoplot.marssMLE <-
 
     if ("model.residuals" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, type = "observations", form = "marxss")
+      df <- augment.marssMLE(x, type = "ytT", form = "marxss")
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(shape = plotpar$point.pch, fill = plotpar$point.fill, 
                             col = plotpar$point.col, size = plotpar$point.size) +
@@ -153,7 +154,15 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("Model residual")
-      if (decorate) p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = conf.int, level = conf.level, na.rm = TRUE)
+      if (decorate){
+        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        df$sigma <- df$.sigma
+        df$sigma[is.na(df$y)] <- 0
+        df$ymin.resid <- qnorm(alpha / 2) * df$sigma
+        df$ymax.resid <- - qnorm(alpha / 2) * df$sigma
+        p1 <- p1 +
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+      } 
       plts[["model.residuals"]] <- p1
       if (identical(plot.type, "model.residuals")) {
         return(p1)
@@ -162,7 +171,7 @@ autoplot.marssMLE <-
 
     if ("state.residuals" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- augment.marssMLE(x, type = "states", form = "marxss")
+      df <- augment.marssMLE(x, type = "xtT", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(shape = plotpar$point.pch, fill = plotpar$point.fill, 
@@ -172,7 +181,13 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("State residuals")
-      if (decorate) p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = conf.int, level = conf.level, na.rm = TRUE)
+      if (decorate){
+        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        df$ymin.resid <- qnorm(alpha / 2) * df$.sigma
+        df$ymax.resid <- - qnorm(alpha / 2) * df$.sigma
+        p1 <- p1 +
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+      } 
       plts[["state.residuals"]] <- p1
       if (identical(plot.type, "state.residuals")) {
         return(p1)
@@ -195,7 +210,7 @@ autoplot.marssMLE <-
 
     if ("model.residuals.qqplot" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, type = "observations", form = "marxss")
+      df <- augment.marssMLE(x, type = "ytT", form = "marxss")
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       abline.dat <- data.frame(.rownames = names(slope), slope = slope, intercept = intercept)
@@ -214,7 +229,7 @@ autoplot.marssMLE <-
 
     if ("state.residuals.qqplot" %in% plot.type) {
       # make qqplot of state residuals
-      df <- augment.marssMLE(x, type = "states", form = "marxss")
+      df <- augment.marssMLE(x, type = "xtT", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)

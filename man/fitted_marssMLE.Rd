@@ -7,10 +7,11 @@
 }
   \usage{
   \method{fitted}{marssMLE}(object, ..., 
-  type=c("observations", "states", "y", "x"),   
+  type=c("observations", "states"),   
   conditioning = c("T", "t", "t-1"),
   interval = c("none", "confidence", "prediction"), 
-  conf.level = 0.95)
+  conf.level = 0.95,
+  output = c("tibble", "matrix"))
   }
   \arguments{
   \item{object}{ A marssMLE object.  }
@@ -19,6 +20,7 @@
   \item{conditioning}{ If "T", then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead". Note, for type="states", conditioning on data up to "t" is not provided (since this would require the estimate of X(t-1) conditioned on data 1:t).}
   \item{interval}{ If interval="confidence", then the standard error of the fitted value is returned. }
   \item{conf.level}{ Level for the intervals if interval != "none".}
+  \item{output}{ tibble or list of matrices}
   }
 \value{
   If interval="none" (the default), a T column matrix of the fitted values with one row for each observation (or state) time series is returned. 

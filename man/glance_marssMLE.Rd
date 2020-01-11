@@ -18,8 +18,8 @@
     \item{logLik}{ The log-likelihood.}
     \item{AIC}{ Akaike information criterion.}
     \item{AICc}{ Akaike information criterion corrected for small sample size.}
-    \item{AICbb}{ Non-parametric bootstrap Akaike information criterion if .}
-    \item{AICbp}{ Parametric bootstrap Akaike information criterion if .}
+    \item{AICbb}{ Non-parametric bootstrap Akaike information criterion if in the marssMLE object.}
+    \item{AICbp}{ Parametric bootstrap Akaike information criterion if in the marssMLE object.}
     \item{convergence}{ 0 if converged according to the convergence criteria set.  Note the default convergence criteria are high in order to speed up fitting. A number other than 0 means the model did not meet the convergence criteria.}
     \item{errors}{ 0 if no errors. 1 if some type of error or warning returned.}
   }

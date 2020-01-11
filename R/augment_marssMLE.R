@@ -4,23 +4,22 @@
 #  the base function is augment_marxss below
 #  augment_dfa is just augment_marxss
 ##############################################################################################################################################
-augment.marssMLE <- function(x, type = c("observations", "states", "y", "x"),
+augment.marssMLE <- function(x, type = c("ytT", "xtT"),
                              interval = c("none", "confidence", "prediction"),
                              conf.level = 0.95,
-                             conditioning = c("T", "t", "t-1"),
                              form = attr(x[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
-  if (type == "y") type <- "observations"
-  if (type == "x") type <- "states"
   interval <- match.arg(interval)
-  conditioning <- match.arg(conditioning)
+  conditioning <- substr(type, 3, 3)
   if (conditioning != "T") {
     stop("augment.marssMLE: Only conditioning='T' allowed currently.", call. = FALSE)
   }
   if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
     stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   }
+  if (substr(type, 1, 1) == "y") type <- "observations"
+  if (substr(type, 1, 1) == "x") type <- "states"
   ## End argument checking
 
   augment.fun <- paste("augment_", form, sep = "")
@@ -37,15 +36,16 @@ augment.marssMLE <- function(x, type = c("observations", "states", "y", "x"),
 #  augment method for class marssMLE form marxss
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
+#  Set up to take other conditioning != T also
 ##############################################################################################################################################
 augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
   resids <- residuals(x)
-  se.resids <- sqrt(apply(resids$var.residuals, 3, function(x) {
-    takediag(x)
-  }))
+  tmp <- apply(resids$var.residuals, 3, function(x) { takediag(x) })
+  tmp[tmp<0 & abs(tmp)<.Machine$double.eps] <- 0
+  se.resids <- sqrt(tmp)
   model.dims <- attr(model, "model.dims")
   data.dims <- model.dims[["y"]]
   nn <- data.dims[1]
@@ -96,7 +96,7 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
                                             .conf.low = vec(t(fit.list$.conf.low)),
                                             .conf.up = vec(t(fit.list$.conf.up)))
     if(interval=="prediction") ret <- cbind(ret,
-                                            .sd.y = vec(t(fit.list$.sd.x)),
+                                            .sd.x = vec(t(fit.list$.sd.x)),
                                             .lwr = vec(t(fit.list$.lwr)),
                                             .upr = vec(t(fit.list$.upr)))
     ret <- cbind(ret,

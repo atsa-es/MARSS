@@ -2,13 +2,13 @@
 #  fitted method for class marssMLE.
 ##############################################################################################################################################
 fitted.marssMLE <- function(object, ...,
-                            type = c("observations", "states", "y", "x"),
+                            type = c("observations", "states"),
                             conditioning = c("T", "t", "t-1"),
                             interval = c("none", "confidence", "prediction"),
-                            conf.level = 0.95) {
+                            conf.level = 0.95,
+                            output = c("tibble", "matrix")) {
   type <- match.arg(type)
-  if (type == "y") type <- "observations"
-  if (type == "x") type <- "states"
+  output <- match.arg(output)
   conditioning <- match.arg(conditioning)
   interval <- match.arg(interval)
   MLEobj <- object
@@ -36,11 +36,11 @@ fitted.marssMLE <- function(object, ...,
   if (type == "observations") {
     if (conditioning == "T") hatxt <- MLEobj[["states"]]
     if (conditioning == "t-1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
-    if (conditioning == "t") hatxt <- MARSSkf(MLEobj)[["xtt"]]
+    if (conditioning == "t") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if(interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
       if (conditioning == "t-1") hatVt <- MARSSkf(MLEobj)[["Vtt1"]]
-      if (conditioning == "t") hatVt <- MARSSkf(MLEobj)[["Vtt"]]
+      if (conditioning == "t") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
     }
     Z.time.varying <- model.dims[["Z"]][3] != 1
     A.time.varying <- model.dims[["A"]][3] != 1
@@ -66,6 +66,20 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt) + Rt)
       }
     }
+    
+    # Set up output
+    if(output=="tibble"){
+      data.names <- attr(MLEobj[["model"]], "Y.names")
+      data.dims <- attr(MLEobj[["model"]], "model.dims")[["y"]]
+      nn <- data.dims[1]
+      TT <- data.dims[2]
+      ret <- data.frame(
+        .rownames = rep(data.names, each = TT),
+        t = rep(1:TT, nn),
+        y = vec(t(MLEobj[["model"]]$data))
+      )
+    }
+    
   }
 
   if (type == "states") {
@@ -109,32 +123,54 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt) + Qt)
       } 
     }
+    
+    # Set up output
+    if(output=="tibble"){
+    state.names <- attr(MLEobj[["model"]], "X.names")
+    state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
+    mm <- state.dims[1]
+    TT <- state.dims[2]
+    
+    ret <- data.frame(
+      .rownames = rep(state.names, each = TT),
+      t = rep(1:TT, mm),
+      xtT = vec(t(x[["states"]]))
+    )
+    }
   }
-  if (interval=="none") return(val)
-  se <- sqrt(se) # was not sqrt earlier
+  
+  if (interval=="none"){
+    if(output=="matrix") return(val)
+    retlist = list(.fitted=val)
+  }
   if (interval=="confidence"){
-    return(list(
-      .fitted=val, 
-      .se.fit=se,
-      .conf.low = val + qnorm(alpha/2) * se,
-      .conf.up = val + qnorm(1- alpha/2) * se
-      ))
+    se <- sqrt(se) # was not sqrt earlier
+    retlist <- list(
+        .fitted = val, 
+        .se.fit = se,
+        .conf.low = val + qnorm(alpha/2) * se,
+        .conf.up = val + qnorm(1- alpha/2) * se
+    )
   }
-  # Then interval == "prediction"
-  if (type == "states"){
-    return(list(
-      .fitted=val, 
-      .sd.x=se, 
+  if (interval=="prediction"){
+    se <- sqrt(se) # was not sqrt earlier
+    if (type == "states"){
+      retlist <-list(
+      .fitted = val, 
+      .sd.x = se, 
       .lwr = val + qnorm(alpha/2) * se,
       .upr = val + qnorm(1- alpha/2) * se
-    ))
-  }
+    )
+    }
   if (type == "observations"){
-    return(list(
+    retlist <- list(
       .fitted=val,
       .sd.y=se,
       .lwr = val + qnorm(alpha/2) * se,
       .upr = val + qnorm(1- alpha/2) * se
-    ))
+    )
   }
+  }
+  if(output=="matrix") return(retlist)
+  return(cbind(ret, as.data.frame(lapply(retlist, function(x){MARSS:::vec(t(x))}))))
 } # end of fitted.marssMLE

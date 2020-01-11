@@ -2187,11 +2187,10 @@ $(\OMG_t^{(1)})^\top(\ddot{\RR}_{t,11})^{-1}\OMG_t^{(1)}$ is a $n \times n$ matr
 Thus if there are no missing values at time $t$, $\IR_t=\II-\II=0$. If there are no observed values at time $t$, $\IR_t$ will reduce to $\II$. 
 
 \subsection{Derivation of the expected value of $\YY_t\YY_t^\top$}
-The following outlines a\footnote{The following derivations are painfully ugly, but appear to work.  There are surely more elegant ways to do this; at least, there must be more elegant notations.} derivation.  If there are no missing values, then we condition on $\YY_t=\yy_t$ and
+The following outlines a\footnote{The following derivations are painfully ugly.  There are surely more elegant ways to do this; at least, there must be more elegant notations.} derivation.  If there are no missing values, then we condition on $\YY_t=\yy_t$ and
 \begin{equation}
 \begin{split}
-\E[\YY_t &\YY_t^\top|\YY(1)=\yy(1)] = \E[\YY_t \YY_t^\top|\YY_t=\yy_t]\\
-&=\yy_t\yy_t^\top.
+\E[\YY_t &\YY_t^\top|\YY(1)=\yy(1)] = \E[\YY_t \YY_t^\top|\YY_t=\yy_t] = \yy_t\yy_t^\top.
 \end{split}
 \end{equation}
 If there are no observed values at time $t$, then 
@@ -2205,9 +2204,9 @@ If there are no observed values at time $t$, then
 \end{equation}
 
 When only some of the $\YY_t$ are observed, we use again the conditional probability of a multivariate normal (equation \ref{eq:cond.multi.normal}).  From this property, we know that 
-\begin{equation}
+\begin{equation}\label{eq:var.Y.cond.x}
 \begin{split}
-&\var_{Y|x}[\YY_t(2)\YY_t(2)^\top|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=\ddot{\RR}_{t,22} - \ddot{\RR}_{t,21}(\ddot{\RR}_{t,11})^{-1}\ddot{\RR}_{t,12},\\
+&\var_{Y|x}[\YY_t(2)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=\ddot{\RR}_{t,22} - \ddot{\RR}_{t,21}(\ddot{\RR}_{t,11})^{-1}\ddot{\RR}_{t,12},\\
 &\var_{Y|x}[\YY_t(1)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=0\\
 \text{and }&\cov_{Y|x}[\YY_t(1),\YY_t(2)|\YY_t(1)=\yy_t(1),\XX_t=\xx_t]=0\\
 \\
@@ -2236,6 +2235,26 @@ Thus,
 \begin{equation}
 \hatOt=\IIm_t^{(2)}(\IR_t\ddot{\RR}_t + \IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top)\IIm_t^{(2)}  +  \hatyt\hatyt^\top  \\
 \end{equation}
+and 
+\begin{equation}\label{eq:cond.var.Y}
+\var_{XY}[\YY_t|\YY_t(1)=\yy_t(1)] = \IIm_t^{(2)}(\IR_t\ddot{\RR}_t + \IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top)\IIm_t^{(2)}
+\end{equation}
+
+The variance can be decomposed into two parts via the law of total variance:
+\begin{equation}\label{eq:law.total.var.Y}
+\var_{XY}[\YY_t|\YY_t(1)=\yy_t(1)] = \E_X[\var_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]] + 
+\var_X[\E_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]]
+\end{equation}
+Hsing equations \ref{eq:law.total.var.Y}, \ref{eq:var.Y.cond.x}, and \ref{eq:cond.var.Y}, we can solve for the variance (over $\xx_t$) of the expected value of $\YY_t|\YY_t(1)=\yy_t(1)$ conditioned on $\XX_t=\xx_t$:
+\begin{equation}
+\begin{split}
+\var_X[\E_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]] & \\
+&= \var_{XY}[\YY_t|\YY_t(1)=\yy_t(1)] - \E_X[\var_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]] \\
+&= \IIm_t^{(2)}(\IR_t\ddot{\RR}_t + \IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top)\IIm_t^{(2)} - \IIm_t^{(2)}\IR_t\ddot{\RR}_t\IIm_t^{(2)} \\
+&= \IIm_t^{(2)}\IR_t\ZZ_t\hatVt\ZZ_t^\top\IR_t^\top\IIm_t^{(2)}
+\end{split}
+\end{equation}
+Though this variance is not used in the EM algoritm, it gives us the confidence intervals for the expected value of missing data while the variance of $\YY_t|\YY_t(1)=\yy_t(1)$ gives us the prediction intervals for missing data.
 
 \subsection{Derivation of the expected value of $\YY_t\XX_t^\top$}
 If there are no missing values, then we condition on $\YY_t=\yy_t$ and

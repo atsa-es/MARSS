@@ -175,9 +175,9 @@ MARSSsimulate <- function(MLEobj, tSteps = NULL, nsim = 1, silent = TRUE, miss.l
       # to see it works, sub transform j back to t; say j=3, X(j) is X(2) and X(j-1) is X(1), so we have
       # X(2)=B(2)X(1)+U(2)+pro.error(2)
     }
-    newData[miss.loc.TF[, , i]] <- as.numeric(NA)
     newStates <- newStates[, 2:(tSteps + 1)] # make indexing t=1:TT again
     newData <- newData[, 2:(tSteps + 1)]
+    newData[miss.loc.TF[, , i]] <- as.numeric(NA)
     sim.data[, , i] <- as.matrix(newData)
     sim.states[, , i] <- as.matrix(newStates)
     # reset newStates and newData to their original dims

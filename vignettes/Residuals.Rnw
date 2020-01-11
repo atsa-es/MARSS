@@ -88,7 +88,8 @@
 \def\trace{\,\textup{\textrm{trace}}}
 \def\hatxtT{\widetilde{\xx}_t^T}
 \def\hatxtpT{\widetilde{\xx}_{t+1}^T}
-\def\hatxtt1{\widetilde{\xx}_t^{t-1}}
+\def\hatxtt{\widetilde{\xx}_t^{t}}
+\def\hatxttm{\widetilde{\xx}_t^{t-1}}
 \def\hatxone{\widetilde{\xx}_1}
 \def\hatxzero{\widetilde{\xx}_0}
 \def\hatxtmT{\widetilde{\xx}_{t-1}^T}
@@ -309,15 +310,15 @@ Equation \ref{eq:varvtcondy} can be written as\footnote{$\var(A+B)=\var(A)+\var(
 \end{equation}
 $\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
-From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$. $\hatVtT$, $\hatUtT$ and $\hatStT$ are multivariate Normal random variables. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on\footnote{Let the $\AA$ be a N-dimensional multivariate normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
+From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate Normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
 \Sigma_1 & \Sigma_{12} \\
 \Sigma_21 & \Sigma_{2}
 \end{bmatrix}$.  The variance-covariance matrix of $\AA$ conditioned on $\AA_1=\aa$ is $\Sigma = \begin{bmatrix}
 0 & 0 \\
 0 & \Sigma_2 - \Sigma_{12}\Sigma_{1}\Sigma_{21}
-\end{bmatrix}$. Notice that $\aa$ does not appear in the conditional variance matrix.}. This means that $\hatVtT$, $\hatUtT$ and $\hatStT$ do not depend on $\yy^{(1)}$. They only depend on the MARSS model parameters.
+\end{bmatrix}$. Notice that $\aa$ does not appear in the conditional variance matrix. This means that $\var[\VV_t|\yy^{(1)}]$ does not depend on $\yy^{(1)}$. Its variance only depends on the MARSS model parameters\footnote{This also implies that $\hatVtT$, $\hatUtT$ and $\hatStT$ do not depend on $\yy^{(1)}$, which is rather counter-intuitive since $\yy^{(1)}$ is part of the algorithm (Kalman filter and smoother) used to compute these values. The value of $\yy^{(1)}$ affects the expected values of $\XX_t$ but only its presence\ (versus absence) affects $\XX_t$'s conditional variance.}.
 
-Because $\hatVtT$, $\hatUtT$ and $\hatStT$ only depend on the MARSS parameters values, $\QQ$, $\BB$, $\RR$, etc., the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$ (Equation \ref{eq:var.Vt.yy}). Putting this into Equation \ref{eq:var.E.vtT.R}, we have
+Because $\var[\VV_t|\yy^{(1)}]$ only depends on the MARSS parameters values, $\QQ$, $\BB$, $\RR$, etc., the second term in Equation \ref{eq:var.E.vtT}, $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$, is equal to $\var[\VV_t|\yy^{(1)}]$ (Equation \ref{eq:var.Vt.yy}). Putting this into Equation \ref{eq:var.E.vtT.R}, we have
 \begin{equation}\label{eq:conditionalvtfinala}
 \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)})]]  = \RR_t - \var[\VV_t|\yy^{(1)}] = \RR_t - \ZZ_t \hatVtT \ZZ_t^\top - \hatUtT + \hatStT\ZZ_t^\top + \ZZ_t(\hatStT)^\top.
 \end{equation}
@@ -463,7 +464,7 @@ $\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus\footnote{$\cov[\BB
 \end{equation}
 where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package.
 
-$\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ are conditional multivariate Normal and are only functions of the MARSS parameters not of $\yy^{(1)}$. Thus 
+Both $\VV_t$ and $\WW_t$ are multivariate Normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
 \begin{equation}
 \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top .
 \end{equation}
@@ -561,7 +562,7 @@ The $\HH_t$ and $\GG_t$ matrices specify the variance and covariance of $\WW_t$ 
 The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\GG_t\epsilon_t\\ \HH_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxtt1=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVtt1=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVtt1=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
 
 \subsection{Algorithm}
 
@@ -584,7 +585,7 @@ Start from $t=T$ and work backwards to $t=1$. At time $T$, $r_T=0_{1 \times m}$ 
 K_t = \BB_{t+1}\KK_t = \BB_{t+1} \hatVtt1{\ZZ_t^*}^\top \FF_t^{-1}  , \,\, m \times n  \\
 L_t = \BB_{t+1} - K_t\ZZ_t^*  , \,\, m \times m \\
 J_t= \QQ^\prime_{t+1} - K_t \RR^\prime_t  , \,\, m \times (n+m) \\
-v_t = \yy_t^* - \ZZ_t\hatxtt1 - \aa_t , \,\, n \times 1 \\
+v_t = \yy_t^* - \ZZ_t\hatxttm - \aa_t , \,\, n \times 1 \\
 u_t = \FF_t^{-1} v_t - K_t^\top r_t , \,\, n \times 1 \\
 r_{t-1} = {\ZZ_t^*}^\top u_t + \BB_{t+1}^\top r_t , \,\, m \times 1  \\
 N_{t-1} = {\ZZ_t^*}^\top \FF_t^{-1} \ZZ_t^* + L_t^\top N_t L_t   , \,\, m \times m .
@@ -628,9 +629,9 @@ One-step-ahead predictions (innovations) are often shown for MARSS models and th
 
 Define the innovations $\checkvt$ as\footnote{This is slightly different than the `innovations' that we normally use. Normally, we would work with the observed innovations while now we are talking about a sample from the random variable `innovations' not the specific sample that we observe. $\yy_t$ here is not the actual data that you observe. It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$.}:
 \begin{equation}\label{eq:vtt1}
-\checkvt = \yy_t - \ZZ_t\hatxtt1 - \aa_t,
+\checkvt = \yy_t - \ZZ_t\hatxttm - \aa_t,
 \end{equation}
-where $\hatxtt1$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance.
+where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance.
 
 The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, and we can write the variance as:
 \begin{equation}\label{eq:innov.model}
@@ -647,27 +648,43 @@ $\yy_t$ is not in the conditional since it only includes data up to $t-1$. Witho
 
 Define the state residuals conditioned on the data from 1 to $t-1$ as $\checkwt$.
 \begin{equation}\label{eq:wtt1}
-\checkwt = \hatxtt1 - \BB_t\hatxtmt1 - \uu_t,
+\checkwt = \hatxtt - \BB_t\hatxtmt1 - \uu_t,
 \end{equation}
-where $\hatxtmt1$ is the $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). However $\hatxtt1 = \E[\XX_t|\yy^{(1),t-1}] = \BB_t\hatxtmt1 + \uu_t$. Thus $\checkwt = 0$.
+where $\hatxtmt1$ is $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). 
+From the Kalman filter equations:
+\begin{equation}\label{eq:wtt1}
+\hatxtt = \BB_t\hatxtmt1 + \uu_t + \KK_t \checkvt
+\end{equation}
+Thus,
+\begin{equation}\label{eq:wtt1.2}
+\checkwt = \KK_t \checkvt,
+\end{equation}
+where $\KK_t$ is the Kalman gain\footnote{In the MARSS R package, this is output by \texttt{MARSSkfss()} in \texttt{Kt}}. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$.
+Thus the variance of $\checkWt$ is 
+\begin{equation}\label{eq:var.Wt}
+\begin{split}
+\var[\checkwt] &= \KK_t\var[\checkVt] \KK_t^\top \\
+&= \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top .
+\end{split}
+\end{equation}
+
 
 \subsection{Covariance of the conditional model and state residuals}
 
-Since $\checkwt = 0$ for all $\yy^{(1)}$:
-
+The covariance of $\cov[\checkVt, \checkWt]$ is
 \begin{equation}
-\cov[\checkVt, \checkWt] = 0 \,\, \text{and} \,\, \cov[\checkVt, \checkWtp] = 0 .
-\end{equation}
+\cov[\checkVt, \checkWt] = \cov[\checkVt, \KK_t \checkVt] =
+[\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top
+\begin{equation}
 
 \subsection{Joint distribution of the conditional residuals}
 
 We now the write the variance of the joint distribution of the conditional one-step ahead residuals. Define
 \begin{equation}
 \overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwt\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtt1 - \BB_t\hatxtmt1 - \uu_t \end{bmatrix}.
+\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \hatxtt - \BB_t\hatxtmt1 - \uu_t \end{bmatrix}.
 \end{equation}
-where $\hatxtt1$ and $\hatxtmt1$ are conditioned on the observed $\yy$ from $t=1$ to $t-1$.
-The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to time $t-1$ is 0 and the variance of $\overline{\mathcal{E}}_t$  is
+The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to time $t$ is 0 and the variance of $\overline{\mathcal{E}}_t$  is
 \begin{equation}\label{eq:jointcondresid1innovs}
  \begin{bmatrix}[c|c]
  \var[\checkVt]&
@@ -676,17 +693,10 @@ The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to t
  (\cov[\checkVt, \checkWt])^\top& 
  \var[\checkWt] \end{bmatrix} =
  \begin{bmatrix}[c|c]
- \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& 0 \\
- \rule[.5ex]{15ex}{0.25pt} & \rule[.5ex]{15ex}{0.25pt} \\
- 0 & 0 \end{bmatrix} .
+ \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \\
+ \rule[.5ex]{25ex}{0.25pt} & \rule[.5ex]{25ex}{0.25pt} \\
+\KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] & \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \end{bmatrix} .
 \end{equation}
-If the residuals are defined as in \citet{Harveyetal1998},
-\begin{equation}
-\overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwtp\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxtt1-\aa_t\\ \hatxtpt1 - \BB_{t+1}\hatxtt1-\uu_{t+1} \end{bmatrix}
-\end{equation}
-since $\checkWtp = 0$, and the variance-covariance matrix is again Equation \ref{eq:jointcondresid1innovs}.
-
 
 \bibliography{./EMDerivation}
 \bibliographystyle{apalike}
