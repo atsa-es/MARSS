@@ -675,7 +675,7 @@ The covariance of $\cov[\checkVt, \checkWt]$ is
 \begin{equation}
 \cov[\checkVt, \checkWt] = \cov[\checkVt, \KK_t \checkVt] =
 [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top
-\begin{equation}
+\end{equation}
 
 \subsection{Joint distribution of the conditional residuals}
 
