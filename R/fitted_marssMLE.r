@@ -172,5 +172,5 @@ fitted.marssMLE <- function(object, ...,
   }
   }
   if(output=="matrix") return(retlist)
-  return(cbind(ret, as.data.frame(lapply(retlist, function(x){MARSS:::vec(t(x))}))))
+  return(cbind(ret, as.data.frame(lapply(retlist, function(x){vec(t(x))}))))
 } # end of fitted.marssMLE
