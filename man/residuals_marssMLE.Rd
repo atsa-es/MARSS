@@ -119,12 +119,15 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
   states <- MLEobj$states
   Q <- coef(MLEobj,type="matrix")$Q
   state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
-  #standardize to variance of 1
-  state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   #compare the two
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
-  #standardized (by variance) model & state residuals
+  #normalize to variance of 1
+  state.resids1 <- residuals(MLEobj, normalize=TRUE)$state.residuals
+  state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
+  cbind(t(state.resids1[,-30]), t(state.resids2))
+
+  #standardized (by joint variance) model & state residuals
   residuals(MLEobj)$std.residuals
 }
 \references{
