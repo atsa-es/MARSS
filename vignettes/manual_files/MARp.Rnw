@@ -317,7 +317,7 @@ if(file %in% dir("./manual_files")) {
 # This is the code used to make the figure comparing different ways to estimate 
 # AR parameters from AR with noise data
 # sims.exist is just a flag.  Set to FALSE to run the code
-if(!exists("sims.exist")){ sims.exist=TRUE } 
+if(!exists("sims.exist")){ sims.exist=FALSE } 
 if(!sims.exist) {
 nsim=200; TT=100
 file=paste("AR2SS",TT,".RData",sep="")
