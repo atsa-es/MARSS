@@ -1,7 +1,8 @@
 # Attaches Hessian, parSigma and parMean to MLEobj
 # Computed at the values in MLEobj$par
 # For confidence intervals, this should be the MLEs
-MARSShessian <- function(MLEobj, method = "Harvey1989") {
+MARSShessian <- function(MLEobj, method = c("Harvey1989", "fdHess", "optim")) {
+  method <- match.arg(method)
   paramvec <- MARSSvectorizeparam(MLEobj)
   if (length(paramvec) == 0) stop("Stopped in MARSShessian(). No estimated parameter elements thus no Hessian.\n", call. = FALSE)
 

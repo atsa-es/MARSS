@@ -11,9 +11,9 @@
 #   Ho, Shumway and Ombao (2006) The state-space approach to modeling dynamic processes in Models for Intensive Longitudinal Data
 #   page 157 suggest that this derivative is hard to compute.
 #######################################################################################################
-MARSSFisherI <- function(MLEobj, method = "Harvey1989") {
+MARSSFisherI <- function(MLEobj, method = c("Harvey1989", "fdHess", "optim")) {
   # optim is here for debugging.  fdHess is the numerical method used for users
-  if (length(method) != 1 || !(method %in% c("Harvey1989", "fdHess", "optim"))) stop("MARSSFisherI: method must be either Harvey1989 or fdHess")
+  method <- match.arg(method)
   if (method == "fdHess" || method == "optim") {
     obsFI <- MARSShessian.numerical(MLEobj, fun = method)
   }

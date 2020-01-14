@@ -8,8 +8,8 @@
 #
 #   Adds Hessian, parameter var-cov matrix, and parameter mean to a marssMLE object
 #######################################################################################################
-MARSShessian.numerical <- function(MLEobj, fun = "fdHess") {
-  ##
+MARSShessian.numerical <- function(MLEobj, fun = c("fdHess", "optim")) {
+  fun <- match.arg(fun)
   kfNLL <- function(x, MLEobj = NULL) { # NULL assignment needed for optim call syntax
     MLEobj <- MARSSvectorizeparam(MLEobj, x)
     negLL <- MARSSkf(MLEobj, only.logLik = TRUE, return.lag.one = FALSE)$logLik
