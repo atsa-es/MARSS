@@ -1,13 +1,13 @@
 \name{MARSShessian}
 \alias{MARSShessian}
 \alias{MARSSFisherI}
-\title{ MARSS Parameter Variance-Covariance Matrix from the Hessian Matrix}
+\title{ Parameter Variance-Covariance Matrix from the Hessian Matrix}
 \description{
 Calculates an approximate parameter variance-covariance matrix for the parameters using an inverse of the Hessian of the log-likelihood function at the MLEs.   It appends \code{$Hessian}, \code{$parMean}, \code{$parSigma} to the marssMLE object. 
 }
 \usage{
-MARSShessian( MLEobj, method="Harvey1989" )
-MARSSFisherI( MLEobj, method="Harvey1989" )
+MARSShessian( MLEobj, method=c("Harvey1989", "fdHess", "optim") )
+MARSSFisherI( MLEobj, method=c("Harvey1989", "fdHess", "optim") )
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 

@@ -1,8 +1,6 @@
 \name{coef.marssMLE}
-\alias{coef}
-\alias{coef.MARSS}
 \alias{coef.marssMLE}
-\alias{coef.marss}
+
 \title{ Coefficient function for MARSS MLE objects }
 \description{
   The MARSS fitting function, \code{\link{MARSS}}, outputs marssMLE objects.  \code{coef(marssMLE)}, where marssMLE is one's output from a \code{\link{MARSS}} call, will print out the estimated parameters.  The default output is a list with the estimated parameters for each MARSS parameter, however \code{coef} can be altered using the \code{type} argument to output a vector of all the estimated values (\code{type="vector"}) or a list with the full parameter matrix with the estimated and fixed elements (\code{type="matrix"}).

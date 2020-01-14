@@ -1,6 +1,7 @@
 \name{MARSSkem}
 \alias{MARSSkem}
-\title{ Maximum Likelihood Estimation for Multivariate Autoregressive State-Space Models }
+
+\title{ EM Algorithm function for MARSS models }
 \description{
   \code{MARSSkem()} performs maximum-likelihood estimation, using an EM algorithm for constrained and unconstrained MARSS models.  Users would not call this function directly normally.  The function \code{\link{MARSS}} calls MARsskem.  However users might want to used MARSSkem directly if they need to avoid some of the error-checking overhead associated with the \code{\link{MARSS}} function.
 }

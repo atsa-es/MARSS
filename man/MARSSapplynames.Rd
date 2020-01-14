@@ -1,5 +1,7 @@
 \name{MARSSapplynames}
 \alias{MARSSapplynames}
+\keyword{internal}
+
 \title{ Names for marssMLE Object Components }
 \description{
 Puts names on the par, start, par.se, init components of \code{\link{marssMLE}} objects.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.

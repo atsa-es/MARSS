@@ -1,5 +1,7 @@
 \name{stdInnov}
 \alias{stdInnov}
+\keyword{internal}
+
 \title{ Standardized Innovations }
 \description{
   Standardizes Kalman filter innovations. This is a helper function called by \code{\link{MARSSinnovationsboot}} in the \code{\link{MARSS-package}}. Not exported.

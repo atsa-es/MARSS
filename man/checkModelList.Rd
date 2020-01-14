@@ -1,8 +1,10 @@
 \name{checkModelList}
 \alias{checkModelList}
+\keyword{internal}
+
 \title{ Check model List Passed into MARSS Call }
 \description{
-  This is a helper function to check the model list passed in to a MARSS() call for any errors. Not exported.
+  This is a helper function to check the model list passed in to a \code{\link{MARSS}()} call for any errors. Not exported.
 }
 \usage{
 checkModelList( model, defaults, this.form.allows)

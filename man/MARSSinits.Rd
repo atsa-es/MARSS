@@ -1,13 +1,11 @@
 \name{MARSSinits}
 \alias{MARSSinits}
-\alias{MARSSinits_marxss}
-\alias{MARSSinits_dlm}
-\alias{MARSSinits_marss}
+
 \title{ Initial Values for MLE }
 \description{
   Sets up generic starting values for parameters for maximum-likelihood estimation algorithms that use an iterative maximization routine needing starting values.   Examples of such algorithms are the EM algorithm in \code{\link{MARSSkem}} and Newton methods in \code{\link{MARSSoptim}}.   This is a utility function in the \code{\link{MARSS-package}}.  It is not exported to the user. Users looking for information on specifying initial conditions should look at \code{\link{MARSS}} and look at the help file for their model form.
   
-The function assumes that the user passed in the inits list using the parameter names in whatever form was specified in the MARSS() call.  The default is form="marxss".  The MARSSinits() function calls MARSSinits_foo, where foo is the form specified in the MARSS() call.  MARSSinits_foo translates the inits list in form foo into form marss.
+The function assumes that the user passed in the inits list using the parameter names in whatever form was specified in the \code{\link{MARSS}()} call.  The default is form="marxss".  The \code{\link{MARSSinits}()} function calls MARSSinits_foo, where foo is the form specified in the \code{\link{MARSS}()} call.  MARSSinits_foo translates the inits list in form foo into form marss.
 }
 \usage{
 MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, 
@@ -39,3 +37,7 @@ MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0,
   eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ \code{\link{marssMODEL}} \code{\link{MARSSkem}} \code{\link{MARSSoptim}} }
+
+\note{
+Within the base code, a form-specific internal \code{MARSSinits} function is called to allow the output to vary based on form: \code{MARSSinits_dfa}, \code{MARSSinits_marss}, \code{MARSSinits_marxss}.
+}

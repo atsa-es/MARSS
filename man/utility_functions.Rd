@@ -1,4 +1,5 @@
 \name{utility.functions}
+\alias{utility.functions}
 \alias{makediag}
 \alias{takediag}
 \alias{is.blockdiag}
@@ -25,6 +26,7 @@
 \alias{ pcholinv }
 \alias{ pchol }
 \alias{ all.equal.vector }
+\keyword{internal}
 
 \title{ Matrix Utilities }
 \description{

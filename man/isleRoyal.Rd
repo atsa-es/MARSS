@@ -1,10 +1,12 @@
 \name{isleRoyal}
 \alias{isleRoyal}
+\keyword{internal}
+
 \docType{data}
 \title{ Isle Royale Wolf and Moose Data }
 \description{
 Example data set for estimation of species interaction strenths. These are data on the number of wolves and 
-  moose on Isle Royal, Michigan.  The data are unlogged.  The covariate data are the average Jan-Feb, average Apr-May and averager July-Sept
+  moose on Isle Royal, Michigan.  The data are unlogged.  The covariate data are the average Jan-Feb, average Apr-May and average July-Sept
   temperature (F) and precipitation (inches).  Also included are 3-year running means of these covariates.  The choice of 
   covariates is based on those presented in the Isle Royale 2012 annual report.
 }

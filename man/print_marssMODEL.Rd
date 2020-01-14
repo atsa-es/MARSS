@@ -1,7 +1,7 @@
 \name{print.marssMODEL}
 \alias{print.marssMODEL}
 \alias{summary.marssMODEL}
-\alias{describe.marssMODEL}
+
 \title{ Printing marssMODEL Objects }
 \description{
   \code{print(marssMODEL)}, where \code{\link{marssMODEL}} is a marssMODEL object, will print out information on the model in short form (e.g. 'diagonal and equal').

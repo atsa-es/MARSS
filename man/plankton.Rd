@@ -1,9 +1,13 @@
-\name{plankton}
+\name{xplankton}
+\alias{plankton}
 \alias{ivesDataLP}
 \alias{ivesDataByWeek}
 \alias{lakeWAplankton}
 \alias{lakeWAplanktonRaw}
 \alias{lakeWAplanktonTrans}
+%\keyword{internal}
+\keyword{datasets}
+
 \docType{data}
 \title{ Plankton Data Sets }
 \description{
@@ -34,4 +38,4 @@ The data are provided as a matrix with time running down the rows.
 str(ivesDataLP)
 str(ivesDataByWeek)
 }
-\keyword{datasets}
+

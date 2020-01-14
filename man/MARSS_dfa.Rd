@@ -1,14 +1,16 @@
 \name{MARSS.dfa}
 \alias{MARSS.dfa}
+\keyword{internal}
+
 \title{ Multivariate Dynamic Factor Analysis }
+
 \description{
 The Dynamic Factor Analysis model in MARSS is
-\describe{
-\item{x(t+1) = x(t) + w(t), where w(t) ~ MVN(0,I)}{}
-\item{y(t) = Z(t) x(t) + D(t)d(t) + v(t), where v(t) ~ MVN(0,R(t))}{}
-\item{x(1) ~ MVN(0, 5*I)}{} 
-}
-Passing in \code{form="dfa"} to MARSS() invokes a helper function to create that model and creates the Z matrix for the user.  Q is by definition identity, x0 is zero and V0 is diagonal with large variance (5). U is zero, A is zero, and covariates only enter the Y equation.  Because U and A are 0, the data should have mean 0 (de-meaned) otherwise one is likely to be creating a structurally inadequate model (i.e. the model implies that the data have mean = 0, yet data do not have mean = 0 ).
+\deqn{x(t+1) = x(t) + w(t), where w(t) ~ MVN(0,I)}
+\deqn{y(t) = Z(t) x(t) + D(t) d(t) + v(t), where v(t) ~ MVN(0,R(t))}
+\deqn{x(1) ~ MVN(0, 5*I)}
+
+Passing in \code{form="dfa"} to \code{\link{MARSS}()} invokes a helper function to create that model and creates the Z matrix for the user.  Q is by definition identity, x0 is zero and V0 is diagonal with large variance (5). U is zero, A is zero, and covariates only enter the Y equation.  Because U and A are 0, the data should have mean 0 (de-meaned) otherwise one is likely to be creating a structurally inadequate model (i.e. the model implies that the data have mean = 0, yet data do not have mean = 0 ).
 }
 \section{Usage}{
 \code{MARSS(y, 

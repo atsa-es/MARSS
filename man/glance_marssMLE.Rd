@@ -1,5 +1,6 @@
 \name{glance.marssMLE}
 \alias{glance.marssMLE}
+
 \title{Return brief summary information on a MARSS fit}
 \usage{
   glance.marssMLE(x, ...)

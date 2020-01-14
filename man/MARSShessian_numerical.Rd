@@ -1,11 +1,11 @@
 \name{MARSShessian.numerical}
 \alias{MARSShessian.numerical}
-\title{ MARSS Hessian Matrix via Numerical Approximation}
+\title{ Hessian Matrix via Numerical Approximation}
 \description{
 Calculates the Hessian of the log-likelihood function at the MLEs using either the  \code{\link{fdHess}} function in the  \code{\link{nlme}} package or the  \code{\link{optim}} function.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
 }
 \usage{
-MARSShessian.numerical(MLEobj, fun="fdHess")
+MARSShessian.numerical(MLEobj, fun=c("fdHess", "optim"))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 

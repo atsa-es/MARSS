@@ -1,14 +1,16 @@
 \name{MARSS.marxss}
 \alias{MARSS.marxss}
+\keyword{internal}
+
 \title{ Multivariate AR-1 State-space Model with Inputs }
 \description{
-The argument \code{form="marxss"} in a MARSS() function call specifies a MAR-1 model with eXogenous variables model.  This is a MARSS(1) model of the form:
-\describe{
-\item{x(t) = B(t) x(t-1) + u(t) + C(t)c(t) + G(t)w(t), where w(t) ~ MVN(0,Q(t))}{}
-\item{y(t) = Z(t) x(t) + a(t) + D(t)d(t) + H(t)v(t), where v(t) ~ MVN(0,R(t))}{}
-\item{x(0) ~ MVN(x0, V0)}{} 
-}
-Note, marxss is a model form.  A model form is defined by a collection of form functions discussed in \code{\link{marssMODEL}}.  These functions are not exported to the user, but are called by MARSS() using the argument \code{form}.  
+The argument \code{form="marxss"} in a \code{\link{MARSS}()} function call specifies a MAR-1 model with eXogenous variables model.  This is a MARSS(1) model of the form:
+\deqn{x(t+1) = B(t) x(t) + U(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
+\deqn{y(t) = Z(t) x(t) + A(t) + D(t) d(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
+\deqn{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }
+Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x(1)} or \eqn{x(0)} is treated as an estimated parameter not a diffuse prior.
+
+Note, "marxss" is a model form.  A model form is defined by a collection of form functions discussed in \code{\link{marssMODEL}}.  These functions are not exported to the user, but are called by \code{\link{MARSS}()} using the argument \code{form}.  
 }
 \section{Usage}{
 \code{MARSS(y, 

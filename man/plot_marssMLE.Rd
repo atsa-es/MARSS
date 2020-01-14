@@ -1,9 +1,8 @@
 \name{plot.marssMLE}
-\alias{plot}
 \alias{plot.marssMLE}
-\alias{autoplot}
 \alias{autoplot.marssMLE}
-\title{ plotting functions for MARSS MLE objects }
+
+\title{ Plot MARSS MLE objects }
 \description{
   Plots fitted observations and estimated states with confidence intervals using base R graphics (\code{plot}) and ggplot2 (\code{autoplot}).  Diagnostic plots also shown.  By default all plots are plotted.  Individual plots can be plotted by passing in \code{type.plot}.  If an individual plot is made using \code{autoplot}, the ggplot object is returned which can be further manipulated.
 }

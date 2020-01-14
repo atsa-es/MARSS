@@ -3,11 +3,13 @@
 \alias{is.marssMODEL_marss}
 \alias{is.marssMODEL_marxss}
 \alias{is.marssMODEL_dfa}
+\keyword{internal}
+
 \title{ Test Model Objects }
 \description{
-These are model objects and utility functions for model objects in the package \code{\link{MARSS-package}}.  Users would not normally work directly with these functions.
+These are model objects and utility functions for model objects in the package \code{\link{MARSS-package}}.  
   \code{is.marssMODEL()} ensures model consistency.
-  \code{MARSS_formname()} translates a model list as passed in call to MARSS() into a marssMODEL model object.
+  \code{MARSS_formname()} translates a model list as passed in call to \code{\link{MARSS}} into a marssMODEL model object.
 }
 \usage{
 is.marssMODEL(MODELobj, method="kem")

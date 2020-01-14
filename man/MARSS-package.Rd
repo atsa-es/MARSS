@@ -7,14 +7,14 @@ Multivariate Autoregressive State-Space Model Estimation
 \description{
 The MARSS package fits constrained and unconstrained multivariate autoregressive time-series models to multivariate time series data.  To open the user guide from the command line, type \code{RShowDoc("UserGuide",package="MARSS")}.  To open an overview page with package information and links to the R scripts in the User Guide, type \code{RShowDoc("index",package="MARSS")}.    
 
-The main function is \code{\link{MARSS}} which is used to fit a specified model to data and estimate the model parameters.  MARSS model specification is based on "form" (an argument to a MARSS() call).  The form tells MARSS() what to expect in the model list (model is a MARSS argument) and how to translate that into the base model form used in the fitting algorithms.
+The main function is \code{\link{MARSS}} which is used to fit a specified model to data and estimate the model parameters.  MARSS model specification is based on "form" (an argument to a \code{\link{MARSS}()} call).  The form tells \code{\link{MARSS}()} what to expect in the model list (\code{model} is a MARSS argument) and how to translate that into the base model form used in the fitting algorithms.
 
 The default MARSS model form is "marxss", which is a model of the following form:
-\describe{
-\item{x(t+1) = B x(t) + U + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}{}
-\item{y(t) = Z x(t) + A + D d(t) + H v(t), where v(t) ~ MVN(0,R)}{}
-\item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }{} 
-}
+\deqn{x(t+1) = B x(t) + U + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
+\deqn{y(t) = Z x(t) + A + D d(t) + H v(t), where v(t) ~ MVN(0,R)}
+\deqn{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }
+Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x(1)} or \eqn{x(0)} is treated as an estimated parameter not a diffuse prior.
+
 The parameters, hidden state processes (x), and observations (y) are matrices:
   \itemize{
     \item x(t) is m x 1 

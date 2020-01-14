@@ -1,9 +1,8 @@
-\name{marssMLE}
-\alias{marssMLE}
+\name{is.marssMLE}
 \alias{is.marssMLE}
-\title{ Maximum Likelihood MARSS Estimation Object }
+\title{ Tests marssMLE object for completeness }
 \description{
-  An object in the  \code{\link{MARSS-package}} that has all the elements needed for maximum-likelihood estimation of multivariate autoregressive state-space model: the data, model, estimation methods, and any control options needed for the method.  If the model has been fit and parameters estimated, the object will also have the MLE parameters.  Other functions add other elements to the marssMLE object, such as CIs, s.e.'s, AICs, and the hessian. There are print, summary, coef, residuals, predict and simulate methods for marssMLE objects and a bootstrap function.  Rather than working directly with the elements of a marssMLE object, use \code{\link{print.marssMLE}} to extract output.
+  Tests an marssMLE for completeness to determine if it has all the pieces and attributes necessary to be passed to MARSS functions for fitting, filtering, smoothing, or displaying. Internal function, use \code{MARSS:::} to access. This is a very slow function which should not be called repeatedly in a \code{for} loop for example.
 }
 \usage{
 is.marssMLE(MLEobj)
@@ -12,9 +11,9 @@ is.marssMLE(MLEobj)
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. See Details.}
 }
 \details{
-  The is.marssMLE() function checks components \code{marss}, \code{start} and \code{control}, which must be present for estimation by functions e.g. \code{\link{MARSSkem}}. Components returned from estimation must include at least \code{method}, \code{par}, \code{kf}, \code{numIter}, \code{convergence} and \code{logLik}. Additional components (e.g. AIC) may be returned, as described in function help files.
+  The \code{is.marssMLE()} function checks components \code{marss}, \code{start} and \code{control}, which must be present for estimation by functions e.g. \code{\link{MARSSkem}}. Components returned from estimation must include at least \code{method}, \code{par}, \code{kf}, \code{numIter}, \code{convergence} and \code{logLik}. Additional components (e.g. AIC) may be returned, as described in function help files.
 \describe{
-  \item{\code{model}}{ An object of class \code{\link{marssMODEL}} in whatever form the user specified in the call to MARSS().  Default is form marxss. }
+  \item{\code{model}}{ An object of class \code{\link{marssMODEL}} in whatever form the user specified in the call to \code{\link{MARSS}()}.  Default is form marxss. }
   \item{\code{marss}}{ An object of class \code{\link{marssMODEL}} in marss forms, needed for all the base MARSS functions. }
   \item{\code{start}}{ List with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying initial values for parameters to be used (if needed) by the maximization algorithm. 
     \describe{

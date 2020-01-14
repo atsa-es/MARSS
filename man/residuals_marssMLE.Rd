@@ -1,8 +1,6 @@
 \name{residuals.marssMLE}
-\alias{residuals}
 \alias{residuals.marssMLE}
-\alias{residuals.MARSS}
-\alias{residuals.marss}
+
 \title{ MARSS Standardized Residuals }
 \description{
   Calculates the standardized (or auxiliary) residuals sensu Harvey, Koopman and Penzer (1998).

@@ -1,10 +1,9 @@
 \name{print.marssMLE}
-\alias{print}
-\alias{print.MARSS}
 \alias{print.marssMLE}
+
 \title{ Printing functions for MARSS MLE objects }
 \description{
-  The MARSS fitting function, \code{\link{MARSS}}, outputs \code{\link{marssMLE}} objects.  \code{print(marssMLE)}, where \code{\link{marssMLE}} is a \code{\link{marssMLE}} object, will print out information on the fit.  However, \code{print} can be used to print a variety of information (residuals, smoothed states, imputed missing values, etc) from a \code{\link{marssMLE}} object using the \code{what} argument in the print call.
+  The MARSS fitting function, \code{\link{MARSS}}, outputs \code{\link{marssMLE}} objects.  \code{print(marssMLE)}, where \code{marssMLE} is a \code{\link{marssMLE}} object, will print out information on the fit.  However, \code{print} can be used to print a variety of information (residuals, smoothed states, imputed missing values, etc) from a \code{\link{marssMLE}} object using the \code{what} argument in the print call.
 }
 \usage{
 \method{print}{marssMLE}(x, digits = max(3, getOption("digits")-4), ..., what="fit", form=NULL, silent=FALSE)
@@ -29,8 +28,8 @@
     \item{ "model.residuals" }{ The smoothed model residuals. y(t)-E(y(t)|xtT(t)), aka actual data at time t minus the expected value of the data conditioned on the smoothed states estimate at time t. Standard function: \code{residuals(x)$model.residuals}}  See \code{\link{residuals.marssMLE}} for a discussion of residuals in the context of MARSS models.
     \item{ "state.residuals" }{ The smoothed state residuals. E(xtT(t))-E(x(t)|xtT(t-1)), aka the expected value of x at t conditioned on all the data minus the expected value of x at t conditioned on (x(t-1) conditioned on all the data). Standard function: \code{residuals(x)$state.residuals}}  See \code{\link{residuals.marssMLE}}.
     \item{ parameter name }{ Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Standard function: \code{coef(x, type="matrix")$elem} }
-    \item{ "kfs" }{ The Kalman filter and smoother output.  See \code{\link{MARSSkf}} for a description of the output. The full kf output is not normally attached to the output from a MARSS() call.  This will run the filter/smoother if needed and return the list INVISIBLY.  So assign the output as \code{foo=print(x,what="kfs")}}
-    \item{ "Ey" }{ The expectations involving y conditioned on all the data.  See \code{\link{MARSShatyt}} for a discussion of these expectations.  This output is not normally attached to the output from a MARSS() call--except \code{ytT} which is the predicted value of any missing y. The list is returned INVISIBLY.  So assign the output as \code{foo=print(x,what="Ey")}.}
+    \item{ "kfs" }{ The Kalman filter and smoother output.  See \code{\link{MARSSkf}} for a description of the output. The full kf output is not normally attached to the output from a \code{\link{MARSS}()} call.  This will run the filter/smoother if needed and return the list INVISIBLY.  So assign the output as \code{foo=print(x,what="kfs")}}
+    \item{ "Ey" }{ The expectations involving y conditioned on all the data.  See \code{\link{MARSShatyt}} for a discussion of these expectations.  This output is not normally attached to the output from a \code{\link{MARSS}()} call--except \code{ytT} which is the predicted value of any missing y. The list is returned INVISIBLY.  So assign the output as \code{foo=print(x,what="Ey")}.}
       } }
   \item{form}{ By default, print uses the model form specified in the call to \code{\link{MARSS}}.  This information is in \code{ attr(marssMLE$model, "form") }, however you can specify a different form.  \code{ form="marss" } should always work since this is the model form in which the model objects are stored (in \code{marssMLE$marss}).}
   \item{silent}{ If TRUE, do not print just return the object.  If print call is assigned, nothing will be printed.  See examples.  If \code{what="fit"}, there is always output printed.}

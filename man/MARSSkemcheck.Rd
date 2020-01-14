@@ -1,5 +1,7 @@
 \name{MARSSkemcheck}
 \alias{MARSSkemcheck}
+\keyword{internal}
+
 \title{ Model Checking for MLE objects Passed to MARSSkem }
 \description{
   This is a helper function in the \code{\link{MARSS-package}} that checks that the model can be handled by the \code{\link{MARSSkem}} algorithm. It also returns the structure of the model as a list of text strings.

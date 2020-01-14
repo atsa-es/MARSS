@@ -2,6 +2,8 @@
 \alias{model.frame}
 \alias{model.frame.marssMODEL}
 \alias{model.frame.marssMLE}
+\keyword{internal}
+
 \title{ model.frame method for marssMLE and marssMODEL objects }
 \description{
   \code{model.frame(marssMLE)} or \code{model.frame(marssMODEL)}, where marssMLE is the output from a \code{\link{MARSS}} call marssMODEL is the model element of a marssMLE object, 

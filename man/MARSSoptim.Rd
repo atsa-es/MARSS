@@ -2,7 +2,7 @@
 \alias{MARSSoptim}
 \title{Parameter estimation for MARSS models using optim}
 \description{
-  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available via the \code{\link{optim}} function.  The \code{MARSSoptim} function is called when \code{\link{MARSS}} is called with \code{method="BFGS"}.  This is a base function in the \code{\link{MARSS-package}}. 
+  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available via the \code{\link{optim}} function.  The \code{MARSSoptim} function is called when \code{\link{MARSS}} is called with \code{method="BFGS"}.  This is an internal function in the \code{\link{MARSS-package}}. 
 }
 \usage{
 MARSSoptim(MLEobj)

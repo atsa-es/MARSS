@@ -1,22 +1,22 @@
 \name{MARSS}
 \alias{MARSS}
-\alias{MARSSsettings}
+
 \title{ MARSS Model Specification and Estimation }
 \description{
-  This is the main MARSS function for fitting multivariate autoregressive state-space (MARSS) models.  Scroll down to the bottom to see some short examples.  To open the user guide from the command line, type \code{RShowDoc("UserGuide",package="MARSS")}. To open a guide to show you how to get started quickly, type \code{RShowDoc("Quick_Start",package="MARSS")}.  To open an overview page with package information and how to find all the R code for the user guide chapters, type \code{RShowDoc("index",package="MARSS")}. To get info on the axillary functions (like for bootstrapping and confidence intervals) go to \code{\link{MARSS-package}}.  To see a discussion of how to get output from your model fits, go to \code{\link{print.MARSS}}. If MARSS() is throwing errors or warnings that you don't understand, try the Troubleshooting section of the user guide or type \code{MARSSinfo()} at the command line.
+  This is the main MARSS function for fitting multivariate autoregressive state-space (MARSS) models.  Scroll down to the bottom to see some short examples.  To open the user guide from the command line, type \code{RShowDoc("UserGuide",package="MARSS")}. To open a guide to show you how to get started quickly, type \code{RShowDoc("Quick_Start",package="MARSS")}.  To open an overview page with package information and how to find all the R code for the user guide chapters, type \code{RShowDoc("index",package="MARSS")}. To get info on the axillary functions (like for bootstrapping and confidence intervals) go to \code{\link{MARSS-package}}.  To see a discussion of how to get output from your model fits, go to \code{\link{print.marssMLE}}. If \code{MARSS()} is throwing errors or warnings that you don't understand, try the Troubleshooting section of the user guide or type \code{MARSSinfo()} at the command line.
   
 The background section on this page is focused on fitting MARSS models in vectorized form. This form will almost certainly look unfamilar.  MARSS works by converting the users' (more familiar model form) into the vectorized form which allows general linear constraints.  You should go to the help page for the form of the model you are fitting to get background on that model form.  Currently the MARSS package has two model forms: marxss and dfa.
 \describe{
-\item{\code{\link{MARSS.marxss}}}{This is the default form. X_t = B_t*X_t-1 + U_t + C_t*c_t + w_t; Y_t=Z_t*X_t + A_t + D_t*d_t + v_t. Any parameters can be set to zero. Most users will want this help page.}
-\item{\code{\link{MARSS.dfa}}}{This is a model form to allow easier specification of models for Dynamic Factor Analysis. X_t = X_t-1 + U_t + w_t; Y_t=Z_t*X_t + A_t + D_t*d_t + v_t. The Z parameters has a specific form and the Q is set at i.i.d with variance of 1.}
+\item{\code{\link{MARSS.marxss}}}{This is the default form. \eqn{x_t = B_t x_t-1 + U_t + C_t*c_t + w_t}; \eqn{y_t=Z_t x_t + A_t + D_t*d_t + v_t}. Any parameters can be set to zero. Most users will want this help page.}
+\item{\code{\link{MARSS.dfa}}}{This is a model form to allow easier specification of models for Dynamic Factor Analysis. \eqn{x_t = x_t-1 + U_t + w_t}; \eqn{y_t=Z_t x_t + A_t + D_t d_t + v_t}. The Z parameters has a specific form and the Q is set at i.i.d with variance of 1.}
 }
 The rest of this help page discusses the vectorized form of a MARSS model.
 
 The MARSS package fits time-varying state-space models that can be transformed into the form (termed form=marss):
 \describe{
-\item{x(t) = (t(x(t-1)) (x) I_m)(f_b(t)+D_b(t)beta) + (f_u(t)+D_u(t)upsilon) + w(t), where w(t) ~ MVN(0,Q(t))}{}
-\item{y(t) = (t(x(t)) (x) I_n)(f_z(t)+D_z(t)zeta) + (f_a(t)+D_a(t)alpha) + v(t), where v(t) ~ MVN(0,R(t))}{}
-\item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0)}{} 
+\item{ \eqn{x(t) = (t(x(t-1)) (x) I_m)(f_b(t)+D_b(t)beta) + (f_u(t)+D_u(t)upsilon) + w(t)}, where \eqn{w(t) ~ MVN(0,Q(t))}}{}
+\item{\eqn{y(t) = (t(x(t)) (x) I_n)(f_z(t)+D_z(t)zeta) + (f_a(t)+D_a(t)alpha) + v(t)}, where \eqn{v(t) ~ MVN(0,R(t))}}{}
+\item{\eqn{x(1) ~ MVN(x0, V0)} or \eqn{x(0) ~ MVN(x0, V0)}}{} 
 }
 where beta, upsilon, zeta, and alpha are column vectors of estimated values, the f are column vectors of inputs, and the D are matrices of inputs.  The f and D are potentially time-varying. (x) means kronecker product and I_p is a p x p identity matrix.  The function \code{MARSS()} is used to fit MARSS models using the argument \code{form} to specify the type of state-space model being fit.  
 
@@ -24,13 +24,13 @@ Most commonly used multivariate autoregressive state-space models can be reformu
 
 The default MARSS form is "marxss" which is the state-space model:
 \describe{
-\item{x(t) = B(t) x(t-1) + u(t) + C(t)c(t) + G(t)w(t), where w(t) ~ MVN(0,Q(t))}{}
-\item{y(t) = Z(t) x(t) + a(t) + D(t)d(t) + H(t)v(t), where v(t) ~ MVN(0,R(t))}{}
-\item{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0)}{} 
+\item{\eqn{x(t) = B(t) x(t-1) + u(t) + C(t)c(t) + G(t)w(t)}, where \eqn{w(t) ~ MVN(0,Q(t))}}{}
+\item{\eqn{y(t) = Z(t) x(t) + a(t) + D(t)d(t) + H(t)v(t)}, where \eqn{v(t) ~ MVN(0,R(t))}}{}
+\item{\eqn{x(1) ~ MVN(x0, V0)} or \eqn{x(0) ~ MVN(x0, V0)}}{} 
 }
 See \code{\link{MARSS.marxss}} for arguments and defaults information.
 
-If you are working with models with time-varying parameters, it is important to notice the time-index for the parameters in the process equation (the x equation).  In some formulations (e.g. in the \code{\link[KFAS]{KFAS}}), the process equation is x(t)=B(t-1)x(t-1)+w(t-1) so B(t-1) goes with x(t) not B(t). Thus one needs to be careful to line up the time indices when passing in time-varying parameters to \code{MARSS()}.
+If you are working with models with time-varying parameters, it is important to notice the time-index for the parameters in the process equation (the x equation).  In some formulations (e.g. in the \code{\link[KFAS]{KFAS}}), the process equation is \eqn{x(t)=B(t-1)x(t-1)+w(t-1)} so \eqn{B(t-1)} goes with \eqn{x(t)} not \eqn{B(t)}. Thus one needs to be careful to line up the time indices when passing in time-varying parameters to \code{\link{MARSS}()}.
 }
 \usage{
 MARSS(y, 
@@ -77,13 +77,13 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
  
 A call to \code{MARSS()} returns an object of class \code{marssMLE}.  The MARSS package has print, coef, and residuals functions that will handle \code{marssMLE} objects.  See \code{\link{print.marssMLE}}, \code{\link{coef.marssMLE}}, and \code{\link{residuals.marssMLE}}. The help page for \code{\link{print.marssMLE}} summarizes all the different output available for \code{marssMLE} objects and describes what the output is mathematically.  Thus, this page is the first place to start and will direct you to the appropriate other method functions (like \code{coef}).
 
- Many different types of multivariate time-series models can be converted to the MARSS form (see the User Guide). \code{MARSS()} allows the user to specify the form of their model using the argument \code{form}. The default form is a multivariate lag-1 (time-varying) state-space model which is denoted using \code{form="marxss"}. Look at \code{\link{MARSS.marxss}}) to see how the model argument for the marxss form is specified.   The model argument is a list, but the elements of that and how it is converted to a marssMODEL(form=marss) object (needed for the internal algorithms) depends intimately on the equation form.  Thus you will need to refer to that appropriate help page (\code{MARSS.formname}) for your equation form.  
+ Many different types of multivariate time-series models can be converted to the MARSS form (see the User Guide). \code{\link{MARSS}()} allows the user to specify the form of their model using the argument \code{form}. The default form is a multivariate lag-1 (time-varying) state-space model which is denoted using \code{form="marxss"}. Look at \code{\link{MARSS.marxss}}) to see how the model argument for the marxss form is specified.   The model argument is a list, but the elements of that and how it is converted to a marssMODEL(form=marss) object (needed for the internal algorithms) depends intimately on the equation form.  Thus you will need to refer to that appropriate help page (\code{MARSS.formname}) for your equation form.  
 
  The likelihood surface for MARSS models can be  multimodal or with strong ridges.  It is  recommended that for final analyses the ML estimates are checked by using a Monte Carlo initial conditions search; see the chapter on initial conditions searches in the User Guide.  This requires more computation time, but reduces the chance of the algorithm terminating at a local maximum and not reaching the true MLEs.  Also it is wise to check the EM results against the BFGS results (if possible) since if there are strong ridges in the likelihood.  Such ridges seems to slow down the EM algorithm considerably and can cause the algorithm to report convergence far from the ML values.  EM steps up the likelihood and the convergence test is based on the rate of change of the LL in each step; once on a strong ridge, the steps can slow dramatically.  You can force the algorithm to keep working by setting \code{minit}.  BFGS seems less hindered by the ridges but can be prodigiously slow for some multivariate problems.
 }
 
 \value{
-  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), go here \code{\link{print.MARSS}}.  
+  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), see \code{\link{print.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{augment.marssMLE}} and \code{\link{plot.marssMLE}}.  
   
   The outputted \code{\link{marssMLE}} object has the following components:
   \item{model}{ MARSS model specification. It is a \code{marssMODEL} object in the form specified by the user in the \code{MARSS()} call.  This is used by print functions so that the user sees the expected form.}
@@ -122,7 +122,7 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
   eli(dot)holmes(at)noaa(dot)gov, kellie(dot)wills(at)noaa(dot)gov
 }
 \seealso{
-\code{\link{marssMLE}} \code{\link{MARSSkem}} \code{\link{MARSSoptim}} \code{\link{MARSS-package}} \code{\link{print.MARSS}} \code{\link{MARSS.marxss}} \code{\link{MARSS.dfa}}
+\code{\link{marssMLE}} \code{\link{MARSSkem}} \code{\link{MARSSoptim}} \code{\link{MARSS-package}} \code{\link{print.marssMLE}} \code{\link{print.marssMODEL}} \code{\link{MARSS.marxss}} \code{\link{MARSS.dfa}}
 \code{\link{augment.marssMLE}} \code{\link{tidy.marssMLE}} \code{\link{coef.marssMLE}} 
 }
 \examples{

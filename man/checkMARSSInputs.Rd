@@ -1,8 +1,10 @@
 \name{checkMARSSInputs}
 \alias{checkMARSSInputs}
 \title{ Check inputs to MARSS call }
+\keyword{internal}
+
 \description{
-  This is a helper function to check the inputs to a MARSS() call for any errors. Not exported.
+  This is a helper function to check the inputs to a \code{\link{MARSS}()} call for any errors. Not exported.
 }
 \usage{
 checkMARSSInputs( MARSS.inputs, silent=FALSE )

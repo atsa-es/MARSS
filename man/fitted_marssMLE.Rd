@@ -1,6 +1,6 @@
 \name{fitted.marssMLE}
-\alias{fitted}
 \alias{fitted.marssMLE}
+
 \title{ fitted function for MARSS MLE objects }
 \description{
   The MARSS fitting function, \code{\link{MARSS}}, outputs marssMLE objects.  \code{fitted(marssMLE)}, where marssMLE is the output from a \code{\link{MARSS}} call,  will return the modeled value of \eqn{y(t)} or \eqn{x(t)}. For \eqn{y(t)}, this is \eqn{Z x(t) + a}. For \eqn{x(t)}, this is \eqn{B x(t-1) + u}. If you want the estimate of \eqn{x(t)}, then use \code{\link{tidy.marssMLE}}.
@@ -14,10 +14,10 @@
   output = c("tibble", "matrix"))
   }
   \arguments{
-  \item{object}{ A marssMLE object.  }
+  \item{object}{ A \code{\link{marssMLE}} object.  }
   \item{...}{ Other arguments. Used for backwards compatibility with old arguments. }
   \item{type}{ Fitted values for the observations (y) or the states (x).}
-  \item{conditioning}{ If "T", then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead". Note, for type="states", conditioning on data up to "t" is not provided (since this would require the estimate of X(t-1) conditioned on data 1:t).}
+  \item{conditioning}{ The data are t=1 to t=T. If \code{conditioning="T"}, then condition on all the data. If "t", condition on data up to "t". If "t-1", condition on data up to "t-1". The latter is termed "one-step-ahead". Note, for \code{type="states"}, conditioning on data up to "t" is not provided (since this would require the estimate of \eqn{X(t-1)} conditioned on data 1:t).}
   \item{interval}{ If interval="confidence", then the standard error of the fitted value is returned. }
   \item{conf.level}{ Level for the intervals if interval != "none".}
   \item{output}{ tibble or list of matrices}
@@ -59,7 +59,7 @@ The model predicted \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)} is \eqn{B(t)\hat{x
 
 If you want estimates of the states, rather than the model predictions based on \eqn{x_{t-1}} then you'll want either the states estimate conditioned on all the data (or conditioned on the data up to time t-1 or up to time t).  These are returned by \code{\link{MARSSkf}} in \code{xtT}, \code{xtt1} and \code{xtt} respectively.  Which one you want depends on your objective and application.  You can also use the \code{\link{tidy.marssMLE}} function to return a data.frame with the states (conditioned on data up to T, t, or t-1) with standard errors and intervals.
   
-\eqn{\hat{x}(t-1)} used in the prediction is the expected value of the states at time t-1. If \code{conditioning="T"}, \eqn{\hat{x}(t-1)} is the expected value at time t-1 conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}}.  If \code{conditioning="t-1"}, \eqn{\hat{x}(t-1)} is the expected value conditioned on the data up to time t-1, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}}. The fitted state values conditioned on data up to $t$ is not provided. This would require the expected value of states at time t conditioned on data up to time t+1, and this is not output by the Kalman filter. Only conditioning on data up to t-1 and T are output.
+\eqn{\hat{x}(t-1)} used in the prediction is the expected value of the states at time t-1. If \code{conditioning="T"}, \eqn{\hat{x}(t-1)} is the expected value at time t-1 conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}}.  If \code{conditioning="t-1"}, \eqn{\hat{x}(t-1)} is the expected value conditioned on the data up to time t-1, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}}. The fitted state values conditioned on data up to t is not provided. This would require the expected value of states at time t conditioned on data up to time t+1, and this is not output by the Kalman filter. Only conditioning on data up to t-1 and T are output.
 
 The intervals returned by \code{fitted.marssMLE} for the fitted states, are not typically what one uses or needs--however might be useful for simulation work. If you are doing outlier detection or shock detection, you need the intervals on the state residuals (X(t)-fitted(X(t)) which are returned by \code{\link{residuals.marssMLE}} or \code{\link{augment.marssMLE}}. If you want intervals on the states estimates (conditioned all the data or data up to t-1), use \code{\link{tidy.marssMLE}}.
 

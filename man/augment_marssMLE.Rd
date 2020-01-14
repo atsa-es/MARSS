@@ -1,9 +1,7 @@
 \name{augment.marssMLE}
 \alias{augment.marssMLE}
-\alias{augment_dfa}
-\alias{augment_marss}
-\alias{augmentmarxss}
-\title{Return the model and state fitted values, residuals, and residual sigma (standard deviation). Also it will optionally return the confidence intervals on fitted values or prediction intervals on new data (or states).}
+
+\title{Return the model and state fitted values, residuals, and residual sigma}
 \usage{
   augment.marssMLE(x, type = c("ytT", "xtT"),
                               interval = c("none", "confidence", "prediction"), 
@@ -23,7 +21,7 @@
 
 }
 \description{
-Returns a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the fitted observations or states. \code{augment} is concerned with predictions of the states or observations at time $t$, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals (the v(t) or w(t)). \code{\link{tidy.marssMLE}} is concerned with estimates of values (parameters, states or observations) conditioned on all the data.
+\code{augment.marssMLE} returns a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the fitted observations or states. \code{augment} is concerned with predictions of the states or observations at time t, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals (the \eqn{v(t)} or \eqn{w(t)}). \code{\link{tidy.marssMLE}} is concerned with estimates of values (parameters, states or observations) conditioned on all the data.
 }
 \value{
 If interval = "none", the data frame has the following columns:
@@ -65,6 +63,7 @@ If you want the expected value of the states and an estimate of their standard e
 
 }
 
+
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
@@ -93,4 +92,8 @@ ggplot(data = d) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("xtT (points) and predition (line)")
 
+}
+
+\note{
+Within the base code, a form-specific internal \code{augment} function is called to allow the output to vary based on form: augment_dfa, augment_marss, augment_marxss.
 }

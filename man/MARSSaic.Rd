@@ -2,7 +2,7 @@
 \alias{MARSSaic}
 \title{ AIC for MARSS Models }
 \description{
-  Calculates AIC, AICc, a parametric bootstrap AIC (AICbp) and a non-parametric bootstrap AIC (AICbb).
+  Calculates AIC, AICc, a parametric bootstrap AIC (AICbp) and a non-parametric bootstrap AIC (AICbb). If you simply want the AIC value for a marssMLE object, you can use \code{AIC(fit)}.
 }
 \usage{
 MARSSaic(MLEobj, output = c("AIC", "AICc"), 

@@ -1,6 +1,8 @@
 \name{marss.conversion}
 \alias{marxss_to_marss}
 \alias{marss_to_marxss}
+\keyword{internal}
+
 \title{ Convert Model Objects between Forms }
 \description{
 These are utility functions for model objects in the package \code{\link{MARSS-package}}.  

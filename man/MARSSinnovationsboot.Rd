@@ -2,7 +2,7 @@
 \alias{MARSSinnovationsboot}
 \title{ Bootstrapped Data using Stoffer and Wall's Algorithm }
 \description{
-  Creates bootstrap data via sampling from the standardized innovations matrix.   This is a base function in the \code{\link{MARSS-package}}. Users should access this with \code{\link{MARSSboot}}.
+  Creates bootstrap data via sampling from the standardized innovations matrix.   This is an internal function in the \code{\link{MARSS-package}} and is not exported. Users should access this with \code{\link{MARSSboot}}.
 }
 \usage{
 MARSSinnovationsboot(MLEobj, nboot = 1000, minIndx = 3)

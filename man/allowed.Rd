@@ -3,7 +3,7 @@
 \alias{kem.methods}
 \alias{optim.methods}
 \alias{alldefaults}
-
+\keyword{internal}
 \title{ MARSS Function Defaults and Allowed Methods }
 \description{
   Defaults and allowed fitting methods for the \code{\link{MARSS}} function are specified in the file \code{MARSSsettings.R}. These are hidden thus to see them preface with \code{MARSS:::}.

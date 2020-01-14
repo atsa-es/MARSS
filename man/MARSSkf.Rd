@@ -2,9 +2,9 @@
 \alias{MARSSkf}
 \alias{MARSSkfas}
 \alias{MARSSkfss}
-\title{ Kalman Filtering and Smoothing for Time-varying MARSS models}
+\title{ Kalman Filtering and Smoothing }
 \description{
-  Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. This is a base function in the \code{\link{MARSS-package}}.  \code{MARSSkf} is a small helper function to select which Kalman filter/smoother function to use based on which function was requested (in \code{MLEobj$fun.kf}).  The default function is \code{MARSSkfas}.
+  Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. \code{MARSSkf} is a small helper function to select which Kalman filter/smoother function to use based on the value in \code{MLEobj$fun.kf}.  The choices are \code{MARSSkfas} which uses the filtering and smoothing algorithms in the KFAS R package based on algorithms in Durbin and Koopman (based on Harvey, de Jong, and others algorithms), and \code{MARSSkfss} which uses the algorithms in Shumway and Stoffer. The default function is \code{MARSSkfas} which is faster and generally more stable (fewer matrix inversions), but there are some cases where \code{MARSSkfss} will be more stable and \code{MARSSkfss} returns some values that \code{MARSSkfas} does not.
 }
 \usage{
 MARSSkf( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE )
@@ -58,8 +58,7 @@ Ghahramani, Z. and Hinton, G.E. (1996) Parameter estimation for linear dynamical
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive
 state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \code{RShowDoc("EMDerivation",package="MARSS")} to open a copy.
 
-Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. R package version
-  0.9.11. \code{http://CRAN.R-project.org/package=KFAS}
+Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. \code{http://CRAN.R-project.org/package=KFAS}
   
 Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Assosiation, 92, 1630-38.
 
