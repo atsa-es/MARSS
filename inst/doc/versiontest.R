@@ -19,14 +19,20 @@
 
 # ###########################################
 
-setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2019")
-setwd("~/Dropbox/MARSS unit tests 2019")
+if(Sys.info()['sysname']=="Windows"){
+  setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2019")
+  lib.new <- "C:/Program Files/R/R-3.6.2/library"
+}
+if(Sys.info()['sysname']=="iOS"){
+  setwd("~/Dropbox/MARSS unit tests 2019")
+  lib.new <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
+}
+lib.old <- Sys.getenv("R_LIBS_USER")
 
-lib.old <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
-lib.new <- Sys.getenv("R_LIBS_USER")
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
 # install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
+# install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
@@ -112,6 +118,22 @@ for(unittestfile in unittestfiles){
   }
   good=rep(TRUE,length(names(testNew)))
   for(ii in 1:length(names(testNew))){
+    if(inherits(testNew[[ii]], "marssMLE")){
+      for(kk in c("model", "marss")){
+      attr(testNew[[ii]][[kk]], "equation") <- NULL
+      attr(testOld[[ii]][[kk]], "equation") <- NULL
+      }
+      if(inherits(testNew[[ii]]$call$inits, "marssMLE")){
+        for(kk in c("model", "marss")){
+          attr(testNew[[ii]]$call$inits[[kk]], "equation") <- NULL
+          attr(testOld[[ii]]$call$inits[[kk]], "equation") <- NULL
+        }
+      }
+    }
+    if(inherits(testNew[[ii]], "marssMODEL")){
+        attr(testNew[[ii]], "equation") <- NULL
+        attr(testOld[[ii]], "equation") <- NULL
+    }
     if(!identical(testNew[[ii]], testOld[[ii]])){
       good[ii] = FALSE
       if(inherits(testNew[[ii]], "marssMLE")){
@@ -120,7 +142,21 @@ for(unittestfile in unittestfiles){
           if(!identical(testNew[[ii]][["par"]][iii], testOld[[ii]][["par"]][iii])){
             cat("Warning:", names(testNew)[ii],"par",iii,"not identical\n")
           }else{
-            cat(names(testNew)[ii],"par",iii,"identical\n")
+            #cat(names(testNew)[ii],"par",iii,"identical\n")
+          }
+        }
+        for(iii in names(testNew[[ii]][["call"]])){
+          if(!identical(testNew[[ii]][["call"]][iii], testOld[[ii]][["call"]][iii])){
+            cat("Warning:", names(testNew)[ii],"call",iii,"not identical\n")
+          }else{
+            #cat(names(testNew)[ii],"call",iii,"identical\n")
+          }
+        }
+        for(iii in names(testNew[[ii]])){
+          if(!identical(testNew[[ii]][iii], testOld[[ii]][iii])){
+            cat("Warning:", names(testNew)[ii],iii,"not identical\n")
+          }else{
+            #cat(names(testNew)[ii],iii,"identical\n")
           }
         }
       }
