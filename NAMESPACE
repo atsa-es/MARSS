@@ -48,6 +48,7 @@ S3method(model.frame, marssMODEL)
 S3method(model.frame, marssMLE)
 S3method(simulate, marssMLE)
 S3method(toLatex, marssMODEL)
+S3method(toLatex, marssMLE)
 if(getRversion() >= "3.6.0") {
   S3method(broom::augment, marssMLE)
   S3method(broom::glance, marssMLE)
