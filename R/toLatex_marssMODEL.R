@@ -1,7 +1,11 @@
 ############################################
 # Add to NAMESPACE
 # S3method(toLatex, marssMODEL)
+# S3method(toLatex, marssMLE)
 #############################################
+toLatex.marssMLE <- function(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE) {
+  toLatex.marssMODEL(object$model, ..., file = file, digits = digits, greek = greek, orientation = orientation, math.sty = math.sty, output = output, replace = replace, simplify = simplify)
+}
 toLatex.marssMODEL <- function(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE) {
   # by default uses geometry package and amsmath
   requireNamespace("Hmisc")
@@ -206,9 +210,9 @@ toLatex.marssMODEL <- function(object, ..., file = NULL, digits = 2, greek = TRU
   }
 
   # Set up the file name
-  if (missing(file) & replace) tmp <- "marssMODEL"
-  if (missing(file) & !replace) tmp <- tempfile("marssMODEL", tmpdir = ".")
-  if (!missing(file)) tmp <- file
+  if (is.null(file) & replace) tmp <- "marssMODEL"
+  if (is.null(file) & !replace) tmp <- tempfile("marssMODEL", tmpdir = ".")
+  if (!is.null(file)) tmp <- file
   # If the user put on a extension of .tex, .dvi or .pdf remove that
   if (tolower(str_sub(tmp, -4)) == ".tex") tmp <- str_sub(tmp, -4)
   if (tolower(str_sub(tmp, -4)) == ".pdf") tmp <- str_sub(tmp, -4)
@@ -252,7 +256,7 @@ get.mat.tex <- function(x, greek, digits) {
       x <- str_replace_all(x, "[+][-]", "-")
       x <- str_replace_all(x, "[-]1[*]", "-")
       x <- str_replace_all(x, "[+]1[*]", "+")
-      x <- str_replace_all(x, "[*]", "$\\\times$")
+      x <- str_replace_all(x, "[*]", "$\\\\\\times$")
       x <- str_replace_all(x, "[+]", "$+$")
       x <- str_replace_all(x, "[-]", "$-$")
       # get rid of all the $ because the matrix will be wrapped in equation
