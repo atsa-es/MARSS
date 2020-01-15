@@ -9,7 +9,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known 
 CHANGES IN MARSS 3.10.12 (current state of master 1-3-2020)
 ------------------------------------
 
-Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity).
+Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models and updating the documentation. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files have been heavily editted to clean-up the presentation and move some of the internal functions out of view.
 
 BUGS
 
@@ -37,6 +37,8 @@ DOCUMENTATION and MAN FILES
 * Added derivation of var_X[E_{Y|X}[Y(t)|y, X]] to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
 * Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity). Reposted to Arxiv. Added innovations residuals.
 * tidy, augment and fitted man files got major update.
+* internal functions given \keyword{internal} so they don't appear in the documentation, but will appear if you use `?` or help.search.
+* Rd files extensively cleaned to improve linking and move more of the internal functions out of view of the normal user.  Equations cleaned up (though not completely).
 
 CHANGES IN MARSS 3.10.11 (GitHub 8-3-2019)
 ------------------------------------
