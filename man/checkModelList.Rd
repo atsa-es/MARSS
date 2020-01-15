@@ -15,7 +15,7 @@ checkModelList( model, defaults, this.form.allows)
   \item{this.form.allows}{ A list of what inputs are allowed for each element in the model list. }
 }
 \details{
-This is a helper function to check that all the model list that will be passed to a \code{MARSS.form} function to make the marssMODEL object.  If elements in the list are left off, they will be filled in by defaults.
+This is a helper function to check that all the model list that will be passed to a \code{MARSS.form} function to make the \code{\link{marssMODEL}} object.  If elements in the list are left off, they will be filled in by defaults.
 }
 \value{
   If the function does not stop due to errors, it returns an updated model list with missing elements filled in by the defaults.
@@ -27,7 +27,7 @@ This is a helper function to check that all the model list that will be passed t
   eli(dot)holmes(at)noaa(dot)gov   
 }
 \seealso{ 
-  \code{\link{MARSS}} \code{\link{marssMODEL}} \code{\link{checkModelList}} 
+  \code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{checkModelList}} 
 }
 
 

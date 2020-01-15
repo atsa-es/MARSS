@@ -2,7 +2,7 @@
 \alias{MARSSoptim}
 \title{Parameter estimation for MARSS models using optim}
 \description{
-  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available via the \code{\link{optim}} function.  The \code{MARSSoptim} function is called when \code{\link{MARSS}} is called with \code{method="BFGS"}.  This is an internal function in the \code{\link{MARSS-package}}. 
+  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available in that function.  The \code{MARSSoptim()} function is called when \code{\link{MARSS}()} is called with \code{method="BFGS"}.  This is an internal function in the \code{\link{MARSS-package}}. 
 }
 \usage{
 MARSSoptim(MLEobj)
@@ -11,7 +11,7 @@ MARSSoptim(MLEobj)
   \item{MLEobj}{An object of class \code{\link{marssMLE}}.}
 }
 \details{
-Objects of class \code{\link{marssMLE}} may be built from scratch but are easier to construct using \code{\link{MARSS}} with \code{MARSS(..., fit=FALSE, method="BFGS")}.
+Objects of class \code{\link{marssMLE}} may be built from scratch but are easier to construct using \code{\link{MARSS}()} called with \code{MARSS(..., fit=FALSE, method="BFGS")}.
 
   Options for \code{\link{optim}} are passed in using \code{MLEobj$control}.  See \code{\link{optim}} for a list of that function's control options.  If \code{lower} and \code{upper} for \code{\link{optim}} need to be passed in, they should be passed in as part of \code{control} as \code{control$lower} and \code{control$upper}. Additional \code{control} arguments affect printing and initial conditions.
   \describe{
@@ -42,18 +42,18 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
 \section{Discussion}{
  The function only returns parameter estimates.  To compute CIs, use \code{\link{MARSSparamCIs}} but if you use parametric or non-parametric bootstrapping with this function, it will use the EM algorithm to compute the bootstrap parameter estimates!  The quasi-Newton estimates are too fragile for the bootstrap routine since one often needs to search to find a set of initial conditions that work (i.e. don't lead to numerical errors).
  
- Estimates from \code{MARSSoptim} (which come from \code{\link{optim}}) should be checked against estimates from the EM algorithm.  If the quasi-Newton algorithm works, it will tend to find parameters with higher likelihood faster than the EM algorithm.  However, the MARSS likelihood surface can be multimodal with sharp peaks at degenerate solutions where a Q or R diagonal element equals 0.  The quasi-Newton algorithm sometimes gets stuck on these peaks even when they are not the maximum.  Neither an initial conditions search nor starting near the known maximum (or from the parameters estimates after the EM algorithm) will necessarily solve this problem.   Thus it is wise to check against EM estimates to ensure that the BFGS estimates are close to the MLE estimates (and vis-a-versa, it's wise to rerun with method="BFGS" after using method="kem").  Conversely, there is a strong flat ridge in your likelihood, the EM algorithm can report early convergence while the BFGS may continue much further along the ridge and find very different parameter values.  Of course a likelihood surface with strong flat ridges makes the MLEs less informative...
+ Estimates from \code{MARSSoptim} (which come from \code{\link{optim}}) should be checked against estimates from the EM algorithm.  If the quasi-Newton algorithm works, it will tend to find parameters with higher likelihood faster than the EM algorithm.  However, the MARSS likelihood surface can be multimodal with sharp peaks at degenerate solutions where a Q or R diagonal element equals 0.  The quasi-Newton algorithm sometimes gets stuck on these peaks even when they are not the maximum.  Neither an initial conditions search nor starting near the known maximum (or from the parameters estimates after the EM algorithm) will necessarily solve this problem.   Thus it is wise to check against EM estimates to ensure that the BFGS estimates are close to the MLE estimates (and vis-a-versa, it's wise to rerun with method="BFGS" after using method="kem").  Conversely, if there is a strong flat ridge in your likelihood, the EM algorithm can report early convergence while the BFGS may continue much further along the ridge and find very different parameter values.  Of course a likelihood surface with strong flat ridges makes the MLEs less informative...
  
  Note this is mainly a problem if the time series are short or very gappy.  If the time series are long, then the likelihood surface should be nice with a single interior peak.  In this case, the quasi-Newton algorithm works well but it can still be sensitive (and slow) if not started with a good initial condition.  Thus starting it with the estimates from the EM algorithm is often desirable.
  
- One should be aware that the prior set on the variance of the initial states at t=0  or t=1 can have catastrophic effects on one's estimates if the presumed prior covariance structure conflicts with the structure implied by the MARSS model.  For example, if you use a diagonal variance-covariance matrix for the prior but the model implies a matrix with non-zero covariances, your MLE estimates can be strongly influenced by the prior variance-covariance matrix.  Setting a diffuse prior does not help because the diffuse prior still has the correlation structure specified by V0.  One way to detect priors effects is to compare the BFGS estimates to the EM estimates.  Persistent differences typically signify a problem with the correlation structure in the prior conflicting with the implied correlation structure in the MARSS model.  If this is the case, using V0=0 and estimating the x0 elements (with control$kf.x0="x10") can often help.
+ One should be aware that the prior set on the variance of the initial states at t=0  or t=1 can have catastrophic effects on one's estimates if the presumed prior covariance structure conflicts with the structure implied by the MARSS model.  For example, if you use a diagonal variance-covariance matrix for the prior but the model implies a variance-covariance matrix with non-zero covariances, your MLE estimates can be strongly influenced by the prior variance-covariance matrix.  Setting a diffuse prior does not help because the diffuse prior still has the correlation structure specified by V0.  One way to detect priors effects is to compare the BFGS estimates to the EM estimates.  Persistent differences typically signify a problem with the correlation structure in the prior conflicting with the implied correlation structure in the MARSS model. 
 }
 \author{
   Eli Holmes, NOAA, Seattle, USA.  
 
   eli(dot)holmes(at)noaa(dot)gov
 }
-\seealso{  \code{\link{MARSS}} \code{\link{MARSSkem}}  \code{\link{marssMLE}}  \code{\link{optim}}
+\seealso{  \code{\link{MARSS}}, \code{\link{MARSSkem}},  \code{\link{marssMLE}},  \code{\link{optim}}
 }
 \examples{
 dat <- t(harborSealWA)

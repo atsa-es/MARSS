@@ -2,7 +2,7 @@
 \alias{MARSSaic}
 \title{ AIC for MARSS Models }
 \description{
-  Calculates AIC, AICc, a parametric bootstrap AIC (AICbp) and a non-parametric bootstrap AIC (AICbb). If you simply want the AIC value for a marssMLE object, you can use \code{AIC(fit)}.
+  Calculates AIC, AICc, a parametric bootstrap AIC (AICbp) and a non-parametric bootstrap AIC (AICbb). If you simply want the AIC value for a \code{\link{marssMLE}} object, you can use \code{AIC(fit)}.
 }
 \usage{
 MARSSaic(MLEobj, output = c("AIC", "AICc"), 
@@ -21,7 +21,7 @@ MARSSaic(MLEobj, output = c("AIC", "AICc"),
   }
 }
 \details{
-  When sample size is small, Akaike's Information Criterion (AIC) under-penalizes more complex models. The most commonly used small sample size corrector is AICc, which uses a penalty term of Kn/(n-K-1), where K is the number of estimated parameters. However, for time series models, AICc still under-penalizes complex models; this is especially true for MARSS models.
+  When sample size is small, Akaike's Information Criterion (AIC) under-penalizes more complex models. The most commonly used small sample size corrector is AICc, which uses a penalty term of \eqn{K n/(n-K-1)}, where \eqn{K} is the number of estimated parameters. However, for time series models, AICc still under-penalizes complex models; this is especially true for MARSS models.
 
 Two small-sample estimators specific for MARSS models have been developed. Cavanaugh and Shumway (1997) developed a variant of bootstrapped AIC using Stoffer and Wall's (1991) bootstrap algorithm ("AICbb"). Holmes and Ward (2010) developed a variant on AICb ("AICbp") using a parametric bootstrap. The parametric bootstrap permits AICb calculation when there are missing values in the data, which Cavanaugh and Shumway's algorithm does not allow. More recently, Bengtsson and Cavanaugh (2006) developed another small-sample AIC estimator, AICi, based on fitting candidate models to multivariate white noise.
 

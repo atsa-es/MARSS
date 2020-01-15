@@ -28,7 +28,7 @@ This function returns the conditional expected value (mean) and variance of the 
 
 If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report Holmes (2014).  The difference in the algorithm only concerns model residuals and their variance for missing values.  The residual variance for missing data is not normally used but is needed for leave-one-out analyses when a non-missing y(t) is removed and then its residual is compared the model residual variance at time t.
 
-The residuals matrix (and se and variance) has a value for each time step.  The residuals in column t is the residual associated with the data at time t and the process (x) transition from x(t) to x(t+1). In the MARSS package, the process equation is written \eqn{x(t)=f(x(t-1))+w(t)}, and the residual in column t is then {v(t) w(t+1)}.  In many other texts, the process equation is written is written \eqn{x(t)=f(x(t-1))+w(t-1)} and the residual in column t is denoted {v(t) w(t)}.  Regardless, the meaning is the same; the state residual in column t is associated with the transition from x(t) to x(t+1) not the transition from x(t-1) to x(t). Thus the last state residual (and associated variance) is NA since there is no x(t+1).
+The residuals matrix (and se and variance) has a value for each time step.  The residuals in column t is the residual associated with the data at time t and the process (x) transition from x(t) to x(t+1). In the MARSS package, the process equation is written \eqn{x(t)=f(x(t-1))+w(t)}, and the residual in column t is then {v(t) w(t+1)}.  In many other texts, the process equation is written  \eqn{x(t)=f(x(t-1))+w(t-1)} and the residual in column t is denoted {v(t) w(t)}.  Regardless, the meaning is the same; the state residual in column t is associated with the transition from x(t) to x(t+1) not the transition from x(t-1) to x(t). Thus the last state residual (and associated variance) is NA since there is no x(t+1).
 
 \strong{model.residuals}
 
@@ -105,7 +105,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
   eli(dot)holmes(at)noaa(dot)gov
 } 
-\seealso{ \code{\link{MARSSkem}} \code{\link{marssMLE}} }
+\seealso{ \code{\link{MARSSkem}}, \code{\link{marssMLE}} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]
@@ -137,6 +137,6 @@ Koopman, S. J., N. Shephard, and J. A. Doornik. 1999. Statistical algorithms for
 
 Harvey, A. and S. J. Koopman. 1992. Diagnostic checking of unobserved-components time series models. Journal of Business & Economic Statistics 4: 377-389.
 
-Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.  This report shows how to compute the residuals from the Kalman smoother output without using the Harvey et al. (1998) algorithm.  The variance of the hatvt for the missing values can then be computed.
+Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.  This report shows how to compute the residuals from the Kalman smoother output without using the Harvey et al. (1998) algorithm.  The variance of the \eqn{\hat{v}(t)}{hat{v}(t)} for the missing values can then be computed.
 }
 

@@ -1,6 +1,6 @@
 \name{isleRoyal}
 \alias{isleRoyal}
-\keyword{internal}
+\keyword{datasets}
 
 \docType{data}
 \title{ Isle Royale Wolf and Moose Data }
@@ -26,4 +26,3 @@ The source for the covariate data is the Western Regional Climate Center (http:/
 \examples{
 str(isleRoyal)
 }
-\keyword{datasets}

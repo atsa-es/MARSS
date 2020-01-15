@@ -1,10 +1,11 @@
 \name{MARSS.marss}
 \alias{MARSS.marss}
-\keyword{internal}
+\keyword{appendix}
+
 
 \title{ Multivariate AR-1 State-space Model  }
 \description{
-The form of MARSS models for users is marxss, the MARSS models with inputs.  See \code{\link{MARSS.marxss}}.  In the internal algorithms (e.g. \code{\link{MARSSkem}}), the "marss" form is used and the D and d are incorporated into the A matrix and C and c are incorporated into the U matrix.
+The form of MARSS models for users is "marxss", the MARSS models with inputs.  See \code{\link{MARSS.marxss}}.  In the internal algorithms (e.g. \code{\link{MARSSkem}}), the "marss" form is used and the D and d are incorporated into the A matrix and C and c are incorporated into the U matrix.
 
 This is a MARSS(1) model of the marss form:
 \deqn{x(t+1) = B(t) x(t) + U(t)  + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
@@ -39,7 +40,7 @@ A object of class \code{\link{marssMLE}}.
   Eli Holmes, NOAA, Seattle, USA.
 
   }
-\seealso{ \code{\link{marssMODEL}} \code{\link{MARSS.marxss}} } 
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marxss}} } 
 \examples{
 \dontrun{
 # See the MARSS man page for examples

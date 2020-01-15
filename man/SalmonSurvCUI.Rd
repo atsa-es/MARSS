@@ -1,6 +1,5 @@
 \name{SalmonSurvCUI}
 \alias{SalmonSurvCUI}
-\keyword{internal}
 \keyword{datasets}
 
 \docType{data}

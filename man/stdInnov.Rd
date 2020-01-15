@@ -28,7 +28,7 @@ Stoffer, D. S., and K. D. Wall. 1991. Bootstrapping state-space models: Gaussian
 
   eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
-\seealso{  \code{\link{MARSSboot}} \code{\link{MARSSkf}} \code{\link{MARSSinnovationsboot}}
+\seealso{  \code{\link{MARSSboot}}, \code{\link{MARSSkf}}, \code{\link{MARSSinnovationsboot}}
 }
 \examples{
   \dontrun{

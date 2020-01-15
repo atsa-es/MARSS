@@ -20,5 +20,5 @@ MARSSkemcheck( MLEobj )
 
   eli(dot)holmes(at)noaa(dot)gov
 }
-\seealso{ \code{\link{marssMODEL}} \code{\link{MARSSkem}} }
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}} }
 

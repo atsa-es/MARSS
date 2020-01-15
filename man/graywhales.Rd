@@ -8,7 +8,6 @@
 \alias{okanaganRedds}
 \alias{kestrel}
 \alias{redstart}
-\keyword{internal}
 \keyword{datasets}
 
 \docType{data}

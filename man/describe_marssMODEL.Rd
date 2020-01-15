@@ -10,7 +10,7 @@
 describe.marssMODEL(x)
 }
 \arguments{
-  \item{x}{ A marssMODEL object.  }
+  \item{x}{ A \code{\link{marssMODEL}} object.  }
 }
 
 \value{

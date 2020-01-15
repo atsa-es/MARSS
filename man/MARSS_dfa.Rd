@@ -36,7 +36,7 @@ In addition to these, form="dfa" has some special arguments that can be passed i
     \item \code{z.score}  Logical.  Default is TRUE, which means the data will be z-scored (demeaned and variance standardized to 1).
     }
 
-The \code{model} argument of the \code{\link{MARSS}} call is constrained in terms of what parameters can be changed and how they can be changed.  See details below. An additional element, \code{m}, can be passed into the \code{model} argument that specifies the number of hidden state variables.  It is not necessariy for the user to specify \code{Z} as the helper function will create a \code{Z} appropriate for a DFA model.
+The \code{model} argument of the \code{\link{MARSS}()} call is constrained in terms of what parameters can be changed and how they can be changed.  See details below. An additional element, \code{m}, can be passed into the \code{model} argument that specifies the number of hidden state variables.  It is not necessariy for the user to specify \code{Z} as the helper function will create a \code{Z} appropriate for a DFA model.
 }
 \details{
 The \code{model} argument is a list. The following details what list elements can be passed in:
@@ -62,10 +62,10 @@ A object of class \code{\link{marssMLE}}.  See \code{\link{print.marssMLE}} for 
   Eli Holmes, NOAA, Seattle, USA. 
   }
 
-\seealso{ \code{\link{MARSS}} \code{\link{MARSS.marxss}} } 
+\seealso{ \code{\link{MARSS}}, \code{\link{MARSS.marxss}} } 
 
 \references{ 
-The user guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
+The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
 Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.          
 }
 \examples{

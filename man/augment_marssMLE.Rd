@@ -9,7 +9,7 @@
                               form=attr(x[["model"]], "form")[1])
 }
 \arguments{
-  \item{x}{a marssMLE object}
+  \item{x}{a \code{\link{marssMLE}} object}
   
   \item{type}{What types of fitted values and residuals to return. ytT (observations) and xtT (states) are the values conditioned on all the data.  Read the details below for xtT.  \code{tidy} would be the more common function for returning xtT (smoothed state) estimates.}
   
@@ -53,13 +53,13 @@ The reported CIs are the approximate CIs computed using the standard deviations:
 
 \strong{observations (type="ytT")}
 
-This returns a model predicted value of the response (y) and the difference between the model prediction and the actual data y(t) is the residual.  If there is no data point, then the residual is NA.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the user guide.
+This returns a model predicted value of the response (y) and the difference between the model prediction and the actual data y(t) is the residual.  If there is no data point, then the residual is NA.  The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{residuals.marssMLE}} and the chapter on shock detection in the MARSS User Guide.
 
 In the literature on state-space models, it is very common to use the one-step ahead predicted values of the data.  The fitted values returned by \code{type=ytT} are NOT the one-step ahead values and the residuals are NOT the one-step ahead residuals (called Innovations in the state-space literature).  If you want the one-step ahead fitted values, you can use \code{fitted(x, conditioning="t-1")}.  The innovations are also returned by \code{\link{MARSSkf}} in \code{Innov}.
 
 \strong{states (type="xtT")}
 
-If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{augment} is not what you want to use.  You want to use \code{\link{tidy.marssMLE}} to return the smoothed estimate of the state. \code{augment(MLEobj, type="xtT")} returns a model prediction of \eqn{\hat{x}(t)} given \eqn{\hat{x}(t-1)}.  The residuals returned are for w(t), the difference between \eqn{\hat{x}(t)} and the prediction of \eqn{\hat{x}(t)}.  These types of residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{residuals.marssMLE}} and read the references cited.
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{augment} is not what you want to use.  You want to use \code{\link{tidy.marssMLE}} to return the smoothed estimate of the state. \code{augment(MLEobj, type="xtT")} returns a model prediction of \eqn{\mathbf{x}(t)}{x(t)} given \eqn{\mathbf{x}(t-1)}{x(t-1)}.  The residuals returned are for \eqn{\mathbf{w}(t)}{w(t)}, the difference between the two.  These types of residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{residuals.marssMLE}} and read the references cited.
 
 }
 

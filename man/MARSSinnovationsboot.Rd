@@ -8,7 +8,7 @@
 MARSSinnovationsboot(MLEobj, nboot = 1000, minIndx = 3)
 }
 \arguments{
-  \item{MLEobj}{ An object of class \code{\link{marssMLE}}. This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}} or \code{\link{MARSS}}. This algorithm may not be used if there are missing datapoints in the data. }
+  \item{MLEobj}{ An object of class \code{\link{marssMLE}}. This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}()} or \code{\link{MARSS}()}. This algorithm may not be used if there are missing datapoints in the data. }
   \item{nboot}{ Number of bootstraps to perform. }
   \item{minIndx}{ Number of innovations to skip. Stoffer & Wall suggest not sampling from innovations 1-3. }
 }
@@ -19,7 +19,7 @@ MARSSinnovationsboot(MLEobj, nboot = 1000, minIndx = 3)
   A list containing the following components:
   \item{boot.states}{ Array (dim is m x tSteps x nboot) of simulated state processes. }
   \item{boot.data}{ Array (dim is n x tSteps x nboot) of simulated data. }
-  \item{marss}{ marssMODEL object element of the \code{\link{marssMLE}} object (\code{marssMLE$marss}). }
+  \item{marss}{ \code{\link{marssMODEL}} object element of the \code{\link{marssMLE}} object (\code{marssMLE$marss}) in "marss" form. }
   \item{nboot}{ Number of bootstraps performed. }
   m is the number state processes (x in the MARSS model) and n is the number of observation time series (y in the MARSS model).
 }
@@ -31,7 +31,7 @@ Stoffer, D. S., and K. D. Wall. 1991. Bootstrapping state-space models: Gaussian
 
   eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
-\seealso{ \code{\link{stdInnov}} \code{\link{MARSSparamCIs}} \code{\link{MARSSboot}} }
+\seealso{ \code{\link{stdInnov}}, \code{\link{MARSSparamCIs}}, \code{\link{MARSSboot}} }
 \examples{
 dat <- t(kestrel)
 dat <- dat[2:3, ]

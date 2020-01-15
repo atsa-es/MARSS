@@ -16,7 +16,7 @@ The tidy function is designed to work with the \code{broom} package and you will
                 form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
-  \item{x}{a marssMLE object}
+  \item{x}{a \code{\link{marssMLE}} object}
   
   \item{type}{What you want estimates and intervals for. Parameters, smoothed states (xtT), the fitted y (Z xtT + A), or observations conditioned on all the data (ytT). If you want intervals for new data sets, use fitted.ytT. If you are getting estimates for missing data, use ytT. See details.}
   
@@ -50,7 +50,7 @@ If \code{type="parameters"}, this returns a data.frame with the estimated parame
 
 \eqn{\tilde{\mathbf{x}}_t}{\tilde{x}_t} (xtT) is an estimate of \eqn{\mathbf{x}_t}{x_t} (the true value), and the standard error of that estimate is given by \eqn{\tilde{\mathbf{V}}_t}{\tilde{V}_t} (\code{VtT[,,t]}). Let \code{se.xt} denote the sqrt of the diagonal of \code{VtT}. The equation for the \eqn{\alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.xt + xtT}). \eqn{\mathbf{x}_t}{x_t} is multivariate and this interval is for one of the \eqn{x}'s in isolation. You could compute the m-dimensional confidence region for the multivariate \eqn{\mathbf{x}_t}{x_t}, also, but \code{tidy.marssMLE} returns the univariate confidence intervals. 
 
-The variance \code{VtT} gives information on the uncertainty of the true location of \eqn{\mathbf{x}_t} conditioned on the observed data. As more data are collected (or added to the analysis), this variance will shrink since the data, especially data at time t, increases the information about the locations of \eqn{\mathbf{x}_t}. This does not affect the estimation of the model parameters, those are fixed, but rather our information about the states at time t.
+The variance \code{VtT} gives information on the uncertainty of the true location of \eqn{\mathbf{x}_t} conditioned on the observed data. As more data are collected (or added to the analysis), this variance will shrink since the data, especially data at time t, increases the information about the locations of \eqn{\mathbf{x}_t}. This does not affect the estimation of the model parameters, those are fixed (we are assuming), but rather our information about the states at time t.
 
 If you have a DFA model (form='dfa'), you can pass in \code{rotate=TRUE} to return the rotated trends.  If you want the rotated loadings, you will need to compute those yourself:
 \preformatted{

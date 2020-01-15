@@ -46,7 +46,7 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 
   eli(dot)holmes(at)noaa(dot)gov
 }
-\seealso{ \code{\link{MARSSboot}} \code{\link{marssMLE}} \code{\link{CSEGtmufigure}} }
+\seealso{ \code{\link{MARSSboot}}, \code{\link{marssMLE}}, \code{\link{CSEGtmufigure}} }
 \examples{
 d <- harborSeal[, 1:2]
 kem <- CSEGriskfigure(d, datalogged = TRUE)

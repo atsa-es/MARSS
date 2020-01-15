@@ -1,5 +1,6 @@
 \name{is.marssMLE}
 \alias{is.marssMLE}
+
 \title{ Tests marssMLE object for completeness }
 \description{
   Tests an marssMLE for completeness to determine if it has all the pieces and attributes necessary to be passed to MARSS functions for fitting, filtering, smoothing, or displaying. Internal function, use \code{MARSS:::} to access. This is a very slow function which should not be called repeatedly in a \code{for} loop for example.
@@ -11,11 +12,11 @@ is.marssMLE(MLEobj)
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. See Details.}
 }
 \details{
-  The \code{is.marssMLE()} function checks components \code{marss}, \code{start} and \code{control}, which must be present for estimation by functions e.g. \code{\link{MARSSkem}}. Components returned from estimation must include at least \code{method}, \code{par}, \code{kf}, \code{numIter}, \code{convergence} and \code{logLik}. Additional components (e.g. AIC) may be returned, as described in function help files.
+  The \code{is.marssMLE()} function checks components \code{marss}, \code{start} and \code{control}, which must be present for estimation by functions e.g. \code{\link{MARSSkem}()}. Components returned from estimation must include at least \code{method}, \code{par}, \code{kf}, \code{numIter}, \code{convergence} and \code{logLik}. Additional components (e.g. AIC) may be returned, as described in function help files.
 \describe{
-  \item{\code{model}}{ An object of class \code{\link{marssMODEL}} in whatever form the user specified in the call to \code{\link{MARSS}()}.  Default is form marxss. }
-  \item{\code{marss}}{ An object of class \code{\link{marssMODEL}} in marss forms, needed for all the base MARSS functions. }
-  \item{\code{start}}{ List with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying initial values for parameters to be used (if needed) by the maximization algorithm. 
+  \item{\code{model}}{ An object of class \code{\link{marssMODEL}} in whatever form the user specified in the call to \code{\link{MARSS}()}.  Default is form "marxss". }
+  \item{\code{marss}}{ An object of class \code{\link{marssMODEL}} in "marss" forms, needed for all the base MARSS functions. }
+  \item{\code{start}}{ List with matrices specifying initial values for parameters to be used (if needed) by the maximization algorithm. 
     \describe{
     \item{\code{B}}{ Initial value(s) for B matrix (m x m). }
     \item{\code{U}}{ Initial value(s) for U matrix (m x 1). }
@@ -27,8 +28,8 @@ is.marssMLE(MLEobj)
     \item{\code{V0}}{ Initial variance(s) for initial state variance (m x m). }
     }
   }
-  \item{\code{control}}{ A list specifying estimation options.  The following options are needed by \code{\link{MARSSkem}}.  Other control options
-  can be set if needed for other estimation methods, e.g. the control options listed for \code{\link{optim}} for use with \code{\link{MARSSoptim}}.  The default values for control options are set in \code{alldefaults[[method]]} which is specified in \code{MARSSsettings.R}.
+  \item{\code{control}}{ A list specifying estimation options.  The following options are needed by \code{\link{MARSSkem}()}.  Other control options
+  can be set if needed for other estimation methods, e.g. the control options listed for \code{\link{optim}} for use with \code{\link{MARSSoptim}()}.  The default values for control options are set in \code{alldefaults[[method]]} which is specified in \code{MARSSsettings.R}.
     \describe{
       \item{\code{minit}}{ The minimum number of iterations to do in the maximization routine (if needed by method). } 
       \item{\code{maxit}}{ Maximum number of iterations to be used in the maximization routine (if needed by method). }
@@ -72,7 +73,7 @@ Once the model has been fitted, additional elements are added.
   kellie(dot)wills(at)noaa(dot)gov
 }
 \seealso{ 
-  \code{\link{marssMODEL}} \code{\link{MARSSkem}} 
+  \code{\link{marssMODEL}}, \code{\link{MARSSkem}} 
 }
 
 

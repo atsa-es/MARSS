@@ -17,17 +17,17 @@ For state space models, \code{MARSShatyt()} computes the expectations involving 
 }
 \value{ 
 A list with the following components (n is the number of state processes). Following the notation in Holmes (2012), y(1) is the observed data (for t=1:TT) while y(2) is the unobserved data.  y(1,1:t-1) is the observed data from time 1 to t-1.
-  \item{ytT}{ Estimates E[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x TT matrix). }
-  \item{ytt1}{ Estimates E[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x TT matrix). }
-  \item{ytt}{ Estimates E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x TT matrix). }
-  \item{OtT}{ Estimates E[Y(t) t(Y(t)) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
-  \item{var.ytT}{ Estimates var[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
-  \item{var.EytT}{ Estimates var_X[E_{Y|x}[Y(t) | Y(1,1:TT)=y(1,1:TT), X(t)=x(t)]] (n x n x TT array). }
-  \item{Ott1}{ Estimates E[Y(t) t(Y(t)) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x TT array). }
-  \item{Ott}{ Estimates E[Y(t) t(Y(t)) | Y(1,1:t)=y(1,1:t)] (n x n x TT array). }
-  \item{yxtT}{ Estimates E[Y(t) t(X(t)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
-  \item{yxtt1T}{ Estimates E[Y(t) t(X(t-1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
-  \item{yxttpT}{ Estimates E[Y(t) t(X(t+1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
+  \item{ytT}{ E[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x TT matrix). }
+  \item{ytt1}{ E[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x TT matrix). }
+  \item{ytt}{ E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x TT matrix). }
+  \item{OtT}{ E[Y(t) t(Y(t)) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
+  \item{var.ytT}{ var[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
+  \item{var.EytT}{ var_X[E_{Y|x}[Y(t) | Y(1,1:TT)=y(1,1:TT), X(t)=x(t)]] (n x n x TT array). }
+  \item{Ott1}{  E[Y(t) t(Y(t)) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x TT array). }
+  \item{Ott}{ E[Y(t) t(Y(t)) | Y(1,1:t)=y(1,1:t)] (n x n x TT array). }
+  \item{yxtT}{ E[Y(t) t(X(t)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
+  \item{yxtt1T}{ E[Y(t) t(X(t-1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
+  \item{yxttpT}{ E[Y(t) t(X(t+1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
   \item{errors}{ Any error messages due to ill-conditioned matrices. }
   \item{ok}{ (TRUE/FALSE) Whether errors were generated. }
 }
@@ -40,7 +40,7 @@ Holmes, E. E. (2012) Derivation of the EM algorithm for constrained and unconstr
   eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ 
-\code{\link{MARSS}} \code{\link{marssMODEL}} \code{\link{MARSSkem}}
+\code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}}
 }
 \examples{
 dat <- t(harborSeal)

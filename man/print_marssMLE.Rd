@@ -3,13 +3,13 @@
 
 \title{ Printing functions for MARSS MLE objects }
 \description{
-  The MARSS fitting function, \code{\link{MARSS}}, outputs \code{\link{marssMLE}} objects.  \code{print(marssMLE)}, where \code{marssMLE} is a \code{\link{marssMLE}} object, will print out information on the fit.  However, \code{print} can be used to print a variety of information (residuals, smoothed states, imputed missing values, etc) from a \code{\link{marssMLE}} object using the \code{what} argument in the print call.
+  \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{print(MLEobj)}, where \code{MLEobj} is a \code{\link{marssMLE}} object, will print out information on the fit.  However, \code{print} can be used to print a variety of information (residuals, smoothed states, imputed missing values, etc) from a \code{\link{marssMLE}} object using the \code{what} argument in the print call.
 }
 \usage{
 \method{print}{marssMLE}(x, digits = max(3, getOption("digits")-4), ..., what="fit", form=NULL, silent=FALSE)
 }
 \arguments{
-  \item{x}{ A marssMLE object.  }
+  \item{x}{ A \code{\link{marssMLE}} object.  }
   \item{digits}{ Number of digits for printing.  }
   \item{...}{ Other arguments for print. }
   \item{what}{ What to print.  Default is "fit".  If you input what as a vector, print returns a list. See examples.
@@ -31,7 +31,7 @@
     \item{ "kfs" }{ The Kalman filter and smoother output.  See \code{\link{MARSSkf}} for a description of the output. The full kf output is not normally attached to the output from a \code{\link{MARSS}()} call.  This will run the filter/smoother if needed and return the list INVISIBLY.  So assign the output as \code{foo=print(x,what="kfs")}}
     \item{ "Ey" }{ The expectations involving y conditioned on all the data.  See \code{\link{MARSShatyt}} for a discussion of these expectations.  This output is not normally attached to the output from a \code{\link{MARSS}()} call--except \code{ytT} which is the predicted value of any missing y. The list is returned INVISIBLY.  So assign the output as \code{foo=print(x,what="Ey")}.}
       } }
-  \item{form}{ By default, print uses the model form specified in the call to \code{\link{MARSS}}.  This information is in \code{ attr(marssMLE$model, "form") }, however you can specify a different form.  \code{ form="marss" } should always work since this is the model form in which the model objects are stored (in \code{marssMLE$marss}).}
+  \item{form}{ By default, print uses the model form specified in the call to \code{\link{MARSS}()}.  This information is in \code{ attr(marssMLE$model, "form") }, however you can specify a different form.  \code{ form="marss" } should always work since this is the model form in which the model objects are stored (in \code{marssMLE$marss}).}
   \item{silent}{ If TRUE, do not print just return the object.  If print call is assigned, nothing will be printed.  See examples.  If \code{what="fit"}, there is always output printed.}
 }
 

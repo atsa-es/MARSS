@@ -1,7 +1,6 @@
 \name{harborSeal}
 \alias{harborSeal}
 \alias{harborSealWA}
-\keyword{internal}
 \keyword{datasets}
 
 \docType{data}

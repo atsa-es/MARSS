@@ -1,7 +1,6 @@
 \name{loggerhead}
 \alias{loggerhead}
 \alias{loggerheadNoisy}
-\keyword{internal}
 \keyword{datasets}
 
 \docType{data}

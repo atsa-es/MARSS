@@ -78,9 +78,9 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L")
   \item{ zero.rows.ok, zero.cols.ok }{ Means the design matrix can have all zero rows or columns. }
   \item{ strict }{ Specifies whether the design matrix must be only 0s and 1s. }
   \item{ by.row }{ For is.fixed, reports whether is.fixed by row rather than for the whole matrix. }
-  \item{ MLEobj}{ A marssMLE object. }
+  \item{ MLEobj}{ A \code{\link{marssMLE}} object. }
   \item{ elem }{ The parameter matrix of a marss model to return. }
-  \item{ model.loc }{ Whether to use the marss or model marssMODEL in the marssMLE object. }
+  \item{ model.loc }{ Whether to use the marss or model marssMODEL in the \code{\link{marssMLE}} object. }
 }
 \details{
 \itemize{
@@ -99,7 +99,7 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L")
   \item \code{ pchol } returns the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
-  \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a marssMLE object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
+  \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
 } 
 }
 \value{

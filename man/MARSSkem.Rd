@@ -3,7 +3,7 @@
 
 \title{ EM Algorithm function for MARSS models }
 \description{
-  \code{MARSSkem()} performs maximum-likelihood estimation, using an EM algorithm for constrained and unconstrained MARSS models.  Users would not call this function directly normally.  The function \code{\link{MARSS}} calls MARsskem.  However users might want to used MARSSkem directly if they need to avoid some of the error-checking overhead associated with the \code{\link{MARSS}} function.
+  \code{MARSSkem()} performs maximum-likelihood estimation, using an EM algorithm for constrained and unconstrained MARSS models.  Users would not call this function directly normally.  The function \code{\link{MARSS}()} calls \code{MARSSkem()}.  However users might want to use \code{MARSSkem()} directly if they need to avoid some of the error-checking overhead associated with the \code{\link{MARSS}()} function.
 }
 \usage{
 MARSSkem(MLEobj)
@@ -12,7 +12,7 @@ MARSSkem(MLEobj)
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. }
 }
 \details{
-Objects of class \code{\link{marssMLE}} may be built from scatch but are easier to construct using \code{\link{MARSS}} with \code{MARSS(..., fit=FALSE)}.
+Objects of class \code{\link{marssMLE}} may be built from scatch but are easier to construct using \code{\link{MARSS}()} with \code{MARSS(..., fit=FALSE)}.
 
   Options for \code{MARSSkem()} may be set using \code{MLEobj$control}.  The commonly used elements of \code{control} are follows (see \code{\link{marssMLE}}:
   \describe{
@@ -76,7 +76,7 @@ Totronto, Dept. of Computer Science.
 Harvey, A. C. (1989) Chapter 5 in Forecasting, structural time series models and the
 Kalman filter. Cambridge University Press, Cambridge, UK.
   
-The user guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
+The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
 Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.      
 
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive

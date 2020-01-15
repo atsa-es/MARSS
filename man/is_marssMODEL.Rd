@@ -9,7 +9,7 @@
 \description{
 These are model objects and utility functions for model objects in the package \code{\link{MARSS-package}}.  
   \code{is.marssMODEL()} ensures model consistency.
-  \code{MARSS_formname()} translates a model list as passed in call to \code{\link{MARSS}} into a marssMODEL model object.
+  \code{MARSS_formname()} translates a model list as passed in call to \code{\link{MARSS}()} into a marssMODEL model object.
 }
 \usage{
 is.marssMODEL(MODELobj, method="kem")
