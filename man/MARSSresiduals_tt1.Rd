@@ -1,34 +1,19 @@
-\name{residuals.marssMLE}
-\alias{residuals.marssMLE}
+\name{MARSSresiduals.tt1}
+\alias{MARSSresiduals.tt1}
 
-\title{ MARSS Residuals }
+\title{ MARSS One-Step-Ahead Residuals }
 \description{
-  Calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals.
+  Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{residuals(object, conditioning="t-1")}.
 }
 \usage{
-\method{residuals}{marssMLE}(object,..., conditioning=c("T", "t-1"), normalize=FALSE)
+MARSSresiduals.tt1(object, method="SS", normalize=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
-  \item{...}{ Additional arguments to be passed to the residuals functions. For conditioning="T", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
-  \item{conditioning}{ "T" for smoothed residuals and "t-1" for one-step-ahead residuals. }
+  \item{method}{ Algorithm to use. Currently only "SS". }
   \item{normalize}{ TRUE/FALSE }
 }
 \value{
-
-\strong{Smoothed residuals}
-
-If \code{conditioning="T"}, a list with the following components  
-  \item{model.residuals}{ The smoothed model residuals E(V(t)|y(1:T),Theta), where Theta is the set of model parameters.  Sometimes called the smoothations. This is different than the Kalman filter innovations which are E(V(t)|y(1:t-1),Theta).}
-  \item{state.residuals}{ The smoothed state residuals E(X(t+1)|y(1:T))-E(X(t+1)|E(x(t)|y(1:T))).}
-  \item{residuals}{ The residuals as a (n+m) x TT matrix with \code{model.residuals} on top and \code{state.residuals} below. \code{model.residuals} is \eqn{\hat(\eta_t)} on page 112 of Harvey, Koopman and Penzer (1998).  }
-  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n.}
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
-  \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
-  
-\strong{One-step-ahead residuals}
-
-If \code{conditioning="t-1"}, a list with the following components  
 A list with the following components  
   \item{residuals}{ The model residuals E(V(t)|y(1:t-1),Theta), where Theta is the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
   \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. The variance exists for all t values including missing data. }
@@ -37,9 +22,21 @@ A list with the following components
 }
 \details{
 
-For smoothed residuals, see \code{\link{MARSSresiduals.tT}}.
+This function returns the conditional expected value (mean) and variance of the model one-step-ahead residuals.  'conditional' means in this context, conditioned on the observed data up to time \eqn{t-1} and a set of parameters.  
 
-For one-step-ahead residuals, see \code{\link{MARSSresiduals.tT}}.
+\strong{model.residuals}
+
+The model residuals \eqn{v_t} are the difference between the data and the predicted data at time t conditioned on the data up to time \eqn{t-1}:
+\deqn{ v_t = y_t - Z x_t - a}
+In a state-space model, \eqn{x_t} is stochastic and the model residuals are a random variable.  \eqn{y_t} is also stochastic, though often observed unlike \eqn{x_t}.  The model residual random variable is:
+\deqn{ V_t= Y_t - Z X_t - a}
+The unconditional mean and variance of \eqn{V_t} is 0 and R.  This function (\code{residuals(MLEobj)}) returns the \emph{conditional} mean and variance of \eqn{V_t} (conditioned on the data up to time \eqn{t-1}).
+
+\code{model.residuals} returns
+\deqn{ \mathbf{y}_t - \mathbf{Z}_t E(\mathbf{X}_t | \mathbf{y}^{(1),t-1}, \Theta) - \mathbf{a}_t }{y_t - Z_t E(X_t | y(1,t-1), \Theta) - a_t}.
+
+\code{var.residuals} returned by the function is the conditional variance of the residuals. This is the variance of \eqn{V_t} conditioned on the data and the parameter set \eqn{\Theta}.  The unconditional variance (no data) would just be \eqn{\mathbf{R}_t}{R(t)} and the conditional variance is 
+\deqn{ \mathbf{R}+\mathbf{Z}_t \mathbf{V}_t^{t-1} \mathbf{Z}_t^\top }{R + Z_t Vtt1 t(Z_t)}
 
 \strong{Standardized residuals}
 
@@ -59,7 +56,7 @@ If normalize=TRUE, the model is assumed to be written
 \deqn{ x_t = B x_{t-1} + u + Gw_t}
 with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
-\code{residuals.marssMLE} returns the residuals defined as in the first equations. To get the residuals defined as the second equations, then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  
+\code{residuals.marssMLE} returns the residuals defined as in the first equations. To get the residuals defined as Harvey et al. (1998) define them (second equations), then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  Note, that the `normalized' residuals are not the same as the `standardized' residuals.  In former, the unconditional residuals have a variance of I while in the latter it is the conditional residuals that have a variance of I.
 
 }
 
@@ -68,32 +65,15 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
   eli(dot)holmes(at)noaa(dot)gov
 } 
-\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{fitted.marssMLE}}, \code{\link{plot.marssMLE}} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]
   MLEobj <- MARSS(dat)
   
-  #state smoothed residuals
-  state.resids1 <- residuals(MLEobj)$state.residuals
-  #this is the same as
-  states <- MLEobj$states
-  Q <- coef(MLEobj,type="matrix")$Q
-  state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
-  #compare the two
-  cbind(t(state.resids1[,-30]), t(state.resids2))
-
-  #normalize to variance of 1
-  state.resids1 <- residuals(MLEobj, normalize=TRUE)$state.residuals
-  state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
-  cbind(t(state.resids1[,-30]), t(state.resids2))
-
-  #one-step-ahead standardized residuals
   residuals(MLEobj, conditioning="t-1")$std.residuals
 }
 \references{
 Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.  This report shows how to compute the residuals from the Kalman smoother output without using the Harvey et al. (1998) algorithm.  The variance of the \eqn{\hat{v}(t)}{hat{v}(t)} for the missing values can then be computed.
-
-See also the references in \code{\link{MARSSresiduals.tT}}.
 }
 

@@ -75,7 +75,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
     # hatvarEytT = variance of the expected value of ytT
     hatytt1 <- hatytt <- matrix(0, n, TT)
     hatOtt1 <- hatOtt <- array(0, dim = c(n, n, TT))
-    hatyxtt1T <- array(0, dim = c(n, m, TT))
+    hatyxtt1T <- hatyxtt1 <- array(0, dim = c(n, m, TT))
     hatvarEytT <- hatvarytT <- array(0, dim = c(n, n, TT))
   }
 
@@ -90,11 +90,12 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
       }
     }
     if(!only.kem){
-      # For conditioning on data up to t-1, the data at time t do not factor in
+      # For conditioning on data up to t-1, the data at time t do not factor in so Delta.r and I.2 not needed
       hatytt1[, t] <- pari$Z %*% hatxtt1[, t, drop = FALSE] + pari$A
       t.Z <- matrix(pari$Z, m, n, byrow = TRUE)
       hatOtt1[, , t] <- pari$R + pari$Z %*% hatVtt1[, , t] %*% t.Z + tcrossprod(hatytt1[, t, drop = FALSE])
-     }
+      hatyxtt1[, , t] <- tcrossprod(hatytt1[, t, drop = FALSE], hatxtt1[, t, drop = FALSE]) + pari$Z %*% hatVtt1[, , t]
+    }
 
     if (all(YM[, t] == 1)) { # none missing
       hatyt[, t] <- y[, t, drop = FALSE]
@@ -142,7 +143,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   if(only.kem){
     rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp)
   }else{
-    rtn.list <- list(ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1T = hatyxtt1T, ytt = hatytt, Ott = hatOtt)
+    rtn.list <- list(ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1 = hatyxtt1, yxtt1T = hatyxtt1T, ytt = hatytt, Ott = hatOtt)
   }
   return(c(rtn.list, list(ok = TRUE, errors = msg)))
 }
