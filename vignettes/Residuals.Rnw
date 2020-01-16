@@ -86,6 +86,7 @@
 \def\cov{\,\textup{\textrm{cov}}}
 \def\diag{\,\textup{\textrm{diag}}}
 \def\trace{\,\textup{\textrm{trace}}}
+\def\dg{\,\textup{\textrm{dg}}}
 \def\hatxtT{\widetilde{\xx}_t^T}
 \def\hatxtpT{\widetilde{\xx}_{t+1}^T}
 \def\hatxtt{\widetilde{\xx}_t^{t}}
@@ -519,8 +520,9 @@ which is
  - \hatStT + \hatSttmT\BB_t^\top + \ZZ_t\hatVtT - \ZZ_t\hatVttmT\BB_t^\top\\
  \rule[.5ex]{40ex}{0.25pt} & \rule[.5ex]{50ex}{0.25pt} \\
  (- \hatStT + \hatSttmT\BB_t^\top + \ZZ_t\hatVtT  - \ZZ_t\hatVttmT\BB_t^\top)^\top& 
- \QQ_t - \hatVtT - \BB_t\hatVtmT\BB_t^\top + \hatVttmT\BB_t^\top + \BB_t\hatVtmtT \end{bmatrix} .
+ \QQ_t - \hatVtT - \BB_t\hatVtmT\BB_t^\top + \hatVttmT\BB_t^\top + \BB_t\hatVtmtT \end{bmatrix},
 \end{equation}
+where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$, $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$, $\hatVtT=\var[\XX_t|\yy^{(1)}]$, $\hatVttmT=\cov[\XX_t,\XX_{t-1}|\yy^{(1)}]$, and $\hatVtmtT=\cov[\XX_{t-1},\XX_t|\yy^{(1)}]$.
 
 If the residuals are defined as in \citet{Harveyetal1998},
 \begin{equation}
@@ -614,22 +616,19 @@ In Equation 20 in \citet{Harveyetal1998}, their $T_t$ is my $\BB_{t+1}$ and thei
 
 $\KK_t$ is the Kalman gain output by the MARSS R package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the MARSS R package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
 
-\subsection{Computing the standardized residuals}
+\subsection{Computing the Cholesky standardized residuals}
 
-The standardized residuals are computed by multiplying $\widehat{\varepsilon}_t$ by $(\widehat{\Sigma}_t)^{-1/2}$ (the inverse of the Cholesky decomposition of $\widehat{\Sigma}$ of the variance-covariance matrix for $\widehat{\varepsilon}_t$):
+The Cholesky standardized residuals are computed by multiplying $\widehat{\varepsilon}_t$ by $(\widehat{\Sigma}_t)^{-1/2}$ (the inverse of the Cholesky decomposition of  the variance-covariance matrix for $\widehat{\varepsilon}_t$):
 \begin{equation}\label{eq:std.resid}
-\text{standardized residuals} \widehat{\varepsilon}_{t, std} = (\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t .
+\widehat{\varepsilon}_{t, std} = (\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t .
 \end{equation}
-These residuals are uncorrelated (across the $n$ residuals in $\widehat{\varepsilon}_t$).
+These residuals are uncorrelated (across the residuals at time $t$ in $\widehat{\varepsilon}_t$).  See \citet{HarveyKoopman1992} and \citet{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
 
-It is also common to use the marginal standardized residuals, which would be $\widehat{\varepsilon}_t$ multiplied by the inverse of the square-root of the diagonal of $\widehat{\Sigma}_t$:
+It is also common to use the marginal standardized residuals, which would be $\widehat{\varepsilon}_t$ multiplied by the inverse of the square-root of $\dg(\widehat{\Sigma}_t)$, where $\dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
 \begin{equation}
-\text{i-th marginal standardized residual} \widehat{\varepsilon}(i)_{t, mar.std} = \frac{\widehat{\varepsilon}_{i,t}}{\sqrt{\widehat{\Sigma}(i,i)_t}}.
+\widehat{\varepsilon}_{t, mar} = \dg(\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t 
 \end{equation}
-These residuals may be correlated across the $n$ residuals in $\widehat{\varepsilon}_t$ (depending on the structure of the MARSS model) but a bit easier to interpret when there is correlation across the $n$ residuals.
-
-See \citet{HarveyKoopman1992} and \citet{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
-
+Marginal standardized residuals may be correlated at time $t$ (unlike the Cholesky standardized residuals) but are a bit easier to interpret when there is correlation across the model residuals. 
 
 \section{Distribution of the MARSS innovation residuals}
 
@@ -637,13 +636,13 @@ One-step-ahead predictions (innovations) are often shown for MARSS models and th
 
 \subsubsection{Variance of the one-step-ahead model residuals}
 
-Define the innovations $\checkvt$ as\footnote{This is slightly different than the observed `innovations' as it includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$. Also $\yy_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$.}:
+Define the innovations $\checkvt$ as:
 \begin{equation}\label{eq:vtt1}
 \checkvt = \yy_t - \ZZ_t\hatxttm - \aa_t,
 \end{equation}
-where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance.
+where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance. This is slightly different than the observed `innovations' as it includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$. $\yy_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$.
 
-The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, and we can write the variance as:
+The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus we can write the variance directly as:
 \begin{equation}\label{eq:innov.model}
 \var[\checkVt] = \RR_t - \ZZ_t \hatVtt1 \ZZ_t^\top + \hatStt1\ZZ_t^\top + \ZZ_t(\hatStt1)^\top
 \end{equation}
@@ -651,10 +650,22 @@ where the $\hatVtt1$ and $\hatStt1$ are now conditioned on only the data from 1 
 $\hatStt1 = \cov[\YY_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t + \aa_t+\VV_t,\XX_t|\yy^{(1), t-1}]$. 
 $\yy_t$ is not in the conditional since it only includes data up to $t-1$. Without $\yy_t$ in the conditional, $\VV_t$ and $\WW_t$ and by extension $\VV_t$ and $\XX_t$ are independent\footnote{Given the way the MARSS equation is written in this report. This is not the case for the more general Harvey et al. MARSS model which allows covariance.} and $\cov[\ZZ_t \XX_t + \aa_t + \VV_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t,\XX_t|\yy^{(1), t-1}] = \ZZ_t \hatVtt1$. Therefore, $\ZZ_t(\hatStt1)^\top =  \ZZ_t \hatVtt1 \ZZ_t^\top = \hatStt1(\ZZ_t)^\top$. Thus Equation \ref{eq:innov.model} reduces to
 \begin{equation}\label{eq:innov.model2}
-\var[\checkVt] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top.
+\overline{\Sigma}_t = \var[\checkVt] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top.
 \end{equation}
 
-Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the MARSS R package, it is output as \texttt{Sigma} from \texttt{MARSSkf()}.
+Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the MARSS R package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
+
+The Cholesky standardized residuals for $\checkvt$ can be computed with $\overline{\Sigma}_t$ in the same way that they were computed for $\widehat{\varepsilon}_t$ with $\widehat{\Sigma}_t$ (Equation \ref{eq:std.resid}):
+\begin{equation}
+\overline{\Sigma}_t^{-1/2} \checkvt
+\end{equation}
+$\overline{\Sigma}_t^{-1/2}$ is the inverse of the Cholesky decomposition of $\overline{\Sigma}_t$.
+The marginal standardized residuals for $\checkvt_t$ can be computed with the inverse of the square root of the diagonal of $\overline{\Sigma}_t$:
+\begin{equation}
+\dg(\overline{\Sigma}_t)^{-1/2} \checkvt
+\end{equation}
+where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
+
 
 \subsection{State residuals conditioned on the data}
 
@@ -667,50 +678,23 @@ From the Kalman filter equations:
 \begin{equation}\label{eq:wtt1}
 \hatxtt = \BB_t\hatxtmt1 + \uu_t + \KK_t \checkvt
 \end{equation}
-Thus,
+Thus, $\checkwt$ is a transformed $\checkvt$:
 \begin{equation}\label{eq:wtt1.2}
 \checkwt = \KK_t \checkvt,
 \end{equation}
-where $\KK_t$ is the Kalman gain\footnote{In the MARSS R package, this is output by \texttt{MARSSkfss()} in \texttt{Kt}}. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$.
+where $\KK_t$ is the Kalman gain. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$.
 Thus the variance of $\checkWt$ is 
 \begin{equation}\label{eq:var.Wt}
 \begin{split}
 \var[\checkwt] &= \KK_t\var[\checkVt] \KK_t^\top \\
-&= \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top .
+&= \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \\
+&= \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}] \ZZ_t \hatVtt1.
 \end{split}
 \end{equation}
 
+\subsection{Joint distribution of the conditional one-step-ahead residuals}
 
-\subsection{Covariance of the conditional model and state residuals}
-
-The covariance of $\cov[\checkVt, \checkWt]$ is
-\begin{equation}
-\cov[\checkVt, \checkWt] = \cov[\checkVt, \KK_t \checkVt] =
-[\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top
-\end{equation}
-
-\subsection{Joint distribution of the conditional residuals}
-
-We now the write the variance of the joint distribution of the conditional one-step ahead residuals. Define
-\begin{equation}
-\overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwt\end{bmatrix} =
-\begin{bmatrix}\yy_t - \ZZ_t\hatxttm-\aa_t\\ \hatxtt - \BB_t\hatxtmt1 - \uu_t \end{bmatrix}.
-\end{equation}
-The expected value of $\overline{\mathcal{E}}_t$ over all possible $\yy$ up to time $t$ is 0 and the variance of $\overline{\mathcal{E}}_t$  is
-\begin{equation}\label{eq:jointcondresid1innovs}
-\overline{\Sigma}_t = \begin{bmatrix}[c|c]
- \var[\checkVt]&
- \cov[\checkVt, \checkWt] \\
- \rule[.5ex]{15ex}{0.25pt} & \rule[.5ex]{15ex}{0.25pt} \\
- (\cov[\checkVt, \checkWt])^\top& 
- \var[\checkWt] \end{bmatrix} =
- \begin{bmatrix}[c|c]
- \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top& [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \\
- \rule[.5ex]{25ex}{0.25pt} & \rule[.5ex]{25ex}{0.25pt} \\
-\KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] & \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \end{bmatrix} .
-\end{equation}
-
-The standardized residuals for $\overline{\varepsilon}_t$ can be computed with $\overline{\Sigma}_t$ in the same way that they were computed for $\widehat{\varepsilon}_t$ with $\widehat{\Sigma}_t$ (Equation \ref{eq:std.resid}).
+Since $\checkwt=\KK_t \checkvt$, the state one-step-ahead residuals are perfectly correlated with the model one-step-ahead residuals so the joint distribution is not useful (all the information is in the variance of $\checkvt$).
 
 \bibliography{./EMDerivation}
 \bibliographystyle{apalike}
