@@ -84,10 +84,10 @@ fitted.marssMLE <- function(object, ...,
 
   if (type == "states") {
     if (conditioning == "T") hatxt <- MLEobj[["states"]]
-    if (conditioning == "t-1") hatxt <- MARSSkf(MLEobj)[["xtt"]]
+    if (conditioning == "t-1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if (interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t-1") hatVt <- MARSSkf(MLEobj)[["Vtt"]]
+      if (conditioning == "t-1") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
     }
     
     B.time.varying <- model.dims[["B"]][3] != 1
