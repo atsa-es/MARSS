@@ -15,12 +15,14 @@ MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE)
 }
 \value{
 A list with the following components  
-  \item{model.residuals}{ The smoothed model residuals E(V(t)|y(1:T),Theta), where Theta is the set of model parameters.  Sometimes called the smoothations. This is different than the Kalman filter innovations which are E(V(t)|y(1:t-1),Theta).}
+  \item{model.residuals}{ The expected value of the smoothed model residuals E[v(t)|y(1:T)],Theta, where Theta is the set of model parameters. Sometimes called the smoothations. This is different than the Kalman filter innovations which are v(t)|y(1:t-1),Theta.}
   \item{state.residuals}{ The smoothed state residuals E(X(t+1)|y(1:T))-E(X(t+1)|E(x(t)|y(1:T))).}
   \item{residuals}{ The residuals as a (n+m) x TT matrix with \code{model.residuals} on top and \code{state.residuals} below. \code{model.residuals} is \eqn{\hat(\eta_t)} on page 112 of Harvey, Koopman and Penzer (1998).  }
-  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n.}
+  \item{var.residuals}{ The variance of the model residuals var[V(t)|y(1:T),Theta] and state residuals var[W(t)|y(1:T),Theta] as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n. }
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
+  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
+
 }
 \details{
 

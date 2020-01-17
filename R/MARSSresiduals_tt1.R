@@ -10,6 +10,7 @@ MARSSresiduals.tt1 <- function(object, ..., method=c("SS"), normalize = FALSE) {
   # set up holders
   et <- st.et <- mar.st.et <- matrix(0, n , TT)
   var.et <- array(0, dim = c(n, n, TT))
+  msg <- NULL
 
   #### make a list of time-varying parameters
   time.varying <- list()
@@ -66,20 +67,20 @@ MARSSresiduals.tt1 <- function(object, ..., method=c("SS"), normalize = FALSE) {
     tmpchol <- try(pchol(tmpvar), silent = TRUE)
     if (inherits(tmpchol, "try-error")) {
       st.et[, t] <- NA
-      cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
+      msg <- c(msg, paste("MARSSresiduals.tt1 warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
     tmpcholinv <- try(psolve(tmpchol), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
-      cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
+      msg <- c(msg, paste("MARSSresiduals.tt1 warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
       next
     }
     # inverse of diagonal of variance matrix for marginal standardization
     tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
     if (inherits(tmpvarinv, "try-error")) {
       mar.st.et[, t] <- NA
-      cat(paste("warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
+      msg <- c(msg, paste("MARSSresiduals.tt1 warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
       next
     }
     st.et[, t] <- tmpcholinv %*% resids
@@ -91,6 +92,9 @@ MARSSresiduals.tt1 <- function(object, ..., method=c("SS"), normalize = FALSE) {
   # add rownames
   Y.names <- attr(MLEobj$model, "Y.names")
   rownames(et) <- rownames(st.et) <- rownames(var.et) <- colnames(var.et) <- Y.names
+  
+  # output any warnings
+  if(object[["control"]][["trace"]] >= 0) cat(msg)
 
-  return(list(residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et))
+  return(list(residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, msg = msg ))
 }

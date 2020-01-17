@@ -25,6 +25,8 @@ If \code{conditioning="T"}, a list with the following components
   \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n.}
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
+  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
+
   
 \strong{One-step-ahead residuals}
 
@@ -34,6 +36,8 @@ A list with the following components
   \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. The variance exists for all t values including missing data. }
   \item{std.residuals}{ The Cholesky standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
+  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
+
 }
 \details{
 
