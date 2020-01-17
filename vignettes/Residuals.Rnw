@@ -660,7 +660,7 @@ The Cholesky standardized residuals for $\checkvt$ can be computed with $\overli
 \overline{\Sigma}_t^{-1/2} \checkvt
 \end{equation}
 $\overline{\Sigma}_t^{-1/2}$ is the inverse of the Cholesky decomposition of $\overline{\Sigma}_t$.
-The marginal standardized residuals for $\checkvt_t$ can be computed with the inverse of the square root of the diagonal of $\overline{\Sigma}_t$:
+The marginal standardized residuals for $\checkvt$ can be computed with the inverse of the square root of the diagonal of $\overline{\Sigma}_t$:
 \begin{equation}
 \dg(\overline{\Sigma}_t)^{-1/2} \checkvt
 \end{equation}
