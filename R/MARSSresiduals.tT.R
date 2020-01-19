@@ -6,9 +6,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   # state.residuals x(t|yT)-Bx(t-1|yT)-u
   # residuals
   # var.residuals variance of above over Y
-  #    except for missing values, var for y_i missing should be 0 but if Harvey=TRUE, returns R(i,i)
-  # std.residuals psolve(chol(var.residuals))%*%model.residuals
-  # normalize means to divide residuals by H%*%t(chol(R)) or G%*%t(chol(Q)) so they are scaled to I
+  # for missing values, Harvey=TRUE returns 0 for var for y_i missing and Harvey=FALSE returns R + Z VtT t(Z)
   # Note, I think there is a problem with the Harvey algorithm when the variance of the state residuals (Q)
   # is non-diagonal and there are missing values; it can become non-invertable
   MLEobj <- object
@@ -222,8 +220,9 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   }
 
   if(!all((et[1:n,]==0) == is.na(y))) msg <- msg <- c(msg, "MARSSresiduals.tT: et is not 0 for all y=NA,\n")
-  # the model residuals are data - E(data), so NA for missing data.
-  et[1:n,is.na(y)] <- NA
+  # the observed model residuals are data - E(data), so NA for missing data.
+  obs.et <- et
+  obs.et[1:n,is.na(y)] <- NA
   # the state.residual at the last time step is NA because it is x(T+1) - f(x(T)) and T+1 does not exist.  For the same reason, the var.residuals at TT will have NAs
   et[(n + 1):(n + m), TT] <- NA
   var.et[, (n + 1):(n + m), TT] <- NA
@@ -231,13 +230,20 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   st.et[, TT] <- NA
   mar.st.et[(n + 1):(n + m), TT] <- NA
   
+  # et is the expected value of the residuals conditioned on y(1)
+  E.obs.v <- et[1:n,,drop=FALSE]
+  var.obs.v <- array(0, dim = c(n, n, TT))
+  for( t in 1:TT) var.obs.v[,,t] <- Ey$OtT[,,t] - tcrossprod(Ey$ytT[,t])
+  
   # add rownames
   Y.names <- attr(MLEobj$model, "Y.names")
   X.names <- attr(MLEobj$model, "X.names")
   rownames(et) <- rownames(st.et) <- rownames(var.et) <- colnames(var.et) <- c(Y.names, X.names)
+  rownames(E.obs.v) <- Y.names
+  rownames(var.obs.v) <- colnames(var.obs.v) <- Y.names
   
   # output any warnings
   if(object[["control"]][["trace"]] >= 0) cat(msg)
 
-  return(list(model.residuals = et[1:n, , drop = FALSE], state.residuals = et[(n + 1):(n + m), , drop = FALSE], residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et), msg = msg)
+  return(list(model.residuals = et[1:n, , drop = FALSE], state.residuals = et[(n + 1):(n + m), , drop = FALSE], residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, E.obs.residuals = E.obs.v, var.obs.residuals = var.obs.v, msg = msg))
 }
