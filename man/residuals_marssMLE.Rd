@@ -25,6 +25,8 @@ If \code{conditioning="T"}, a list with the following components
   \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n.}
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
+    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x TT matrix.  For observed data, this will be the observed model residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See \code{\link{MARSSresiduals.tT}}. }
+    \item{var.obs.residuals}{ The variance value of the model residuals conditioned on the observed data. Returned as a n x n x TT matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
   
@@ -65,6 +67,10 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
 \code{residuals.marssMLE} returns the residuals defined as in the first equations. To get the residuals defined as the second equations, then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  
 
+\strong{Missing or left-out data}
+
+See the discussion of smoothed residuals for missing and left-out data in \code{\link{MARSSresiduals.tT}}.
+
 }
 
 \author{ 
@@ -96,7 +102,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
   residuals(MLEobj, conditioning="t-1")$std.residuals
 }
 \references{
-Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.  This report shows how to compute the residuals from the Kalman smoother output without using the Harvey et al. (1998) algorithm.  The variance of the \eqn{\hat{v}(t)}{hat{v}(t)} for the missing values can then be computed.
+Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.
 
 See also the references in \code{\link{MARSSresiduals.tT}}.
 }
