@@ -34,7 +34,7 @@ If \code{conditioning="T"}, a list with the following components
 
 If \code{conditioning="t-1"}, a list with the following components  
 A list with the following components  
-  \item{residuals}{ The model residuals E(V(t)|y(1:t-1),Theta), where Theta is the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
+  \item{residuals}{ The model residuals E(V(t)|y(1:t-1),Theta), where Theta is the set of model parameters, as a n x TT matrix.  Called the innovations. Residuals associated with missing data will appear as NA. }
   \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. The variance exists for all t values including missing data. }
   \item{std.residuals}{ The Cholesky standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
@@ -64,8 +64,6 @@ If normalize=TRUE, the model is assumed to be written
 \deqn{ y_t = Z x_t + a + Hv_t}
 \deqn{ x_t = B x_{t-1} + u + Gw_t}
 with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
-
-\code{residuals.marssMLE} returns the residuals defined as in the first equations. To get the residuals defined as the second equations, then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  
 
 \strong{Missing or left-out data}
 
@@ -104,6 +102,6 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
 \references{
 Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.
 
-See also the references in \code{\link{MARSSresiduals.tT}}.
+See also the discussion and references in \code{\link{MARSSresiduals.tT}}.
 }
 
