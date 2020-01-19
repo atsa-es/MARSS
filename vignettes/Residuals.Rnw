@@ -201,9 +201,9 @@ The state and model residuals are respectively
 The model (and state) residuals are a random variables since $\yy_t$ and $\xx_t$ are drawn from the joint multivariate distribution of $\YY_t$ and $\XX_t$ defined by the MARSS equations (Equation \ref{eq:residsMARSS}).
 The unconditional\footnote{meaning not conditioning on any particular set of observed data but rather taking the expectation across all possible values of $\yy_t$ and $\xx_t$.} variance of the model residuals is
 \begin{equation}\label{eq:unconditiondistofVt}
-\var_{XY_t}[\VV_t] = \var_{XY_t}[\YY_t - (\ZZ_t \XX_t + \aa_t)] = \RR_t\\
+\var_{XY}[\VV_t] = \var_{XY}[\YY_t - (\ZZ_t \XX_t + \aa_t)] = \RR_t\\
 \end{equation}
-based on the distribution of $\VV_t$ in Equation \ref{eq:residsMARSS}.  $\var_{XY_t}$ indicates that the integration is over the joint unconditional distribution of $\XX_t$ and $\YY_t$. 
+based on the distribution of $\VV_t$ in Equation \ref{eq:residsMARSS}.  $\var_{XY}$ indicates that the integration is over the joint unconditional distribution of $\XX$ and $\YY$. 
 
 Once we have data, $\RR_t$ is not the variance-covariance matrix of our model residuals because our residuals are now conditioned\footnote{`conditioned' means that the probability distribution of the residual has changed. The distribution is now the distribution given that $\YY=\yy$, say. Expectations and variances $\var[ ]$ are integrals over the value that a random variable might take multiplied by the probability of that value. When presenting an   `expectation', the probability distribution is normally implicit but for derivations involving conditional expectations, it is important to be explicit about the distribution that is being integrated over.} on a set of observed data. There are two types of conditional model residuals used in MARSS analyses: innovations and smoothations.  Innovations are the model residuals at time $t$ using the expected value of $\XX_t$ conditioned on the data from 1 to $t-1$.  Smoothations  are the model residuals using the expected value of $\XX_t$ conditioned on all the data, $t=1$ to $T$.  Smoothations are used in computing standardized residuals for outlier and structural break detection \citep{HarveyKoopman1992, Harveyetal1998, deJongPenzer1998, CommandeurKoopman2007}.
 
@@ -235,7 +235,7 @@ I leave off the subscript on the inner conditional expectation or variance. Just
 
 The law of total variance will appear in this report in the following form:
 \begin{equation}
-\var_{XY_t}[f(\YY_t,\XX_t)] = \var_{Y^{(1)}}[\E_{XY_t|Y^{(1)}}[f(\YY_t,\XX_t)|\YY^{(1)}]] + \E_{Y^{(1)}}[\var_{XY_t|Y^{(1)}}[f(\YY_t,\XX_t)|\YY^{(1)}]] ,
+\var_{XY}[f(\YY,\XX)] = \var_{Y^{(1)}}[\E_{XY|Y^{(1)}}[f(\YY,\XX)|\YY^{(1)}]] + \E_{Y^{(1)}}[\var_{XY|Y^{(1)}}[f(\YY,\XX)|\YY^{(1)}]] ,
 \end{equation}
 where $f(\YY_t,\XX_t)$ is some function of $\XX_t$ and $\YY_t$ and $\YY^{(1)}$ is the observed data from $t=1$ to $T$ ($\YY^{(2)}$ is the unobserved data). 
 
@@ -250,9 +250,9 @@ where  $\hatxtT$ is $\E[\XX_t|\yy^{(1)}]$. The smoothation is different from $\v
 
 $\hatvt$ is a sample from the random variable $\hatVt$.  We want to compute the mean and variance of this random variable over all possibles values that $\XX_t$ and $\YY_t$ might take. The mean of $\hatVt$ is 0 and we are concerned only with computing the variance:
 \begin{equation}\label{eq:var.vtT}
-\var[\hatVt] = \var_{XY_t}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}] - \aa_t] .
+\var[\hatVt] = \var_{XY}[\YY_t - \ZZ_t\E[\XX_t|\YY^{(1)}] - \aa_t] .
 \end{equation}
-Notice we have an unconditional variance over $XY_t$ (i.e., over all possible values that $\XX_t$ and $\YY_t$ can take) on the outside and a conditional expectation over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
+Notice we have an unconditional variance over ${\XX,\YY}$ on the outside and a conditional expectation over a specific value of $\YY^{(1)}$ on the inside (in the $\E[\;]$).
 
 From the law of total variance (Equation \ref{eq:lawoftotvar}), we can write the variance of the model residuals as
 \begin{equation}\label{eq:varvvtgeneral}
@@ -283,6 +283,7 @@ The right side is $\E[\VV_t|\yy^{(1)}]$, no `hat' on the $\VV_t$, and this appli
 \begin{equation}\label{eq:no.hat.on.V}
 \var_{Y^{(1)}}[\E[\hatVt|\YY^{(1)}]] = \var_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}]] .
 \end{equation}
+If $\YY_t$ were completely observed (no missing values), this would be zero since $\E[\VV_t|\yy]$ would be a fixed value in that case. But $\YY_t$ is not assumed to be fully observed; it may have $\YY^{(2)}_t$ which is unobserved, or more precisely, not included in the estimation of $VV_t$ for whatever reason (`unknown" because it was unobserved being one reason). The derivation of $\E[\YY_t|\yy^{(1)}]$ is given in \citet{Holmes2010}\footnote{$\E[\YY^{(2)}_t|\yy^{(1)}]$ is not $\ZZ_t \hatxtT + \aa_t$ in general since $\YY^{(2)}_t$ and $\YY^{(1)}_t$ may be correlated through $\RR$ in addition to being correlated through $\hatxtT$}.
 
 Using the law of total variance, we can re-write $\var[\VV_t]$ as:
 \begin{equation}\label{eq:varianceVt}
@@ -340,9 +341,9 @@ The middle term is:
 \begin{equation}
 \E_{Y^{(1)}}[\var[\E[\XX_t|\YY^{(1)}]|\YY^{(1)}]].
 \end{equation}
-Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$ since the variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. Thus for a specific $\YY^{(1)}=\yy^{(1)}$, the inside of the right hand side expectation reduces to $\var[\YY_t|\yy^{(1)}]$ which is $\hatUtT$. As noted in the previous section, $\hatUtT$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$ and $\var[\YY_t|\yy^{(1)}]=\hatUtT$ for all $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUtT$:
+Let's solve the inner part for a specific $\YY^{(1)}=\yy^{(1)}$. $\E[\XX_t|\yy^{(1)}]$ is a fixed value. Thus  $\var[\E[\XX_t|\yy^{(1)}]|\yy^{(1)}]=0$ since the variance of a fixed value is 0. This is true for all $\yy^{(1)}$ so the middle term reduces to 0. $\aa_t$ is also fixed and its variance is also 0. The covariance between a random variable and a fixed value is 0\footnote{$\var[A+B] = \var[A]+\var[B]+\cov[A,B]$}. Thus for a specific $\YY^{(1)}=\yy^{(1)}$, the inside of the right hand side expectation reduces to $\var[\YY_t|\yy^{(1)}]$ which is $\hatUtT$. As noted in the previous section, $\hatUtT$ is only a function of the MARSS parameters; it is not a function of $\yy^{(1)}$ and $\var[\YY_t|\yy^{(1)}]=\hatUtT$ for all $\yy^{(1)}$. Thus the second term in Equation \ref{eq:varvvtgeneral} is simply $\hatUtT$:
 \begin{equation}\label{eq:second.term.rhs.9final}
-\E_{Y^{(1)}}[\var[\hatVt|\YY^{(1)}]] = \hatUtT .
+\E_{Y^{(1)}}[\var[\hatVt|\YY^{(1)}]] = \var[\hatVt|\yy^{(1)}] = \hatUtT .
 \end{equation}
 
 \subsubsection{Putting together the first and second terms}
