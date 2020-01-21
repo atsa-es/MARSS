@@ -19,23 +19,22 @@
 \strong{Smoothed residuals}
 
 If \code{conditioning="T"}, a list with the following components  
-  \item{model.residuals}{ The smoothed model residuals E(V(t)|y(1:T),Theta), where Theta is the set of model parameters.  Sometimes called the smoothations. This is different than the Kalman filter innovations which are E(V(t)|y(1:t-1),Theta).}
-  \item{state.residuals}{ The smoothed state residuals E(X(t+1)|y(1:T))-E(X(t+1)|E(x(t)|y(1:T))).}
-  \item{residuals}{ The residuals as a (n+m) x TT matrix with \code{model.residuals} on top and \code{state.residuals} below. \code{model.residuals} is \eqn{\hat(\eta_t)} on page 112 of Harvey, Koopman and Penzer (1998).  }
-  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals in rows 1 to n.}
+  \item{model.residuals}{ The smoothed model residuals (data minus model predicted values) as a n x TT matrix. The residuals are conditioned on all the data and the set of model parameters.  Called the smoothations. This is different than the Kalman filter innovations which are conditioned on the data up to \eqn{t-1}.}
+  \item{state.residuals}{ The smoothed state residuals.}
+  \item{residuals}{ The residuals as a (n+m) x TT matrix with \code{model.residuals} on top and \code{state.residuals} below. }
+  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x TT matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. }
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
     \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x TT matrix.  For observed data, this will be the observed model residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See \code{\link{MARSSresiduals.tT}}. }
-    \item{var.obs.residuals}{ The variance value of the model residuals conditioned on the observed data. Returned as a n x n x TT matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }
+    \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x TT matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
   
 \strong{One-step-ahead residuals}
 
 If \code{conditioning="t-1"}, a list with the following components  
-A list with the following components  
-  \item{residuals}{ The model residuals E(V(t)|y(1:t-1),Theta), where Theta is the set of model parameters, as a n x TT matrix.  Called the innovations. Residuals associated with missing data will appear as NA. }
-  \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. The variance exists for all t values including missing data. }
+  \item{residuals}{ The model residuals (data minus model predicted values), as a n x TT matrix. The residuals are conditioned on the data up to time \eqn{t-1} and the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
+  \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. }
   \item{std.residuals}{ The Cholesky standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
   \item{mar.residuals}{ The marginal standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
@@ -45,15 +44,18 @@ A list with the following components
 
 For smoothed residuals, see \code{\link{MARSSresiduals.tT}}.
 
-For one-step-ahead residuals, see \code{\link{MARSSresiduals.tT}}.
+For one-step-ahead residuals, see \code{\link{MARSSresiduals.tt1}}.
 
 \strong{Standardized residuals}
 
-\code{std.residuals} are Cholesky standardized residuals. These are the residuals muliplied by the inverse of the Cholesky decomposition of the variance matrix of the residuals: \deqn{ \Sigma_t^{-1/2} \hat{v}_t}{ Sigma_t^{-1/2} hat{v}_t}. These residuals are uncorrelated. 
+\code{std.residuals} are Cholesky standardized residuals. These are the residuals muliplied by the inverse of the Cholesky decomposition of the variance matrix of the residuals: 
+\deqn{ \hat{\Sigma}_t^{-1/2} \hat{\mathbf{v}}_t.}{ hatSigma_t^{-1/2} hatv_t.}
+These residuals are uncorrelated. 
 
 The interpretation of the Cholesky standardized residuals is not straight-forward when the Q and R variance-covariance matrices are non-diagonal.  The residuals which were generated by a non-diagonal variance-covariance matrices are transformed into orthogonal residuals in MVN(0,I) space.  For example, if v is 2x2 correlated errors with variance-covariance matrix R. The transformed residuals (from this function) for the i-th row of v is a combination of the row 1 effect and the row 1 effect plus the row 2 effect.  So in this case, row 2 of the transformed residuals would not be regarded as solely the row 2 residual but rather how different row 2 is from row 1, relative to expected.  If the errors are highly correlated, then the Cholesky standardized residuals can look rather non-intuitive.
 
-\code{mar.residuals} are the marginal standardized residuals. These are the residuals muliplied by the inverse of the diagonal matrix formed from the square-root of the diagonal of the variance matrix of the residuals: \deqn{ dg(\Sigma_t)^{-1/2} \hat{v}_t}{ dg(Sigma_t)^{-1/2} hat{v}_t}, where 'dg(A)' is the square matrix formed from the diagonal of A, aka \code{diag(diag(A))}. These residuals will be correlated if the variance matrix is non-diagonal. 
+\code{mar.residuals} are the marginal standardized residuals. These are the residuals muliplied by the inverse of the diagonal matrix formed from the square-root of the diagonal of the variance matrix of the residuals: 
+\deqn{ \textrm{dg}(\hat{\Sigma}_t)^{-1/2} \hat{v}_t,}{ dg(hatSigma_t)^{-1/2} hatv_t,} where 'dg(A)' is the square matrix formed from the diagonal of A, aka \code{diag(diag(A))}. These residuals will be correlated if the variance matrix is non-diagonal. 
 
 \strong{Normalized residuals}
 
@@ -102,6 +104,6 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
 \references{
 Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.
 
-See also the discussion and references in \code{\link{MARSSresiduals.tT}}.
+See also the discussion and references in \code{\link{MARSSresiduals.tT}} and \code{\link{MARSSresiduals.tt1}}.
 }
 
