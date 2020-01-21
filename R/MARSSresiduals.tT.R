@@ -220,9 +220,6 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   }
 
   if(!all((et[1:n,]==0) == is.na(y))) msg <- msg <- c(msg, "MARSSresiduals.tT: et is not 0 for all y=NA,\n")
-  # the observed model residuals are data - E(data), so NA for missing data.
-  obs.et <- et
-  obs.et[1:n,is.na(y)] <- NA
   # the state.residual at the last time step is NA because it is x(T+1) - f(x(T)) and T+1 does not exist.  For the same reason, the var.residuals at TT will have NAs
   et[(n + 1):(n + m), TT] <- NA
   var.et[, (n + 1):(n + m), TT] <- NA
@@ -234,6 +231,11 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   E.obs.v <- et[1:n,,drop=FALSE]
   var.obs.v <- array(0, dim = c(n, n, TT))
   for( t in 1:TT) var.obs.v[,,t] <- Ey$OtT[,,t] - tcrossprod(Ey$ytT[,t])
+
+  # the observed model residuals are data - E(data), so NA for missing data.
+  model.et <- et[1:n, , drop = FALSE]
+  model.et[is.na(y)] <- NA
+  et[1:n,] <- model.et
   
   # add rownames
   Y.names <- attr(MLEobj$model, "Y.names")
