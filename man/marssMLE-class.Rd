@@ -29,12 +29,8 @@
 \code{\link{is.marssMLE}}
 }
 \author{ 
-  Eli Holmes, NOAA, Seattle, USA
+  Eli Holmes and Kellie Wills, NOAA, Seattle, USA
   
   eli(dot)holmes(at)noaa(dot)gov
-  
-  Kellie Wills, NOAA, Seattle, USA.  
-
-  kellie(dot)wills(at)noaa(dot)gov
 }
 \keyword{classes}

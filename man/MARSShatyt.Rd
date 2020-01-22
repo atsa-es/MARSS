@@ -16,18 +16,18 @@ For state space models, \code{MARSShatyt()} computes the expectations involving 
  
 }
 \value{ 
-A list with the following components (n is the number of state processes). Following the notation in Holmes (2012), y(1) is the observed data (for t=1:TT) while y(2) is the unobserved data.  y(1,1:t-1) is the observed data from time 1 to t-1.
-  \item{ytT}{ E[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x TT matrix). }
-  \item{ytt1}{ E[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x TT matrix). }
-  \item{ytt}{ E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x TT matrix). }
-  \item{OtT}{ E[Y(t) t(Y(t)) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
-  \item{var.ytT}{ var[Y(t) | Y(1,1:TT)=y(1,1:TT)] (n x n x TT array). }
-  \item{var.EytT}{ var_X[E_{Y|x}[Y(t) | Y(1,1:TT)=y(1,1:TT), X(t)=x(t)]] (n x n x TT array). }
-  \item{Ott1}{  E[Y(t) t(Y(t)) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x TT array). }
-  \item{Ott}{ E[Y(t) t(Y(t)) | Y(1,1:t)=y(1,1:t)] (n x n x TT array). }
-  \item{yxtT}{ E[Y(t) t(X(t)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
-  \item{yxtt1T}{ E[Y(t) t(X(t-1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
-  \item{yxttpT}{ E[Y(t) t(X(t+1)) | Y(1,1:TT)=y(1,1:TT)] (n x m x TT array). }
+A list with the following components (n is the number of state processes). Following the notation in Holmes (2012), y(1) is the observed data (for t=1:T) while y(2) is the unobserved data.  y(1,1:t-1) is the observed data from time 1 to t-1.
+  \item{ytT}{ E[Y(t) | Y(1,1:T)=y(1,1:T)] (n x T matrix). }
+  \item{ytt1}{ E[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x T matrix). }
+  \item{ytt}{ E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x T matrix). }
+  \item{OtT}{ E[Y(t) t(Y(t)) | Y(1,1:T)=y(1,1:T)] (n x n x T array). }
+  \item{var.ytT}{ var[Y(t) | Y(1,1:T)=y(1,1:T)] (n x n x T array). }
+  \item{var.EytT}{ var_X[E_{Y|x}[Y(t) | Y(1,1:T)=y(1,1:T), X(t)=x(t)]] (n x n x T array). }
+  \item{Ott1}{  E[Y(t) t(Y(t)) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x T array). }
+  \item{Ott}{ E[Y(t) t(Y(t)) | Y(1,1:t)=y(1,1:t)] (n x n x T array). }
+  \item{yxtT}{ E[Y(t) t(X(t)) | Y(1,1:T)=y(1,1:T)] (n x m x T array). }
+  \item{yxtt1T}{ E[Y(t) t(X(t-1)) | Y(1,1:T)=y(1,1:T)] (n x m x T array). }
+  \item{yxttpT}{ E[Y(t) t(X(t+1)) | Y(1,1:T)=y(1,1:T)] (n x m x T array). }
   \item{errors}{ Any error messages due to ill-conditioned matrices. }
   \item{ok}{ (TRUE/FALSE) Whether errors were generated. }
 }

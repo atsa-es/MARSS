@@ -129,10 +129,10 @@ The \verb@R@, \verb@Q@ and \verb@V0@ variances can be set to zero to specify par
 
 \section*{Linear constraints}
 
-Your model can have simple linear constraints within all the parameters except Q, R and V0.  For example $1+2a-3b$ is a linear constraint. When entering this value for you matrix, you specify this a \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so $+-$ for subtraction. ANYTHING after `*` is a parameter. So `1*1` has a parameter called `"1"`. Example, let's change the $\BB$ matrix and $\QQ$ matrices in the previous model to:
+Your model can have simple linear constraints within all the parameters except Q, R and V0.  For example $1+2a-3b$ is a linear constraint. When entering this value for you matrix, you specify this a \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so $+-$ for subtraction. Anything after `*` is a parameter. So `1*1` has a parameter called `"1"`. Example, let's change the $\BB$ matrix and $\QQ$ matrices in the previous model to:
 \begin{equation*}
 \BB = \begin{bmatrix}b-0.1&0\\ 0&b+0.1\end{bmatrix}\quad
-\QQ = \begin{bmatrix}q_{11}&0\\ 1&0\end{bmatrix} \end{pmatrix}\quad
+\QQ = \begin{bmatrix}q_{11}&0\\ 1&0\end{bmatrix}\quad
 \ZZ = \begin{bmatrix}z_1-z_2&2*z_1\\ 0&z_1\\ z_2&0\end{bmatrix}
 \end{equation*}
 

@@ -68,9 +68,7 @@ Once the model has been fitted, additional elements are added.
 }
 
 \author{ 
-  Kellie Wills, NOAA, Seattle, USA.  
-
-  kellie(dot)wills(at)noaa(dot)gov
+  Eli Holmes and Kellie Wills, NOAA, Seattle, USA.  
 }
 \seealso{ 
   \code{\link{marssMODEL}}, \code{\link{MARSSkem}} 

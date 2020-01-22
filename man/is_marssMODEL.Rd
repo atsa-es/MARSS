@@ -50,7 +50,7 @@ The first dimension for f (\code{fixed}) and D (\code{free}) must be:
     \item{A}{ n x 1 }
     \item{R}{ n x n }
   }
-  The third dimension of f (\code{fixed}) and D (\code{free}) is either 1 (if not time-varying) or TT (if time-varying).   The second dimension of f (\code{fixed}) is always 1, while the second dimension of D  (\code{free}) depends on how many values are being estimated for a matrix.  It can be 0 (if the matrix is fixed) or up to the size of the matrix (if all elements are being estimated).
+  The third dimension of f (\code{fixed}) and D (\code{free}) is either 1 (if not time-varying) or T (if time-varying).   The second dimension of f (\code{fixed}) is always 1, while the second dimension of D  (\code{free}) depends on how many values are being estimated for a matrix.  It can be 0 (if the matrix is fixed) or up to the size of the matrix (if all elements are being estimated).
 
 }
 \value{

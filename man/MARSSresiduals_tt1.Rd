@@ -16,9 +16,9 @@ MARSSresiduals.tt1(object, method="SS", normalize=FALSE)
 \value{
 A list with the following components  
   \item{residuals}{ The model residuals conditioned on the data up to time \eqn{t-1} and the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
-  \item{var.residuals}{ The variance of the model residuals as a n x n x TT matrix. The variance exists for all t values including missing data. }
-  \item{std.residuals}{ The Cholesky standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
-  \item{mar.residuals}{ The marginal standardized model residuals as a n x TT matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
+  \item{var.residuals}{ The variance of the model residuals as a n x n x T matrix. The variance exists for all t values including missing data. }
+  \item{std.residuals}{ The Cholesky standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
+  \item{mar.residuals}{ The marginal standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
 }
