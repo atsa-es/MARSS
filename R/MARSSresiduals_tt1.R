@@ -1,4 +1,4 @@
-MARSSresiduals.tt1 <- function(object, ..., method=c("SS"), normalize = FALSE) {
+MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE) {
   # These are the residuals and their variance conditioned on the data up to time t-1
   MLEobj <- object
   method <- match.arg(method)

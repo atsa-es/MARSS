@@ -28,7 +28,7 @@ See Holmes (2012) for a discussion of MARSS models in vectorized form.
 \examples{
 dat <- t(harborSealWA)
 dat <- dat[2:4, ] 
-kemfit <- MARSS(dat)
+MLEobj <- MARSS(dat)
 
 # free (D) and fixed (f) matrices
 names(MLEobj$model$free)

@@ -53,7 +53,7 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
       \item{\code{silent}}{   TRUE/FALSE(default), Suppresses all printing including progress bars, error messages and convergence information. 0, Turns on all printing of progress bars, fitting information and error messages.  2, Prints a brief success/failure message.    }
       \item{\code{safe}}{   TRUE/FALSE(default), Setting safe=TRUE runs the Kalman smoother after each parameter update rather than running the smoother only once after updated all parameters.  The latter is faster but is not a strictly correct EM algorithm.  In most cases, safe=FALSE (default) will not change the fits.  If this setting does cause problems, you will know because you will see an error regarding the log-likelihood dropping and it will direct you to set safe=TRUE.    }
   } }
-    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \link[KFAS]{`KFAS-package`} based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implimentation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
+    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \link[KFAS]{KFAS} package based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implimentation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
     \item{...}{ Optional arguments passed to function specified by form. }
 }
 \details{
@@ -136,9 +136,6 @@ kem.with.hess.CIs
 kemfit <- MARSS(dat, silent = TRUE) # suppress printing
 kemfit
 
-# Fit the above model with BFGS
-bffit <- MARSS(dat, method="BFGS")
-
 # Fit the above model with BFGS using a short EM fit as initial conditions
 kemfit <- MARSS(dat, control=list(minit=5, maxit=5))
 bffit <- MARSS(dat, method="BFGS", inits=kemfit)
@@ -160,7 +157,6 @@ kemfit <- MARSS(dat, model = list(U = matrix(c("N", "S", "S"), 3, 1)))
 # all parameters can be specified in this way using list matrices
 kemfit <- MARSS(dat, model = list(U = matrix(list("N", "N", 0), 3, 1), R = diag(0.01, 3)))
 
-
 # fit a model with 2 hidden states (north and south)
 # where observation time series 1-2 are north and 3 is south
 # Make the hidden state process independent with same process var
@@ -180,7 +176,6 @@ kemfit <- MARSS(dat, model = list(
 
 # print the model followed by the marssMLE object
 kemfit$model
-kemfit
 
 \dontrun{
 # simulate some new data from our fitted model
