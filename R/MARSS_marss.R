@@ -179,18 +179,18 @@ MARSS.marss <- function(MARSS.call) {
     if (is.array(model$Z) && length(dim(model$Z)) == 3) {
       if (dim(model$Z)[3] != 1 && !is.design(model$Z, zero.cols.ok = TRUE)) { # if it is a matrix
         problem <- TRUE
-        msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou can construct a scaling A matrix and pass that in.")
+        msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou need to specify A in your model list. You can construct a scaling A matrix and pass that in.")
       }
     }
     if (!is.array(model$Z) && !is.factor(model$Z)) { # if it is a string
       if (!(model$Z %in% c("onestate", "identity"))) {
         problem <- TRUE
-        msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
+        msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou need to specify A in your model list. You can construct a scaling A matrix and pass that in.")
       }
     }
     if (is.matrix(model$Z) && !is.design(model$Z, zero.cols.ok = TRUE)) { # if it is a matrix, won't be array due to first test
       problem <- TRUE
-      msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\n")
+      msg <- c(msg, " If A is scaling(the default), then Z must be a time-constant design matrix:(0,1) and rowsums=1.\nYou need to specify A in your model list. You can construct a scaling A matrix and pass that in.")
     }
   }
   if (is.array(model$x0) && length(dim(model$x0)) == 3) {
