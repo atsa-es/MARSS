@@ -44,7 +44,7 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   model <- x[["model"]]
   resids <- residuals(x)
   tmp <- apply(resids$var.residuals, 3, function(x) { takediag(x) })
-  tmp[tmp<0 & abs(tmp)<.Machine$double.eps] <- 0
+  tmp[tmp<0 & abs(tmp)<sqrt(.Machine$double.eps)] <- 0
   se.resids <- sqrt(tmp)
   model.dims <- attr(model, "model.dims")
   data.dims <- model.dims[["y"]]

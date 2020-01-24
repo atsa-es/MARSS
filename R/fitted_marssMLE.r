@@ -144,6 +144,7 @@ fitted.marssMLE <- function(object, ...,
     retlist = list(.fitted=val)
   }
   if (interval=="confidence"){
+    se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
     retlist <- list(
         .fitted = val, 
@@ -153,6 +154,7 @@ fitted.marssMLE <- function(object, ...,
     )
   }
   if (interval=="prediction"){
+    se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
     if (type == "states"){
       retlist <-list(
