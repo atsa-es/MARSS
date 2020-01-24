@@ -39,7 +39,7 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     if (form != "dfa") stop("tidy.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
     rotate <- extras[["rotate"]]
     if (!(rotate %in% c(TRUE, FALSE))) stop("tidy.marssMLE: rotate must be TRUE/FALSE. \n", call. = FALSE)
-    if( rotate && attr(x, "model.dims")[["Z"]][3]!=1 ) stop("tidy.marssMLE: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
+    if( rotate && attr(x[["model"]], "model.dims")[["Z"]][3]!=1 ) stop("tidy.marssMLE: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
   }
 
   if (type == "parameters") {
