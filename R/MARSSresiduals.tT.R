@@ -219,7 +219,6 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
     mar.st.et[is.miss, t] <- NA
   }
 
-  if(!all((et[1:n,]==0) == is.na(y))) msg <- msg <- c(msg, "MARSSresiduals.tT: et is not 0 for all y=NA,\n")
   # the state.residual at the last time step is NA because it is x(T+1) - f(x(T)) and T+1 does not exist.  For the same reason, the var.residuals at TT will have NAs
   et[(n + 1):(n + m), TT] <- NA
   var.et[, (n + 1):(n + m), TT] <- NA
