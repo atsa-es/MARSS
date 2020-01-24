@@ -1,8 +1,8 @@
 autoplot.marssMLE <-
   function(x,
-           plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations"),
+           plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations", "model.residuals.acf", "state.residuals.acf"),
            form = c("marxss", "marss", "dfa"),
-           conf.int = TRUE, conf.level = 0.95, decorate = TRUE, 
+           conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), 
            ...) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
@@ -88,7 +88,7 @@ autoplot.marssMLE <-
       # make plot of observations
       tit <- "Model fitted Y"
       if (conf.int) tit <- paste(tit, "+ CI")
-      if (decorate) tit <- paste(tit, "+ PI (dashed)")
+      if (pi.int) tit <- paste(tit, "+ PI (dashed)")
       df <- augment.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
@@ -100,12 +100,15 @@ autoplot.marssMLE <-
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
-      if (decorate){
+      if (pi.int){
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.pi), linetype="dashed")
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.pi), linetype="dashed")
+      }
+      # Add data points
+      if (decorate){
         p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
-                            shape = plotpar$point.pch, fill = plotpar$point.fill, 
-                            col = plotpar$point.col, size = plotpar$point.size)
+                                     shape = plotpar$point.pch, fill = plotpar$point.fill, 
+                                     col = plotpar$point.col, size = plotpar$point.size)
       }
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
@@ -243,6 +246,73 @@ autoplot.marssMLE <-
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
       plts[["state.residuals.qqplot"]] <- p1
       if (identical(plot.type, "state.residuals.qqplot")) {
+        return(p1)
+      }
+    }
+    
+    acffun <- function(x,y) {
+      bacf <- acf(x, plot = FALSE, na.action=na.pass)
+      bacfdf <- with(bacf, data.frame(lag, acf))
+      return(bacfdf)
+    }
+    acfci <- function(x) {
+      ciline <- qnorm((1 - conf.level)/2)/sqrt(length(x))
+      return(ciline)
+    }
+    if ("state.residuals.acf" %in% plot.type) {
+      df <- augment.marssMLE(x, type = "xtT", form = "marxss")
+      df$.rownames <- paste0("State ", df$.rownames)
+      
+      acfdf <- tapply(df$.resids, df$.rownames, acffun)
+      fun <- function(x,y) data.frame(.rownames=y, lag=x$lag, acf=x$acf)
+      acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY =FALSE)
+      acf.dat <- data.frame(.rownames = unlist(lapply(acfdf, function(x){x$.rownames})), 
+                            lag = unlist(lapply(acfdf, function(x){x$lag})),
+                            acf = unlist(lapply(acfdf, function(x){x$acf})))
+      
+      cidf <- tapply(df$.resids, df$.rownames, acfci)
+      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
+      
+      p1 <- ggplot2::ggplot(acf.dat, mapping = aes(x = lag, y = acf)) +
+        geom_hline(aes(yintercept = 0)) +
+        geom_segment(mapping = aes(xend = lag, yend = 0)) +
+        ggplot2::xlab("Lag") +
+        ggplot2::ylab("ACF") +
+        ggplot2::facet_wrap(~.rownames, scales = "free_y") +
+        ggplot2::ggtitle("State Residuals ACF")
+      p1 <- p1 + 
+        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
+        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
+        plts[["state.residuals.acf"]] <- p1
+      if (identical(plot.type, "state.residuals.acf")) {
+        return(p1)
+      }
+    }
+    if ("model.residuals.acf" %in% plot.type) {
+      df <- augment.marssMLE(x, type = "ytT", form = "marxss")
+
+      acfdf <- tapply(df$.resids, df$.rownames, acffun)
+      fun <- function(x,y) data.frame(.rownames=y, lag=x$lag, acf=x$acf)
+      acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY =FALSE)
+      acf.dat <- data.frame(.rownames = unlist(lapply(acfdf, function(x){x$.rownames})), 
+                            lag = unlist(lapply(acfdf, function(x){x$lag})),
+                            acf = unlist(lapply(acfdf, function(x){x$acf})))
+      
+      cidf <- tapply(df$.resids, df$.rownames, acfci)
+      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
+      
+      p1 <- ggplot2::ggplot(acf.dat, mapping = aes(x = lag, y = acf)) +
+        geom_hline(aes(yintercept = 0)) +
+        geom_segment(mapping = aes(xend = lag, yend = 0)) +
+        ggplot2::xlab("Lag") +
+        ggplot2::ylab("ACF") +
+        ggplot2::facet_wrap(~.rownames, scales = "free_y") +
+        ggplot2::ggtitle("Model Residuals ACF")
+      p1 <- p1 + 
+        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
+        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
+      plts[["model.residuals.acf"]] <- p1
+      if (identical(plot.type, "model.residuals.acf")) {
         return(p1)
       }
     }

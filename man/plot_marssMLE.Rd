@@ -15,16 +15,18 @@
            plot.par = list(), ...)
   \method{autoplot}{marssMLE}(x, plot.type=c("observations", "states", "model.residuals", 
                        "state.residuals", "model.residuals.qqplot", 
-                       "state.residuals.qqplot", "expected.value.observations"),
+                       "state.residuals.qqplot", "expected.value.observations", 
+                       "model.residuals.acf", "state.residuals.acf"),
            form=c("marxss", "marss", "dfa"),
-           conf.int=TRUE, conf.level=0.95, decorate=TRUE,
+           conf.int=TRUE, conf.level=0.95, decorate=TRUE, pi.int = FALSE,
            plot.par = list(), ...)
   }
   \arguments{
   \item{x}{ A \code{\link{marssMLE}} object.  }
-  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. Options for arguments include \code{"observations"} (fits to the raw data), \code{"states"} (estimates of the hidden or latent trends), \code{"model.residuals"} (residuals for the observation error), \code{"state.residuals"} (residuals associated with the process model), \code{"model.residuals.qqplot"} (qq plot for the observation residuals), \code{"state.residuals.qqplot"} (qq plot for the state residuals)}
+  \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. Options for arguments include \code{"observations"} (fits to the raw data), \code{"states"} (estimates of the hidden or latent trends), \code{"model.residuals"} (residuals for the observation error), \code{"state.residuals"} (residuals associated with the process model), \code{"model.residuals.qqplot"} (qq plot for the observation residuals), \code{"state.residuals.qqplot"} (qq plot for the state residuals). \code{"expected.value.observations"} (estimates of the missing data points), \code{"model.residuals.acf"} and \code{"state.residuals.acf"} (ACF of the residuals).  }
   \item{form}{ Optional. Form of the model.  This is normally taken from the form attribute of the MLE object (x), but the user can specify a different form. }
   \item{conf.int}{ TRUE/FALSE. Whether to include a confidence interval. }
+  \item{pi.int}{ TRUE/FALSE. Whether to include a prediction interval on the observations plot }
   \item{conf.level}{ Confidence level for CIs. }
   \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots and add data points plus residuals confidence intervals to states and observations plots. }
   \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  The default is list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
