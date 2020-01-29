@@ -31,7 +31,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE) {
 
   if (method=="SS") {
     # model.et will be 0 where no data E(y)-modeled(y)
-    et <- y - fitted(MLEobj, type = "observations", conditioning = "t-1", output = "matrix") # model residuals
+    et <- y - fitted(MLEobj, type = "ytT", output = "matrix") # model residuals
 
     for (t in 1:TT) {
       # model residuals

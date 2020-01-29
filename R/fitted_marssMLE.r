@@ -2,15 +2,15 @@
 #  fitted method for class marssMLE.
 ##############################################################################################################################################
 fitted.marssMLE <- function(object, ...,
-                            type = c("observations", "states"),
-                            conditioning = c("T", "t", "t-1"),
+                            type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
                             conf.level = 0.95,
                             output = c("tibble", "matrix")) {
   type <- match.arg(type)
   output <- match.arg(output)
-  conditioning <- match.arg(conditioning)
   interval <- match.arg(interval)
+  conditioning <- substring(type, 3)
+  type <- substr(type, 1, 1)
   MLEobj <- object
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
@@ -21,10 +21,7 @@ fitted.marssMLE <- function(object, ...,
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
-    if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use conditioning='t-1' instead of one.step.ahead=TRUE.", call. = FALSE)
-  }
-  if (conditioning == "t" && type == "states") {
-    stop("fitted.marssMLE: Only conditioning = 'T' and 't-1' allowed for type='states'. ")
+    if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use type='ytt1' or 'xtt1' instead of one.step.ahead=TRUE.", call. = FALSE)
   }
 
   # need the model dims in marss form with c in U and d in A
@@ -33,13 +30,13 @@ fitted.marssMLE <- function(object, ...,
   n <- model.dims[["y"]][1]
   m <- model.dims[["x"]][1]
 
-  if (type == "observations") {
+  if (type == "y") {
     if (conditioning == "T") hatxt <- MLEobj[["states"]]
-    if (conditioning == "t-1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
+    if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
     if (conditioning == "t") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if(interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t-1") hatVt <- MARSSkf(MLEobj)[["Vtt1"]]
+      if (conditioning == "t1") hatVt <- MARSSkf(MLEobj)[["Vtt1"]]
       if (conditioning == "t") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
     }
     Z.time.varying <- model.dims[["Z"]][3] != 1
@@ -82,12 +79,12 @@ fitted.marssMLE <- function(object, ...,
     
   }
 
-  if (type == "states") {
+  if (type == "x") {
     if (conditioning == "T") hatxt <- MLEobj[["states"]]
-    if (conditioning == "t-1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
+    if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if (interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t-1") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
+      if (conditioning == "t1") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
     }
     
     B.time.varying <- model.dims[["B"]][3] != 1
@@ -156,7 +153,7 @@ fitted.marssMLE <- function(object, ...,
   if (interval=="prediction"){
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
-    if (type == "states"){
+    if (type == "x"){
       retlist <-list(
       .fitted = val, 
       .sd.x = se, 
@@ -164,7 +161,7 @@ fitted.marssMLE <- function(object, ...,
       .upr = val + qnorm(1- alpha/2) * se
     )
     }
-  if (type == "observations"){
+  if (type == "y"){
     retlist <- list(
       .fitted=val,
       .sd.y=se,
