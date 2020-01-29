@@ -9,7 +9,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known 
 CHANGES IN MARSS 3.10.12 (current state of master 1-29-2020)
 ------------------------------------
 
-Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models and updating the documentation. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files have been heavily editted to clean-up the presentation and move some of the internal functions out of view.
+Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models. This was a major update though probably users won't notice much. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The documentation got a major clean-up also. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files were cleaned-up  and  some of the internal functions moved out of the manual.
 
 BUGS
 
@@ -23,7 +23,7 @@ BUGS
 
 ENHANCEMENTS
 
-* `MARSShatyt()` Added ytt, ytt1, Ott, Ott1 to MARSShatyt so that tidy.marssMLE can more easily return the one-step-ahead preditions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
+* `MARSShatyt()` Added ytt, ytt1, Ott, Ott1 to MARSShatyt() so that tidy.marssMLE() can more easily return the one-step-ahead preditions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
 * `tidy.marssMLE()` Changed type for tidy() to xtT, ytT and fitted.ytT. tidy() exclusively gives estimates of things (parameters, X, Y, fitted Y) conditioned on all the data.
 * `fitted.marssMLE()` Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals. Also added conditioning argument to fitted.marssMLE which gives fitted values with different conditioning. Changed default output to tibble.
 * `augment.marssMLE()` Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
@@ -35,7 +35,7 @@ ENHANCEMENTS
 
 DOCUMENTATION and MAN FILES
 
-* Added derivation of var_X[E_{Y|X}[Y(t)|y, X]] to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
+* Added derivation of variance of Y conditioned on y and X to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
 * Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity). Reposted to Arxiv. Added innovations residuals.
 * tidy, augment and fitted man files got major update.
 * internal functions given \keyword{internal} so they don't appear in the documentation, but will appear if you use `?` or help.search.
@@ -47,16 +47,16 @@ Minor update. Version 3.10.11 has some edits to speed up the code by minimizing 
 
 BUGS
 
-* MARSSkfss had a bug "\*" was used in place of %\*% with J0. Would never show up unless V0 estimated.
-* Bug in MARSSharveyobsFI() which arose if a parameter was fixed and time-varying. This caused MARSSparamCIs() to fail if a parameter was fixed and time-varying.
-* dparmat() did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
+* `MARSSkfss()` had a bug "\*" was used in place of %\*% with J0. Would never show up unless V0 estimated.
+* Bug in `MARSSharveyobsFI()` which arose if a parameter was fixed and time-varying. This caused MARSSparamCIs() to fail if a parameter was fixed and time-varying.
+* `dparmat()` did not return values if it was time-varying and fixed. Caused tidy() to return error for dlm models.
 
 ENHANCEMENTS
 
-* is.validvarcov is expensive. minimize calls to it. If called with a diagonal matrix, it should automatically pass so added a check to is.validvarcov() to see if matrix is diagonal.
-* is.marssMLE is expensive. Replace with a call to class().
+* `is.validvarcov()` is expensive. minimize calls to it. If called with a diagonal matrix, it should automatically pass so added a check to is.validvarcov() to see if matrix is diagonal.
+* `is.marssMLE()` is expensive. Replace with a call to class().
 * Added S3 methods for broom functions if broom is loaded.
-* Added autoplot function and updated plot documentation to cover autoplot functions.
+* Added `autoplot.marssMLE()` function and updated plot documentation to cover autoplot functions.
 * Fixed typos in Case Study 4 and Derivation eq 143b.
 
 
@@ -67,16 +67,16 @@ Minor update to declare S3 objects if user has broom package installed.  A few m
 ENHANCEMENTS
 
 * Added if statement to declare S3 objects in NAMESPACE if user has broom package installed.  Allows delayed loading of S3 methods for broom.
-* is.validvarcov() is expensive.  Minimize use in MARSSaic, MARSSboot, MARSSoptim, MARSSparamCIs, MARSSsimulate, MARSS_marxss.
-* Added is.diagonal() utility function
+* `is.validvarcov()` is expensive.  Minimize use in MARSSaic, MARSSboot, MARSSoptim, MARSSparamCIs, MARSSsimulate, MARSS_marxss.
+* Added `is.diagonal()` utility function
 * Typo in User Guide Chapter 2.  R was supposed to be "diagonal and equal" in the first example.
-* Changed plot.marssMLE to autoplot since it is ggplot2 based
-* Created plot.marssMLE that uses only base R graphics
+* Changed `plot.marssMLE()` to `autoplot.marssMLE()` since it is ggplot2 based
+* Created `plot.marssMLE()` that uses only base R graphics
 
 BUGS
 
-* MARSSkfss had bug on V0T line.  "\*" instead of %\*%.  This code is almost never called.
-* MARSSkfss had bug.  Did not check if G was time-varying.  This code is almost never called.
+* `MARSSkfss()` had bug on V0T line.  "\*" instead of %\*%.  This code is almost never called.
+* `MARSSkfss()` had bug.  Did not check if G was time-varying.  This code is almost never called.
 
 CHANGES IN MARSS 3.10.8 (CRAN 4-14-2018)
 ------------------------------------
@@ -84,70 +84,70 @@ Major update over 3.9. The main changes have to do with residuals and confidence
 
 BUGS
 
-residuals.marssMLE()
+`residuals.marssMLE()`
 * Erroneous standardized residuals when Z was non-diagonal (and thus also > 1 row). Also changed residuals.MARSSMLE so it returns residuals (which would be equal to 0) when there are 0s on the diagonal of Q or R
 * If t=1 and x0 was fixed, residuals were not returned.
 * The wrong residuals were returned if there were any missing values.  Fix involved implementing the missing values modifications for the Kalman filter described in Shumway and Stoffer.
 
 inits functions
 
-* In MARSSinits_marxss() function would give error if U, A, C, or D fixed and user passed in inits.  inits ignored in this case so should not throw error.
+* In `MARSSinits_marxss()` function would give error if U, A, C, or D fixed and user passed in inits.  inits ignored in this case so should not throw error.
 * `alldefaults` could be updated by form.  A few functions were neglecting to (re)load alldefaults or to ressign `alldefaults` when updated: is_marssMLE(), MARSSinits.marxss(), MARSSinits().  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
 
 kalman filter functions
 
-* MARSSkf() was not passing optional function args to MARSSkfas().
-* MARSSkfss() mis-counting num data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
+* `MARSSkf()` was not passing optional function args to `MARSSkfas()`.
+* `MARSSkfss()` mis-counting num data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss() was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
 
 Confidence intervals and std error for R and Q
 
-* MARSSparamCIs() gave the wrong s.e. for variances and covariances when method="hessian".  It also gave the wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%\*%t(chol) ).
-* MARSSparamCIs(), vrs 3.9 was getting the hessian numerically using a var-cov matrix that had been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed from the s.e.'s. I back-transformed the Hessian to the original (non-chol) scale the same way I back transformed a var-covariance matrix.  But the variance of s^2 is not the var(s)^2, which is what I was doing, essentially. So the s.e. for R and Q were wrong in all cases.  Note, using a Hessian to estimate CIs for variance-covariance matrices is generally a bad idea anyhow however.
+* `MARSSparamCIs()` gave the wrong s.e. for variances and covariances when method="hessian".  It also gave the wrong CIs for variances and covariances when var-cov matrix was non-diagonal. There were a series of issues related to back-transforming from the hessian of a chol-transformed var-cov matrix ( Sigma=chol%\*%t(chol) ).
+* `MARSSparamCIs()`, vrs 3.9 was getting the Hessian matrix numerically using a var-cov matrix that had been transformed with a Cholesky decomposition to ensure it stays positive-definite.  The upper and lower CIs were computed from the s.e.'s. I back-transformed the Hessian to the original (non-chol) scale the same way I back transformed a var-covariance matrix.  But the variance of s^2 is not the var(s)^2, which is what I was doing, essentially. So the s.e. for R and Q were wrong in all cases.  Note, using a Hessian to estimate CIs for variance-covariance matrices is generally a bad idea anyhow however.
 * For non-diagonal matrices.  There was a bug in MARSShessian() in subscripting the d matrix when doing the chol transform.  Caused NAs for cases with non-diagonal matrices.  However, had the se been returned, they would be wrong for non-diagonal matrices because the elements of the chol transformed matrices do not correspond one-to-one to the non-transformed matrices.  E.g. the untransformed [2,2]^2 is chol transformed [1,2]^2+[2,2]^2.  The hessian used was for the chol-transformation and the curvature of the LL surface for the chol-transformed values is different than the curvature for the untransformed var-cov elements.
 
 Fix: I completely abandoned working with the chol transformed variance-covariance matrices for the Hessian calculation.  The chol transformation was not necessary for computing the Hessian since the Hessian is computed at the MLEs and localized.  
 
-1. Created a new function MARSSharveyobsFI() which uses the Harvey (1989) recursion to analyticallycompute the observed Fisher Information matrix. This is the Hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can lead to negative lower CIs).
+1. Created a new function `MARSSharveyobsFI()` which uses the Harvey (1989) recursion to analyticallycompute the observed Fisher Information matrix. This is the Hessian for the untransformed var-cov parameters.  So CIs on variances can be negative since the variance of the MLE is being approximated by a MVN (which can lead to negative lower CIs).
 
-2. Harvey1989 is now the default function when method='hessian'.
+2. Harvey1989 is now the default function when method='hessian'. *In later vrs of MARSS, this is changed to Holmes2014.*
 
 3. The user can also select method='hessian' and hessian.fun='fdHess' or hessian.fun='optim'.  This will compute the Hessian (of the log-LL function at the MLEs) numerically using these functions.  The variance-covariance matrices are NOT chol transformed.  These are numerically estimated Hessians of the untransformed variance-covariance matrices.
 
-4. Added MARSSinfo(26) which discusses the reason for NAs in the Hessian.
+4. Added `MARSSinfo(26)` which discusses the reason for NAs in the Hessian.
 
 Misc minor bugs
 
-* MARSShatyt() was setting ytt1 (expected value of y(t) conditioned on data up to t-1) to y(t), which is incorrect. Expected value of y(t) conditioned on y up to t-1 is Z xtt1 + a
-* CSEGriskfigure() panel 2 was wrong when mu>0 (increasing population).
-* CSEGriskfigure() panel 2 CIs were wrong when CI method=hessian since Q had not been back transformed (so was using sqrt(Q)).
-* MARSSkemcheck()'s test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
-* coef.marssMLE() was not stopping when illegal "what: arg passed in.  man page did not say what happens when type=parameter.
+* `MARSShatyt()` was setting ytt1 (expected value of y(t) conditioned on data up to t-1) to y(t), which is incorrect. Expected value of y(t) conditioned on y up to t-1 is Z xtt1 + a
+* `CSEGriskfigure()` panel 2 was wrong when mu>0 (increasing population).
+* `CSEGriskfigure()` panel 2 CIs were wrong when CI method=hessian since Q had not been back transformed (so was using sqrt(Q)).
+* `MARSSkemcheck()`'s test that fixed B is in unit circle failed when B was time-varying and some fixed and others estimated. Also when the eigenvalues were complex, it should test the real part only.
+* `coef.marssMLE()` was not stopping when illegal "what: arg passed in.  man page did not say what happens when type=parameter.
 * Passing in method not in allowed.methods was causing errors since model conversion and testing happening before checkMARSSinputs and model testing is algorithm dependent (some forms not allowed by BFGS).  Added check for method at top of MARSS function.
 
 
 IMPROVEMENTS
 
 * w(t) and v(t) can be specified as G(t)\*w(t) and H(t)\*v(t) where G and H are fixed matrices (not estimated).  In version 3.10, G and H are restricted to being 0 or identity, however the code is in place for other values.
-  - changes to MARSS.marxss and MARSS.marss to allow G, H, and L passed in
-  - change to MARSSkem to specifiy star lists with G, H, and L (mathbb(elem) in EM Derivation)
-  - changed MARSSkss to use Q\*=G Q t(G), R\*=H R t(H) and V0\*=L V0 t(L)
+  - changes to `MARSS.marxss()` and `MARSS.marss()` to allow G, H, and L passed in
+  - change to `MARSSkem()` to specifiy star lists with G, H, and L (mathbb(elem) in EM Derivation)
+  - changed `MARSSkss()` to use Q\*=G Q t(G), R\*=H R t(H) and V0\*=L V0 t(L)
 * Added Multivariate linear regression chapter
 * Added chapter on estimating a Leslie matrix from stage time series using a MARSS model.
-* Removed the function MARSSmcinits and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, MARSSmcinits was increasing obsolete and it was impossible to come up with good searching distributions.  Because MARSSmcinits was removed, control$MCInits list item was removed also from defaults and from accepted input.
+* Removed the function `MARSSmcinits()` and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, MARSSmcinits was increasing obsolete and it was impossible to come up with good searching distributions.  Because MARSSmcinits was removed, control$MCInits list item was removed also from defaults and from accepted input.
 * Added default inits for c and d in marxss form so that user can pass in inits using coef(fit); was balking because this includes d and c which didn't have defaults.  Removed msg referring to need that model be in marss form for inits (not true).
-* Changed MARSS.marxss() to allow c and d to be 3D arrays.  This allows one to use inits=fit to set inits and not get a d (or c) must be 2D error.
-* Added info to MARSSinfo(4) regarding errors about R=0 and x0 not fixed. Added info to the error warnings to direct user to MARSSinfo().
+* Changed `MARSS.marxss()` to allow c and d to be 3D arrays.  This allows one to use inits=fit to set inits and not get a d (or c) must be 2D error.
+* Added info to `MARSSinfo(4)` regarding errors about R=0 and x0 not fixed. Added info to the error warnings to direct user to MARSSinfo().
 * Changed order of MARSS args to be MARSS(y, model= , inits=, ...)
-* Added pchol and psolve functions to return the chol or inverse via solve when there are 0s on the diagonal
+* Added `pchol()` and `psolve()` functions to return the chol or inverse via solve when there are 0s on the diagonal
 * Added information to print.marssMODEL on summary.marssMODEL.  Added silent argument to summary.marssMODEL to block printing to the console.
-* print.marssMLE(x, what="par") returned a vector of estimated values instead of the list of par.  Changed to return the list.
-* Added E[y(t), x(t+1)] to MARSShatyt output.  Needed for residuals.marssMLE().
-* Added code to is.validvarcov() so that it returns an error if the user specifies a structurally illegal variance-covariance matrix.  Added info to MARSSinfo(25).
+* `print.marssMLE(x, what="par")` returned a vector of estimated values instead of the list of par.  Changed to return the list.
+* Added E[y(t), x(t+1)] to `MARSShatyt()` output.  Needed for residuals.marssMLE().
+* Added code to `is.validvarcov()` so that it returns an error if the user specifies a structurally illegal variance-covariance matrix.  Added info to MARSSinfo(25).
 * Added a model.frame method for marssMODEL and marssMLE
-* Added broom augment, tidy and glance functions for marssMLE
-* Added logLik method for marssMLE objects
-* Added fitted method for marssMLE objects to return Z xtT + u (model fitted value of y)
-* Added plot method with diagnostics
+* Added broom `augment`, `tidy` and `glance` functions for marssMLE
+* Added `logLik` method for marssMLE objects
+* Added `fitted` method for marssMLE objects to return Z xtT + u (model fitted value of y)
+* Added `plot` method with diagnostics
 
 MISC
 
