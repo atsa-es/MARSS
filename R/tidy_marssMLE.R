@@ -70,7 +70,11 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     state.dims <- attr(model, "model.dims")[["x"]]
     mm <- state.dims[1]
     TT <- state.dims[2]
-    kfss <- MARSSkfss(x)
+    if(csuffix=="tt"){ 
+      kfss <- MARSSkfss(x)
+    }else{
+      kfss <- MARSSkfas(x)
+    }
     states <- kfss[[xtype]]
     vtype <- str_replace(xtype, "x", "V")
     states.se <- apply(kfss[[vtype]], 3, function(x) {
