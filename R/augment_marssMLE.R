@@ -11,21 +11,14 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
   ## Argument checking
   type <- match.arg(type)
   interval <- match.arg(interval)
-  conditioning <- substr(type, 3, 3)
-  if (conditioning != "T") {
-    stop("augment.marssMLE: Only conditioning='T' allowed currently.", call. = FALSE)
-  }
   if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
     stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   }
-  if (substr(type, 1, 1) == "y") type <- "observations"
-  if (substr(type, 1, 1) == "x") type <- "states"
-  ## End argument checking
 
   augment.fun <- paste("augment_", form, sep = "")
   tmp <- try(exists(augment.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(augment.fun, x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning))
+    ret <- eval(call(augment.fun, x, type = type, interval = interval, conf.level = conf.level))
   } else {
     ret <- paste("No augment_", form[1], " is available.\n", sep = "")
   }
@@ -36,9 +29,8 @@ augment.marssMLE <- function(x, type = c("ytT", "xtT"),
 #  augment method for class marssMLE form marxss
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
-#  Set up to take other conditioning != T also
 ##############################################################################################################################################
-augment_marxss <- function(x, type, interval, conf.level, conditioning) {
+augment_marxss <- function(x, type, interval, conf.level) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
@@ -51,9 +43,9 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   nn <- data.dims[1]
   TT <- data.dims[2]
   alpha <- 1 - conf.level
-  if (type == "observations") {
+  if (substr(type, 1, 1) == "y") {
     data.names <- attr(model, "Y.names")
-    fit.list <- fitted(x, type = "observations", interval=interval, conditioning=conditioning, conf.level=conf.level)
+    fit.list <- fitted(x, type = type, interval=interval, conf.level=conf.level)
     ret <- data.frame(
       .rownames = fit.list$.rownames,
       t = fit.list$t,
@@ -74,7 +66,7 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
       .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE]))
     )
   }
-  if (type == "states") {
+  if (substr(type, 1, 1) == "x") {
     # line up the residuals so that xtT(t) has residuals for xtT(t)-f(xtT(t-1))
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
@@ -82,7 +74,7 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
     state.se.resids <- cbind(NA, se.resids[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
     state.resids <- cbind(NA, resids$state.residuals[, 1:(TT - 1), drop = FALSE])
     state.std.resids <- cbind(NA, resids$std.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
-    fit.list <- fitted(x, type = "states", interval=interval, conditioning=conditioning, conf.level=conf.level)
+    fit.list <- fitted(x, type = type, interval=interval, conf.level=conf.level)
     ret <- data.frame(
       .rownames = fit.list$.rownames,
       t = fit.list$t,
@@ -106,12 +98,12 @@ augment_marxss <- function(x, type, interval, conf.level, conditioning) {
   ret
 }
 
-augment_dfa <- function(x, type, interval, conf.level, conditioning) {
-  ret <- augment_marxss(x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning)
+augment_dfa <- function(x, type, interval, conf.level) {
+  ret <- augment_marxss(x, type = type, interval = interval, conf.level = conf.level)
 
   ret
 }
 
-augment_marss <- function(x, type, interval, conf.level, conditioning) {
-  return(augment_marxss(x, type = type, interval = interval, conf.level = conf.level, conditioning = conditioning))
+augment_marss <- function(x, type, interval, conf.level) {
+  return(augment_marxss(x, type = type, interval = interval, conf.level = conf.level))
 }
