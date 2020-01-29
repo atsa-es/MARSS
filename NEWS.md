@@ -6,7 +6,7 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known issues are also posted there.
 
-CHANGES IN MARSS 3.10.12 (current state of master 1-3-2020)
+CHANGES IN MARSS 3.10.12 (current state of master 1-29-2020)
 ------------------------------------
 
 Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models and updating the documentation. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files have been heavily editted to clean-up the presentation and move some of the internal functions out of view.
@@ -31,6 +31,7 @@ ENHANCEMENTS
 *  `MARSSinfo()` Added "AZR0" to MARSSinfo() to give info if user gets error that A cannot be estimated with R=0.  Added more informative message to MARSSkemcheck() for that case.
 * Made all if statements checking class of object robust to the class returning more than one class (so vector of length > 1). Due to change in R 4.0.0 where matrix has class c("matrix","array")
 * Updated all code to tidyverse style
+* Changed `residuals.marssMLE()`. This is now a helper function which calls `MARSSresiduals.tT()` or `MARSSresiduals.tt1()`. The former is smoothation residuals and the latter is innovations (one-step-ahead) residuals.
 
 DOCUMENTATION and MAN FILES
 
