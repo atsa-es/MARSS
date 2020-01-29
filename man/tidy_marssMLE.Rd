@@ -71,7 +71,7 @@ The types of intervals you want for data (Y part of the MARSS equation) depends 
 \item{Compare your data to model predictions}{In this case, you want the distribution of the model residuals for the data. Use \code{\link{augment.marssMLE}} with \code{type="observations"}. You want the standard errors for the observed data minus the fitted values which is what  \code{\link{augment.marssMLE}} gives.  }
 \item{Get estimates and variance of missing data in your data set}{Use \code{type="ytT"}. The observed data will have an expected value equal to the observed data and variance of 0, while the missing data will have an expected value and variance conditioned on all the observed data. Note, if R is diagonal then the missing data values (and intervals) will be the same as for \code{type="fitted.ytT"} but if R is non-diagonal and some y at time t are missing and some are not, then the expected values will be very different.}
 \item{Do a leave-one-out cross-validation}{In this case, you want the distribution of the model residuals for those left-out values. Use \code{augment.marssMLE} with \code{type="observations"}. You want the standard errors for the left-out data minus the fitted values which is what  \code{\link{augment.marssMLE}} gives.  }
-\item{One-step-ahead predictions}{Use \code{fitted.marssMLE} with \code{conditioning="t-1"}. Confidence (mean prediction) and prediction intervals (new data) are returned.  }
+\item{One-step-ahead predictions}{Use \code{fitted.marssMLE} with \code{type="ytt1"} or \code{type="xtt1"}. Confidence (mean prediction) and prediction intervals (new data) are returned.  }
 \item{Y prediction conditioned on data up to t-1}{Same as one-step-ahead.}
 }
 
