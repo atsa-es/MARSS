@@ -1,4 +1,4 @@
-MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
+MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=FALSE) {
   # These are the residuals and their variance conditioned on all the data
   # Harvey=TRUE uses Harvey et al (1998) algorithm to compute these
   # Harvey=FALSE uses the straight smoother output
@@ -203,7 +203,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
     tmpcholinv <- try(psolve(tmpchol), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
-      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
+      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
     # inverse of diagonal of variance matrix for marginal standardization
@@ -244,7 +244,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE) {
   rownames(var.obs.v) <- colnames(var.obs.v) <- Y.names
   
   # output any warnings
-  if(object[["control"]][["trace"]] >= 0) cat(msg)
+  if(object[["control"]][["trace"]] >= 0 & !silent) cat(msg)
 
   return(list(model.residuals = et[1:n, , drop = FALSE], state.residuals = et[(n + 1):(n + m), , drop = FALSE], residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, E.obs.residuals = E.obs.v, var.obs.residuals = var.obs.v, msg = msg))
 }

@@ -6,12 +6,13 @@
   Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{residuals(object, conditioning="T")}.
 }
 \usage{
-MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE)
+MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{Harvey}{ TRUE/FALSE. Use the Harvey et al. (1998) algorithm or use the Holmes (2014) algorithm. The values are the same except for missing values. }
   \item{normalize}{ TRUE/FALSE }
+  \item{silent}{ If TRUE, don't print inversion warnings. }
 }
 \value{
 A list with the following components  

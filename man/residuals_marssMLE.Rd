@@ -6,13 +6,14 @@
   Calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals.
 }
 \usage{
-\method{residuals}{marssMLE}(object,..., conditioning=c("T", "t-1"), normalize=FALSE)
+\method{residuals}{marssMLE}(object,..., conditioning=c("T", "t-1"), normalize=FALSE, silent=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{...}{ Additional arguments to be passed to the residuals functions. For conditioning="T", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
   \item{conditioning}{ "T" for smoothed residuals and "t-1" for one-step-ahead residuals. }
   \item{normalize}{ TRUE/FALSE }
+  \item{silent}{ If TRUE, do not print inversion warnings. }
 }
 \value{
 
