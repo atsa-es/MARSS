@@ -226,9 +226,11 @@ MARSSkfss <- function(MLEobj) {
     Vtt[, , t] <- Vtt1[, , t] - Kt.tmp %*% Zt %*% Vtt1[, , t] # eqn 6.22, detail after 6.28, modified Z per 6.78
     if (m != 1) Vtt[, , t] <- symm(Vtt[, , t]) # to ensure its symetric
     # zero out rows cols as needed when R diag = 0
-    OmgRVtt.t <- OmgRVtt
-    if (any(diag.OmgRVtt == 0)) diag(OmgRVtt.t) <- diag.OmgRVtt + t(!(Z == 0)) %*% (diag.R == 0 & YM[, t] == 0)
-    Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
+    # Commented out in version 3.10.12
+    # This is only true if colSums Z == 1 & Q assoc with states is not 0
+    # OmgRVtt.t <- OmgRVtt
+    # if (any(diag.OmgRVtt == 0)) diag(OmgRVtt.t) <- diag.OmgRVtt + t(!(Z == 0)) %*% (diag.R == 0 & YM[, t] == 0)
+    # Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
 
     # Variables needed for the likelihood calculation; see comments above
     R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
