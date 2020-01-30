@@ -159,11 +159,12 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     Y.dims <- attr(x[["model"]], "model.dims")[["y"]]
     nn <- Y.dims[1]
     TT <- Y.dims[2]
-    fit.y.conf <- fitted.marssMLE(x, type="observations", 
-                             conditioning=conditioning, interval="confidence", 
+    fit.y.conf <- fitted.marssMLE(x, type="ytT", 
+                             interval="confidence", 
                              conf.level=conf.level)
-    fit.y.pred <- fitted.marssMLE(x, type="observations", 
-                             conditioning=conditioning, interval="prediction", conf.level=conf.level)
+    fit.y.pred <- fitted.marssMLE(x, type="ytT", 
+                             interval="prediction", 
+                             conf.level=conf.level)
 
     ret <- fit.y.conf[,c(".rownames","t","y")]
     ret <- cbind( ret,
