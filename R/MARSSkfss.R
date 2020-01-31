@@ -64,27 +64,15 @@ MARSSkfss <- function(MLEobj) {
   } else {
     diag.R <- unname(R)[1 + 0:(n - 1) * (n + 1)]
   }
-  # Check that if any R are 0 then model is solveable
+  # Check that if any R are 0 then modelA is solveable
+  # Get which x are fully determined by data. The Vtt corr to these must be set to 0
   OmgRVtt <- I.m
   diag.OmgRVtt <- rep(1, m)
   if (any(diag.R == 0)) {
-    Z.R0 <- Z[diag.R == 0, , drop = FALSE]
-    Z.R0.n0 <- Z.R0[, colSums(Z.R0) != 0, drop = FALSE] # The Z cols where there is a val
-    if (dim(Z.R0.n0)[1] == dim(Z.R0.n0)[2]) { # then it must be invertible
-      Ck <- try(solve(Z.R0.n0))
-      if (class(Ck)[1] == "try-error") { # inherits is slow and this function called often
-        return(list(ok = FALSE, errors = "Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
-      } else {
-        OmgRVtt <- diag(ifelse(colSums(Z.R0) != 0, 0, 1), m)
-      } # mxm; sets the p elem of Vtt to 0 because these are determined by data
-    } else { # then num rows must be greater than num cols
-      if (dim(Z.R0.n0)[1] > dim(Z.R0.n0)[2]) {
-        return(list(ok = FALSE, errors = "Some R diagonal elements are 0, and Z is such that model is over-determined."))
-      } else {
-        OmgRVtt <- diag(ifelse(colSums(Z.R0) != 0, 0, 1), m)
-      }
-    }
-    diag.OmgRVtt <- takediag(OmgRVtt)
+    tmp <- fully.spec.x( Z, R )
+    if(!tmp$ok) return(tmp)
+    diag.OmgRVtt <- tmp$detx
+    OmgRVtt <- makediag(diag.OmgRVtt)
   }
   if (m == 1) {
     diag.Q <- unname(Q)
@@ -228,9 +216,19 @@ MARSSkfss <- function(MLEobj) {
     # zero out rows cols as needed when R diag = 0
     # Commented out in version 3.10.12
     # This is only true if colSums Z == 1 & Q assoc with states is not 0
-    # OmgRVtt.t <- OmgRVtt
-    # if (any(diag.OmgRVtt == 0)) diag(OmgRVtt.t) <- diag.OmgRVtt + t(!(Z == 0)) %*% (diag.R == 0 & YM[, t] == 0)
-    # Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
+    
+    # If R=0 and YM is missing, then set diag of OmgRVtt to 1 since Vtt should not be 0-ed
+    # was tmp <- t(!(Z == 0)) %*% (diag.R == 0 & YM[, t] == 0) 
+    # but that fails if one Z row has more than 1 non-0 val or if Q is fixing some Z
+    OmgRVtt.t <- OmgRVtt
+    if (any(diag.OmgRVtt == 0)){
+      # zero out rows where 2 states; rowSums of tmp will be 1 or 0
+      tmp <- diag(rowSums(Z != 0)==1)%*%(Z !=0 )
+      tmp <- t(!(tmp == 0)) %*% (diag.R == 0 & YM[, t] == 0)
+      diag(OmgRVtt.t) <- diag.OmgRVtt + tmp==1
+      # diag(OmgRVtt.t) <- diag.OmgRVtt + t(!(Z == 0)) %*% (diag.R == 0 & YM[, t] == 0)
+      }
+    Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
 
     # Variables needed for the likelihood calculation; see comments above
     R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
