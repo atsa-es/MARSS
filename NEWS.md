@@ -9,7 +9,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known 
 CHANGES IN MARSS 3.10.12 (current state of master 1-29-2020)
 ------------------------------------
 
-Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models. This was a major update though probably users won't notice much. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The documentation got a major clean-up also. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files were cleaned-up  and  some of the internal functions moved out of the manual.
+Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models. This was a major update though probably users won't notice much as it only affects residuals output. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The documentation got a major clean-up. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files were cleaned-up  and  some of the internal functions moved out of the manual.
 
 BUGS
 
@@ -20,6 +20,7 @@ BUGS
 * `MARSS_dfa()` used form="dfa" in MARSS.call list. Just info. Never used.
 * Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
 * `toLatex.marssMODEL()` Fixed some old bugs in toLatex_marssMODEL.R. Added S3 class declaration in NAMESPACE for toLatex. fixed equation attribute in MARSS_marxss. G{t} was used instead of G_{t}. Only affected toLatex_marssMODEL(). Had extra line in build.mat.tex() that removed last line of matrices. This function was not exported so users would never have run into these bugs.
+* `MARSSkfss()` To limit propogation of numerical errors when R=0, the row/col of Vtt the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data.
 
 ENHANCEMENTS
 
