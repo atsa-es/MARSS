@@ -33,37 +33,39 @@
   Matrix utilities for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
 }
 \usage{
-is.blockdiag(x)
-is.validvarcov(x, method="kem")
-is.identity(x, dim=NULL)
-is.diagonal(x, na.rm=FALSE)
-is.equaltri(x)
-makediag(x, nrow=NA)
-takediag(x)
-is.design(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=FALSE)
-is.fixed(x, by.row=FALSE)
-is.identity(x, dim=NULL)
-is.zero(x)
-vec(x)
-unvec(x, dim=NULL)
-is.wholenumber(x, tol = .Machine$double.eps^0.5)
-Imat(x)
-rwishart(nu, V)
-mystrsplit(x)
+all.equal.vector(x)
 convert.model.mat(param.matrix)
 fixed.free.to.formula(fixed,free,dim)
+fully.spec.x(Z, R)
+Imat(x)
+is.blockdiag(x)
+is.design(x, strict=TRUE, dim=NULL, zero.rows.ok=FALSE, zero.cols.ok=FALSE)
+is.diagonal(x, na.rm=FALSE)
+is.equaltri(x)
+is.fixed(x, by.row=FALSE)
+is.identity(x, dim=NULL)
+is.identity(x, dim=NULL)
+is.solvable(A,y=NULL)
+is.validvarcov(x, method="kem")
+is.wholenumber(x, tol = .Machine$double.eps^0.5)
+is.zero(x)
+makediag(x, nrow=NA)
 matrix.power(x, n)
-sub3D(x,t=1)
+mystrsplit(x)
+parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
+       t = 1, dims = NULL, model.loc = "marss")
 pinv(x)
 pcholinv(x)
 pchol(x) 
-is.solvable(A,y=NULL)
-all.equal.vector(x)
-parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
-       t = 1, dims = NULL, model.loc = "marss")
+rwishart(nu, V)
+sub3D(x,t=1)
+takediag(x)
+unvec(x, dim=NULL)
+vec(x)
 }
 \arguments{
   \item{x, A, y}{ A matrix (or vector for '\code{makediag}' or string for '\code{mystrsplit}'.). }
+  \item{ Z, R }{ Z matrix and R matrix }
   \item{na.rm}{ How to treat NAs in the block diag test. }
   \item{dim, dims}{ Matrix dimensions. Some functions will take the vec of a matrix.  In this case, the optional dim arg specifies the matrix dimensions. }
   \item{fixed}{ A fixed matrix per the MARSS specification for fixed matrix syntax. }
@@ -100,6 +102,8 @@ parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L")
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
+  \item \code{ fully.spec.x } returns a list with 0 and 1 showing which x are fully specified by data when R has zeros. Used by \code{\link{MARSSkfss}()}.
+
 } 
 }
 \value{

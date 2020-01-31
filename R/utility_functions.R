@@ -801,6 +801,7 @@ psolve <- function(x) {
   }
   return(inv.x)
 }
+
 # report on whether the linear system y=Ax is underconstrained, overconstrained, or 1 unique solution
 is.solvable <- function(A, y = NULL) {
   dimA <- dim(A)
@@ -827,6 +828,37 @@ all.equal.vector <- function(x) {
   all(sapply(as.list(x[-1]), FUN = function(z) {
     identical(z, unlist(x[1]))
   }))
+}
+
+# returns a vector with 0s and 1s showing which x are fully spec by the data
+fully.spec.x <- function(Z, R){
+  m <- dim(Z)[2]
+  diag.R <- takediag(R)
+  Z.R0 <- Z[diag.R == 0, , drop = FALSE]
+  # The Z cols where there is a val; and where rows have a val
+  Z.R0.n0 <- Z.R0[rowSums(Z.R0 != 0) != 0, colSums(Z.R0 != 0) != 0, drop = FALSE] 
+  # If more rows than columns, over-constrained
+  dimZ00 <- dim(Z.R0.n0)
+  if (dimZ00[1] > dimZ00[2]) {
+    return(list(ok = FALSE, errors = "Some R diagonal elements are 0, and Z is such that model is over-determined."))
+  }
+  # must be invertible if square and not 0x0
+  if (dimZ00[1] == dimZ00[2] & dimZ00[1]!=0) { 
+    Ck <- det(Z.R0.n0)
+    if (Ck == 0) {
+      return(list(ok = FALSE, errors = "Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
+    }
+  }
+  # If got here, Z.R0.n0 is ok. Make matrix to 0 out determined x in Vtt
+  Z1 <- Z.R0
+  for(i in 1:m){
+    tmp <-  (rowSums(Z1 != 0)==1)
+    if(!any(tmp)) break
+    tmp <- (rowSums(Z1 != 0)==1) %*% (Z1!=0)
+    Z1 <- Z1 %*% makediag(!tmp)
+  }
+  detx <- ifelse(colSums(Z1 != 0 ) == 0 & colSums(Z != 0 ) != 0, 0, 1)
+  return(list(ok = TRUE, detx = detx))
 }
 
 ######################################################################################
