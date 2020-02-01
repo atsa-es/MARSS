@@ -279,9 +279,9 @@ autoplot.marssMLE <-
       cidf <- tapply(df$.resids, df$.rownames, acfci)
       ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
       
-      p1 <- ggplot2::ggplot(acf.dat, mapping = aes(x = lag, y = acf)) +
-        geom_hline(aes(yintercept = 0)) +
-        geom_segment(mapping = aes(xend = lag, yend = 0)) +
+      p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
+        ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0)) +
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
@@ -307,9 +307,9 @@ autoplot.marssMLE <-
       cidf <- tapply(df$.resids, df$.rownames, acfci)
       ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
       
-      p1 <- ggplot2::ggplot(acf.dat, mapping = aes(x = lag, y = acf)) +
-        geom_hline(aes(yintercept = 0)) +
-        geom_segment(mapping = aes(xend = lag, yend = 0)) +
+      p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
+        ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0)) +
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
