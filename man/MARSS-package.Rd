@@ -5,13 +5,13 @@
 Multivariate Autoregressive State-Space Model Estimation
 }
 \description{
-The MARSS package fits time-varying constrained and unconstrained multivariate autoregressive time-series models to multivariate time series data.  Get started quickly, go to the \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} (or type \code{RShowDoc("Quick_Start",package="MARSS")} at the command line). To open the MARSS User Guide with many vignettes and examples, go to \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} (or type \code{RShowDoc("UserGuide",package="MARSS")}).  
+The MARSS package fits time-varying constrained and unconstrained multivariate autoregressive time-series models to multivariate time series data.  Get started quickly, go to the \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} (or at the command line, you can type \code{RShowDoc("Quick_Start", package="MARSS")}). To open the MARSS User Guide with many vignettes and examples, go to \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} (or type \code{RShowDoc("UserGuide",package="MARSS")}).  
 
 The default MARSS model form is a MARXSS model: Multivariate Auto-Regressive(1) eXogenous inputs State-Space model. This model has the following form:
 \deqn{\mathbf{x}_{t+1} = \mathbf{B} \mathbf{x}_t + \mathbf{u} + \mathbf{C} \mathbf{c}_t + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t+1) = B x(t) + u + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}(t) + \mathbf{a} + \mathbf{D} \mathbf{d}_t + \mathbf{H} \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R})}{y(t) = Z x(t) + a + D d(t) + H v(t), where v(t) ~ MVN(0,R)}
 \deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~ MVN(x0, V0) }
-All parameters can be time-varying; "_t" is left off the parameters to remove clutter. Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x_1}{x(1)} or \eqn{x_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
+All parameters can be time-varying; the "t" subscript is left off the parameters to remove clutter. Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x_1}{x(1)} or \eqn{x_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
 
 The parameter matrices can have fixed values and linear constraints. This is an example of a 3x3 matrix with fixed values and linear constraints. In this example all the matrix elements can be written as a linear function of \eqn{a}, \eqn{b}, and \eqn{c}:
 \deqn{\left[\begin{array}{c c c} a+2b & 1 & a\\ 1+3a+b & 0 & b \\ 0 & -2 & c\end{array}\right]}{ [a+2b  1   a \\n 1+3a+b   0   b \\n 0   -2    c ]}
