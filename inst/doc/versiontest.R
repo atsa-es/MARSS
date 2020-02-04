@@ -23,7 +23,7 @@ if(Sys.info()['sysname']=="Windows"){
   setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2019")
   lib.new <- "C:/Program Files/R/R-3.6.2/library"
 }
-if(Sys.info()['sysname']=="iOS"){
+if(Sys.info()['sysname']=="Darwin"){
   setwd("~/Dropbox/MARSS unit tests 2019")
   lib.new <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
 }
@@ -31,21 +31,20 @@ lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
-# install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
-# install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
+# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
 
 #Load new and get the R files
+unittestfiles = dir(path=paste(lib.new,"/MARSS/doc",sep=""), pattern="*[.]R$", full.names = TRUE)
+unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/doc/versiontest.R",sep="")]
+
 unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.new)
 zscore.fun = zscore #3.9 does not have this
-
-#Get whatever code files are in the doc directory; these are tested
-unittestfiles = dir(path=paste(lib.new,"/MARSS/doc",sep=""), pattern="*[.]R$", full.names = TRUE)
-unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/doc/versiontest.R",sep="")]
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
@@ -134,6 +133,26 @@ for(unittestfile in unittestfiles){
         attr(testNew[[ii]], "equation") <- NULL
         attr(testOld[[ii]], "equation") <- NULL
     }
+    if(inherits(testNew[[ii]], "list")){
+      for(iii in 1:length(testNew[[ii]])){
+        if(inherits(testNew[[ii]][[iii]], "marssMLE")){
+          for(kk in c("model", "marss")){
+            attr(testNew[[ii]][[iii]][[kk]], "equation") <- NULL
+            attr(testOld[[ii]][[iii]][[kk]], "equation") <- NULL
+          }
+          if(inherits(testNew[[ii]][[iii]]$call$inits, "marssMLE")){
+            for(kk in c("model", "marss")){
+              attr(testNew[[ii]][[iii]]$call$inits[[kk]], "equation") <- NULL
+              attr(testOld[[ii]][[iii]]$call$inits[[kk]], "equation") <- NULL
+            }
+          }
+        }
+        if(inherits(testNew[[ii]][[iii]], "marssMODEL")){
+          attr(testNew[[ii]][[iii]], "equation") <- NULL
+          attr(testOld[[ii]][[iii]], "equation") <- NULL
+        }
+      }
+    }
     if(!identical(testNew[[ii]], testOld[[ii]])){
       good[ii] = FALSE
       if(inherits(testNew[[ii]], "marssMLE")){
@@ -158,6 +177,35 @@ for(unittestfile in unittestfiles){
           }else{
             #cat(names(testNew)[ii],iii,"identical\n")
           }
+        }
+      }
+      if(inherits(testNew[[ii]], "list")){
+        for(kk in 1:length(testNew[[ii]])){
+          if(inherits(testNew[[ii]][[kk]], "marssMLE")){
+            for(iii in names(testNew[[ii]][[kk]][["par"]])){
+              if(iii %in% c("G","H","L")) next
+              if(!identical(testNew[[ii]][[kk]][["par"]][iii], testOld[[ii]][[kk]][["par"]][iii])){
+                cat("Warning:", names(testNew)[[ii]][kk],"par",iii,"not identical\n")
+              }else{
+                #cat(names(testNew)[ii],"par",iii,"identical\n")
+              }
+            }
+            for(iii in names(testNew[[ii]][[kk]][["call"]])){
+              if(!identical(testNew[[ii]][[kk]][["call"]][iii], testOld[[ii]][[kk]][["call"]][iii])){
+                cat("Warning:", names(testNew)[[ii]][kk],"call",iii,"not identical\n")
+              }else{
+                #cat(names(testNew)[ii],"call",iii,"identical\n")
+              }
+            }
+            for(iii in names(testNew[[ii]][[kk]])){
+              if(!identical(testNew[[ii]][[kk]][iii], testOld[[ii]][[kk]][iii])){
+                cat("Warning:", names(testNew)[[ii]][kk],iii,"not identical\n")
+              }else{
+                #cat(names(testNew)[ii],iii,"identical\n")
+              }
+            }
+          }
+          
         }
       }
     }
