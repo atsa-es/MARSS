@@ -6,12 +6,13 @@
   Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{residuals(object, conditioning="t-1")}.
 }
 \usage{
-MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE)
+MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, silent=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{method}{ Algorithm to use. Currently only "SS". }
   \item{normalize}{ TRUE/FALSE }
+  \item{silent}{ If TRUE, don't print inversion warnings. }
 }
 \value{
 A list with the following components  

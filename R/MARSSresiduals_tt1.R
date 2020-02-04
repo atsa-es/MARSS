@@ -1,4 +1,4 @@
-MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE) {
+MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE) {
   # These are the residuals and their variance conditioned on the data up to time t-1
   MLEobj <- object
   method <- match.arg(method)
@@ -94,7 +94,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE) {
   rownames(et) <- rownames(st.et) <- rownames(var.et) <- colnames(var.et) <- Y.names
   
   # output any warnings
-  if(object[["control"]][["trace"]] >= 0) cat(msg)
+  if(object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tT reported warnings. See msg element of returned residuals object.")
 
   return(list(residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, msg = msg ))
 }
