@@ -6,21 +6,21 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known issues are also posted there.
 
-CHANGES IN MARSS 3.10.12 (current state of master 1-29-2020)
+CHANGES IN MARSS 3.10.12 (CRAN 2-3-2020)
 ------------------------------------
 
 Version 3.10.12 update mainly has to do with the `tidy()`, `fitted()` and `augment()` enhancements which clarify ytT, xtT and residual intervals for MARSS models. This was a major update though probably users won't notice much as it only affects residuals output. A few minor bugs were fixed which caused errors to be thrown in some rare time-varying cases. One bug that affected bootstrap confidence intervals was fixed. The documentation got a major clean-up. The Residuals report has been heavily edited to improve precision and clarity (with added verbosity). The help files and automated manual from the help files were cleaned-up  and  some of the internal functions moved out of the manual.
 
 BUGS
 
-* `MARSSsimulate()` missing values were placed in the wrong positions in simulated data. This would affect all simulated data with missing values and thus any function that used `MARSSboot()`, for example bootstrap confidence intervals for a data set with missing values.
+* `MARSSsimulate()` missing values were placed in the wrong positions in simulated data. This would affect all simulated data with missing values and thus any function that used `MARSSboot()`, for example bootstrap confidence intervals for a data set with missing values. Default is to use Hessian so the user would not normally have encountered this bug and it had little effect on the CIs.
 * `fitted.marssMLE()` Fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
 * `degen.test()` in MARSSkem() was not catching when R or Q was time-varying (and thus degeneracy should not be allowed). Changed to test the 3D of model.dims == 1 or not.
 * `residuals.marssMLE(..., Harvey=TRUE)` would fail if Q, B, or G was time-varying because parmat() called with t+1. Changed to only call parmat() when t<TT. Q, B, and G do not appear in the recursion when t=TT so parmat() with t=t+1 is never needed.
 * `MARSS_dfa()` used form="dfa" in MARSS.call list. Just info. Never used.
 * Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
 * `toLatex.marssMODEL()` Fixed some old bugs in toLatex_marssMODEL.R. Added S3 class declaration in NAMESPACE for toLatex. fixed equation attribute in MARSS_marxss. G{t} was used instead of G_{t}. Only affected toLatex_marssMODEL(). Had extra line in build.mat.tex() that removed last line of matrices. This function was not exported so users would never have run into these bugs.
-* `MARSSkfss()` To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data. Note, MARSkfss() is the classic Kalman filter/smoother. The MARSS algorithm does not use this normally. Normally MARSSkfas() which build off the Koopman et al algorithm which avoid unneeded matrix inversion is used. MARSSkfas() uses the Kalman filter/smoother in the KFAS package is used. 
+* `MARSSkfss()` To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data. Note, MARSkfss() is the classic Kalman filter/smoother. The MARSS algorithm does not use this normally. Normally MARSSkfas(), build off the Koopman et al algorithm which avoids unneeded matrix inverses, is used. MARSSkfas() uses the Kalman filter/smoother in the KFAS package. 
 
 ENHANCEMENTS
 
