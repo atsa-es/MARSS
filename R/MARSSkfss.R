@@ -392,12 +392,20 @@ MARSSkfss <- function(MLEobj) {
   if (init.state == "x10") Vtt1T[, , 1] <- NA
 
   ###########################################################
-  # Calculate log likelihood, see eqn 6.62
-  # Innovations form of the likelihood
   rtn.list <- list(
     xtT = xtT, VtT = VtT, Vtt1T = Vtt1T, x0T = x0T, V0T = V0T, Vtt = Vtt,
     Vtt1 = Vtt1, J = J, J0 = J0, Kt = Kt, xtt1 = xtt1, xtt = xtt, Innov = vt, Sigma = Ft
   )
+
+  # apply names
+  MODELobj <- MLEobj[["marss"]]
+  X.names <- attr(MODELobj, "X.names")
+  Y.names <- attr(MODELobj, "Y.names")
+  for(el in c("xtT", "xtt1", "xtt", "x0T")) rownames(rtn.list[[el]]) <- X.names
+  rownames(rtn.list[["Innov"]]) <- Y.names
+
+    # Calculate log likelihood, see eqn 6.62
+  # Innovations form of the likelihood
   loglike <- -sum(YM) / 2 * log(2 * base::pi) # sum(YM) is the number of data points
   for (t in 1:TT) {
     if (n == 1) diag.Ft <- Ft[, , t] else diag.Ft <- unname(Ft[, , t])[1 + 0:(n - 1) * (n + 1)]

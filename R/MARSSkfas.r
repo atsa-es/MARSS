@@ -256,4 +256,9 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     ok = TRUE,
     errors = NULL
   )
+  # apply names
+  MODELobj <- MLEobj[["marss"]]
+  X.names <- attr(MODELobj, "X.names")
+  for(el in c("xtT", "xtt1", "x0T", "x00T", "x10T")) rownames(rtn.list[[el]]) <- X.names
+  return(rtn.list)
 }
