@@ -50,6 +50,7 @@ is.validvarcov(x, method="kem")
 is.wholenumber(x, tol = .Machine$double.eps^0.5)
 is.zero(x)
 makediag(x, nrow=NA)
+marssMODEL.to.list(MODELobj)
 matrix.power(x, n)
 mystrsplit(x)
 parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
@@ -81,6 +82,7 @@ vec(x)
   \item{ strict }{ Specifies whether the design matrix must be only 0s and 1s. }
   \item{ by.row }{ For is.fixed, reports whether is.fixed by row rather than for the whole matrix. }
   \item{ MLEobj}{ A \code{\link{marssMLE}} object. }
+  \item{ MODELobj}{ A \code{\link{marssMODEL}} object. }
   \item{ elem }{ The parameter matrix of a marss model to return. }
   \item{ model.loc }{ Whether to use the marss or model marssMODEL in the \code{\link{marssMLE}} object. }
 }
@@ -91,6 +93,7 @@ vec(x)
   \item \code{unvec(c,dim)} takes the vector c and creates a matrix with the specified dimensions.
   \item \code{Imat(nrow)} returns the identity matrix of dimension nrow.
   \item \code{ fixed.free.to.formula } takes a fixed and free pair and constructs a list matrix (or array if time-varying) with formulas in each matrix element.
+  \item \code{ marssMODEL.to.list } uses \code{ fixed.free.to.formula } on all the elements of a \code{\link{marssMODEL}} to create a list that can be passed to \code{\link{MARSS}()} as the \code{model} argument.
   \item \code{ convert.model.mat } takes a list matrix with formulas in each element and converts to a fixed/free pair.
   \item \code{ sub3D } returns a 2D matrix after subsetting a 3D matrix on the third (time) dimension. Ensures that R always returns a matrix.
   \item \code{ mystrsplit } is a customized string splitter used by \code{convert.model.mat}.
