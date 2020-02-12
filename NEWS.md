@@ -6,6 +6,14 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known issues are also posted there.
 
+CHANGES IN MARSS 3.10.13
+------------------------------------
+
+ENHANCEMENTS
+
+* `MARSSkfss()` and `MARSSkfas()` Add rownames to the x elements of the list.
+* `MARSSkf()` Added `newdata` to allow user to pass in a new dataset to fit with the fitted model.
+
 CHANGES IN MARSS 3.10.12 (CRAN 2-3-2020)
 ------------------------------------
 
