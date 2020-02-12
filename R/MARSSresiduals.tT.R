@@ -244,7 +244,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   rownames(var.obs.v) <- colnames(var.obs.v) <- Y.names
   
   # output any warnings
-  if(object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tT reported warnings. See msg element of returned residuals object.")
+  if(object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tT reported warnings. See msg element of returned residuals object.\n")
 
   return(list(model.residuals = et[1:n, , drop = FALSE], state.residuals = et[(n + 1):(n + m), , drop = FALSE], residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, E.obs.residuals = E.obs.v, var.obs.residuals = var.obs.v, msg = msg))
 }
