@@ -34,7 +34,7 @@ MARSS(y,
 The default settings for the optional arguments are set in \code{MARSSsettings.R} and are given below in the details section. For form specific defaults see the form help file (e.g. \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}).
   \item{y}{ A n x T matrix of n time series over T time steps. Only y is required for the function.}
   \item{inits}{ A list with the same form as the list outputted by \code{coef(fit)} that specifies initial values for the parameters.  See also \code{\link{MARSS.marxss}}. }
-  \item{model}{ Model specification using parameter model text shortcuts or matrices. See Details and \code{\link{MARSS.marxss}} for the default form. Or better yet open the Quick Start Guide \code{RShowDoc("Quick_Start",package="MARSS")}. }
+  \item{model}{ Model specification using a list of parameter matrix text shortcuts or matrices. See Details and \code{\link{MARSS.marxss}} for the default form. Or better yet open the Quick Start Guide \code{RShowDoc("Quick_Start",package="MARSS")}. }
   \item{miss.value}{ Deprecated.  Denote missing values by NAs in your data. }
   \item{method}{ Estimation method. MARSS provides an EM algorithm (\code{method="kem"}) (see \code{\link{MARSSkem}}) and the BFGS algorithm (\code{method="BFGS"}) (see \code{\link{MARSSoptim}}). }
   \item{form}{ The equation form used in the \code{MARSS()} call.  The default is "marxss". See \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}. }
