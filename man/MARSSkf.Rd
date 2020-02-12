@@ -7,7 +7,7 @@
   Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. \code{MARSSkf()} is a small helper function to select which Kalman filter/smoother function to use based on the value in \code{MLEobj$fun.kf}.  The choices are \code{MARSSkfas} which uses the filtering and smoothing algorithms in the \link[KFAS]{KFAS} package based on algorithms in Koopman and Durbin (2001-2003), and \code{MARSSkfss()} which uses the algorithms in Shumway and Stoffer. The default function is \code{MARSSkfas()} which is faster and generally more stable (fewer matrix inversions), but there are some cases where \code{MARSSkfss()} will be more stable and \code{MARSSkfss()} returns some values that \code{MARSSkfas()} does not.
 }
 \usage{
-MARSSkf( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE )
+MARSSkf( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, newdata=NULL )
 MARSSkfss( MLEobj )
 MARSSkfas( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE )
 }
@@ -16,6 +16,7 @@ MARSSkfas( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FAL
   \item{ only.logLik }{ Used by \code{MARSSkfas}.  If set, only the log-likelihood is returned using the \link[KFAS]{KFAS} package function \code{\link[KFAS]{logLik.SSModel}}.  This is much faster if only the log-likelihood is needed. }
   \item{ return.lag.one }{ Used by \code{MARSSkfas}.  If set to FALSE, the smoothed lag-one covariance  values are not returned (Vtt1T is set to NULL).  This speeds up \code{MARSSkfas} because to return the smoothed lag-one covariance a stacked MARSS model is used with twice the number of state vectors---thus the state matrices are larger and take more time to work with. }
   \item{ return.kfas.model }{ Used by \code{MARSSkfas}.  If set to TRUE, it returns the MARSS model in \link[KFAS]{KFAS} model form (class \code{\link[KFAS]{SSModel}}).  This is useful if you want to use other KFAS functions or write your own functions to work with \code{\link{optim}} to do optimization.  This can speed things up since there is a bit of code overhead in \code{\link{MARSSoptim}} associated with the \code{\link{marssMODEL}} model specification needed for the constrained EM algorithm (but not strictly needed for \code{\link{optim}}; useful but not required.). }
+  \item{ newdata }{ A new matrix of data to use in place of the data used to fit the model (in the model$data and marss$data elements of a \code{\link{marssMLE}} object). If the initial \eqn{x} was estimated (in \code{x0}) then this estimate will be used for \code{newdata} and this may not be appropriate. }
 }
 \details{
 For state-space models, the Kalman filter and smoother provide optimal (minimum mean square error) estimates of the hidden states. The Kalman filter is a forward recursive algorithm which computes estimates of the states \eqn{x(t)} conditioned on the data up to time t (\code{xtt}). The Kalman smoother is a backward recursive algorithm which starts at time T and works backwards to t = 1 to provide estimates of the states conditioned on all data (\code{xtT}).    The data may contain missing values (NAs).  All parameters may be time varying.
