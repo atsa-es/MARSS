@@ -631,7 +631,11 @@ fixed.free.to.formula <- function(fixed, free, dim) { # dim is the 1st and 2nd d
   Tmax <- max(Tmax, dim(fixed)[3], dim(free)[3])
 
   # turns a fixed/free pair to a list (possibly time-varying) matrix describing that MARSS parameter structure
-  model <- array(list(0), dim = c(dim(fixed)[1], dim(fixed)[2], Tmax))
+  if(dim(free)[2] != 0){
+    model <- array(list(0), dim = c(dim(fixed)[1], dim(fixed)[2], Tmax))
+  }else{
+    model <- array(0, dim = c(dim(fixed)[1], dim(fixed)[2], Tmax))
+  }
   for (t in 1:Tmax) {
     free.t <- min(t, dim(free)[3])
     fixed.t <- min(t, dim(fixed)[3])
@@ -663,6 +667,22 @@ fixed.free.to.formula <- function(fixed, free, dim) { # dim is the 1st and 2nd d
     model <- array(model, dim = c(dim, Tmax))
   }
   return(model)
+}
+
+marssMODEL.to.list <- function(MODELobj) {
+  fixed <- MODELobj$fixed
+  free <- MODELobj$free
+  model.dims <- attr(MODELobj, "model.dims")
+  model.elem <- attr(MODELobj, "par.names")
+  # set up the constr type list with an element for each par name and init val of "none"
+  model.list <- list()
+  
+  for (elem in model.elem) {
+    model.list[[elem]] <- fixed.free.to.formula(fixed[[elem]], free[[elem]], model.dims[[elem]][1:2])
+  }
+  dim(model.list[["c"]]) <- model.dims[["c"]][c(1,3)]
+  dim(model.list[["d"]]) <- model.dims[["d"]][c(1,3)]
+  return(model.list)
 }
 
 # From Alberto Monteiro posted in the R forum
