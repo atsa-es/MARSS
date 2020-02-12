@@ -30,7 +30,10 @@ MARSS <- function(y,
   if (is.vector(y)) y <- matrix(y, nrow = 1)
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
-
+  
+  if(inherits(model, "marssMLE")) model <- coef(model, type="matrix")
+  if(inherits(model, "marssMODEL")) model <- marssMODEL.to.list(model)
+  
   MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, ...)
 
   # First make sure specified equation form has a corresponding function to do the conversion to marssMODEL (form=marss) object
