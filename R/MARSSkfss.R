@@ -8,16 +8,16 @@ MARSSkfss <- function(MLEobj) {
   condition.limit <- 1E10
   condition.limit.Ft <- 1E5 # because the Ft is used to compute LL and LL drop limit is about 2E-8
 
-  MODELobj <- MLEobj$marss
+  MODELobj <- MLEobj[["marss"]]
   debugkf <- MLEobj$control$trace
-  n <- dim(MODELobj$data)[1]
-  TT <- dim(MODELobj$data)[2]
-  m <- dim(MODELobj$fixed$x0)[1]
+  n <- dim(MODELobj[["data"]])[1]
+  TT <- dim(MODELobj[["data"]])[2]
+  m <- dim(MODELobj[["fixed"]][["x0"]])[1]
 
   # create the YM matrix
-  YM <- matrix(as.numeric(!is.na(MODELobj$data)), n, TT)
+  YM <- matrix(as.numeric(!is.na(MODELobj[["data"]])), n, TT)
   # Make sure the missing vals in y are zeroed out if there are any
-  y <- MODELobj$data
+  y <- MODELobj[["data"]]
   y[YM == 0] <- 0
 
   if (MODELobj$tinitx == 1) {

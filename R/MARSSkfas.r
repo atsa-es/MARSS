@@ -7,9 +7,9 @@
 #     smoothed lag-1 covariances needed by the EM algorithm
 #######################################################################################################
 MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return.kfas.model = FALSE) {
-  MODELobj <- MLEobj$marss
-  control <- MLEobj$control
-  diffuse <- MODELobj$diffuse
+  MODELobj <- MLEobj[["marss"]]
+  control <- MLEobj[["control"]]
+  diffuse <- MODELobj[["diffuse"]]
   model.dims <- attr(MODELobj, "model.dims")
 
   n <- model.dims$data[1]
@@ -257,7 +257,6 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     errors = NULL
   )
   # apply names
-  MODELobj <- MLEobj[["marss"]]
   X.names <- attr(MODELobj, "X.names")
   for(el in c("xtT", "xtt1", "x0T", "x00T", "x10T")) rownames(rtn.list[[el]]) <- X.names
   return(rtn.list)
