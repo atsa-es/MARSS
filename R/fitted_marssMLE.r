@@ -31,7 +31,7 @@ fitted.marssMLE <- function(object, ...,
   m <- model.dims[["x"]][1]
 
   if (type == "y") {
-    if (conditioning == "T") hatxt <- MLEobj[["states"]]
+    if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
     if (conditioning == "t") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if(interval!="none"){
@@ -80,7 +80,7 @@ fitted.marssMLE <- function(object, ...,
   }
 
   if (type == "x") {
-    if (conditioning == "T") hatxt <- MLEobj[["states"]]
+    if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
     if (interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
@@ -92,7 +92,7 @@ fitted.marssMLE <- function(object, ...,
     Q.time.varying <- model.dims[["Q"]][3] != 1
     
     val <- matrix(NA, m, TT)
-    rownames(val) <- attr(MLEobj$marss, "X.names")
+    rownames(val) <- attr(MLEobj[["marss"]], "X.names")
     if(interval!="none") se <- val
     
     x0 <- coef(MLEobj, type = "matrix")[["x0"]]
@@ -105,7 +105,7 @@ fitted.marssMLE <- function(object, ...,
       if (interval=="confidence") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt))
       if (interval=="prediction") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt) + Qt)
     }
-    if (MLEobj$model$tinitx == 1){
+    if (MLEobj[["model"]][["tinitx"]] == 1){
       val[, 1] <- x0
       if(interval != "none") se[, 1] <- takediag(V0)
     }
