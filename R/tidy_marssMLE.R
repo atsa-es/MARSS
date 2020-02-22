@@ -7,7 +7,7 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
   ## Argument checking
   type <- match.arg(type)
   conditioning <- "T" # MARSShatyt missing needed var.ytt1 and var.Eytt1 for other cases
-  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
+  if (conf.int && (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0)) stop("tidy.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
   if (!(conf.int %in% c(TRUE, FALSE))) stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
   if (type == "xtT") type <- "x"
   if (type == "ytT") type <- "y"
