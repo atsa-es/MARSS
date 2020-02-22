@@ -4,15 +4,20 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at the GitHub repo.  Notes on known issues are also posted there.
+New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
 CHANGES IN MARSS 3.10.13
 ------------------------------------
+
+Version 3.10.13 mainly has to do with the `predict()` and `forecast()` functions along with plotting and printing methods.
 
 ENHANCEMENTS
 
 * `MARSSkfss()` and `MARSSkfas()` Add rownames to the x elements of the list.
 * `MARSSkf()` Added `newdata` to allow user to pass in a new dataset to fit with the fitted model.
+* `predict.marssMLE()` Shows the prediction or confidence intervals for data or states. Forecasts can be done by passing in `h`. `newdata` can be passed in also and fitted model will be used to fit these data and show the intervals. Output is a tibble. Returns a list of class `marssPredict`.
+* `forecast.marssMLE()` This does the foreward forecasting past the end of the data. Intended to be called by `predict.marssMLE`. I did not write a `marssMLE` method for the `forecast` generic in the **forecast** package since that would require that the forecast package be required for the **MARSS** package.
+* `plot.marssPredict()` plot method for the new marssPredict class. This is designed to look like the `plot.forecast()` function in the **forecast** package.
 
 CHANGES IN MARSS 3.10.12 (CRAN 2-3-2020)
 ------------------------------------
