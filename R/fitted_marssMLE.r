@@ -15,7 +15,7 @@ fitted.marssMLE <- function(object, ...,
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
-  if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0)
+  if (interval != "none" && (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0))
     stop("fitted.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   alpha <- 1-conf.level
   extras <- list()
