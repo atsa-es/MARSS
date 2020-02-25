@@ -1,4 +1,4 @@
-plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
+plot.marssPredict <- function(x, include, pi.int = TRUE, main=NULL,
                               showgap = TRUE, shaded = TRUE, 
                               shadebars = (x$h < 5 & x$h != 0), shadecols = NULL, col = 1, 
           fcol = 4, pi.col = 1, pi.lty = 2, ylim = NULL,  
@@ -21,15 +21,15 @@ plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
     stop(paste0("plot.marssPredict: ", paste(names(list(...))[bad], collapse=","), " is not a graphical parameter.\n"), call.=FALSE)
   }
   if ( is.null(x$level) || length(x$level) == 0 ) {
-    PI <- FALSE
+    pi.int <- FALSE
   }
   else if (!is.finite(max(xf[,-1*c(1:4)]))) {
-    PI <- FALSE
+    pi.int <- FALSE
   }
   if (!shaded) {
     shadebars <- FALSE
   }
-  if (PI && is.null(shadecols)) {
+  if (pi.int && is.null(shadecols)) {
     if (min(x$level) < 50) {
       shadecols <- rev(colorspace::sequential_hcl(100)[x$level])
     }
@@ -48,8 +48,8 @@ plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
   plot.ncol <- ceiling(nX / plot.nrow)
   par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
   for (plt in unique(xf$.rownames)) {
-      if(x$type=="xtT") main <- paste(main, "State ", plt, sep = "")
-      if(x$type=="ytT") main <- paste(main, "Data ", plt, sep = "")
+      if(x$type=="xtT") maintit <- paste(main, "State ", plt, sep = "")
+      if(x$type=="ytT") maintit <- paste(main, "Data ", plt, sep = "")
     tmp <- subset(xf, xf$.rownames == plt)
     if(h > 0) pt <- c((nx - include + 1):nx, nx + 1:h)
     if(h == 0) pt <- (nx - include + 1):nx
@@ -61,7 +61,7 @@ plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
       xxx <- x$t[pt]
 
     if(!showgap & h!=0) xxx <- xxx[c((nx - include + 1):nx, nx:(nx+h-1))]
-      plot(xxx, c(tmp$estimate[(nx - include + 1):nx], rep(NA, h)), xlab = "", ylab = "Estimate", ylim = ylim, main=main, col=col, type=type, ...)
+      plot(xxx, c(tmp$estimate[(nx - include + 1):nx], rep(NA, h)), xlab = "", ylab = "Estimate", ylim = ylim, main=maintit, col=col, type=type, ...)
       if(x$type=="ytT") points(xxx[(length(xxx) - include -h + 1):(length(xxx)-h)], tmp$y[(nx - include + 1):nx], col = fcol, pch = 19, cex=0.75)
       if (h != 0){ # plot forecast
         pvals <- 1:h
@@ -72,7 +72,7 @@ plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
         pvals <- (nx - include + 1):nx #subset to plot
         xxx <- x$t
       }
-      if (PI){
+      if (pi.int){
         loc <- which(colnames(tmp)==".sd" | colnames(tmp)=="se")
         for (i in 1:nint) {
           if (shadebars) {
@@ -100,7 +100,7 @@ plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
             lines(xxx[(nx - include + 1):nx], tmp[pt[(nx - include + 1):nx], loc+1+(idx[i]-1)*2+1], col = pi.col, lty = pi.lty)
           }
         }
-      } # end PI
+      } # end pi.int
       if(h > 0){
       if (!shadebars) {
         lines(xxx, tmp$estimate[pt], lty = flty, lwd = flwd, col = fcol)

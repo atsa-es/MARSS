@@ -6,7 +6,7 @@ predict.marssMLE <- function(object, h=0,
                              newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
                              interval = c("prediction", "confidence", "none"),
                              fun.kf = c("MARSSkfas", "MARSSkfss"),
-                             x0 = list(x0=NULL, tinitx=NULL),
+                             use.initial.values = FALSE,
                              ...) {
   type <- match.arg(type)
   interval <- match.arg(interval)
@@ -28,18 +28,15 @@ predict.marssMLE <- function(object, h=0,
   if(length(conf.level) == 0) interval <- "none"
   if (!missing(h) && (!is.numeric(h) ||  length(h) != 1 || h < 0 || (h %% 1) != 0))
     stop("predict.marssMLE: h must be an integer > 0.", call. = FALSE)
-  if (!is.list(x0))
-    stop("predict.marssMLE: x0 must be list with elements x0 and/or tinitx.", call. = FALSE)
-  if (!is.null(x0$tinitx) && is.null(x0$x0))
-    stop("predict.marssMLE: if x0$tinitx is specified, so must x0$x0.", call. = FALSE)
-  if(missing(x0) || all(unlist(lapply(x0, is.null)))) x0.estimate <- FALSE else x0.estimate <- TRUE
+  if(use.initial.values) x0 <- list(x0 = coef(object, type="matrix")[["x0"]], tinitx=object[["model"]][["tinitx"]])
+  if(!use.initial.values) x0 <- list(x0 = object[["call"]][["model"]][["x0"]], tinitx=object[["call"]][["model"]][["tinitx"]])
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
   }
   
-  if(!missing(h)){
-    if(!missing(x0)) message("predict.marssMLE: x0 was passed in. Will be ignored since h also passed in.")
+  if(!missing(h) && h > 0){
+    if(!missing(use.initial.values) && !use.initial.values) message("predict.marssMLE: use.initial.values = FALSE. This is ignored since h > 0 (forecast).")
     
     outlist <- forecast.marssMLE(object, h=h, conf.level = conf.level,
                                  interval = interval,
@@ -64,15 +61,20 @@ predict.marssMLE <- function(object, h=0,
       stop("predict.marssMLE: t in newdata must be a positive ordered sequence of integers, one time step apart (like 1,2,3...).", call.=FALSE)
   }
   nonewdata <- all(unlist(lapply(newdata[c("y", "c", "d")], is.null)))
+  isnullnewdata <- all(unlist(lapply(newdata[c("t", "y", "c", "d")], is.null)))
   if(nonewdata && !is.null(newdata[["t"]])){
-    if(length(newdata[["t"]]) > TT || newdata[["t"]][length(newdata[["t"]])] > TT)
+    if(length(newdata[["t"]]) > TT || newdata[["t"]][length(newdata[["t"]])] > TT){
       stop("predict.marssMLE: if no y, c or d in newdata, t must be within the original time steps.", call.=FALSE)
-  }
-  if(nonewdata && is.null(newdata[["t"]])) newdata[["t"]] <- 1:TT
+    }else{
+      newdata[["y"]] <- object[["model"]][["data"]][, newdata[["t"]], drop=FALSE]
+      message(paste0("predict.marssMLE(): prediction is conditioned on the model data t = ", newdata[["t"]][1], " to ", max(newdata[["t"]]), "."))
+    }
+      }
+  if(isnullnewdata) newdata[["t"]] <- 1:TT
   
   # h is NULL if here; if newdata is missing and so is h, then use model data
-  if(nonewdata){
-    if(!missing(x0)) message("predict.marssMLE: x0 was passed in. Will be ignored since newdata was not passed in.")
+  if(isnullnewdata){ # Use original data
+    if(!missing(use.initial.values) && !use.initial.values) message("predict.marssMLE: use.initial.values = FALSE. Will be ignored since newdata was not passed in.")
     newMLEobj <- object
   } else {
     # newdata was passed in. Need to make newMLEobj
@@ -137,10 +139,10 @@ predict.marssMLE <- function(object, h=0,
     if(!is.null(newdata[["t"]]) && length(newdata[["t"]])!=ncol.newdata)
       stop("predict.marssMLE(): t in newdata must be the same length as the number of columns in y, c and d.", call.=FALSE)
 
-    if(!x0.estimate)
-      message("predict.marssMLE(): x0 from model is being used for prediction. Data assumed to start at t=1.")
-    if(x0.estimate && all(is.na(newdata[["y"]])))
-      stop("predict.marssMLE(): to reestimate x0, data (y in newdata) are required.", call.=FALSE)
+    if(use.initial.values)
+      message("predict.marssMLE(): x0 and tinitx from model are being used for prediction.")
+    if(!use.initial.values && all(is.na(newdata[["y"]])))
+      stop("predict.marssMLE(): to reestimate x0 (use.initial.values = FALSE), data (y in newdata) are required.", call.=FALSE)
     
     # check if parameters are time-varying. If so, t used to specify which parameters to use
     for(elem in names(new.MODELlist)){
@@ -168,18 +170,12 @@ predict.marssMLE <- function(object, h=0,
     #Passed all checks. Can set t now if still null
     if(is.null(newdata[["t"]])) newdata[["t"]] <- 1:ncol.newdata
     
-    
-    if(x0.estimate){
+    # The x0 values based on use.initial.values is set at top
       new.MODELlist[["tinitx"]] <- x0[["tinitx"]]
       new.MODELlist[["x0"]] <- x0[["x0"]]
       newMLEobj <- MARSS(newdata[["y"]], model=new.MODELlist, silent=TRUE, method=object[["method"]])
-    }
-    
-    if(!x0.estimate){
-      new.MODELlist[["tinitx"]] <- object[["model"]][["tinitx"]]
-      newMLEobj <- MARSS(newdata[["y"]], model=new.MODELlist, silent=TRUE, method=object[["method"]])
-    }
-  } # end setting up newMLEobj
+
+        } # end setting up newMLEobj
   
   if(type=="ytT"){
     if(length(conf.level) == 0) interval <- "none"
@@ -222,10 +218,6 @@ predict.marssMLE <- function(object, h=0,
     }
   }
   
-  if(nonewdata){
-    ret <- subset(ret, t %in% newdata[["t"]])
-  }
-  
   # set t in ret with t in newdata
   ret$t <- rep(newdata[["t"]], nx)
   
@@ -239,8 +231,8 @@ predict.marssMLE <- function(object, h=0,
     type = type,
     t = newdata[["t"]],
     h = h,
-    x0 = coef(newMLEobj, type="matrix")[["x0"]],
-    tinitx = newMLEobj[["model"]][["tinitx"]]
+    x0 = x0[["x0"]],
+    tinitx = x0[["tinitx"]]
   )
   
   class(outlist) <- "marssPredict"

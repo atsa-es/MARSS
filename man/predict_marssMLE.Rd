@@ -85,6 +85,15 @@ fit <- MARSS(dat, model=list(R="diagonal and equal", Q=Q))
 fr <- predict(fit, type="ytT", h=2)
 plot(fr)
 
+# use model data with initial values (at t=0) for initial values at t=9
+fr <- predict(fit,  newdata=list(t=10:20), use.initial.values = TRUE))
+plot(fr)
+
+# pass in new data and give it new t; initial conditions will be estimated
+fr <- predict(fit,  newdata=list(t=23:33, y=matrix(10,3,11)))
+plot(fr, ylim=c(8,12))
+
+
 # Covariate example
 fulldat = lakeWAplanktonTrans
 years = fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
@@ -108,8 +117,9 @@ plot(predict(fit, newdata=list(t=1:10, y="model", c=matrix(5,2,10))))
 # Use all model data
 plot(predict(fit,  newdata=list(t=1:22, y="model", c=matrix(5,2,22))))
 
-# Use no data
-plot(predict(fit,  newdata=list(y="none", c=matrix(5,2,22))))
+# Use no data; cannot estimate initial conditions without data
+fr <- predict(fit,  newdata=list(y="none", c=matrix(5,2,22)), use.initial.values=TRUE)
+plot(fr)
 
 # forecast with covariates
 plot(predict(fit,  newdata=list(c=matrix(5,2,10)), h=10))
