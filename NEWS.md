@@ -6,7 +6,7 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
-CHANGES IN MARSS 3.10.13
+CHANGES IN MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
 
 Version 3.10.13 mainly has to do with the `predict()` and `forecast()` functions along with plotting and printing methods.
