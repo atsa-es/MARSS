@@ -1,4 +1,6 @@
-plot.marssPredict <- function(x, include, PI = TRUE, showgap = TRUE, shaded = TRUE, shadebars = (x$h < 5 & x$h != 0), shadecols = NULL, col = 1, 
+plot.marssPredict <- function(x, include, PI = TRUE, main=NULL,
+                              showgap = TRUE, shaded = TRUE, 
+                              shadebars = (x$h < 5 & x$h != 0), shadecols = NULL, col = 1, 
           fcol = 4, pi.col = 1, pi.lty = 2, ylim = NULL,  
           xlab = "", ylab = "", type = "l", flty = 1, flwd = 2, ...) 
 {
@@ -13,7 +15,11 @@ plot.marssPredict <- function(x, include, PI = TRUE, showgap = TRUE, shaded = TR
     include <- nx
   }
   if( !is.numeric(include) || include < 1 || (include %% 1) != 0 )
-    stop("plot.marssForecast: include must be positive integer greater than 0.\n", call.=FALSE)
+    stop("plot.marssPredict: include must be positive integer greater than 0.\n", call.=FALSE)
+  if(!missing(...) && !all(names(list(...)) %in% names(par()))){
+    bad <- !(names(list(...)) %in% names(par()))
+    stop(paste0("plot.marssPredict: ", paste(names(list(...))[bad], collapse=","), " is not a graphical parameter.\n"), call.=FALSE)
+  }
   if ( is.null(x$level) || length(x$level) == 0 ) {
     PI <- FALSE
   }
@@ -42,8 +48,8 @@ plot.marssPredict <- function(x, include, PI = TRUE, showgap = TRUE, shaded = TR
   plot.ncol <- ceiling(nX / plot.nrow)
   par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
   for (plt in unique(xf$.rownames)) {
-      if(x$type=="xtT") main <- paste("State ", plt, sep = "")
-      if(x$type=="ytT") main <- paste("Data ", plt, sep = "")
+      if(x$type=="xtT") main <- paste(main, "State ", plt, sep = "")
+      if(x$type=="ytT") main <- paste(main, "Data ", plt, sep = "")
     tmp <- subset(xf, xf$.rownames == plt)
     if(h > 0) pt <- c((nx - include + 1):nx, nx + 1:h)
     if(h == 0) pt <- (nx - include + 1):nx
@@ -61,9 +67,10 @@ plot.marssPredict <- function(x, include, PI = TRUE, showgap = TRUE, shaded = TR
         pvals <- 1:h
         pt <- xxx <- x$t[nx] + pvals # pt is the locs of PIs to plot; xxx is x-axis
       if(!showgap) xxx <- xxx-1
-      } else {
-        pvals <- (1:length(x$t))[(nx - include + 1):nx]
-        pt <- xxx <- x$t
+      } else { # h=0; nx is length x$t;
+        pt <- 1:nx
+        pvals <- (nx - include + 1):nx #subset to plot
+        xxx <- x$t
       }
       if (PI){
         loc <- which(colnames(tmp)==".sd" | colnames(tmp)=="se")
@@ -79,9 +86,9 @@ plot.marssPredict <- function(x, include, PI = TRUE, showgap = TRUE, shaded = TR
           else if (shaded) {
             if( h > 0 ) polygon(c(xxx, rev(xxx)), c(tmp[pt, loc+(idx[i]-1)*2+1], rev(tmp[pt, loc+1+(idx[i]-1)*2+1])), col = shadecols[i], border = FALSE)
             if( h == 0 ) 
-              polygon(c(xxx[(nx - include + 1):nx], rev(xxx[(nx - include + 1):nx])), 
-                      c(tmp[pt[(nx - include + 1):nx], loc+(idx[i]-1)*2+1], 
-                        rev(tmp[pt[(nx - include + 1):nx], loc+1+(idx[i]-1)*2+1])), 
+              polygon(c(xxx[pvals], rev(xxx[pvals])), 
+                      c(tmp[pvals, loc+(idx[i]-1)*2+1], 
+                        rev(tmp[pvals, loc+1+(idx[i]-1)*2+1])), 
                       col = shadecols[i], border = FALSE)
           }
           else if (h == 1) {

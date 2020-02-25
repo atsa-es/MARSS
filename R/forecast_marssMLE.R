@@ -78,7 +78,7 @@ forecast.marssMLE <- function(object, h=1,
       tmp[,,1:TT] <- new.MODELlist[[elem]]
       tmp[,,(TT+1):(TT+h)] <- new.MODELlist[[elem]][,,TT, drop=FALSE]
       new.MODELlist[[elem]] <- tmp
-      message(paste0(elem, " is time-varying. The value at ", TT, " is used for the forecast.\n"))
+      message(paste0(elem, " is time-varying. The value at t =", TT, " is used for the forecast.\n"))
     }
   }
   
@@ -122,7 +122,7 @@ forecast.marssMLE <- function(object, h=1,
   if(type=="xtT"){
     conf.int <- TRUE
     if(length(conf.level) == 0 || interval == "none") conf.int <- FALSE
-    ret <- tidy.marssMLE(object, type=type, conf.int=conf.int, conf.level=conf.level[1])
+    ret <- tidy.marssMLE(newMLEobj, type=type, conf.int=conf.int, conf.level=conf.level[1])
     colnames(ret)[which(colnames(ret)=="std.error")] <- ".sd"
     colnames(ret)[which(colnames(ret)=="conf.low")] <- paste("Lo", 100*conf.level[1])
     colnames(ret)[which(colnames(ret)=="conf.high")] <- paste("Hi", 100*conf.level[1])
