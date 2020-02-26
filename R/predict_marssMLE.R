@@ -138,7 +138,10 @@ predict.marssMLE <- function(object, h=0,
     # check that t length matches ncols
     if(!is.null(newdata[["t"]]) && length(newdata[["t"]])!=ncol.newdata)
       stop("predict.marssMLE(): t in newdata must be the same length as the number of columns in y, c and d.", call.=FALSE)
-
+    
+    # use x0 in model if no data and user didn't specify not to use x0
+    if(missing(use.initial.values) && (all(is.na(newdata[["y"]])) || newdata[["y"]]=="none"))
+      use.initial.values <- TRUE
     if(use.initial.values)
       message("predict.marssMLE(): x0 and tinitx from model are being used for prediction.")
     if(!use.initial.values && all(is.na(newdata[["y"]])))
