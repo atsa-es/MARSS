@@ -5,8 +5,8 @@
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{predict(object)}, where object is \code{\link{marssMLE}} object,  will return the fitted value of \eqn{\mathbf{y}_t}{y(t)} or the smoothed value of \eqn{\mathbf{x}_t}{x(t)}. If \code{h} is passed in, \code{predict(object)} will return a forecast h steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} for automatic plotting of predictions and forecasts with intervals.
 }
-  \usage{
-  \method{predict}{marssMLE}(object, h=0,
+\usage{
+\method{predict}{marssMLE}(object, h=0,
      conf.level = c(0.80, 0.95),
      type = c("ytT", "xtT"),
      newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
@@ -14,17 +14,18 @@
      fun.kf = c("MARSSkfas", "MARSSkfss"),
      use.initial.values = FALSE, ...)
    }
-  \arguments{
-  \item{object}{ A \code{\link{marssMLE}} object.  }
-  \item{h}{ Number of steps ahead to forecast. If \code{h !=0}, then \code{newdata} is for the forecast, i.e. for the h time steps after the end of the model data. See details. }
-  \item{conf.level}{ Level for the intervals if \code{interval != "none".}}
-  \item{type}{ Fitted values for the observations (ytT) or the states (xtT). The predictions are conditioned on all the data (if data are supplied in newdata or implicitly supplied by not passing in \code{newdata}).}
-  \item{newdata}{ An optional list with new y (data), c or d (covariates) to use for the predictions or forecasts. y, c and d must have the same form as used in the \code{\link{MARSS}()} call but the number of time steps can be different. t is used if there is ambuiquity as to which time steps the y, c and d refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
-  \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the fitted value is returned. If \code{interval="prediction"} (default), prediction intervals (new data) are returned. Note, in the context of a MARSS model, only confidence intervals are available for xtT.}
-  \item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
-  \item{use.initial.values}{ If FALSE (the default), then the initial value of x is re-estimated. If TRUE, then x0 in the fitted model is used. If you change the data, then this x0 may not be appropriate. \code{use.initial.values} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
-  \item{...}{ Other arguments. Not used. }
-  }
+\arguments{
+\item{object}{ A \code{\link{marssMLE}} object.  }
+\item{h}{ Number of steps ahead to forecast. If \code{h !=0}, then \code{newdata} is for the forecast, i.e. for the h time steps after the end of the model data. See details. }
+\item{conf.level}{ Level for the intervals if \code{interval != "none".}}
+\item{type}{ Fitted values for the observations (ytT) or the states (xtT). The predictions are conditioned on all the data (if data are supplied in newdata or implicitly supplied by not passing in \code{newdata}).}
+\item{newdata}{ An optional list with new y (data), c or d (covariates) to use for the predictions or forecasts. y, c and d must have the same form as used in the \code{\link{MARSS}()} call but the number of time steps can be different. t is used if there is ambuiquity as to which time steps the y, c and d refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
+\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the fitted value is returned. If \code{interval="prediction"} (default), prediction intervals (new data) are returned. Note, in the context of a MARSS model, only confidence intervals are available for xtT.}
+\item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
+\item{use.initial.values}{ If FALSE (the default), then the initial value of x is re-estimated. If TRUE, then x0 in the fitted model is used. If you change the data, then this x0 may not be appropriate. \code{use.initial.values} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
+\item{...}{ Other arguments. Not used. }
+}
+
 \value{
   A list with the following components:
 
@@ -39,6 +40,7 @@
 \item{x0}{The x0 used.}
 \item{tinitx}{The tinitx used.}
 }
+
 \details{
 
 \strong{Forecasts \code{h != 0}}
