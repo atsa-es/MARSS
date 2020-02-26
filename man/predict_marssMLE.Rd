@@ -1,7 +1,8 @@
 \name{predict.marssMLE}
 \alias{predict.marssMLE}
+\alias{predict}
 
-\title{ predict function for MARSS MLE objects }
+\title{ predict and forecast MARSS MLE objects }
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{predict(object)}, where object is \code{\link{marssMLE}} object,  will return the fitted value of \eqn{\mathbf{y}_t}{y(t)} or the smoothed value of \eqn{\mathbf{x}_t}{x(t)}. If \code{h} is passed in, \code{predict(object)} will return a forecast h steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} for automatic plotting of predictions and forecasts with intervals.
 }
