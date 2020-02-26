@@ -10,7 +10,7 @@
   will return a data.frame with the data (y) and inputs/covariates (c and d elements) for a MARSS model in "marxss" form. See \code{\link{MARSS.marxss}}.  This is mainly a utility function to help with the \code{broom} functions (\code{tidy}, \code{augment} and \code{glance}).
 }
 \usage{
-  \method{model.frame}{marssMODEL}(formula, ...)
+\method{model.frame}{marssMODEL}(formula, ...)
 }
 \arguments{
   \item{formula}{ A \code{\link{marssMODEL}} object.  }

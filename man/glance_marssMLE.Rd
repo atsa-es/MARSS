@@ -3,7 +3,7 @@
 
 \title{Return brief summary information on a MARSS fit}
 \usage{
-  glance.marssMLE(x, ...)
+glance.marssMLE(x, ...)
 }
 \arguments{
   \item{x}{A \code{\link{marssMLE}} object}

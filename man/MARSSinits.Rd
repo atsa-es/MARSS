@@ -9,7 +9,7 @@ The function assumes that the user passed in the inits list using the parameter 
 }
 \usage{
 MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0, 
-           R=0.05, x0=-99, V0=5, G=0, H=0, L=0))
+    R=0.05, x0=-99, V0=5, G=0, H=0, L=0))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. }

@@ -3,10 +3,9 @@
 
 \title{Return the model and state fitted values, residuals, and residual sigma}
 \usage{
-  augment.marssMLE(x, type = c("ytT", "xtT"),
-                              interval = c("none", "confidence", "prediction"), 
-                              conf.level = 0.95, 
-                              form=attr(x[["model"]], "form")[1])
+augment.marssMLE(x, type = c("ytT", "xtT"),
+    interval = c("none", "confidence", "prediction"), 
+    conf.level = 0.95, form=attr(x[["model"]], "form")[1])
 }
 \arguments{
   \item{x}{a \code{\link{marssMLE}} object}

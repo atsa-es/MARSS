@@ -10,7 +10,7 @@ The observed Fisher Information is the negative of the second-order partial deri
 Note for the numerically estimated Hessian, we pass in the negative log-likelihood funcation to a minimization function. As a result, the numerical functions return the Hessian of the negative log-likelihood function (which is the observed Fisher Information matrix).
 }
 \usage{
-MARSSFisherI( MLEobj, method=c("Harvey1989", "fdHess", "optim") )
+MARSSFisherI(MLEobj, method=c("Harvey1989", "fdHess", "optim"))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 

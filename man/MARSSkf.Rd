@@ -7,9 +7,9 @@
   Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. \code{MARSSkf()} is a small helper function to select which Kalman filter/smoother function to use based on the value in \code{MLEobj$fun.kf}.  The choices are \code{MARSSkfas} which uses the filtering and smoothing algorithms in the \link[KFAS]{KFAS} package based on algorithms in Koopman and Durbin (2001-2003), and \code{MARSSkfss()} which uses the algorithms in Shumway and Stoffer. The default function is \code{MARSSkfas()} which is faster and generally more stable (fewer matrix inversions), but there are some cases where \code{MARSSkfss()} will be more stable and \code{MARSSkfss()} returns some values that \code{MARSSkfas()} does not.
 }
 \usage{
-MARSSkf( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, newdata=NULL )
-MARSSkfss( MLEobj )
-MARSSkfas( MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE )
+MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, newdata=NULL)
+MARSSkfss(MLEobj)
+MARSSkfas(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE)
 }
 \arguments{
   \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specificitions.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}

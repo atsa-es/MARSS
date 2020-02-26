@@ -1,18 +1,18 @@
 \name{plot.marssPredict}
 \alias{plot.marssPredict}
+\alias{autoplot.marssPredict}
 
 \title{ Plot MARSS Forecast and Predict objects }
 \description{
-  Plots forecasts with prediction (default) or confidence intervals using base R graphics (\code{plot}) and ggplot2 (\code{autoplot}).  The plot function is built to mimic plot.forecast in the forecast package in terms of arguments and look.
+  Plots forecasts with prediction (default) or confidence intervals using base R graphics (\code{plot}) and ggplot2 (\code{autoplot}).  The plot function is built to mimic \code{plot.forecast} in the forecast package in terms of arguments and look.
 }
-  \usage{
-  \method{plot}{marssPredict}(x, include, pi.int = TRUE, main = NULL, showgap = TRUE, 
-          shaded = TRUE, shadebars = (x$h < 5 & x$h != 0), shadecols = NULL, col = 1, 
-          fcol = 4, pi.col = 1, pi.lty = 2, ylim = NULL, 
-          xlab = "", ylab = "", type = "l", flty = 1, flwd = 2, ...)
-  \method{autoplot}{marssPredict}(x, include, pi.int = TRUE, decorate = TRUE,
-            plot.par = list(),  ...)
-
+\usage{
+\method{plot}{marssPredict}(x, include, pi.int = TRUE, main = NULL, showgap = TRUE, 
+    shaded = TRUE, shadebars = (x$h < 5 & x$h != 0), shadecols = NULL, col = 1, 
+    fcol = 4, pi.col = 1, pi.lty = 2, ylim = NULL, 
+    xlab = "", ylab = "", type = "l", flty = 1, flwd = 2, ...)
+\method{autoplot}{marssPredict}(x, include, pi.int = TRUE, decorate = TRUE,
+    plot.par = list(),  ...)
   }
   \arguments{
 \item{x}{ marssPredict produced by \code{\link{forecast.marssMLE}} or \code{\link{predict.marssMLE}}. }
@@ -49,7 +49,7 @@
   None. Plots are plotted
 }
 \author{ 
-  Eli Holmes, and based of plot.forecast in the forecast package written by Rob J Hyndman & Mitchell O'Hara-Wild.
+  Eli Holmes and based off of \code{plot.forecast} in the forecast package written by Rob J Hyndman & Mitchell O'Hara-Wild.
 }
 \examples{
 data(harborSealWA)

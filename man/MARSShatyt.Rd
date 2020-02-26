@@ -5,7 +5,7 @@
 Computes the expected value of random variables involving Y.  Users can also use \code{print( MLEobj, what="Ey")} to access this output.  See \code{\link{print.marssMLE}}.
 }
 \usage{
-MARSShatyt( MLEobj, only.kem = TRUE )
+MARSShatyt(MLEobj, only.kem = TRUE)
 }
 \arguments{
   \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{model} element with the model description and data. }

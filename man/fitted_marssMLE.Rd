@@ -5,12 +5,12 @@
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{fitted(MLEobj)}, where MLEobj is the output from a \code{\link{MARSS}()} call,  will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)}. For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}. If you want the estimate of \eqn{\mathbf{x}_t}{x(t)}, then use \code{\link{tidy.marssMLE}}.
 }
-  \usage{
-  \method{fitted}{marssMLE}(object, ..., 
-  type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),   
-  interval = c("none", "confidence", "prediction"), 
-  conf.level = 0.95,
-  output = c("tibble", "matrix"))
+\usage{
+\method{fitted}{marssMLE}(object, ..., 
+    type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),   
+    interval = c("none", "confidence", "prediction"), 
+    conf.level = 0.95,
+    output = c("tibble", "matrix"))
   }
   \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }

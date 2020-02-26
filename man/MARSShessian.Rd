@@ -6,7 +6,7 @@
 Calculates an approximate parameter variance-covariance matrix for the parameters using an inverse of the Hessian of the negative log-likelihood function at the MLEs (the observed Fisher Information matrix).   It appends \code{$Hessian}, \code{$parMean}, \code{$parSigma} to the \code{\link{marssMLE}} object. 
 }
 \usage{
-MARSShessian( MLEobj, method=c("Harvey1989", "fdHess", "optim") )
+MARSShessian(MLEobj, method=c("Harvey1989", "fdHess", "optim"))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 

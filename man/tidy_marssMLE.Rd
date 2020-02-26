@@ -10,10 +10,9 @@ For parameters, \code{tidy.marssMLE} returns their estimates and their confidenc
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
 \usage{
-  tidy.marssMLE(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
-                conf.int = TRUE,
-                conf.level = 0.95,
-                form=attr(x[["model"]], "form")[1], ...)
+tidy.marssMLE(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
+    conf.int = TRUE, conf.level = 0.95,
+    form=attr(x[["model"]], "form")[1], ...)
 }
 \arguments{
   \item{x}{a \code{\link{marssMLE}} object}

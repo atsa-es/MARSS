@@ -6,8 +6,8 @@
 }
 \usage{
 MARSSaic(MLEobj, output = c("AIC", "AICc"), 
-  Options = list(nboot = 1000, return.logL.star = FALSE, 
-  silent = FALSE))
+    Options = list(nboot = 1000, return.logL.star = FALSE, 
+    silent = FALSE))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{MARSSkem()}. }

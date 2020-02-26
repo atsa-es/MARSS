@@ -5,7 +5,6 @@
 
 \description{
 The EM algorithm (\code{\link{MARSSkem}}) in the MARSS package works by converting the more familiar MARSS model in matrix form into the vectorized form which allows general linear constraints (Holmes 2012).  
-
 The vectorized form is:
 \deqn{\mathbf{x}(t) = (\mathbf{x}(t-1)^\top \otimes \mathbf{I}_m)(\mathbf{f}_b(t)+\mathbf{D}_b(t)\beta) + (\mathbf{f}_u(t)+\mathbf{D}_u(t)\upsilon) + \mathbf{w}(t), \textrm{ where } \mathbf{w}(t) \sim \textrm{MVN}(0,\textbf{Q}(t))}{x(t) = (t(x(t-1)) (x) I_m)(f_b(t)+D_b(t)beta) + (f_u(t)+D_u(t)upsilon) + w(t), where w(t) ~ MVN(0,Q(t))}
 \deqn{\mathbf{y}(t) = (\mathbf{x}(t)^\top \otimes \mathbf{I}_n)(\mathbf{f}_z(t)+\mathbf{D}_z(t)\zeta) + (\mathbf{f}_a(t)+\mathbf{D}_a(t)\alpha) + \mathbf{v}(t), \textrm{ where } \mathbf{v}(t) \sim \textrm{MVN}(0,\textbf{R}(t))}{y(t) = (t(x(t)) (x) I_n)(f_z(t)+D_z(t)zeta) + (f_a(t)+D_a(t)alpha) + v(t), where v(t) ~ MVN(0,R(t))}
@@ -22,8 +21,7 @@ See Holmes (2012) for a discussion of MARSS models in vectorized form.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
-
-  }
+}
 \seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marss}}, \code{\link{MARSS.marxss}} } 
 \examples{
 dat <- t(harborSealWA)

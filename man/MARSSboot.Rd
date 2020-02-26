@@ -6,8 +6,8 @@ Creates bootstrap parameter estimates and simulated (or bootstrapped) data (if a
 }
 \usage{
 MARSSboot(MLEobj, nboot = 1000, 
-  output = "parameters", sim = "parametric", 
-  param.gen = "MLE", control = NULL, silent = FALSE)
+    output = "parameters", sim = "parametric", 
+    param.gen = "MLE", control = NULL, silent = FALSE)
 }
 
 \arguments{

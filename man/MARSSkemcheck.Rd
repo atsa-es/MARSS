@@ -7,7 +7,7 @@
   This is a helper function in the \code{\link{MARSS-package}} that checks that the model can be handled by the \code{\link{MARSSkem}} algorithm. It also returns the structure of the model as a list of text strings.
 }
 \usage{
-MARSSkemcheck( MLEobj )
+MARSSkemcheck(MLEobj)
 }
 \arguments{
   \item{ MLEobj }{ An object of class \code{\link{marssMLE}}. }

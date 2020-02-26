@@ -6,7 +6,7 @@ Computes standard errors, confidence intervals and bias for the maximum-likeliho
 }
 \usage{
 MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot =
-                 1000, silent = TRUE, hessian.fun = "Harvey1989")
+    1000, silent = TRUE, hessian.fun = "Harvey1989")
 }
 
 \arguments{

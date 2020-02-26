@@ -5,7 +5,7 @@
 Calculates the observed Fisher Information analytically via the recursion by Harvey (1989) as adapted by Holmes (2017) for MARSS models with linear constraints.  This is the same as the Hessian of the negative log-likelihood function at the MLEs.  This is a utility function in the \code{\link{MARSS-package}} and is not exported.  Use \code{\link{MARSShessian}} to access.
 }
 \usage{
-MARSSharveyobsFI( MLEobj )
+MARSSharveyobsFI(MLEobj)
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 

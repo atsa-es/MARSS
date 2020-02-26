@@ -54,7 +54,7 @@ marssMODEL.to.list(MODELobj)
 matrix.power(x, n)
 mystrsplit(x)
 parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
-       t = 1, dims = NULL, model.loc = "marss")
+    t = 1, dims = NULL, model.loc = "marss")
 pinv(x)
 pcholinv(x)
 pchol(x) 

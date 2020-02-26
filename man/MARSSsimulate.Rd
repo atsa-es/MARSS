@@ -7,7 +7,7 @@
 }
 \usage{
 MARSSsimulate(object, tSteps = NULL, nsim = 1, silent = TRUE, 
-  miss.loc = NULL)
+    miss.loc = NULL)
 }
 \arguments{
   \item{object}{ A fitted \code{\link{marssMLE}} object, as output by \code{\link{MARSS}()}. }
