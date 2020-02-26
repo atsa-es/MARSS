@@ -60,7 +60,7 @@ If the model has time-varying parameters, the value of the parameters at the las
 
 dat <- t(harborSealWA)
 dat <- dat[2:4,] #remove the year row
-fit <- MARSS(dat, model=list(R="diagonal and equal", Q=Q))
+fit <- MARSS(dat, model=list(R="diagonal and equal"))
 
 # 2 steps ahead forecast
 fr <- predict(models[[i]], type="ytT", h=2)

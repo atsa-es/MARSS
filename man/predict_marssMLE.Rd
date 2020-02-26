@@ -79,7 +79,7 @@ If newdata is passed in, then xtT and ytT are computed using newdata but with th
 \examples{
 dat <- t(harborSealWA)
 dat <- dat[2:4,] #remove the year row
-fit <- MARSS(dat, model=list(R="diagonal and equal", Q=Q))
+fit <- MARSS(dat, model=list(R="diagonal and equal"))
 
 # 2 steps ahead forecast
 fr <- predict(fit, type="ytT", h=2)
