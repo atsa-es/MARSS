@@ -117,6 +117,7 @@ Major update over 3.9. The main changes have to do with with errors in the Hessi
 BUGS
 
 `residuals.marssMLE()`
+
 * Erroneous standardized residuals when Z was non-diagonal (and thus also > 1 row). 
 * Changed residuals.MARSSMLE so it returns residuals (which would be equal to 0) when there are 0s on the diagonal of Q or R
 * If t=1 and x0 was fixed, residuals were not returned.
@@ -324,7 +325,7 @@ DOCUMENTATION
 BUGS
 
 * `MARSSboot()` was out of date with newest version of `MARSShessian()`'s returned arguments.
-* `is.blockunconst() bug made it break on certain diagonal list matrices
+* `is.blockunconst()` bug made it break on certain diagonal list matrices
 
 MARSS 3.3 and 3.4  (CRAN 1-16-2013)
 ------------------------------------
@@ -453,24 +454,29 @@ BUGS
 * Fixed `MARSSaic()` and `MARSSparamCIs()` so that `MARSSboot()` call uses param.gen="MLE".  This fixes the bug that stopped MLE objects from BFGS calls to fail.
 
 
-
 MARSS 2.8 (2012-01-23)
 ------------------------------------
-Version 2.8 improved default initial conditions and fixed bugs in the Shumway and Stoffer Kalman filter/smoother function.
+Version 2.8 improved default initial conditions functions and fixed bugs in the Shumway and Stoffer Kalman filter/smoother function.
 
 * Added NEWS file, .Rinstignore in inst\doc
 * Added example of lag-p model to the manual.
 * Fixed bug in `MARSSkf()` when R=0, kf.x0=x10, and V0=0. The algorithm was not setting x(1) via y(1) in this special case.
 * In `MARSSinits()`, got rid of the linear regression to get inits for x0; using instead solution of pi from y(1)=Z\*(D\*pi+f)+A; This stops MARSS from complaining about no inits when Z is not a design matrix.  NOTE NB: This means the default initial x0 are different for 2.7 and 2.8, which leads to slightly different answers for `MARSS(dat)` in 2.7 and 2.8. The answers are not really different, just they started with slightly different initial values so have slightly different values when the algorithm reaches its convergence limit.
-* Added warning in the covariate section. The error-free covariate section in the manual did not clarify that the log-likelihood of the covariates with the dummy state model would be included in the MARSS output.  MARSS version 2.9 will allow error-free covariates in a more standard manner.
 * Removed dependency on time package. The progressBar function was moved into MARSS since the time package is no longer maintained.
 * Changed `MARSSkemcheck()` to allow lag-p models. I worked on the derivation of the degenerate models (with 0 on diag of Q) to better define the needed constraints on B.0 and B.plus sub matrices.  This led to changes in MARSSkemcheck.r so that lag-p models written as MARSS model are now allowed.  There are still problems though in x0 estimation in the EM algorithm when there are zeros on R and B diagonals, so best to method=``BFGS'' until I redo the degenerate EM algorithm.
-* Bug in `MARSSoptim()` did not allow unconstrained Q or R. The problem had to do with temporarily resetting the upper triangle of tmp fixed matrices to 0 when using tmp.par as chol matrix.
-* Error in `MARSSkf()` when there were 0s on diagonal of Q. The algorithm only worked if B was diagonal.  Fix required changes to Kalman smoother bit of `MARSSkf()`. I rewrote the pertinent section in EMDerivation.pdf.
-* Cleaned up degenerate derivation in EMDerivation.pdf
 * Added option to force use of `MARSSkf()` function instead of MARSSkfas. If kf.x0="x10", default was to use `MARSSkfas()` function which is much faster, but it doesn't like 0s on B diagonal if V0 is 0.  So I added the option to force use of slower `MARSSkf()` function using method="BFGSkf". Reguired adding stuff to MARSSsettings.r and MARSSoptim.r.  This is mainly for debugging since `MARSSoptim()` will now check if optim failed and try using `MARSSkf()` if `MARSSkfas()` was used.  Added line to output that says which function used for likelihood calculation; again for debugging.
  * Edited `MARSSmcinit()` to improve random B generation. There is nothing to guarantee that random Bs in mcinit routine will be within the unit circle, however it is probably a good idea if they are.   Default bounds for B changed to -1,1 and random B matrix rescaled by dividing by max(abs(Re(eigen(B)))/runif(1) to get the max abs eigenvalue between 0 and 1.  This works unless the user has fixed some B values to non-zero values.  This required change to is\_marssMLE.r also to remove constraint that B bounds be greater than 0.
 * Edited `MARSSmcinit()` to allow fixed and shared values in random Qs and Rs. The random Wishart draw is rescaled based on the fixed and shared structure in R or Q.  As part of this, I cleaned up how fixed and shared values are specified in the random draws of other parameters.  This change doesn't change the end effect, but the code is cleaner.
+
+BUGS
+
+* `MARSSoptim()` did not allow unconstrained Q or R. The problem had to do with temporarily resetting the upper triangle of tmp fixed matrices to 0 when using tmp.par as chol matrix.
+* Error in `MARSSkf()` when there were 0s on diagonal of Q. The algorithm only worked if B was diagonal.  Fix required changes to Kalman smoother bit of `MARSSkf()`. I rewrote the pertinent section in EMDerivation.pdf.
+
+DOCUMENTATION
+
+* Cleaned up degenerate derivation in EMDerivation.pdf
+* Added warning in the covariate section. The error-free covariate section in the manual did not clarify that the log-likelihood of the covariates with the dummy state model would be included in the MARSS output.  MARSS version 2.9 will allow error-free covariates in a more standard manner.
 
 
 MARSS 2.7 and 2.6 (2011-10-21)
@@ -511,17 +517,27 @@ Version 2.2 focused on incorporating the KFAS Kalman filter/smoother functions w
 
 MARSS 2.0
 ------------------------------------
-* `MARSSkem()` algorithm changed to allow B and Z estimation. This was the main objective of MARSS 2.0
+Version 2.0 implements changes to allow B and Z estimation and more element sharing in Q and R matrices.
+
+ENHANCEMENTS
+
+* `MARSSkem()` algorithm changed to allow B and Z estimation.
 * `MARSSkem()` algorithm changed to allow constrained B and Z estimation.  This was the second main objective of MARSS 2.0.  This allows you to have fixed values or shared values in your B or Z matrices.
 * Allow more types of element sharing in the Q and R estimation. In MARSS 1.1, you were limited to diagonal, equal var-cov, and unconstrained.  Now various types of block-diagonal matrices are allowed.
 * Allow some Q or R variances to be set to 0. This allows partially deterministic systems (Q=0) and systems with no observation error (R=0)
 * Fixed the V0=0 case. I was using a work-around to do the fixed x at t=0 case (V0=0).  I derived the solution and added this to `MARSSkem()`.  There is no iter.V0 control element anymore.
 * Changed logLik conv test. I was doing the log-log test against logLik instead of log(logLik).  I think the test works better using the log of the log-likelihood.
-* Detect degeneracy and set Q or R element to zero] Now instead of the variance walking to log(negative infinity) in an infinite number of iterations, the algorithm detects that a variance is going to zero and tries setting it to zero.
+* Detect degeneracy and set Q or R element to zero. Now instead of the variance walking to log(negative infinity) in an infinite number of iterations, the algorithm detects that a variance is going to zero and tries setting it to zero.
 * `MARSSkem()` changed to a more general way to deal with missing values. This is described in the EMDerivation.pdf.  It doesn't affect the user, but allows the code to be expanded to more types of models much more easily.
 * Changed to using list matrices to describe models. Now you can essentially write the way your model looks on paper (in matrix form) as a list matrix in R and it will run.  No more fixed and free matrices---at least from the user's perspective.
 * Added some code optimization. I cleaned up some of the things that really slowed down 1.1.  2.0 is now about as fast as 1.0 was.
+
+DOCUMENTATION
+
 * Big revamp of EMDerivations.pdf. I cleaned up my derivation a lot.  I'm especially happy with the sections on dealing missing values part of the derivation.  It's much more elegant and logical now.  The sections on degenerate matrices are cluttered and the notation is painful, but I will leave them be for awhile.
+
+BUGS
+
 * Bug in miss.value=NA. When miss.value=NA, class for NA was logical.  Needed to be numeric.
 
 
