@@ -22,6 +22,7 @@ export(
   MARSSsimulate,
   MARSSFisherI,
   zscore,
+  ldiag,
   augment.marssMLE,
   glance.marssMLE,
   tidy.marssMLE,
