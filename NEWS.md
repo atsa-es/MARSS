@@ -22,6 +22,9 @@ TO DO
 * [maybe] create accuracy() method sensu forecast package.
 * [maybe] revamp marssPredict object so that it plays nice with forecast methods
 
+ENHANCEMENTS
+
+* `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 
 MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
