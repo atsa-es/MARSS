@@ -957,6 +957,26 @@ zscore <- function(x) {
   x.z
 }
 
+############# Function to make a diagonal matrix; 
+# exported function to make diagonal list matrix. Slower than makediag()
+# which is only for numeric x
+ldiag <- function(x, nrow = NA)
+{
+  if (length(x) == 1) {
+    return(matrix(x, nrow, nrow))
+  }
+  if (!is.vector(x)) { 
+    stop("mdiag: x is not vector.\n", call. = FALSE)
+  }
+  if (is.na(nrow)) nrow <- length(x)
+  if(is.list(x)){
+    if(!all(unlist(lapply(x, length))==1)) stop("mdiag: all elements in x list must be length 1.\n", call. = FALSE)
+  }
+  tmp <- matrix(list(0), nrow, nrow)
+  diag(tmp) <- x
+  return(tmp)
+}
+
 MARSS.out <- function(){
   #Null function for man file
 }
