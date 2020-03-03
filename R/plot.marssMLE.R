@@ -1,12 +1,15 @@
 plot.marssMLE <-
   function(x,
-           plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot"),
+           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
            plot.par = list(), ...) {
     
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
+    old.plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot")
+    new.plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids")
+    for(i in 1:NROW(old.plot.type)) if(old.plot.type[i] %in% plot.type) plot.type[plot.type==old.plot.type[i]] <- new.plot.type[i]
     if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     
@@ -44,7 +47,7 @@ plot.marssMLE <-
     
     alpha <- 1 - conf.level
     
-    if ("states" %in% plot.type) {
+    if ("xtT" %in% plot.type) {
       # make plot of states and CIs
       
       if ("rotate" %in% names(extras)) {
@@ -80,8 +83,8 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "states"]
-      cat(paste("plot type = Estimated States\n"))
+      plot.type <- plot.type[plot.type != "xtT"]
+      cat(paste("plot type = \"xtT\" Estimated States\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -90,7 +93,7 @@ plot.marssMLE <-
       }
     }
     
-    if ("observations" %in% plot.type) {
+    if ("fitted.ytT" %in% plot.type) {
       # make plot of observations
       df <- augment.marssMLE(x, type = "ytT", interval="confidence", 
                              conf.level=conf.level, form = model_form)
@@ -118,8 +121,8 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "observations"]
-      cat(paste("plot type = Observations with Fitted Values\n"))
+      plot.type <- plot.type[plot.type != "fitted.ytT"]
+      cat(paste("plot type = \"fitted.ytT\" Observations with Fitted Values\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -128,7 +131,7 @@ plot.marssMLE <-
       }
     }
     
-    if ("model.residuals" %in% plot.type) {
+    if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- augment.marssMLE(x, type = "ytT", form = "marxss")
       df$.resids[is.na(df$y)] <- NA
@@ -167,8 +170,8 @@ plot.marssMLE <-
         })
         mtext("Observation residuals, y - E[y]", side = 2, outer = TRUE, line = -1)
       }
-      plot.type <- plot.type[plot.type != "model.residuals"]
-      cat(paste("plot type = Model Residuals\n"))
+      plot.type <- plot.type[plot.type != "model.resids"]
+      cat(paste("plot type = \"model.resids\" Model Residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -177,7 +180,7 @@ plot.marssMLE <-
       }
     }
     
-    if ("state.residuals" %in% plot.type) {
+    if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
       df <- augment.marssMLE(x, type = "xtT", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
@@ -214,8 +217,8 @@ plot.marssMLE <-
         })
         mtext("State residuals, xtT - E[x]", side = 2, outer = TRUE, line = -1)
       }
-      plot.type <- plot.type[plot.type != "state.residuals"]
-      cat(paste("plot type = State Residuals\n"))
+      plot.type <- plot.type[plot.type != "state.resids"]
+      cat(paste("plot type = \"state.resids\" State Residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -238,7 +241,7 @@ plot.marssMLE <-
       return(int)
     }
     
-    if ("model.residuals.qqplot" %in% plot.type) {
+    if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- augment.marssMLE(x, type = "ytT", form = "marxss")
       slope <- tapply(df$.std.resid, df$.rownames, slp)
@@ -253,8 +256,8 @@ plot.marssMLE <-
           abline(a = intercept[plt], b = slope[plt], col = plotpar$line.col, lwd = plotpar$line.lwd)
         })
       }
-      plot.type <- plot.type[plot.type != "model.residuals.qqplot"]
-      cat(paste("plot type = Model Standardized Residuals\n"))
+      plot.type <- plot.type[plot.type != "qqplot.model.resids"]
+      cat(paste("plot type = \"qqplot.model.resids\" QQplot of Model Standardized Residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -263,7 +266,7 @@ plot.marssMLE <-
       }
     }
     
-    if ("state.residuals.qqplot" %in% plot.type) {
+    if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
       df <- augment.marssMLE(x, type = "xtT", form = "marxss")
       df$.rownames <- paste0("State ", df$.rownames)
@@ -279,8 +282,8 @@ plot.marssMLE <-
           abline(a = intercept[plt], b = slope[plt], col = plotpar$line.col, lwd = plotpar$line.lwd)
         })
       }
-      plot.type <- plot.type[plot.type != "state.residuals.qqplot"]
-      cat(paste("plot type = Standardized State Residuals\n"))
+      plot.type <- plot.type[plot.type != "qqplot.state.resids"]
+      cat(paste("plot type = \"qqplot.state.resids\" QQplot of State Standardized Residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {

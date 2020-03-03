@@ -1,6 +1,6 @@
 autoplot.marssMLE <-
   function(x,
-           plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations", "model.residuals.acf", "state.residuals.acf"),
+           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), 
@@ -8,9 +8,11 @@ autoplot.marssMLE <-
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
-
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
+    old.plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations")
+    new.plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT")
+    for(i in 1:NROW(old.plot.type)) if(old.plot.type[i] %in% plot.type) plot.type[plot.type==old.plot.type[i]] <- new.plot.type[i]
     if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("autoplot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("autoplot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
 
@@ -38,7 +40,7 @@ autoplot.marssMLE <-
       extras <- list(...)
       allowednames <- c("rotate", "method", "hessian.fun", "nboot")
       bad.names <- names(extras)[!(names(extras) %in% allowednames)]
-      if (!all(names(extras) %in% allowednames)) stop(paste("autoplot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?tidy.marssMLE for allowed arguments.\n"), call. = FALSE)
+      if (!all(names(extras) %in% allowednames)) stop(paste("autoplot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?autoplot.marssMLE for allowed arguments.\n"), call. = FALSE)
       if (model_form != "dfa" & "rotate" %in% names(extras)) {
         cat("autoplot.marssMLE: 'rotate' argument is ignored if form!='dfa'\n Pass in form='dfa' if your model is a DFA model, but the form \n attribute is not set (because you set up your DFA model manually).\n\n")
         rotate <- FALSE
@@ -50,12 +52,12 @@ autoplot.marssMLE <-
     plts <- list()
     
     # augment is very slow because the residuals() function is slow. Don't call multiple times
-    if(any(c("state.residuals", "state.residuals.qqplot", "state.residuals.acf") %in% plot.type))
+    if(any(c("state.resids", "qqplot.state.resids", "acf.state.resids") %in% plot.type))
       augxdf <- augment.marssMLE(x, type = "xtT", form = "marxss")
-    if(any(c("model.residuals", "model.residuals.qqplot", "model.residuals.acf") %in% plot.type))
+    if(any(c("model.resids", "qqplot.model.resids", "acf.model.resids") %in% plot.type))
       augydf <- augment.marssMLE(x, type = "ytT", form = "marxss")
     
-    if ("states" %in% plot.type) {
+    if ("xtT" %in% plot.type) {
       # make plot of states and CIs
 
       if ("rotate" %in% names(extras)) {
@@ -84,13 +86,13 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle("States")
-      plts[["states"]] <- p1
-      if (identical(plot.type, "states")) {
+      plts[["xtT"]] <- p1
+      if (identical(plot.type, "xtT")) {
         return(p1)
       }
     }
 
-    if ("observations" %in% plot.type) {
+    if ("fitted.ytT" %in% plot.type) {
       # make plot of observations
       tit <- "Model fitted Y"
       if (conf.int) tit <- paste(tit, "+ CI")
@@ -121,13 +123,13 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(tit)
-      plts[["observations"]] <- p1
-      if (identical(plot.type, "observations")) {
+      plts[["fitted.ytT"]] <- p1
+      if (identical(plot.type, "fitted.ytT")) {
         return(p1)
       }
     }
 
-    if ("expected.value.observations" %in% plot.type) {
+    if ("ytT" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
       df <- tidy.marssMLE(x, type = "ytT", form = "marxss")
       df$ymin <- df$conf.low
@@ -146,13 +148,13 @@ autoplot.marssMLE <-
                             shape = plotpar$point.pch, fill = plotpar$point.fill, 
                             col = plotpar$point.col, size = plotpar$point.size) +
         ggplot2::ggtitle("Expected value of Y conditioned on data")
-      plts[["expected.value.observations"]] <- p1
-      if (identical(plot.type, "expected.value.observations")) {
+      plts[["ytT"]] <- p1
+      if (identical(plot.type, "ytT")) {
         return(p1)
       }
     }
 
-    if ("model.residuals" %in% plot.type) {
+    if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- augydf
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)), ], ggplot2::aes_(~t, ~.resids)) +
@@ -172,13 +174,13 @@ autoplot.marssMLE <-
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       } 
-      plts[["model.residuals"]] <- p1
-      if (identical(plot.type, "model.residuals")) {
+      plts[["model.resids"]] <- p1
+      if (identical(plot.type, "model.resids")) {
         return(p1)
       }
     }
 
-    if ("state.residuals" %in% plot.type) {
+    if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
       df <- augxdf
       df$.rownames <- paste0("State ", df$.rownames)
@@ -197,8 +199,8 @@ autoplot.marssMLE <-
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       } 
-      plts[["state.residuals"]] <- p1
-      if (identical(plot.type, "state.residuals")) {
+      plts[["state.resids"]] <- p1
+      if (identical(plot.type, "state.resids")) {
         return(p1)
       }
     }
@@ -217,7 +219,7 @@ autoplot.marssMLE <-
       return(int)
     }
 
-    if ("model.residuals.qqplot" %in% plot.type) {
+    if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- augydf
       slope <- tapply(df$.std.resid, df$.rownames, slp)
@@ -230,13 +232,13 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle("Model residuals")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
-      plts[["model.residuals.qqplot"]] <- p1
-      if (identical(plot.type, "model.residuals.qqplot")) {
+      plts[["qqplot.model.resids"]] <- p1
+      if (identical(plot.type, "qqplot.model.resids")) {
         return(p1)
       }
     }
 
-    if ("state.residuals.qqplot" %in% plot.type) {
+    if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
       df <- augxdf
       df$.rownames <- paste0("State ", df$.rownames)
@@ -250,8 +252,8 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
         ggplot2::ggtitle("State residuals")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
-      plts[["state.residuals.qqplot"]] <- p1
-      if (identical(plot.type, "state.residuals.qqplot")) {
+      plts[["qqplot.state.resids"]] <- p1
+      if (identical(plot.type, "qqplot.state.resids")) {
         return(p1)
       }
     }
@@ -265,7 +267,7 @@ autoplot.marssMLE <-
       ciline <- qnorm((1 - conf.level)/2)/sqrt(length(x))
       return(ciline)
     }
-    if ("state.residuals.acf" %in% plot.type) {
+    if ("acf.state.resids" %in% plot.type) {
       df <- augxdf
       df$.rownames <- paste0("State ", df$.rownames)
       
@@ -289,12 +291,12 @@ autoplot.marssMLE <-
       p1 <- p1 + 
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
-        plts[["state.residuals.acf"]] <- p1
-      if (identical(plot.type, "state.residuals.acf")) {
+        plts[["acf.state.resids"]] <- p1
+      if (identical(plot.type, "acf.state.resids")) {
         return(p1)
       }
     }
-    if ("model.residuals.acf" %in% plot.type) {
+    if ("acf.model.resids" %in% plot.type) {
       df <- augydf
 
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
@@ -309,7 +311,7 @@ autoplot.marssMLE <-
       
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
-        ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0)) +
+        ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0), na.rm=TRUE) +
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
@@ -317,8 +319,8 @@ autoplot.marssMLE <-
       p1 <- p1 + 
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
-      plts[["model.residuals.acf"]] <- p1
-      if (identical(plot.type, "model.residuals.acf")) {
+      plts[["acf.model.resids"]] <- p1
+      if (identical(plot.type, "acf.model.resids")) {
         return(p1)
       }
     }
