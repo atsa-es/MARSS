@@ -18,7 +18,7 @@
 }
 
 \value{
-  A data.frame witht the data and inputs (c and d) in a MARSS model in "marxss" form.  See \code{\link{MARSS.marxss}}.
+  A data.frame with the data and inputs (c and d) in a MARSS model in "marxss" form.  See \code{\link{MARSS.marxss}}.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
