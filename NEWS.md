@@ -19,12 +19,13 @@ TO DO
 
 * change the arguments for plot.marssMLE() to look like autoplot.marssMLE()
 * add x0 argument to predict.marssMLE() so that user can specify x0 if needed.
-* [maybe] create accuracy() method sensu forecast package.
 * [maybe] revamp marssPredict object so that it plays nice with forecast methods
 
 ENHANCEMENTS
 
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
+* Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
+
 
 MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
