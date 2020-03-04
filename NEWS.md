@@ -26,6 +26,11 @@ ENHANCEMENTS
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
 
+BUGS
+
+* In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. History: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.det.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made wrong for MARSSkfss()$xtT whenever there were 0s on diagonal of R. This would show up in residuals() since that was using MARSSkfss() (in order to get some output that MARSSkfas() doesn't provide.)
+
+
 
 MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
