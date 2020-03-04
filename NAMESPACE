@@ -27,7 +27,9 @@ export(
   glance.marssMLE,
   tidy.marssMLE,
   autoplot.marssMLE,
-  autoplot.marssPredict
+  autoplot.marssPredict,
+  accuracy.marssMLE,
+  accuracy.marssPredict
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
@@ -67,6 +69,8 @@ if(getRversion() >= "3.6.0") {
   S3method(broom::tidy, marssMLE)
   S3method(ggplot2::autoplot, marssMLE)
   S3method(ggplot2::autoplot, marssPredict)
+  S3method(forecast::accuracy, marssMLE)
+  S3method(forecast::accuracy, marssPredict)
 }
 
 
