@@ -855,6 +855,7 @@ fully.spec.x <- function(Z, R){
   m <- dim(Z)[2]
   diag.R <- takediag(R)
   Z.R0 <- Z[diag.R == 0, , drop = FALSE]
+  Z.R.not.0 <- Z[diag.R != 0, , drop = FALSE]
   # The Z cols where there is a val; and where rows have a val
   Z.R0.n0 <- Z.R0[rowSums(Z.R0 != 0) != 0, colSums(Z.R0 != 0) != 0, drop = FALSE] 
   # If more rows than columns, over-constrained
@@ -869,15 +870,21 @@ fully.spec.x <- function(Z, R){
       return(list(ok = FALSE, errors = "Some R diagonal elements are 0, but Z is such that model is indeterminate in this case."))
     }
   }
-  # If got here, Z.R0.n0 is ok. Make matrix to 0 out determined x in Vtt
+  # If got here, Z.R0.n0 is ok. Make matrix to zero out determined x in Vtt
   Z1 <- Z.R0
+  detx <- rep(1,m) #1 means NOT fully specified by data
+  # Is there any y where R=0 where there only one x in that row? Then that x is fixed.
+  # Set the Z col for that x to 0 (fixed). And repeat. Will have to do at most m iterations to find all
+  # the x that are fully specified by the data.
   for(i in 1:m){
     tmp <-  (rowSums(Z1 != 0)==1)
     if(!any(tmp)) break
     tmp <- (rowSums(Z1 != 0)==1) %*% (Z1!=0)
     Z1 <- Z1 %*% makediag(!tmp)
   }
-  detx <- ifelse(colSums(Z1 != 0 ) == 0 & colSums(Z != 0 ) != 0, 0, 1)
+  # Any Z1 cols that are 0 are fully spec and should be 0
+  # Unless the Z.R0 column is all 0, meaning that x is not affected by R=0 at all
+  detx <- ifelse(colSums(Z1 != 0 ) == 0 & colSums(Z.R0 != 0 ) != 0, 0, 1)
   return(list(ok = TRUE, detx = detx))
 }
 
