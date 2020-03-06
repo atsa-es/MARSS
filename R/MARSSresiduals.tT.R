@@ -187,6 +187,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
     tmpvar <- sub3D(var.et, t = t)
     resids <- et[, t, drop = FALSE]
     # don't includ values for resids if there is no residual (no data)
+    # replace NAs with 0s
     is.miss <- c(is.na(y[, t]), rep(FALSE, m))
     resids[is.miss] <- 0
 
@@ -203,19 +204,19 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
     tmpcholinv <- try(psolve(tmpchol), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
-      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
+      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo('residvarinv')\n"))
       next
     }
     # inverse of diagonal of variance matrix for marginal standardization
     tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
     if (inherits(tmpvarinv, "try-error")) {
       mar.st.et[, t] <- NA
-      msg <- c(msg, paste("MARSSresiduals.tT warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, "\n"))
+      msg <- c(msg, paste('MARSSresiduals.tT warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for mar.residuals at t =", t, "\n'))
       next
     }
     st.et[, t] <- tmpcholinv %*% resids
     st.et[is.miss, t] <- NA
-    mar.st.et[, t] <- tmpvarinv %*% resids
+    mar.st.et[, t] <- sqrt(tmpvarinv) %*% resids
     mar.st.et[is.miss, t] <- NA
   }
 
@@ -225,6 +226,13 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   var.et[(n + 1):(n + m), , TT] <- NA
   st.et[, TT] <- NA
   mar.st.et[(n + 1):(n + m), TT] <- NA
+  if(Harvey==TRUE){
+    for (t in 1:TT) {
+    is.miss <- c(is.na(y[, t]), rep(FALSE, m))
+    var.et[is.miss,1:n,t] <- NA
+    var.et[1:n,is.miss,t] <- NA
+    }
+  }
   
   # et is the expected value of the residuals conditioned on y(1)
   E.obs.v <- et[1:n,,drop=FALSE]
