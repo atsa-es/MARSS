@@ -34,14 +34,16 @@ augment_marxss <- function(x, type, interval, conf.level) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
-  resids <- residuals(x)
-  tmp <- apply(resids$var.residuals, 3, function(x) { takediag(x) })
-  tmp[tmp<0 & abs(tmp)<sqrt(.Machine$double.eps)] <- 0
-  se.resids <- sqrt(tmp)
   model.dims <- attr(model, "model.dims")
   data.dims <- model.dims[["y"]]
   nn <- data.dims[1]
   TT <- data.dims[2]
+  resids <- residuals(x)
+  tmp <- apply(resids$var.residuals, 3, function(x) { takediag(x) })
+  tmp[tmp<0 & abs(tmp)<sqrt(.Machine$double.eps)] <- 0
+  se.resids <- sqrt(tmp)
+  model.se.resids <-  se.resids[1:nn,,drop=FALSE]
+  model.se.resids[is.na(resids$model.residuals)] <- NA
   alpha <- 1 - conf.level
   if (substr(type, 1, 1) == "y") {
     data.names <- attr(model, "Y.names")
@@ -62,8 +64,9 @@ augment_marxss <- function(x, type, interval, conf.level) {
                                             .upr = fit.list$.upr)
     ret <- cbind(ret,
       .resids = vec(t(resids$model.residuals)),
-      .sigma = vec(t(se.resids[1:nn, , drop = FALSE])),
-      .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE]))
+      .sigma = vec(t(model.se.resids)),
+      .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE])),
+      .mar.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE]))
     )
   }
   if (substr(type, 1, 1) == "x") {
@@ -74,6 +77,7 @@ augment_marxss <- function(x, type, interval, conf.level) {
     state.se.resids <- cbind(NA, se.resids[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
     state.resids <- cbind(NA, resids$state.residuals[, 1:(TT - 1), drop = FALSE])
     state.std.resids <- cbind(NA, resids$std.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
+    state.mar.resids <- cbind(NA, resids$mar.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
     fit.list <- fitted(x, type = type, interval=interval, conf.level=conf.level)
     ret <- data.frame(
       .rownames = fit.list$.rownames,
@@ -92,7 +96,8 @@ augment_marxss <- function(x, type, interval, conf.level) {
     ret <- cbind(ret,
     .resids = vec(t(state.resids)),
     .sigma = vec(t(state.se.resids)),
-    .std.resid = vec(t(state.std.resids))
+    .std.resid = vec(t(state.std.resids)),
+    .mar.resid = vec(t(state.mar.resids))
     )
   }
   ret
