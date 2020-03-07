@@ -5,7 +5,7 @@
 \usage{
 augment.marssMLE(x, type = c("ytT", "xtT"),
     interval = c("none", "confidence", "prediction"), 
-    conf.level = 0.95, form=attr(x[["model"]], "form")[1])
+    conf.level = 0.95)
 }
 \arguments{
   \item{x}{a \code{\link{marssMLE}} object}
@@ -16,8 +16,6 @@ augment.marssMLE(x, type = c("ytT", "xtT"),
   
   \item{conf.level}{Confidence level.}
   
-  \item{form}{If you want the augment function to use a different augment function than augment_form.  This might be useful if you manually specified a DFA model and want to use augment.dfa for rotating.}
-
 }
 \description{
 \code{augment.marssMLE} returns a data.frame with fitted values, residuals, and upper and lower confidence intervals (if requested) for the fitted observations or states. \code{augment} is concerned with predictions of the states or observations at time t, i.e. the right part of a MARSS model equation with the error terms left off. The error terms are the residuals (the \eqn{v_t}{v(t)} or \eqn{w_t}{w(t)}). \code{\link{tidy.marssMLE}} is concerned with estimates of values (parameters, states or observations) conditioned on all the data.

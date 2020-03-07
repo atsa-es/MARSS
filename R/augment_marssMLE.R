@@ -6,15 +6,14 @@
 ##############################################################################################################################################
 augment.marssMLE <- function(x, type = c("ytT", "xtT"),
                              interval = c("none", "confidence", "prediction"),
-                             conf.level = 0.95,
-                             form = attr(x[["model"]], "form")[1]) {
+                             conf.level = 0.95) {
   ## Argument checking
   type <- match.arg(type)
   interval <- match.arg(interval)
   if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) {
     stop("augment.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
   }
-
+  form = attr(x[["model"]], "form")[1]
   augment.fun <- paste("augment_", form, sep = "")
   tmp <- try(exists(augment.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
