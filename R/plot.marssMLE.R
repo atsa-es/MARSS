@@ -95,11 +95,10 @@ plot.marssMLE <-
     
     if ("fitted.ytT" %in% plot.type) {
       # make plot of observations
-      df <- augment.marssMLE(x, type = "ytT", interval="confidence", 
-                             conf.level=conf.level, form = model_form)
+      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
-      df2 <- augment.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+      df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level)
       df$ymin.pi <- df2$.lwr
       df$ymax.pi <- df2$.upr
       nY <- min(9, attr(x$model, "model.dims")$y[1])
