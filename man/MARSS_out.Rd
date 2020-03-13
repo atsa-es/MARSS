@@ -26,7 +26,7 @@ When looking at estimates and intervals for x and y, keep in mind that the MARSS
 
 \strong{fitted Y(t)} The fitted values of \eqn{\mathbf{Y}_t}{Y_t} is the expected value of the right side of the \eqn{\mathbf{Y}_t}{Y_t} equation WITHOUT the \eqn{v_t}. Use \code{\link{fitted.marssMLE}} and \code{\link{augment.marssMLE}} to get the fitted values, their residuals, and their residual variances (for outlier analysis).
 
-\strong{Residual intervals} For residuals analysis (outlier detection), you want to use the "residual" intervals provided with \code{\link{augment.marssMLE}}. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{residuals.marssMLE}}. The residuals intervals are also what you want to evaluate data that you leave out, for example for a leave-one-out-cross-validation.
+\strong{Residual intervals} For residuals analysis (outlier detection), you want to use the "residual" intervals provided with \code{\link{augment.marssMLE}}. These are are the quantiles for the model residuals for data that were used to fit the model (and estimate xtT).  Read more about residuals analysis for MARSS models at \code{\link{MARSSresiduals}}. The residuals intervals are also what you want to evaluate data that you leave out, for example for a leave-one-out-cross-validation.
 
 \strong{Leave-one-out analysis} The one-step-ahead prediction intervals are not what you want if you left some of your data out and want to evaluate the model residuals for the left-out-data. The residuals intervals are also what you want for this case (with the left-out-data set to NA).
 

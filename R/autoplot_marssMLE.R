@@ -51,7 +51,7 @@ autoplot.marssMLE <-
     alpha <- 1 - conf.level
     plts <- list()
     
-    # augment is very slow because the residuals() function is slow. Don't call multiple times
+    # augment is very slow because the MARSSresiduals() function is slow. Don't call multiple times
     if(any(c("state.resids", "qqplot.state.resids", "acf.state.resids") %in% plot.type))
       augxdf <- augment.marssMLE(x, type = "xtT", form = "marxss")
     if(any(c("model.resids", "qqplot.model.resids", "acf.model.resids") %in% plot.type))

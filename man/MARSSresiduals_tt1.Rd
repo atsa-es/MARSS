@@ -3,7 +3,7 @@
 
 \title{ MARSS One-Step-Ahead Residuals }
 \description{
-  Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{residuals(object, conditioning="t-1")}.
+  Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{MARSSresiduals(object, conditioning="t-1")}.
 }
 \usage{
 MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, silent=FALSE)
@@ -60,7 +60,7 @@ If normalize=TRUE, the model is assumed to be written
 \deqn{ x_t = B x_{t-1} + u + Gw_t}
 with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
-\code{residuals.marssMLE} returns the residuals defined as in the first equations. To get the residuals defined as Harvey et al. (1998) define them (second equations), then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  Note, that the `normalized' residuals are not the same as the `standardized' residuals.  In former, the unconditional residuals have a variance of I while in the latter it is the conditional residuals that have a variance of I.
+\code{MARSSresiduals} returns the residuals defined as in the first equations. To get the residuals defined as Harvey et al. (1998) define them (second equations), then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of R and Q.  Note, that the `normalized' residuals are not the same as the `standardized' residuals.  In former, the unconditional residuals have a variance of I while in the latter it is the conditional residuals that have a variance of I.
 
 }
 
@@ -75,7 +75,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
   dat <- dat[c(2,11),]
   MLEobj <- MARSS(dat)
   
-  residuals(MLEobj, conditioning="t-1")$std.residuals
+  MARSSresiduals(MLEobj, conditioning="t-1")$std.residuals
 }
 \references{
 R. H. Shumway and D. S. Stoffer (2006).  Section on the calculation of the likelihood of state-space models in Time series analysis and its applications.  Springer-Verlag, New York.
