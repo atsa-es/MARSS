@@ -76,18 +76,19 @@ residuals_marxss <- function(x, type, standardization) {
     if(standardization=="marginal") 
       state.std.resids <- cbind(NA, resids$mar.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
     fit.list <- fitted(x, type = type1, interval="none")
-    ret <- data.frame(
+    if (type1=="xtt1") fit.list$value <- fit.list$xtt
+    if (type1=="xtT") fit.list$value <- fit.list$xtT
+    ret2 <- data.frame(
       .rownames = fit.list$.rownames,
       type = "state",
       t = fit.list$t,
-      value = fit.list$xtT,
-      .fitted = fit.list$.fitted
+      value = fit.list$value,
+      .fitted = fit.list$.fitted,
+      .resids = vec(t(state.resids)),
+      .sigma = vec(t(state.se.resids)),
+      .std.resid = vec(t(state.std.resids))
     )
-    ret <- cbind(ret,
-    .resids = vec(t(state.resids)),
-    .sigma = vec(t(state.se.resids)),
-    .std.resid = vec(t(state.std.resids))
-    )
+    ret <- rbind(ret, ret2)
   
   class(ret) <- c("marssResiduals", "tbl_df", "tbl", "data.frame")
   attr(ret, "standardization") <- standardization
