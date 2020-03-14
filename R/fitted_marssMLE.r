@@ -23,13 +23,13 @@ fitted.marssMLE <- function(object, ...,
     extras <- list(...)
     if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use type='ytt1' or 'xtt1' instead of one.step.ahead=TRUE.", call. = FALSE)
   }
-
+  
   # need the model dims in marss form with c in U and d in A
   model.dims <- attr(MLEobj[["marss"]], "model.dims")
   TT <- model.dims[["x"]][2]
   n <- model.dims[["y"]][1]
   m <- model.dims[["x"]][1]
-
+  
   if (type == "y") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
@@ -46,7 +46,7 @@ fitted.marssMLE <- function(object, ...,
     val <- matrix(NA, n, TT)
     rownames(val) <- attr(MLEobj$marss, "Y.names")
     if(interval!="none") se <- val
-
+    
     Zt <- parmat(MLEobj, "Z", t = 1)$Z
     At <- parmat(MLEobj, "A", t = 1)$A
     Rt <- parmat(MLEobj, "R", t = 1)$R
@@ -78,7 +78,7 @@ fitted.marssMLE <- function(object, ...,
     }
     
   }
-
+  
   if (type == "x") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
@@ -123,16 +123,23 @@ fitted.marssMLE <- function(object, ...,
     
     # Set up output
     if(output=="tibble"){
-    state.names <- attr(MLEobj[["model"]], "X.names")
-    state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
-    mm <- state.dims[1]
-    TT <- state.dims[2]
-    
-    ret <- data.frame(
-      .rownames = rep(state.names, each = TT),
-      t = rep(1:TT, mm),
-      xtT = vec(t(MLEobj[["states"]]))
-    )
+      state.names <- attr(MLEobj[["model"]], "X.names")
+      state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
+      mm <- state.dims[1]
+      TT <- state.dims[2]
+      
+      if (conditioning == "T")
+        ret <- data.frame(
+          .rownames = rep(state.names, each = TT),
+          t = rep(1:TT, mm),
+          xtT = vec(t(hatxt))
+        )
+      if (conditioning == "t1")
+        ret <- data.frame(
+          .rownames = rep(state.names, each = TT),
+          t = rep(1:TT, mm),
+          xtt = vec(t(hatxt))
+        )
     }
   }
   
@@ -144,10 +151,10 @@ fitted.marssMLE <- function(object, ...,
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
     retlist <- list(
-        .fitted = val, 
-        .se.fit = se,
-        .conf.low = val + qnorm(alpha/2) * se,
-        .conf.up = val + qnorm(1- alpha/2) * se
+      .fitted = val, 
+      .se.fit = se,
+      .conf.low = val + qnorm(alpha/2) * se,
+      .conf.up = val + qnorm(1- alpha/2) * se
     )
   }
   if (interval=="prediction"){
@@ -155,20 +162,20 @@ fitted.marssMLE <- function(object, ...,
     se <- sqrt(se) # was not sqrt earlier
     if (type == "x"){
       retlist <-list(
-      .fitted = val, 
-      .sd.x = se, 
-      .lwr = val + qnorm(alpha/2) * se,
-      .upr = val + qnorm(1- alpha/2) * se
-    )
+        .fitted = val, 
+        .sd.x = se, 
+        .lwr = val + qnorm(alpha/2) * se,
+        .upr = val + qnorm(1- alpha/2) * se
+      )
     }
-  if (type == "y"){
-    retlist <- list(
-      .fitted=val,
-      .sd.y=se,
-      .lwr = val + qnorm(alpha/2) * se,
-      .upr = val + qnorm(1- alpha/2) * se
-    )
-  }
+    if (type == "y"){
+      retlist <- list(
+        .fitted=val,
+        .sd.y=se,
+        .lwr = val + qnorm(alpha/2) * se,
+        .upr = val + qnorm(1- alpha/2) * se
+      )
+    }
   }
   if(output=="matrix") return(retlist)
   return(cbind(ret, as.data.frame(lapply(retlist, function(x){vec(t(x))}))))
