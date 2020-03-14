@@ -64,7 +64,6 @@ S3method(toLatex, marssMLE)
 
 # Declare these methods if the user has the package
 if(getRversion() >= "3.6.0") {
-  S3method(broom::augment, marssMLE)
   S3method(broom::glance, marssMLE)
   S3method(broom::tidy, marssMLE)
   S3method(ggplot2::autoplot, marssMLE)
