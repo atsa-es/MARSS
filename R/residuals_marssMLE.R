@@ -89,7 +89,7 @@ residuals_marxss <- function(x, type, standardization) {
     .std.resid = vec(t(state.std.resids))
     )
   
-  class(ret) <- c("marssResiduals", class(ret))
+  class(ret) <- c("marssResiduals", "tbl_df", "tbl", "data.frame")
   attr(ret, "standardization") <- standardization
   attr(ret, "residual.type") <- type
   ret
