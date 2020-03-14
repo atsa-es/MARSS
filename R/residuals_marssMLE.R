@@ -17,7 +17,7 @@ residuals.marssMLE <- function(x,
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(resids.fun, x, type = type))
+    ret <- eval(call(resids.fun, x, type = type, standardization = standardization))
   } else {
     ret <- paste("No residuals_", form[1], " is available.\n", sep = "")
   }
@@ -89,7 +89,7 @@ residuals_marxss <- function(x, type, standardization) {
     .std.resid = vec(t(state.std.resids))
     )
   
-  class(ret) <- "marssResiduals"
+  class(ret) <- c("marssResiduals", class(ret))
   attr(ret, "standardization") <- standardization
   attr(ret, "residual.type") <- type
   ret
