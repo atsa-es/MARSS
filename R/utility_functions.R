@@ -413,6 +413,11 @@ is.zero <- function(x) {
   (abs(x) < .Machine$double.eps)
 }
 
+is.unitcircle <- function(x, tol=.Machine$double.eps^0.5){
+  eigval <- eigen(x, only.values = TRUE)$values
+  all(abs(eigval) <= 1+tol)
+}
+
 vec <- function(x) {
   if (!is.array(x)) stop("vec:arg must be a 2D or 3D matrix")
   len.dim.x <- length(dim(x))
