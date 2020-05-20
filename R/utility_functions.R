@@ -415,7 +415,7 @@ is.zero <- function(x) {
 
 is.unitcircle <- function(x, tol=.Machine$double.eps^0.5){
   eigval <- eigen(x, only.values = TRUE)$values
-  all(sqrt(Re(eigval)^2+Im(eigval)^2) <= 1+tol)
+  all(abs(eigval) <= 1+tol)
 }
 
 vec <- function(x) {
