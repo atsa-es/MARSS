@@ -26,8 +26,8 @@ MARSSkemcheck <- function(MLEobj) {
       if (is.null(MLEobj$par$B)) tmpparB <- MLEobj$start$B else tmpparB <- MLEobj$par$B
       tmp.MLEobj <- list(marss = MODELobj, par = list(B = tmpparB)) # B is fixed but par might have cols from other times
       parB <- parmat(tmp.MLEobj, "B", t = t)$B
-      if (!all(abs(Re(eigen(parB, only.values = TRUE)$values)) <= 1)) {
-        msg <- c(msg, " All the eigenvalues of B must be within the unit circle: all(abs(Re(eigen(fixed$B)$values))<=1)\n")
+      if (!is.unitcircle(parB)) {
+        msg <- c(msg, " All the eigenvalues of B must be within the unit circle: all(sqrt(Re(eigen(B)$values)^2+Im(eigen(B)$values)^2)<=1)\n")
         ok <- FALSE
       }
     }
