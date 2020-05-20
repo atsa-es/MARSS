@@ -622,7 +622,7 @@ MARSSkem <- function(MLEobj) {
       # ~~~~~~~~Error checking
       if (any(eigen(par1$V0, symmetric = TRUE, only.values = TRUE)$values < 0)) {
         tmp <- ""
-        if (any(abs(Re(eigen(par1$B, only.values = TRUE)$values) > 1))) tmp <- "Your B matrix is outside the unit circle.  This is likely the problem.\n"
+        if (!is.unitcircle(par1$B)) tmp <- "Your B matrix is outside the unit circle.  This is likely the problem.\n"
         stop.msg <- paste("Stopped at iter=", iter, " in MARSSkem: solution became unstable. V0 update is not positive definite.\n", tmp, sep = "")
         stopped.with.errors <- TRUE
         break
@@ -899,7 +899,7 @@ MARSSkem <- function(MLEobj) {
         if (Ck > condition.limit) msg.kem <- c(msg.kem, paste("iter=", iter, " Unstable B estimate because P_{t-1,t-1} is ill-conditioned. C =", round(Ck), "\n", sep = ""))
         for (i in 1:max(dim(f$B)[3], dim(d$B)[3])) {
           parB <- parmat(MLEobj.iter, "B", t = i)$B
-          if (any(abs(Re(eigen(parB, only.values = TRUE)$values)) > 1)) msg.kem <- c(msg.kem, paste("iter=", iter, ",t=", i, " B update is outside the unit circle.", "\n", sep = ""))
+          if (!is.unitcircle(parB)) msg.kem <- c(msg.kem, paste("iter=", iter, ",t=", i, " B update is outside the unit circle.", "\n", sep = ""))
         }
       }
     } # if !is.fixed B

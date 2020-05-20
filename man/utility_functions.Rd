@@ -10,6 +10,7 @@
 \alias{is.design}
 \alias{is.fixed}
 \alias{is.zero}
+\alias{is.unitcircle}
 \alias{ is.solvable }
 \alias{vec}
 \alias{unvec}
@@ -48,6 +49,7 @@ is.identity(x, dim=NULL)
 is.solvable(A,y=NULL)
 is.validvarcov(x, method="kem")
 is.wholenumber(x, tol = .Machine$double.eps^0.5)
+is.unitcircle(x, tol = .Machine$double.eps^0.5)
 is.zero(x)
 makediag(x, nrow=NA)
 marssMODEL.to.list(MODELobj)
