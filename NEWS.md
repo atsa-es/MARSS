@@ -25,6 +25,7 @@ ENHANCEMENTS
 
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
+* Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
 
 BUGS
 
