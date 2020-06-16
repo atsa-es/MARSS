@@ -17,8 +17,8 @@ Work is currently focused on cleaning up 3.10.13 in prep for release on CRAN.
 
 TO DO
 
-* change the arguments for plot.marssMLE() to look like autoplot.marssMLE()
 * add x0 argument to predict.marssMLE() so that user can specify x0 if needed.
+* remove references to `augment()` in all the documentation.
 * [maybe] revamp marssPredict object so that it plays nice with forecast methods
 
 ENHANCEMENTS
@@ -26,7 +26,8 @@ ENHANCEMENTS
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
-* Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. The required also slight changes to the `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
+* Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. The required also slight changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
 
 BUGS
 
