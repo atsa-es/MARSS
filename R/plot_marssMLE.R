@@ -2,7 +2,7 @@ plot.marssMLE <-
   function(x,
            plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids"),
            form = c("marxss", "marss", "dfa"),
-           conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
+           conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), ...) {
     
     # Argument checks
@@ -110,14 +110,18 @@ plot.marssMLE <-
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
       for (plt in levels(df$.rownames)) {
+        tit <- plt
+        if (conf.int) tit <- paste(tit, "+ CI")
+        if (pi.int) tit <- paste(tit, "+ PI (dashed)")
+        df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
         with(subset(df, df$.rownames == plt), {
           ylims <- c(min(.fitted, y, ymin, ymax, na.rm = TRUE), max(.fitted, y, ymin, ymax, na.rm = TRUE))
           plot(t, .fitted, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
-          title(plt)
+          title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
-          points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
+          if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
           lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
-          if (decorate){
+          if (pi.int){
             lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
             lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
           }
