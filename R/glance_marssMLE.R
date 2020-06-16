@@ -1,11 +1,12 @@
 ###############################################################################################################################################
-#  glance method for class marssMLE
+#  glance method for class marssMLE. For package broom
 ##############################################################################################################################################
 glance.marssMLE <- function(x, ...) {
-  a <- augment.marssMLE(x)
+  a <- residuals.marssMLE(x)
+  a <- subset(a, type=="model")
   a <- na.omit(a)
   ret <- data.frame(
-    coef.det = cor(a$.fitted, a$y)^2,
+    coef.det = cor(a$.fitted, a$value)^2,
     sigma = var(a$.resids),
     df = x$num.params,
     logLik = x$logLik,
