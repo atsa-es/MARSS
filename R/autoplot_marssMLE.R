@@ -51,11 +51,10 @@ autoplot.marssMLE <-
     alpha <- 1 - conf.level
     plts <- list()
     
-    # augment is very slow because the MARSSresiduals() function is slow. Don't call multiple times
-    if(any(c("state.resids", "qqplot.state.resids", "acf.state.resids") %in% plot.type))
-      augxdf <- augment.marssMLE(x, type = "xtT", form = "marxss")
-    if(any(c("model.resids", "qqplot.model.resids", "acf.model.resids") %in% plot.type))
-      augydf <- augment.marssMLE(x, type = "ytT", form = "marxss")
+    if (any(str_detect(plot.type, "resids"))){
+      resids <- residuals.marssMLE(x, type = "innovations", standardization="marginal")
+      std.resids <- residuals.marssMLE(x, type="smoothations", standardization="Cholesky")
+    }
     
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
@@ -156,8 +155,9 @@ autoplot.marssMLE <-
 
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- augydf
-      p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$y)), ], ggplot2::aes_(~t, ~.resids)) +
+      df <- subset(resids, type=="model")
+      df$.rownames <- factor(df$.rownames) # drop levels
+      p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$value)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(shape = plotpar$point.pch, fill = plotpar$point.fill, 
                             col = plotpar$point.col, size = plotpar$point.size) +
         ggplot2::xlab("Time") +
@@ -166,9 +166,9 @@ autoplot.marssMLE <-
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("Model residual")
       if (decorate){
-        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        p1 <- p1 + ggplot2::stat_smooth(formula=y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
         df$sigma <- df$.sigma
-        df$sigma[is.na(df$y)] <- 0
+        df$sigma[is.na(df$value)] <- 0
         df$ymin.resid <- qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- - qnorm(alpha / 2) * df$sigma
         p1 <- p1 +
@@ -182,7 +182,8 @@ autoplot.marssMLE <-
 
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- augxdf
+      df <- subset(resids, type=="state")
+      df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(shape = plotpar$point.pch, fill = plotpar$point.fill, 
@@ -193,7 +194,7 @@ autoplot.marssMLE <-
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle("State residuals")
       if (decorate){
-        p1 <- p1 + ggplot2::stat_smooth(method = "loess", se = FALSE, na.rm = TRUE)
+        p1 <- p1 + ggplot2::stat_smooth(formula=y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
         df$ymin.resid <- qnorm(alpha / 2) * df$.sigma
         df$ymax.resid <- - qnorm(alpha / 2) * df$.sigma
         p1 <- p1 +
@@ -221,7 +222,8 @@ autoplot.marssMLE <-
 
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- augydf
+      df <- subset(std.resids, type=="model")
+      df$.rownames <- factor(df$.rownames) # drop levels
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       abline.dat <- data.frame(.rownames = names(slope), slope = slope, intercept = intercept)
@@ -240,7 +242,8 @@ autoplot.marssMLE <-
 
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
-      df <- augxdf
+      df <- subset(std.resids, type=="state")
+      df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
@@ -258,6 +261,7 @@ autoplot.marssMLE <-
       }
     }
     
+    # ACF functions
     acffun <- function(x,y) {
       bacf <- acf(x, plot = FALSE, na.action=na.pass)
       bacfdf <- with(bacf, data.frame(lag, acf))
@@ -268,7 +272,8 @@ autoplot.marssMLE <-
       return(ciline)
     }
     if ("acf.state.resids" %in% plot.type) {
-      df <- augxdf
+      df <- subset(std.resids, type=="state")
+      df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
@@ -297,8 +302,8 @@ autoplot.marssMLE <-
       }
     }
     if ("acf.model.resids" %in% plot.type) {
-      df <- augydf
-
+      df <- subset(std.resids, type=="model")
+      df$.rownames <- factor(df$.rownames) # drop state levels
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
       fun <- function(x,y) data.frame(.rownames=y, lag=x$lag, acf=x$acf)
       acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY =FALSE)
@@ -315,7 +320,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("Model Residuals ACF")
+        ggplot2::ggtitle("geom_smooth")
       p1 <- p1 + 
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
