@@ -88,7 +88,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "xtT"]
-      cat(paste("plot type = \"xtT\" Estimated States\n"))
+      cat(paste("plot type = \"xtT\" Estimated states\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -130,7 +130,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "fitted.ytT"]
-      cat(paste("plot type = \"fitted.ytT\" Observations with Fitted Values\n"))
+      cat(paste("plot type = \"fitted.ytT\" Observations with fitted values\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -173,7 +173,7 @@ plot.marssMLE <-
         mtext("Observation residuals, y - E[y]", side = 2, outer = TRUE, line = -1)
       }
       plot.type <- plot.type[plot.type != "model.resids"]
-      cat(paste("plot type = \"model.resids\" Model Residuals\n"))
+      cat(paste("plot type = \"model.resids\" Model residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -208,7 +208,7 @@ plot.marssMLE <-
         mtext("Observation standardized residuals", side = 2, outer = TRUE, line = -1)
       }
       plot.type <- plot.type[plot.type != "std.model.resids"]
-      cat(paste("plot type = \"std.model.resids\" Standardized Model Residuals\n"))
+      cat(paste("plot type = \"std.model.resids\" Standardized model residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -251,7 +251,7 @@ plot.marssMLE <-
         mtext("State residuals, xtT - E[x]", side = 2, outer = TRUE, line = -1)
       }
       plot.type <- plot.type[plot.type != "state.resids"]
-      cat(paste("plot type = \"state.resids\" State Residuals\n"))
+      cat(paste("plot type = \"state.resids\" State residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -291,7 +291,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "qqplot.model.resids"]
-      cat(paste("plot type = \"qqplot.model.resids\" QQplot of Model Standardized Residuals\n"))
+      cat(paste("plot type = \"qqplot.model.resids\" QQ plot of model standardized residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -318,7 +318,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "qqplot.state.resids"]
-      cat(paste("plot type = \"qqplot.state.resids\" QQplot of State Standardized Residuals\n"))
+      cat(paste("plot type = \"qqplot.state.resids\" QQ plot of state standardized residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -375,7 +375,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "acf.model.resids"]
-      cat(paste("plot type = \"acf.model.resids\" Model Residuals ACF\n"))
+      cat(paste("plot type = \"acf.model.resids\" Model residuals ACF\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -401,7 +401,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "acf.state.resids"]
-      cat(paste("plot type = \"acf.state.resids\" State Residuals ACF\n"))
+      cat(paste("plot type = \"acf.state.resids\" State residuals ACF\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
