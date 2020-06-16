@@ -1,6 +1,6 @@
 plot.marssMLE <-
   function(x,
-           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT"),
+           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), ...) {
@@ -186,7 +186,7 @@ plot.marssMLE <-
       # make plot of standardized observation residuals
       df <- subset(std.resids, type=="model")
       df$.rownames <- factor(df$.rownames) # drop state levels
-      df$.std.resids[is.na(df$valu)] <- NA
+      df$.std.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -303,7 +303,7 @@ plot.marssMLE <-
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
       df <- subset(std.resids, type=="state")
-      df$.rownames <- factor(df$.rownames) # drop levels
+      df$.rownames <- factor(df$.rownames) # drop model levels
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
@@ -349,9 +349,59 @@ plot.marssMLE <-
           box()
         })
       }
-      
       plot.type <- plot.type[plot.type != "ytT"]
       cat(paste("plot type = \"ytT\" Expected value of Y conditioned on data\n"))
+      if (length(plot.type) != 0) {
+        ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
+        if (tolower(ans) == "q") {
+          return()
+        }
+      }
+    }
+
+    if ("acf.model.resids" %in% plot.type) {
+      df <- subset(std.resids, type=="model")
+      df$.rownames <- factor(df$.rownames) # drop levels
+      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      plot.ncol <- round(sqrt(nY))
+      plot.nrow <- ceiling(nY / plot.ncol)
+      par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
+      for (plt in levels(df$.rownames)) {
+        tit <- plt
+        with(subset(df, df$.rownames == plt), {
+          stats::acf(.resids, na.action=na.pass, main="")
+          title(tit)
+          box()
+        })
+      }
+      plot.type <- plot.type[plot.type != "acf.model.resids"]
+      cat(paste("plot type = \"acf.model.resids\" Model Residuals ACF\n"))
+      if (length(plot.type) != 0) {
+        ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
+        if (tolower(ans) == "q") {
+          return()
+        }
+      }
+    }
+
+    if ("acf.state.resids" %in% plot.type) {
+      df <- subset(std.resids, type=="state")
+      df$.rownames <- factor(df$.rownames) # drop levels
+      df$.rownames <- paste0("State ", df$.rownames)
+      nX <- min(9, attr(x$model, "model.dims")$x[1])
+      plot.nrow <- round(sqrt(nX))
+      plot.ncol <- ceiling(nX / plot.nrow)
+      par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
+      for (plt in unique(df$.rownames)) {
+        tit <- plt
+        with(subset(df, df$.rownames == plt), {
+          stats::acf(.resids, na.action=na.pass, main="")
+          title(tit)
+          box()
+        })
+      }
+      plot.type <- plot.type[plot.type != "acf.state.resids"]
+      cat(paste("plot type = \"acf.state.resids\" State Residuals ACF\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
