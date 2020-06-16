@@ -29,20 +29,19 @@ ENHANCEMENTS
 
 BUGS
 
-* This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. History: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was in `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
 
 
 
 MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
-
 Version 3.10.13 mainly has to do with the `predict()` and `forecast()` functions along with plotting and printing methods.
 
 ENHANCEMENTS
 
 * `MARSSkfss()` and `MARSSkfas()` Add rownames to the x elements of the list.
 * `MARSSkf()` Added `newdata` to allow user to pass in a new dataset to fit with the fitted model.
-* `predict.marssMLE()` Shows the prediction or confidence intervals for data or states. Forecasts can be done by passing in `h`. `newdata` can be passed in also and fitted model will be used to fit these data and show the intervals. Output is a tibble. Returns a list of class `marssPredict`.
+* `predict.marssMLE()` Shows the prediction or confidence intervals for data or states. Forecasts can be done by passing in `h`. `newdata` can be passed in also and fitted model will be used to fit these data and show the intervals. Output is same form as a tibble (but not a tibble). Returns a list of class `marssPredict`.
 * `forecast.marssMLE()` This does the foreward forecasting past the end of the data. Intended to be called by `predict.marssMLE`. I did not write a `marssMLE` method for the `forecast` generic in the **forecast** package since that would require that the forecast package be required for the **MARSS** package.
 * `plot.marssPredict()` plot method for the new marssPredict object. This is designed to look like the `plot.forecast()` function in the **forecast** package.
 * `print.marssPredict()` print method for marssPredict objects.
