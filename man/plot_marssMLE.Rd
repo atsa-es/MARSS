@@ -8,7 +8,7 @@
 }
 \usage{
 \method{plot}{marssMLE}(x, plot.type=c("fitted.ytT", "xtT", "model.resids", 
-    "state.resids", "qqplot.model.resids", "qqplot.state.resids"), 
+    "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT"), 
     form=c("marxss", "marss", "dfa"),
     conf.int=TRUE, conf.level=0.95, decorate=TRUE,
     plot.par = list(), ...)
@@ -45,7 +45,7 @@ The plot types are as follows:
 \item{\code{"state.resids"}}{ \code{"state.residuals"} can also be used. State smoothation residuals (E(x(t) | xtT(t-1)) minus xtT(t)). The intervals are the CIs for the smoothation residuals not one-step-ahead residuals. }
 \item{\code{qqplot.model.resids}}{\code{"model.residuals.qqplot"} can also be used. Visual normality test for the model residuals.} 
 \item{\code{qqplot.state.resids}}{\code{"state.residuals.qqplot"} can also be used. Visual normality test for the state residuals.} 
-\item{\code{"ytT"}}{ The expected value of \eqn{y} conditioned on the data. Use this for estimates of the missing data points. } 
+\item{\code{"ytT"}}{ The expected value of \eqn{y} conditioned on the data. Use this for estimates of the missing data points. Note for non-missing \eqn{y} values, the expected value of \eqn{y} is \eqn{y}. } 
 \item{\code{"acf.model.resids"}}{ ACF of the model residuals.}
 \item{\code{"acf.state.resids"}}{ ACF of the state residuals.}
 }
