@@ -99,8 +99,7 @@ plot.marssMLE <-
     
     if ("fitted.ytT" %in% plot.type) {
       # make plot of observations
-      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", 
-                             conf.level=conf.level)
+      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
       df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level)
