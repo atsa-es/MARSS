@@ -164,7 +164,7 @@ autoplot.marssMLE <-
         ggplot2::ylab("Observation residuals, y - E[y]") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
-        ggplot2::ggtitle("Model residual")
+        ggplot2::ggtitle("Model residuals")
       if (decorate){
         p1 <- p1 + ggplot2::stat_smooth(formula=y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
         df$sigma <- df$.sigma
@@ -232,7 +232,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Theoretical Quantiles") +
         ggplot2::ylab("Standardized Model Residuals") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
-        ggplot2::ggtitle("Model residuals")
+        ggplot2::ggtitle("Model residuals normality")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
       plts[["qqplot.model.resids"]] <- p1
       if (identical(plot.type, "qqplot.model.resids")) {
@@ -253,7 +253,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Theoretical Quantiles") +
         ggplot2::ylab("Standardized State Residuals") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("State residuals")
+        ggplot2::ggtitle("State residuals normality")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
       plts[["qqplot.state.resids"]] <- p1
       if (identical(plot.type, "qqplot.state.resids")) {
@@ -292,7 +292,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("State Residuals ACF")
+        ggplot2::ggtitle("State residuals ACF")
       p1 <- p1 + 
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
@@ -320,7 +320,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("geom_smooth")
+        ggplot2::ggtitle("Model residuals ACF")
       p1 <- p1 + 
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~-ci), color = "blue", linetype = 2)
