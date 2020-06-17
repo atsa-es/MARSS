@@ -18,8 +18,8 @@ Work is currently focused on cleaning up 3.10.13 in prep for release on CRAN.
 TO DO
 
 * add x0 argument to predict.marssMLE() so that user can specify x0 if needed.
-* remove references to `augment()` in all the documentation.
 * [maybe] revamp marssPredict object so that it plays nice with forecast methods
+* review the residuals write up again and MARSS_out.Rd
 
 ENHANCEMENTS
 
@@ -27,7 +27,7 @@ ENHANCEMENTS
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
 * Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
-* Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. The required also slight changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. This required changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
 
 BUGS
 

@@ -342,7 +342,7 @@ x=print(kemfit, what="states",silent=TRUE)
 
 \section{Tidy output}
 
-The \verb@augment@, \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \verb@?augment.marssMLE@ for examples.\index{augment}\index{functions!augment}\index{tidy}\index{functions!tidy}
+The \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
 
 <<model-tidy-R>>=
 require(broom)

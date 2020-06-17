@@ -31,7 +31,7 @@
   eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{
-\code{\link{augment.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{print.marssMLE}} 
+\code{\link{tidy.marssMLE}}, \code{\link{print.marssMLE}} 
 }
 \examples{ 
 dat <- t(harborSeal)

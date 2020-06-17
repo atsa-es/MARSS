@@ -44,7 +44,7 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
       \item{\code{\link{fitted.marssMLE}}}{ Fitted Y and X estimates output as a tibble. Output can be conditioned on all the data (T), data up to t-1, or data up to t.} 
       \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
       \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates and fitted Y and X estimates output as a tibble. With confidence intervals if requested} 
-      \item{\code{\link{augment.marssMLE}}}{ Model residuals as a tibble. } 
+      \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a tibble. } 
       \item{\code{\link{plot.marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
       \item{\code{\link{autoplot.marssMLE}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
       \item{\code{\link{glance.marssMLE}}}{ Brief summary of fit. } 

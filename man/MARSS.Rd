@@ -73,7 +73,7 @@ If you are working with models with time-varying parameters, it is important to 
 }
 
 \value{
-  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), see \code{\link{print.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{augment.marssMLE}} and \code{\link{plot.marssMLE}}.  
+  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), see \code{\link{print.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{MARSSresiduals}} and \code{\link{plot.marssMLE}}.  
   
   The outputted \code{\link{marssMLE}} object has the following components:
   \item{model}{ MARSS model specification. It is a \code{\link{marssMODEL}} object in the form specified by the user in the \code{MARSS()} call.  This is used by print functions so that the user sees the expected form.}
@@ -112,8 +112,8 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
   eli(dot)holmes(at)noaa(dot)gov and eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{
-\code{\link{marssMLE}} \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},
-\code{\link{augment.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
+\code{\link{marssMLE}} \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}},
+\code{\link{residuals.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
 }
 \examples{
 dat <- t(harborSealWA)
