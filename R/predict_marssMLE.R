@@ -6,7 +6,7 @@ predict.marssMLE <- function(object, h=0,
                              newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
                              interval = c("prediction", "confidence", "none"),
                              fun.kf = c("MARSSkfas", "MARSSkfss"),
-                             use.initial.values = FALSE,
+                             x0 = "new",
                              ...) {
   type <- match.arg(type)
   interval <- match.arg(interval)
@@ -28,8 +28,20 @@ predict.marssMLE <- function(object, h=0,
   if(length(conf.level) == 0) interval <- "none"
   if (!missing(h) && (!is.numeric(h) ||  length(h) != 1 || h < 0 || (h %% 1) != 0))
     stop("predict.marssMLE: h must be an integer > 0.", call. = FALSE)
-  if(use.initial.values) x0 <- list(x0 = coef(object, type="matrix")[["x0"]], tinitx=object[["model"]][["tinitx"]])
-  if(!use.initial.values) x0 <- list(x0 = object[["call"]][["model"]][["x0"]], tinitx=object[["call"]][["model"]][["tinitx"]])
+
+  # test x0 structure
+  if(!(identical(x0, "new") |
+       identical(x0, "model") | 
+       inherits(x0, "matrix")))
+    stop("predict.marssMLE: x0 must be 'new', 'model' or a new x0 matrix to use as the x0 value.", call. = FALSE)
+  dimx0 <- attr(object$model, "model.dims")$x0[1:2]
+  if(inherits(x0, "matrix") && !identical(dim(x0), dimx0))
+    stop(paste0("predict.marssMLE: if x0 is a matrix, it must be the same dimensions as the model x0 (", dimx0[1], " x ", dimx0[2],")."), call. = FALSE)
+  # Use the x0 estimated in the fitted model (object)
+  if(identical(x0, "model")) x0 <- list(x0 = coef(object, type="matrix")[["x0"]], tinitx=object[["model"]][["tinitx"]])
+  # Set up x0 to be the same form (sharing, independent, etc) as in the model call
+  if(identical(x0, "new")) x0 <- list(x0 = object[["call"]][["model"]][["x0"]], tinitx=object[["call"]][["model"]][["tinitx"]])
+  if(inherits(x0, "matrix")) x0 <- list(x0 = x0, tinitx=object[["model"]][["tinitx"]])
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
