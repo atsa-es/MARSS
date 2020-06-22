@@ -69,6 +69,11 @@ The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) An
 Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.          
 }
 \examples{
+dat <- t(harborSealWA[,-1])
+# DFA with 3 states; used BFGS because it fits much faster for this model
+fit <- MARSS(dat, model = list(m=3), form="dfa", method="BFGS")
+
+
 \dontrun{
 # See the Dynamic Factor Analysis chapter in the User Guide
 RShowDoc("UserGuide", package = "MARSS")
