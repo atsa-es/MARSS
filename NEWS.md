@@ -14,12 +14,13 @@ Work is currently focused on cleaning up 3.10.13 in prep for release on CRAN.
 * predict.marssMLE.Rd (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
 * clean-up on the man pages for predict() and predict.marssMLE
 * changed the x0 estimation behavior for predict.marssMLE() when no data passed in.
+* added x0 argument to predict.marssMLE() so that user can specify x0 if needed.
 
 TO DO
 
-* add x0 argument to predict.marssMLE() so that user can specify x0 if needed.
 * [maybe] revamp marssPredict object so that it plays nice with forecast methods
 * review the residuals write up again and MARSS_out.Rd
+* Move pdf docs back onto github package
 
 ENHANCEMENTS
 
@@ -32,6 +33,11 @@ ENHANCEMENTS
 BUGS
 
 * This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+
+DOCUMENTATION and MAN FILES
+
+* Added covariates and example to `MARSS_dfa.Rd`
+* Removed all mention of `augment()` from documentation and manuals. Replaced with `residuals()`.
 
 OTHER
 
