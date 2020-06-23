@@ -345,10 +345,8 @@ x=print(kemfit, what="states",silent=TRUE)
 The \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
 
 <<model-tidy-R>>=
-require(broom)
-head(augment(kemfit))
-tidy(kemfit)
-glance(kemfit)
+broom::tidy(kemfit)
+broom::glance(kemfit)
 @
 
 \section{Confidence intervals on a fitted model}

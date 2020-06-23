@@ -134,7 +134,6 @@ ggplot(data = d) +
 # Make a plot of the fitted y(t), i.e., to put a line through the points
 # Intervals are for new data not the blue dots 
 # (which were used to fit the model so are not new)
-# Use augment() for model residuals (data - fitted values)
 library(ggplot2)
 d <- tidy(MLEobj, type = "fitted.ytT")
 ggplot(data = d) +

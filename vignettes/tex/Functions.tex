@@ -33,7 +33,7 @@ The following core functions are designed to work with `unfitted' marssMLE objec
 The following functions use a marssMLE object that has a populated \verb@par@ element, i.e. a marssMLE object returned from one of the fitting functions (\verb@MARSS@, \verb@MARSSkem@, \verb@MARSSoptim@).  Below \verb@MODELobj@ means the argument is a marssMODEL object and \verb@MLEobj@ means the argument is a marssMLE object.  Type \verb@?function.name@ to see information on function usage and examples.
 \begin{description}
   \item[standard functions] The standard R functions for fitted objects are provided: \verb@residuals()@, \verb@fitted()@, \verb@logLik()@, \verb@AIC()@, and \verb@coef()@.
-  \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output using the broom R package and \verb@augment()@, \verb@tidy()@, and \verb@glance()@.
+  \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output: \verb@tidy()@ and \verb@glance()@.
 \end{description}
 
 In addition, the following are special functions for MARSS fitted models:

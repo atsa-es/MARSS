@@ -74,7 +74,7 @@ if(getRversion() >= "3.6.0") {
 
 # Another approach for the broom and ggplot2 S3 methods is 
 # to put broom and ggplot2 in imports
-# importFrom(broom, augment, glance, tidy)
+# importFrom(broom, glance, tidy)
 # importFrom(ggplot2, autoplot)
 # S3method(augment, marssMLE)
 # S3method(glance, marssMLE)
