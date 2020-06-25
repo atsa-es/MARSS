@@ -112,8 +112,8 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
   eli(dot)holmes(at)noaa(dot)gov and eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{
-\code{\link{marssMLE}} \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}},
-\code{\link{residuals.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
+\code{\link{marssMLE}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}},
+\code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
 }
 \examples{
 dat <- t(harborSealWA)
