@@ -23,7 +23,7 @@
 }
 
 \seealso{
-\code{\link{residuals.marssMLE}} \code{\link{MARSSresiduals}} 
+\code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals}} 
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA
