@@ -399,8 +399,8 @@ kemz.3 = MARSS(dat.z, model=dfa.model, control=cntl.list)
 <<load_results_if_present, results=hide, echo=FALSE>>=
 # This is being done to speed up building the user guide
 file="CS4--model.fits.Rdata"
-if(file %in% dir("./manual_files")) {
-	load(paste("./manual_files/",file,sep=""))
+if(file %in% dir(file.path(here::here(), "vignettes/manual_files"))) {
+	load(file.path(here::here(), "vignettes/manual_files", file))
 	saved.res = TRUE
 } else { saved.res = FALSE }
 @
@@ -743,12 +743,15 @@ Alternatively, you can use the \verb@residuals()@ function to obtain a summary o
 \begin{center}
 <<Cs25d_plotwithaugment, fig=TRUE, height=6, width=6, results=hide>>=
 require(ggplot2)
+alpha <- 0.05
 theme_set(theme_bw()) 
-d <- residuals(the.fit, interval="confidence")
+d <- residuals(the.fit)
+d$up <- qnorm(1-alpha/2)*d$.sigma + d$.fitted
+d$lo <- qnorm(alpha/2)*d$.sigma + d$.fitted
 ggplot(data = d) + 
   geom_line(aes(t, .fitted)) +
-  geom_point(aes(t, y)) +
-  geom_ribbon(aes(x=t, ymin=.conf.low, ymax=.conf.up), linetype=2, alpha=0.2) +
+  geom_point(aes(t, value)) +
+  geom_ribbon(aes(x=t, ymin=lo, ymax=up), linetype=2, alpha=0.2) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
 @
