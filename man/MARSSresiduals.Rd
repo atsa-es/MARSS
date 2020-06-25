@@ -3,7 +3,7 @@
 
 \title{ MARSS Residuals }
 \description{
-  Calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals.
+  The normal residuals function is \code{\link{residuals.marssMLE}()}. \code{MARSSresiduals()} returns residuals as matrices while \code{\link{residuals.marssMLE}()} returns the same information as a data frame.  This function calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals. 
 }
 \usage{
 MARSSresiduals(object,..., conditioning=c("T", "t-1"), normalize=FALSE, silent=FALSE)
@@ -79,7 +79,7 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
 
   eli(dot)holmes(at)noaa(dot)gov
 } 
-\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]
