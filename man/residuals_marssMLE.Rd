@@ -4,8 +4,8 @@
 \title{Return the model and state fitted values, residuals, and residual sigma}
 \usage{
 \method{residuals}{marssMLE}(x, type=c("smoothations", "innovations"),
-                               standardization=c("Cholesky", "marginal"),
-                               form=attr(x[["model"]], "form")[1])
+           standardization=c("Cholesky", "marginal"),
+           form=attr(x[["model"]], "form")[1])
 }
 \arguments{
   \item{x}{a \code{\link{marssMLE}} object}
