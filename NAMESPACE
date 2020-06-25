@@ -3,7 +3,6 @@
 export(
   CSEGriskfigure,
   CSEGtmufigure,
-  forecast.marssMLE,
   MARSS,
   MARSSaic,
   MARSSboot,
@@ -19,16 +18,18 @@ export(
   MARSSkfas,
   MARSSoptim,
   MARSSparamCIs,
+  MARSSresiduals,
   MARSSsimulate,
   MARSSFisherI,
   zscore,
   ldiag,
-  glance.marssMLE,
-  tidy.marssMLE,
   autoplot.marssMLE,
   autoplot.marssPredict,
   accuracy.marssMLE,
-  accuracy.marssPredict
+  accuracy.marssPredict,
+  forecast.marssMLE,
+  glance.marssMLE,
+  tidy.marssMLE
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
