@@ -15,7 +15,7 @@ autoplot.marssPredict <-
                     ci.linetype = "blank", 
                     ci.linesize = 0, ci.alpha = 0.6, 
                     f.col = "#0000AA", f.linetype = "solid", f.linesize=0.5,
-                    theme = theme_bw()
+                    theme = ggplot2::theme_bw()
                     )
     if (!is.list(plot.par)) stop("autoplot.marssMLE: plot.par must be a list.", call. = FALSE)
     if (!missing(plot.par)){
@@ -45,17 +45,17 @@ autoplot.marssPredict <-
     }
     if (pi.int && (is.null(plotpar[["ci.fill"]]) || length(plotpar[["ci.fill"]]) != nint)) {
       if (min(lev) < 50) {
-        plotpar[["ci.fill"]] <- colorspace::sequential_hcl(100)[lev]
+        plotpar[["ci.fill"]] <- hcl_palette_100[lev]
       }
       else {
-        plotpar[["ci.fill"]] <- colorspace::sequential_hcl(52)[lev - 49]
+        plotpar[["ci.fill"]] <- hcl_palette_52[lev - 49]
       }
     }
     if(is.null(plotpar[["ci.col"]]) || length(plotpar[["ci.col"]]) != nint)
       plotpar[["ci.col"]] <- plotpar[["ci.fill"]]
     
     if(h == 0){
-      df <- subset(x$pred, t > nx-include+1)
+      df <- subset(x$pred, x$t > nx-include+1)
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
       loc <- which(colnames(df)=="se")
       if (pi.int){
@@ -71,7 +71,7 @@ autoplot.marssPredict <-
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~.rownames, scale = "free_y") +
+        ggplot2::facet_wrap(~df$.rownames, scale = "free_y") +
         ggplot2::ggtitle(paste(ifelse(x$type=="xtT", "State", "Data"), "Predictions"))
       if(x$type=="ytT" && decorate) 
           p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
@@ -80,14 +80,14 @@ autoplot.marssPredict <-
       return(p1)
     }
     if(h != 0){
-      df <- subset(x$pred, t > nx-include+1)
+      df <- subset(x$pred, x$t > nx-include+1)
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
-      tmp <- subset(df, t <= nx)
+      tmp <- subset(df, df$t <= nx)
       p1 <- p1 + ggplot2::geom_line(data= tmp, linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$f.linesize)
       loc <- which(colnames(df)=="se")
       if (pi.int){
         for(i in length(lev):1){
-          tmp <- subset(df, t > nx) 
+          tmp <- subset(df, df$t > nx) 
           colnames(tmp)[colnames(tmp)==paste("Lo",lev[i])] <- "conf.low"
           colnames(tmp)[colnames(tmp)==paste("Hi",lev[i])] <- "conf.high"
           p1 <- p1 + ggplot2::geom_ribbon(data = tmp, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), 
@@ -98,7 +98,7 @@ autoplot.marssPredict <-
       }
       p1 <- p1 +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~.rownames, scale = "free_y") +
+        ggplot2::facet_wrap(~df$.rownames, scale = "free_y") +
         ggplot2::ggtitle(paste(ifelse(x$type=="xtT", "State", "Data"), "Predictions"))
       if(x$type=="ytT" && decorate) 
         p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
