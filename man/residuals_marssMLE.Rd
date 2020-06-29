@@ -3,12 +3,12 @@
 
 \title{Return the model and state fitted values, residuals, and residual sigma}
 \usage{
-\method{residuals}{marssMLE}(x, type=c("smoothations", "innovations"),
+\method{residuals}{marssMLE}(object, ..., type=c("smoothations", "innovations"),
            standardization=c("Cholesky", "marginal"),
            form=attr(x[["model"]], "form")[1])
 }
 \arguments{
-  \item{x}{a \code{\link{marssMLE}} object}
+  \item{object}{a \code{\link{marssMLE}} object}
   
   \item{type}{"Cholesky" means it is standardized by the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
 "marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals.}
@@ -16,6 +16,8 @@
   \item{standardization}{"smoothations" means the fitted values are computed conditioned on all the data. See \code{\link{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "innovations" means the fitted values are computed conditioned on the data up to t-1. See \code{\link{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}.}
 
   \item{form}{If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
+  
+  \item{...}{Not used.}
 
 }
 \description{
