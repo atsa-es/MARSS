@@ -1,6 +1,6 @@
 ######################################################################################################  forecast method for class marssMLE. Prediction intervals
 ##################################################################################
-forecast.marssMLE <- function(object, h=1,
+forecast.marssMLE <- function(object, h=10,
                               conf.level = c(0.80, 0.95),
                               type = c("ytT", "xtT"),
                               newdata = list(y=NULL, c=NULL, d=NULL),
