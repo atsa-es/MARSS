@@ -31,15 +31,15 @@ plot.marssPredict <- function(x, include, pi.int = TRUE, main=NULL,
   }
   if (pi.int && is.null(shadecols)) {
     if (min(x$level) < 50) {
-      shadecols <- rev(colorspace::sequential_hcl(100)[x$level])
+      shadecols <- rev(hcl_palette_100[x$level])
     }
     else {
-      shadecols <- rev(colorspace::sequential_hcl(52)[x$level - 49])
+      shadecols <- rev(hcl_palette_52[x$level - 49])
     }
   }
   if (length(shadecols) == 1) {
     if (shadecols == "oldstyle") {
-      shadecols <- heat.colors(nint + 2)[switch(1 + (nint > 1), 2, nint:1) + 1]
+      shadecols <- grDevices::heat.colors(nint + 2)[switch(1 + (nint > 1), 2, nint:1) + 1]
     }
   }
   
