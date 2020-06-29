@@ -4,7 +4,7 @@
 #  the base function is residuals_marxss below
 #  residuals_dfa is just residuals_marxss
 ##############################################################################################################################################
-residuals.marssMLE <- function(x,
+residuals.marssMLE <- function(object, ...,
                                type=c("smoothations", "innovations"),
                                standardization=c("Cholesky", "marginal"),
                                form = attr(x[["model"]], "form")[1]) {
@@ -17,7 +17,7 @@ residuals.marssMLE <- function(x,
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(resids.fun, x, type = type, standardization = standardization))
+    ret <- eval(call(resids.fun, object, type = type, standardization = standardization))
   } else {
     ret <- paste("No residuals_", form[1], " is available.\n", sep = "")
   }
