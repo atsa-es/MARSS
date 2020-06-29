@@ -7,7 +7,8 @@
   Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. \code{MARSSkf()} is a small helper function to select which Kalman filter/smoother function to use based on the value in \code{MLEobj$fun.kf}.  The choices are \code{MARSSkfas} which uses the filtering and smoothing algorithms in the \link[KFAS]{KFAS} package based on algorithms in Koopman and Durbin (2001-2003), and \code{MARSSkfss()} which uses the algorithms in Shumway and Stoffer. The default function is \code{MARSSkfas()} which is faster and generally more stable (fewer matrix inversions), but there are some cases where \code{MARSSkfss()} will be more stable and \code{MARSSkfss()} returns some values that \code{MARSSkfas()} does not.
 }
 \usage{
-MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, newdata=NULL)
+MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, 
+           newdata=NULL)
 MARSSkfss(MLEobj)
 MARSSkfas(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE)
 }
