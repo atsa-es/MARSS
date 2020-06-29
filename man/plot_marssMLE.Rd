@@ -7,11 +7,12 @@
   Plots fitted observations and estimated states with confidence intervals using base R graphics (\code{plot}) and ggplot2 (\code{autoplot}).  Diagnostic plots also shown.  By default all plots are plotted.  Individual plots can be plotted by passing in \code{type.plot}.  If an individual plot is made using \code{autoplot}, the ggplot object is returned which can be further manipulated.
 }
 \usage{
-\method{plot}{marssMLE}(x, plot.type=c("fitted.ytT", "xtT", "model.resids", 
-    "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT"), 
-    form=c("marxss", "marss", "dfa"),
-    conf.int=TRUE, conf.level=0.95, decorate=TRUE,
-    plot.par = list(), ...)
+\method{plot}{marssMLE}(x, plot.type = c("fitted.ytT", "xtT", "model.resids",
+                 "state.resids", "qqplot.model.resids",
+                 "qqplot.state.resids", "ytT", "acf.model.resids",
+                 "acf.state.resids"), form = c("marxss", "marss",
+                 "dfa"), conf.int = TRUE, conf.level = 0.95, 
+                 decorate = TRUE, pi.int = FALSE, plot.par = list(), ...)
 \method{autoplot}{marssMLE}(x, plot.type = c("fitted.ytT", "xtT", "model.resids", 
     "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", 
     "acf.model.resids", "acf.state.resids"),
