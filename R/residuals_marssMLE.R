@@ -7,7 +7,7 @@
 residuals.marssMLE <- function(object, ...,
                                type=c("smoothations", "innovations"),
                                standardization=c("Cholesky", "marginal"),
-                               form = attr(x[["model"]], "form")[1]) {
+                               form = attr(object[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
   if (type == "smoothations") type <- "tT"
