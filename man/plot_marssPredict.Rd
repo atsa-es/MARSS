@@ -74,7 +74,9 @@ plot(fr)
 fr <- predict(fit, newdata=list(y=dat[3:4,]), x0=list(x0="unequal"))
 plot(fr)
 
-# MARSS does not have a forecast generic, in order not to conflict with the forecast generic in the forecast package
-# However if you happen to have the forecast package installed and loaded, this will work
-# fr <- forecast(fit, h=10)
+# forecast
+fr <- forecast.marssMLE(fit, h=10)
+# If you load the forecast package, this will work
+library(forecast)
+fr <- forecast(fit, h=10)
 }
