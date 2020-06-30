@@ -109,7 +109,7 @@ predict.marssMLE <- function(object, h = 0,
       new.MODELlist$x0 <- x0
       newMLEobj <- MARSS(object$call$data,
         model = new.MODELlist, silent = TRUE,
-        method = object[["method"]], miss.value = object$call$miss.value,
+        method = object[["method"]],
         fun.kf = object$call$fun.kf, form = "marxss"
       )
     } else {
@@ -223,7 +223,7 @@ predict.marssMLE <- function(object, h = 0,
     newMLEobj <- MARSS(newdata[["y"]],
       model = new.MODELlist, silent = TRUE,
       method = object[["method"]], control = object$call$control,
-      inits = object$call$inits, miss.value = object$call$miss.value,
+      inits = object$call$inits, 
       fun.kf = object$call$fun.kf, form = "marxss"
     )
   } # end setting up newMLEobj
@@ -284,8 +284,8 @@ predict.marssMLE <- function(object, h = 0,
     type = type,
     t = newdata[["t"]],
     h = h,
-    x0 = x0[["x0"]],
-    tinitx = x0[["tinitx"]]
+    x0 = x0list[["x0"]],
+    tinitx = x0list[["tinitx"]]
   )
 
   class(outlist) <- "marssPredict"
