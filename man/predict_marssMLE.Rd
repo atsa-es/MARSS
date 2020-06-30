@@ -12,7 +12,7 @@
      newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
      interval = c("prediction", "confidence", "none"),
      fun.kf = c("MARSSkfas", "MARSSkfss"),
-     x0 = "new", ...)
+     x0 = "reestimate", ...)
    }
 \arguments{
 \item{object}{ A \code{\link{marssMLE}} object.  }
@@ -22,7 +22,7 @@
 \item{newdata}{ An optional list with new y (data), c or d (covariates) to use for the predictions or forecasts. y, c and d must have the same form as used in the \code{\link{MARSS}()} call but the number of time steps can be different. t is used if there is ambuiquity as to which time steps the y, c and d refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
 \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the fitted value is returned. If \code{interval="prediction"} (default), prediction intervals (new data) are returned. Note, in the context of a MARSS model, only confidence intervals are available for xtT.}
 \item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
-\item{x0}{ If "new" (the default), then the initial value of x is re-estimated. If "model", then x0 in the fitted model (object argument) is used. If you change the data, then this x0 may not be appropriate. You can also pass in a new x0 to use. It must be a matrix that is the same dimensions as x0 in the model. \code{x0} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
+\item{x0}{ If "reestimate" (the default), then the initial value of x is re-estimated. If "use.model", then x0 in the fitted model (object argument) is used. If you change the data, then this x0 may not be appropriate. You can also pass in a new x0 to use. It must be a matrix that is the same dimensions as x0 in the model. \code{x0} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
 \item{...}{ Other arguments. Not used. }
 }
 
@@ -67,7 +67,7 @@ For \code{type="ytT"}, the predictions are conceptually the same as predictions 
 \item{y, c and d have more time steps than the original data}{If the model has time-varying parameters, you will need to pass in t. If the model is time-constant, then t is assumed to be 1 to the number of columns in y, c and d but you can pass in t to change that.}
 }
 
-\strong{x0 estimation} If you are using different data, so passing in y in \code{newdata}, then it is likely that you will need to re-estimate x0, which is the default behavior. Use \code{x0 = "model"} to use the x0 values in the estimated model (object).
+\strong{x0 estimation} If you are using different data, so passing in y in \code{newdata}, then it is likely that you will need to re-estimate x0, which is the default behavior. Use \code{x0 = "use.model"} to use the x0 values in the estimated model (object).
 
 
 }
@@ -90,7 +90,7 @@ plot(fr)
 
 # use model data with the estimated initial values (at t=0) for 
 # initial values at t=9
-fr <- predict(fit,  newdata=list(t=10:20), x0 = "model"))
+fr <- predict(fit,  newdata=list(t=10:20), x0 = "use.model")
 plot(fr)
 
 # pass in new data and give it new t; initial conditions will be estimated
@@ -116,7 +116,7 @@ model.list = list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=covariates)
 fit = MARSS(dat, model=model.list)
 
 # Use a new c (covariate) and the first 10 time steps of model data
-fr <- predict(fit,  newdata=list(c=matrix(5,2,10)), x0="model")
+fr <- predict(fit,  newdata=list(c=matrix(5,2,10)), x0="use.model")
 plot(fr)
 
 # Use first 10 time steps of model data
@@ -126,7 +126,8 @@ plot(predict(fit, newdata=list(t=1:10, y="model", c=matrix(5,2,10))))
 plot(predict(fit,  newdata=list(t=1:22, y="model", c=matrix(5,2,22))))
 
 # Use no data; cannot estimate initial conditions without data
-fr <- predict(fit,  newdata=list(y="none", c=matrix(5,2,22)), x0="model")
+# so x0 must be "use.model"
+fr <- predict(fit,  newdata=list(y="none", c=matrix(5,2,22)), x0="use.model")
 plot(fr)
 
 # forecast with covariates
