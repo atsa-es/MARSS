@@ -91,5 +91,5 @@ clean:
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
-	$(RM) ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd ../man/MARSS_out.Rd
+	$(RM) ../man/MARSS_out.Rd
 	
