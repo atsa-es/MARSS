@@ -5,7 +5,7 @@
 \usage{
 \method{residuals}{marssMLE}(object, ..., type=c("smoothations", "innovations"),
            standardization=c("Cholesky", "marginal"),
-           form=attr(x[["model"]], "form")[1])
+           form=attr(object[["model"]], "form")[1])
 }
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
