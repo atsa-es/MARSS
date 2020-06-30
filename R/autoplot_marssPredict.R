@@ -43,6 +43,7 @@ autoplot.marssPredict <-
     else if (!is.finite(max(df[,-1*c(1:4)]))) {
       pi.int <- FALSE
     }
+    # Palette from colorspace::sequential_hcl(n) and kept in sysdata.rda
     if (pi.int && (is.null(plotpar[["ci.fill"]]) || length(plotpar[["ci.fill"]]) != nint)) {
       if (min(lev) < 50) {
         plotpar[["ci.fill"]] <- hcl_palette_100[lev]
@@ -58,6 +59,11 @@ autoplot.marssPredict <-
       df <- subset(x$pred, x$t > nx-include+1)
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
       loc <- which(colnames(df)=="se")
+      p1 <- p1 +
+        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
+        ggplot2::facet_wrap(~df$.rownames, scale = "free_y") +
+        ggplot2::ggtitle(paste(ifelse(x$type=="xtT", "State", "Data"), "Predictions"))
       if (pi.int){
         for(i in length(lev):1){
           tmp <- df
@@ -68,11 +74,6 @@ autoplot.marssPredict <-
                                           linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
         }
       }
-      p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
-        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~df$.rownames, scale = "free_y") +
-        ggplot2::ggtitle(paste(ifelse(x$type=="xtT", "State", "Data"), "Predictions"))
       if(x$type=="ytT" && decorate) 
           p1 <- p1 + ggplot2::geom_point(data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y), 
                                          shape = plotpar$point.pch, fill = plotpar$point.fill, 
