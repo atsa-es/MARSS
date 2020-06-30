@@ -8,6 +8,9 @@ autoplot.marssMLE <-
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
+    if (!inherits("x", "marssMLE")) {
+      stop("autoplot.marssMLE: x must be class marssMLE.", call. = FALSE)
+    }
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
     old.plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations")
