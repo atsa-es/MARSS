@@ -51,6 +51,7 @@
 \author{ 
   Eli Holmes and based off of \code{plot.forecast} in the forecast package written by Rob J Hyndman & Mitchell O'Hara-Wild.
 }
+\seealso{ \code{\link{predict.marssMLE}} }
 \examples{
 data(harborSealWA)
 dat <- t(harborSealWA[, -1])
@@ -66,12 +67,12 @@ plot(fr)
 fr <- predict(fit)
 plot(fr)
 
-# you can fit to a new set of data using the same model
-fr <- predict(fit, newdata=list(y=dat[3:4,]))
+# you can fit to a new set of data using the same model and same x0
+fr <- predict(fit, newdata=list(y=dat[3:4,]), x0="use.model")
 plot(fr)
 
-# but you might want to re-estimate x0
-fr <- predict(fit, newdata=list(y=dat[3:4,]), x0=list(x0="unequal"))
+# but you probably want to re-estimate x0
+fr <- predict(fit, newdata=list(y=dat[3:4,]), x0="reestimate")
 plot(fr)
 
 # forecast

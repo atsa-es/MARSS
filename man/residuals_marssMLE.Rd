@@ -64,27 +64,28 @@ These types of residuals are used for outlier detection or shock detection in th
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
-MLEobj <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
+fit <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
-library(broom)
 library(ggplot2)
 theme_set(theme_bw())
 
-# Make a plot of the observations and model fits
-d <- residuals(MLEobj, interval = "confidence")
+# Make a plot of the observations and residuals intervals
+d <- residuals(fit)
+d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
   geom_line(aes(t, .fitted)) +
-  geom_point(aes(t, y)) +
+  geom_point(aes(t, value)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of xtT versus prediction of xt from xtT[t-1]
 # This is NOT the estimate of the states with CIs. Use tidy() for that.
-d <- residuals(MLEobj, type = "xtT")
+d <- residuals(fit, type = "smoothations")
 ggplot(data = d) +
-  geom_point(aes(t, xtT)) +
-  geom_line(aes(x = t, .fitted)) +
+  geom_point(aes(t, value)) +
+  geom_line(aes(x = t, .fitted), color="blue") +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("xtT (points) and predition (line)")

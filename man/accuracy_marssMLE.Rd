@@ -41,8 +41,9 @@ fit<- MARSS(dat[,1:12], model = list(Z = factor(c("WA", "OR", "OR"))))
 library(forecast)
 accuracy(fit)
 
+# Compare to test dataset
 fr <- predict(fit, h=10)
-accuracy(fit, x=dat[,13:22])
+accuracy(fr, x=dat[,13:22])
 }
 \references{
 Hyndman, R.J. and Koehler, A.B. (2006) "Another look at measures of forecast accuracy". International Journal of Forecasting, 22(4), 679-688. Hyndman, R.J. and Athanasopoulos, G. (2018) "Forecasting: principles and practice", 2nd ed., OTexts, Melbourne, Australia. Section 3.4 "Evaluating forecast accuracy". https://otexts.org/fpp2/accuracy.html.
