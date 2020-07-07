@@ -74,7 +74,6 @@ pdf:
 	cat Manual.pdf > UserGuide.pdf
 
 clean:
-	cat ./vignettes/index.html > ../inst/doc/index.html
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
@@ -87,6 +86,8 @@ clean:
 	$(RM) ./figures/*.*
 	$(RM) ./manual_files/*.*
 	$(RM) debug_manual.R debugger_template.Rnw
+	cat ./index.html > ../inst/doc/index.html
+	$(RM) ./index.html
 	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
