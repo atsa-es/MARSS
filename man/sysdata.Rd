@@ -8,7 +8,4 @@
 Palettes to use in the plotting functions. This is from \code{colorspace::sequential_hcl(n)} with n=100 or n=52.
 }
 
-\examples{
-plot(1:10, col=hcl_palette_100[1])
-}
 
