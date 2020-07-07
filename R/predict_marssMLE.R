@@ -183,11 +183,12 @@ predict.marssMLE <- function(object, h = 0,
     }
 
     # use x0 in model if no data and user didn't specify not to use x0
-    if (missingx0 && (all(is.na(newdata[["y"]])) || newdata[["y"]] == "none")) {
+    nodata <- (all(is.na(newdata[["y"]])) || identical(newdata[["y"]], "none"))
+    if (missingx0 && nodata) {
       x0list <- list(x0 = coef(object, type = "matrix")[["x0"]], tinitx = object[["model"]][["tinitx"]])
       message("predict.marssMLE(): x0 and tinitx from model are being used for prediction.")
     }
-    if (!missingx0 && identical(x0, "reestimate") && all(is.na(newdata[["y"]]))) {
+    if (!missingx0 && identical(x0, "reestimate") && nodata) {
       stop("predict.marssMLE(): to reestimate x0 (x0='reestimate'), data (y in newdata) are required.", call. = FALSE)
     }
 
