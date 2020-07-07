@@ -74,6 +74,7 @@ pdf:
 	cat Manual.pdf > UserGuide.pdf
 
 clean:
+	cat ./vignettes/index.html > ../inst/doc/index.html
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
 	$(RM) *.sty *.bst *.cls
 	$(RM) *.tex
