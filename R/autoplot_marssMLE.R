@@ -8,7 +8,7 @@ autoplot.marssMLE <-
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
-    if (!inherits("x", "marssMLE")) {
+    if (!inherits(x, "marssMLE")) {
       stop("autoplot.marssMLE: x must be class marssMLE.", call. = FALSE)
     }
     # Argument checks
