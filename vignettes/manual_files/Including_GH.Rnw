@@ -344,7 +344,7 @@ save(true.2ss,TT,params,file=file)
 <<Cs_18_marssperffig,fig=TRUE,echo=FALSE, keep.source=TRUE>>=
 # This makes a plot of the comparisons
 par(ylbias=-.2,tcl=-.2,cex=.75)
-boxplot(t(params[c(7,1,3,5,8,2,4,6),]),names=c("AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)","AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)"),ylab="estimates of the ar coefficients",las=2)
+graphics::boxplot(t(params[c(7,1,3,5,8,2,4,6),]),names=c("AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)","AR(2)\n","MARSS\nEM","MARSS\nBFGS","ARMA\n(2,2)"),ylab="estimates of the ar coefficients",las=2)
 points(1:8,apply(params[c(7,1,3,5,8,2,4,6),],1,mean),pch="x",cex=1.25)
 par(cex=1.5)
 axis(side=3,at=c(2,6),labels=c(expression(b[1]),expression(b[2])),tick=FALSE,cex=2)

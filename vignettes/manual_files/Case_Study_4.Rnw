@@ -489,7 +489,7 @@ if (!saved.res) {
     "equalvarcov",
     "unconstrained"
   )
-  model.data <- data.frame()
+  model.data <- data.frame(stringsAsFactors = FALSE)
   # fit lots of models & store results
   # NOTE: this will take a long time to run because minit is big!
   for (R in levels.R) {
@@ -522,7 +522,7 @@ levels.R <- c(
   "equalvarcov",
   "unconstrained"
 )
-model.data <- data.frame()
+model.data <- data.frame(stringsAsFactors = FALSE)
 # fit lots of models & store results
 # NOTE: this will take a long time to run!
 for (R in levels.R) {

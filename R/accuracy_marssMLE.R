@@ -33,7 +33,10 @@ accuracy.marssPredict <- function (f, x, test=NULL, type="ytt1", verbose=FALSE, 
         val <- Y.names %in% rownames(x)
         if(!all(val)) stop(paste0("accuracy.marssPredict: Test data is missing ", paste(Y.names[!val], collapse=" ,"),".\n"), call.=FALSE)
         x <- x[match(Y.names, rownames(x)),,drop=FALSE] #match ordering if off
-        x <- data.frame(.rownames=rep(rownames(x), each=h), y=vec(t(x)), t=rep(1:h,n))
+        x <- data.frame(
+          .rownames=rep(rownames(x), each=h), 
+          y=vec(t(x)), t=rep(1:h,n),
+          stringsAsFactors = FALSE)
       }else{
         if(!all(c(".rownames", "y") %in% colnames(x))) stop("accuracy.marssPredict: If data frame, test data have rows .rownames and estimate.\n", call.=FALSE)
         val <- Y.names %in% x$.rownames

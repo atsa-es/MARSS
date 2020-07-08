@@ -57,7 +57,7 @@ royale.dat = log(t(isleRoyal[yr1960to2011,c("Wolf","Moose")]))
 <<Cs02_plotwolfmoosedata, fig=TRUE, keep.source=TRUE, echo=TRUE>>=
 x = isleRoyal[,"Year"]
 y = log(isleRoyal[,c("Wolf","Moose")])
-matplot(x, y,
+graphics::matplot(x, y,
     ylab="log count",xlab="Year",type="l",
     lwd=3,bty="L",col="black")
 legend("topright",c("Wolf","Moose"), lty=c(1,2), bty="n")
@@ -213,7 +213,7 @@ We will demean the data so we can set $\uu$ to 0.  We do not standardize by the 
 \begin{figure}[htp]
 \begin{center}
 <<Cs13_plot-plankton-data, fig=TRUE, echo=FALSE,width=8,height=4>>=
-matplot((1:(52*6))[27:295],t(d.plank.dat),type="l",lty=c(1,1,1,1),lwd=c(1,1,3,3),xlab="week of study",ylab="log biomass",xaxt="n",xlim=c(11,52*6-11),bty="L")
+graphics::matplot((1:(52*6))[27:295],t(d.plank.dat),type="l",lty=c(1,1,1,1),lwd=c(1,1,3,3),xlab="week of study",ylab="log biomass",xaxt="n",xlim=c(11,52*6-11),bty="L")
 #axis(1,at=(1:(52*6))[seq(27,295,2)])
 axis(1,at=seq(1,52*6,2))
 abline(v=c(52*(1:6)))

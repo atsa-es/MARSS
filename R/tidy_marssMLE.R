@@ -50,7 +50,8 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
     } else {
       ret <- data.frame(
         term = names(ests),
-        estimate = ests
+        estimate = ests,
+        stringsAsFactors = FALSE
       )
       if (conf.int) {
         if (rerun.MARSSparamCIs) x <- MARSSparamCIs(x, alpha = alpha, ...)
@@ -102,7 +103,8 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
       .rownames = rep(state.names, each = TT),
       t = rep(1:TT, mm),
       estimate = vec(t(states)),
-      std.error = vec(t(states.se))
+      std.error = vec(t(states.se)),
+      stringsAsFactors = FALSE
     )
     if (conf.int) {
       conf.low <- qnorm(alpha / 2) * ret$std.error + ret$estimate
@@ -142,7 +144,8 @@ tidy.marssMLE <- function(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
       y = vec(t(x[["model"]][["data"]])),
       estimate = vec(t(Ey)),
       std.error = vec(t(Ey.se)),
-      std.dev = vec(t(y.sd))
+      std.dev = vec(t(y.sd)),
+      stringsAsFactors = FALSE
     )
     if (conf.int) {
       ret <- cbind(ret,

@@ -229,7 +229,11 @@ autoplot.marssMLE <-
       df$.rownames <- factor(df$.rownames) # drop levels
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
-      abline.dat <- data.frame(.rownames = names(slope), slope = slope, intercept = intercept)
+      abline.dat <- data.frame(
+        .rownames = names(slope), 
+        slope = slope, 
+        intercept = intercept,
+        stringsAsFactors = FALSE)
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
         ggplot2::xlab("Theoretical Quantiles") +
@@ -250,7 +254,11 @@ autoplot.marssMLE <-
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
-      abline.dat <- data.frame(.rownames = names(slope), slope = slope, intercept = intercept)
+      abline.dat <- data.frame(
+        .rownames = names(slope), 
+        slope = slope, 
+        intercept = intercept,
+        stringsAsFactors = FALSE)
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
         ggplot2::xlab("Theoretical Quantiles") +
@@ -280,14 +288,16 @@ autoplot.marssMLE <-
       df$.rownames <- paste0("State ", df$.rownames)
       
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
-      fun <- function(x,y) data.frame(.rownames=y, lag=x$lag, acf=x$acf)
+      fun <- function(x,y) 
+        data.frame(.rownames=y, lag=x$lag, acf=x$acf, stringsAsFactors = FALSE)
       acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY =FALSE)
       acf.dat <- data.frame(.rownames = unlist(lapply(acfdf, function(x){x$.rownames})), 
                             lag = unlist(lapply(acfdf, function(x){x$lag})),
-                            acf = unlist(lapply(acfdf, function(x){x$acf})))
+                            acf = unlist(lapply(acfdf, function(x){x$acf})),
+                            stringsAsFactors = FALSE)
       
       cidf <- tapply(df$.resids, df$.rownames, acfci)
-      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
+      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf, stringsAsFactors = FALSE)
       
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
@@ -308,14 +318,16 @@ autoplot.marssMLE <-
       df <- subset(std.resids, std.resids$type=="model")
       df$.rownames <- factor(df$.rownames) # drop state levels
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
-      fun <- function(x,y) data.frame(.rownames=y, lag=x$lag, acf=x$acf)
+      fun <- function(x,y) 
+        data.frame(.rownames=y, lag=x$lag, acf=x$acf, stringsAsFactors = FALSE)
       acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY =FALSE)
       acf.dat <- data.frame(.rownames = unlist(lapply(acfdf, function(x){x$.rownames})), 
                             lag = unlist(lapply(acfdf, function(x){x$lag})),
-                            acf = unlist(lapply(acfdf, function(x){x$acf})))
+                            acf = unlist(lapply(acfdf, function(x){x$acf})),
+                            stringsAsFactors = FALSE)
       
       cidf <- tapply(df$.resids, df$.rownames, acfci)
-      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf)
+      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf, stringsAsFactors = FALSE)
       
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +

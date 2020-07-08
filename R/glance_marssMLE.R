@@ -11,7 +11,8 @@ glance.marssMLE <- function(x, ...) {
     df = x$num.params,
     logLik = x$logLik,
     AIC = x$AIC,
-    AICc = x$AICc
+    AICc = x$AICc,
+    stringsAsFactors = FALSE
   )
   if ("AICbb" %in% names(x)) ret <- cbind(ret, AICbb = x$AICbb)
   if ("AICbp" %in% names(x)) ret <- cbind(ret, AICbp = x$AICbp)

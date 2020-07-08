@@ -73,7 +73,8 @@ fitted.marssMLE <- function(object, ...,
       ret <- data.frame(
         .rownames = rep(data.names, each = TT),
         t = rep(1:TT, nn),
-        y = vec(t(MLEobj[["model"]]$data))
+        y = vec(t(MLEobj[["model"]]$data)),
+        stringsAsFactors = FALSE
       )
     }
     
@@ -132,13 +133,15 @@ fitted.marssMLE <- function(object, ...,
         ret <- data.frame(
           .rownames = rep(state.names, each = TT),
           t = rep(1:TT, mm),
-          xtT = vec(t(hatxt))
+          xtT = vec(t(hatxt)),
+          stringsAsFactors = FALSE
         )
       if (conditioning == "t1")
         ret <- data.frame(
           .rownames = rep(state.names, each = TT),
           t = rep(1:TT, mm),
-          xtt = vec(t(hatxt))
+          xtt = vec(t(hatxt)),
+          stringsAsFactors = FALSE
         )
     }
   }

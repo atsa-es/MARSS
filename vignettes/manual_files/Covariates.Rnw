@@ -322,15 +322,15 @@ The bottom panel in Figure \ref{fig:mon-effects} shows the estimated seasonal ef
 \begin{center}
 <<Covar_sec6_12_plot-seas-effects, echo=FALSE, fig=TRUE>>=
 par(mfrow=c(3,1), mar=c(2,4,2,2)) 
-matplot(t(seas.1),type="l",bty="n",xaxt="n", ylab="Fixed monthly", col=1:5)
+graphics::matplot(t(seas.1),type="l",bty="n",xaxt="n", ylab="Fixed monthly", col=1:5)
 axis(1,labels=month.abb, at=1:12,las=2,cex.axis=0.75)
 legend("topright", lty=1:5, legend=phytos, cex=0.6, col=1:5)
 
-matplot(t(seas.2),type="l",bty="n",xaxt="n", ylab="Cubic", col=1:5)
+graphics::matplot(t(seas.2),type="l",bty="n",xaxt="n", ylab="Cubic", col=1:5)
 axis(1,labels=month.abb, at=1:12,las=2,cex.axis=0.75)
 legend("topright", lty=1:5, legend=phytos, cex=0.6, col=1:5)
 
-matplot(t(seas.3),type="l",bty="n",xaxt="n",ylab="Fourier", col=1:5)
+graphics::matplot(t(seas.3),type="l",bty="n",xaxt="n",ylab="Fourier", col=1:5)
 axis(1,labels=month.abb, at=1:12,las=2,cex.axis=0.75)
 legend("topright", lty=1:5, legend=phytos, cex=0.6, col=1:5)
 @
@@ -344,7 +344,8 @@ Rather than rely on our eyes to judge model fits, we should formally assess whic
 data.frame(Model=c("Fixed", "Cubic", "Fourier"),
            AICc=round(c(seas.mod.1$AICc,
                         seas.mod.2$AICc,
-                        seas.mod.3$AICc),1))
+                        seas.mod.3$AICc),1),
+          stringsAsFactors = FALSE)
 @
 The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
 

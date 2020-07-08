@@ -52,7 +52,8 @@ residuals_marxss <- function(x, type, standardization) {
       type = "model",
       t = fit.list$t,
       value = fit.list$y,
-      .fitted = fit.list$.fitted
+      .fitted = fit.list$.fitted,
+      stringsAsFactors = FALSE
     )
     ret <- cbind(ret,
       .resids = vec(t(resids$model.residuals)),
@@ -86,11 +87,12 @@ residuals_marxss <- function(x, type, standardization) {
       .fitted = fit.list$.fitted,
       .resids = vec(t(state.resids)),
       .sigma = vec(t(state.se.resids)),
-      .std.resid = vec(t(state.std.resids))
+      .std.resid = vec(t(state.std.resids)),
+      stringsAsFactors = FALSE
     )
     ret <- rbind(ret, ret2)
   
-  class(ret) <- c("marssResiduals", "tbl_df", "tbl", "data.frame")
+  class(ret) <- c("marssResiduals", "data.frame")
   attr(ret, "standardization") <- standardization
   attr(ret, "residual.type") <- type
   ret
