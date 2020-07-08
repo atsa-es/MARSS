@@ -179,7 +179,7 @@ CSEGriskfigure <- function(data, te = 100, absolutethresh = FALSE, threshold = 0
     for (i in 1:10) {
       N[i, ] <- N0 * cumprod(exp(rnorm(te, kal.u, sqrt(kal.Q))))
     }
-    matplot(t(N), type = "l", bty = "L", main = "Sample projections", xlab = "time steps into the future", ylab = "N")
+    graphics::matplot(t(N), type = "l", bty = "L", main = "Sample projections", xlab = "time steps into the future", ylab = "N")
 
     # Finally make TMU plot
     CSEGtmufigure(N = nyr, u = kal.u, s2p = kal.Q, make.legend = FALSE)

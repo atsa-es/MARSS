@@ -56,7 +56,7 @@ CSEGtmufigure <- function(N = 20, u = -0.1, s2p = 0.01, make.legend = TRUE) {
     }, lower = minval, upper = maxval)$root
   }
 
-  matplot(Tvals, log10(cbind(safe.limits, dead.limits)),
+  graphics::matplot(Tvals, log10(cbind(safe.limits, dead.limits)),
     ylim = c(-2.2, 0), type = "l", lty = 1, col = "white",
     xlim = c(1, 100), xlab = xlabs, ylab = ylabs
   )
