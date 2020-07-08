@@ -4,7 +4,7 @@
 # Install one version of MARSS into the base R library R_HOME
 # Install a second version into the local R library R_LIBS_USER
 # RStudio will use R_LIBS_USER if it exists.  It does not by default so
-#  you might have to create this folder to hav a local library.
+#  you might have to create this folder to have a local library.
 #  look at Sys.getenv("R_LIBS_USER"). Click Install under Packages tab and see
 #  where it is installing
 # Open the unit test.R file
@@ -31,8 +31,8 @@ lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
-# Mac: install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
-# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
+# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
@@ -45,6 +45,9 @@ unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.new)
 zscore.fun = zscore #3.9 does not have this
+MARSSresiduals.fun = MARSSresiduals
+MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
+MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
@@ -83,6 +86,11 @@ for(unittestfile in unittestfiles){
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
   if(!exists("zscore")){zscore=zscore.fun}
+  if(!exists("MARSSresiduals")){
+    MARSSresiduals = MARSSresiduals.fun
+    MARSSresiduals.tT = MARSSresiduals_tT.fun
+    MARSSresiduals.tt1 = MARSSresiduals_tt1.fun
+  }
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
@@ -119,8 +127,8 @@ for(unittestfile in unittestfiles){
   for(ii in 1:length(names(testNew))){
     if(inherits(testNew[[ii]], "marssMLE")){
       for(kk in c("model", "marss")){
-      attr(testNew[[ii]][[kk]], "equation") <- NULL
-      attr(testOld[[ii]][[kk]], "equation") <- NULL
+        attr(testNew[[ii]][[kk]], "equation") <- NULL
+        attr(testOld[[ii]][[kk]], "equation") <- NULL
       }
       if(inherits(testNew[[ii]]$call$inits, "marssMLE")){
         for(kk in c("model", "marss")){
@@ -130,8 +138,8 @@ for(unittestfile in unittestfiles){
       }
     }
     if(inherits(testNew[[ii]], "marssMODEL")){
-        attr(testNew[[ii]], "equation") <- NULL
-        attr(testOld[[ii]], "equation") <- NULL
+      attr(testNew[[ii]], "equation") <- NULL
+      attr(testOld[[ii]], "equation") <- NULL
     }
     if(inherits(testNew[[ii]], "list")){
       for(iii in 1:length(testNew[[ii]])){
@@ -205,7 +213,17 @@ for(unittestfile in unittestfiles){
               }
             }
           }
-          
+          if(inherits(testNew[[ii]][[kk]], "matrix") || inherits(testNew[[ii]][[kk]], "array")){
+            if(!identical(dim(testNew[[ii]][[kk]]), dim(testOld[[ii]][[kk]]))){
+              cat("Warning: dims of ", ii, names(testNew[[ii]])[kk], "not identical\n")
+              next
+            }
+            if(!all((testNew[[ii]][[kk]]-testOld[[ii]][[kk]])<sqrt(.Machine$double.eps)))
+              cat("Warning: values in ", ii, names(testNew[[ii]])[kk], "not identical\n")
+            if(!identical(rownames(testNew[[ii]][[kk]]), rownames(testOld[[ii]][[kk]])))
+              cat("Warning: dims of ", ii, names(testNew[[ii]])[kk], "not identical\n")
+            
+          }
         }
       }
     }
