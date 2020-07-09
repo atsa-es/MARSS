@@ -33,7 +33,7 @@
 \item{model}{The \code{\link{marssMLE}} object passed into predict(). }
 \item{newdata}{The \code{newdata} list passed into predict(). c and d must be matrices. t must be a vector (same length as the 2nd dimension of y, c, and d). If \code{h!=0}, y must be a matrix. If \code{h==0}, y can be a matrix or "none" (no data), or "model" (use the model data in object). If the latter, t in \code{newdata} can be used to specify a subset of the model data. See examples.}
 \item{level}{The \code{conf.level} passed into predict().}
-\item{pred}{A data frame the predictions or forecasts along with the intervals. In tibble format. }
+\item{pred}{A data frame the predictions or forecasts along with the intervals. }
 \item{type}{The \code{type} ("ytT" or "xtT") passed into predict().}
 \item{t}{The time steps used in pred (used for plotting).}
 \item{h}{The number of forecast time steps (used for plotting).}

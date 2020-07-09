@@ -9,7 +9,7 @@ accuracy.marssMLE(f, x, test=NULL, type="ytt1", verbose=FALSE, ...)
 }
 \arguments{
   \item{f}{A \code{\link{marssMLE}} or \code{\link{marssPredict}} object}
-  \item{x}{A matrix or tibble with data to test against the h steps of a forecast.}
+  \item{x}{A matrix or data frame with data to test against the h steps of a forecast.}
   \item{test}{Which time steps in training data (data model fit to) to compute accuracy for.}
   \item{type}{type="ytt1" is the one-step-ahead predictions. type="ytT" is the fitted ytT predictions. The former are standardly used for training data prediction metrics.}  
   \item{verbose}{Show metrics for each time series of data.}

@@ -21,7 +21,7 @@
 
 }
 \description{
-\code{residuals.marssMLE} returns a data.frame (in tibble form) with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{y}) or  state (\eqn{x}) and the "fitted" value. 
+\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{y}) or  state (\eqn{x}) and the "fitted" value. 
 }
 \value{
 A data frame with the following columns:

@@ -34,17 +34,18 @@ The MARSS model parameters, hidden state processes (x), and observations (y) are
   }
 If a parameter is time-varying then the time dimension is the 3rd dimension. Thus a time-varying Z parameters would be n x m x T where T is the length of the data time series.
   
-The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for a variety of output including parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries in tibble format,
+The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for a variety of output including parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries.
 }
 \details{
 
 \strong{Main MARSS functions}:
 \describe{
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
-      \item{\code{\link{fitted.marssMLE}}}{ Fitted Y and X estimates output as a tibble. Output can be conditioned on all the data (T), data up to t-1, or data up to t.} 
+      \item{\code{\link{fitted.marssMLE}}}{ Fitted Y and X estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t.} 
       \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
-      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates and fitted Y and X estimates output as a tibble. With confidence intervals if requested} 
-      \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a tibble. } 
+      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates and fitted Y and X estimates output as a data frame. With confidence intervals if requested} 
+      \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a data frame. } 
+      \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame. } 
       \item{\code{\link{plot.marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
       \item{\code{\link{autoplot.marssMLE}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
       \item{\code{\link{glance.marssMLE}}}{ Brief summary of fit. } 

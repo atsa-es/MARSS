@@ -5,7 +5,7 @@ fitted.marssMLE <- function(object, ...,
                             type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
                             conf.level = 0.95,
-                            output = c("tibble", "matrix")) {
+                            output = c("data.frame", "matrix")) {
   type <- match.arg(type)
   output <- match.arg(output)
   interval <- match.arg(interval)
@@ -65,7 +65,7 @@ fitted.marssMLE <- function(object, ...,
     }
     
     # Set up output
-    if(output=="tibble"){
+    if(output=="data.frame"){
       data.names <- attr(MLEobj[["model"]], "Y.names")
       data.dims <- attr(MLEobj[["model"]], "model.dims")[["y"]]
       nn <- data.dims[1]
@@ -123,7 +123,7 @@ fitted.marssMLE <- function(object, ...,
     }
     
     # Set up output
-    if(output=="tibble"){
+    if(output=="data.frame"){
       state.names <- attr(MLEobj[["model"]], "X.names")
       state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
       mm <- state.dims[1]

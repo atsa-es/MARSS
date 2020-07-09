@@ -5,7 +5,7 @@
 
 \title{Class "marssResiduals"}
 \description{
-\code{\link{marssResiduals}} are the objects returned by \code{\link{residuals.marssMLE}} in the package \code{\link{MARSS-package}}. It is a tibble, a type of data frame, with special attributes.
+\code{\link{marssResiduals}} are the objects returned by \code{\link{residuals.marssMLE}} in the package \code{\link{MARSS-package}}. It is a data frame in tibble format (but not tibble class).
 
 \code{standardization} 
 \itemize{

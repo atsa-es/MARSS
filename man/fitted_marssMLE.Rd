@@ -10,7 +10,7 @@
     type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),   
     interval = c("none", "confidence", "prediction"), 
     conf.level = 0.95,
-    output = c("tibble", "matrix"))
+    output = c("data.frame", "matrix"))
   }
   \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
@@ -18,7 +18,7 @@
   \item{type}{ Fitted values for the observations (y) or the states (x). If 'tT', then the estimate at time 't' is conditioned on all the data. If 'tt', then the estimate is conditioned on data up to time t. If 'tt1', estimate is conditioned on data up to time t-1. This is also known as one-step-ahead estimate or for y, the innovations.}
   \item{interval}{ If interval="confidence", then the standard error and confidence interval of the fitted value is returned. }
   \item{conf.level}{ Level for the intervals if interval != "none".}
-  \item{output}{ tibble or list of matrices}
+  \item{output}{ data frame or list of matrices}
   }
 \value{
   If interval="none" (the default), a T column matrix of the fitted values with one row for each observation (or state) time series is returned. 
@@ -55,7 +55,7 @@ If interval="confidence", the se and interval is for the fitted \eqn{\mathbf{y}}
 
 The model predicted \eqn{\mathbf{x}(t)}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)} is \eqn{\mathbf{B}(t)\tilde{\mathbf{x}}(t-1)+\mathbf{u}(t)}{B(t) tildex(t-1)+u(t)}, where the model is written in "marss" form (\code{\link{MARSS.marss}}). This type of state fitted value is used for process outlier detection and shock detection.  See \code{\link{MARSSresiduals}} and read the references cited.
 
-If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)} then you'll want either the states estimate conditioned on all the data (or conditioned on the data up to time \eqn{t-1} or up to time \eqn{t}).  These are returned by \code{\link{MARSSkf}()} in \code{xtT}, \code{xtt1} and \code{xtt} respectively.  Which one you want depends on your objective and application.  You can also use the \code{\link{tidy.marssMLE}()} function to return a data.frame (tibble) with the estimated states with standard errors and intervals.
+If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)} then you'll want either the states estimate conditioned on all the data (or conditioned on the data up to time \eqn{t-1} or up to time \eqn{t}).  These are returned by \code{\link{MARSSkf}()} in \code{xtT}, \code{xtt1} and \code{xtt} respectively.  Which one you want depends on your objective and application.  You can also use the \code{\link{tidy.marssMLE}()} function to return a data frame with the estimated states with standard errors and intervals.
   
 \eqn{\tilde{\mathbf{x}}_{t-1}}{tildex(t-1)} used in the prediction is the expected value of the states at time \eqn{t-1}. If \code{type="xtT"}, this is the expected value at time \eqn{t-1} conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}()}.  If \code{type="xtt1"}, it is the expected value conditioned on the data up to time \eqn{t-1}, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}()}. The fitted state values conditioned on data up to \eqn{t} is not provided. This would require the expected value of states at time \eqn{t} conditioned on data up to time \eqn{t+1}, and this is not output by the Kalman filter. Only conditioning on data up to \eqn{t-1} and T are output.
 

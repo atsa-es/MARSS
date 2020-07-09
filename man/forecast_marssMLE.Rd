@@ -30,7 +30,7 @@
 \item{model}{The \code{\link{marssMLE}} object passed into \code{forecast.marssMLE()}. }
 \item{newdata}{The \code{newdata} list if passed into \code{forecast.marssMLE()}.}
 \item{level}{The \code{conf.level} passed into \code{forecast.marssMLE()}.}
-\item{pred}{A data frame the forecasts along with the intervals. In tibble format. }
+\item{pred}{A data frame the forecasts along with the intervals. }
 \item{type}{The \code{type} ("ytT" or "xtT") passed into \code{forecast.marssMLE()}.}
 \item{t}{The time steps used to fit the model (used for plotting).}
 \item{h}{The number of forecast time steps (used for plotting).}

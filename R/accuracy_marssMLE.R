@@ -82,7 +82,7 @@ accuracy.marssMLE <- function (f, x=NULL, test=NULL, type="ytt1", verbose=FALSE,
   return(out)
 }
 
-aout <- function(fx, test){ #fx is a tibble
+aout <- function(fx, test){ #fx is a data frame
   dx <- fx$y
   fits <- fx$.fitted
   res <- dx - fits
