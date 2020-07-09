@@ -202,7 +202,7 @@ is.validvarcov <- function(x, method = "kem") {
         tmp <- try(eigen(test.block, only.values = TRUE), silent = TRUE)
         if (inherits(tmp, "try-error")) {
           pos.flag <- TRUE
-        } else if (!all(tmp$values >= 0)) pos.flag <- TRUE
+        } else if (!all(tmp$values > 0)) pos.flag <- TRUE
         # if there is a problem
         if (pos.flag) {
           return(list(ok = FALSE, error = "One of the fixed blocks within the varcov matrix is not positive-definite "))
