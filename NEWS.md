@@ -11,7 +11,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 
 * The versiontest.R tests passed.
 * Working on testing predict and residuals against other packages and models.
-* Currently working on StructTS() in Chapter_Residuals.Rnw. The EM algorithm is dropping logLik dramatically in a simple structural model. BFGS is fine.
+* Currently working on `StructTS()` examples in Chapter_Residuals.Rnw. The EM algorithm is dropping logLik dramatically in a simple structural model. BFGS is fine.
 
         dat <- log10(forecast:::subset.ts(UKgas, quarter=1))
         B <- matrix(c(1,0,1,1),2,2)
@@ -42,21 +42,23 @@ ENHANCEMENTS
 BUGS
 
 * This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
-* `trace=1` would fail because `MARSSapplynames()` did not recognize that kf$xtt was a msg instead of a matrix.
+* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix.
+* `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
 
 DOCUMENTATION and MAN FILES
 
 * Added covariates and example to `MARSS_dfa.Rd`
 * Removed all mention of `augment()` from documentation and manuals. Replaced with `residuals()`.
 * `predict.marssMLE.Rd` (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
-* Clean-uped the man pages for `predict()` and `predict.marssMLE()`.
+* Cleaned-up the man pages for `predict()` and `predict.marssMLE()`.
 
 OTHER
 
 * Changed `fitted.marssMLE` to have column with xtt when type="xtt1" instead of xtT.
 * Changed the x0 estimation behavior for `predict.marssMLE()` when no data passed in.
 * Added x0 argument to `predict.marssMLE()` so that user can specify x0 if needed.
-* Removed the tibble class from the data frames returned by `residuals.marssMLE()`. The data frames are still in tibble form.
+* Removed the tibble class from the data frames returned by `residuals.marssMLE()`. The data frames are still in tibble form. Removed all reference to tibbles in the documentation.
+* When `trace = -1` some tests were still being done. I added a test for `trace = -1` to a few more test lines in `MARSS.R` and `MARSS_marxss.R`.
 
 
 MARSS 3.10.13 (GitHub 2-25-2020)
