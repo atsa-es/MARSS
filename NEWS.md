@@ -6,7 +6,23 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
+7-09-2020 Status
+-----------------------------------
 
+* The versiontest.R tests passed.
+* Working on testing predict and residuals against other packages and models.
+* Currently working on StructTS() in Chapter_Residuals.Rnw. The EM algorithm is dropping logLik dramatically in a simple structural model. BFGS is fine.
+
+        dat <- log10(forecast:::subset.ts(UKgas, quarter=1))
+        B <- matrix(c(1,0,1,1),2,2)
+        Z <- matrix(c(1,0), 1, 2)
+        Q <- "diagonal and unequal"
+        mod.list <- list(Z=Z, B=B, U="zero", A="zero", Q="diagonal and unequal", x0="zero", V0=diag(10,2))
+        fit.marss <- MARSS(as.vector(dat), model=mod.list,     control=list(safe=TRUE, trace=1))
+    
+    This example is not too dramatic. If I estimate x0, it is more dramatic. Appears in a variety of structural models.
+
+    
 MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
 Version 3.11.0 is focused on the `predict` function and updating the structure of the `residuals` functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
