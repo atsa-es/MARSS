@@ -18,9 +18,6 @@ MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
 Version 3.11.0 is focused on the `predict` function and updating the structure of the `residuals` functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
 
-TO DO
-
-* review the residuals write up again and MARSS_out.Rd
 
 ENHANCEMENTS
 
