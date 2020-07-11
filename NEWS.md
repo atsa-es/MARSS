@@ -11,16 +11,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 
 * The versiontest.R tests passed.
 * Working on testing predict and residuals against other packages and models.
-* Currently working on `StructTS()` examples in Chapter_Residuals.Rnw. The EM algorithm is dropping logLik dramatically in a simple structural model. BFGS is fine.
-
-        dat <- log10(forecast:::subset.ts(UKgas, quarter=1))
-        B <- matrix(c(1,0,1,1),2,2)
-        Z <- matrix(c(1,0), 1, 2)
-        Q <- "diagonal and unequal"
-        mod.list <- list(Z=Z, B=B, U="zero", A="zero", Q="diagonal and unequal", x0="zero", V0=diag(10,2))
-        fit.marss <- MARSS(as.vector(dat), model=mod.list,     control=list(safe=TRUE, trace=1))
-    
-    This example is not too dramatic. If I estimate x0, it is more dramatic. Appears in a variety of structural models.
+* Currently working on `StructTS()` examples in Chapter_Residuals.Rnw. 
 
     
 MARSS 3.11.0 (resids_update for CRAN)
@@ -42,8 +33,9 @@ ENHANCEMENTS
 BUGS
 
 * This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
-* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix.
+* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
+* `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
 
 DOCUMENTATION and MAN FILES
 

@@ -226,7 +226,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
     xtT.1 <- ks.out$alphahat[1:m, 1, drop = FALSE]
     x0T <- x00 + J0 %*% (ks.out$alphahat[1:m, 1, drop = FALSE] - ks.out$a[1:m, 1, drop = FALSE]) # eqn 6.47
-    V0T <- V00 + J0 %*% (VtT[, , 1] - Vtt1[, , 1]) * t(J0) # eqn 6.48
+    V0T <- V00 + J0 %*% (VtT[, , 1] - Vtt1[, , 1]) %*% t(J0) # eqn 6.48
   }
 
   if (!return.kfas.model) kfas.model <- NULL
