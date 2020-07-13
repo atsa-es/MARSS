@@ -33,8 +33,8 @@ The likelihood returned for both functions is the exact likelihood when there ar
 \value{
 A list with the following components (m is the number of state processes). "V" elements are called "P" in Shumway and Stoffer (S&S eqn 6.17 with s=T).  The output is referenced against equations in Shumway and Stoffer (2006); the Kalman filter and smoother implemented in MARSS is for a more general MARSS model than that shown in S&S but the output has the same meaning.  In the expectations below, the parameters are left off, so E[x | y] is really E[x | theta, y] where theta is the parameter list.
   \item{xtT}{ State first moment conditioned on y(1:T): E[x(t) | y(1:T)] (m x T matrix). Kalman smoother output.}
-  \item{VtT}{ State variance conditioned on y(1:T): E[(x(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)] (m x m x T array). Kalman smoother output. P_t^T in S&S (S&S eqn 6.18 with s=T, t1=t2=t). State second moment E[x(t)x(t)'| y(1:T)] = VtT(t)+xtT(t)xtT(t)'}
-  \item{Vtt1T}{ State lag-one covariance E[(x(t)-xtT(t))(x(t-1)-xtT(t-1))' | y(1:T)] (m x m x T). Kalman smoother output. P_{t,t-1}^T in S&S (S&S eqn 6.18 with s=T, t1=t, t2=t-1). State lag-one second moments E[x(t)x(t-1)'| y(1:T)] = Vtt1T(t)+xtT(t)xtT(t-1)'. }
+  \item{VtT}{ State variance matrix conditioned on y(1:T): E[(x(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)] (m x m x T array). Kalman smoother output. P_t^T in S&S (S&S eqn 6.18 with s=T, t1=t2=t). State second moment E[x(t)x(t)'| y(1:T)] = VtT(t)+xtT(t)xtT(t)'}
+  \item{Vtt1T}{ State lag-one cross-covariance matrix E[(x(t)-xtT(t))(x(t-1)-xtT(t-1))' | y(1:T)] (m x m x T). Kalman smoother output. P_{t,t-1}^T in S&S (S&S eqn 6.18 with s=T, t1=t, t2=t-1). State lag-one second moments E[x(t)x(t-1)'| y(1:T)] = Vtt1T(t)+xtT(t)xtT(t-1)'. }
   \item{x0T}{ Initial state estimate E[x(i) | y(1:T)] (m x 1). If control$kf.x0="x00", i=0; if ="x10", i=1. Kalman smoother output.}
   \item{V0T}{ Estimate of initial state covariance matrix E[x(i)x(i)' | y(1:T)] (m x m). If model$tinitx=0, i=0; if =1, i=1.  Kalman smoother output. P_0^T in S&S.}
   \item{J}{ (m x m x T) Kalman smoother output.  Only for \code{MARSSkfss}. (ref S&S eqn 6.49)}
