@@ -6,12 +6,19 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
-7-09-2020 Status
+Status
 -----------------------------------
+
+7-09-2020
 
 * The versiontest.R tests passed.
 * Working on testing predict and residuals against other packages and models.
-* Currently working on `StructTS()` examples in Chapter_Residuals.Rnw. 
+* Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
+
+7-12-2020
+
+* Working on issue #74 that is coming up in the BSM model. Weird Q update error at iteration 1. It's a numerical accuracy issue I think. Fixed by using solve(A,B) to get J0 instead of inverse of Vtt1[,,1]
+* Rerun the versiontest.R tests because of the J0 change.
 
     
 MARSS 3.11.0 (resids_update for CRAN)
@@ -26,6 +33,7 @@ ENHANCEMENTS
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
 * Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. This required changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
 
 BUGS
 
