@@ -19,6 +19,7 @@ Status
 
 * Working on issue #74 that is coming up in the BSM model. Weird Q update error at iteration 1. It's a numerical accuracy issue I think. Fixed by using solve(A,B) to get J0 instead of inverse of Vtt1[,,1]
 * Rerun the versiontest.R tests because of the J0 change.
+* KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
 
     
 MARSS 3.11.0 (resids_update for CRAN)
