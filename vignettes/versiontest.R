@@ -31,7 +31,7 @@ lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
-# Mac: install.packages("~/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.00.tar.gz", lib=lib.new, repos=NULL)
 # Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
