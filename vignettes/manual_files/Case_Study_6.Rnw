@@ -334,90 +334,61 @@ mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
 \label{fig:CS6.levelchanges}
 \end{figure}
 
+\clearpage
 \subsection{Detecting changes in the drift parameter in a random walk model}
-For the Nile River data, a random walk with drift model does not make much sense (nor is such a model supported via AICc).  In other studies, for example when looking for long-term trends or movement studies, the drift parameter of a random walk is the main object of interest.  In this case, the default model would be a random walk with drift: 
+
+The model of a random walk with a fixed $u$ drift term is: 
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{gathered}
 y_t = x_t+v_t \text{ where } v_t \sim \N(0,r)  \\
 x_t = x_{t-1}+u+w_t \text{ where } w_t \sim \N(0,q) \\
-x_1 = \pi 
+x_0 = \pi 
 \end{gathered}   
 \label{eq:random.walk.w.drift}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-The $u$ parameter is the drift term and gives the long-term average rate of change.   One of the questions of interest is often whether the $u$ parameter has changed over time or whether it has experienced sudden breaks.
-
-To fit this model with MARSS, we will explicitly show all the MARSS parameters:
+Same as we did for the level, we can model the drift as a random walk and explore whether $u_t$ has changed over time or whether it has experienced sudden breaks. The stochastic level and trend model is
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
-\begin{split}
-y_t &= 1 \times \x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
-x_t &= 1 \times x_{t-1}+ u + w_t    \text{ where } w_t \sim \N(0,q) \\
-x_1 = \pi 
- \end{split}   
- \label{eq:marss.model.2}\end{equation}
-%~~~~~~~~~~~~~~~~~~~~~~~~~
-Thus, $\ZZ=1$, $\aa=0$, $\RR=r$, $\BB=1$, $\uu=0$, $\QQ=q$, and $\xx_0=\pi$.  For MARSS, all parameters must be written as matrices.  The model is specified as a list as follows:
-<<mod-nile-u, eval=FALSE>>=
-mod.nile.u <- list(
-  Z = matrix(1), A = matrix(0), R = matrix("r"),
-  B = matrix(1), U = matrix("u"), Q = matrix("q"),
-  x0 = matrix("pi")
-)
-@
-
-
-
-
-%~~~~~~~~~~~~~~~~~~~~~~~~~
-\begin{equation}
-\begin{split}
-y_t &= x_t + v_t \text{where } v_t &\sim \N(0,r)  \\
-x_t &= x_{t-1} + \beta_{t-1} + w_t \text{ where } w_t &\sim \N(0,q) \\
-\beta_t &= \beta_{t-1} +  z_t \text{ where } z_t &\sim \N(0,p) \\
-x_1 = \pi_x \text{ and }  \beta_1 = \pi_\beta
- \end{split}   
- \label{eq:stochastic.slope}\end{equation}
+\begin{gathered}
+y_t = x_t + v_t \text{where } v_t \sim \N(0,r)  \\
+x_t = x_{t-1} + u_{t-1} + w_t \text{ where } w_t \sim \N(0,q) \\
+u_t = u_{t-1} +  z_t \text{ where } z_t \sim \N(0,p) \\
+x_0 = \pi_x \text{ and }  u_0 = \pi_u
+\end{gathered}\label{eq:stochastic.slope}
+\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Write the model in MARSS form:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
-\begin{split}
-y_t &= \begin{bmatrix}1&0\end{bmatrix}\begin{bmatrix}x_t\\\beta_t\end{bmatrix} + w_t \\
-\\
-\begin{bmatrix}x_t\\ \beta_t\end{bmatrix}
-&= \begin{bmatrix}1&1\\0&1\end{bmatrix}
-\begin{bmatrix}x_{t-1}\\ \beta_{t-1}\end{bmatrix} 
-+ \begin{bmatrix}v_t\\ z_t\end{bmatrix}
- \end{split}   
- \label{eq:marss.stochastic.slope}
- \end{equation}
+\begin{gathered}
+y_t = \begin{bmatrix}1&0\end{bmatrix}\begin{bmatrix}x_t\\ u_t\end{bmatrix} + v_t \\
+\begin{bmatrix}x_t\\ u_t\end{bmatrix}
+= \begin{bmatrix}1&1\\0&1\end{bmatrix}
+\begin{bmatrix}x_{t-1}\\ u_{t-1}\end{bmatrix} 
++ \begin{bmatrix}w_t\\ z_t\end{bmatrix} \text{ where }
+\begin{bmatrix}v_t\\ z_t \end{bmatrix} \sim 
+\MVN\bigg(0, \begin{bmatrix}q&0\\0&p \end{bmatrix}\bigg)
+\end{gathered}\label{eq:marss.stochastic.slope}
+\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-Define a matrix $\xx$ and $\ww$ 
-\begin{equation*}
-\begin{split}
-\xx_t = \begin{bmatrix}x_t\\ \beta_t \end{bmatrix} \\
-\ww_t = \begin{bmatrix}v_t\\ z_t \end{bmatrix} \\
-\ww_t \sim \MVN\bigg(0, \begin{bmatrix}q&0\\0&p \end{bmatrix}\bigg) 
-\end{split}
-\end{equation*}
 
 The model is then:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
-\begin{split}
-y_t &= \ZZ\xx + \aa + v_t \\
-\xx_t&=\BB\xx_{t-1}+\uu+ \ww_t\\
-\ZZ= \begin{bmatrix}1&0\end{bmatrix}\\
-\aa= \begin{bmatrix}0\end{bmatrix}\\
-\RR= \begin{bmatrix}r\end{bmatrix}\\
-\BB= \begin{bmatrix}1&1\\0&1\end{bmatrix}\\
-\uu= \begin{bmatrix}0\\0\end{bmatrix}\\
-\QQ= \begin{bmatrix}q&0\\0&p \end{bmatrix}\\
-\xx_0= \begin{bmatrix}\pi_1\\ \pi_2 \end{bmatrix}\\
- \end{split}   
- \label{eq:marss.stochastic.slope2}
+\begin{gathered}
+y_t = \ZZ\xx + \aa + v_t \\
+\xx_t=\BB\xx_{t-1}+\uu+ \ww_t\\
+\\
+\ZZ= \begin{bmatrix}1&0\end{bmatrix} \text{  }
+\aa= \begin{bmatrix}0\end{bmatrix} \text{  }
+\RR= \begin{bmatrix}r\end{bmatrix} \\
+\BB= \begin{bmatrix}1&1\\0&1\end{bmatrix} \text{  }
+\uu= \begin{bmatrix}0\\0\end{bmatrix} \text{  }
+\QQ= \begin{bmatrix}q&0\\0&p \end{bmatrix} \text{  }
+\xx_0= \begin{bmatrix}\pi_x\\ \pi_u \end{bmatrix}\\
+\end{gathered} \label{eq:marss.stochastic.slope2}
  \end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 We then write this in \R for the MARSS() function:
@@ -426,70 +397,53 @@ mod.nile.3 <- list(
   Z = matrix(c(1, 0), 1, 2), A = matrix(0), R = matrix("r"),
   B = matrix(c(1, 0, 1, 1), 2, 2), U = matrix(0, 2, 1),
   Q = matrix(list("q", 0, 0, "p"), 2, 2),
-  x0 = matrix(c("pi1", "pi2"), 2, 1)
+  x0 = matrix(c("x", "u"), 2, 1)
 )
 @
-We could also use the following text shortcuts to specify the model.  
-<<mod-nile-not-used-2>>=
-Q <- "diagonal and unequal"
-x0 <- "unequal"
-@
 
-This model takes a long time to fit with the EM algorithm\footnote{Normally this type of model is fit with a fixed diffuse initial condition which makes the fitting much faster. See the chapter on Structural Time Series Models}.  We could run the EM algorithm a long time, but there is a quicker trick in this case.  We will run the EM algorithm for a few iterations and stop before convergence.  Then we will use the fit from the EM algorithm as the initial condition for the faster BFGS algorithm for the final approach to the maximum-likelihood:
+
+This model takes a long time to fit with the EM algorithm\footnote{Normally this type of model is fit with a fixed diffuse initial condition which makes the fitting much faster. See the chapter on Structural time series models}.  We could run the EM algorithm a long time, but there is a quicker trick in this case.  We will run the EM algorithm for a few iterations and stop before convergence.  Then we will use the fit from the EM algorithm as the initial condition for the faster BFGS algorithm for the final approach to the maximum-likelihood:
 <<fit-mod3, echo=TRUE>>=
 model <- mod.nile.3
 kem.3 <- MARSS(dat,
   model = model, inits = list(x0 = matrix(c(1000, -4), 2, 1)),
   control = list(maxit = 20), silent = TRUE)
-kem.3 <- MARSS(dat, model = model, inits = kem.3$par, method = "BFGS", silent = TRUE)
+kem.3 <- MARSS(dat, model = model, inits = kem.3, 
+               method = "BFGS", silent = TRUE)
 summary(kem.3)
 @
 
 
-Now we will compute the model residuals as before:
-<<compute-var-hat-vt2, echo=TRUE>>=
-resids <- MARSSresiduals(kem.3)$std.residuals
-@
+The Nile data is not a good example since the variance for the slope is close to zero so the residual line is just a flat 0 (see value for \verb@Q.p@). Let's run the same model on the \verb@WWWusage@ dataset (Figure \ref{fig:CS6.fig3}).
 
-The Nile data is not a good example since the variance for the slope is close to zero so the residual line is just a flat 0.
 \begin{figure}[htp]
 \begin{center}
-<<plotslopetests-nile, echo=TRUE, fig=TRUE>>=
-library(Hmisc)
-par(mfrow = c(2, 1), mar = c(4, 3, 2, 1))
-x <- seq(tsp(Nile)[1], tsp(Nile)[2], tsp(Nile)[3])
-plot(x, resids[2, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), xaxp = c(1870, 1970, 10))
-minor.tick(nx = 10, ny = 0, tick.ratio = .3)
-abline(h = c(1.97, -1.97), lty = 2)
-title("test for level changes")
-
-plot(x, resids[3, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), xaxp = c(1870, 1970, 10))
-minor.tick(nx = 10, ny = 0, tick.ratio = .3)
-abline(h = c(1.97, -1.97), lty = 2)
-title("test for slope changes")
-mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
+<<plotslopetests-nile, echo=FALSE, fig=TRUE>>=
+plot(WWWusage)
 @
 \end{center}
-\caption{The standardized residuals for null model against one with level changes and slope changes for the Nile data. The slope plot is flat because the variance for the slope is almost zero.}
+\caption{The WWWusage data set.}
 \label{fig:CS6.fig3}
 \end{figure}
 
 
-Let's run the same model on the \verb@treering@ dataset.
 <<fit-mod-www, echo=TRUE>>=
 dat <- as.vector(WWWusage)
 kem.3 <- MARSS(dat,
-  model = model, inits = list(x0 = matrix(c(1000, -4), 2, 1)),
+  model = model, inits = list(x0 = matrix(0, 2, 1)),
   control = list(maxit = 20), silent = TRUE)
-kem.3 <- MARSS(dat, model = model, inits = kem.3$par, method = "BFGS", silent = TRUE)
+kem.3 <- MARSS(dat, model = model, inits = kem.3, 
+               method = "BFGS", silent = TRUE)
 summary(kem.3)
-resids <- MARSSresiduals(kem.3)$std.residuals
 @
+
+Figure \ref{fig:CS6.fig4} shows the standardized residuals for the $u$, which is the 2nd state in $\xx$. There appears to be unusually large changes in the trend around year 25. The other changes in the trend are consistent with a random walk, i.e. the trend changes but only the rapid change near year 25 is inconsistent with the estimated trend random walk.
 
 \begin{figure}[htp]
 \begin{center}
-<<plotslopetests-www, echo=TRUE, fig=TRUE>>=
+<<plotslopetests-www, echo=FALSE, fig=TRUE>>=
 library(Hmisc)
+resids <- MARSSresiduals(kem.3)$std.residuals
 par(mfrow = c(2, 1), mar = c(4, 3, 2, 1))
 x <- seq(tsp(WWWusage)[1], tsp(WWWusage)[2], tsp(WWWusage)[3])
 plot(x, resids[2, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), 
