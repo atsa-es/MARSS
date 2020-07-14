@@ -120,7 +120,9 @@ for(unittestfile in unittestfiles){
   #Compare the lists and report any differences
   cat("Checking ", tag, "\n")
   if(!identical(names(testNew), names(testOld))){
-    cat("ERROR: Names of the test lists not identical\n\n")
+    cat("ERROR: Names of the test lists not identical\n")
+    cat("testNew has these not in testOld", setdiff(names(testNew), names(testOld)), "\n")
+    cat("testOld has these not in testNew", setdiff(names(testOld), names(testNew)), "\n\n")
     next
   }
   good=rep(TRUE,length(names(testNew)))
@@ -187,6 +189,16 @@ for(unittestfile in unittestfiles){
           }
         }
       }
+      if(inherits(testNew[[ii]], "matrix") || inherits(testNew[[ii]], "array")){
+        if(!identical(dim(testNew[[ii]]), dim(testOld[[ii]]))){
+          cat("Warning: dims of", names(testNew)[ii], "not identical\n")
+          next
+        }
+        if(!all((testNew[[ii]]-testOld[[ii]])<sqrt(.Machine$double.eps)))
+          cat("Warning: values in", names(testNew)[ii], "not identical\n")
+        if(!identical(rownames(testNew[[ii]]), rownames(testOld[[ii]])))
+          cat("Warning: rownames of", names(testNew)[ii], "not identical\n")
+      }
       if(inherits(testNew[[ii]], "list")){
         for(kk in 1:length(testNew[[ii]])){
           if(inherits(testNew[[ii]][[kk]], "marssMLE")){
@@ -215,13 +227,13 @@ for(unittestfile in unittestfiles){
           }
           if(inherits(testNew[[ii]][[kk]], "matrix") || inherits(testNew[[ii]][[kk]], "array")){
             if(!identical(dim(testNew[[ii]][[kk]]), dim(testOld[[ii]][[kk]]))){
-              cat("Warning: dims of ", ii, names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: dims of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
               next
             }
             if(!all((testNew[[ii]][[kk]]-testOld[[ii]][[kk]])<sqrt(.Machine$double.eps)))
-              cat("Warning: values in ", ii, names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: values in", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
             if(!identical(rownames(testNew[[ii]][[kk]]), rownames(testOld[[ii]][[kk]])))
-              cat("Warning: dims of ", ii, names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: rownames of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
             
           }
         }
