@@ -1,4 +1,4 @@
-Package: MARSScpp
+Package: MARSS
 Type: Package
 Title: Multivariate Autoregressive State-Space Modeling
 Version: 4.1.0
