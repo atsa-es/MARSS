@@ -13,7 +13,8 @@ plot.marssMLE <-
     if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     if (any(str_detect(plot.type, "resids"))){
-      resids <- residuals.marssMLE(x, type = "innovations", standardization="marginal")
+      # Not using innovations residuals in this function yet
+      # resids <- residuals.marssMLE(x, type = "innovations", standardization="marginal")
       std.resids <- residuals.marssMLE(x, type="smoothations", standardization="Cholesky")
     }
     
@@ -141,7 +142,7 @@ plot.marssMLE <-
     
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- subset(resids, resids$type=="model")
+      df <- subset(std.resids, std.resids$type=="model")
       df$.rownames <- factor(df$.rownames) # drop state levels
       df$.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
@@ -219,7 +220,7 @@ plot.marssMLE <-
     
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- subset(resids, resids$type=="state")
+      df <- subset(std.resids, std.resids$type=="state")
       df$.rownames <- factor(df$.rownames) # drop state levels
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
