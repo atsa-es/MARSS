@@ -47,10 +47,12 @@ BUGS
 * `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
 * `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
+* `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`.
 
 DOCUMENTATION and MAN FILES
 
 * Added covariates and example to `MARSS_dfa.Rd`
+* Added chapter on Structural time series models which compares `StructTS()` to `MARSS()` output.
 * Removed all mention of `augment()` from documentation and manuals. Replaced with `residuals()`.
 * `predict.marssMLE.Rd` (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
 * Cleaned-up the man pages for `predict()` and `predict.marssMLE()`.
