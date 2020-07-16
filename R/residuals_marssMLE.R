@@ -13,7 +13,7 @@ residuals.marssMLE <- function(object, ...,
   if (type == "smoothations") type <- "tT"
   if (type == "innovations") type <- "tt1"
   standardization <- match.arg(standardization)
-
+  
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
@@ -29,7 +29,7 @@ residuals.marssMLE <- function(object, ...,
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
 ##############################################################################################################################################
-residuals_marxss <- function(x, type, standardization) {
+residuals_marxss <- function(x, type, standardization, ...) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
@@ -37,34 +37,37 @@ residuals_marxss <- function(x, type, standardization) {
   data.dims <- model.dims[["y"]]
   nn <- data.dims[1]
   TT <- data.dims[2]
-  resids <- MARSSresiduals(x)
+  resids <- MARSSresiduals(x, type=type, ...)
   tmp <- apply(resids$var.residuals, 3, function(x) { takediag(x) })
   tmp[tmp<0 & abs(tmp)<sqrt(.Machine$double.eps)] <- 0
+  if(is.null(dim(tmp))) tmp <- matrix(tmp, nrow=1)
   se.resids <- sqrt(tmp)
   model.se.resids <-  se.resids[1:nn,,drop=FALSE]
   model.se.resids[is.na(resids$model.residuals)] <- NA
   # First y
   type1 <- paste0("y", type)
-    data.names <- attr(model, "Y.names")
-    fit.list <- fitted(x, type = type1, interval="none")
-    ret <- data.frame(
-      .rownames = fit.list$.rownames,
-      type = "model",
-      t = fit.list$t,
-      value = fit.list$y,
-      .fitted = fit.list$.fitted,
-      stringsAsFactors = FALSE
-    )
-    ret <- cbind(ret,
-      .resids = vec(t(resids$model.residuals)),
-      .sigma = vec(t(model.se.resids))
-      )
-    if(standardization=="Cholesky") 
-      ret <- cbind(ret, .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE])))
-    if(standardization=="marginal") 
-      ret <- cbind(ret, .std.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
-    
+  data.names <- attr(model, "Y.names")
+  fit.list <- fitted(x, type = type1, interval="none")
+  ret <- data.frame(
+    .rownames = fit.list$.rownames,
+    type = "model",
+    t = fit.list$t,
+    value = fit.list$y,
+    .fitted = fit.list$.fitted,
+    stringsAsFactors = FALSE
+  )
+  ret <- cbind(ret,
+               .resids = vec(t(resids$model.residuals)),
+               .sigma = vec(t(model.se.resids))
+  )
+  if(standardization=="Cholesky") 
+    ret <- cbind(ret, .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE])))
+  if(standardization=="marginal") 
+    ret <- cbind(ret, .std.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
+  
   # Second x
+  # there are no state innovations residuals
+  if(type!="tt1"){
     type1 <- paste0("x", type)
     # line up the residuals so that xtT(t) has residuals for xtT(t)-f(xtT(t-1))
     state.names <- attr(model, "X.names")
@@ -91,6 +94,7 @@ residuals_marxss <- function(x, type, standardization) {
       stringsAsFactors = FALSE
     )
     ret <- rbind(ret, ret2)
+  }
   
   class(ret) <- c("marssResiduals", "data.frame")
   attr(ret, "standardization") <- standardization
@@ -98,10 +102,10 @@ residuals_marxss <- function(x, type, standardization) {
   ret
 }
 
-residuals_dfa <- function(x, type, standardization) {
+residuals_dfa <- function(x, type, standardization, ...) {
   return(residuals_marxss(x, type, standardization))
 }
 
-residuals_marss <- function(x, type, standardization) {
+residuals_marss <- function(x, type, standardization, ...) {
   return(residuals_marxss(x, type, standardization))
 }
