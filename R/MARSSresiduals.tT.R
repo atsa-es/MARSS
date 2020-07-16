@@ -234,7 +234,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
     }
   }
   
-  # et is the expected value of the residuals conditioned on y(1)
+  # et is the expected value of the residuals conditioned on y(1)-the observed data
   E.obs.v <- et[1:n,,drop=FALSE]
   var.obs.v <- array(0, dim = c(n, n, TT))
   for( t in 1:TT) var.obs.v[,,t] <- Ey$OtT[,,t] - tcrossprod(Ey$ytT[,t])
