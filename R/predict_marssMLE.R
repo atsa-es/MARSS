@@ -1,6 +1,6 @@
 ######################################################################################################  predict method for class marssMLE. Prediction intervals
 ##################################################################################
-predict.marssMLE <- function(object, h = 0,
+predict.marssMLE <- function(object, n.ahead = 0,
                              conf.level = c(0.80, 0.95),
                              type = c("ytT", "xtT"),
                              newdata = list(t = NULL, y = NULL, c = NULL, d = NULL),
@@ -28,8 +28,9 @@ predict.marssMLE <- function(object, h = 0,
     stop("predict.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
   }
   if (length(conf.level) == 0) interval <- "none"
-  if (!missing(h) && (!is.numeric(h) || length(h) != 1 || h < 0 || (h %% 1) != 0)) {
-    stop("predict.marssMLE: h must be an integer >= 0.", call. = FALSE)
+  if (!missing(n.ahead) && (!is.numeric(n.ahead) || length(n.ahead) != 1 
+                            || n.ahead < 0 || (n.ahead %% 1) != 0)) {
+    stop("predict.marssMLE: n.ahead must be an integer >= 0.", call. = FALSE)
   }
   missingx0 <- TRUE
   is.matrixx0 <- FALSE
@@ -58,22 +59,16 @@ predict.marssMLE <- function(object, h = 0,
     extras <- list(...)
   }
 
-  if (!missing(h) && h > 0) {
-    if (!missingx0) message("predict.marssMLE: x0 was passed in. This is ignored since h > 0 (forecast). x at time T is used for x0.")
+  if (!missing(n.ahead) && n.ahead > 0) {
+    if (!missingx0) message("predict.marssMLE: x0 was passed in. This is ignored since n.ahead > 0 (forecast). x at time T is used for x0.")
 
     outlist <- forecast.marssMLE(object,
-      h = h, conf.level = conf.level,
+      h = n.ahead, conf.level = conf.level,
       interval = interval,
       type = type, newdata = newdata,
       fun.kf = fun.kf, ...
     )
-    tmp <- colnames(outlist[["pred"]])
-    colnames(outlist[["pred"]])[which(tmp == ".sd")] <- "se"
-    outlist$x0 <- coef(object, type = "matrix")[["x0"]]
-    outlist$tinitx <- object[["model"]][["tinitx"]]
-
-    class(outlist) <- "marssPredict"
-
+    
     return(outlist)
   }
 
@@ -279,14 +274,15 @@ predict.marssMLE <- function(object, h = 0,
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
-    newdata = newdata,
     level = 100 * conf.level,
-    pred = ret,
     type = type,
+    pred = ret,
     t = newdata[["t"]],
-    h = h,
+    h = n.ahead,
+    n.ahead = n.ahead,
     x0 = x0list[["x0"]],
-    tinitx = x0list[["tinitx"]]
+    tinitx = x0list[["tinitx"]],
+    newdata = newdata
   )
 
   class(outlist) <- "marssPredict"
