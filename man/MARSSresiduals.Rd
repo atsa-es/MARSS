@@ -3,23 +3,23 @@
 
 \title{ MARSS Residuals }
 \description{
-  The normal residuals function is \code{\link{residuals.marssMLE}()}. \code{MARSSresiduals()} returns residuals as matrices while \code{\link{residuals.marssMLE}()} returns the same information as a data frame.  This function calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals. 
+  The normal residuals function is \code{\link{residuals.marssMLE}()}. \code{MARSSresiduals()} returns residuals as a list of matrices while \code{\link{residuals.marssMLE}()} returns the same information in a data frame.  This function calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals. 
 }
 \usage{
-MARSSresiduals(object,..., conditioning=c("T", "t-1"), normalize=FALSE, silent=FALSE)
+MARSSresiduals(object, ..., type=c("tT", "tt1"), normalize=FALSE, silent=FALSE)
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
-  \item{...}{ Additional arguments to be passed to the residuals functions. For conditioning="T", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
-  \item{conditioning}{ "T" for smoothed residuals and "t-1" for one-step-ahead residuals. }
-  \item{normalize}{ TRUE/FALSE }
+  \item{...}{ Additional arguments to be passed to the residuals functions. For type="tT", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
+  \item{type}{ "tT" for smoothed residuals conditioned on all the data 1 to T, aka smoothation residuals. "tt1" for one-step-ahead residuals, aka innovations residuals. }
+  \item{normalize}{ TRUE/FALSE See details.}
   \item{silent}{ If TRUE, do not print inversion warnings. }
 }
 \value{
 
 \strong{Smoothed residuals}
 
-If \code{conditioning="T"}, a list with the following components  
+If \code{type="tT"}, a list with the following components  
   \item{model.residuals}{ The smoothed model residuals (data minus model predicted values) as a n x T matrix. The residuals are conditioned on all the data and the set of model parameters.  Called the smoothations. This is different than the Kalman filter innovations which are conditioned on the data up to \eqn{t-1}.}
   \item{state.residuals}{ The smoothed state residuals.}
   \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
@@ -33,7 +33,7 @@ If \code{conditioning="T"}, a list with the following components
   
 \strong{One-step-ahead residuals}
 
-If \code{conditioning="t-1"}, a list with the following components  
+If \code{type="tt1"}, a list with the following components  
   \item{residuals}{ The model residuals (data minus model predicted values), as a n x T matrix. The residuals are conditioned on the data up to time \eqn{t-1} and the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
   \item{var.residuals}{ The variance of the model residuals as a n x n x T matrix. }
   \item{std.residuals}{ The Cholesky standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
@@ -100,7 +100,7 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #one-step-ahead standardized residuals
-  MARSSresiduals(MLEobj, conditioning="t-1")$std.residuals
+  MARSSresiduals(MLEobj, type="tt1")$std.residuals
 }
 \references{
 Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.
