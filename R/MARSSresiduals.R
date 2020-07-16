@@ -1,6 +1,6 @@
-MARSSresiduals <- function(object, ..., conditioning=c("T", "t-1"), normalize = FALSE, silent=FALSE) {
-  conditioning <- match.arg(conditioning)
-  if(conditioning=="T") val <- MARSSresiduals.tT(object, ..., normalize=normalize, silent=silent)
-  if(conditioning=="t-1") val <- MARSSresiduals.tt1(object, ..., normalize=normalize, silent=silent)
+MARSSresiduals <- function(object, ..., type=c("tT", "tt1"), normalize = FALSE, silent=FALSE) {
+  type <- match.arg(type)
+  if(type=="tT") val <- MARSSresiduals.tT(object, ..., normalize=normalize, silent=silent)
+  if(type=="tt1") val <- MARSSresiduals.tt1(object, ..., normalize=normalize, silent=silent)
   return(val)
 }
