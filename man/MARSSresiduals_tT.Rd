@@ -3,7 +3,7 @@
 
 \title{ MARSS Smoothed Residuals }
 \description{
-  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, conditioning="T")}.
+  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="smoothations")}.
 }
 \usage{
 MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
@@ -11,7 +11,7 @@ MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{Harvey}{ TRUE/FALSE. Use the Harvey et al. (1998) algorithm or use the Holmes (2014) algorithm. The values are the same except for missing values. }
-  \item{normalize}{ TRUE/FALSE }
+  \item{normalize}{ TRUE/FALSE See details.}
   \item{silent}{ If TRUE, don't print inversion warnings. }
 }
 \value{
@@ -22,8 +22,8 @@ A list with the following components
   \item{var.residuals}{ The joint variance of the model and state residuals conditioned on observed data. Returned as a (n+m) x (n+m) x T matrix. For Harvey=FALSE, this is Holmes (2014) equation 57. For Harvey=TRUE, this is the residual variance in eqn. 24, page 113, in Harvey et al. (1998). They are identical except for missing values, for those Harvey=TRUE returns 0s.}
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. This for convenience for residuals diagnostics. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. This for convenience for residuals diagnostics. }
-    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See details. }
-    \item{var.obs.residuals}{ The variance value of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See details. }
+    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed residuals (values in \code{model.residuals}). For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See details. }
+    \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See details. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
 }
@@ -129,7 +129,7 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
   MLEobj <- MARSS(dat)
   
   #state residuals
-  state.resids1 <- MARSSresiduals(MLEobj, conditioning="T")$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj)$state.residuals
   #this is the same as
   states <- MLEobj$states
   Q <- coef(MLEobj,type="matrix")$Q
@@ -138,7 +138,7 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #normalize to variance of 1
-  state.resids1 <- MARSSresiduals(MLEobj, normalize=TRUE, conditioning="T")$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj, normalize=TRUE)$state.residuals
   state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
