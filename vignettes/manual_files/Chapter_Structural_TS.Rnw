@@ -66,8 +66,9 @@ fit4$kf <- MARSSkfss(fit4)
 @
 
 <<label=STS_level_output>>=
-data.frame(StructTS=fit1$fitted, fit2=fit2$kf$xtt[1,], 
-  fit.bfgs=fit3$kf$xtt[1,], fit.em=fit4$kf$xtt[1,])[1:5,]
+df <- data.frame(StructTS=fit1$fitted, fit2=fit2$kf$xtt[1,], 
+  fit.bfgs=fit3$kf$xtt[1,], fit.em=fit4$kf$xtt[1,])
+head(df)
 @
 
 \begin{figure}[htp]
@@ -343,6 +344,44 @@ ggplot(df, aes(x=t, y=value, color=model, linetype=model, shape=model)) +
 \caption{Comparison of the level, trend and season estimates for the BSM model.}
 \label{fig:STS.fig.bsm}
 \end{figure}
+
+\subssection{Forecasting}
+\index{structural ts models!forecasting}
+
+Forecasts can be made with the \verb@predict()@ function or the \verb@forecast()@ function in the forecast package. 
+
+<<label=STS_predict_pre_models, results=hide>>=
+y <- window(treering, start = 0, end=20)
+vy <- var(y, na.rm = TRUE)/100
+
+fit1 <- StructTS(y, type = "level")
+mod.list <- list(x0=matrix(y[1]), U="zero", tinitx=0, 
+                 Q=matrix(fit1$coef[1]), R=matrix(fit1$coef[2]),
+                 V0=matrix(1e+06 * vy))
+fit2 <- MARSS(as.vector(y), model=mod.list)
+@
+
+<<>>=
+# Now estimate the parameters
+mod.list <- list(x0=matrix(y[1]), U="zero", tinitx=0, V0=matrix(1e+06 * vy),
+                 Q=matrix("s2xi"), R=matrix("s2eps"))
+fit3 <- MARSS(as.vector(y), model=mod.list, method="BFGS")
+fit4 <- MARSS(as.vector(y), model=mod.list, control=list(allow.degen=FALSE))
+@
+
+
+<<label=STS_predict_level>>=
+fr <- predict(fit1, n.ahead=10)
+fr$pred
+@
+
+<<>>=
+fr=forecast::forecast(fit1, h=10)
+plot(fr)
+@
+
+
+
 
 <<reset, echo=FALSE>>=
 options(prompt="> ", continue=" +", width=120)
