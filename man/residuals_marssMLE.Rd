@@ -10,12 +10,13 @@
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
   
-  \item{type}{"Cholesky" means it is standardized by the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
-"marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals.}
+  \item{type}{"smoothations" means the fitted values are computed conditioned on all the data. See \code{\link{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "innovations" means the fitted values are computed conditioned on the data up to t-1. See \code{\link{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. In most MARSS functions, estimates at time t conditionined on data 1 to T are denoted "tT" and conditioned on the data from 1 to t-1 are denoted "tt1". This function is an exception since the terms smoothations and innovations are used in the literature.}
 
-  \item{standardization}{"smoothations" means the fitted values are computed conditioned on all the data. See \code{\link{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "innovations" means the fitted values are computed conditioned on the data up to t-1. See \code{\link{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}.}
+  \item{standardization}{"Cholesky" means it is standardized by the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
+"marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. Note, if the data and states are univariate, there is no difference in these two standardization methods.}
 
-  \item{form}{If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
+
+  \item{form}{If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating. This can be ignored in almost all cases.}
   
   \item{...}{Not used.}
 
