@@ -2,7 +2,7 @@
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
 options(prompt=" ", continue=" ", width=60)
 @
-<<STS_required_libraries, echo=FALSE>>=
+<<label=Cs01_required-libraries, echo=FALSE>>=
 library(MARSS)
 library(tidyr)
 library(ggplot2)
@@ -46,7 +46,7 @@ Here the model is fit to 20 time steps of tree ring data. \verb@fit1@ is the \ve
 
 Another difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate) is the estimate of the state conditioned on the data up to $t$ not $T$. In the MARSS package, the state estimate (in the \verb@states@ element) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$). We set \verb@control=list(allow.degen=FALSE)@ when using the EM algorithm (the default) in order to compare results to the BFGS algorithm used in \verb@StructTS()@ which will not variances to go to zero (they may appear that way in the output but that is rounding).
 
-<<label=STS_structTS_level, keep.source=TRUE, results=hide>>=
+<<label=Cs02_structTS-level, keep.source=TRUE, results=hide>>=
 y <- window(treering, start = 0, end=20)
 vy <- var(y, na.rm = TRUE)/100
 
@@ -65,15 +65,17 @@ fit4 <- MARSS(as.vector(y), model=mod.list, control=list(allow.degen=FALSE))
 fit4$kf <- MARSSkfss(fit4)
 @
 
-<<label=STS_level_output>>=
-df <- data.frame(StructTS=fit1$fitted, fit2=fit2$kf$xtt[1,], 
-  fit.bfgs=fit3$kf$xtt[1,], fit.em=fit4$kf$xtt[1,])
+<<label=Cs03_level-output, keep.source=TRUE>>=
+df <- data.frame(
+  StructTS=fit1$fitted, fit2=fit2$kf$xtt[1,], 
+  fit.bfgs=fit3$kf$xtt[1,], fit.em=fit4$kf$xtt[1,]
+  )
 head(df)
 @
 
 \begin{figure}[htp]
 \begin{center}
-<<label=STS_plot_structTS, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
+<<label=Cs04_plot-structTS, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
 require(tidyr)
 require(ggplot2)
 df1 <- as.data.frame(fit1$fitted)
@@ -139,7 +141,7 @@ y_1\\
 
 Because \verb@MARSS()@ does an inversion of \verb@V0@ as part of code to force positive definite matrices and deal with degenerate models with 0s on diagonals of $\QQ$ or $\RR$, the \verb@V0@  used in \verb@StructTS()@ needs to be made positive definite for \verb@MARSS()@. This is done by adding a small value (1e-10) to the diagonal as shown in the \verb@mod.list@ used for \verb@fit3@ and \verb@fit4@. This model will be illustrated with the \verb@UKgas@ data set since for the tree ring data the trend variance estimate is 0 and that will not illustrate a stochastic trend. The \verb@subset.ts()@ function in the forecast package is used to subset just the 2nd quarter data.
 
-<<label=STS_structTS_leveltrend, keep.source=TRUE, results=hide>>=
+<<label=Cs05_structTS-leveltrend, keep.source=TRUE, results=hide>>=
 y <- log10(forecast:::subset.ts(UKgas, quarter=2))
 vy <- var(y, na.rm = TRUE)/100
 
@@ -165,14 +167,14 @@ fit4$kf <- MARSSkfss(fit4)
 @
 
 Trend estimate comparison for the first 5 time points. Figure \ref{fig:STS.fig.trend} shows the comparisons for the full level and trend estimates.  The EM algorithm would need a lower tolerance to get closer to the maximum likelihood parameter values.
-<<label=STS_leveltrend_output>>=
+<<label=Cs06_leveltrend-output>>=
 data.frame(StructTS=fit1$fitted[,2], fit2=fit2$kf$xtt[2,], 
   fit.bfgs=fit3$kf$xtt[2,], fit.em=fit4$kf$xtt[2,])[1:5,]
 @
 
 \begin{figure}[htp]
 \begin{center}
-<<label=STS_plot_structTS_leveltrend, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
+<<label=Cs07_plot-structTS-leveltrend, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
 require(tidyr)
 require(ggplot2)
 df1 <- as.data.frame(fit1$fitted)
@@ -278,12 +280,12 @@ y_1\\0\\0\\0\\0
 \end{equation}
 
 Let's see an example with the UKgas data set used in \verb@?StructTS()@.
-<<label=STS_fit_structTS_bsm, keep.source=TRUE>>=
+<<label=Cs08_fit-structTS-bsm, keep.source=TRUE>>=
 y <- log10(UKgas)
 fit1 <- StructTS(y, type="BSM")
 @
 To make $\BB$, we write a little helper function. \verb@nf@ is the frequency.
-<<label=STS_makeB>>=
+<<label=Cs09_makeB>>=
 makeB <- function(nf){
   B <- matrix(0, nf + 1L, nf + 1L)
   B[1L:2L, 1L:2L] <- c(1, 0, 1, 1)
@@ -296,7 +298,7 @@ makeB <- function(nf){
 }
 @
 Now we can fit with \verb@MARSS()@. 
-<<label=STS_fit_structTS_bsm_marss_bfgs, keep.source=TRUE, results=hide>>=
+<<label=Cs10_fit-structTS-bsm-marss-bfgs, keep.source=TRUE, results=hide>>=
 nf <- frequency(y)
 vy <- var(y)/100
 B <- makeB(nf)
@@ -316,7 +318,7 @@ Figure \ref{fig:STS.fig.bsm} shows the comparisons.
 
 \begin{figure}[htp]
 \begin{center}
-<<label=STS_plot_structTS_bsm, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
+<<label=Cs11_plot-structTS-bsm, echo=FALSE, keep.source=TRUE, fig=TRUE>>=
 require(tidyr)
 require(ggplot2)
 df1 <- as.data.frame(fit1$fitted)
@@ -345,48 +347,66 @@ ggplot(df, aes(x=t, y=value, color=model, linetype=model, shape=model)) +
 \label{fig:STS.fig.bsm}
 \end{figure}
 
-\subssection{Forecasting}
+\subsection{Forecasting}
 \index{structural ts models!forecasting}
 
-Forecasts can be made with the \verb@predict()@ function or the \verb@forecast()@ function in the forecast package. 
+Forecasts can be made with the \verb@predict()@ function or the \verb@forecast()@ function in the forecast package. Here we will use the BSM model fits to illustrate forecasting the univariate models.
 
-<<label=STS_predict_pre_models, results=hide>>=
-y <- window(treering, start = 0, end=20)
-vy <- var(y, na.rm = TRUE)/100
 
-fit1 <- StructTS(y, type = "level")
-mod.list <- list(x0=matrix(y[1]), U="zero", tinitx=0, 
-                 Q=matrix(fit1$coef[1]), R=matrix(fit1$coef[2]),
-                 V0=matrix(1e+06 * vy))
+<<label=Cs12_pre-predict-fits, results=hide>>=
+y <- log10(UKgas)
+fit1 <- StructTS(y, type="BSM")
+
+nf <- frequency(y)
+vy <- var(y)/100
+B <- makeB(nf) # defined in the BSM section above
+Z <- matrix(c(1, 0, 1, rep(0, nf - 2L)),1,nf+1)
+V0 <- matrix(1e+06 * vy,nf+1,nf+1)+diag(1e-10,nf+1)
+mod.list <- list(x0=matrix(c(y[1],rep(0,nf)),ncol=1), U="zero", A="zero", tinitx=0, 
+                 Q=diag(c(fit1$coef[1:3],0,0)), R=matrix(fit1$coef[4]), V0=V0, Z=Z, B=B)
 fit2 <- MARSS(as.vector(y), model=mod.list)
 @
 \verb@fit1@ and \verb@fit2@ are exactly the same since \verb@fit2@ used the \verb@fit1@ estimated parameters.
 
-\verb@stats::predict.StructTS()@ is only for forecasting and takes the fit and \verb@n.ahead@ as arguments. It returns a list with the forecasts in \verb@pred@ and a ts object and their standard errors in \verb@se@. \verb@MARSS::predict.marssMLE()@ does both predicting within the data (similar to other \verb@predict@ methods) and will forecast if \verb@n.ahead@ is passed in. It returns a list with the predictions and forecasts in \verb@pred@ as a data frame in long form (suitable for \verb@ggplot@ calls). The standard errors and intervals (confidence or prediction) are included in \verb@pred@.
-<<label=STS_predict_level_1>>=
+\verb@stats::predict.StructTS()@ is only for forecasting and takes the fit and \verb@n.ahead@ as arguments. It returns a list with the forecasts in \verb@pred@ and a ts object and their standard errors in \verb@se@. 
+<<label=Cs13_predict-level-1>>=
 fr1 <- predict(fit1, n.ahead=5)
 fr1
 @
 
-The standard error is not printed but is in \verb@pred@.
-<<label=STS_predict_level_2>>=
+The \verb@MARSS::predict.marssMLE()@ does both predicting within the data (similar to other \verb@predict@ methods) and will forecast if \verb@n.ahead@ is passed in. It returns a list with the predictions and forecasts in \verb@pred@ as a data frame in long form (suitable for \verb@ggplot@ calls). The standard errors and intervals (confidence or prediction) are included in \verb@pred@. The standard error is not printed but is in the \verb@pred@ data frame.
+<<label=Cs14_predict-level-2>>=
 fr2 <- predict(fit2, n.ahead=5)
 fr2
 head(fr2$pred)
 @
 
 The estimates are the same. \verb@ft@ is the time steps associated with the forecast.
-<<label=STS_predict_level_compare>>=
+<<label=Cs15_predict-bsm-compare>>=
 rbind(pred1=fr1$pred, pred2=fr2$pred$estimate[fr2$ft],
       se1=fr1$se, se2=fr2$pred$se[fr2$ft])
 @
 
-<<>>=
-fr=forecast::forecast(fit1, h=10)
-plot(fr)
+If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get a forecast object that can be printed since the forecast package has a plot method for forecast objects.
+The MARSS package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.
+
+The plots from the \verb@StructTS@ and \verb@marssMLE@ objects are similar though they have slightly different formats.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs16_predict-bsm-compare, keep.source=TRUE, fig=TRUE, fig.width=6>>=
+fr1 <- forecast::forecast(fit1, h=10)
+fr2 <- forecast::forecast(fit2, h=10)
+p1 <- ggplot2::autoplot(fr1, include=8)
+p2 <- ggplot2::autoplot(fr2, include=8)
+gridExtra::grid.arrange(p1, p2, nrow = 1)
 @
+\end{center}
+\caption{Comparison of the forecast plots.}
+\label{fig:STS.fig.bsm.forecasts}
+\end{figure}
 
-
+\subsection{Fitted values}
+\index{structural ts models!fitted}
 
 
 <<reset, echo=FALSE>>=
