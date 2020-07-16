@@ -33,7 +33,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   # MARSSkfas doesn't output Innov, Sigma or Kt so might need to run MARSSkfss to get those
   if (is.null(MLEobj[["kf"]]) || is.null(MLEobj$kf$Innov) || is.null(MLEobj$kf$Sigma) || is.null(MLEobj$kf$Kt)) {
     kf <- MARSSkfss(MLEobj)
-  }
+  }else{ kf <- MLEobj[["kf"]] }
   # MARSSkfas sets these to a character warning, so not NULL; add this to catch that
   if (!is.array(MLEobj$kf$Innov) || !is.array(MLEobj$kf$Sigma) || !is.array(MLEobj$kf$Kt)) {
     kf <- MARSSkfss(MLEobj)
