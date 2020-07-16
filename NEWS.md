@@ -26,6 +26,14 @@ Status
 * Back to working on testing predict and residuals against other packages and models. After fixing issue #74 and ensuring that version test passes.
 * Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
 
+7-16-2020
+
+* Fixed various issues in MARSSresiduals() due to not passing type in. That error progated to problems in plot functions. 
+* autoplot.marssPredict() not working for forecasts since facet_wrap fails when plot uses data with different number of time steps. Fixed by not subsetting but instead using NAs for the data I don't want to show.
+* Did the forecast subsection for StructTS models.
+* Next up, work on fitted() and residuals() for StructTS models.
+* Then move to multivariate examples.
+
     
 MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
