@@ -360,19 +360,25 @@ mod.list <- list(x0=matrix(y[1]), U="zero", tinitx=0,
                  V0=matrix(1e+06 * vy))
 fit2 <- MARSS(as.vector(y), model=mod.list)
 @
+\verb@fit1@ and \verb@fit2@ are exactly the same since \verb@fit2@ used the \verb@fit1@ estimated parameters.
 
-<<>>=
-# Now estimate the parameters
-mod.list <- list(x0=matrix(y[1]), U="zero", tinitx=0, V0=matrix(1e+06 * vy),
-                 Q=matrix("s2xi"), R=matrix("s2eps"))
-fit3 <- MARSS(as.vector(y), model=mod.list, method="BFGS")
-fit4 <- MARSS(as.vector(y), model=mod.list, control=list(allow.degen=FALSE))
+\verb@stats::predict.StructTS()@ is only for forecasting and takes the fit and \verb@n.ahead@ as arguments. It returns a list with the forecasts in \verb@pred@ and a ts object and their standard errors in \verb@se@. \verb@MARSS::predict.marssMLE()@ does both predicting within the data (similar to other \verb@predict@ methods) and will forecast if \verb@n.ahead@ is passed in. It returns a list with the predictions and forecasts in \verb@pred@ as a data frame in long form (suitable for \verb@ggplot@ calls). The standard errors and intervals (confidence or prediction) are included in \verb@pred@.
+<<label=STS_predict_level_1>>=
+fr1 <- predict(fit1, n.ahead=5)
+fr1
 @
 
+The standard error is not printed but is in \verb@pred@.
+<<label=STS_predict_level_2>>=
+fr2 <- predict(fit2, n.ahead=5)
+fr2
+head(fr2$pred)
+@
 
-<<label=STS_predict_level>>=
-fr <- predict(fit1, n.ahead=10)
-fr$pred
+The estimates are the same. \verb@ft@ is the time steps associated with the forecast.
+<<label=STS_predict_level_compare>>=
+rbind(pred1=fr1$pred, pred2=fr2$pred$estimate[fr2$ft],
+      se1=fr1$se, se2=fr2$pred$se[fr2$ft])
 @
 
 <<>>=
