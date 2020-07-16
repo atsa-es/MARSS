@@ -30,8 +30,8 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   Zt <- parmat(MLEobj, "Z", t = 1)$Z
 
   if (method=="SS") {
-    # model.et will be 0 where no data E(y)-modeled(y)
-    et <- y - fitted(MLEobj, type = "ytT", output = "matrix") # model residuals
+    # model.et will be NA where no data E(y)-modeled(y) since y used here
+    et <- y - fitted(MLEobj, type = "ytt1", output = "matrix") # model residuals
 
     for (t in 1:TT) {
       # model residuals
@@ -56,7 +56,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   for (t in 1:TT) {
     tmpvar <- sub3D(var.et, t = t)
     resids <- et[, t, drop = FALSE]
-    # don't includ values for resids if there is no residual (no data)
+    # don't include values for resids if there is no residual (no data)
     is.miss <- is.na(y[, t])
     resids[is.miss] <- 0
 
@@ -88,13 +88,23 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
     mar.st.et[, t] <- tmpvarinv %*% resids
     mar.st.et[is.miss, t] <- NA
   }
+  
+  # et is the expected value of the residuals conditioned on y(1)-the observed data
+  E.obs.v <- Ey$ytt1 - fitted(MLEobj, type = "ytt1", output = "matrix")
+  var.obs.v <- array(0, dim = c(n, n, TT))
+  for( t in 1:TT) var.obs.v[,,t] <- Ey$Ott1[,,t] - tcrossprod(Ey$ytt1[,t])
 
   # add rownames
   Y.names <- attr(MLEobj$model, "Y.names")
   rownames(et) <- rownames(st.et) <- rownames(var.et) <- colnames(var.et) <- Y.names
+  rownames(E.obs.v) <- rownames(var.obs.v) <- colnames(var.obs.v) <- Y.names
   
   # output any warnings
   if(!is.null(msg) && object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tT reported warnings. See msg element of returned residuals object.\n")
 
-  return(list(residuals = et, std.residuals = st.et, mar.residuals = mar.st.et, var.residuals = var.et, msg = msg ))
+  return(list(model.residuals = et, state.residuals = NULL, residuals = et, 
+              std.residuals = st.et, mar.residuals = mar.st.et, 
+              var.residuals = var.et, 
+              E.obs.residuals = E.obs.v, var.obs.residuals = var.obs.v, msg = msg))
+  
 }
