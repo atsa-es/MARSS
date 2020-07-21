@@ -201,7 +201,8 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
-    tmpcholinv <- try(psolve(tmpchol), silent = TRUE)
+    # chol() returns the upper triangle. We need to lower triangle
+    tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo('residvarinv')\n"))
