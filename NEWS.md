@@ -34,6 +34,12 @@ Status
 * Next up, work on fitted() and residuals() for StructTS models.
 * Then move to multivariate examples.
 
+7-20-2020
+
+* Fixed bug in MARSSresiduals.tT. Needed t(chol()) for Cholesky standardization.
+* Working on innovations state residuals. Need Vtt1t1 (covariance of x_t,x_t-1 conditioned on data up to t-1).
+* Finish the derivation in Residuals.Rnw first. Did it for vt//wt. Now need vt//wtp. But maybe I should just show vt//wt since it doesn't really matter that they sync with the smoothation residuals.
+
     
 MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
@@ -51,7 +57,8 @@ ENHANCEMENTS
 
 BUGS
 
-* This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* This bug affected `residuals()` in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* When computing the Cholesky standardized residuals, the lower triangle of the Cholesky decomposition should be used so that the residuals are standardized to a variance of 1. `base::chol()` returns the upper triangle. Thus the lines in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` that applied the standardization need `t(chol())`. 
 * `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
 * `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
@@ -64,6 +71,7 @@ DOCUMENTATION and MAN FILES
 * Removed all mention of `augment()` from documentation and manuals. Replaced with `residuals()`.
 * `predict.marssMLE.Rd` (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
 * Cleaned-up the man pages for `predict()` and `predict.marssMLE()`.
+* In the chapter on structural breaks and outliers, Koopman et al (1998) use the marginal residuals in their example rather than the Cholesky standardized residuals. Changed to use marginal residuals to follow their example.
 
 OTHER
 
