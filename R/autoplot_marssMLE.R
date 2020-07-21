@@ -58,12 +58,13 @@ autoplot.marssMLE <-
     alpha <- 1 - conf.level
     plts <- list()
 
+    if (any(str_detect(plot.type, "acf"))) {
+      tt1.resids <- residuals.marssMLE(x, type = "innovations", standardization = "Cholesky")
+    }
     if (any(str_detect(plot.type, "resids"))) {
-      # Currently not using innovations residuals in this function
-      # resids <- residuals.marssMLE(x, type = "innovations", standardization = "marginal")
       std.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
     }
-
+    
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
 
@@ -252,9 +253,9 @@ autoplot.marssMLE <-
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
         ggplot2::xlab("Theoretical quantiles") +
-        ggplot2::ylab("Cholesky standardized model residuals") +
+        ggplot2::ylab("Cholesky standardized model smoothed residuals") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
-        ggplot2::ggtitle("Model residuals normality")
+        ggplot2::ggtitle("Model residuals normality test")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
       plts[["qqplot.model.resids"]] <- p1
       if (identical(plot.type, "qqplot.model.resids")) {
@@ -278,9 +279,9 @@ autoplot.marssMLE <-
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
         ggplot2::xlab("Theoretical quantiles") +
-        ggplot2::ylab("Cholesky standardized state residuals") +
+        ggplot2::ylab("Cholesky standardized state smoothed residuals") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("State residuals normality")
+        ggplot2::ggtitle("State residuals normality test")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
       plts[["qqplot.state.resids"]] <- p1
       if (identical(plot.type, "qqplot.state.resids")) {
@@ -299,7 +300,7 @@ autoplot.marssMLE <-
       return(ciline)
     }
     if ("acf.state.resids" %in% plot.type) {
-      df <- subset(std.resids, std.resids$type == "state")
+      df <- subset(tt1.resids, tt1.resids$type == "state")
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
 
@@ -330,7 +331,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("State residuals ACF")
+        ggplot2::ggtitle("State one-step ahead residuals ACF")
       p1 <- p1 +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ -ci), color = "blue", linetype = 2)
@@ -340,7 +341,7 @@ autoplot.marssMLE <-
       }
     }
     if ("acf.model.resids" %in% plot.type) {
-      df <- subset(std.resids, std.resids$type == "model")
+      df <- subset(tt1.resids, tt1.resids$type == "model")
       df$.rownames <- factor(df$.rownames) # drop state levels
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
       fun <- function(x, y) {
@@ -369,7 +370,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Lag") +
         ggplot2::ylab("ACF") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("Model residuals ACF")
+        ggplot2::ggtitle("Model innovations residuals ACF")
       p1 <- p1 +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ -ci), color = "blue", linetype = 2)
