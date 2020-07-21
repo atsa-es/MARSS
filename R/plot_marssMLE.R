@@ -24,7 +24,7 @@ plot.marssMLE <-
       model_form <- match.arg(form)
     }
     
-    plotpar <- list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
+    plotpar <- list(point.pch = 20, point.col = "blue", point.fill = "blue", point.size = 1,
                     line.col = "black", line.size = 1, line.linetype = "solid",
                     ci.fill = "grey70", ci.col = "grey70", ci.border = FALSE, 
                     ci.linesize = 0, ci.alpha = 0.6)
@@ -36,7 +36,7 @@ plot.marssMLE <-
             plotpar[[i]] <- plot.par[[i]]
         }
     }
-
+    
     extras <- list()
     if (!missing(...)) {
       extras <- list(...)
@@ -51,6 +51,48 @@ plot.marssMLE <-
     # End Argument checks
     
     alpha <- 1 - conf.level
+    
+    if ("fitted.ytT" %in% plot.type) {
+      # make plot of observations
+      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
+      df$ymin <- df$.conf.low
+      df$ymax <- df$.conf.up
+      if (pi.int){
+        df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+        df$ymin.pi <- df2$.lwr
+        df$ymax.pi <- df2$.upr
+      }
+      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      plot.ncol <- round(sqrt(nY))
+      plot.nrow <- ceiling(nY / plot.ncol)
+      par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
+      for (plt in unique(df$.rownames)) {
+        tit <- plt
+        if (conf.int) tit <- paste(tit, "+ CI")
+        if (pi.int) tit <- paste(tit, "+ PI (dashed)")
+        with(subset(df, df$.rownames == plt), {
+          ylims <- c(min(.fitted, y, ymin, ymax, na.rm = TRUE), max(.fitted, y, ymin, ymax, na.rm = TRUE))
+          plot(t, .fitted, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          title(tit)
+          if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
+          if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)
+          lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          if (pi.int){
+            lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
+            lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
+          }
+          box()
+        })
+      }
+      plot.type <- plot.type[plot.type != "fitted.ytT"]
+      cat(paste("plot type = \"fitted.ytT\" Observations with fitted values\n"))
+      if (length(plot.type) != 0) {
+        ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
+        if (tolower(ans) == "q") {
+          return()
+        }
+      }
+    }
     
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
@@ -98,64 +140,22 @@ plot.marssMLE <-
       }
     }
     
-    if ("fitted.ytT" %in% plot.type) {
-      # make plot of observations
-      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
-      df$ymin <- df$.conf.low
-      df$ymax <- df$.conf.up
-      if (pi.int){
-        df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
-        df$ymin.pi <- df2$.lwr
-        df$ymax.pi <- df2$.upr
-      }
-      nY <- min(9, attr(x$model, "model.dims")$y[1])
-      plot.ncol <- round(sqrt(nY))
-      plot.nrow <- ceiling(nY / plot.ncol)
-      par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
-        tit <- plt
-        if (conf.int) tit <- paste(tit, "+ CI")
-        if (pi.int) tit <- paste(tit, "+ PI (dashed)")
-        with(subset(df, df$.rownames == plt), {
-          ylims <- c(min(.fitted, y, ymin, ymax, na.rm = TRUE), max(.fitted, y, ymin, ymax, na.rm = TRUE))
-          plot(t, .fitted, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
-          title(tit)
-          if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
-          if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
-          lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
-          if (pi.int){
-            lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
-            lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
-          }
-          box()
-        })
-      }
-      plot.type <- plot.type[plot.type != "fitted.ytT"]
-      cat(paste("plot type = \"fitted.ytT\" Observations with fitted values\n"))
-      if (length(plot.type) != 0) {
-        ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
-        if (tolower(ans) == "q") {
-          return()
-        }
-      }
-    }
-    
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- subset(std.resids, std.resids$type=="model")
-      df$.rownames <- factor(df$.rownames) # drop state levels
       df$.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
+      for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
           ylims <- c(min(.resids, na.rm = TRUE), max(.resids, na.rm = TRUE))
           plot(t, .resids,
                type = "p", xlab = "",
                ylab = "", ylim = ylims,
-               col = plotpar$point.col, pch = plotpar$point.pch
+               col = plotpar$point.col, pch = plotpar$point.pch,
+               cex=plotpar$point.size
           )
           if (decorate) {
             lo <- predict(loess(.resids ~ t), newdata = data.frame(t = t), se = TRUE)
@@ -182,23 +182,23 @@ plot.marssMLE <-
         }
       }
     }
-
+    
     if ("std.model.resids" %in% plot.type) {
       # make plot of standardized observation residuals
       df <- subset(std.resids, std.resids$type=="model")
-      df$.rownames <- factor(df$.rownames) # drop state levels
       df$.std.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
+      for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
           ylims <- c(min(.resids, na.rm = TRUE), max(.resids, na.rm = TRUE))
           plot(t, .std.resids,
                type = "p", xlab = "",
                ylab = "", ylim = ylims,
-               col = plotpar$point.col, pch = plotpar$point.pch
+               col = plotpar$point.col, pch = plotpar$point.pch,
+               cex=plotpar$point.size
           )
           title(plt)
           box()
@@ -221,7 +221,6 @@ plot.marssMLE <-
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
       df <- subset(std.resids, std.resids$type=="state")
-      df$.rownames <- factor(df$.rownames) # drop state levels
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
@@ -233,7 +232,8 @@ plot.marssMLE <-
           plot(t, .resids,
                type = "p", xlab = "",
                ylab = "", ylim = ylims,
-               col = plotpar$point.col, pch = plotpar$point.pch
+               col = plotpar$point.col, pch = plotpar$point.pch,
+               cex=plotpar$point.size
           )
           if (decorate) {
             lo <- predict(loess(.resids ~ t), newdata = data.frame(t = t), se = TRUE)
@@ -278,14 +278,13 @@ plot.marssMLE <-
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- subset(std.resids, std.resids$type=="model")
-      df$.rownames <- factor(df$.rownames) # drop state levels
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
+      for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
           qqnorm(.std.resid, main = plt)
           abline(a = intercept[plt], b = slope[plt], col = plotpar$line.col, lwd = plotpar$line.lwd)
@@ -304,7 +303,6 @@ plot.marssMLE <-
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
       df <- subset(std.resids, std.resids$type=="state")
-      df$.rownames <- factor(df$.rownames) # drop model levels
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
@@ -337,7 +335,7 @@ plot.marssMLE <-
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
+      for (plt in unique(df$.rownames)) {
         tit <- plt
         if (conf.int) tit <- paste(tit, "+ CI")
         with(subset(df, df$.rownames == plt), {
@@ -345,7 +343,7 @@ plot.marssMLE <-
           plot(t, estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
-          points(t, y, col = plotpar$point.col, pch = plotpar$point.pch)
+          points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)
           lines(t, estimate, col = plotpar$line.col, lwd = plotpar$line.lwd)
           box()
         })
@@ -359,15 +357,14 @@ plot.marssMLE <-
         }
       }
     }
-
+    
     if ("acf.model.resids" %in% plot.type) {
       df <- subset(std.resids, std.resids$type=="model")
-      df$.rownames <- factor(df$.rownames) # drop levels
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in levels(df$.rownames)) {
+      for (plt in unique(df$.rownames)) {
         tit <- plt
         with(subset(df, df$.rownames == plt), {
           stats::acf(.resids, na.action=na.pass, main="")
@@ -384,10 +381,9 @@ plot.marssMLE <-
         }
       }
     }
-
+    
     if ("acf.state.resids" %in% plot.type) {
       df <- subset(std.resids, std.resids$type=="state")
-      df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
