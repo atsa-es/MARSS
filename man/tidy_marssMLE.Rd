@@ -30,7 +30,7 @@ tidy.marssMLE(x, type = c("parameters", "xtT", "fitted.ytT", "ytT"),
 }
 
 \value{
-A data.frame with estimates, sample standard errors, and confidence (or prediction) intervals.
+A data frame with estimates, sample standard errors, and confidence (or prediction) intervals.
 }
 
 \details{
@@ -39,7 +39,7 @@ Below, X and Y refers to the random variable and x and y refer to a specific rea
 
 \strong{type="parameters"}  
 
-If \code{type="parameters"}, this returns a data.frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data.frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the model object if these are not already added.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
+If \code{type="parameters"}, this returns a data frame with the estimated parameters  of a MARSS model with, optionally, standard errors and confidence intervals. This assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the model object if these are not already added.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
   
 \strong{type="xtT"}
 
