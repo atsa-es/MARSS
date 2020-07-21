@@ -66,19 +66,16 @@ residuals_marxss <- function(x, type, standardization, ...) {
     ret <- cbind(ret, .std.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
   
   # Second x
-  # there are no state innovations residuals
-  if(type!="tt1"){
     type1 <- paste0("x", type)
-    # line up the residuals so that xtT(t) has residuals for xtT(t)-f(xtT(t-1))
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
     mm <- state.dims[1]
-    state.se.resids <- cbind(NA, se.resids[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
-    state.resids <- cbind(NA, resids$state.residuals[, 1:(TT - 1), drop = FALSE])
+    state.se.resids <- se.resids[(nn + 1):(nn + mm), , drop = FALSE]
+    state.resids <- resids$state.residuals
     if(standardization=="Cholesky") 
-      state.std.resids <- cbind(NA, resids$std.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
+      state.std.resids <- resids$std.residuals[(nn + 1):(nn + mm), , drop = FALSE]
     if(standardization=="marginal") 
-      state.std.resids <- cbind(NA, resids$mar.residuals[(nn + 1):(nn + mm), 1:(TT - 1), drop = FALSE])
+      state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
     fit.list <- fitted(x, type = type1, interval="none")
     if (type1=="xtt1") fit.list$value <- fit.list$xtt
     if (type1=="xtT") fit.list$value <- fit.list$xtT
@@ -94,7 +91,7 @@ residuals_marxss <- function(x, type, standardization, ...) {
       stringsAsFactors = FALSE
     )
     ret <- rbind(ret, ret2)
-  }
+
   
   class(ret) <- c("marssResiduals", "data.frame")
   attr(ret, "standardization") <- standardization
