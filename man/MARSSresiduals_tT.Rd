@@ -3,7 +3,7 @@
 
 \title{ MARSS Smoothed Residuals }
 \description{
-  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="smoothations")}.
+  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="tT")}. At time t (in the returned matrices), the model residuals are for time t, while the state residuals are for the transition from t to t+1 following the convention in Harvey, Koopman and Penzer (1998).
 }
 \usage{
 MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
@@ -17,11 +17,11 @@ MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
 \value{
 A list with the following components  
   \item{model.residuals}{ The the observed smoothed model residuals: data minus the model predictions conditioned on all observed data. This is different than the Kalman filter innovations which use on the data up to time \eqn{t-1} for the predictions. See details. }
-  \item{state.residuals}{ The smoothed state residuals \eqn{\tilde{\mathbf{x}}_{t+1}^T - \mathbf{Z}\tilde{\mathbf{x}}_t^T - \mathbf{u}}{E(X_{t+1}|y(1:T))-E(X_{t+1}|E(x_t|y(1:T)))}.}
-  \item{residuals}{ The residuals conditioned on the observed data. Returned as a (n+m) x T matrix with \code{model.residuals} in rows 1 to n and \code{state.residuals} in rows n+1 to n+m.  NAs will appear in rows 1 to n is the places where data are missing. }
-  \item{var.residuals}{ The joint variance of the model and state residuals conditioned on observed data. Returned as a (n+m) x (n+m) x T matrix. For Harvey=FALSE, this is Holmes (2014) equation 57. For Harvey=TRUE, this is the residual variance in eqn. 24, page 113, in Harvey et al. (1998). They are identical except for missing values, for those Harvey=TRUE returns 0s.}
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. This for convenience for residuals diagnostics. }
-  \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. This for convenience for residuals diagnostics. }
+  \item{state.residuals}{ The smoothed state residuals \eqn{\tilde{\mathbf{x}}_{t+1}^T - \mathbf{Z}\tilde{\mathbf{x}}_t^T - \mathbf{u}}{E(X_{t+1}|y(1:T))-E(X_{t+1}|E(x_t|y(1:T)))}. The last time step will be NA because the last step would be for T to T+1 (past the end of the data).}
+  \item{residuals}{ The residuals conditioned on the observed data. Returned as a (n+m) x T matrix with \code{model.residuals} in rows 1 to n and \code{state.residuals} in rows n+1 to n+m.  NAs will appear in rows 1 to n in the places where data are missing. }
+  \item{var.residuals}{ The joint variance of the model and state residuals conditioned on observed data. Returned as a (n+m) x (n+m) x T matrix. For Harvey=FALSE, this is Holmes (2014) equation 57. For Harvey=TRUE, this is the residual variance in eqn. 24, page 113, in Harvey et al. (1998). They are identical except for missing values, for those Harvey=TRUE returns 0s. For the state residual variance, the last time step will be all NA because the last step would be for T to T+1 (past the end of the data).}
+  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. }
+  \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
     \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed residuals (values in \code{model.residuals}). For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See details. }
     \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See details. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
@@ -31,7 +31,7 @@ A list with the following components
 
 This function returns the raw, Cholesky standardized and marginal standardized smoothed model and state residuals.  'smoothed' means conditioned on all the observed data and a set of parameters. These are the residuals presented in Harvey, Koopman and Penzer (1998) pages 112-113, with the addition of the values for unobserved data (Holmes 2014).  If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report (Holmes 2014).  
 
-The residuals matrix has a value for each time step.  The residuals in column \eqn{t} rows 1 to n are the model residual associated with the data at time \eqn{t}. The residuals in rows n+1 to n+m are the state residuals associated with the transition from \eqn{\mathbf{x}_t}{x(t)} to \eqn{\mathbf{x}_{t+1}}{x(t+1)}, not the transition from \eqn{\mathbf{x}_t}{x(t-1)} to \eqn{\mathbf{x}_{t+1}}{x(t)}. Because \eqn{\mathbf{x}_{t+1}}{x(t+1)} does not exist at time \eqn{T}, the state residuals and associated variances at time \eqn{T} are NA.
+The residuals matrix has a value for each time step.  The residuals in column \eqn{t} rows 1 to n are the model residuals associated with the data at time \eqn{t}. The residuals in rows n+1 to n+m are the state residuals associated with the transition from \eqn{\mathbf{x}_t}{x(t)} to \eqn{\mathbf{x}_{t+1}}{x(t+1)}, not the transition from \eqn{\mathbf{x}_t}{x(t-1)} to \eqn{\mathbf{x}_{t}}{x(t)}. Because \eqn{\mathbf{x}_{t+1}}{x(t+1)} does not exist at time \eqn{T}, the state residuals and associated variances at time \eqn{T} are NA.
 
 Below the conditional residuals and their variance are discussed. The random variables are capitalized and the realizations from the random variables are lower case. The random variables are \eqn{\mathbf{X}}{X}, \eqn{\mathbf{Y}}{Y}, \eqn{\mathbf{V}}{V} and \eqn{\mathbf{W}}{W}. There are two types of \eqn{\mathbf{Y}}{Y}. The observed \eqn{\mathbf{Y}}{Y} that are used to estimate the states \eqn{\mathbf{x}}{x}. These are termed \eqn{\mathbf{Y}^{(1)}}{Y(1)}. The unobserved  \eqn{\mathbf{Y}}{Y} are termed \eqn{\mathbf{Y}^{(2)}}{Y(2)}. These are not used to estimate the states \eqn{\mathbf{x}}{x} and we may or may not know the values of \eqn{\mathbf{y}^{(2)}}{y(2)}. Typically we treat \eqn{\mathbf{y}^{(2)}}{y(2)} as unknown but it may be known but we did not include it in our model fitting.  Note that the model parameters \eqn{\Theta}{Theta} are treated as fixed or known. The 'fitting' does not involve estimating \eqn{\Theta}{Theta}; it involves estimating \eqn{\mathbf{x}}{x}. All MARSS parameters can be time varying but the \eqn{t} subscripts are left off parameters to reduce clutter.
 
@@ -83,7 +83,7 @@ To standardize the observed residuals, we will use \eqn{ \hat{\Sigma}_t }{ hatSi
 
 \strong{Standardized residuals}
 
-\code{MARSSresiduals} will return the Cholesky standardized residuals sensu Harvey et al. (1998) in \code{std.residuals} for outlier and shock detection.  These are the model and state residuals multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. The standardized model residuals are set to NA when there are missing data. The standardized state residuals however always exist since the expected value of the states exist without data. The calculation of the standardized residuals for both the observations and states requires the full residuals variance matrix. Since the state residuals variance is NA at the last time step, the standarized residual in the last time step will be all NA.
+\code{MARSSresiduals} will return the Cholesky standardized residuals sensu Harvey et al. (1998) in \code{std.residuals} for outlier and shock detection.  These are the model and state residuals multiplied by the inverse of the upper triangle of the Cholesky decomposition of \code{var.residuals} (note \code{chol()} in R returns the lower triangle thus a transpose is needed). The standardized model residuals are set to NA when there are missing data. The standardized state residuals however always exist since the expected value of the states exist without data. The calculation of the standardized residuals for both the observations and states requires the full residuals variance matrix. Since the state residuals variance is NA at the last time step, the standarized residual in the last time step will be all NA.
 
 The interpretation of the Cholesky standardized residuals is not straight-forward when the \eqn{\mathbf{Q}}{Q} and \eqn{\mathbf{R}}{R} variance-covariance matrices are non-diagonal.  The residuals which were generated by a non-diagonal variance-covariance matrices are transformed into orthogonal residuals in MVN(0,I) space.  For example, if v is 2x2 correlated errors with variance-covariance matrix R. The transformed residuals (from this function) for the i-th row of v is a combination of the row 1 effect and the row 1 effect plus the row 2 effect.  So in this case, row 2 of the transformed residuals would not be regarded as solely the row 2 residual but rather how different row 2 is from row 1, relative to expected.  If the errors are highly correlated, then the transformed residuals can look rather non-intuitive.
 
@@ -130,14 +130,14 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
   
   #state residuals
   state.resids1 <- MARSSresiduals(MLEobj)$state.residuals
-  #this is the same as
+  #this is the same as hatx_t-(hatx_{t-1}+u)
   states <- MLEobj$states
-  Q <- coef(MLEobj,type="matrix")$Q
   state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
   #compare the two
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
-  #normalize to variance of 1
+  #normalize the state residuals to a variance of 1
+  Q <- coef(MLEobj,type="matrix")$Q
   state.resids1 <- MARSSresiduals(MLEobj, normalize=TRUE)$state.residuals
   state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   cbind(t(state.resids1[,-30]), t(state.resids2))

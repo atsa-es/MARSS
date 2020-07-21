@@ -17,27 +17,14 @@ MARSSresiduals(object, ..., type=c("tT", "tt1"), normalize=FALSE, silent=FALSE)
 }
 \value{
 
-\strong{Smoothed residuals}
-
-If \code{type="tT"}, a list with the following components  
   \item{model.residuals}{ The smoothed model residuals (data minus model predicted values) as a n x T matrix. The residuals are conditioned on all the data and the set of model parameters.  Called the smoothations. This is different than the Kalman filter innovations which are conditioned on the data up to \eqn{t-1}.}
-  \item{state.residuals}{ The smoothed state residuals.}
+  \item{state.residuals}{ The smoothed state residuals. The residual at time t in the matrices is for the transition from t to t+1 thus the last time step will be NA (since T+1 is past the data).}
   \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
-  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x T matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. }
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
+  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x T matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. For the state residuals, the last time step will be all NA since the state residual is for t to t+1.}
+  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. For type="tt1", the Cholesky standardized residual is NA. See \link{\code{MARSSresiduals.tt1}}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
     \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed model residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See \code{\link{MARSSresiduals.tT}}. }
     \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }
-  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
-
-  
-\strong{One-step-ahead residuals}
-
-If \code{type="tt1"}, a list with the following components  
-  \item{residuals}{ The model residuals (data minus model predicted values), as a n x T matrix. The residuals are conditioned on the data up to time \eqn{t-1} and the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
-  \item{var.residuals}{ The variance of the model residuals as a n x n x T matrix. }
-  \item{std.residuals}{ The Cholesky standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
-  \item{mar.residuals}{ The marginal standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
 }
