@@ -641,9 +641,11 @@ One-step-ahead predictions (innovations) are often shown for MARSS models and th
 
 Define the innovations $\checkvt$ as:
 \begin{equation}\label{eq:vtt1}
-\checkvt = \yy_t - \ZZ_t\hatxttm - \aa_t,
+\checkvt = E[\YY_t|\yy^{(1)}_t] - \ZZ_t\hatxttm - \aa_t,
 \end{equation}
-where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance. This is slightly different than the observed `innovations' as it includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$. $\yy_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$.
+where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance. 
+
+This is conceptually different than the observed `innovations'. First, this is the random variable `innovation'.  $\yy^{(1)}_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$ and $\checkvt$ is a sample from the innovations you could observe. Second, $\checkvt$ includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$ (observed and unobserved $\yy$). Normally, the innovations for missing data would appear as 0s (e.g. from a call to \verb@MARSSfss()@). For missing data, $\checkvt$ is not necessarily 0. For example if $\yy$ is multivariate and correlated with each other through $\RR$ or a shared $\xx$ dependency.
 
 The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus we can write the variance directly as:
 \begin{equation}\label{eq:innov.model}
@@ -665,7 +667,7 @@ Define the state residuals conditioned on the data from 1 to $t-1$ as $\checkwt$
 \begin{equation}\label{eq:wtt1}
 \checkwt = \hatxtt - \BB_t\hatxtmt1 - \uu_t,
 \end{equation}
-where $\hatxtmt1$ is $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$). 
+where $\hatxtmt1$ is $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$) and $\hatxtt$ is $\E[\XX_{t}|\yy^{(1),t}]$ (expected value of $\XX_{t}$ conditioned on the data up to time $t$). 
 From the Kalman filter equations:
 \begin{equation}\label{eq:wtt1}
 \hatxtt = \BB_t\hatxtmt1 + \uu_t + \KK_t \checkvt
@@ -674,14 +676,10 @@ Thus, $\checkwt$ is a transformed $\checkvt$:
 \begin{equation}\label{eq:wtt1.2}
 \checkwt = \KK_t \checkvt,
 \end{equation}
-where $\KK_t$ is the Kalman gain. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$.
+where $\KK_t$ is the Kalman gain. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$ and $\ZZ_t$ is the missing values modified $\ZZ_t$ where if the $i$-th $\yy_t$ is missing, the $i$-th row of $\ZZ_t$ is set to all 0s (Shumway and Stoffer 2006, equation 6.78).
 Thus the variance of $\checkWt$ is 
 \begin{equation}\label{eq:var.Wt}
-\begin{split}
-\var[\checkWt] &= \KK_t\var[\checkVt] \KK_t^\top \\
-&= \KK_t [\RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top] \KK_t^\top \\
-&= \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}] \ZZ_t \hatVtt1.
-\end{split}
+\var[\checkWt] = \KK_t \var[\checkVt] \KK_t^\top
 \end{equation}
 
 \subsection{Joint distribution of the conditional one-step-ahead residuals}
