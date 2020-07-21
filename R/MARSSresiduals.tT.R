@@ -228,6 +228,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   st.et[, TT] <- NA
   mar.st.et[(n + 1):(n + m), TT] <- NA
   if(Harvey==TRUE){
+    # Harvey algorithm doesn't calculate var for missing data
     for (t in 1:TT) {
     is.miss <- c(is.na(y[, t]), rep(FALSE, m))
     var.et[is.miss,1:n,t] <- NA
