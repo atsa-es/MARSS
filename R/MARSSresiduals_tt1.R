@@ -8,8 +8,12 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   n <- model.dims[["y"]][1]
   y <- MLEobj$marss$data
   # set up holders
-  et <- st.et <- mar.st.et <- matrix(0, n , TT)
-  var.et <- array(0, dim = c(n, n, TT))
+  et <- st.et <- mar.st.et <- matrix(NA, n+m, TT)
+  model.et <- matrix(NA, n, TT)
+  state.et <- state.st.et <- state.mar.st.et <- matrix(NA, m , TT)
+  model.var.et <- array(0, dim = c(n, n, TT))
+  var.et <- array(0, dim = c(n+m, n+m, TT))
+  cov.var.et <- array(0, dim = c(n, m, TT))
   msg <- NULL
 
   #### make a list of time-varying parameters
@@ -31,7 +35,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
 
   if (method=="SS") {
     # model.et will be NA where no data E(y)-modeled(y) since y used here
-    et <- y - fitted(MLEobj, type = "ytt1", output = "matrix") # model residuals
+    model.et <- y - fitted(MLEobj, type = "ytt1", output = "matrix") # model residuals
 
     for (t in 1:TT) {
       # model residuals
@@ -39,9 +43,20 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
       if(time.varying$H) Ht <- parmat(MLEobj, "H", t = t)$H
       if(time.varying$R || time.varying$H ) Rt <- Ht %*% Rt %*% t(Ht)
       if(time.varying$Z) Zt <- parmat(MLEobj, "Z", t = t)$Z
-
-      # model.et and state.et defined outside for loop
-      var.et[, , t] <- Rt + Zt %*% kf$Vtt1[, , t] %*% t(Zt)
+      model.var.et[, , t] <- Rt + tcrossprod(Zt %*% kf$Vtt1[, , t], Zt)
+    }
+    
+    for(t in 1:TT){
+      if(t < TT){
+        state.et[,t] <- kf$Kt[, , t+1] %*% model.et[, t+1]
+        cov.et <- tcrossprod(model.var.et[, , t+1], kf$Kt[, , t+1])
+        tmpvar.state.et <- kf$Kt[, , t+1] %*% cov.et
+      else {
+        cov.et <- matrix(NA, n, m)
+        tmpvar.state.et <- matrix(NA, m, m)
+      }
+      var.et[1:n, , t] <- cbind(model.var.et[, , t], cov.et)
+      var.et[(n + 1):(n + m), , t] <- cbind(t(cov.et), tmpvar.state.et)
 
       if (normalize) {
         Rinv <- matrix(0, n, n + m)
