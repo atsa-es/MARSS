@@ -231,7 +231,7 @@ MARSSkfss <- function(MLEobj) {
     Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
 
     # Variables needed for the likelihood calculation; see comments above
-    R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
+    R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documentation per LL calc when missing values; R here is R[t]
     Ft[, , t] <- Zt %*% Vtt1[, , t] %*% t.Zt + R_mod # need to hold on to this for loglike calc ; 1 on diagonal when y is missing
     if (n != 1) Ft[, , t] <- symm(Ft[, , t]) # to ensure its symetric
 
