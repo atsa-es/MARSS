@@ -251,8 +251,8 @@ autoplot.marssMLE <-
       )
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
-        ggplot2::xlab("Theoretical Quantiles") +
-        ggplot2::ylab("Standardized Model Residuals") +
+        ggplot2::xlab("Theoretical quantiles") +
+        ggplot2::ylab("Cholesky standardized model residuals") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle("Model residuals normality")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
@@ -277,8 +277,8 @@ autoplot.marssMLE <-
       )
       p1 <- ggplot2::ggplot(df) +
         ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
-        ggplot2::xlab("Theoretical Quantiles") +
-        ggplot2::ylab("Standardized State Residuals") +
+        ggplot2::xlab("Theoretical quantiles") +
+        ggplot2::ylab("Cholesky standardized state residuals") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +
         ggplot2::ggtitle("State residuals normality")
       if (decorate) p1 <- p1 + ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
