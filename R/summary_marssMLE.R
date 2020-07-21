@@ -9,7 +9,7 @@ summary.marssMLE <- function(object, digits = max(3, getOption("digits") - 3), .
   X.names <- attr(object$model, "X.names")
   Y.names <- attr(object$model, "Y.names")
   
-  cat(paste("\nModel Structure is\n",
+  cat(paste("\n",
             "m: ", m, " state process(es) named ", paste(X.names, collapse = " "), "\n",
             "n: ", n, " observation time series named ", paste(Y.names, collapse = " "), "\n\n",
             sep = ""
