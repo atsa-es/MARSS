@@ -9,21 +9,6 @@ tabledir <- "tables/"
 
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_StructuralBreaks.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<compute-for-figs, echo=FALSE, include.source=FALSE, results=hide>>=
-if (1 == 0) {
-  mod.nile.3 <- list(
-    Z = matrix(c(1, 0), 1, 2), A = matrix(0), R = matrix("r"),
-    B = matrix(c(1, 0, 1, 1), 2, 2), U = matrix(0, 2, 1),
-    Q = matrix(list("q", 0, 0, "p"), 2, 2),
-    x0 = matrix(c("pi1", "pi2"), 2, 1)
-  )
-  library(datasets)
-  dat <- t(as.matrix(Nile))
-  model <- mod.nile.3
-  kem.3 <- MARSS(dat, model = model, inits = list(x0 = matrix(c(1000, -4), 2, 1)))
-}
-@
 
 \section{Overview}
 \index{structural breaks}\index{outliers} This chapter is based on a short example shown on pages 147-148 in \citet{Koopmanetal1998} using a 100-year record of river flow on the Nile River.  The methods are based on \citet{Harveyetal1998} which is in turn based on techniques in \citet{HarveyKoopman1992} and \citet{Koopman1993}. The Nile dataset is included in \R.  Figure \ref{fig:CS6.fig1} shows the data.
@@ -97,12 +82,14 @@ mod.nile.0 <- list(
 )
 @
 
-We then fit the model with \verb@MARSS()@:
+We then fit the model:
 <<Cs03_fit-data-0, eval=TRUE>>=
 # The data is in a ts format, and we need a matrix
 dat <- t(as.matrix(Nile))
-# Now we fit the model
-kem.0 <- MARSS(dat, model = mod.nile.0)
+rownames(dat) <- "Nile"
+
+kem.0 <- MARSS(dat, model = mod.nile.0, silent=TRUE)
+summary(kem.0)
 @
 
 \subsection{Linear trend in flow model}
@@ -125,10 +112,10 @@ mod.nile.1 <- list(
 )
 @
 
-We then fit the model with \verb@MARSS()@:
+We then fit the model:
 <<Cs05_fit-data-1, eval=TRUE>>=
 kem.1 <- MARSS(dat, model = mod.nile.1, silent = TRUE)
-glance(kem.1)
+summary(kem.1)
 @
 Figure \ref{fig:CS6.fits} shows the fits for the two models with deterministic models (flat and declining) for mean river flow along with their AICc values (smaller AICc is better).    The AICc for the model with a declining river flow is lower by over 20 (which is a lot).
 
@@ -162,20 +149,16 @@ mod.nile.2 <- list(
   x0 = matrix("pi")
 )
 @
-We could also use the text shortcuts to specify the model.  Because $\RR$ and $\QQ$ are $1 \times 1$ matrices, ``unconstrained'', ``diagonal and unequal``, ``diagonal and equal'' and ``equalvarcov'' will all lead to a $1 \times 1$ matrix with one estimated element.  For $\aa$ and $\uu$, the following shortcut could be used:
-<<mod-nile-not-used, eval=FALSE>>=
-A <- U <- "zero"
-@
-Because $\xx_0$ is $1 \times 1$, it could be specified as ``unequal'', ``equal'' or ``unconstrained''.
+We could also use the text shortcuts to specify the model.  Because $\RR$ and $\QQ$ are $1 \times 1$ matrices, ``unconstrained'', ``diagonal and unequal``, ``diagonal and equal'' and ``equalvarcov'' will all lead to a $1 \times 1$ matrix with one estimated element.
 
-We fit the model with the \verb@MARSS()@ function.  We are using the ``BFGS" algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
+To fit the model, we use the ``BFGS" algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
 <<Cs07_fit-data-2, eval=TRUE>>=
 kem.2em <- MARSS(dat, model = mod.nile.2, silent = TRUE)
 kem.2 <- MARSS(dat,
   model = mod.nile.2,
   inits = kem.2em$par, method = "BFGS", silent = TRUE
 )
-tidy(kem.2, conf.int = FALSE)
+summary(kem.2)
 @
 This is the same model fit in \citet[p. 148]{Koopmanetal1998} except that we estimate $x_1$ as parameter rather than specifying $x_1$ via a diffuse prior\index{prior!diffuse}. As a result, the log-likelihood value and $\RR$ and $\QQ$ are a little different than in  \citet{Koopmanetal1998}. 
 
@@ -246,7 +229,7 @@ The MARSS function will output the expected values of $x_t$ conditioned on the m
 where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \eqref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
 
 \subsection{Using observation residuals to detect outliers}
-\index{residuals!observation}The standardized smoothed observation residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data standardized by the observation variance:
+\index{residuals!observation}The standardized smoothed observation residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data and then standardized by the observation variance:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
@@ -255,12 +238,12 @@ e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 \end{split}
  \label{eq:smoothations}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   It returns the standardized residuals (also called auxiliary residuals) as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \index{functions!residuals}
+These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   \verb@MARSSresiduals()@ returns two types of standardized residuals (also called auxiliary residuals): Cholesky standardized residuals and marginal standardized residuals. We are using the latter here. The residuals are returned as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \index{functions!residuals}
 
 <<Cs09_compute-resids, eval=TRUE, echo=TRUE>>=
-resids.0 <- MARSSresiduals(kem.0)$std.residuals
-resids.1 <- MARSSresiduals(kem.1)$std.residuals
-resids.2 <- MARSSresiduals(kem.2)$std.residuals
+resids.0 <- MARSSresiduals(kem.0)$mar.residuals
+resids.1 <- MARSSresiduals(kem.1)$mar.residuals
+resids.2 <- MARSSresiduals(kem.2)$mar.residuals
 @
 
 Figure \ref{fig:CS6.outliers} shows the observation residuals for the three models developed above.  We immediately see that model 0 (flat level) and model 1 (linear declining level) have problems because the residuals are all positive for the first part of the time series and then all negative.  The residuals should not be temporally correlated like that.  Model 2 with a stochastic level shows well-behaving residuals with low temporal correlation between $t$ and $t-1$.  Looking at the residuals for model 2, we see that there are a number of years with flow levels that appear to be outliers (are beyond the dashed level lines).
@@ -296,13 +279,13 @@ abline(h = c(1.97, -1.97, 0), lty = 2)
 title("model 2--stochastic level")
 @
 \end{center}
-\caption{The standardized observation residuals from models 0, 1, and 2.  These residuals are the standardized $\hat{v}_t$.  The dashed lines are the 95\% CIs for a $t$-distribution.}
+\caption{The marginal standardized observation residuals from models 0, 1, and 2.  These residuals are the standardized $\hat{v}_t$.  The dashed lines are the 95\% CIs for a $t$-distribution.}
 \label{fig:CS6.outliers}
 \end{figure}
 
 \subsection{Detecting sudden level changes}
 \index{residuals!state}
-The standardized smoothed state residuals ($f_t$ below) are the difference between the estimated state at time $t$ and the estimated state at time $t-1$ conditioned on all the data standardized by the standard deviation:
+The standardized smoothed state residuals ($f_t$ below) are the difference between the estimated state at time $t$ and the estimated state at time $t-1$ conditioned on all the data and then standardized by the standard deviation:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
@@ -330,11 +313,10 @@ title("test for level changes")
 mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
 @
 \end{center}
-\caption{Top panel, the standardized observation residuals.  Bottom panel, the standardized state residuals.  This replicates Figure 12 in Koopman et al. (1999).}
+\caption{Top panel, the marginal standardized observation residuals.  Bottom panel, the standardized state residuals.  This replicates Figure 12 in Koopman et al. (1999).}
 \label{fig:CS6.levelchanges}
 \end{figure}
 
-\clearpage
 \subsection{Detecting changes in the drift parameter in a random walk model}
 
 The model of a random walk with a fixed $u$ drift term is: 
@@ -391,7 +373,7 @@ y_t = \ZZ\xx + \aa + v_t \\
 \end{gathered} \label{eq:marss.stochastic.slope2}
  \end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-We then write this in \R for the MARSS() function:
+We then write the model list as:
 <<mod-nile-3>>=
 mod.nile.3 <- list(
   Z = matrix(c(1, 0), 1, 2), A = matrix(0), R = matrix("r"),
@@ -414,16 +396,16 @@ summary(kem.3)
 @
 
 
-The Nile data is not a good example since the variance for the slope is close to zero so the residual line is just a flat 0 (see value for \verb@Q.p@). Let's run the same model on the \verb@WWWusage@ dataset (Figure \ref{fig:CS6.fig3}).
+The Nile data is not a good example since the variance for the slope is close to zero so the residual line is just a flat 0 (see value for \verb@Q.p@). Let's run the same model on the \verb@WWWusage@ dataset (Figure \ref{fig:CS6.WWWdata}).
 
 \begin{figure}[htp]
 \begin{center}
-<<plotslopetests-nile, echo=FALSE, fig=TRUE>>=
-plot(WWWusage)
+<<plotslopetests-nile, echo=FALSE, fig=TRUE, height=4>>=
+plot(WWWusage, xlab="")
 @
 \end{center}
 \caption{The WWWusage data set.}
-\label{fig:CS6.fig3}
+\label{fig:CS6.WWWdata}
 \end{figure}
 
 
@@ -443,30 +425,23 @@ Figure \ref{fig:CS6.fig4} shows the standardized residuals for the $u$, which is
 \begin{center}
 <<plotslopetests-www, echo=FALSE, fig=TRUE>>=
 library(Hmisc)
-resids <- MARSSresiduals(kem.3)$std.residuals
-par(mfrow = c(2, 1), mar = c(4, 3, 2, 1))
+resids <- MARSSresiduals(kem.3)$mar.residuals
 x <- seq(tsp(WWWusage)[1], tsp(WWWusage)[2], tsp(WWWusage)[3])
-plot(x, resids[2, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), 
-     xaxp = c(tsp(WWWusage)[1]-1, tsp(WWWusage)[2], 10))
-minor.tick(nx = 10, ny = 0, tick.ratio = .3)
-abline(h = c(1.97, -1.97), lty = 2)
-title("test for level changes")
-
 plot(x, resids[3, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), 
      xaxp = c(tsp(WWWusage)[1]-1, tsp(WWWusage)[2], 10))
 minor.tick(nx = 10, ny = 0, tick.ratio = .3)
 abline(h = c(1.97, -1.97), lty = 2)
+abline(h=0)
 title("test for slope changes")
-mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
 @
 \end{center}
-\caption{The standardized residuals for null model against one with level changes and slope changes for the WWWusage data.}
+\caption{The marginal standardized residuals for slope changes for the WWWusage model.}
 \label{fig:CS6.fig4}
 \end{figure}
 
 \section{Discussion}
 
-This chapter shows the basic strategy for doing shock detection sensu Harvey et al. using standardized residuals. This was illustrated with stochastic level and trend models. Stochastic level and trend models are also called Structural Time Series models. You can find more examples of these models in the chapter on that topic along with the the seasonal version.
+This chapter shows the basic strategy for doing shock detection sensu Harvey et al. using standardized residuals. This was illustrated with stochastic level and trend models. Stochastic level and trend models are also called Structural Time Series models. You can find more examples of these models in the chapter on that topic along with the seasonal version.
 
 <<Reset, echo=FALSE>>=
 options(prompt = "> ", continue = "+ ")
