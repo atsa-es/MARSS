@@ -12,10 +12,13 @@ plot.marssMLE <-
     for(i in 1:NROW(old.plot.type)) if(old.plot.type[i] %in% plot.type) plot.type[plot.type==old.plot.type[i]] <- new.plot.type[i]
     if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
-    if (any(str_detect(plot.type, "resids"))){
-      # Not using innovations residuals in this function yet
-      # resids <- residuals.marssMLE(x, type = "innovations", standardization="marginal")
-      std.resids <- residuals.marssMLE(x, type="smoothations", standardization="Cholesky")
+    
+    # run residuals if needed
+    if (any(str_detect(plot.type, "acf"))) {
+      tt1.resids <- residuals.marssMLE(x, type = "innovations", standardization = "Cholesky")
+    }
+    if (any(str_detect(plot.type, "resids"))) {
+      std.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
     }
     
     if (missing(form)) {
@@ -142,7 +145,7 @@ plot.marssMLE <-
     
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- subset(std.resids, std.resids$type=="model")
+      df <- subset(tT.resids, tT.resids$type=="model")
       df$.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -185,8 +188,8 @@ plot.marssMLE <-
     
     if ("std.model.resids" %in% plot.type) {
       # make plot of standardized observation residuals
-      df <- subset(std.resids, std.resids$type=="model")
-      df$.std.resids[is.na(df$value)] <- NA
+      df <- subset(tT.resids, tT.resids$type=="model")
+      df$.std.resid[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -194,7 +197,7 @@ plot.marssMLE <-
       for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
           ylims <- c(min(.resids, na.rm = TRUE), max(.resids, na.rm = TRUE))
-          plot(t, .std.resids,
+          plot(t, .std.resid,
                type = "p", xlab = "",
                ylab = "", ylim = ylims,
                col = plotpar$point.col, pch = plotpar$point.pch,
@@ -220,7 +223,7 @@ plot.marssMLE <-
     
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- subset(std.resids, std.resids$type=="state")
+      df <- subset(tT.resids, tT.resids$type=="state")
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
@@ -277,7 +280,7 @@ plot.marssMLE <-
     
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- subset(std.resids, std.resids$type=="model")
+      df <- subset(tT.resids, tT.resids$type=="model")
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       nY <- min(9, attr(x$model, "model.dims")$y[1])
@@ -291,7 +294,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "qqplot.model.resids"]
-      cat(paste("plot type = \"qqplot.model.resids\" QQ plot of model standardized residuals\n"))
+      cat(paste("plot type = \"qqplot.model.resids\" QQ plot of model standardized smoothed residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -302,7 +305,7 @@ plot.marssMLE <-
     
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
-      df <- subset(std.resids, std.resids$type=="state")
+      df <- subset(tT.resids, tT.resids$type=="state")
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
@@ -317,7 +320,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "qqplot.state.resids"]
-      cat(paste("plot type = \"qqplot.state.resids\" QQ plot of state standardized residuals\n"))
+      cat(paste("plot type = \"qqplot.state.resids\" QQ plot of state standardized smoothed residuals\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -359,7 +362,7 @@ plot.marssMLE <-
     }
     
     if ("acf.model.resids" %in% plot.type) {
-      df <- subset(std.resids, std.resids$type=="model")
+      df <- subset(tt1.resids, tt1.resids$type=="model")
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -373,7 +376,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "acf.model.resids"]
-      cat(paste("plot type = \"acf.model.resids\" Model residuals ACF\n"))
+      cat(paste("plot type = \"acf.model.resids\" Model innovations residuals ACF\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -383,7 +386,7 @@ plot.marssMLE <-
     }
     
     if ("acf.state.resids" %in% plot.type) {
-      df <- subset(std.resids, std.resids$type=="state")
+      df <- subset(tt1.resids, tt1.resids$type=="state")
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
@@ -398,7 +401,7 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != "acf.state.resids"]
-      cat(paste("plot type = \"acf.state.resids\" State residuals ACF\n"))
+      cat(paste("plot type = \"acf.state.resids\" State one-step ahead residuals ACF\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
