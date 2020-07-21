@@ -720,9 +720,9 @@ However the Cholesky standardized joint residuals cannot be computed since $\ove
 \end{equation}
 $\var[\checkVt]^{-1/2}$ is the inverse of the lower triangle of the Cholesky decomposition of $\var[\checkVt]$.
 
-The marginal standardized joint residuals for $\widehat{\varepsilon}_t$ (both model and state one-step ahead residuals) can be computed with the inverse of the square root of the diagonal of $\overline{\Sigma}_t$:
+The marginal standardized joint residuals for $\overline{\varepsilon}_t$ (both model and state one-step ahead residuals) can be computed with the inverse of the square root of the diagonal of $\overline{\Sigma}_t$:
 \begin{equation}
-\dg(\overline{\Sigma}_t)^{-1/2} \widehat{\varepsilon}_t
+\dg(\overline{\Sigma}_t)^{-1/2} \overline{\varepsilon}_t
 \end{equation}
 where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
 
@@ -730,75 +730,34 @@ where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matr
 
 Define the one-step ahead residuals as
 \begin{equation}
-\overline{\varepsilon}_t = \begin{bmatrix}\checkvt\\ \checkwtp \end{bmatrix}
+\overline{\varepsilon}_t^* = \begin{bmatrix}\checkvt\\ \checkwtp \end{bmatrix}
 \end{equation}
 
 The covariance of $\checkVt$ and $\checkWtp$ is
 \begin{equation}\label{eq:covhatVtWtp.onestep}
 \cov[\checkVt,\checkWtp] = \cov[\checkVt,\KK_{t+1}\checkVtp] = \cov[\checkVt, \checkVtp]\KK_{t+1}^\top
 \end{equation}
+Innovations residuals are temporally uncorrelated, thus $\cov[\checkVt,\checkVtp]=0$ and thus $\cov[\checkVt,\checkWtp]=0$.
 
-The unconditional model residuals, $\VV_t$ and $\VV_{t+1}$, are independent, but the conditional model residuals, $\cov[\checkVt,\checkVtp]$, are not independent since both depend on $\yy^{(1)}$ up to $t$.  
-Using the law of total covariance, we can write
-\begin{equation}\label{eq:covhatVtVtp}
-\cov[\checkVt,\checkVtp] = 
-\cov_{Y^{(1)}}[\E[\checkVt|\YY^{(1)}],\E[\checkVtp|\YY^{(1)}]] + \E_{Y^{(1)}}[\cov[\checkVt, \checkWt|\YY^{(1)}]] .
-\end{equation}
-
-For a specific value of $\YY^{(1)}=\yy^{(1)}$, the covariance in the second term on the right is $\cov[\hatVt, \hatWt|\yy^{(1)}]$. Conditioned on a specific value of $\YY^{(1)}$, $\hatWt$ is a fixed value, $\hatwt = \hatxtT - \BB_t\hatxtmT - \uu_t$, and conditioned on $\yy^{(1)}$, $\hatxtT$ and $\hatxtmT$ are fixed values. $\uu_t$ is also fixed; it is a parameter. $\hatVt$ is not a fixed value because it has $\YY_t^{(2)}$ and that is a random variable.  Thus $\cov[\hatVt, \hatWt|\yy^{(1)}]$ is the covariance between a random variable and a fixed variable and thus the covariance is 0. This is true for all $\yy^{(1)}$.
-Thus the second right-side term in Equation \ref{eq:covhatVtWt1} is zero, and the equation reduces to
-\begin{equation}\label{eq:covhatVtWt3}
-\cov[\hatVt,\hatWt] = \cov_{Y^{(1)}}[\E[\hatVt|\YY^{(1)}],\E[\hatWt|\YY^{(1)}]].
-\end{equation}
-Notice that $\E[\hatWt|\yy^{(1)}]=\E[\WW_t|\yy^{(1)}]$ and $\E[\hatVt|\yy^{(1)}]=\E[\VV_t|\yy^{(1)}]$ since
-\begin{equation}
-\E[\WW_t|\yy^{(1)}]= \E[\XX_t|\yy^{(1)}]-\BB_t\E[\XX_{t-1}|\yy^{(1)}] - \uu_t = \hatxtT-\BB_t\hatxtmT - \uu_t = \hatwt = \E[\hatWt|\yy^{(1)}]
-\end{equation}
-and
-\begin{equation}
-\E[\VV_t|\yy^{(1)}]= \E[\YY_t|\yy^{(1)}]-\ZZ_t\E[\XX_{t}|\yy^{(1)}] - \aa_t = \E[\YY_t|\yy^{(1)}]-\ZZ_t \hatxtT - \aa_t = \E[\hatVt|\yy^{(1)}] .
-\end{equation}
-Thus the right side of Equation \ref{eq:covhatVtWt3} can be written in terms of $\VV_t$ and $\WW_t$ instead of $\hatVt$ and $\hatWt$:
-\begin{equation}\label{eq:covhatVtWt2}
-\cov[\hatVt,\hatWt] = \cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_t|\YY^{(1)}]].
+The joint variance-covariance matrix is
+\begin{equation}\label{eq:jointcondresid.onestep2}
+\overline{\Sigma}_t^* = \var[\overline{\varepsilon}_t^*] = \begin{bmatrix}[c|c]
+ \var[\checkVt]&  0\\
+ \rule[.5ex]{20ex}{0.25pt} & \rule[.5ex]{20ex}{0.25pt} \\
+0 & \KK_{t+1}\var[\checkVtp]\KK_{t+1}^\top \end{bmatrix},
 \end{equation}
 
-Using the law of total covariance, we can write:
-\begin{equation}\label{eq:covVtWt}
-\cov[\VV_t, \WW_t] = \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\YY^{(1)}]] + \cov_{Y^{(1)}}[\E[\VV_t|\yy^{(1)}],\E[\WW_t|\YY^{(1)}]] .
+The Cholesky standardized residuals for $\overline{\varepsilon}_t^*$ are
+\begin{equation}
+(\overline{\Sigma}_t^*)^{-1/2} \overline{\varepsilon}_t^*
 \end{equation}
-The unconditional covariance of $\VV_t$ and $\WW_t$  is 0. Thus the left side of Equation \ref{eq:covVtWt} is 0 and we can rearrange the equation as
-\begin{equation}\label{eq:covVtWt2}
-\cov_{Y^{(1)}}[\E[\VV_t|\YY^{(1)}],\E[\WW_t|\YY^{(1)}]] = - \E_{Y^{(1)}}[\cov[\VV_t, \WW_t|\YY^{(1)}]] .
-\end{equation}
-Combining Equation \ref{eq:covhatVtWt2} and \ref{eq:covVtWt2}, we get
-\begin{equation}\label{eq:conditionalcovvtwt}
-\cov[\hatVt,\hatWt] = - \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ] ,
-\end{equation}
-and our problem reduces to solving for the conditional covariance of the model and state residuals (right side of Equation \ref{eq:conditionalcovvtwt}).  
+ $\overline{\Sigma}_t^*$ is positive definite so its Cholesky decomposition can be computed.
 
-For a specific $\YY^{(1)}=\yy^{(1)}$, the conditional covariance $\cov[\VV_t, \WW_t|\yy^{(1)}]$ can be written out as
+The marginal standardized joint residuals for $\overline{\varepsilon}_t^*$ are:
 \begin{equation}
-\cov[\VV_t, \WW_t|\yy^{(1)}] = \cov[\YY_t-\ZZ_t\XX_t-\aa_t,\, \XX_t-\BB_t\XX_{t-1}-\uu_t|\yy^{(1)}] .
+\dg(\overline{\Sigma}_t^*)^{-1/2} \overline{\varepsilon}_t^*
 \end{equation}
-$\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus\footnote{$\cov[\BB \mathbf{A},\CC \mathbf{D}]=\BB\cov[\mathbf{A},\mathbf{D}]\CC^\top$.}
-\begin{equation}
-\begin{split}
-\cov&[\VV_t, \WW_t|\yy^{(1)}] =\cov[\YY_t-\ZZ_t\XX_t, \XX_t-\BB_t\XX_{t-1}|\yy^{(1)}] \\
-& =\cov[\YY_t,\XX_t|\yy^{(1)}] + \cov[\YY_t,-\BB_t\XX_{t-1}|\yy^{(1)}] + \cov[-\ZZ_t\XX_t,\XX_t|\yy^{(1)}] + \cov[-\ZZ_t\XX_t,-\BB_t\XX_{t-1}|\yy^{(1)}]\\
-& = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top ,
-\end{split}
-\end{equation}
-where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package.
-
-Both $\VV_t$ and $\WW_t$ are multivariate Normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
-\begin{equation}
-\E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top .
-\end{equation}
-$\cov[\hatVt,\hatWt]$ is the negative of this (Equation \ref{eq:conditionalcovvtwt}), thus
-\begin{equation}
-\cov[\hatVt,\hatWt] = - \hatStT + \hatSttmT\BB_t^\top + \ZZ_t \hatVtT - \ZZ_t\hatVttmT\BB_t^\top .
-\end{equation}
+where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
 
 \bibliography{./EMDerivation}
 \bibliographystyle{apalike}
