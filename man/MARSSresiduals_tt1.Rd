@@ -73,7 +73,7 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
 
   eli(dot)holmes(at)noaa(dot)gov
 } 
-\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{fitted.marssMLE}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSpredict}}, \code{\link{plot.marssMLE}} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]
