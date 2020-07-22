@@ -408,6 +408,20 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 \subsection{Fitted values}
 \index{structural ts models!fitted}
 
+`fitted(x)` applied to a `StructTS` object will return the expected value of $X_t$ conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). There is a plot method for ts and mts objects.
+<<label=Cs16_fitted-bsm-sts>>=
+fitted1 <- fitted(fit1)
+plot(fitted1)
+@
+In the MARSS package, this is returned with `broom::tidy(x, type="ytt")`. The `"tt"` means at $t$ conditioned on data 1 to $t$. It is returned as a data frame.
+
+<<label=Cs16_fitted-bsm-compare>>=
+fitted2 <- fitted(fit2, type="ytt")
+ggplot(fitted2, aes(x=t, y=.fitted)) +
+  geom_line() +
+  facet_wrap(~.rownames)
+@
+
 
 <<reset, echo=FALSE>>=
 options(prompt="> ", continue=" +", width=120)
