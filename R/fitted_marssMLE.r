@@ -1,185 +1,133 @@
 ###############################################################################################################################################
-#  fitted method for class marssMLE.
+#  fitted method for class marssMLE
 ##############################################################################################################################################
-fitted.marssMLE <- function(object, ...,
-                            type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
-                            interval = c("none", "confidence", "prediction"),
-                            conf.level = 0.95,
-                            output = c("data.frame", "matrix")) {
+fitted.marssMLE <- function(object, 
+    type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1", "model.ytT", "model.ytt", "model.ytt1"),
+    interval = c("none", "confidence"),
+    level = 0.95, ...) {
+  ## Argument checking
   type <- match.arg(type)
-  output <- match.arg(output)
   interval <- match.arg(interval)
-  conditioning <- substring(type, 3)
-  type <- substr(type, 1, 1)
-  MLEobj <- object
-  if (is.null(MLEobj[["par"]])) {
-    stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
-  }
-  if (interval != "none" && (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0))
-    stop("fitted.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
-  alpha <- 1-conf.level
-  extras <- list()
+  if(interval != "none" && type == "ytt")
+    stop("fitted.marssMLE: MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs")
+  if(interval != "none" && type == "ytt1")
+    stop("fitted.marssMLE: MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs")
+  if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0))
+    stop("fitted.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
+  alpha <- 1-level
+  
+  ## End Argument checking
+
+  alpha <- 1 - level
+
+    extras <- list()
   if (!missing(...)) {
     extras <- list(...)
-    if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use type='ytt1' or 'xtt1' instead of one.step.ahead=TRUE.", call. = FALSE)
+    if (!all(names(extras) %in% c("rotate"))) stop("Unknown extra argument. Only rotate allowed if form='dfa'.\n")
   }
-  
-  # need the model dims in marss form with c in U and d in A
-  model.dims <- attr(MLEobj[["marss"]], "model.dims")
-  TT <- model.dims[["x"]][2]
-  n <- model.dims[["y"]][1]
-  m <- model.dims[["x"]][1]
-  
-  if (type == "y") {
-    if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
-    if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
-    if (conditioning == "t") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
-    if(interval!="none"){
-      if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t1") hatVt <- MARSSkf(MLEobj)[["Vtt1"]]
-      if (conditioning == "t") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
+
+  # set rotate
+  rotate <- FALSE
+  if ("rotate" %in% names(extras)) {
+    if (form != "dfa") stop("fitted.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
+    rotate <- extras[["rotate"]]
+    if (!(rotate %in% c(TRUE, FALSE))) stop("fitted.marssMLE: rotate must be TRUE/FALSE. \n", call. = FALSE)
+    if( rotate && attr(object[["model"]], "model.dims")[["Z"]][3]!=1 ) stop("fitted.marssMLE: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
+  }
+
+  if (type %in% c("xtT", "xtt", "xtt1")) {
+    xtype <- type
+    model <- object[["model"]]
+    state.names <- attr(model, "X.names")
+    state.dims <- attr(model, "model.dims")[["x"]]
+    mm <- state.dims[1]
+    TT <- state.dims[2]
+    if(type=="xtt"){ 
+      kfss <- MARSSkfss(object)
+    }else{
+      kfss <- MARSSkfas(object)
     }
-    Z.time.varying <- model.dims[["Z"]][3] != 1
-    A.time.varying <- model.dims[["A"]][3] != 1
-    R.time.varying <- model.dims[["R"]][3] != 1
-    
-    val <- matrix(NA, n, TT)
-    rownames(val) <- attr(MLEobj$marss, "Y.names")
-    if(interval!="none") se <- val
-    
-    Zt <- parmat(MLEobj, "Z", t = 1)$Z
-    At <- parmat(MLEobj, "A", t = 1)$A
-    Rt <- parmat(MLEobj, "R", t = 1)$R
-    
-    for (t in 1:TT) {
-      # parmat returns marss form
-      if (Z.time.varying) Zt <- parmat(MLEobj, "Z", t = t)$Z
-      if (A.time.varying) At <- parmat(MLEobj, "A", t = t)$A
-      val[, t] <- Zt %*% hatxt[, t, drop = FALSE] + At
-      if(interval=="confidence") 
-        se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt))
-      if(interval=="prediction"){
-        if (R.time.varying) Rt <- parmat(MLEobj, "R", t = t)$R
-        se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt) + Rt)
+    states <- kfss[[xtype]]
+    vtype <- paste0("V", substr(xtype, 2, nchar(type)))
+    states.se <- apply(kfss[[vtype]], 3, function(x) {
+      takediag(x)
+    })
+    states.se[states.se < 0] <- NA
+    states.se <- sqrt(states.se)
+    if (mm == 1) states.se <- matrix(states.se, 1, TT)
+
+    # if user specified rotate, 
+    # I specified that Z (in marxss form) must be time-constant
+    if (form == "dfa" && rotate && length(object[["par"]][["Z"]]) != 0) {
+      Z.est <- coef(object, type = "matrix")[["Z"]]
+      H <- 1
+      if (ncol(Z.est) > 1) {
+        H <- solve(varimax(Z.est)[["rotmat"]])
+        states <- H %*% states # rotated states
+        states.var <- kfss[[vtype]]
+        for (t in 1:TT) {
+          states.se[, t] <- sqrt(takediag(H %*% states.var[, , t] %*% t(H)))
+        }
       }
     }
-    
-    # Set up output
-    if(output=="data.frame"){
-      data.names <- attr(MLEobj[["model"]], "Y.names")
-      data.dims <- attr(MLEobj[["model"]], "model.dims")[["y"]]
-      nn <- data.dims[1]
-      TT <- data.dims[2]
-      ret <- data.frame(
-        .rownames = rep(data.names, each = TT),
-        t = rep(1:TT, nn),
-        y = vec(t(MLEobj[["model"]]$data)),
-        stringsAsFactors = FALSE
-      )
-    }
-    
-  }
-  
-  if (type == "x") {
-    if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
-    if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
-    if (interval!="none"){
-      if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t1") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
-    }
-    
-    B.time.varying <- model.dims[["B"]][3] != 1
-    U.time.varying <- model.dims[["U"]][3] != 1
-    Q.time.varying <- model.dims[["Q"]][3] != 1
-    
-    val <- matrix(NA, m, TT)
-    rownames(val) <- attr(MLEobj[["marss"]], "X.names")
-    if(interval!="none") se <- val
-    
-    x0 <- coef(MLEobj, type = "matrix")[["x0"]]
-    if(interval!="none") V0 <- coef(MLEobj, type = "matrix")[["V0"]]
-    Bt <- parmat(MLEobj, "B", t = 1)[["B"]]
-    Ut <- parmat(MLEobj, "U", t = 1)[["U"]]
-    Qt <- parmat(MLEobj, "Q", t = 1)[["Q"]]
-    if (MLEobj$model$tinitx == 0){
-      val[, 1] <- Bt %*% x0 + Ut
-      if (interval=="confidence") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt))
-      if (interval=="prediction") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt) + Qt)
-    }
-    if (MLEobj[["model"]][["tinitx"]] == 1){
-      val[, 1] <- x0
-      if(interval != "none") se[, 1] <- takediag(V0)
-    }
-    for (t in 2:TT) {
-      if (B.time.varying) Bt <- parmat(MLEobj, "B", t = t)[["B"]]
-      if (U.time.varying) Ut <- parmat(MLEobj, "U", t = t)[["U"]]
-      val[, t] <- Bt %*% hatxt[, t - 1, drop = FALSE] + Ut
-      if (interval=="confidence") 
-        se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt))
-      if (interval=="prediction"){
-        if (Q.time.varying) Qt <- parmat(MLEobj, "Q", t = t)[["Q"]]
-        se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt) + Qt)
-      } 
-    }
-    
-    # Set up output
-    if(output=="data.frame"){
-      state.names <- attr(MLEobj[["model"]], "X.names")
-      state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
-      mm <- state.dims[1]
-      TT <- state.dims[2]
-      
-      if (conditioning == "T")
-        ret <- data.frame(
-          .rownames = rep(state.names, each = TT),
-          t = rep(1:TT, mm),
-          xtT = vec(t(hatxt)),
-          stringsAsFactors = FALSE
-        )
-      if (conditioning == "t1")
-        ret <- data.frame(
-          .rownames = rep(state.names, each = TT),
-          t = rep(1:TT, mm),
-          xtt = vec(t(hatxt)),
-          stringsAsFactors = FALSE
-        )
-    }
-  }
-  
-  if (interval=="none"){
-    if(output=="matrix") return(val)
-    retlist = list(.fitted=val)
-  }
-  if (interval=="confidence"){
-    se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
-    se <- sqrt(se) # was not sqrt earlier
-    retlist <- list(
-      .fitted = val, 
-      .se.fit = se,
-      .conf.low = val + qnorm(alpha/2) * se,
-      .conf.up = val + qnorm(1- alpha/2) * se
+    ret <- data.frame(
+      .rownames = rep(state.names, each = TT),
+      t = rep(1:TT, mm),
+      estimate = vec(t(states)),
+      se = vec(t(states.se)),
+      stringsAsFactors = FALSE
     )
-  }
-  if (interval=="prediction"){
-    se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
-    se <- sqrt(se) # was not sqrt earlier
-    if (type == "x"){
-      retlist <-list(
-        .fitted = val, 
-        .sd.x = se, 
-        .lwr = val + qnorm(alpha/2) * se,
-        .upr = val + qnorm(1- alpha/2) * se
+    if (interval == "confidence") {
+      conf.low <- qnorm(alpha / 2) * ret$se + ret$estimate
+      conf.up <- qnorm(1 - alpha / 2) * ret$se + ret$estimate
+      ret <- cbind(ret,
+        conf.low = conf.low,
+        conf.high = conf.up
       )
     }
-    if (type == "y"){
-      retlist <- list(
-        .fitted=val,
-        .sd.y=se,
-        .lwr = val + qnorm(alpha/2) * se,
-        .upr = val + qnorm(1- alpha/2) * se
-      )
+    rownames(ret) <- NULL
+  }
+  if (type %in% c("ytT", "ytt", "ytt1")) {
+    ytype <- type
+    model <- object[["model"]]
+    Y.names <- attr(model, "Y.names")
+    Y.dims <- attr(model, "model.dims")[["y"]]
+    nn <- Y.dims[1]
+    TT <- Y.dims[2]
+    hatyt <- MARSShatyt(object, only.kem=FALSE)
+    Ey <- hatyt[[ytype]]
+    ret <- data.frame(
+      .rownames = rep(Y.names, each = TT),
+      t = rep(1:TT, nn),
+      y = vec(t(object[["model"]][["data"]])),
+      estimate = vec(t(Ey)),
+      stringsAsFactors = FALSE
+    )
+    if(type %in% c("ytT")){
+      vtype <- paste0("var.y", substr(ytype, 2, nchar(type)))
+      y.var <- hatyt[[vtype]]
+      vtype <- paste0("var.Ey", substr(ytype, 2, nchar(type)))
+      Ey.var <- hatyt[[vtype]]
+      Ey.se <- apply(Ey.var, 3, function(x) { takediag(x) })
+      Ey.se[Ey.se < 0] <- NA
+      Ey.se <- sqrt(Ey.se)
+      y.sd <- apply(y.var, 3, function(x) { takediag(x) })
+      y.sd[y.sd < 0] <- NA
+      y.sd <- sqrt(y.sd)
+      if (nn == 1) Ey.se <- matrix(Ey.se, 1, TT)
+      if (nn == 1) y.sd <- matrix(y.sd, 1, TT)
+      ret <- cbind(ret,se = vec(t(Ey.se)))
+      if (interval=="confidence") {
+        ret <- cbind(ret,
+                     conf.low = qnorm(alpha / 2) * ret$se + ret$estimate,
+                     conf.high = qnorm(1 - alpha / 2) * ret$se + ret$estimate,
+                     pred.std.dev = vec(t(y.sd)),
+                     pred.low = qnorm(alpha / 2) * ret$pred.std.dev + ret$estimate,
+                     pred.high = qnorm(1 - alpha / 2) * ret$pred.std.dev + ret$estimate
+        )
+      }
+      rownames(ret) <- NULL
     }
   }
-  if(output=="matrix") return(retlist)
-  return(cbind(ret, as.data.frame(lapply(retlist, function(x){vec(t(x))}))))
-} # end of fitted.marssMLE
+  ret
+}
