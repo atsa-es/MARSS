@@ -1,6 +1,6 @@
 ######################################################################################################  forecast method for class marssMLE. Prediction intervals
 ##################################################################################
-forecast.marssMLE <- function(object, h=1,
+forecast.marssMLE <- function(object, h=10,
                               conf.level = c(0.80, 0.95),
                               type = c("ytT", "xtT"),
                               newdata = list(y=NULL, c=NULL, d=NULL),
@@ -139,13 +139,19 @@ forecast.marssMLE <- function(object, h=1,
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
-    newdata = newdata,
     level = 100*conf.level,
-    pred = ret,
     type = type,
+    pred = ret,
     t = 1:(TT+h),
-    h = h
+    ft = (TT+1):(TT+h),
+    h = h,
+    n.ahead = h,
+    x0 = coef(object, type = "matrix")[["x0"]],
+    tinitx = object[["model"]][["tinitx"]],
+    newdata = newdata
   )
+  tmp <- colnames(outlist[["pred"]])
+  colnames(outlist[["pred"]])[which(tmp == ".sd")] <- "se"
   
   class(outlist) <- "marssPredict"
   

@@ -3,7 +3,7 @@
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 
-\include{tex/ModelSpec}
+\SweaveInput{manual_files/Case_Study_6.Rnw}
 
 \bibliography{tex/Manual}
 

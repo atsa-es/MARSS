@@ -342,13 +342,11 @@ x=print(kemfit, what="states",silent=TRUE)
 
 \section{Tidy output}
 
-The \verb@augment@, \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \verb@?augment.marssMLE@ for examples.\index{augment}\index{functions!augment}\index{tidy}\index{functions!tidy}
+The \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
 
 <<model-tidy-R>>=
-require(broom)
-head(augment(kemfit))
-tidy(kemfit)
-glance(kemfit)
+broom::tidy(kemfit)
+broom::glance(kemfit)
 @
 
 \section{Confidence intervals on a fitted model}
@@ -458,7 +456,7 @@ MARSS uses two convergence tests.  The first is
 $$\mathrm{logLik}_{i+1}-\mathrm{logLik}_i < \mathrm{tol}$$
 This is called \verb@abstol@ (meaning absolute tolerance) in the output.  The second is called the \verb@conv.test.slope@. This looks at the slope of the log parameter value (or likelihood) versus log iteration number and asks whether that is close to zero (not changing).  
 
-If you are having trouble getting the model to converge, then start by addressing the following 1) Are you trying to fit a bad model, e.g. a non-stationary model fit to stationary data or the opposite or a model that specifies independence of errors or states to data that clearly violate that or a model that implies a particular stationary distribution (particular mean and variance) to data that strongly violate that? 2) Do you have confounded parameters, e.g. two parameters that have the same effect (like effectively two intercepts)?, 3) Are you trying to fit a model to 1 data point somewhere, e.g. in a big multivariate dataset with lots of missing values?  4) How many parameters are you trying to estimate per data point? 5) Check your residuals (\verb@residuals(kemfit)$model.residuals@) for normality.  6) Did you do any data transformations that would cause one of the variances to go to zero? Replacing 0s with a constant will do that.  Try replacing them with NAs (missing).  Do you have long strings of constant numbers in your data?  Binned data often look like that, and that will drive $\QQ$ to 0.
+If you are having trouble getting the model to converge, then start by addressing the following 1) Are you trying to fit a bad model, e.g. a non-stationary model fit to stationary data or the opposite or a model that specifies independence of errors or states to data that clearly violate that or a model that implies a particular stationary distribution (particular mean and variance) to data that strongly violate that? 2) Do you have confounded parameters, e.g. two parameters that have the same effect (like effectively two intercepts)?, 3) Are you trying to fit a model to 1 data point somewhere, e.g. in a big multivariate dataset with lots of missing values?  4) How many parameters are you trying to estimate per data point? 5) Check your residuals (\verb@MARSSresiduals(kemfit)$model.residuals@) for normality.  6) Did you do any data transformations that would cause one of the variances to go to zero? Replacing 0s with a constant will do that.  Try replacing them with NAs (missing).  Do you have long strings of constant numbers in your data?  Binned data often look like that, and that will drive $\QQ$ to 0.
 
 <<reset, echo=F, include.source=F>>=
 options(prompt="> ", continue=" +", width=120)

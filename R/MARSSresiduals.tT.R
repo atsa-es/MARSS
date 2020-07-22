@@ -33,7 +33,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   # MARSSkfas doesn't output Innov, Sigma or Kt so might need to run MARSSkfss to get those
   if (is.null(MLEobj[["kf"]]) || is.null(MLEobj$kf$Innov) || is.null(MLEobj$kf$Sigma) || is.null(MLEobj$kf$Kt)) {
     kf <- MARSSkfss(MLEobj)
-  }
+  }else{ kf <- MLEobj[["kf"]] }
   # MARSSkfas sets these to a character warning, so not NULL; add this to catch that
   if (!is.array(MLEobj$kf$Innov) || !is.array(MLEobj$kf$Sigma) || !is.array(MLEobj$kf$Kt)) {
     kf <- MARSSkfss(MLEobj)
@@ -201,7 +201,8 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
-    tmpcholinv <- try(psolve(tmpchol), silent = TRUE)
+    # chol() returns the upper triangle. We need to lower triangle
+    tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo('residvarinv')\n"))
@@ -227,6 +228,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   st.et[, TT] <- NA
   mar.st.et[(n + 1):(n + m), TT] <- NA
   if(Harvey==TRUE){
+    # Harvey algorithm doesn't calculate var for missing data
     for (t in 1:TT) {
     is.miss <- c(is.na(y[, t]), rep(FALSE, m))
     var.et[is.miss,1:n,t] <- NA
@@ -234,7 +236,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
     }
   }
   
-  # et is the expected value of the residuals conditioned on y(1)
+  # et is the expected value of the residuals conditioned on y(1)-the observed data
   E.obs.v <- et[1:n,,drop=FALSE]
   var.obs.v <- array(0, dim = c(n, n, TT))
   for( t in 1:TT) var.obs.v[,,t] <- Ey$OtT[,,t] - tcrossprod(Ey$ytT[,t])

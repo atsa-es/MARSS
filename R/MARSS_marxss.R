@@ -446,11 +446,13 @@ MARSS.marxss <- function(MARSS.call) {
   assign("alldefaults", alldefaults, pkg_globals)
 
   ## Check that the marssMODEL object output by MARSS.form() is ok since marxss_to_marss will go south otherwise
+  if(!identical(MARSS.call$control$trace, -1)){ # turn off all error checking if trace = -1
   if (MARSS.call$silent == 2) cat(paste("  Running is.marssMODEL on the marxss model.\n", sep = ""))
   tmp <- is.marssMODEL(marxss_object, method = MARSS.call$method)
   if (!isTRUE(tmp)) {
     cat(tmp)
     stop("Stopped in MARSS.marxss() due to problem(s) with model specification.", call. = FALSE)
+  }
   }
 
   # Put the marxss model into $model since model holds the model in the 'form' form

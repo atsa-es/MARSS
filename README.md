@@ -68,7 +68,11 @@ If you are on a Windows machine and get an error saying 'loading failed for i386
 ```
 options(devtools.install.args = "--no-multiarch")
 ```
-To install an R package from Github, you need to be able to build an R package on your machine. If you are on Windows, that means you will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). On a Mac, installation should work fine; you don't need to install anything.
+If R asks you to update packages, and then proceeds to fail at installation because of a warning that a package was built under a later R version than you have on your computer, use
+```
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS=TRUE)
+```
+To install an R package from GitHub, you need to be able to build an R package on your machine. If you are on Windows, that means you will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). On a Mac, installation should work fine; you don't need to install anything.
 
 ### DOCUMENTATION and TUTORIALS  {#documentation}
 

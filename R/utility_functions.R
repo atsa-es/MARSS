@@ -202,7 +202,7 @@ is.validvarcov <- function(x, method = "kem") {
         tmp <- try(eigen(test.block, only.values = TRUE), silent = TRUE)
         if (inherits(tmp, "try-error")) {
           pos.flag <- TRUE
-        } else if (!all(tmp$values >= 0)) pos.flag <- TRUE
+        } else if (!all(tmp$values > 0)) pos.flag <- TRUE
         # if there is a problem
         if (pos.flag) {
           return(list(ok = FALSE, error = "One of the fixed blocks within the varcov matrix is not positive-definite "))
@@ -760,19 +760,28 @@ sub3D <- function(x, t = 1) {
 }
 
 # replace 0 diags with 0 row/cols; no error checking.  Need square symm matrix
-pcholinv <- function(x) {
+pcholinv <- function(x, chol=TRUE) {
+  if(all(!x)) return(x)
   dim.x <- dim(x)[1]
   diag.x <- x[1 + 0:(dim.x - 1) * (dim.x + 1)]
   if (any(diag.x == 0)) {
     if (any(diag.x != 0)) {
-      b <- chol2inv(chol(x[diag.x != 0, diag.x != 0]))
+      if(chol){
+        b <- chol2inv(chol(x[diag.x != 0, diag.x != 0]))
+      }else{
+        b <- solve(x[diag.x != 0, diag.x != 0])
+      }
       OMG.x <- diag(1, dim.x)[diag.x != 0, , drop = FALSE]
       inv.x <- t(OMG.x) %*% b %*% OMG.x
     } else {
       inv.x <- matrix(0, dim.x, dim.x)
     }
   } else {
-    inv.x <- chol2inv(chol(x))
+    if(chol){
+      inv.x <- chol2inv(chol(x))
+    }else{
+      inv.x <- solve(x)
+    }
   }
   return(inv.x)
 }

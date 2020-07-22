@@ -168,7 +168,7 @@ flatrecdat=apply(recdat,1,sum,na.rm=TRUE)
 \begin{figure}[htp]
 \begin{center}
 <<label=rockfish1,fig=TRUE>>=
-matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
+graphics::matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
 title("Puget Sound Total Rockfish Recreational CPUE data")
 @
 \end{center}
@@ -200,7 +200,7 @@ Including the management effect has a big effect on our estimate of trend.
 \begin{figure}[htp]
 \begin{center}
 <<label=rockfish2,fig=TRUE>>=
-matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
+graphics::matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
 lines(rockfish[rec.years,1],as.vector(kem.rock1$states),col="red",lty=2,lwd=2)
 lines(rockfish[rec.years,1],as.vector(kem.rock2$states),col="blue",lty=1,lwd=2)
 title("Puget Sound Total Rockfish Recreational CPUE data")
@@ -242,7 +242,7 @@ options(warn=0)
 
 meany = matrix(apply(dat,2,mean,na.rm=T),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #take off the mean; for better plotting and to mask pattern
 adj = matrix(c(1.5,0,-2,1,2,-2,-1,0,2),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #just to mask pattern in data
-matplot(x,dat-meany+adj,xlab="",ylab="index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
+graphics::matplot(x,dat-meany+adj,xlab="",ylab="index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
 title("Puget Sound Total Rockfish Indices")
 @
 \end{center}

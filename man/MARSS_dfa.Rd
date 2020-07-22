@@ -34,6 +34,7 @@ In addition to these, form="dfa" has some special arguments that can be passed i
 \itemize{
     \item \code{demean}  Logical.  Default is TRUE, which means the data will be demeaned.
     \item \code{z.score}  Logical.  Default is TRUE, which means the data will be z-scored (demeaned and variance standardized to 1).
+    \item \code{covariates}  Covariates (\eqn{d}) for the \eqn{y} equation. No missing values allowed and must be a matrix with the same number of time steps as the data. An unconstrained \eqn{D} matrix will estimated.
     }
 
 The \code{model} argument of the \code{\link{MARSS}()} call is constrained in terms of what parameters can be changed and how they can be changed.  See details below. An additional element, \code{m}, can be passed into the \code{model} argument that specifies the number of hidden state variables.  It is not necessariy for the user to specify \code{Z} as the helper function will create a \code{Z} appropriate for a DFA model.
@@ -70,6 +71,10 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 }
 \examples{
 \dontrun{
+dat <- t(harborSealWA[,-1])
+# DFA with 3 states; used BFGS because it fits much faster for this model
+fit <- MARSS(dat, model = list(m=3), form="dfa", method="BFGS")
+
 # See the Dynamic Factor Analysis chapter in the User Guide
 RShowDoc("UserGuide", package = "MARSS")
 }

@@ -86,10 +86,12 @@ clean:
 	$(RM) ./figures/*.*
 	$(RM) ./manual_files/*.*
 	$(RM) debug_manual.R debugger_template.Rnw
+	cat ./index.html > ../inst/doc/index.html
+	$(RM) ./index.html
 	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
-	$(RM) ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd ../man/MARSS_out.Rd
+	$(RM) ../man/MARSS_out.Rd
 	

@@ -9,7 +9,7 @@ accuracy.marssMLE(f, x, test=NULL, type="ytt1", verbose=FALSE, ...)
 }
 \arguments{
   \item{f}{A \code{\link{marssMLE}} or \code{\link{marssPredict}} object}
-  \item{x}{A matrix or tibble with data to test against the h steps of a forecast.}
+  \item{x}{A matrix or data frame with data to test against the h steps of a forecast.}
   \item{test}{Which time steps in training data (data model fit to) to compute accuracy for.}
   \item{type}{type="ytt1" is the one-step-ahead predictions. type="ytT" is the fitted ytT predictions. The former are standardly used for training data prediction metrics.}  
   \item{verbose}{Show metrics for each time series of data.}
@@ -41,8 +41,9 @@ fit<- MARSS(dat[,1:12], model = list(Z = factor(c("WA", "OR", "OR"))))
 library(forecast)
 accuracy(fit)
 
+# Compare to test dataset
 fr <- predict(fit, h=10)
-accuracy(fit, x=dat[,13:22])
+accuracy(fr, x=dat[,13:22])
 }
 \references{
 Hyndman, R.J. and Koehler, A.B. (2006) "Another look at measures of forecast accuracy". International Journal of Forecasting, 22(4), 679-688. Hyndman, R.J. and Athanasopoulos, G. (2018) "Forecasting: principles and practice", 2nd ed., OTexts, Melbourne, Australia. Section 3.4 "Evaluating forecast accuracy". https://otexts.org/fpp2/accuracy.html.

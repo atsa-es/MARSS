@@ -6,34 +6,86 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
+Status
+-----------------------------------
 
-MARSS 3.11.0 (resids_update branch)
+7-09-2020
+
+* The versiontest.R tests passed.
+* Working on testing predict and residuals against other packages and models.
+* Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
+
+7-12-2020
+
+* Working on issue #74 that is coming up in the BSM model. Weird Q update error at iteration 1. It's a numerical accuracy issue. Fixed by using solve(A,B) to get J0 instead of inverse of Vtt1[,,1] [Fixed]
+* Rerun the versiontest.R tests because of the J0 change. [passed 7/14]
+
+7-14-2020
+
+* Back to working on testing predict and residuals against other packages and models. After fixing issue #74 and ensuring that version test passes.
+* Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
+
+7-16-2020
+
+* Fixed various issues in MARSSresiduals() due to not passing type in. That error progated to problems in plot functions. 
+* autoplot.marssPredict() not working for forecasts since facet_wrap fails when plot uses data with different number of time steps. Fixed by not subsetting but instead using NAs for the data I don't want to show.
+* Did the forecast subsection for StructTS models.
+
+7-20-2020
+
+* Fixed bug in MARSSresiduals.tT. Needed t(chol()) for Cholesky standardization.
+* Working on innovations state residuals. Finished. Residuals.Rnw and MARSSresiduals.tt1()
+* Changed ACF plots to be for the innovations residuals. Smoothation residuals are temporally correlated.
+
+To do
+
+* Work on fitted() and residuals() for StructTS models.
+* Then move to multivariate examples.
+* KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
+
+    
+MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
-Work is currently focused on on the resids_update branch in prep for release of 3.11.0 on CRAN. 3.11.0 is focused on the prediction, forecasting, and residuals functions for MARSS models. This is a major release and current project status is the final testing phase.
+Version 3.11.0 is focused on the `predict` function and updating the structure of the `residuals` functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
 
-https://github.com/nwfsc-timeseries/MARSS/blob/resids_update/NEWS.md
-
-
-MARSS 3.10.14 (master branch)
-------------------------------------
-Version 3.10.14 on master is the last 3.10 version before the 3.11 release. It is functional but the predict functions are not finalized. Finalization of the predict functions is happening on the resids_update branch.
-
-* predict.marssMLE.Rd (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
-* clean-up on the man pages for predict() and predict.marssMLE
-* changed the x0 estimation behavior for predict.marssMLE() when no data passed in.
 
 ENHANCEMENTS
 
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
+* Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
+* Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. This required changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
 
 BUGS
 
-* This bug affected `residuals()` which is used for diagnostic plots in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was in `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* This bug affected `residuals()` in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* When computing the Cholesky standardized residuals, the lower triangle of the Cholesky decomposition should be used so that the residuals are standardized to a variance of 1. `base::chol()` returns the upper triangle. Thus the lines in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` that applied the standardization need `t(chol())`. 
+* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
+* `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
+* `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
+* `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`.
+
+DOCUMENTATION and MAN FILES
+
+* Added covariates and example to `MARSS_dfa.Rd`
+* Added chapter on Structural time series models which compares `StructTS()` to `MARSS()` output.
+* Removed all mention of `augment()` from documentation and manuals. Replaced with `residuals()`.
+* `predict.marssMLE.Rd` (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
+* Cleaned-up the man pages for `predict()` and `predict.marssMLE()`.
+* In the chapter on structural breaks and outliers, Koopman et al (1998) use the marginal residuals in their example rather than the Cholesky standardized residuals. Changed to use marginal residuals to follow their example.
+
+OTHER
+
+* Changed `fitted.marssMLE` to have column with xtt when type="xtt1" instead of xtT.
+* Changed the x0 estimation behavior for `predict.marssMLE()` when no data passed in.
+* Added x0 argument to `predict.marssMLE()` so that user can specify x0 if needed.
+* Removed the tibble class from the data frames returned by `residuals.marssMLE()`. The data frames are still in tibble form. Removed all reference to tibbles in the documentation.
+* When `trace = -1` some tests were still being done. I added a test for `trace = -1` to a few more test lines in `MARSS.R` and `MARSS_marxss.R`.
 
 
-MARSS 3.10.13 (lastest release on GitHub 2-25-2020)
+MARSS 3.10.13 (GitHub 2-25-2020)
 ------------------------------------
 Version 3.10.13 mainly has to do with the `predict()` and `forecast()` functions along with plotting and printing methods.
 

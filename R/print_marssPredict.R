@@ -7,7 +7,7 @@ print.marssPredict <- function(x, ...) {
   if(x$h!=0){
     TT <- attr(x$model$model, "model.dims")[["x"]][2]
     loc <- which(colnames(x$pred)=="se")
-    print(subset(x$pred, t >TT)[,-1*c(3,loc)])
+    print(subset(x$pred, x$t >TT)[,-1*c(3,loc)])
   }
   invisible(x$pred)
 }

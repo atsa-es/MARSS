@@ -15,7 +15,7 @@ accuracy.marssPredict <- function (f, x, test=NULL, type="ytt1", verbose=FALSE, 
 
       TT <- attr(f$model$model, "model.dims")[["x"]][2]
       loc <- which(colnames(f$pred)=="se")
-      testset <- subset(f$pred, t >TT)[,c(".rownames","y","estimate")]
+      testset <- subset(f$pred, f$t >TT)[,c(".rownames","y","estimate")]
       colnames(testset) <- c(".rownames","y",".fitted")
       testset$t <- rep(1:h,n)
       
@@ -33,7 +33,10 @@ accuracy.marssPredict <- function (f, x, test=NULL, type="ytt1", verbose=FALSE, 
         val <- Y.names %in% rownames(x)
         if(!all(val)) stop(paste0("accuracy.marssPredict: Test data is missing ", paste(Y.names[!val], collapse=" ,"),".\n"), call.=FALSE)
         x <- x[match(Y.names, rownames(x)),,drop=FALSE] #match ordering if off
-        x <- data.frame(.rownames=rep(rownames(x), each=h), y=vec(t(x)), t=rep(1:h,n))
+        x <- data.frame(
+          .rownames=rep(rownames(x), each=h), 
+          y=vec(t(x)), t=rep(1:h,n),
+          stringsAsFactors = FALSE)
       }else{
         if(!all(c(".rownames", "y") %in% colnames(x))) stop("accuracy.marssPredict: If data frame, test data have rows .rownames and estimate.\n", call.=FALSE)
         val <- Y.names %in% x$.rownames
@@ -49,7 +52,7 @@ accuracy.marssPredict <- function (f, x, test=NULL, type="ytt1", verbose=FALSE, 
       rownames(testout) <- rout
       if(verbose){
         for(i in unique(testset$.rownames)){
-          testout <- rbind(testout, aout(subset(testset, .rownames==i), test))
+          testout <- rbind(testout, aout(subset(testset, testset$.rownames==i), test))
           rout <- c(rout, paste(" ",i))
         }
         rownames(testout) <- rout
@@ -72,14 +75,14 @@ accuracy.marssMLE <- function (f, x=NULL, test=NULL, type="ytt1", verbose=FALSE,
   n <- attr(f$model, "model.dims")[["y"]][1]
   if(!verbose && n!=1) return(out)
   for(i in unique(fx$.rownames)){
-    out <- rbind(out, aout(subset(fx, .rownames==i), test))
+    out <- rbind(out, aout(subset(fx, fx$.rownames==i), test))
     rout <- c(rout, paste(" ",i))
   }
   rownames(out) <- rout
   return(out)
 }
 
-aout <- function(fx, test){ #fx is a tibble
+aout <- function(fx, test){ #fx is a data frame
   dx <- fx$y
   fits <- fx$.fitted
   res <- dx - fits

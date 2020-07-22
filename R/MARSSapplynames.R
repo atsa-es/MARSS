@@ -19,9 +19,9 @@ MARSSapplynames <- function(MLEobj) {
   if (!is.null(MLEobj[["Ey"]][["ytT"]])) rownames(MLEobj[["Ey"]][["ytT"]]) <- Y.names
   if (!is.null(MLEobj[["kf"]][["xtT"]])) rownames(MLEobj[["kf"]][["xtT"]]) <- X.names
   if (!is.null(MLEobj[["kf"]][["xtt1"]])) rownames(MLEobj[["kf"]][["xtt1"]]) <- X.names
-  if (!is.null(MLEobj[["kf"]][["xtt"]])) rownames(MLEobj[["kf"]][["xtt"]]) <- X.names
+  if (!is.null(MLEobj[["kf"]][["xtt"]]) && !is.character(MLEobj[["kf"]][["xtt"]])) rownames(MLEobj[["kf"]][["xtt"]]) <- X.names
   if (!is.null(MLEobj[["kf"]][["x0T"]])) rownames(MLEobj[["kf"]][["x0T"]]) <- X.names
-  if (!is.null(MLEobj[["kf"]][["Innov"]])) rownames(MLEobj[["kf"]][["Innov"]]) <- Y.names
+  if (!is.null(MLEobj[["kf"]][["Innov"]]) && !is.character(MLEobj[["kf"]][["Innov"]])) rownames(MLEobj[["kf"]][["Innov"]]) <- Y.names
   if (!is.null(MLEobj[["states.se"]])) rownames(MLEobj[["states.se"]]) <- X.names
   if (!is.null(MLEobj[["states"]])) rownames(MLEobj[["states"]]) <- X.names
 

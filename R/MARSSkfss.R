@@ -231,7 +231,7 @@ MARSSkfss <- function(MLEobj) {
     Vtt[, , t] <- OmgRVtt.t %*% Vtt[, , t] %*% OmgRVtt.t
 
     # Variables needed for the likelihood calculation; see comments above
-    R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documention per LL calc when missing values; R here is R[t]
+    R_mod <- (I.n - Mt) + Mt %*% R %*% Mt # not in S&S; see MARSS documentation per LL calc when missing values; R here is R[t]
     Ft[, , t] <- Zt %*% Vtt1[, , t] %*% t.Zt + R_mod # need to hold on to this for loglike calc ; 1 on diagonal when y is missing
     if (n != 1) Ft[, , t] <- symm(Ft[, , t]) # to ensure its symetric
 
@@ -345,15 +345,17 @@ MARSSkfss <- function(MLEobj) {
         return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: soln became unstable when zeros appeared on the diagonal of Vtt1 at t=1.\n")))
       }
     }
-    if (m == 1) {
-      Vinv <- pcholinv(matrix(Vtt1[, , 1], 1, 1)) # pcholinv doesn't like vectors
-    } else {
-      Vinv <- pcholinv(Vtt1[, , 1])
-      Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+    Vtt1.1 <- sub3D(Vtt1, t = 1)
+    if(any(takediag(Vtt1.1)==0)){
+      Vinv <- pcholinv(Vtt1.1, chol=FALSE)
+      if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+      J0 <- V0 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+    }else{
+      t.J0 <- solve(matrix(Vtt1.1, m, m, byrow = TRUE), B%*%V0)
+      if (m==1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE)
     }
-    J0 <- V0 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
     x0T <- x0 + J0 %*% (xtT[, 1, drop = FALSE] - xtt1[, 1, drop = FALSE]) # eqn 6.47
-    V0T <- V0 + J0 %*% (VtT[, , 1] - Vtt1[, , 1]) %*% t(J0) # eqn 6.48
+    V0T <- V0 + tcrossprod(J0 %*% (VtT[, , 1] - Vtt1[, , 1]), J0) # eqn 6.48
     V0T <- symm(V0T) # enforce symmetry
   }
   if (init.state == "x10") { # Ghahramani treatment of initial states; LAM and pi defined for x_1
