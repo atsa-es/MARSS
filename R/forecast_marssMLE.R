@@ -1,15 +1,15 @@
 ######################################################################################################  forecast method for class marssMLE. Prediction intervals
 ##################################################################################
 forecast.marssMLE <- function(object, h=10,
-                              conf.level = c(0.80, 0.95),
-                              type = c("ytT", "xtT"),
+                              level = c(0.80, 0.95),
+                              type = c("ytT", "xtT", "ytt", "xtt1", "ytt1"),
                               newdata = list(y=NULL, c=NULL, d=NULL),
                               interval = c("prediction", "confidence", "none"),
                               fun.kf = c("MARSSkfas", "MARSSkfss"),
                               ...) {
   type <- match.arg(type)
   interval <- match.arg(interval)
-  if( interval == "none" ) conf.level <- c()
+  if( interval == "none" ) level <- c()
   fun.kf <- match.arg(fun.kf)
   if(object[["fun.kf"]] != fun.kf) message(paste0(fun.kf, "is being used for forecast. This is different than fun.kf in the marssMLE object.\n"))
   MODELobj <- object[["model"]]
@@ -20,9 +20,9 @@ forecast.marssMLE <- function(object, h=10,
   if (is.null(object[["par"]])) {
     stop("forecast.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
-  if (length(conf.level) > 0 && (!is.numeric(conf.level) ||  any(conf.level > 1) || any(conf.level < 0)))
-    stop("forecast.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
-  if( length(conf.level) == 0 ) interval <- "none"
+  if (length(level) > 0 && (!is.numeric(level) ||  any(level > 1) || any(level < 0)))
+    stop("forecast.marssMLE: level must be between 0 and 1.", call. = FALSE)
+  if( length(level) == 0 ) interval <- "none"
   if (!is.numeric(h) ||  length(h) != 1 || h < 0 || (h %% 1) != 0)
     stop("forecast.marssMLE: h must be an integer > 0.", call. = FALSE)
   extras <- list()
@@ -83,7 +83,7 @@ forecast.marssMLE <- function(object, h=10,
   }
   
   new.MODELlist[["tinitx"]] = object[["model"]][["tinitx"]]
-
+  
   newMLEobj <- MARSS.marxss(list(
     data=new.data, 
     model=new.MODELlist, 
@@ -96,42 +96,27 @@ forecast.marssMLE <- function(object, h=10,
   for(elem in names(newMLEobj[["par"]])) newMLEobj[["par"]][[elem]] <- matrix(0, 0, 1)
   class(newMLEobj) <- "marssMLE"
   
-  if(type=="ytT"){
+  if(type %in% c("ytT", "ytt", "ytt1")) estcol <- "y"
+  if(type == "xtT") estcol <- "xtT"
+  if(type == "xtt1") estcol <- "xtt"
+  cols <- switch(interval,
+                 prediction = c(".rownames", "t", estcol, ".pred", ".sd", ".lwr", ".upr"),
+                 none = c(".rownames", "t", estcol, ".pred"),
+                 confidence = c(".rownames", "t", estcol, ".pred", ".se", ".conf.low", ".conf.up"))
+  ret <- MARSSpredict(newMLEobj, type=type, interval=interval, level=level[1])[cols]
+  colnames(ret)[which(colnames(ret) %in% c(".sd", ".se"))] <- "se"
+  colnames(ret)[which(colnames(ret)==".lwr")] <- paste("Lo", 100*level[1])
+  colnames(ret)[which(colnames(ret)==".upr")] <- paste("Hi", 100*level[1])
+  colnames(ret)[which(colnames(ret)==".conf.low")] <- paste("Lo", 100*level[1])
+  colnames(ret)[which(colnames(ret)==".conf.up")] <- paste("Hi", 100*level[1])
+  if(length(level) > 1){
     cols <- switch(interval,
-                   prediction = c(".rownames", "t", "y", ".fitted", ".sd.y", ".lwr", ".upr"),
-                   none = c(".rownames", "t", "y", ".fitted"),
-                   confidence = c(".rownames", "t", "y", ".fitted", ".se.fit", ".conf.low", ".conf.up"))
-    ret <- fitted.marssMLE(newMLEobj, type=type, interval=interval, conf.level=conf.level[1])[cols]
-    colnames(ret)[which(colnames(ret)==".fitted")] <- "estimate"
-    colnames(ret)[which(colnames(ret) %in% c(".sd.y", ".se.fit"))] <- "se"
-    colnames(ret)[which(colnames(ret)==".lwr")] <- paste("Lo", 100*conf.level[1])
-    colnames(ret)[which(colnames(ret)==".upr")] <- paste("Hi", 100*conf.level[1])
-    colnames(ret)[which(colnames(ret)==".conf.low")] <- paste("Lo", 100*conf.level[1])
-    colnames(ret)[which(colnames(ret)==".conf.up")] <- paste("Hi", 100*conf.level[1])
-    if(length(conf.level) > 1){
-      for(i in 2:length(conf.level)){
-        cols <- switch(interval,
-                       prediction = c(".lwr", ".upr"),
-                       confidence = c(".conf.low", ".conf.up"))
-        tmp <- fitted.marssMLE(newMLEobj, type=type, interval=interval, conf.level=conf.level[i])[cols]
-        colnames(tmp) <- paste(c("Lo", "Hi"), 100*conf.level[i])
-        ret <- cbind(ret, tmp)
-      }
-    }
-  }
-  if(type=="xtT"){
-    conf.int <- TRUE
-    if(length(conf.level) == 0 || interval == "none") conf.int <- FALSE
-    ret <- tidy.marssMLE(newMLEobj, type=type, conf.int=conf.int, conf.level=conf.level[1])
-    colnames(ret)[which(colnames(ret)=="std.error")] <- ".sd"
-    colnames(ret)[which(colnames(ret)=="conf.low")] <- paste("Lo", 100*conf.level[1])
-    colnames(ret)[which(colnames(ret)=="conf.high")] <- paste("Hi", 100*conf.level[1])
-    if(length(conf.level) > 1){
-      for(i in 2:length(conf.level)){
-        tmp <- tidy.marssMLE(newMLEobj, type=type, conf.int=TRUE, conf.level=conf.level[i])[c("conf.low", "conf.high")]
-        colnames(tmp) <- paste(c("Lo", "Hi"), 100*conf.level[i])
-        ret <- cbind(ret, tmp)
-      }
+                   prediction = c(".lwr", ".upr"),
+                   confidence = c(".conf.low", ".conf.up"))
+    for(i in 2:length(level)){
+      tmp <- MARSSpredict(newMLEobj, type=type, interval=interval, level=level[i])[cols]
+      colnames(tmp) <- paste(c("Lo", "Hi"), 100*level[i])
+      ret <- cbind(ret, tmp)
     }
   }
   
@@ -139,7 +124,7 @@ forecast.marssMLE <- function(object, h=10,
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
-    level = 100*conf.level,
+    level = 100*level,
     type = type,
     pred = ret,
     t = 1:(TT+h),
@@ -150,8 +135,6 @@ forecast.marssMLE <- function(object, h=10,
     tinitx = object[["model"]][["tinitx"]],
     newdata = newdata
   )
-  tmp <- colnames(outlist[["pred"]])
-  colnames(outlist[["pred"]])[which(tmp == ".sd")] <- "se"
   
   class(outlist) <- "marssPredict"
   

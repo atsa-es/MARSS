@@ -7,7 +7,7 @@
 }
 \usage{
 \method{forecast}{marssMLE}(object, h=10,
-    conf.level = c(0.80, 0.95),
+    level = c(0.80, 0.95),
     type = c("ytT", "xtT"),
     newdata = list(y = NULL, c=NULL, d=NULL),
     interval = c("prediction", "confidence", "none"),
@@ -16,7 +16,7 @@
   \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
   \item{h}{ Number of steps ahead to forecast. \code{newdata} is for the forecast, i.e. for the \eqn{h} time steps after the end of the model data. If there are covariates, \eqn{c} or \eqn{d}, then \code{newdata} is required. See details. }
-  \item{conf.level}{ Level for the intervals if \code{interval != "none"}.}
+  \item{level}{ Level for the intervals if \code{interval != "none"}.}
   \item{type}{ Observations (ytT) or the states (xtT). }
   \item{newdata}{ An optional list with matrices for new covariates \eqn{c} or \eqn{d} to use for the forecasts. \eqn{c} and \eqn{d} must be in the original model and have the same matrix rows and columns as used in the \code{\link{MARSS}()} call but the number of time steps can be different. }
   \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence interval of the expected value of \eqn{\mathbf{y}_t}{y(t)} (ytT) or \eqn{\mathbf{x}_t}{x(t)} (xtT) is returned. \code{interval="prediction"} (default) returns prediction intervals which include the uncertainty in the expected value and due to observation error (the \eqn{R} in the \eqn{y} equation). Note, in the context of a MARSS model, only confidence intervals are available for xtT. }
@@ -29,7 +29,7 @@
 \item{method}{The method used for fitting, e.g. "kem". }
 \item{model}{The \code{\link{marssMLE}} object passed into \code{forecast.marssMLE()}. }
 \item{newdata}{The \code{newdata} list if passed into \code{forecast.marssMLE()}.}
-\item{level}{The \code{conf.level} passed into \code{forecast.marssMLE()}.}
+\item{level}{The confidence \code{level} passed into \code{forecast.marssMLE()}.}
 \item{pred}{A data frame the forecasts along with the intervals. }
 \item{type}{The \code{type} ("ytT" or "xtT") passed into \code{forecast.marssMLE()}.}
 \item{t}{The time steps used to fit the model (used for plotting).}
