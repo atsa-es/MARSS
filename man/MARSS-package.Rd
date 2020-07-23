@@ -43,16 +43,17 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
       \item{\code{\link{fitted.marssMLE}}}{ Fitted Y and X estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t.} 
       \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
-      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates and fitted Y and X estimates output as a data frame. With confidence intervals if requested} 
+      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates with confidence intervals } 
       \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a data frame. } 
-      \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame. } 
+      \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame or matrices. Normal user interface to residuals is \code{residuals.marssMLE}.} 
+      \item{\code{\link{predict.marssMLE}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
+      \item{\code{\link{MARSSpredict}}}{ Model x or y predictions as a data frame or matrices. Normal user interface to predictions is \code{predict.marssMLE}. } 
       \item{\code{\link{plot.marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
       \item{\code{\link{autoplot.marssMLE}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
       \item{\code{\link{glance.marssMLE}}}{ Brief summary of fit. } 
       \item{\code{\link{logLik.marssMLE}}}{ Log-likelihood. }
       \item{\code{\link{print.marssMLE}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
       \item{\code{\link{print.marssMODEL}}}{ Prints description of the MARSS model (\code{\link{marssMODEL}} object). }
-      \item{\code{\link{predict.marssMLE}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
       \item{\code{\link{plot.marssPredict}}}{ Plot a prediction or forecast. } 
       \item{\code{\link{toLatex.marssMODEL}}}{ Outputs a LaTeX version of the model. }
     }
