@@ -6,7 +6,6 @@ export(
   MARSS,
   MARSSaic,
   MARSSboot,
-  MARSSest,
   MARSShessian,
   MARSSinfo,
   MARSSinits,
@@ -19,7 +18,6 @@ export(
   MARSSkfas,
   MARSSoptim,
   MARSSparamCIs,
-  MARSSpredict,
   MARSSresiduals,
   MARSSsimulate,
   MARSSFisherI,
@@ -63,6 +61,7 @@ S3method(model.frame, marssMLE)
 S3method(simulate, marssMLE)
 S3method(toLatex, marssMODEL)
 S3method(toLatex, marssMLE)
+S3method(stats::tsSmooth, marssMLE)
 
 # Declare these methods if the user has the package
 if(getRversion() >= "3.6.0") {
