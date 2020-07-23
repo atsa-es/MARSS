@@ -417,7 +417,7 @@ In the MARSS package, this is returned with `broom::tidy(x, type="ytt")`. The `"
 
 <<label=Cs16_fitted-bsm-compare>>=
 fitted2 <- fitted(fit2, type="ytt")
-ggplot(fitted2, aes(x=t, y=.fitted)) +
+ggplot(fitted2, aes(x=t, y=estimate)) +
   geom_line() +
   facet_wrap(~.rownames)
 @
