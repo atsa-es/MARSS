@@ -57,13 +57,13 @@ plot.marssMLE <-
     
     if ("model.ytT" %in% plot.type) {
       # make plot of observations
-      df <- MARSSpredict(x, type = "ytT", interval="confidence", level=conf.level)
-      df$ymin <- df$conf.low
-      df$ymax <- df$conf.up
+      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", level=conf.level)
+      df$ymin <- df$.conf.low
+      df$ymax <- df$.conf.up
       if (pi.int){
-        df2 <- MARSSpredict(x, type = "ytT", interval="prediction", level=conf.level)
-        df$ymin.pi <- df2$lwr
-        df$ymax.pi <- df2$upr
+        df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", level=conf.level)
+        df$ymin.pi <- df2$.lwr
+        df$ymax.pi <- df2$.upr
       }
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -74,12 +74,12 @@ plot.marssMLE <-
         if (conf.int) tit <- paste(tit, "+ CI")
         if (pi.int) tit <- paste(tit, "+ PI (dashed)")
         with(subset(df, df$.rownames == plt), {
-          ylims <- c(min(prediction, y, ymin, ymax, na.rm = TRUE), max(prediction, y, ymin, ymax, na.rm = TRUE))
-          plot(t, prediction, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          ylims <- c(min(.fitted, y, ymin, ymax, na.rm = TRUE), max(.fitted, y, ymin, ymax, na.rm = TRUE))
+          plot(t, .fitted, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)
-          lines(t, prediction, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
           if (pi.int){
             lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
             lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
@@ -107,7 +107,7 @@ plot.marssMLE <-
         rotate <- FALSE
       }
       
-      states <- fitted.marssMLE(x, type = "xtT", interval = ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
+      states <- tsSmooth.marssMLE(x, type = "xtT", interval = ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -125,11 +125,11 @@ plot.marssMLE <-
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
       for (plt in unique(states$.rownames)) {
         with(subset(states, states$.rownames == plt), {
-          ylims <- c(min(estimate, conf.low, na.rm = TRUE), max(estimate, conf.high, na.rm = TRUE))
-          plot(t, estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          ylims <- c(min(.estimate, .conf.low, na.rm = TRUE), max(.estimate, .conf.up, na.rm = TRUE))
+          plot(t, .estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(plt)
-          if (conf.int) polygon(c(t, rev(t)), c(conf.low, rev(conf.high)), col = plotpar$ci.col, border = plotpar$ci.border)
-          lines(t, estimate)
+          if (conf.int) polygon(c(t, rev(t)), c(.conf.low, rev(.conf.up)), col = plotpar$ci.col, border = plotpar$ci.border)
+          lines(t, .estimate)
           box()
         })
       }
@@ -331,10 +331,10 @@ plot.marssMLE <-
     
     if ("ytT" %in% plot.type) {
       # make plot of expected value of y
-      df <- fitted.marssMLE(x, type = "ytT", interval=ifelse(conf.int, "confidence", "none"))
+      df <- tsSmooth.marssMLE(x, type = "ytT", interval=ifelse(conf.int, "confidence", "none"))
       if(cont.int){
-        df$ymin <- df$conf.low
-        df$ymax <- df$conf.high
+        df$ymin <- df$.conf.low
+        df$ymax <- df$.conf.up
       }
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -344,8 +344,8 @@ plot.marssMLE <-
         tit <- plt
         if (conf.int) tit <- paste(tit, "+ CI")
         with(subset(df, df$.rownames == plt), {
-          ylims <- c(min(estimate, y, ymin, ymax, na.rm = TRUE), max(estimate, y, ymin, ymax, na.rm = TRUE))
-          plot(t, estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          ylims <- c(min(.estimate, y, ymin, ymax, na.rm = TRUE), max(.estimate, y, ymin, ymax, na.rm = TRUE))
+          plot(t, .estimate, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)

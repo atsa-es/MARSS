@@ -47,13 +47,13 @@ residuals_marxss <- function(x, type, standardization, ...) {
   # First y
   type1 <- paste0("y", type)
   data.names <- attr(model, "Y.names")
-  fit.list <- MARSSpredict(x, type = type1, interval="none")
+  fit.list <- fitted.marssMLE(x, type = type1, interval="none")
   ret <- data.frame(
     .rownames = fit.list$.rownames,
     type = "model",
     t = fit.list$t,
     value = fit.list$y,
-    .fitted = fit.list$prediction,
+    .fitted = fit.list$.fitted,
     stringsAsFactors = FALSE
   )
   ret <- cbind(ret,
@@ -76,15 +76,15 @@ residuals_marxss <- function(x, type, standardization, ...) {
       state.std.resids <- resids$std.residuals[(nn + 1):(nn + mm), , drop = FALSE]
     if(standardization=="marginal") 
       state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
-    fit.list <- MARSSpredict(x, type = type1, interval="none")
-    if (type1=="xtt1") fit.list$value <- fit.list$xtt
-    if (type1=="xtT") fit.list$value <- fit.list$xtT
+    fit.list <- fitted.marssMLE(x, type = type1, interval="none")
+    if (type1=="xtt1") fit.list$value <- fit.list$.xtt
+    if (type1=="xtT") fit.list$value <- fit.list$.xtT
     ret2 <- data.frame(
       .rownames = fit.list$.rownames,
       type = "state",
       t = fit.list$t,
       value = fit.list$value,
-      .fitted = fit.list$prediction,
+      .fitted = fit.list$.fitted,
       .resids = vec(t(state.resids)),
       .sigma = vec(t(state.se.resids)),
       .std.resid = vec(t(state.std.resids)),

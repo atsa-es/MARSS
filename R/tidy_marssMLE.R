@@ -39,7 +39,7 @@ tidy.marssMLE <- function(x, conf.int = TRUE, conf.level = 0.95, ...) {
         ret <- cbind(ret,
           std.error = coef(x, type = "vector", what = "par.se"),
           conf.low = coef(x, type = "vector", what = "par.lowCI"),
-          conf.high = coef(x, type = "vector", what = "par.upCI")
+          conf.up = coef(x, type = "vector", what = "par.upCI")
         )
       }
     }
