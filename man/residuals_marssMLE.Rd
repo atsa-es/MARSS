@@ -31,9 +31,9 @@ A data frame with the following columns:
 \item{type}{model or state}
 \item{t}{time step}
 \item{value}{The data value if type="model" or the x estimate if type="state". }
-\item{.pred}{Model predicted values of observations or states. See details.}
+\item{.fitted}{Model predicted values of observations or states. See details.}
 \item{.resids}{Model or states residuals. See details.}
-\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .pred.}
+\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .fitted.}
 \item{.std.resid}{Standardized residuals. See \code{\link{MARSSresiduals}} for a discussion of residual standardization.}
 
 }
@@ -72,10 +72,10 @@ theme_set(theme_bw())
 
 # Make a plot of the observations and residuals intervals
 d <- residuals(fit)
-d$.conf.low <- d$.pred+qnorm(0.05/2)*d$.sigma
-d$.conf.up <- d$.pred-qnorm(0.05/2)*d$.sigma
+d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
-  geom_line(aes(t, .pred)) +
+  geom_line(aes(t, .fitted)) +
   geom_point(aes(t, value)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
   facet_grid(~.rownames) +
@@ -86,7 +86,7 @@ ggplot(data = d) +
 d <- residuals(fit, type = "smoothations")
 ggplot(data = d) +
   geom_point(aes(t, value)) +
-  geom_line(aes(x = t, .pred), color="blue") +
+  geom_line(aes(x = t, .fitted), color="blue") +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("xtT (points) and predition (line)")

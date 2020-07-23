@@ -53,7 +53,7 @@ residuals_marxss <- function(x, type, standardization, ...) {
     type = "model",
     t = fit.list$t,
     value = fit.list$y,
-    .pred = fit.list$.pred,
+    .fitted = fit.list$prediction,
     stringsAsFactors = FALSE
   )
   ret <- cbind(ret,
@@ -84,7 +84,7 @@ residuals_marxss <- function(x, type, standardization, ...) {
       type = "state",
       t = fit.list$t,
       value = fit.list$value,
-      .pred = fit.list$.pred,
+      .fitted = fit.list$prediction,
       .resids = vec(t(state.resids)),
       .sigma = vec(t(state.se.resids)),
       .std.resid = vec(t(state.std.resids)),
