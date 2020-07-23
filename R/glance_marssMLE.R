@@ -6,7 +6,7 @@ glance.marssMLE <- function(x, ...) {
   a <- subset(a, a$type=="model")
   a <- na.omit(a)
   ret <- data.frame(
-    coef.det = cor(a$.pred, a$value)^2,
+    coef.det = cor(a$.fitted, a$value)^2,
     sigma = var(a$.resids),
     df = x$num.params,
     logLik = x$logLik,
