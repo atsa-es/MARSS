@@ -19,7 +19,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
     ytT = model.dims[["y"]][1],
     ytt = model.dims[["y"]][1],
     ytt1 = model.dims[["y"]][1],
-    xtT = model.dims[["x"]][1]
+    xtT = model.dims[["x"]][1],
     xtt1 = model.dims[["x"]][1]
   )
 
@@ -66,7 +66,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
     if (!missingx0) message("predict.marssMLE: x0 was passed in. This is ignored since n.ahead > 0 (forecast). x at time T is used for x0.")
 
     outlist <- forecast.marssMLE(object,
-      h = n.ahead, conf.level = level,
+      h = n.ahead, level = level,
       interval = interval,
       type = type, newdata = newdata,
       fun.kf = fun.kf, ...
