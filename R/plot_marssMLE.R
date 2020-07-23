@@ -1,6 +1,6 @@
 plot.marssMLE <-
   function(x,
-           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
+           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), ...) {
@@ -8,7 +8,7 @@ plot.marssMLE <-
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
     old.plot.type = c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations")
-    new.plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT")
+    new.plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT")
     for(i in 1:NROW(old.plot.type)) if(old.plot.type[i] %in% plot.type) plot.type[plot.type==old.plot.type[i]] <- new.plot.type[i]
     if (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0) stop("plot.marssMLE: conf.level must be between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
@@ -43,9 +43,9 @@ plot.marssMLE <-
     extras <- list()
     if (!missing(...)) {
       extras <- list(...)
-      allowednames <- c("rotate", "method", "hessian.fun", "nboot")
+      allowednames <- c("rotate")
       bad.names <- names(extras)[!(names(extras) %in% allowednames)]
-      if (!all(names(extras) %in% allowednames)) stop(paste("plot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?tidy.marssMLE for allowed arguments.\n"), call. = FALSE)
+      if (!all(names(extras) %in% allowednames)) stop(paste("plot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?fitted.marssMLE for allowed arguments.\n"), call. = FALSE)
       if (model_form != "dfa" & "rotate" %in% names(extras)) {
         cat("plot.marssMLE: 'rotate' argument is ignored if form!='dfa'\n Pass in form='dfa' if your model is a DFA model, but the form \n attribute is not set (because you set up your DFA model manually).\n\n")
         rotate <- FALSE
@@ -55,13 +55,13 @@ plot.marssMLE <-
     
     alpha <- 1 - conf.level
     
-    if ("fitted.ytT" %in% plot.type) {
+    if ("model.ytT" %in% plot.type) {
       # make plot of observations
-      df <- fitted.marssMLE(x, type = "ytT", interval="confidence", conf.level=conf.level, form = model_form)
+      df <- MARSSpredict(x, type = "ytT", interval="confidence", level=conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
       if (pi.int){
-        df2 <- fitted.marssMLE(x, type = "ytT", interval="prediction", conf.level=conf.level, form = model_form)
+        df2 <- MARSSpredict(x, type = "ytT", interval="prediction", level=conf.level)
         df$ymin.pi <- df2$.lwr
         df$ymax.pi <- df2$.upr
       }
@@ -74,12 +74,12 @@ plot.marssMLE <-
         if (conf.int) tit <- paste(tit, "+ CI")
         if (pi.int) tit <- paste(tit, "+ PI (dashed)")
         with(subset(df, df$.rownames == plt), {
-          ylims <- c(min(.fitted, y, ymin, ymax, na.rm = TRUE), max(.fitted, y, ymin, ymax, na.rm = TRUE))
-          plot(t, .fitted, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          ylims <- c(min(.pred, y, ymin, ymax, na.rm = TRUE), max(.pred, y, ymin, ymax, na.rm = TRUE))
+          plot(t, .pred, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)
-          lines(t, .fitted, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          lines(t, .pred, col = plotpar$line.col, lwd = plotpar$line.lwd)
           if (pi.int){
             lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
             lines(t, ymax.pi, col = "black", lwd = 1, lty=2)
@@ -87,8 +87,8 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "fitted.ytT"]
-      cat(paste("plot type = \"fitted.ytT\" Observations with fitted values\n"))
+      plot.type <- plot.type[plot.type != "model.ytT"]
+      cat(paste("plot type = \"model.ytT\" Observations with fitted values\n"))
       if (length(plot.type) != 0) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -107,7 +107,7 @@ plot.marssMLE <-
         rotate <- FALSE
       }
       
-      states <- tidy.marssMLE(x, type = "xtT", conf.int = conf.int, conf.level = conf.level, ...)
+      states <- fitted.marssMLE(x, type = "xtT", interval = ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -331,9 +331,11 @@ plot.marssMLE <-
     
     if ("ytT" %in% plot.type) {
       # make plot of expected value of y
-      df <- tidy.marssMLE(x, type = "ytT", form = "marxss")
-      df$ymin <- df$conf.low
-      df$ymax <- df$conf.high
+      df <- fitted.marssMLE(x, type = "ytT", interval=ifelse(conf.int, "confidence", "none"))
+      if(cont.int){
+        df$ymin <- df$conf.low
+        df$ymax <- df$conf.high
+      }
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
