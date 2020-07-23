@@ -143,26 +143,26 @@ MARSSpredict <- function(object,
   
   if (interval=="none"){
     if(output=="matrix") return(val)
-    retlist = list(.pred=val)
+    retlist = list(prediction=val)
   }
   if (interval=="confidence"){
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
     retlist <- list(
-      .pred = val, 
-      .se = se,
-      .conf.low = val + qnorm(alpha/2) * se,
-      .conf.up = val + qnorm(1- alpha/2) * se
+      prediction = val, 
+      se = se,
+      conf.low = val + qnorm(alpha/2) * se,
+      conf.up = val + qnorm(1- alpha/2) * se
     )
   }
   if (interval=="prediction"){
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
       retlist <-list(
-        .pred = val, 
-        .sd = se, 
-        .lwr = val + qnorm(alpha/2) * se,
-        .upr = val + qnorm(1- alpha/2) * se
+        prediction = val, 
+        sd = se, 
+        lwr = val + qnorm(alpha/2) * se,
+        upr = val + qnorm(1- alpha/2) * se
       )
   }
   if(output=="matrix") return(retlist)
