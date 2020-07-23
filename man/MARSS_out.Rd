@@ -46,7 +46,6 @@ The function you want to use depends on what you are trying to do.
 \item{One-step-ahead predictions of y}{Use \code{fitted.marssMLE} with \code{type="ytt1"} and \code{fit.type="prediction"} or \code{predict.marssMLE} with \code{type="ytt1"}. Confidence (mean prediction) and prediction intervals (new data) are returned.  }
 \item{One-step-ahead forecast errors}{Same as one-step-ahead above or use \code{\link{residuals.marssMLE}} with \code{type="innovations"}. }
 }
-}
 
 
 }

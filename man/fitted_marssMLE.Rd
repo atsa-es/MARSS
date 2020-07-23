@@ -33,7 +33,7 @@ If \code{interval="none"}, the following are returned:
 \item{.rownames}{ Names of the data or states. }
 \item{t}{ Time step. }
 \item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
-\item{.xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type} is \code{"xtT""}. From \code{\link{tsSmooth.marssMLE}()}. }
+\item{.xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type} is \code{"xtT"}. From \code{\link{tsSmooth.marssMLE}()}. }
 \item{.xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type} is \code{"xtt1"}. From \code{\link{tsSmooth.marssMLE}()}. }
 \item{.fitted}{Predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
 
