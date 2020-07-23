@@ -58,12 +58,12 @@ plot.marssMLE <-
     if ("model.ytT" %in% plot.type) {
       # make plot of observations
       df <- MARSSpredict(x, type = "ytT", interval="confidence", level=conf.level)
-      df$ymin <- df$.conf.low
-      df$ymax <- df$.conf.up
+      df$ymin <- df$conf.low
+      df$ymax <- df$conf.up
       if (pi.int){
         df2 <- MARSSpredict(x, type = "ytT", interval="prediction", level=conf.level)
-        df$ymin.pi <- df2$.lwr
-        df$ymax.pi <- df2$.upr
+        df$ymin.pi <- df2$lwr
+        df$ymax.pi <- df2$upr
       }
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -74,12 +74,12 @@ plot.marssMLE <-
         if (conf.int) tit <- paste(tit, "+ CI")
         if (pi.int) tit <- paste(tit, "+ PI (dashed)")
         with(subset(df, df$.rownames == plt), {
-          ylims <- c(min(.pred, y, ymin, ymax, na.rm = TRUE), max(.pred, y, ymin, ymax, na.rm = TRUE))
-          plot(t, .pred, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
+          ylims <- c(min(prediction, y, ymin, ymax, na.rm = TRUE), max(prediction, y, ymin, ymax, na.rm = TRUE))
+          plot(t, prediction, type = "l", xlab = "", ylab = "Estimate", ylim = ylims)
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           if (decorate) points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex=plotpar$point.size)
-          lines(t, .pred, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          lines(t, prediction, col = plotpar$line.col, lwd = plotpar$line.lwd)
           if (pi.int){
             lines(t, ymin.pi, col = "black", lwd = 1, lty=2)
             lines(t, ymax.pi, col = "black", lwd = 1, lty=2)

@@ -107,17 +107,17 @@ autoplot.marssMLE <-
       if (conf.int) tit <- paste(tit, "+ CI")
       if (pi.int) tit <- paste(tit, "+ PI (dashed)")
       df <- MARSSpredict(x, type = "ytT", interval = "confidence", level = conf.level)
-      df$ymin <- df$.conf.low
-      df$ymax <- df$.conf.up
-      p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.pred))
+      df$ymin <- df$conf.low
+      df$ymax <- df$conf.up
+      p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~prediction))
       if (conf.int) {
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       if (pi.int) {
         df2 <- MARSSpredict(x, type = "ytT", interval = "prediction", level = conf.level)
-        df$ymin.pi <- df2$.lwr
-        df$ymax.pi <- df2$.upr
+        df$ymin.pi <- df2$lwr
+        df$ymax.pi <- df2$upr
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.pi), linetype = "dashed")
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.pi), linetype = "dashed")
       }
