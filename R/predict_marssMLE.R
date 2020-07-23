@@ -2,7 +2,7 @@
 ##################################################################################
 predict.marssMLE <- function(object, n.ahead = 0,
                              level = c(0.80, 0.95),
-                             type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
+                             type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
                              newdata = list(t = NULL, y = NULL, c = NULL, d = NULL),
                              interval = c("none", "confidence", "prediction"),
                              fun.kf = c("MARSSkfas", "MARSSkfss"),
@@ -228,28 +228,30 @@ predict.marssMLE <- function(object, n.ahead = 0,
     )
   } # end setting up newMLEobj
 
-  if (type == "xtT") estcol="xtT"
-  if (type == "xtt1") estcol="xtt"
+  if (type == "xtT") estcol=".xtT"
+  if (type == "xtt1") estcol=".xtt"
   if (type %in% c("ytT", "ytt", "ytt1")) estcol="y"
   cols <- switch(interval,
-                   prediction = c(".rownames", "t", estcol, "prediction", "sd", "lwr", "upr"),
-                   none = c(".rownames", "t", "xtT", "prediction"),
-                   confidence = c(".rownames", "t", "xtT", "prediction", "se", "conf.low", "conf.up")
+                   prediction = c(".rownames", "t", estcol, ".fitted", ".sd", ".lwr", ".upr"),
+                   none = c(".rownames", "t", estcol, ".fitted"),
+                   confidence = c(".rownames", "t", estcol, ".fitted", ".se", ".conf.low", ".conf.up")
     )
-    ret <- MARSSpredict(newMLEobj, type = type, interval = interval, 
+    ret <- fitted.marssMLE(newMLEobj, type = type, interval = interval, 
                         level = level[1], output="data.frame")[cols]
-    colnames(ret)[which(colnames(ret) == "sd")] <- "se"
-    colnames(ret)[which(colnames(ret) == "lwr")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == "upr")] <- paste("Hi", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == "conf.low")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == "conf.up")] <- paste("Hi", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == ".fitted")] <- "estimate"
+    colnames(ret)[which(colnames(ret) == ".sd")] <- "se"
+    colnames(ret)[which(colnames(ret) == ".se")] <- "se"
+    colnames(ret)[which(colnames(ret) == ".lwr")] <- paste("Lo", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == ".upr")] <- paste("Hi", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == ".conf.low")] <- paste("Lo", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == ".conf.up")] <- paste("Hi", 100 * level[1])
     if (interval != "none" && length(level) > 1) {
       for (i in 2:length(level)) {
         cols <- switch(interval,
-                       prediction = c("lwr", "upr"),
-                       confidence = c("conf.low", "conf.up")
+                       prediction = c(".lwr", ".upr"),
+                       confidence = c(".conf.low", ".conf.up")
         )
-        tmp <- MARSSpredict(newMLEobj, type = type, interval = interval, 
+        tmp <- fitted.marssMLE(newMLEobj, type = type, interval = interval, 
                             level = level[i], output="data.frame")[cols]
         colnames(tmp) <- paste(c("Lo", "Hi"), 100 * level[i])
         ret <- cbind(ret, tmp)
