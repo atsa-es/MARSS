@@ -31,9 +31,9 @@ A data frame with the following columns:
 \item{type}{model or state}
 \item{t}{time step}
 \item{value}{The data value if type="model" or the x estimate if type="state". }
-\item{.fitted}{Fitted values of observations or states. See details.}
+\item{.pred}{Model predicted values of observations or states. See details.}
 \item{.resids}{Model or states residuals. See details.}
-\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .fitted.}
+\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .pred.}
 \item{.std.resid}{Standardized residuals. See \code{\link{MARSSresiduals}} for a discussion of residual standardization.}
 
 }
@@ -47,13 +47,13 @@ The model residuals are in the data frame with \code{.type="model"}.
 
 The model residuals are the familar type of residuals, they are the difference between the data at time t and the predictied value at time t. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="smoothations"}, the predicted value is the expected value of \eqn{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{x} at time t (\code{xtT}).  If \code{type="innovations"}, the predicted value is the expected value of \eqn{y} conditioned on the data up to time t-1, i.e. is computed using the estimate of \eqn{x} at time t conditioned on the data up to time t-1 (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
 
-The standard errors help visualize how well the model fits to the data.  See \code{\link{fitted.marssMLE}} for a discussion of the calculation of the fitted values for the observations (the modeled values).  The standardized residuals can be used for outlier detection.  See \code{\link{MARSSresiduals}} and the chapter on shock detection in the MARSS User Guide.
+The standard errors help visualize how well the model fits to the data.  See \code{\link{MARSSpredict}} for a discussion of the calculation of the modeled values for the observations.  The standardized residuals can be used for outlier detection.  See \code{\link{MARSSresiduals}} and the chapter on shock detection in the MARSS User Guide.
 
 \strong{state residuals}
 
 The state residuals are in the data frame with \code{.type="state"}.
 
-If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link{tidy.marssMLE}} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object. 
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link{fitted.marssMLE}} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object. 
 
 The state residuals are only for state-space models. At time t, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state given the estimate of the state at time t, thus it is the residual for the state transition from t to t+1. For the state residuals, the "value"" depends on whether you are compute "smoothations" or "innovations" state residuals. If \code{type="smoothations"}, the value is the smoothed estimate (\eqn{xtT}) at time t+1 and the predicted value is the expected value of \eqn{x} computed using the smoothed estimated of \eqn{x} at time t, so is \eqn{B xtT[,t] + u}).  If \code{type="innovations"}, the value is expected value of \eqn{x} conditioned on the data up to time t+1 and the predicted value is computed using the expected value of \eqn{x} conditioned on the data up to time t, i.e. \eqn{B xtt[,t]} + u or \eqn{xtt1[,t+1]}.
 
@@ -72,10 +72,10 @@ theme_set(theme_bw())
 
 # Make a plot of the observations and residuals intervals
 d <- residuals(fit)
-d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
-d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
+d$.conf.low <- d$.pred+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.pred-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
-  geom_line(aes(t, .fitted)) +
+  geom_line(aes(t, .pred)) +
   geom_point(aes(t, value)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
   facet_grid(~.rownames) +
@@ -86,7 +86,7 @@ ggplot(data = d) +
 d <- residuals(fit, type = "smoothations")
 ggplot(data = d) +
   geom_point(aes(t, value)) +
-  geom_line(aes(x = t, .fitted), color="blue") +
+  geom_line(aes(x = t, .pred), color="blue") +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
   ggtitle("xtT (points) and predition (line)")
