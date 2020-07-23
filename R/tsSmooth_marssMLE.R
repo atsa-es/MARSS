@@ -1,41 +1,41 @@
-###############################################################################################################################################
-#  Return the estimated states and observations with different conditioning for class marssMLE
-#  Companion to MARSSpredict
 ##############################################################################################################################################
-MARSSest <- function(object, 
-    type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1"),
-    interval = c("none", "confidence", "prediction"),
-    level = 0.95, ...) {
+#  Return the estimated states and observations with different conditioning for class marssMLE
+#  Companion to fitted.marssMLE
+##############################################################################################################################################
+tsSmooth.marssMLE <- function(object, 
+                              type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1"),
+                              interval = c("none", "confidence", "prediction"),
+                              level = 0.95, ...) {
   ## Argument checking
   type <- match.arg(type)
   interval <- match.arg(interval)
   if(interval == "prediction" && type != "ytT")
-    stop("MARSSest: prediction intervals only available for ytT.")
+    stop("tsSmooth.marssMLE: prediction intervals only available for ytT.")
   if(interval != "none" && type == "ytt")
-    stop("MARSSest: MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
+    stop("tsSmooth.marssMLE: MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
   if(interval != "none" && type == "ytt1")
-    stop("MARSSest: MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs for ytt1.")
+    stop("tsSmooth.marssMLE: MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs for ytt1.")
   if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0))
-    stop("MARSSest: level must be a single number between 0 and 1.", call. = FALSE)
+    stop("tsSmooth.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
   ## End Argument checking
-
+  
   alpha <- 1 - level
-
-    extras <- list()
+  
+  extras <- list()
   if (!missing(...)) {
     extras <- list(...)
     if (!all(names(extras) %in% c("rotate"))) stop("Unknown extra argument. Only rotate allowed if form='dfa'.\n")
   }
-
+  
   # set rotate
   rotate <- FALSE
   if ("rotate" %in% names(extras)) {
-    if (form != "dfa") stop("MARSSest: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
+    if (form != "dfa") stop("tsSmooth.marssMLE: rotate only makes sense if form='dfa'.\n  Pass in form='dfa' if your model is a DFA model, but the form\n attribute is not set (because you set up your DFA model manually). \n", call. = FALSE)
     rotate <- extras[["rotate"]]
-    if (!(rotate %in% c(TRUE, FALSE))) stop("MARSSest: rotate must be TRUE/FALSE. \n", call. = FALSE)
-    if( rotate && attr(object[["model"]], "model.dims")[["Z"]][3]!=1 ) stop("MARSSest: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
+    if (!(rotate %in% c(TRUE, FALSE))) stop("tsSmooth.marssMLE: rotate must be TRUE/FALSE. \n", call. = FALSE)
+    if( rotate && attr(object[["model"]], "model.dims")[["Z"]][3]!=1 ) stop("tsSmooth.marssMLE: if rotate = TRUE, Z must be time-constant. \n", call. = FALSE)
   }
-
+  
   if (type %in% c("xtT", "xtt", "xtt1")) {
     xtype <- type
     model <- object[["model"]]
@@ -56,7 +56,7 @@ MARSSest <- function(object,
     states.se[states.se < 0] <- NA
     states.se <- sqrt(states.se)
     if (mm == 1) states.se <- matrix(states.se, 1, TT)
-
+    
     # if user specified rotate, 
     # I specified that Z (in marxss form) must be time-constant
     if (form == "dfa" && rotate && length(object[["par"]][["Z"]]) != 0) {
@@ -82,8 +82,8 @@ MARSSest <- function(object,
       conf.low <- qnorm(alpha / 2) * ret$se + ret$estimate
       conf.up <- qnorm(1 - alpha / 2) * ret$se + ret$estimate
       ret <- cbind(ret,
-        conf.low = conf.low,
-        conf.high = conf.up
+                   conf.low = conf.low,
+                   conf.high = conf.up
       )
     }
     rownames(ret) <- NULL
