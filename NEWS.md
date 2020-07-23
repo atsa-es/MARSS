@@ -37,6 +37,13 @@ Status
 * Working on innovations state residuals. Finished. Residuals.Rnw and MARSSresiduals.tt1()
 * Changed ACF plots to be for the innovations residuals. Smoothation residuals are temporally correlated.
 
+7-22-2020
+
+* Revamped fitted, tidy and predict. 
+* fitted.marssMLE -> MARSSpredict. 
+* tidy.marssMLE -> fitted.marssMLE (the observations and states bit). tidy only return parameter info
+* predict.marssMLE updated to use ytt1, ytt, ytt1. Only minor changes to predict.marssMLE.
+
 To do
 
 * Work on fitted() and residuals() for StructTS models.
@@ -46,7 +53,7 @@ To do
     
 MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
-Version 3.11.0 is focused on the `predict` function and updating the structure of the `residuals` functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
+Version 3.11.0 is focused on the `predict`, `fitted` and `residuals` functions functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
 
 
 ENHANCEMENTS
@@ -56,6 +63,7 @@ ENHANCEMENTS
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
 * Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. This required changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* Revamped `fitted.marssMLE` and `tidy.marssMLE`. `fitted.marssMLE` now returned the estimates from the Kalman filter or smoother which `tidy.marssMLE` had returned. `tidy.marssMLE` only returns a data frame for the parameter estimates.
 * V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
 
 BUGS
@@ -78,6 +86,8 @@ DOCUMENTATION and MAN FILES
 
 OTHER
 
+* `fitted.marssMLE` now called `MARSSpredict`. It is the expected value of the right side of the MARSS equations.
+* The part of `tidy.marssMLE` related to states and observations was moved to `fitted.marssMLE`. It is the expected value of the left side of the MARSS equations.
 * Changed `fitted.marssMLE` to have column with xtt when type="xtt1" instead of xtT.
 * Changed the x0 estimation behavior for `predict.marssMLE()` when no data passed in.
 * Added x0 argument to `predict.marssMLE()` so that user can specify x0 if needed.
