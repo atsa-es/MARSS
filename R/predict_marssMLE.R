@@ -232,24 +232,22 @@ predict.marssMLE <- function(object, n.ahead = 0,
   if (type == "xtt1") estcol="xtt"
   if (type %in% c("ytT", "ytt", "ytt1")) estcol="y"
   cols <- switch(interval,
-                   prediction = c(".rownames", "t", estcol, ".pred", ".sd", ".lwr", ".upr"),
-                   none = c(".rownames", "t", "xtT", ".pred"),
-                   confidence = c(".rownames", "t", "xtT", ".pred", ".se", ".conf.low", ".conf.up")
+                   prediction = c(".rownames", "t", estcol, "prediction", "sd", "lwr", "upr"),
+                   none = c(".rownames", "t", "xtT", "prediction"),
+                   confidence = c(".rownames", "t", "xtT", "prediction", "se", "conf.low", "conf.up")
     )
     ret <- MARSSpredict(newMLEobj, type = type, interval = interval, 
                         level = level[1], output="data.frame")[cols]
-    colnames(ret)[which(colnames(ret) == ".pred")] <- "prediction"
-    colnames(ret)[which(colnames(ret) == ".sd")] <- "se"
-    colnames(ret)[which(colnames(ret) == ".se")] <- "se"
-    colnames(ret)[which(colnames(ret) == ".lwr")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".upr")] <- paste("Hi", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".conf.low")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".conf.up")] <- paste("Hi", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == "sd")] <- "se"
+    colnames(ret)[which(colnames(ret) == "lwr")] <- paste("Lo", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == "upr")] <- paste("Hi", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == "conf.low")] <- paste("Lo", 100 * level[1])
+    colnames(ret)[which(colnames(ret) == "conf.up")] <- paste("Hi", 100 * level[1])
     if (interval != "none" && length(level) > 1) {
       for (i in 2:length(level)) {
         cols <- switch(interval,
-                       prediction = c(".lwr", ".upr"),
-                       confidence = c(".conf.low", ".conf.up")
+                       prediction = c("lwr", "upr"),
+                       confidence = c("conf.low", "conf.up")
         )
         tmp <- MARSSpredict(newMLEobj, type = type, interval = interval, 
                             level = level[i], output="data.frame")[cols]

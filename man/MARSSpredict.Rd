@@ -5,7 +5,7 @@
 \description{
 This function returns the model predictions for the observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}) conditioned on data from 1 to \eqn{t-1}, \eqn{t} or \eqn{T}. The normal user function for this is the \code{predict} method for  \code{\link{marssMLE}} objects: \code{\link{predict.marssMLE}}.
 
-\code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{MARSSpredict(MLEobj)}, where MLEobj is the output from a \code{\link{MARSS}()} call,  will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)}. For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}. 
+\code{MARSSpredict(MLEobj)}, where MLEobj is the output from a \code{\link{MARSS}()} call,  will return the modeled (or predicted) value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)}. For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}. It is the expected value of the right-side of the MARSS equations with the error term (\eqn{\mathbf{w}_t}{w(t)} or \eqn{\mathbf{v}_t}{v(t)}) removed.
 
 If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data or data up to time \eqn{t}, then use \code{\link{fitted.marssMLE}}. Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother (only conditioning on 1 to \eqn{t-1}, \eqn{t} or \eqn{T} is output).
 }
@@ -33,22 +33,22 @@ If \code{interval="none"}, the following are returned:
 \item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
 \item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type} is \code{"xtT"}. From \code{\link{fitted.marssMLE}()}. }
 \item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type} is \code{"xtt1"}. From \code{\link{fitted.marssMLE}()}. }
-\item{.pred}{Predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
+\item{prediction}{Predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
 
 
 If interval = "confidence", the following are also returned:
 
-\item{.se}{ Standard errors of the predictions. }
-\item{.conf.low}{ Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*.se + .pred. }
-\item{.conf.up}{ Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*.se + .pred. }
+\item{se}{ Standard errors of the predictions. }
+\item{conf.low}{ Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*.se + prediction }
+\item{conf.up}{ Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*se + prediction }
 
 The confidence interval is for the predicted value, i.e. \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)} for \eqn{\mathbf{y}}{y} or \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)} for \eqn{\mathbf{x}}{x}.
 
 If interval = "prediction", the following are also returned:
 
-\item{.sd}{ Standard deviation of new \eqn{\mathbf{x}_t}{x(t)} or \eqn{\mathbf{y}_t}{y(t)} iid values. }
-\item{.lwr}{ Lower range at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*.sd + .pred }
-\item{.upr}{ Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2)*.sd + .pred. }
+\item{sd}{ Standard deviation of new \eqn{\mathbf{x}_t}{x(t)} or \eqn{\mathbf{y}_t}{y(t)} iid values. }
+\item{lwr}{ Lower range at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*sd + prediction }
+\item{upr}{ Upper range at \code{level}. The interval is approximated using qnorm(1-alpha/2)*sd + prediction }
 
 The prediction interval is for new \eqn{\mathbf{x}_t}{x(t)} or \eqn{\mathbf{y}_t}{y(t)}, not estimated \eqn{\mathbf{x}_t}{x(t)} nor \eqn{\mathbf{y}_t}{y(t)} used in the model. If you want to evaluate the observed data or the states estimates for outliers then these are not the intervals that you want. For that you need the residuals intervals provided by \code{\link{residuals.marssMLE}}.
 
@@ -100,6 +100,6 @@ mod.list <- list(
 )
 fit <- MARSS(nile, model = mod.list, silent = TRUE)
 plot(nile, type = "p", pch = 16, col = "blue")
-lines(MARSSpredict(fit, type="ytT")$.pred, col = "red", lwd = 2)
-lines(MARSSpredict(fit, type="ytt1")$.pred, col = "grey", lwd = 2)
+lines(MARSSpredict(fit, type="ytT")$prediction, col = "red", lwd = 2)
+lines(MARSSpredict(fit, type="ytt1")$prediction, col = "grey", lwd = 2)
   }
