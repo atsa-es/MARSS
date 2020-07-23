@@ -1,4 +1,5 @@
 ##############################################################################################################################################
+# tsSmooth method for marssMLE objects
 #  Return the estimated states and observations with different conditioning for class marssMLE
 #  Companion to fitted.marssMLE
 ##############################################################################################################################################
@@ -74,16 +75,16 @@ tsSmooth.marssMLE <- function(object,
     ret <- data.frame(
       .rownames = rep(state.names, each = TT),
       t = rep(1:TT, mm),
-      estimate = vec(t(states)),
-      se = vec(t(states.se)),
+      .estimate = vec(t(states)),
+      .se = vec(t(states.se)),
       stringsAsFactors = FALSE
     )
     if (interval == "confidence") {
-      conf.low <- qnorm(alpha / 2) * ret$se + ret$estimate
-      conf.up <- qnorm(1 - alpha / 2) * ret$se + ret$estimate
+      conf.low <- qnorm(alpha / 2) * ret$.se + ret$.estimate
+      conf.up <- qnorm(1 - alpha / 2) * ret$.se + ret$.estimate
       ret <- cbind(ret,
-                   conf.low = conf.low,
-                   conf.high = conf.up
+                   .conf.low = conf.low,
+                   .conf.up = conf.up
       )
     }
     rownames(ret) <- NULL
@@ -101,7 +102,7 @@ tsSmooth.marssMLE <- function(object,
       .rownames = rep(Y.names, each = TT),
       t = rep(1:TT, nn),
       y = vec(t(object[["model"]][["data"]])),
-      estimate = vec(t(Ey)),
+      .estimate = vec(t(Ey)),
       stringsAsFactors = FALSE
     )
     if(type %in% c("ytT")){
@@ -111,11 +112,11 @@ tsSmooth.marssMLE <- function(object,
       Ey.se[Ey.se < 0] <- NA
       Ey.se <- sqrt(Ey.se)
       if (nn == 1) Ey.se <- matrix(Ey.se, 1, TT)
-      ret <- cbind(ret, se = vec(t(Ey.se)))
+      ret <- cbind(ret, .se = vec(t(Ey.se)))
       if (interval=="confidence") {
         ret <- cbind(ret,
-                     conf.low = qnorm(alpha / 2) * ret$se + ret$estimate,
-                     conf.high = qnorm(1 - alpha / 2) * ret$se + ret$estimate
+                     .conf.low = qnorm(alpha / 2) * ret$.se + ret$.estimate,
+                     .conf.up = qnorm(1 - alpha / 2) * ret$.se + ret$.estimate
         )
       }
       if(interval=="prediction"){
@@ -125,10 +126,10 @@ tsSmooth.marssMLE <- function(object,
         y.sd[y.sd < 0] <- NA
         y.sd <- sqrt(y.sd)
         if (nn == 1) y.sd <- matrix(y.sd, 1, TT)
-        ret <- cbind(ret, sd = vec(t(y.sd)))
+        ret <- cbind(ret, .sd = vec(t(y.sd)))
         ret <- cbind(ret,
-                     lwr = qnorm(alpha / 2) * ret$sd + ret$estimate,
-                     upr = qnorm(1 - alpha / 2) * ret$sd + ret$estimate
+                     .lwr = qnorm(alpha / 2) * ret$.sd + ret$.estimate,
+                     .upr = qnorm(1 - alpha / 2) * ret$.sd + ret$.estimate
         )
       }
       
