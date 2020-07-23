@@ -32,6 +32,22 @@ When looking at estimates and intervals for x and y, keep in mind that the MARSS
 
 \strong{Prediction intervals for new data} The one-step-ahead prediction intervals are also not what you want if you want to compute intervals for data during 1 to TT that you didn't collect (so not in the future but contemporaneous with your data).  To compute prediction intervals for new data within 1:TT (so not forecasts past TT), you need to decide what you mean by 'new' and how these new data at time t relate to existing data at time t. Are the new data are i.i.d relative to the old data? So if you made an R matrix, it would be diagonal with the same value on the diagonal. Or are they missing data which might have a different variance and be correlated with the old data. In this case the R matrix might not be diagonal with one value on the diagonal.
 
+\strong{Deciding on \code{fitted.marssMLE}, \code{predict.marssMLE} or \code{residuals.marssMLE} for estimates and intervals calculations.}
+
+The function you want to use depends on what you are trying to do.
+\itemize{
+\item{Get the smoothed state estimates from the Kalman smoother}{ \code{fitted.marssMLE(x, type="xtT", fit.type="estimate")}. These are also the values are in \code{xtT} returned by \code{\link{MARSSkf}()}. }
+\item{Get the contemporaneous state estimates from the Kalman filter}{ \code{fitted.marssMLE(x, type="xtt", fit.type="estimate")}.  These are also the values are in \code{xtt} returned by \code{\link{MARSSkf}()}. }
+\item{Get the one-step ahead state estimates from the Kalman filter}{ \code{fitted.marssMLE(x, type="xtt1", fit.type="estimate")}.  These are also the values are in \code{xtt1} returned by \code{\link{MARSSkf}()}. }
+\item{Get the model predictions for new data that might be generated from your model}{Use \code{fitted.marssMLE} with \code{type="ytT"} and \code{fit.type="prediction"}) or use \code{\link{predict.marssMLE}} with \code{type="ytT"}. This returns the model predictions (Z x(t)+A) for \eqn{Y_t} conditioned on all the data. Confidence intervals and prediction intervals can be returned. The former is the interval for the mean of new data and the latter is the interval for new data (not the mean but data themselves).}
+\item{Compare your observed data to model predictions}{In this case, you want the distribution of the model residuals for the data. Use \code{\link{residuals.marssMLE}}.  }
+\item{Get estimates and variance of missing data in your data set}{Use \code{fitted.marssMLE} with \code{type="ytT"} and \code{fit.type="estimate"}). The observed data will have an expected value equal to the observed data and variance of 0, while the missing data will have an expected value and variance conditioned on all the observed data. }
+\item{Do a leave-one-out cross-validation}{ In this case, you want the distribution of the model residuals for those left-out values. Use \code{\link{residuals.marssMLE}}. You want the standard errors for the left-out data minus the predictions which is what  \code{\link{residuals.marssMLE}} gives in the \code{.type="model"} column.  }
+\item{One-step-ahead predictions of y}{Use \code{fitted.marssMLE} with \code{type="ytt1"} and \code{fit.type="prediction"} or \code{predict.marssMLE} with \code{type="ytt1"}. Confidence (mean prediction) and prediction intervals (new data) are returned.  }
+\item{One-step-ahead forecast errors}{Same as one-step-ahead above or use \code{\link{residuals.marssMLE}} with \code{type="innovations"}. }
+}
+}
+
 
 }
 \seealso{
