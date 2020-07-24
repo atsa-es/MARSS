@@ -8,9 +8,7 @@
 The tidy function is designed to work with the \code{broom} package and you will need to load that package if you want to call \code{tidy(fit)} instead of \code{tidy.marssMLE(fit)}. 
 }
 \usage{
-tidy.marssMLE(x,
-    conf.int = TRUE, conf.level = 0.95,
-    form=attr(x[["model"]], "form")[1], ...)
+tidy.marssMLE(x, conf.int = TRUE, conf.level = 0.95, ...)
 }
 \arguments{
   \item{x}{a \code{\link{marssMLE}} object}
@@ -19,8 +17,6 @@ tidy.marssMLE(x,
   
   \item{conf.level}{ Confidence level. alpha=1-conf.level}
 
-  \item{form}{If you want the tidy function to use a different form than that specified in attr(x$model, "form").  Useful if you have a DFA model that you manually set up, which does not have the form attribute set. Normally just ignore and let the function use the "form" set in the attributes.}
-  
   \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. }
 
 }

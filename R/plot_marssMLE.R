@@ -18,7 +18,7 @@ plot.marssMLE <-
       tt1.resids <- residuals.marssMLE(x, type = "innovations", standardization = "Cholesky")
     }
     if (any(str_detect(plot.type, "resids"))) {
-      std.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
+      tT.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
     }
     
     if (missing(form)) {
@@ -332,7 +332,7 @@ plot.marssMLE <-
     if ("ytT" %in% plot.type) {
       # make plot of expected value of y
       df <- tsSmooth.marssMLE(x, type = "ytT", interval=ifelse(conf.int, "confidence", "none"))
-      if(cont.int){
+      if(conf.int){
         df$ymin <- df$.conf.low
         df$ymax <- df$.conf.up
       }
