@@ -1,5 +1,5 @@
 \name{fitted.marssMLE}
-\alias{fited.marssMLE}
+\alias{fitted.marssMLE}
 \title{Return fitted values for X(t) and Y(t) in a MARSS model}
 \description{
 

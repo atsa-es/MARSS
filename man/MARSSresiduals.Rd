@@ -9,7 +9,7 @@
 MARSSresiduals(object, ..., type=c("tT", "tt1"), normalize=FALSE, silent=FALSE)
 }
 \arguments{
-  \item{object}{ An object of class \code{\link{marssMLE}}.}
+  \item{object}{ An object of class \code{marssMLE}.}
   \item{...}{ Additional arguments to be passed to the residuals functions. For type="tT", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
   \item{type}{ "tT" for smoothed residuals conditioned on all the data 1 to T, aka smoothation residuals. "tt1" for one-step-ahead residuals, aka innovations residuals. }
   \item{normalize}{ TRUE/FALSE See details.}
@@ -21,7 +21,7 @@ MARSSresiduals(object, ..., type=c("tT", "tt1"), normalize=FALSE, silent=FALSE)
   \item{state.residuals}{ The smoothed state residuals. The residual at time t in the matrices is for the transition from t to t+1 thus the last time step will be NA (since T+1 is past the data).}
   \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
   \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x T matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. For the state residuals, the last time step will be all NA since the state residual is for t to t+1.}
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. For type="tt1", the Cholesky standardized residual is NA. See \link{\code{MARSSresiduals.tt1}}. }
+  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. For type="tt1", the Cholesky standardized residual is NA. See \code{\link{MARSSresiduals.tt1}}. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
     \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed model residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See \code{\link{MARSSresiduals.tT}}. }
     \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }

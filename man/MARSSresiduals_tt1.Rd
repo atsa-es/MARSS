@@ -22,7 +22,7 @@ A list with the following components
   \item{var.residuals}{ The joint variance of the one-step-ahead model residuals conditioned on observed data from 1 to t-1. Returned as a n x n x T matrix. }
   \item{std.residuals}{ The Cholesky standardized residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. }
   \item{mar.residuals}{ The marginal standardized residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
-    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data 1 to t-1. Returned as a n x T matrix. Because all the data at time t are unobserved for the purpose of estimation (since conditioning is from 1 to t-1), this will be all 0s (unlike the case where we condition on the data from 1 to T). This and \code{var.obs.residuals} are included for completeness since they are returned for \link{\code{MARSSresiduals.tT}}, but they are not relevant for one-step-ahead residuals. See the discussion there. }
+    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data 1 to t-1. Returned as a n x T matrix. Because all the data at time t are unobserved for the purpose of estimation (since conditioning is from 1 to t-1), this will be all 0s (unlike the case where we condition on the data from 1 to T). This and \code{var.obs.residuals} are included for completeness since they are returned for \code{\link{MARSSresiduals.tT}}, but they are not relevant for one-step-ahead residuals. See the discussion there. }
     \item{var.obs.residuals}{ For one-step-ahead residuals, this will be the same as \code{var.residuals} since none of the t data affect the residual at time t, since the residuals are conditioned only on the data up to t-1. This is different for residuals conditioned on the data from 1 to T. This and \code{E.obs.residuals} are included for completeness since they are returned for \link{\code{MARSSresiduals.tT}}, but they are not relevant for one-step-ahead residuals. See the discussion there. Note, also included as a code check. They are computed differently, but \code{var.obs.residuals} and \code{var.residuals} should always be the same.}
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 
@@ -79,7 +79,8 @@ with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
   dat <- dat[c(2,11),]
   MLEobj <- MARSS(dat)
   
-  MARSSresiduals(MLEobj, type="innovations")$std.residuals
+  MARSSresiduals(MLEobj, type="tt1")$std.residuals
+  residuals(MLEobj, type="innovations")
 }
 \references{
 R. H. Shumway and D. S. Stoffer (2006).  Section on the calculation of the likelihood of state-space models in Time series analysis and its applications.  Springer-Verlag, New York.

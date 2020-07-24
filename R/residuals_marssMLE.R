@@ -5,7 +5,7 @@
 #  residuals_dfa is just residuals_marxss
 ##############################################################################################################################################
 residuals.marssMLE <- function(object, ...,
-                               type=c("smoothations", "innovations"),
+                               type=c("innovations", "smoothations"),
                                standardization=c("Cholesky", "marginal"),
                                form = attr(object[["model"]], "form")[1]) {
   ## Argument checking

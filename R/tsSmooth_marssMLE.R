@@ -10,6 +10,7 @@ tsSmooth.marssMLE <- function(object,
   ## Argument checking
   type <- match.arg(type)
   interval <- match.arg(interval)
+  form = attr(object[["model"]], "form")[1]
   if(interval == "prediction" && type != "ytT")
     stop("tsSmooth.marssMLE: prediction intervals only available for ytT.")
   if(interval != "none" && type == "ytt")

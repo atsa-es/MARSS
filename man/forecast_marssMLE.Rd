@@ -6,14 +6,13 @@
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{forecast(object)}, where object is \code{\link{marssMLE}} object, will return the forecasts of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} for \code{h} steps past the end of the model data. \code{forecast(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{\link{plot.marssPredict}} for automatic plotting of the forecast. \code{forecast.marssMLE()} is used by \code{\link{predict.marssMLE}()} to generate forecasts.
 }
 \usage{
-\method{forecast}{marssMLE}(object, h=10,
-    level = c(0.80, 0.95),
-    type = c("ytT", "xtT", "ytt", "ytt1", "xtt", "xtt1"),
-    interval = c("prediction", "confidence", "none"),
-    newdata = list(y = NULL, c=NULL, d=NULL),
-    fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
+\method{forecast}{marssMLE}(object, h = 10, level = c(0.8, 0.95), 
+     type = c("ytT","xtT", "ytt", "ytt1", "xtt", "xtt1"), 
+     newdata = list(y = NULL, c = NULL, d = NULL), 
+     interval = c("prediction", "confidence", "none"), 
+     fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
    }
-  \arguments{
+\arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
   \item{h}{ Number of steps ahead to forecast. \code{newdata} is for the forecast, i.e. for the \eqn{h} time steps after the end of the model data. If there are covariates, \eqn{c} or \eqn{d}, then \code{newdata} is required. See details. }
   \item{level}{ Level for the intervals if \code{interval != "none"}.}

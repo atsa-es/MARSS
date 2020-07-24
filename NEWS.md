@@ -50,6 +50,25 @@ To do
 * Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
 
+7-23-2020
+
+* Back to original. Got rid of MARSSpredict and MARSSest
+* use tsStruct for the smoothed and filter ests
+
+* need to fix equations in Rd files. changed to x(t+1) and messed up time indexing for the 
+time-varying parameters.
+x(t) = B(t)*x(t-1)+u(t)+C(t)c(t)
+so 
+x(t+1) = B(t+1)x(t)+u(t+1)
+Go back to x(t). That's how it is in the User Guide.
+
+* In Covariates.Rnw I show acf of residuals. need to use innovations there.
+* In quick examples, I talk about diagnostics too.
+* changed default residuals(fit) to return innovations.
+    * don't return the state innovation residuals (only via MARSSresiduals())
+    * check all refs to residuals in the documentation
+
+
     
 MARSS 3.11.0 (resids_update for CRAN)
 ------------------------------------
