@@ -350,16 +350,16 @@ data.frame(Model=c("Fixed", "Cubic", "Fourier"),
 The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
 
 \section{Model diagnostics}\index{diagnostics}\index{functions!residuals}
-We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals and their autocorrelation functions (ACFs) for all five taxa using the following code:
+We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals (innovations) and their autocorrelation functions (ACFs) for all five taxa using the following code:
 <<Covar_sec7_01_diag-code, eval=FALSE>>=
 for(i in 1:3) {
   dev.new()
   modn = paste("seas.mod",i,sep=".")
   for(j in 1:5) {
-    plot.ts(MARSSresiduals(modn)$model.residuals[j,], 
+    plot.ts(MARSSresiduals(modn, type="tt1")$model.residuals[j,], 
       ylab="Residual", main=phytos[j])
     abline(h=0, lty="dashed")
-    acf(MARSSresiduals(modn)$model.residuals[j,], na.action=na.pass)
+    acf(MARSSresiduals(modn, type="tt1")$model.residuals[j,], na.action=na.pass)
     }
   }
 @
@@ -371,7 +371,7 @@ Figures \ref{fig:mon-diagnostics-1}--\ref{fig:mon-diagnostics-3} shows these dia
 <<Covar_sec7_02_plot-acf-1,  fig=TRUE, echo=FALSE>>=
 par(mfrow=c(5,2), mai=c(0.1,0.5,0.2,0.1), omi=c(0.5,0,0,0))
 for(i in 1:5) {
-  plot.ts(MARSSresiduals(seas.mod.1)$model.residuals[i,], 
+  plot.ts(MARSSresiduals(seas.mod.1, type="tt1")$model.residuals[i,], 
       ylab="Residual", main=phytos[i], xlab="", xaxt="n")
   abline(h=0, lty="dashed")
   if(i==5) {
@@ -379,7 +379,7 @@ for(i in 1:5) {
             labels=seq(fulldat[years,"Year"][1],fulldat[years,"Year"][TT]))
        mtext(side=1, line=2.7, "Time")
      }
-  acf(MARSSresiduals(seas.mod.1)$model.residuals[i,], lag.max=period, na.action=na.pass)
+  acf(MARSSresiduals(seas.mod.1, type="tt1")$model.residuals[i,], lag.max=period, na.action=na.pass)
   if(i==5) {
        axis(1, at=c(0,seq(period)))
        mtext(side=1, line=2.7, "Time lag")
@@ -397,7 +397,7 @@ for(i in 1:5) {
 <<Covar_sec7_03_plot-acf-2,  fig=TRUE, echo=FALSE>>=
 par(mfrow=c(5,2), mai=c(0.1,0.5,0.2,0.1), omi=c(0.5,0,0,0))
 for(i in 1:5) {
-  plot.ts(MARSSresiduals(seas.mod.2)$model.residuals[i,], 
+  plot.ts(MARSSresiduals(seas.mod.2, type="tt1")$model.residuals[i,], 
       ylab="Residual", main=phytos[i], xlab="", xaxt="n")
   abline(h=0, lty="dashed")
   if(i==5) {
@@ -405,7 +405,7 @@ for(i in 1:5) {
             labels=seq(fulldat[years,"Year"][1],fulldat[years,"Year"][TT]))
        mtext(side=1, line=2.7, "Time")
      }
-  acf(MARSSresiduals(seas.mod.2)$model.residuals[i,], lag.max=period, na.action=na.pass)
+  acf(MARSSresiduals(seas.mod.2, type="tt1")$model.residuals[i,], lag.max=period, na.action=na.pass)
   if(i==5) {
        axis(1, at=c(0,seq(period)))
        mtext(side=1, line=2.7, "Time lag")
@@ -423,7 +423,7 @@ for(i in 1:5) {
 <<Covar_sec7_04_plot-acf-2,  fig=TRUE, echo=FALSE>>=
 par(mfrow=c(5,2), mai=c(0.1,0.5,0.2,0.1), omi=c(0.5,0,0,0))
 for(i in 1:5) {
-  plot.ts(MARSSresiduals(seas.mod.3)$model.residuals[i,], 
+  plot.ts(MARSSresiduals(seas.mod.3, type="tt1")$model.residuals[i,], 
       ylab="Residual", main=phytos[i], xlab="", xaxt="n")
   abline(h=0, lty="dashed")
   if(i==5) {
@@ -431,7 +431,7 @@ for(i in 1:5) {
             labels=seq(fulldat[years,"Year"][1],fulldat[years,"Year"][TT]))
        mtext(side=1, line=2.7, "Time")
      }
-  acf(MARSSresiduals(seas.mod.3)$model.residuals[i,], lag.max=period, na.action=na.pass)
+  acf(MARSSresiduals(seas.mod.3, type="tt1")$model.residuals[i,], lag.max=period, na.action=na.pass)
   if(i==5) {
        axis(1, at=c(0,seq(period)))
        mtext(side=1, line=2.7, "Time lag")

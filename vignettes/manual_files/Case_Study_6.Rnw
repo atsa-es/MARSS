@@ -238,12 +238,12 @@ e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 \end{split}
  \label{eq:smoothations}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals()@ will compute these residuals for a marssMLE object (output by a MARSS call).   \verb@MARSSresiduals()@ returns two types of standardized residuals (also called auxiliary residuals): Cholesky standardized residuals and marginal standardized residuals. We are using the latter here. The residuals are returned as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \index{functions!residuals}
+These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals(..., type="tT")@ will compute the smoothation (or auxilliary) residuals for a marssMLE object (output by a MARSS call).   \verb@MARSSresiduals()@ returns two types of standardized residuals (also called auxiliary residuals): Cholesky standardized residuals and marginal standardized residuals. We are using the latter here. The residuals are returned as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \verb@residuals(..., type="smoothations")@ will also return the smoothations but in a data frame. We use \verb@MARSSresiduals()@ which return them in a list of matrices. \index{functions!residuals}
 
 <<Cs09_compute-resids, eval=TRUE, echo=TRUE>>=
-resids.0 <- MARSSresiduals(kem.0)$mar.residuals
-resids.1 <- MARSSresiduals(kem.1)$mar.residuals
-resids.2 <- MARSSresiduals(kem.2)$mar.residuals
+resids.0 <- MARSSresiduals(kem.0, type="tT")$mar.residuals
+resids.1 <- MARSSresiduals(kem.1, type="tT")$mar.residuals
+resids.2 <- MARSSresiduals(kem.2, type="tT")$mar.residuals
 @
 
 Figure \ref{fig:CS6.outliers} shows the observation residuals for the three models developed above.  We immediately see that model 0 (flat level) and model 1 (linear declining level) have problems because the residuals are all positive for the first part of the time series and then all negative.  The residuals should not be temporally correlated like that.  Model 2 with a stochastic level shows well-behaving residuals with low temporal correlation between $t$ and $t-1$.  Looking at the residuals for model 2, we see that there are a number of years with flow levels that appear to be outliers (are beyond the dashed level lines).
@@ -425,7 +425,7 @@ Figure \ref{fig:CS6.fig4} shows the standardized residuals for the $u$, which is
 \begin{center}
 <<plotslopetests-www, echo=FALSE, fig=TRUE>>=
 library(Hmisc)
-resids <- MARSSresiduals(kem.3)$mar.residuals
+resids <- MARSSresiduals(kem.3, type="tT")$mar.residuals
 x <- seq(tsp(WWWusage)[1], tsp(WWWusage)[2], tsp(WWWusage)[3])
 plot(x, resids[3, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), 
      xaxp = c(tsp(WWWusage)[1]-1, tsp(WWWusage)[2], 10))

@@ -54,7 +54,7 @@ The standard errors help visualize how well the model fits to the data.  See \co
 
 The state residuals are in the data frame with \code{.type="state"}.
 
-If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link{tsSmooth.marssMLE}} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object. 
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link{tsSmooth.marssMLE}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object. 
 
 The state residuals are only for state-space models. At time t, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state given the estimate of the state at time t, thus it is the residual for the state transition from t to t+1. For the state residuals, the "value"" depends on whether you are compute "smoothations" or "innovations" state residuals. If \code{type="smoothations"}, the value is the smoothed estimate (\eqn{xtT}) at time t+1 and the predicted value is the expected value of \eqn{x} computed using the smoothed estimated of \eqn{x} at time t, so is \eqn{B xtT[,t] + u}).  If \code{type="innovations"}, the value is expected value of \eqn{x} conditioned on the data up to time t+1 and the predicted value is computed using the expected value of \eqn{x} conditioned on the data up to time t, i.e. \eqn{B xtt[,t]} + u or \eqn{xtt1[,t+1]}.
 
@@ -71,8 +71,19 @@ fit <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 library(ggplot2)
 theme_set(theme_bw())
 
-# Make a plot of the observations and residuals intervals
-d <- residuals(fit)
+# Make a plot of the model residuals (innovations) with intervals
+d <- residuals(fit, type="innovations")
+d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
+ggplot(data = d) +
+  geom_line(aes(t, .fitted)) +
+  geom_point(aes(t, value)) +
+  geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
+  ggtitle("Model residuals (innovations)") +
+  xlab("Time Step") + ylab("Count")
+
+# Make a plot of the smoothed residuals with intervals
+d <- residuals(fit, type="smoothations")
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
 d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
@@ -80,17 +91,18 @@ ggplot(data = d) +
   geom_point(aes(t, value)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
   facet_grid(~.rownames) +
+  ggtitle("Smoothations") +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of xtT versus prediction of xt from xtT[t-1]
-# This is NOT the estimate of the states with CIs. Use tidy() for that.
+# This is NOT the estimate of the smoothed states with CIs. Use tsSmooth() for that.
 d <- residuals(fit, type = "smoothations")
 ggplot(data = d) +
   geom_point(aes(t, value)) +
   geom_line(aes(x = t, .fitted), color="blue") +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
-  ggtitle("xtT (points) and predition (line)")
+  ggtitle("xtT (points) and prediction (line)")
 
 }
 

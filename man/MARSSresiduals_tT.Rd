@@ -3,7 +3,7 @@
 
 \title{ MARSS Smoothed Residuals }
 \description{
-  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="tT")}. At time t (in the returned matrices), the model residuals are for time t, while the state residuals are for the transition from t to t+1 following the convention in Harvey, Koopman and Penzer (1998).
+  Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="tT")}. At time \eqn{t} (in the returned matrices), the model residuals are for time \eqn{t}, while the state residuals are for the transition from \eqn{t} to \eqn{t+1} following the convention in Harvey, Koopman and Penzer (1998).
 }
 \usage{
 MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
@@ -49,7 +49,7 @@ MLEobj = MARSS(dat)
 Z = coef(MLEobj, type="matrix")$Z
 A = coef(MLEobj, type="matrix")$A
 res1 = dat - Z \%*\% MLEobj$states - A \%*\% matrix(1,1,ncol(dat))
-res2 = MARSSresiduals(MLEobj)$model.residuals
+res2 = MARSSresiduals(MLEobj, type="tT")$model.residuals
 }
 
 \strong{state.residuals}
@@ -70,7 +70,7 @@ U = coef(MLEobj, type="matrix")$U
 statest = MLEobj$states[,2:TT]
 statestm1 = MLEobj$states[,1:(TT-1)]
 res1 = statest - B \%*\% statestm1 - U \%*\% matrix(1,1,TT-1)
-res2 = MARSSresiduals(MLEobj)$state.residuals
+res2 = MARSSresiduals(MLEobj, type="tT")$state.residuals
 }
 Note that the state residual at the last time step (\eqn{T}) will be NA because it is the residual associated with \eqn{\mathbf{x}_T}{x_T} to \eqn{\mathbf{x}_{T+1}}{x_{T+1}} and \eqn{T+1} is beyond the data.  Similarly, the variance matrix at the last time step will have NAs for the same reason.
 
@@ -129,7 +129,7 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
   MLEobj <- MARSS(dat)
   
   #state residuals
-  state.resids1 <- MARSSresiduals(MLEobj)$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj, type="tT")$state.residuals
   #this is the same as hatx_t-(hatx_{t-1}+u)
   states <- MLEobj$states
   state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
@@ -138,12 +138,12 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
 
   #normalize the state residuals to a variance of 1
   Q <- coef(MLEobj,type="matrix")$Q
-  state.resids1 <- MARSSresiduals(MLEobj, normalize=TRUE)$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj, type="tT", normalize=TRUE)$state.residuals
   state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #Cholesky standardized (by joint variance) model & state residuals
-  MARSSresiduals(MLEobj)$std.residuals
+  MARSSresiduals(MLEobj, type="tT")$std.residuals
 }
 \references{
 Harvey, A., S. J. Koopman, and J. Penzer. 1998. Messy time series: a unified approach. Advances in Econometrics 13: 103-144  (see page 112-113).  Eqn 21 is the Kalman eqns.  Eqn 23 and 24 is the backward recursion to compute the smoothations.  This function uses the MARSSkf output for eqn 21 and then implements the backwards recursion in eqn 23 and eqn 24.  Pages 120-134 discuss the use of standardized residuals for outlier and structural break detection.

@@ -66,8 +66,8 @@ Go back to x(t). That's how it is in the User Guide.
 * In quick examples, I talk about diagnostics too.
 * changed default residuals(fit) to return innovations.
     * don't return the state innovation residuals (only via MARSSresiduals())
-    * check all refs to residuals in the documentation
-
+    * check all refs to residuals in the documentation [done but recheck text]
+* Check getDFAfits(). does it return smoothations like the chap says it does?
 
     
 MARSS 3.11.0 (resids_update for CRAN)

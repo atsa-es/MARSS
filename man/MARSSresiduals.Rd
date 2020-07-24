@@ -16,7 +16,7 @@ MARSSresiduals(object, ..., type=c("tT", "tt1"), normalize=FALSE, silent=FALSE)
   \item{silent}{ If TRUE, do not print inversion warnings. }
 }
 \value{
-
+A list of the following components
   \item{model.residuals}{ The smoothed model residuals (data minus model predicted values) as a n x T matrix. The residuals are conditioned on all the data and the set of model parameters.  Called the smoothations. This is different than the Kalman filter innovations which are conditioned on the data up to \eqn{t-1}.}
   \item{state.residuals}{ The smoothed state residuals. The residual at time t in the matrices is for the transition from t to t+1 thus the last time step will be NA (since T+1 is past the data).}
   \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
@@ -73,7 +73,7 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
   MLEobj <- MARSS(dat)
   
   #state smoothed residuals
-  state.resids1 <- MARSSresiduals(MLEobj)$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj, type="tT")$state.residuals
   #this is the same as
   states <- MLEobj$states
   Q <- coef(MLEobj,type="matrix")$Q
@@ -82,7 +82,7 @@ See the discussion of smoothed residuals for missing and left-out data in \code{
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #normalize to variance of 1
-  state.resids1 <- MARSSresiduals(MLEobj, normalize=TRUE)$state.residuals
+  state.resids1 <- MARSSresiduals(MLEobj, type="tT", normalize=TRUE)$state.residuals
   state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   cbind(t(state.resids1[,-30]), t(state.resids2))
 

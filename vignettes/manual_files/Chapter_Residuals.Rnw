@@ -48,12 +48,12 @@ dat <- dat[2,] #remove the year row
 Q <- array(c(rep(.02,11),rep(.01,11)),dim=c(1,1,22))
 kemfit <- MARSS(dat, model=list(Q=Q))
 # returns a data.frame
-harvey.resids <- residuals(kemfit, Harvey=TRUE)
-holmes.resids <- residuals(kemfit, Harvey=FALSE)
+harvey.resids <- residuals(kemfit, type="smoothations", Harvey=TRUE)
+holmes.resids <- residuals(kemfit, type="smoothations", Harvey=FALSE)
 identical(harvey.resids, holmes.resids)
 # returns a matrix with various variances
-harvey.resids <- MARSSresiduals(kemfit, Harvey=TRUE)
-holmes.resids <- MARSSresiduals(kemfit, Harvey=FALSE)
+harvey.resids <- MARSSresiduals(kemfit, type="smoothations", Harvey=TRUE)
+holmes.resids <- MARSSresiduals(kemfit, type="smoothations", Harvey=FALSE)
 for(i in names(holmes.resids)) cat(i,all(na.omit(as.vector(harvey.resids[[i]]-holmes.resids[[i]]))<sqrt(.Machine$double.eps)), "\n")
 @
 
