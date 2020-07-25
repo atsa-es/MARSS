@@ -2,7 +2,7 @@
 #  glance method for class marssMLE. For package broom
 ##############################################################################################################################################
 glance.marssMLE <- function(x, ...) {
-  a <- residuals.marssMLE(x)
+  a <- residuals.marssMLE(x, type="innovations")
   a <- subset(a, a$type=="model")
   a <- na.omit(a)
   ret <- data.frame(

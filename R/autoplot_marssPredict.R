@@ -67,8 +67,8 @@ autoplot.marssPredict <-
         for(i in length(lev):1){
           tmp <- df
           colnames(tmp)[colnames(tmp)==paste("Lo",lev[i])] <- "conf.low"
-          colnames(tmp)[colnames(tmp)==paste("Hi",lev[i])] <- "conf.high"
-          p1 <- p1 + ggplot2::geom_ribbon(data = tmp, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), 
+          colnames(tmp)[colnames(tmp)==paste("Hi",lev[i])] <- "conf.up"
+          p1 <- p1 + ggplot2::geom_ribbon(data = tmp, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.up), 
                                           alpha = plotpar$ci.alpha, fill = plotpar$ci.fill[i], color = plotpar$ci.col[i], 
                                           linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
         }
@@ -91,11 +91,11 @@ autoplot.marssPredict <-
         for(i in length(lev):1){
           tmp <- df
           colnames(tmp)[colnames(tmp)==paste("Lo",lev[i])] <- "conf.low"
-          colnames(tmp)[colnames(tmp)==paste("Hi",lev[i])] <- "conf.high"
+          colnames(tmp)[colnames(tmp)==paste("Hi",lev[i])] <- "conf.up"
           tmp$conf.low[tmp$t <= nx] <- NA
-          tmp$conf.high[tmp$t <= nx] <- NA
+          tmp$conf.up[tmp$t <= nx] <- NA
           p1 <- p1 + 
-            ggplot2::geom_ribbon(data = tmp, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), 
+            ggplot2::geom_ribbon(data = tmp, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.up), 
                                           alpha = plotpar$ci.alpha, fill = plotpar$ci.fill[i], na.rm=TRUE)
         }
       }

@@ -36,14 +36,16 @@ For the training data, the metrics are shown for the one-step-ahead predictions 
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12),]
-fit<- MARSS(dat[,1:12], model = list(Z = factor(c("WA", "OR", "OR"))))
+train.dat <- dat[,1:12]
+fit<- MARSS(train.dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
 library(forecast)
 accuracy(fit)
 
-# Compare to test dataset
-fr <- predict(fit, h=10)
-accuracy(fr, x=dat[,13:22])
+# Compare to test data set
+fr <- predict(fit, n.ahead=10)
+test.dat <- dat[,13:22]
+accuracy(fr, x=test.dat)
 }
 \references{
 Hyndman, R.J. and Koehler, A.B. (2006) "Another look at measures of forecast accuracy". International Journal of Forecasting, 22(4), 679-688. Hyndman, R.J. and Athanasopoulos, G. (2018) "Forecasting: principles and practice", 2nd ed., OTexts, Melbourne, Australia. Section 3.4 "Evaluating forecast accuracy". https://otexts.org/fpp2/accuracy.html.

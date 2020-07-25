@@ -1,6 +1,6 @@
 autoplot.marssMLE <-
   function(x,
-           plot.type = c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
+           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
@@ -14,7 +14,7 @@ autoplot.marssMLE <-
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
     old.plot.type <- c("observations", "states", "model.residuals", "state.residuals", "model.residuals.qqplot", "state.residuals.qqplot", "expected.value.observations")
-    new.plot.type <- c("fitted.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT")
+    new.plot.type <- c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT")
     for (i in 1:NROW(old.plot.type)) if (old.plot.type[i] %in% plot.type) plot.type[plot.type == old.plot.type[i]] <- new.plot.type[i]
     if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("autoplot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
     if (!(conf.int %in% c(TRUE, FALSE))) stop("autoplot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
@@ -75,7 +75,7 @@ autoplot.marssMLE <-
         rotate <- FALSE
       }
 
-      states <- tidy.marssMLE(x, type = "xtT", conf.int = conf.int, conf.level = conf.level, ...)
+      states <- tsSmooth.marssMLE(x, type = "xtT", ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -86,9 +86,9 @@ autoplot.marssMLE <-
       } else {
         states$term <- paste0("State ", states$term)
       }
-      p1 <- ggplot2::ggplot(data = states, ggplot2::aes_(~t, ~estimate))
+      p1 <- ggplot2::ggplot(data = states, ggplot2::aes_(~t, ~.estimate))
       if (conf.int) {
-        p1 <- p1 + ggplot2::geom_ribbon(data = states, ggplot2::aes_(ymin = ~conf.low, ymax = ~conf.high), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+        p1 <- p1 + ggplot2::geom_ribbon(data = states, ggplot2::aes_(ymin = ~.conf.low, ymax = ~.conf.up), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
@@ -101,12 +101,12 @@ autoplot.marssMLE <-
       }
     }
 
-    if ("fitted.ytT" %in% plot.type) {
+    if ("model.ytT" %in% plot.type) {
       # make plot of observations
       tit <- "Model fitted Y"
       if (conf.int) tit <- paste(tit, "+ CI")
       if (pi.int) tit <- paste(tit, "+ PI (dashed)")
-      df <- fitted.marssMLE(x, type = "ytT", interval = "confidence", conf.level = conf.level, form = model_form)
+      df <- fitted.marssMLE(x, type = "ytT", interval = "confidence", level = conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
@@ -115,7 +115,7 @@ autoplot.marssMLE <-
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       if (pi.int) {
-        df2 <- fitted.marssMLE(x, type = "ytT", interval = "prediction", conf.level = conf.level, form = model_form)
+        df2 <- fitted.marssMLE(x, type = "ytT", interval = "prediction", level = conf.level)
         df$ymin.pi <- df2$.lwr
         df$ymax.pi <- df2$.upr
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymin.pi), linetype = "dashed")
@@ -134,18 +134,20 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(tit)
-      plts[["fitted.ytT"]] <- p1
-      if (identical(plot.type, "fitted.ytT")) {
+      plts[["model.ytT"]] <- p1
+      if (identical(plot.type, "model.ytT")) {
         return(p1)
       }
     }
 
     if ("ytT" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
-      df <- tidy.marssMLE(x, type = "ytT", form = "marxss")
-      df$ymin <- df$conf.low
-      df$ymax <- df$conf.high
-      p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) +
+      df <- tsSmooth.marssMLE(x, type = "ytT", ifelse(conf.int, "confidence", "none"), level=conf.level)
+      if(conf.int){
+        df$ymin <- df$.conf.low
+        df$ymax <- df$.conf.up
+      }
+      p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate)) +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size)
       if (conf.int) {
         p1 <- p1 +

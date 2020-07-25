@@ -13,7 +13,7 @@ MARSSkfss(MLEobj)
 MARSSkfas(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE)
 }
 \arguments{
-  \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specificitions.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}
+  \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specifications.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}
   \item{ only.logLik }{ Used by \code{MARSSkfas}.  If set, only the log-likelihood is returned using the \link[KFAS]{KFAS} package function \code{\link[KFAS]{logLik.SSModel}}.  This is much faster if only the log-likelihood is needed. }
   \item{ return.lag.one }{ Used by \code{MARSSkfas}.  If set to FALSE, the smoothed lag-one covariance  values are not returned (Vtt1T is set to NULL).  This speeds up \code{MARSSkfas} because to return the smoothed lag-one covariance a stacked MARSS model is used with twice the number of state vectors---thus the state matrices are larger and take more time to work with. }
   \item{ return.kfas.model }{ Used by \code{MARSSkfas}.  If set to TRUE, it returns the MARSS model in \link[KFAS]{KFAS} model form (class \code{\link[KFAS]{SSModel}}).  This is useful if you want to use other KFAS functions or write your own functions to work with \code{\link{optim}} to do optimization.  This can speed things up since there is a bit of code overhead in \code{\link{MARSSoptim}} associated with the \code{\link{marssMODEL}} model specification needed for the constrained EM algorithm (but not strictly needed for \code{\link{optim}}; useful but not required.). }
@@ -62,7 +62,7 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \code{R
 
 Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. \code{http://CRAN.R-project.org/package=KFAS}
   
-Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Assosiation, 92, 1630-38.
+Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Association, 92, 1630-38.
 
 Koopman, S.J. and Durbin J. (2001). Time series analysis by state space methods. Oxford: Oxford University Press.
 
@@ -82,13 +82,13 @@ The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) An
 \examples{
 dat <- t(harborSeal)
 dat <- dat[2:nrow(dat), ]
-# you can use MARSS to construct a MLEobj
+# you can use MARSS to construct a marssMLE object
 # MARSS calls MARSSinits to construct default initial values
-# with fit = FALSE, the $par element of MLEobj will be NULL
-MLEobj <- MARSS(dat, fit = FALSE)
-# MARSSkf needs a marss MLE object with the par element set
-MLEobj$par <- MLEobj$start
+# with fit = FALSE, the $par element of the marssMLE object will be NULL
+fit <- MARSS(dat, fit = FALSE)
+# MARSSkf needs a marssMLE object with the par element set
+fit$par <- fit$start
 # Compute the kf output at the params used for the inits
-kfList <- MARSSkf(MLEobj)
+kfList <- MARSSkf(fit)
 }
 

@@ -257,7 +257,7 @@ MARSSkfss <- function(MLEobj) {
     if (any(diag.Vtt < 0)) {
       return(list(
         ok = FALSE,
-        errors = paste("Stopped in MARSSkfss: soln became unstable and negative values appeared on the diagonal of Vtt at t=", t, ".\n", sep = "")
+        errors = paste("Stopped in MARSSkfss: solution became unstable and negative values appeared on the diagonal of Vtt at t=", t, ".\n", sep = "")
       ))
     }
     ####### End Error-checking
@@ -293,7 +293,7 @@ MARSSkfss <- function(MLEobj) {
     if (any(diag.Vtt1 < 0)) { # abandon if problems like this
       return(list(
         ok = FALSE,
-        errors = paste("Stopped in MARSSkfss: soln became unstable and negative values appeared on the diagonal of Vtt1.\n")
+        errors = paste("Stopped in MARSSkfss: solution became unstable and negative values appeared on the diagonal of Vtt1.\n")
       ))
     }
 
@@ -303,7 +303,7 @@ MARSSkfss <- function(MLEobj) {
       Q0s <- all(which(diag.Vtt1 == 0) %in% which(diag.Q == 0))
       # Q0s=identical(which(diag.Q==0),which(diag.Vtt1==0))
       if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
-        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: soln became unstable when zeros appeared on the diagonal of Vtt1 at t=", t, ".\n")))
+        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=", t, ".\n")))
       }
     }
     if (m == 1) {
@@ -342,7 +342,7 @@ MARSSkfss <- function(MLEobj) {
       # deal with 0s that are ok if there are corresponding 0s on Q diagonal
       Q0s <- identical(which(diag.Q == 0), which(diag.Vtt1 == 0))
       if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
-        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: soln became unstable when zeros appeared on the diagonal of Vtt1 at t=1.\n")))
+        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=1.\n")))
       }
     }
     Vtt1.1 <- sub3D(Vtt1, t = 1)

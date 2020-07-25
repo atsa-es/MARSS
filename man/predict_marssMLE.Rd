@@ -3,26 +3,30 @@
 
 \title{ predict and forecast MARSS MLE objects }
 \description{
-  \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{predict(object)}, where object is \code{\link{marssMLE}} object,  will return the fitted value of \eqn{\mathbf{y}_t}{y(t)} or the smoothed value of \eqn{\mathbf{x}_t}{x(t)}. If \code{h} is passed in, \code{predict(object)} will return a forecast h steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} for automatic plotting of predictions and forecasts with intervals.
+This function will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} conditioned on the data (either data used to fit the data or data in \code{newdata}). For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}.  \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the smoothed state estimate at time \eqn{t} conditioned on all the data (either data used to fit the model or the optional data passed into \code{newdata}).
+
+If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data (i.e. output from the Kalman filter or smoother), then use \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother.
+
+If \code{h} is passed in, \code{predict(object)} will return a forecast \eqn{h} steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} or \code{ggplot2::autoplot()}for automatic plotting of predictions and forecasts with intervals.
 }
 \usage{
 \method{predict}{marssMLE}(object, n.ahead=0,
-     conf.level = c(0.80, 0.95),
-     type = c("ytT", "xtT"),
+     level = c(0.80, 0.95),
+     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
      newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
-     interval = c("prediction", "confidence", "none"),
+     interval = c("none", "confidence", "prediction"),
      fun.kf = c("MARSSkfas", "MARSSkfss"),
      x0 = "reestimate", ...)
    }
 \arguments{
 \item{object}{ A \code{\link{marssMLE}} object.  }
 \item{n.ahead}{ Number of steps ahead to forecast. If \code{n.ahead !=0}, then \code{newdata} is for the forecast, i.e. for the n.ahead time steps after the end of the model data. See details. }
-\item{conf.level}{ Level for the intervals if \code{interval != "none".}}
-\item{type}{ Fitted values for the observations (ytT) or the states (xtT). The predictions are conditioned on all the data (if data are supplied in newdata or implicitly supplied by not passing in \code{newdata}).}
-\item{newdata}{ An optional list with new y (data), c or d (covariates) to use for the predictions or forecasts. y, c and d must have the same form as used in the \code{\link{MARSS}()} call but the number of time steps can be different. t is used if there is ambuiquity as to which time steps the y, c and d refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
-\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the fitted value is returned. If \code{interval="prediction"} (default), prediction intervals (new data) are returned. Note, in the context of a MARSS model, only confidence intervals are available for xtT.}
+\item{level}{ Level for the intervals if \code{interval != "none".}}
+\item{type}{ \code{ytT}, \code{ytt} or \code{ytt1}: predictions for the observations based on the states estimate at time \eqn{t} conditioned on all the data, data up to \eqn{t} or data up to \eqn{t-1}. \code{xtT} or \code{xtt1}: predictions for the states at time \eqn{t} based on the states estimate at time \eqn{t-1} conditioned on all the data or data up to \eqn{t-1}. The data are the data used to fit the model unless \code{y} is passed in in \code{newdata}.}
+\item{newdata}{ An optional list with new \code{y} (data), \code{c} or \code{d} (covariates) to use for the predictions or forecasts. \code{y}, \code{c} or \code{d} must have the same structure (matrix dimensions) as used in the \code{\link{MARSS}()} call but the number of time steps can be different. \code{t} is used if there is ambuiquity as to which time steps the \code{newdata} refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
+\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the predictions are returned. If \code{interval="prediction"}, prediction intervals are returned. See \code{\link[=fitted.marssMLE]{fitted}} for a discussion of the intervals. }
 \item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
-\item{x0}{ If "reestimate" (the default), then the initial value of x is re-estimated. If "use.model", then x0 in the fitted model (object argument) is used. If you change the data, then this x0 may not be appropriate. You can also pass in a new x0 to use. It must be a matrix that is the same dimensions as x0 in the model. \code{x0} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
+\item{x0}{ If "reestimate" (the default), then the initial value for the states is re-estimated. If \code{"use.model"}, then the initial values in the fitted model (\code{object}) are used. If you change the data, then this initial condition may not be appropriate. You can also pass in a new \code{x0} to use. It must be a matrix that is the same dimensions as \code{x0} in the model. \code{x0} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
 \item{...}{ Other arguments. Not used. }
 }
 
@@ -31,48 +35,64 @@
 
 \item{method}{The method used for fitting, e.g. MARSS kem. }
 \item{model}{The \code{\link{marssMLE}} object passed into predict(). }
-\item{newdata}{The \code{newdata} list passed into predict(). c and d must be matrices. t must be a vector (same length as the 2nd dimension of y, c, and d). If \code{h!=0}, y must be a matrix. If \code{h==0}, y can be a matrix or "none" (no data), or "model" (use the model data in object). If the latter, t in \code{newdata} can be used to specify a subset of the model data. See examples.}
-\item{level}{The \code{conf.level} passed into predict().}
+\item{newdata}{The \code{newdata} list if passed in.}
+\item{level}{The confidence or prediction intervals \code{level}.}
 \item{pred}{A data frame the predictions or forecasts along with the intervals. }
-\item{type}{The \code{type} ("ytT" or "xtT") passed into predict().}
-\item{t}{The time steps used in pred (used for plotting).}
-\item{n.ahead}{The number of forecast time steps (used for plotting).}
-\item{x0}{The x0 used.}
+\item{type}{The \code{type} passed in.}
+\item{t}{The time steps in the pred data frame.}
+\item{n.ahead and h}{The number of forecast time steps.}
+\item{x0}{The x0 used for the predictions.}
 \item{tinitx}{The tinitx used.}
+
+The pred data frame has the following columns:
+
+\item{.rownames}{ Names of the data or states. }
+\item{t}{ Time step. }
+\item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
+\item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type="xtT"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type="xtt1"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{estimate}{Model predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
+
+If intervals are returned, the following are added to the data frame:
+
+\item{se}{ Standard errors of the predictions. }
+\item{Lo ...}{ Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*se + prediction. }
+\item{Hi ...}{ Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*se + prediction. }
+
 }
 
 \details{
 
 \strong{Forecasts \code{n.ahead != 0}}
 
-The xtT forecast is returned with \code{\link{tidy.marssMLE}}. It is the smoothed x estimate, i.e. the estimate conditioned on all the data. If \code{n.ahead !=0}, then 'data' that is being conditioned on is the original data (model data) plus any data in \code{newdata$y} for the h forecast time steps. Note, typically forecasts would not have data, since they are forecasts, but \code{predict.marssMLE()} allows you to specify data for the forecast if you need to. If the model includes covariates (c or d matrices passed into the \code{model} list in the \code{\link{MARSS}()} call), then c and d must be passed into \code{newdata}. 
+The \code{type="xtT"} forecast is the states forecast conditioned on all the data. If \code{n.ahead !=0}, then 'data' that is being conditioned on is the original data (model data) plus any data in \code{newdata$y} for the h forecast time steps. Note, typically forecasts would not have data, since they are forecasts, but \code{predict.marssMLE()} allows you to specify data for the forecast time steps if you need to. If the model includes covariates (\eqn{\mathbf{c}}{c} and/or \eqn{\mathbf{d}}{d} matrices passed into the \code{model} list in the \code{\link{MARSS}()} call), then \code{c} and/or \code{d} must be passed into \code{newdata}. 
 
-The ytT forecast is returned with \code{\link{fitted.marssMLE}}. It is the fitted ytT or, said alternatively, the expected value of NEW data (y) conditioned on the data used for fitting. The data used for fitting is the same at for xtT (above). The ytT forecast is \eqn{Z xtT + A}. 
+The \code{type="ytT"} forecast is the expected value of NEW data (\eqn{\mathbf{y}}{y}) conditioned on the data used for fitting. The data used for fitting is the same as for \code{type="xtT"} (above). The \eqn{\mathbf{y}}{y} forecast is \eqn{Z xtT + A}. 
 
-If the model has time-varying parameters, the value of the parameters at the last time step is used for the forecast.
+If the model has time-varying parameters, the value of the parameters at the last time step are used for the forecast.
 
-\strong{Predictions \code{n.ahead == 0}}
+\strong{Model predictions \code{n.ahead == 0}}
 
-If \code{newdata} is not passed in, then the model data (y) and c and d (if part of model) are used for the predictions. The xtT is returned with \code{\link{tidy.marssMLE}} and ytT, with prediction or confidence intervals, is returned with \code{\link{fitted.marssMLE}}.
+If \code{newdata} is not passed in, then the model data (\eqn{\mathbf{y}}{y}) and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} (if part of model) are used for the predictions. \code{\link[=fitted.marssMLE]{fitted}()} is the internal function for model predictions.
 
-If \code{newdata} is passed in, then xtT and ytT are computed using newdata but with the MARSS model estimated from the original data, essentially the Kalman filter/smoother is run using the estimated MARSS model but with data (and c and d if in the model) in \code{newdata}.  y, c and d must all have the same number of columns (time-steps) and the length of t must be the same as the number of columns and must be sequential.
+If \code{newdata} is passed in, then the predictions are computed using \code{newdata} but with the MARSS model estimated from the original data, essentially the Kalman filter/smoother is run using the estimated MARSS model but with data (and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} if in the model) in \code{newdata}.  \code{y}, \code{c} and \code{d} in the \code{newdata} list must all have the same number of columns (time-steps) and the length of \code{t} in \code{newdata} must be the same as the number of columns and must be sequential.
 
-For \code{type="ytT"}, the predictions are conceptually the same as predictions returned by \code{predict.lm} for a linear regression. The confidence interval is the interval for the expected value of NEW data. The prediction interval is the interval for NEW data. Prediction intervals will always be wider (or equal if R=0) to confidence intervals. The difference is that the uncertainty in \code{predict.lm} comes from parameter uncertainty and the data error while in \code{predict.marssMLE}, the uncertainty is from x uncertainty and data error. Parameter uncertainty does not enter the interval calculations; parameters are treated as known at their point estimates. This is not specific to the MARSS package. This is how prediction and confidence intervals are presented for MARSS models in the literature, i.e. no parameter uncertainty. 
+For \code{type="ytT"}, the predictions are conceptually the same as predictions returned by \code{predict.lm} for a linear regression. The confidence interval is the interval for the expected value of NEW data. The prediction interval is the interval for NEW data. Prediction intervals will always be wider (or equal if R=0) to confidence intervals. The difference is that the uncertainty in \code{predict.lm} comes from parameter uncertainty and the data error while in \code{predict.marssMLE}, the uncertainty is from \eqn{\mathbf{x}}{x} uncertainty and data error. Parameter uncertainty does not enter the interval calculations; parameters are treated as known at their point estimates. This is not specific to the MARSS package. This is how prediction and confidence intervals are presented for MARSS models in the literature, i.e. no parameter uncertainty. 
 
 \itemize{
-\item{t in newdata}{t in \code{newdata} removes any ambiguity as to which time steps your y, c and d correspond to. In most cases when you pass in y, c or d for a prediction, you will want to specify t (and in some cases need to specify t). If you pass in y and all the parameters are time-constant, t is only used for plotting (the x axis). If you pass in \code{y="model"}, then t can be used to specify a subset of the model data. If left off, it is assumed you want all the model data. If the model has time-varying parameters, t specifies which values of the parameters you want. If you leave off t, then it is assumed that t is 1 to the number of columns in y, c and d in newdata.}
-\item{The model has c or d}{c or d must be passed in. If y (new data) is not passed in, it is assumed to be absent. That is, the default behavior if y is absent but c or d is present is \code{y="none"}. If you want to use the model data, then pass in \code{y="model"} in \code{newdata}. Pass in t in \code{newdata} if it is ambiguous which time steps of the model data to use.}
-\item{The model has time-varying parameters}{You have to pass in t in \code{newdata} to specify what parameter values to use. Any t > TT (time steps in the model data), is assumed to mean that you want to use the parameter values at the at the last time step of the original time series. See examples. }
-\item{Only t is passed in}{You can specify a subset of the model data (y) (and c and d if in model), by passing in t alone with the desired time steps denoted. For example t=1:10.}
-\item{y, c and d have more time steps than the original data}{If the model has time-varying parameters, you will need to pass in t. If the model is time-constant, then t is assumed to be 1 to the number of columns in y, c and d but you can pass in t to change that.}
+\item{\code{t} in \code{newdata}}{\code{t} in \code{newdata} removes any ambiguity as to which time steps your \code{y}, \code{c} and \code{d} in \code{newdata} correspond to. In most cases when you pass in \code{newdata} for a prediction, you will want to specify \code{t} (and in some cases need to specify \code{t}). If you pass in \code{y} and all the parameters are time-constant, \code{t} is only used for plotting (the x axis). If you pass in \code{y="model"}, then \code{t} can be used to specify a subset of the model data. If left off, it is assumed you want all the model data. If the model has time-varying parameters, \code{t} specifies which values of the parameters you want. If you leave off \code{t}, then it is assumed that \code{t} is 1 to the number of columns in \code{y}, \code{c} and \code{d} in \code{newdata}.}
+\item{The model has \eqn{\mathbf{c}}{c} and/or \eqn{\mathbf{d}}{d}}{\code{c} and/or \code{d} must be included in \code{newdata}. If \code{y} (new data) is not in \code{newdata}, it is assumed to be absent. That is, the default behavior if \code{y} is absent but \code{c} and/or \code{d} is present is \code{y="none"}. If you want to use the model data, then pass in \code{y="model"} in \code{newdata}. Pass in \code{t} in \code{newdata} if it is ambiguous which time steps of the model data to use.}
+\item{The model has time-varying parameters}{You have to pass in \code{t} in \code{newdata} to specify what parameter values to use. Any t > T (T =time steps in the model data), is assumed to mean that you want to use the parameter values at the at the last time step of the original time series. See examples. }
+\item{Only \code{t} is in \code{newdata}}{You can specify a subset of the model data (and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d}), by passing in \code{t} alone with the desired time steps denoted. For example \code{t=1:10}.}
+\item{\code{y}, \code{c} and \code{d} in \code{newdata} have more time steps than the original data}{If the model has time-varying parameters, you will need to pass in \code{t}. If the model is time-constant, then \code{t} is assumed to be 1 to the number of columns in \code{y}, \code{c} and \code{d} but you can pass in \code{t} to change that.}
 }
 
-\strong{x0 estimation} If you are using different data, so passing in y in \code{newdata}, then it is likely that you will need to re-estimate x0, which is the default behavior. Use \code{x0 = "use.model"} to use the x0 values in the estimated model (object).
+\strong{x0 estimation} If you are passing in \code{y} in \code{newdata}, then it is likely that you will need to re-estimate the \eqn{\mathbf{x}}{x} initial condition. The default behavior of \code{predict.marssMLE}. Use \code{x0 = "use.model"} to use the initial values in the estimated model (\code{object}).
 
 
 }
 \seealso{
-\code{\link{plot.marssPredict}}, \code{\link{fitted.marssMLE}}, \code{\link{tidy.marssMLE}}
+\code{\link{plot.marssPredict}}, \code{\link{fitted.marssMLE}}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  

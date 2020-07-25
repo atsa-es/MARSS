@@ -12,7 +12,7 @@ MARSSharveyobsFI(MLEobj)
   This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}}. }
  }
 \value{
-  The observed Fisher Information matrix computed via equation 3.4.69 in Harvey (1989).  The differentials in the equation are computed in the recursion in equations 3.4.73a to 3.4.74b.  See Holmes (2016c) for a discussion of the Harvey (1989) algorithm and Holmes (2017) for the specific implemention of the algorithm for MARSS models with linear constraints. 
+  The observed Fisher Information matrix computed via equation 3.4.69 in Harvey (1989).  The differentials in the equation are computed in the recursion in equations 3.4.73a to 3.4.74b.  See Holmes (2016c) for a discussion of the Harvey (1989) algorithm and Holmes (2017) for the specific implementation of the algorithm for MARSS models with linear constraints. 
   
 Harvey (1989) discusses missing observations in section 3.4.7.  However, the \code{MARSSharveyobsFI()} function implements the approach of Shumway and Stoffer (2006) in section 6.4 for the missing values.  See Holmes (2012) for a full discussion of the missing values modifications.
 }
@@ -25,8 +25,8 @@ Harvey (1989) discusses missing observations in section 3.4.7.  However, the \co
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]
-MLEobj <- MARSS(dat)
-MARSS:::MARSSharveyobsFI(MLEobj)
+fit <- MARSS(dat)
+MARSS:::MARSSharveyobsFI(fit)
 }
 \references{ 
 R. H. Shumway and D. S. Stoffer (2006).  Section 6.4 (Missing Data Modifications) in Time series analysis and its applications.  Springer-Verlag, New York.

@@ -8,7 +8,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
   # var.residuals variance of above over Y
   # for missing values, Harvey=TRUE returns 0 for var for y_i missing and Harvey=FALSE returns R + Z VtT t(Z)
   # Note, I think there is a problem with the Harvey algorithm when the variance of the state residuals (Q)
-  # is non-diagonal and there are missing values; it can become non-invertable
+  # is non-diagonal and there are missing values; it can become non-invertible
   MLEobj <- object
   model.dims <- attr(MLEobj$marss, "model.dims")
   TT <- model.dims[["x"]][2]

@@ -6,7 +6,7 @@
 \docType{data}
 \title{ Harbor Seal Population Count Data (Log counts) }
 \description{
-Data sets used in MARSS vignettes in the \code{\link{MARSS-package}}.  These are data sets based on LOGGED count data from Oregon, Washington and California sites where harbor seals were censused while hauled out on land. "harborSeallnomiss" is an extrapolated data set where missing values in the original dataset have been extrapolated so that the data set can be used to demonstrate fitting population models with different underlying structures.
+Data sets used in MARSS vignettes in the \code{\link{MARSS-package}}.  These are data sets based on LOGGED count data from Oregon, Washington and California sites where harbor seals were censused while hauled out on land. "harborSealnomiss" is an extrapolated data set where missing values in the original data set have been extrapolated so that the data set can be used to demonstrate fitting population models with different underlying structures.
 }
 \usage{
 data(harborSeal)

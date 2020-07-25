@@ -53,7 +53,7 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
       \item{\code{silent}}{   TRUE/FALSE(default), Suppresses all printing including progress bars, error messages and convergence information. 0, Turns on all printing of progress bars, fitting information and error messages.  2, Prints a brief success/failure message.    }
       \item{\code{safe}}{   TRUE/FALSE(default), Setting safe=TRUE runs the Kalman smoother after each parameter update rather than running the smoother only once after updated all parameters.  The latter is faster but is not a strictly correct EM algorithm.  In most cases, safe=FALSE (default) will not change the fits.  If this setting does cause problems, you will know because you will see an error regarding the log-likelihood dropping and it will direct you to set safe=TRUE.    }
   } }
-    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \link[KFAS]{KFAS} package based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implimentation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
+    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \link[KFAS]{KFAS} package based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implementation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
     \item{...}{ Optional arguments passed to function specified by form. }
 }
 \details{
@@ -112,7 +112,7 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
   eli(dot)holmes(at)noaa(dot)gov and eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{
-\code{\link{marssMLE}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}},
+\code{\link{marssMLE}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}}, \code{\link{tsSmooth.marssMLE}},
 \code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
 }
 \examples{

@@ -1,10 +1,10 @@
 ###############################################################################################################################################
-#  fitted method for class marssMLE.
+#  fitted method for marssMLE objects; expected value of rhs minus error term
 ##############################################################################################################################################
 fitted.marssMLE <- function(object, ...,
-                            type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
+                            type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
-                            conf.level = 0.95,
+                            level = 0.95,
                             output = c("data.frame", "matrix")) {
   type <- match.arg(type)
   output <- match.arg(output)
@@ -15,15 +15,10 @@ fitted.marssMLE <- function(object, ...,
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
-  if (interval != "none" && (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0))
-    stop("fitted.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
-  alpha <- 1-conf.level
-  extras <- list()
-  if (!missing(...)) {
-    extras <- list(...)
-    if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use type='ytt1' or 'xtt1' instead of one.step.ahead=TRUE.", call. = FALSE)
-  }
-  
+  if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0))
+    stop("fitted.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
+  alpha <- 1-level
+
   # need the model dims in marss form with c in U and d in A
   model.dims <- attr(MLEobj[["marss"]], "model.dims")
   TT <- model.dims[["x"]][2]
@@ -133,14 +128,14 @@ fitted.marssMLE <- function(object, ...,
         ret <- data.frame(
           .rownames = rep(state.names, each = TT),
           t = rep(1:TT, mm),
-          xtT = vec(t(hatxt)),
+          .xtT = vec(t(hatxt)),
           stringsAsFactors = FALSE
         )
       if (conditioning == "t1")
         ret <- data.frame(
           .rownames = rep(state.names, each = TT),
           t = rep(1:TT, mm),
-          xtt = vec(t(hatxt)),
+          .xtt = vec(t(hatxt)),
           stringsAsFactors = FALSE
         )
     }
@@ -155,7 +150,7 @@ fitted.marssMLE <- function(object, ...,
     se <- sqrt(se) # was not sqrt earlier
     retlist <- list(
       .fitted = val, 
-      .se.fit = se,
+      .se = se,
       .conf.low = val + qnorm(alpha/2) * se,
       .conf.up = val + qnorm(1- alpha/2) * se
     )
@@ -163,22 +158,12 @@ fitted.marssMLE <- function(object, ...,
   if (interval=="prediction"){
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
-    if (type == "x"){
       retlist <-list(
         .fitted = val, 
-        .sd.x = se, 
+        .sd = se, 
         .lwr = val + qnorm(alpha/2) * se,
         .upr = val + qnorm(1- alpha/2) * se
       )
-    }
-    if (type == "y"){
-      retlist <- list(
-        .fitted=val,
-        .sd.y=se,
-        .lwr = val + qnorm(alpha/2) * se,
-        .upr = val + qnorm(1- alpha/2) * se
-      )
-    }
   }
   if(output=="matrix") return(retlist)
   return(cbind(ret, as.data.frame(lapply(retlist, function(x){vec(t(x))}))))

@@ -9,44 +9,28 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 Status
 -----------------------------------
 
-7-09-2020
-
-* The versiontest.R tests passed.
-* Working on testing predict and residuals against other packages and models.
-* Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
-
-7-12-2020
-
-* Working on issue #74 that is coming up in the BSM model. Weird Q update error at iteration 1. It's a numerical accuracy issue. Fixed by using solve(A,B) to get J0 instead of inverse of Vtt1[,,1] [Fixed]
-* Rerun the versiontest.R tests because of the J0 change. [passed 7/14]
-
-7-14-2020
-
-* Back to working on testing predict and residuals against other packages and models. After fixing issue #74 and ensuring that version test passes.
-* Currently working on `StructTS()` examples in Chapter_Structural_TS.Rnw. 
-
-7-16-2020
-
-* Fixed various issues in MARSSresiduals() due to not passing type in. That error progated to problems in plot functions. 
-* autoplot.marssPredict() not working for forecasts since facet_wrap fails when plot uses data with different number of time steps. Fixed by not subsetting but instead using NAs for the data I don't want to show.
-* Did the forecast subsection for StructTS models.
-
-7-20-2020
-
-* Fixed bug in MARSSresiduals.tT. Needed t(chol()) for Cholesky standardization.
-* Working on innovations state residuals. Finished. Residuals.Rnw and MARSSresiduals.tt1()
-* Changed ACF plots to be for the innovations residuals. Smoothation residuals are temporally correlated.
-
-To do
+To do 7-24-2020
 
 * Work on fitted() and residuals() for StructTS models.
 * Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
+* need to fix equations in Rd files. changed to x(t+1) and messed up time indexing for the 
+time-varying parameters.
+x(t) = B(t)*x(t-1)+u(t)+C(t)c(t)
+so 
+x(t+1) = B(t+1)x(t)+u(t+1)
+Go back to x(t). That's how it is in the User Guide.
+
+* In quick examples, I talk about ACF diagnostics. Check that innovations are used.
+* changed default residuals(fit) to return innovations.
+    * don't return the state innovation residuals (only via MARSSresiduals())
+    * check all refs to residuals in the documentation [done but recheck text]
+* Check getDFAfits(). does it return smoothations like the chap says it does?
 
     
-MARSS 3.11.0 (resids_update for CRAN)
+MARSS 3.11.01 (resids_update for CRAN)
 ------------------------------------
-Version 3.11.0 is focused on the `predict` function and updating the structure of the `residuals` functions. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
+Version 3.11.01 is focused on the `predict`, `fitted` and `residuals` functions and documentation. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
 
 
 ENHANCEMENTS
@@ -54,18 +38,21 @@ ENHANCEMENTS
 * `ldiag()` convenience function added to make list diagonal matrices. This replaces having to do code like `a <- matrix(list(0),2,2); diag(a) <- list(2,"a")`. Now you can call `ldiag(list(2,"a"))`.
 * Added `accurancy.marssMLE()` and `accuracy.marssPredict()` which returns accuracy metrics sensu the **forecast** package.
 * Added `is.unitcircle()` utility function and added tol so that it does not fail if abs(eigenvalue) is above 1 by machine tolerance.
-* Added ACF plots for model and state residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
+* Added ACF plots for model and state innovation residuals to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * Revamped `residuals.marssMLE()`. Got rid of `augment.marssMLE()` and renamed it `residuals.marssMLE()`. The old `residuals.marssMLE()` became `MARSSresiduals()`. There was too much duplication between `residuals.marssMLE()` and `augment.marssMLE()` and between `augment.marssMLE()` and `fitted.marssMLE()`. Also I want to minimize dependency on other packages and `augment` is a class in the **broom** package. This required changes to the `glance.marssMLE()`, `plot.marssMLE()` and `autoplot.marssMLE()` code.
+* Revamped `tidy.marssMLE`. `tsSmooth.marssMLE` now returns the estimates from the Kalman filter or smoother which `tidy.marssMLE` had returned. `tidy.marssMLE` only returns a data frame for the parameter estimates.
 * V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
+* `predict.marssMLE` updated to return ytt1, ytt, ytt1.
+* Added state innovations residuals to `MARSSresiduals.tt1` but not printed. Only model innovation residuals are printed.
 
 BUGS
 
-* This bug affected `residuals()` in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
-* When computing the Cholesky standardized residuals, the lower triangle of the Cholesky decomposition should be used so that the residuals are standardized to a variance of 1. `base::chol()` returns the upper triangle. Thus the lines in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` that applied the standardization need `t(chol())`. 
-* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were msg instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
+* This bug affected `residuals()` in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propagation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* When computing the Cholesky standardized residuals, the lower triangle of the Cholesky decomposition should be used so that the residuals are standardized to a variance of 1. `base::chol()` returns the upper triangle. Thus the lines in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` that applied the standardization need `t(chol())`.
+* `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were a message instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
 * `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
-* `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`.
+* The following bug was in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`. This caused `residuals()` to fail if `trace=2`.
 
 DOCUMENTATION and MAN FILES
 
@@ -75,14 +62,18 @@ DOCUMENTATION and MAN FILES
 * `predict.marssMLE.Rd` (help page) had bug in the examples. remove `Q=Q` from the model list in the first example.
 * Cleaned-up the man pages for `predict()` and `predict.marssMLE()`.
 * In the chapter on structural breaks and outliers, Koopman et al (1998) use the marginal residuals in their example rather than the Cholesky standardized residuals. Changed to use marginal residuals to follow their example.
+* In Covariates.Rnw I show the acf of residuals. This should use innovations instead of smoothations. Only the former are temporally independent.
+* Added derivation for joint variance-covariance matrices for innovations model and state residuals.
 
 OTHER
 
-* Changed `fitted.marssMLE` to have column with xtt when type="xtt1" instead of xtT.
+* Changed `fitted.marssMLE` to have column with .xtt when type="xtt1" instead of .xtT.
 * Changed the x0 estimation behavior for `predict.marssMLE()` when no data passed in.
 * Added x0 argument to `predict.marssMLE()` so that user can specify x0 if needed.
 * Removed the tibble class from the data frames returned by `residuals.marssMLE()`. The data frames are still in tibble form. Removed all reference to tibbles in the documentation.
 * When `trace = -1` some tests were still being done. I added a test for `trace = -1` to a few more test lines in `MARSS.R` and `MARSS_marxss.R`.
+* Changed the default behavior of `residuals.marssMLE()` to return innovations instead of smoothations.
+* Columns of model estimated values in `fitted.marssMLE`, `residuals.marssMLE`, and `tsSmooth.marssMLE` have a leading ".".
 
 
 MARSS 3.10.13 (GitHub 2-25-2020)
@@ -94,7 +85,7 @@ ENHANCEMENTS
 * `MARSSkfss()` and `MARSSkfas()` Add rownames to the x elements of the list.
 * `MARSSkf()` Added `newdata` to allow user to pass in a new dataset to fit with the fitted model.
 * `predict.marssMLE()` Shows the prediction or confidence intervals for data or states. Forecasts can be done by passing in `h`. `newdata` can be passed in also and fitted model will be used to fit these data and show the intervals. Output is same form as a tibble (but not a tibble). Returns a list of class `marssPredict`.
-* `forecast.marssMLE()` This does the foreward forecasting past the end of the data. Intended to be called by `predict.marssMLE`. I did not write a `marssMLE` method for the `forecast` generic in the **forecast** package since that would require that the forecast package be required for the **MARSS** package.
+* `forecast.marssMLE()` This does the forward forecasting past the end of the data. Intended to be called by `predict.marssMLE`. I did not write a `marssMLE` method for the `forecast` generic in the **forecast** package since that would require that the forecast package be required for the **MARSS** package.
 * `plot.marssPredict()` plot method for the new marssPredict object. This is designed to look like the `plot.forecast()` function in the **forecast** package.
 * `print.marssPredict()` print method for marssPredict objects.
 
@@ -111,11 +102,11 @@ BUGS
 * `MARSS_dfa()` used form="dfa" in MARSS.call list. Just info. Never used.
 * Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
 * `toLatex.marssMODEL()` Fixed some old bugs in toLatex_marssMODEL.R. Added S3 class declaration in NAMESPACE for toLatex. fixed equation attribute in MARSS_marxss. G{t} was used instead of G_{t}. Only affected toLatex_marssMODEL(). Had extra line in build.mat.tex() that removed last line of matrices. This function was not exported so users would never have run into these bugs.
-* `MARSSkfss()` To limit propogation of numerical errors when R=0, the row/col of Vtt for the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data. Note, MARSkfss() is the classic Kalman filter/smoother. The MARSS algorithm does not use this normally. Normally MARSSkfas(), build off the Koopman et al algorithm which avoids unneeded matrix inverses, is used. MARSSkfas() uses the Kalman filter/smoother in the KFAS package. 
+* `MARSSkfss()` To limit propagation of numerical errors when R=0, the row/col of Vtt for the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data. Note, MARSkfss() is the classic Kalman filter/smoother. The MARSS algorithm does not use this normally. Normally MARSSkfas(), build off the Koopman et al algorithm which avoids unneeded matrix inverses, is used. MARSSkfas() uses the Kalman filter/smoother in the KFAS package. 
 
 ENHANCEMENTS
 
-* `MARSShatyt()` Added ytt, ytt1, Ott, Ott1 to MARSShatyt() so that tidy.marssMLE() can more easily return the one-step-ahead preditions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
+* `MARSShatyt()` Added ytt, ytt1, Ott, Ott1 to MARSShatyt() so that tidy.marssMLE() can more easily return the one-step-ahead predictions for Y(t). Also added var.ytT and var.EytT so you can easily get the estimates, CI and prediction intervals for missing data. Added only.kem to MARSShatyt() so that only values conditioned on 1:T as needed by MARSS kem are returned. This makes the Ey part of a MARSS object smaller and speeds up MARSShatyt() a little.
 * `tidy.marssMLE()` Changed type for tidy() to xtT, ytT and fitted.ytT. tidy() exclusively gives estimates of things (parameters, X, Y, fitted Y) conditioned on all the data.
 * `fitted.marssMLE()` Added interval=c("none", "confidence", "prediction") to fitted() and returns a list with se's (or sd's if prediction) and intervals. Also added conditioning argument to fitted.marssMLE which gives fitted values with different conditioning. Changed default output to tibble.
 * `augment.marssMLE()` Changed standard errors output for augment() to .se.fit for std error of fitted y and .sigma to std error of residuals. This matches what augment.lm outputs.
@@ -128,7 +119,7 @@ ENHANCEMENTS
 DOCUMENTATION and MAN FILES
 
 * Added derivation of variance of Y conditioned on y and X to EMDerivation.Rnw.  Needed for CI on the missing values estimate.
-* Major update to Residuals report. No changes to equations but much editting to improve precision and clarity (with much more verbosity). Reposted to Arxiv. Added innovations residuals.
+* Major update to Residuals report. No changes to equations but much editing to improve precision and clarity (with much more verbosity). Reposted to Arxiv. Added innovations residuals.
 * tidy, augment and fitted man files got major update.
 * internal functions given \keyword{internal} so they don't appear in the documentation, but will appear if you use `?` or help.search.
 * Rd files extensively cleaned to improve linking and move more of the internal functions out of view of the normal user.  Equations cleaned up (though not completely).
@@ -187,12 +178,12 @@ BUGS
 inits functions
 
 * In `MARSSinits_marxss()` function would give error if U, A, C, or D fixed and user passed in inits.  inits ignored in this case so should not throw error.
-* `alldefaults` could be updated by form.  A few functions were neglecting to (re)load alldefaults or to ressign `alldefaults` when updated: is_marssMLE(), MARSSinits.marxss(), MARSSinits().  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
+* `alldefaults` could be updated by form.  A few functions were neglecting to (re)load alldefaults or to reassign `alldefaults` when updated: is_marssMLE(), MARSSinits.marxss(), MARSSinits().  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
 
-kalman filter functions
+Kalman filter functions
 
 * `MARSSkf()` was not passing optional function args to `MARSSkfas()`.
-* `MARSSkfss()` mis-counting num data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss() was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
+* `MARSSkfss()` miscounting the number of data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss() was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
 
 Confidence intervals and std error for R and Q
 
@@ -206,7 +197,7 @@ Fix: I completely abandoned working with the chol transformed variance-covarianc
 
 2. Harvey1989 is now the default function when method='hessian'. *In later vrs of MARSS, this is changed to Holmes2014.*
 
-3. The user can also select method='hessian' and hessian.fun='fdHess' or hessian.fun='optim'.  This will compute the Hessian (of the log-LL function at the MLEs) numerically using these functions.  The variance-covariance matrices are NOT chol transformed.  These are numerically estimated Hessians of the untransformed variance-covariance matrices.
+3. The user can also select method='hessian' and hessian.fun='fdHess' or hessian.fun='optim'.  This will compute the Hessian (of the log-LL function at the MLEs) numerically using these functions.  The variance-covariance matrices are NOT Cholesky transformed.  These are numerically estimated Hessian matrices of the untransformed variance-covariance matrices.
 
 4. Added `MARSSinfo(26)` which discusses the reason for NAs in the Hessian.
 
@@ -223,7 +214,7 @@ IMPROVEMENTS
 
 * w(t) and v(t) can be specified as G(t)\*w(t) and H(t)\*v(t) where G and H are fixed matrices (not estimated).  In version 3.10, G and H are restricted to being 0 or identity, however the code is in place for other values.
   - changes to `MARSS.marxss()` and `MARSS.marss()` to allow G, H, and L passed in
-  - change to `MARSSkem()` to specifiy star lists with G, H, and L (mathbb(elem) in EM Derivation)
+  - change to `MARSSkem()` to specify star lists with G, H, and L (mathbb(elem) in EM Derivation)
   - changed `MARSSkss()` to use Q\*=G Q t(G), R\*=H R t(H) and V0\*=L V0 t(L)
 * Removed the function `MARSSmcinits()` and added chapter on searching over the initial conditions into the User Guide.  As the MARSS models that MARSS() can fit expanded, `MARSSmcinits()` was increasing obsolete and it was impossible to come up with good searching distributions.  Because `MARSSmcinits()` was removed, control$MCInits list item was removed also from defaults and from accepted input.
 * Added default inits for c and d in marxss form so that user can pass in inits using coef(fit); was balking because this includes d and c which didn't have defaults.  Removed msg referring to need that model be in marss form for inits (not true).
@@ -251,13 +242,13 @@ MISC
 
 * Moved info in MARSSsettings.R to .onLoad function.
 * Added suppressWarnings() wrapper to KFAS call when R=0 in MARSSkfas since update to KFAS package produces warning messages when R=0.
-* Typo in Eqn 124 of EMDerivation.pdf.  \beta should have been ^{-1}. Typo in Eqns 133 and 134.  vec parentheses should have been in front of R in second summation.  R in first line of eqn 133, was not referring to R (the var-cov matrix).  It should have had a new symbol.  Switched to T.  Eqn 134 was not R but this 'T'.
+* Typo in Eqn 124 of EMDerivation.pdf.  \beta should have been ^{-1}. Typo in Eqns 133 and 134.  vec parentheses should have been in front of R in second summation.  R in first line of equation 133, was not referring to R (the var-cov matrix).  It should have had a new symbol.  Switched to T.  Equation 134 was not R but this 'T'.
 * Added safe to control list in man file MARSS.Rd   Left off accidentally.
 * Small change to DLM chapter to clarify that rotation matrix only exists if Z has more than 2 columns.
 * All subfunctions for a function moved into the main functions so they are hidden to the rest of the functions.
 * The logLik function was using the logLik, samp.size and df attributes from the MLE object, but this is prone to creating errors.  The user may have changed the model structure or data in a MLE object and is trying to get the new logLik.  Changed to recompute the logLik.
 * Removed use of stringr package; did not need
-* Poor name choice. y.se was not the standardard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
+* Poor name choice. y.se was not the standard error of ytT since sqrt(OtT) not sqrt(OtT-ytT^2) was being returned.  Changed name of y.se to ytT.se
 
 
 MARSS 3.9 (CRAN 3-21-2014)
@@ -274,7 +265,7 @@ ENHANCEMENTS
 * Added check to `print.marssMLE()` to make sure models are class marssMODEL.  
 * Changed `summary.marssMODEL()` to return the list matrix instead of the marssMODEL passed in. Added tinitx to the returned (and printed) list.
 * Removed `is.blockunconst()` and `is.blockequaltri()` functions.  Not really used or useful and were buggy.
-* Much of this function code (assoc with identifying blocks) incorporated into a better is.validvarcov function to test for many more illegal constraints on a variance-covariance matrix.  This will catch most but not all illegal constraints on Q, R and V0.  It has a method argument, so method=BFGS can be passed in to check that all blocks are diagonal or unconstrained as needed by the chol transformation used in the `MARSSoption()` code to ensure varcov matrices stay postitive-definite.
+* Much of this function code (assoc with identifying blocks) incorporated into a better is.validvarcov function to test for many more illegal constraints on a variance-covariance matrix.  This will catch most but not all illegal constraints on Q, R and V0.  It has a method argument, so method=BFGS can be passed in to check that all blocks are diagonal or unconstrained as needed by the chol transformation used in the `MARSSoption()` code to ensure varcov matrices stay positive-definite.
 * In `MARSS()`.  
    - Switched to use `MARSSkf()` to return kf (so use what user requested), but set Innov, Sigma, Kt etc with `MARSSkfss()`.
    - Added row names to states.se and y.se.
@@ -292,10 +283,10 @@ DOCUMENTATION
 
 BUGS
 
-* In `MARSSkfss()`. When Z was not square (num rows > num cols), OmgRVtt was not getting set.  OmgRVtt sets Vtt diagonals (and corresponding cols and row) to zero when R had 0s on the diagonal.
+* In `MARSSkfss()`. When Z was not square (number of rows > number of cols), OmgRVtt was not getting set.  OmgRVtt sets Vtt diagonals (and corresponding cols and row) to zero when R had 0s on the diagonal.
 * In `MARSSkfas()`. Was returning $Innov and $Sigma using $v and $F, but as detailed in the KFS help page (KFAS package), the ones returned by KFS are not the same as the standard innovations and Sigma for multivariate data.  Now, `MARSSkfas()` returns a text message to use `MARSSkfss()` to get these.
 * `residuals.marssMLE()` and `MARSSinnovationsboot()` were not running `MARSSkfss()` to get Innov, Kt, and Sigma when R was not diagonal.  Problem occurred after I changed `MARSSkfss()` to return text error instead of NULL for these.
-* Bug introduced in 3.6 that printed no absol convergence when convergence=10.  Should have printed abstol convergence only.
+* Bug introduced in 3.6 that printed no abstol convergence when convergence=10.  Should have printed abstol convergence only.
 * Bug in MARSSoptim (method=BFGS) that lead to only diagonal var-cov matrices when anything other than a diagonal var-cov matrix was selected.
 * Same bug affected attempt to compute CIs for non-diagonal var-cov matrices with Hessian.
 * Bug in MARSSoptim (method=BFGS) that allowed user to specify time-varying Q and R models, which code does not allow because cannot backsolve for par in that case.
@@ -323,7 +314,7 @@ DOCUMENTATION
 
 BUGS
 
-* Fixed `allow.degen()` bug that would set elements to zero, leading to non positive definite matrices. Test if Q and R are diagonal.  If not, don't allow degens to be set since that is likely to lead to non-pos def matrices.  I could test if the row/col covariance are 0s but that would be costly.
+* Fixed `allow.degen()` bug that would set elements to zero, leading to non positive definite matrices. Test if Q and R are diagonal.  If not, don't allow 0s to be set on diagonal since that is likely to lead to non-positive definite matrices.  I could test if the row/col covariance are 0s but that would be costly.
 * Fixed `loglog.conv.test()` bug that returned NAs when logLik > 720 due to exp(LL) call.  Changed to exp(LL-mean(LL))
 
 
@@ -441,7 +432,7 @@ OTHER
 
 MARSS 3.0  (CRAN 07-10-2012)
 ------------------------------------
-Version 3.0 is a major update and clean-up. Besides the clean-up, the changes were to allow time-varying parameters and a way for the user to specify linear constaints using an eqn like `a+2*b` in the parameter matrix.
+Version 3.0 is a major update and clean-up. Besides the clean-up, the changes were to allow time-varying parameters and a way for the user to specify linear constraints using an eqn like `a+2*b` in the parameter matrix.
 
 The changes are extensive but are internal and should be largely invisible to users of MARSS 2.X.  The `MARSS()` 3.0 call is backwards compatible to 2.9 except that kf.x0 changed to tinitx and moved from control list to model list.   Use of KFAS remains disabled until I can update to the new version of KFAS.  This slows down method="BFGS", but does not affect method="kem".
 
@@ -460,7 +451,7 @@ INTERNAL CHANGES
 * Added `checkMARSSInputs()` and `checkModelList()`. These replaced the functionality of popWrap.r and checkPopWrap.r
 * Added `MARSS.marxss()`.  This is the first `MARSS.form()` function.  This is a standardized format for so that I can add other forms easily.
 * Changed `MARSSkf()` so that K (Kalman gain) is 0 when tinitx=1 and V0=0. Changed `MARSSkf()` to allow some of diagonals of V0 to be 0 and others non zero.  Got rid of many of the OMGs.  Added `pcholinv()` function to diaghelpers.r which deals with matrices with 0s on diagonals.  This streamlined the filter code.
-* Rewrote many sections of `MARSSkem()` to allow time-varying parameters. Made changes to `MARSSkf()`, `MARSSkfas()` and `MARSSsimulate()` to allow time-varying parameters.  See EMDerivations.pdf
+* Rewrote many sections of `MARSSkem()` to allow time-varying parameters. Made changes to `MARSSkf()`, `MARSSkfas()` and `MARSSsimulate()` to allow time-varying parameters.  See EMDerivation.pdf
 * Added fun argument to `MARSShessian()` and `MARSSparamCIs()` to allow one to specify the function used to compute the log-likelihood.
 * Added row and col names to Hessian in `MARSShessian()`
 * Moved diffuse from control element to model element of MLEobj since it is part of the model specification.  Required changes to `MARSSsettings()`, `MARSS.marxss()`, `is.marssm()`, `is.marssMLE()`.
@@ -469,8 +460,8 @@ INTERNAL CHANGES
 
 DOCUMENTATION
 
-* Totally revamped the EMDerivations.pdf to allow time-varying models.
-* Rewrote (again) the section on degenerate models in EMDerivation.pdf to allow B structures that imply both total deterministic X and indirectly stochastic x.  The latter is required to allow one to rewrite a MAR-p model as a MAR-1 model.  Time-varying params meant that the matrix geometric function no longer could be used, but I found a simplier recursion.  Improved the presentation so only 1 x0 and U update equation is given rather than 5 special cases.  
+* Totally revamped the EMDerivation.pdf to allow time-varying models.
+* Rewrote (again) the section on degenerate models in EMDerivation.pdf to allow B structures that imply both total deterministic X and indirectly stochastic x.  The latter is required to allow one to rewrite a MAR-p model as a MAR-1 model.  Time-varying params meant that the matrix geometric function no longer could be used, but I found a simpler recursion.  Improved the presentation so only 1 x0 and U update equation is given rather than 5 special cases.  
 
 OTHER CHANGES
 
@@ -525,7 +516,7 @@ Version 2.8 improved default initial conditions functions and fixed bugs in the 
 * In `MARSSinits()`, got rid of the linear regression to get inits for x0; using instead solution of pi from y(1)=Z\*(D\*pi+f)+A; This stops MARSS from complaining about no inits when Z is not a design matrix.  NOTE NB: This means the default initial x0 are different for 2.7 and 2.8, which leads to slightly different answers for `MARSS(dat)` in 2.7 and 2.8. The answers are not really different, just they started with slightly different initial values so have slightly different values when the algorithm reaches its convergence limit.
 * Removed dependency on time package. The progressBar function was moved into MARSS since the time package is no longer maintained.
 * Changed `MARSSkemcheck()` to allow lag-p models. I worked on the derivation of the degenerate models (with 0 on diag of Q) to better define the needed constraints on B.0 and B.plus sub matrices.  This led to changes in MARSSkemcheck.r so that lag-p models written as MARSS model are now allowed.  There are still problems though in x0 estimation in the EM algorithm when there are zeros on R and B diagonals, so best to method=``BFGS'' until I redo the degenerate EM algorithm.
-* Added option to force use of `MARSSkf()` function instead of MARSSkfas. If kf.x0="x10", default was to use `MARSSkfas()` function which is much faster, but it doesn't like 0s on B diagonal if V0 is 0.  So I added the option to force use of slower `MARSSkf()` function using method="BFGSkf". Reguired adding stuff to MARSSsettings.r and MARSSoptim.r.  This is mainly for debugging since `MARSSoptim()` will now check if optim failed and try using `MARSSkf()` if `MARSSkfas()` was used.  Added line to output that says which function used for likelihood calculation; again for debugging.
+* Added option to force use of `MARSSkf()` function instead of MARSSkfas. If kf.x0="x10", default was to use `MARSSkfas()` function which is much faster, but it doesn't like 0s on B diagonal if V0 is 0.  So I added the option to force use of slower `MARSSkf()` function using method="BFGSkf". Required adding stuff to MARSSsettings.r and MARSSoptim.r.  This is mainly for debugging since `MARSSoptim()` will now check if optim failed and try using `MARSSkf()` if `MARSSkfas()` was used.  Added line to output that says which function used for likelihood calculation; again for debugging.
  * Edited `MARSSmcinit()` to improve random B generation. There is nothing to guarantee that random Bs in mcinit routine will be within the unit circle, however it is probably a good idea if they are.   Default bounds for B changed to -1,1 and random B matrix rescaled by dividing by max(abs(Re(eigen(B)))/runif(1) to get the max abs eigenvalue between 0 and 1.  This works unless the user has fixed some B values to non-zero values.  This required change to is\_marssMLE.r also to remove constraint that B bounds be greater than 0.
 * Edited `MARSSmcinit()` to allow fixed and shared values in random Qs and Rs. The random Wishart draw is rescaled based on the fixed and shared structure in R or Q.  As part of this, I cleaned up how fixed and shared values are specified in the random draws of other parameters.  This change doesn't change the end effect, but the code is cleaner.
 
@@ -595,7 +586,7 @@ ENHANCEMENTS
 
 DOCUMENTATION
 
-* Big revamp of EMDerivations.pdf. I cleaned up my derivation a lot.  I'm especially happy with the sections on dealing missing values part of the derivation.  It's much more elegant and logical now.  The sections on degenerate matrices are cluttered and the notation is painful, but I will leave them be for awhile.
+* Big revamp of EMDerivation.pdf. I cleaned up my derivation a lot.  I'm especially happy with the sections on dealing missing values part of the derivation.  It's much more elegant and logical now.  The sections on degenerate matrices are cluttered and the notation is painful, but I will leave them be for awhile.
 
 BUGS
 
@@ -611,7 +602,7 @@ MARSS 1.1
 * Fixed ungraceful exiting when minit > maxit
 * Fixed ungraceful exiting when method=BFGS threw error
 * Added more info to ?MARSS and help(``MARSS-package''). Changed MARSS.Rd and MARSS-package to have reference to user guide, index, and MARSS-package help page.
-* Changed convergence test. In the convergence diagnostics test, we check that the slope of logLik vs (log iteration num) is close to zero.  This is a standard convergence test.  But Shumway and Stoffers code uses a delta logLik test which checks that the logLik.new-logLik.old is less than some absolute (user specified) tolerance.  This turns out to be a bad convergence test because the log-log plot (described above) can still have a fairly clear slope.  I switched over to using the log-log test as the default test, but I allow the user to specify a abstol (delta logLik) if they want that instead.  This change slows down model fitting considerably but model fits that are actually converged.\
+* Changed convergence test. In the convergence diagnostics test, we check that the slope of logLik vs (log iteration num) is close to zero.  This is a standard convergence test.  But Shumway and Stoffer's code uses a delta logLik test which checks that the logLik.new-logLik.old is less than some absolute (user specified) tolerance.  This turns out to be a bad convergence test because the log-log plot (described above) can still have a fairly clear slope.  I switched over to using the log-log test as the default test, but I allow the user to specify a abstol (delta logLik) if they want that instead.  This change slows down model fitting considerably but model fits that are actually converged.\
 * Fixed `is.design()` function. A design matrix must have more or equal rows than columns.
 * R was changing dims on some matrices in `MARSSkf()`. R has a flaw in terms of how it behaves when you subscript a matrix and the new matrix has a dimension length of 1 for one (or more dimensions).  For example, if a=array(0,dim=c(1,2,4)), then a[,,1] is no longer a matrix but instead is a vector and dim(a[,,1]) is NULL.  This can cause all sorts of mysterious bugs.  Sometimes adding drop=FALSE will prevent this unpleasant behavior.  If b=matrix(0,2,2), dim(b[,1,drop=FALSE]) is c(2,1) while dim(b[,1]) is NULL.  drop=FALSE works great with 2-dimensional matrices, but with 3-dimensional matrices it doesn't work.  If a=array(0,dim=c(1,2,4)), dim(a[,,1,drop=FALSE]) is c(1,2,1) instead of c(1,2) which is what you want if a[,,1] is what is going to appear in some matrix operation. This problem came up in the Kt[,,t] %\*% innov[,t] line in MARSSkf.  Normally Kt[,,t] is square and a square matrix or a scalar is returned, but if Kt[,,t] happened to be something like dim=c(1,3,20) then Kt[,,t] returned a VECTOR of length 3.  In this case, Kt[, , t] %\*% innov[, t] crashed the code.  I had to use a kluge to force R to keep the dimensions after subscripting. This bug only occurred in models where Z is not a design matrix.
 * Fixed formatting issues in summary(marssm object). The naming of elements in the model matrices did not match `summary(marssMLE object)`.

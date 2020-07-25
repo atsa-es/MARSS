@@ -704,12 +704,12 @@ Now that we have done the appropriate factor and trends rotations, we
 should examine some plots of model fits. To do so, we will create a
 function \verb@getDFAfits()@ to extract the model fits and estimated $(1 - \alpha)$\% confidence intervals\blfootnote{Type \texttt{RShowDoc("Chapter\_DFA.R",package="MARSS")} at the R command line to open a file with all
 the code for this chapter and search for the function name.}. Note, the
-function \verb@MARSSresiduals()@ will also return this
+function \verb@residuals(..., type="smoothations")@ will also return this
 information.
 
 <<Cs25_func_get_DFA_fits, eval=TRUE, echo=FALSE>>=
 # If there were no missing values, this function will return the fits and CIs
-# Use tidy.marssMLE() to return the general fits and CIs
+# Use tsSmooth.marssMLE() to return the general fits and CIs
 # for the missing values case
 getDFAfits <- function(MLEobj, alpha = 0.05, covariates = NULL) {
   fits <- list()
@@ -785,7 +785,7 @@ Alternatively, you can use the \verb@residuals()@ function to obtain a summary o
 require(ggplot2)
 alpha <- 0.05
 theme_set(theme_bw())
-d <- residuals(the.fit)
+d <- residuals(the.fit, type = "smoothations")
 d$up <- qnorm(1 - alpha / 2) * d$.sigma + d$.fitted
 d$lo <- qnorm(alpha / 2) * d$.sigma + d$.fitted
 ggplot(data = d) +

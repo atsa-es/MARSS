@@ -36,11 +36,11 @@
 \examples{ 
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]
-MLEobj <- MARSS(dat)
+fit <- MARSS(dat)
 
-coef(MLEobj)
-coef(MLEobj, type = "vector")
-coef(MLEobj, type = "matrix")
+coef(fit)
+coef(fit, type = "vector")
+coef(fit, type = "matrix")
 # to retrieve just the Q matrix
-coef(MLEobj, type = "matrix")$Q
+coef(fit, type = "matrix")$Q
 }
