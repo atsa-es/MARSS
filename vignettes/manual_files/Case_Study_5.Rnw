@@ -5,9 +5,9 @@
 
 <<RUNFIRST, echo=FALSE, include.source=FALSE, keep.source=FALSE>>=
 library(MARSS)
-options(width=60)
-options(prompt=" ", continue=" ")
-op <- par(no.readonly = TRUE)   
+options(width = 60)
+options(prompt = " ", continue = " ")
+op <- par(no.readonly = TRUE)
 @
 <<Cs00_required_libraries, echo=FALSE>>=
 library(MARSS)
@@ -59,51 +59,59 @@ STOP Data, however we have corrupted this data severely by adding random errors 
 Our noisy data are in \texttt{loggerheadNoisy}.  They consist of daily readings of location (longitude/latitude).
   If data are missing for a day, then the entries for latitude and longitude for that day should be NA.  However, to make the code in this chapter run quickly, we have interpolated all missing values in the original, uncorrupted, dataset (\texttt{loggerhead}).  The first six lines of the corrupted data look like so
 <<Cs01_data2>>=
-loggerheadNoisy[1:6,]
+loggerheadNoisy[1:6, ]
 @
 The file has data for eight turtles:
 <<Cs02_turtles2>>=
-turtles=levels(loggerheadNoisy$turtle)
+turtles <- levels(loggerheadNoisy$turtle)
 turtles
 @
 We will  analyze the position data for ``Big Mama''.  We put the data for ``Big Mama'' into matrix \texttt{dat}.  \verb@dat@ is transposed because we need time across the columns.
 <<Cs03_data3, keep.source=TRUE>>=
-turtlename="BigMama"
-theTurtle=which(loggerheadNoisy$turtle==turtlename)
-dat = loggerheadNoisy[theTurtle, 5:6]
-dat = t(dat) #transpose
+turtlename <- "BigMama"
+theTurtle <- which(loggerheadNoisy$turtle == turtlename)
+dat <- loggerheadNoisy[theTurtle, 5:6]
+dat <- t(dat) # transpose
 @
 
 Figure \ref{fig:CS5.fig1} shows the corrupted location data for Big Mama. The figure code uses the \texttt{maps} \R package. You will need to install this \R package in order to run the example code.  
 <<Cs04_fig-code>>=
-#load the map package; you have to install it first
-library(maps) 
+# load the map package; you have to install it first
+library(maps)
 # Read in our noisy data (no missing values)
-pdat = loggerheadNoisy  #for plotting
-turtlename="BigMama"
-theTurtle=which(loggerheadNoisy$turtle==turtlename)
-par(mai = c(0,0,0,0),mfrow=c(1,1))
-map('state', region = c('florida', 'georgia', 'south carolina',
-    'north carolina', 'virginia', 'delaware','new jersey','maryland'),
-    xlim=c(-85,-70))
-points(pdat$lon[theTurtle], pdat$lat[theTurtle], 
-    col="blue",pch=21, cex=0.7)
+pdat <- loggerheadNoisy # for plotting
+turtlename <- "BigMama"
+theTurtle <- which(loggerheadNoisy$turtle == turtlename)
+par(mai = c(0, 0, 0, 0), mfrow = c(1, 1))
+map("state",
+  region = c(
+    "florida", "georgia", "south carolina",
+    "north carolina", "virginia", "delaware", "new jersey", "maryland"
+  ),
+  xlim = c(-85, -70)
+)
+points(pdat$lon[theTurtle], pdat$lat[theTurtle],
+  col = "blue", pch = 21, cex = 0.7
+)
 @
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
 <<Cs05_badtagfig,fig=TRUE,echo=FALSE>>=
-#load the map package; you have to install it first
-library(maps) 
+# load the map package; you have to install it first
+library(maps)
 # Read in our noisy data (no missing values)
-pdat = loggerheadNoisy  #for plotting
-turtlename="BigMama"
-par(mai = c(0,0,0,0),mfrow=c(1,1))
-map('state', region = c('florida', 'georgia', 'south carolina', 'north carolina', 
-    'virginia', 'delaware','new jersey','maryland'),xlim=c(-85,-70))
-points(pdat$lon[which(pdat$turtle==turtlename)], pdat$lat[which(pdat$turtle==turtlename)], 
-    col="blue",pch=21, cex=0.7)
+pdat <- loggerheadNoisy # for plotting
+turtlename <- "BigMama"
+par(mai = c(0, 0, 0, 0), mfrow = c(1, 1))
+map("state", region = c(
+  "florida", "georgia", "south carolina", "north carolina",
+  "virginia", "delaware", "new jersey", "maryland"
+), xlim = c(-85, -70))
+points(pdat$lon[which(pdat$turtle == turtlename)], pdat$lat[which(pdat$turtle == turtlename)],
+  col = "blue", pch = 21, cex = 0.7
+)
 @
 \end{center}
 \caption{Plot of the tag data from the turtle Big Mama.  Errors in the location data make it seem that Big Mama has been moving overland. }
@@ -117,68 +125,86 @@ We will begin by specifying the structure of the MARSS model and then use \textt
 
 We will assume that the errors are independent and that there are different drift rates ($u$), process variances ($\sigma^2$) and observation variances for latitude and longitude ($\eta^2$).
 <<Cs06_setup2>>=
-Z.model="identity"
-U.model="unequal"
-Q.model="diagonal and unequal"
-R.model="diagonal and unequal"
+Z.model <- "identity"
+U.model <- "unequal"
+Q.model <- "diagonal and unequal"
+R.model <- "diagonal and unequal"
 @
 Fit the model to the data:
 <<Cs07_fitmodel, results=hide>>=
-kem = MARSS(dat, model=list(Z = Z.model,
-      Q = Q.model, R = R.model, U = U.model))
+kem <- MARSS(dat, model = list(
+  Z = Z.model,
+  Q = Q.model, R = R.model, U = U.model
+))
 @
 
 We can create a plot comparing the estimated and actual locations (Figure \ref{fig:kaltotrue}). The real locations (from which \texttt{loggerheadNoisy} was produced by adding noise) are in  \texttt{loggerhead} and plotted with crosses.  There are only a few data points for the real data because in the real tag data, there are many missing days.  
 <<Cs08_code-to-plot>>=
-#Code to plot estimated turtle track against observations
-#The estimates
-pred.lon = kem$states[1,]
-pred.lat = kem$states[2,]
+# Code to plot estimated turtle track against observations
+# The estimates
+pred.lon <- kem$states[1, ]
+pred.lat <- kem$states[2, ]
 
-par(mai = c(0,0,0,0),mfrow=c(1,1))
+par(mai = c(0, 0, 0, 0), mfrow = c(1, 1))
 library(maps)
-pdat=loggerheadNoisy
-turtlename="BigMama"
-map('state', region = c('florida', 'georgia', 'south carolina',
-    'north carolina', 'virginia', 'delaware','new jersey','maryland'),
-    xlim=c(-85,-70))
-points(pdat$lon[theTurtle], pdat$lat[theTurtle],   
-     col="blue",pch=21, cex=0.7)
-lines(pred.lon, pred.lat,col="red", lwd=2)
+pdat <- loggerheadNoisy
+turtlename <- "BigMama"
+map("state",
+  region = c(
+    "florida", "georgia", "south carolina",
+    "north carolina", "virginia", "delaware", "new jersey", "maryland"
+  ),
+  xlim = c(-85, -70)
+)
+points(pdat$lon[theTurtle], pdat$lat[theTurtle],
+  col = "blue", pch = 21, cex = 0.7
+)
+lines(pred.lon, pred.lat, col = "red", lwd = 2)
 
-goodturtles = loggerhead
-gooddat = goodturtles[which(goodturtles$turtle==turtlename),5:6]
-points(gooddat[,1], gooddat[,2],col="black", lwd=2, pch=3,cex=1.1)
-legend("bottomright",c("bad locations", "estimated true location", 
-  "good location data"),pch=c(1,-1,3),lty=c(-1,1,-1),
-   col=c("blue","red","black"), bty=FALSE)
+goodturtles <- loggerhead
+gooddat <- goodturtles[which(goodturtles$turtle == turtlename), 5:6]
+points(gooddat[, 1], gooddat[, 2], col = "black", lwd = 2, pch = 3, cex = 1.1)
+legend("bottomright", c(
+  "bad locations", "estimated true location",
+  "good location data"
+),
+pch = c(1, -1, 3), lty = c(-1, 1, -1),
+col = c("blue", "red", "black"), bty = FALSE
+)
 @
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{figure}[htp]
 \begin{center}
 <<Cs09_figbigmama,fig=TRUE,width=6, height=6,echo=FALSE>>=
-#Code to plot estimated turtle track against observations
-#The estimates
-pred.lon = kem$states[1,]
-pred.lat = kem$states[2,]
+# Code to plot estimated turtle track against observations
+# The estimates
+pred.lon <- kem$states[1, ]
+pred.lat <- kem$states[2, ]
 
-par(mai = c(0,0,0,0),mfrow=c(1,1))
+par(mai = c(0, 0, 0, 0), mfrow = c(1, 1))
 library(maps)
-pdat=loggerheadNoisy
-turtlename="BigMama"
-map('state', region = c('florida', 'georgia', 'south carolina', 'north carolina', 
-     'virginia', 'delaware','new jersey','maryland'),xlim=c(-85,-70))
-points(pdat$lon[which(pdat$turtle==turtlename)], pdat$lat[which(pdat$turtle==turtlename)],   
-     col="blue",pch=21, cex=0.7)
-lines(pred.lon, pred.lat,col="red", lwd=2)
+pdat <- loggerheadNoisy
+turtlename <- "BigMama"
+map("state", region = c(
+  "florida", "georgia", "south carolina", "north carolina",
+  "virginia", "delaware", "new jersey", "maryland"
+), xlim = c(-85, -70))
+points(pdat$lon[which(pdat$turtle == turtlename)], pdat$lat[which(pdat$turtle == turtlename)],
+  col = "blue", pch = 21, cex = 0.7
+)
+lines(pred.lon, pred.lat, col = "red", lwd = 2)
 
-goodturtles = loggerhead
-gooddat = goodturtles[which(goodturtles$turtle==turtlename),5:6]
-points(gooddat[,1], gooddat[,2],col="black", lwd=2, pch=3,cex=1.1)
-legend("bottomright",c("bad locations", "estimated true location", 
-  "good location data"),pch=c(1,-1,3),lty=c(-1,1,-1),
-   col=c("blue","red","black"), bty=FALSE)
+goodturtles <- loggerhead
+gooddat <- goodturtles[which(goodturtles$turtle == turtlename), 5:6]
+points(gooddat[, 1], gooddat[, 2], col = "black", lwd = 2, pch = 3, cex = 1.1)
+legend("bottomright", c(
+  "bad locations", "estimated true location",
+  "good location data"
+),
+pch = c(1, -1, 3), lty = c(-1, 1, -1),
+col = c("blue", "red", "black"), bty = FALSE
+)
 @
 \end{center}
 \caption{Plot of the estimated track of the turtle Big Mama versus the good location data (before we corrupted it with noise).}
@@ -189,28 +215,34 @@ legend("bottomright",c("bad locations", "estimated true location",
 \section{Estimate speeds for each turtle}
 Turtle biologists designated one of these loggerheads ``Big Mama,'' presumably for her size and speed.  For each of the eight turtles, estimate the average miles traveled per day.  To calculate the distance traveled by a turtle each day, you use the estimate (from \texttt{MARSS()}) of the lat/lon location of turtle at day $t$ and at day $t-1$.  To calculate distance traveled in miles from lat/lon start and finish locations, we will use the function \verb@GCDF@:
 <<Cs09b_GCDF>>=
-GCDF <- function(lon1, lon2, lat1, lat2, degrees=TRUE, units="miles") {
-   temp = ifelse(degrees==FALSE, 
-     acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1)), 
-     acos(sin(lat1/57.2958)*sin(lat2/57.2958)+cos(lat1/57.2958)*cos(lat2/57.2958)
-       *cos(lon2/57.2958-lon1/57.2958)))
-   r=3963.0 # (statute miles) , default
-   if("units"=="nm") r=3437.74677 # (nautical miles)
-   if("units"=="km") r=6378.7 # (kilometers)
-   return (r * temp)
+GCDF <- function(lon1, lon2, lat1, lat2, degrees = TRUE, units = "miles") {
+  temp <- ifelse(degrees == FALSE,
+    acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)),
+    acos(sin(lat1 / 57.2958) * sin(lat2 / 57.2958) + cos(lat1 / 57.2958) * cos(lat2 / 57.2958)
+      * cos(lon2 / 57.2958 - lon1 / 57.2958))
+  )
+  r <- 3963.0 # (statute miles) , default
+  if ("units" == "nm") r <- 3437.74677 # (nautical miles)
+  if ("units" == "km") r <- 6378.7 # (kilometers)
+  return(r * temp)
 }
 @
 We can now compute the distance traveled each day by passing in lat/lon estimates from day $i-1$ and day $i$:
 <<Cs10_distance, eval=FALSE>>=
-distance[i-1]=GCDF(pred.lon[i-1],pred.lon[i],
-                   pred.lat[i-1],pred.lat[i])
+distance[i - 1] <- GCDF(
+  pred.lon[i - 1], pred.lon[i],
+  pred.lat[i - 1], pred.lat[i]
+)
 @
 \texttt{pred.lon} and \texttt{pred.lat} are the predicted longitudes and latitudes from \texttt{MARSS()}: rows one and two in \verb@kem$states@.  To calculate the distances for all days, we put this through a \texttt{for} loop:
 <<Cs11_distance2, keep.source=TRUE>>=
-distance = array(NA, dim=c(dim(dat)[2]-1,1))
-for(i in 2:dim(dat)[2])
-   distance[i-1]=GCDF(pred.lon[i-1],pred.lon[i],
-      pred.lat[i-1],pred.lat[i])
+distance <- array(NA, dim = c(dim(dat)[2] - 1, 1))
+for (i in 2:dim(dat)[2]) {
+  distance[i - 1] <- GCDF(
+    pred.lon[i - 1], pred.lon[i],
+    pred.lat[i - 1], pred.lat[i]
+  )
+}
 @
 
 The command \texttt{mean(distance)} gives us the average distance per day.  We can also make a histogram of the distances traveled per day (Figure \ref{fig:disfig}).
@@ -218,8 +250,8 @@ The command \texttt{mean(distance)} gives us the average distance per day.  We c
 \begin{figure}[htp]
 \begin{center}
 <<Cs13_disfig,fig=TRUE>>= 
-par(mfrow=c(1,1))
-hist(distance) #make a histogram of distance traveled per day
+par(mfrow = c(1, 1))
+hist(distance) # make a histogram of distance traveled per day
 @
 \end{center}
 \caption{Histogram of the miles traveled per day for Big Mama with estimates that account for measurement error in the data.}
@@ -233,10 +265,11 @@ We can compare the histogram of daily distances to what we would get if we had n
 \begin{center}
 <<Cs14_disfig2,fig=TRUE>>= 
 # Compare to the distance traveled per day if you used the raw data
-distance.noerr = array(NA, dim=c(dim(dat)[2]-1,1))
-for(i in 2:dim(dat)[2])
-  distance.noerr[i-1]=GCDF(dat[1,i-1],dat[1,i],dat[2,i-1],dat[2,i])
-hist(distance.noerr) #make a histogram of distance traveled per day
+distance.noerr <- array(NA, dim = c(dim(dat)[2] - 1, 1))
+for (i in 2:dim(dat)[2]) {
+  distance.noerr[i - 1] <- GCDF(dat[1, i - 1], dat[1, i], dat[2, i - 1], dat[2, i])
+}
+hist(distance.noerr) # make a histogram of distance traveled per day
 @
 \end{center}
 \caption{Histogram of the miles traveled per day for Big Mama with estimates that account for measurement error in the data.}
@@ -245,9 +278,9 @@ hist(distance.noerr) #make a histogram of distance traveled per day
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 We can also compare the mean miles per day:
 <<Cs15_mean.miles, keep.source=TRUE>>=
-#accounting for observation error
+# accounting for observation error
 mean(distance)
-#assuming the data have no observation error
+# assuming the data have no observation error
 mean(distance.noerr)
 @
 
@@ -272,116 +305,134 @@ To use \texttt{kftrack} to fit the turtle data, type
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <<Cs17_kftrack, keep.source=TRUE, eval=FALSE>>=
 library(kftrack) # must be installed from github
-loggerhead = loggerhead
-turtlename = "BigMama"
-dat = loggerhead[which(loggerhead$turtle == turtlename),2:6]
-model = kftrack(dat, fix.first=FALSE, fix.last=FALSE, 
-       var.struct="uniform")   
+loggerhead <- loggerhead
+turtlename <- "BigMama"
+dat <- loggerhead[which(loggerhead$turtle == turtlename), 2:6]
+model <- kftrack(dat,
+  fix.first = FALSE, fix.last = FALSE,
+  var.struct = "uniform"
+)
 @
 
 
 <<Reset, echo=FALSE>>=
-options(prompt="> ", continue="+ ")
+options(prompt = "> ", continue = "+ ")
 par(op)
 @
 
 <<Cs18_code, eval=TRUE, echo=FALSE, results=hide, fig=FALSE, keep.source=TRUE>>=
 ###############################################################
 #    GCDF FUNCTION
-#    This function converts units of degrees lat/lon to miles, 
+#    This function converts units of degrees lat/lon to miles,
 #    nautical miles, or kilometers
 ###############################################################
-GCDF <- function(lon1, lon2, lat1, lat2, degrees=TRUE, units="miles") {
-   # This is the function for the Great Circle Distance Formula 
-   # using decimal degrees or radians
-   # Calculations at: http://www.nhc.noaa.gov/gccalc.shtml
-   # This first component is only dependent on degrees or radians
-   temp = ifelse(degrees==FALSE, acos(sin(lat1) *  
-   sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)), 
-   acos(sin(lat1/57.2958) * sin(lat2/57.2958) + cos(lat1/57.2958) 
-   * cos(lat2/57.2958) *  cos(lon2/57.2958 -lon1/57.2958)))
-   r=3963.0 # (statute miles) , default
-   if("units"=="nm") r=3437.74677 # (nautical miles)
-   if("units"=="km") r=6378.7 # (kilometers)
-   return (r * temp)
+GCDF <- function(lon1, lon2, lat1, lat2, degrees = TRUE, units = "miles") {
+  # This is the function for the Great Circle Distance Formula
+  # using decimal degrees or radians
+  # Calculations at: http://www.nhc.noaa.gov/gccalc.shtml
+  # This first component is only dependent on degrees or radians
+  temp <- ifelse(degrees == FALSE, acos(sin(lat1) *
+    sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)),
+  acos(sin(lat1 / 57.2958) * sin(lat2 / 57.2958) + cos(lat1 / 57.2958)
+  * cos(lat2 / 57.2958) * cos(lon2 / 57.2958 - lon1 / 57.2958))
+  )
+  r <- 3963.0 # (statute miles) , default
+  if ("units" == "nm") r <- 3437.74677 # (nautical miles)
+  if ("units" == "km") r <- 6378.7 # (kilometers)
+  return(r * temp)
 }
 
-library(maps)    # must be installed from CRAN
+library(maps) # must be installed from CRAN
 
 # our noisy data (with no missing values)
-turtles = levels(loggerheadNoisy$turtle)
+turtles <- levels(loggerheadNoisy$turtle)
 levels(loggerheadNoisy$turtle)
 
-##############SPECIFY THE TURTLE NAME HERE
-turtlename="BigMama"
+############## SPECIFY THE TURTLE NAME HERE
+turtlename <- "BigMama"
 
-dat = loggerheadNoisy[which(loggerheadNoisy$turtle==turtlename),5:6]
-dat = t(dat)
+dat <- loggerheadNoisy[which(loggerheadNoisy$turtle == turtlename), 5:6]
+dat <- t(dat)
 
 # Set up the MSSM model
 # We are going to make a big approximation:
-# We are going to pretend that 1 deg longitude 
+# We are going to pretend that 1 deg longitude
 # change is equal to about the same distance (miles)
 # over the range of latitudes that the turtles are moving
 # That's not true.  There is about a 10% difference across
 # their range of latitude movement.
-Q.model="diagonal and unequal"
-R.model="diagonal and unequal"
-U.model="unequal"
-Z.model="identity" 
+Q.model <- "diagonal and unequal"
+R.model <- "diagonal and unequal"
+U.model <- "unequal"
+Z.model <- "identity"
 
 # Fit a random walk model for lon/lat to the lon/lat data
-kem = MARSS(dat, model=list(Z = Z.model, 
-   Q = Q.model, R = R.model, U = U.model))
-pred.lon = kem$states[1,]
-pred.lat = kem$states[2,]
+kem <- MARSS(dat, model = list(
+  Z = Z.model,
+  Q = Q.model, R = R.model, U = U.model
+))
+pred.lon <- kem$states[1, ]
+pred.lat <- kem$states[2, ]
 
 ##########################################
 # Plot the results
 ##########################################
-op = par(mai = c(0,0,0,0))
-map('state', region = c('florida', 'georgia', 
-   'south carolina', 'north carolina', 'virginia', 
-   'delaware','new jersey','maryland'),xlim=c(-85,-65))
-points(loggerheadNoisy$lon[which(loggerheadNoisy$turtle==turtlename)], 
-   loggerheadNoisy$lat[which(loggerheadNoisy$turtle==turtlename)], 
-   col="blue",pch=21, cex=0.7)
-lines(pred.lon, pred.lat,col="red", lwd=2)
+op <- par(mai = c(0, 0, 0, 0))
+map("state", region = c(
+  "florida", "georgia",
+  "south carolina", "north carolina", "virginia",
+  "delaware", "new jersey", "maryland"
+), xlim = c(-85, -65))
+points(loggerheadNoisy$lon[which(loggerheadNoisy$turtle == turtlename)],
+  loggerheadNoisy$lat[which(loggerheadNoisy$turtle == turtlename)],
+  col = "blue", pch = 21, cex = 0.7
+)
+lines(pred.lon, pred.lat, col = "red", lwd = 2)
 
 # add the good location data
-goodturtles = loggerhead
-gooddat = goodturtles[which(goodturtles$turtle==turtlename),5:6]
-points(gooddat[,1], gooddat[,2],col="black", lwd=2, pch=3, cex=1.1)
-legend("bottomright",c("bad locations", "estimated true location", "good location data"),pch=c(1,-1,3),lty=c(-1,1,-1),col=c("blue","red","black"),bty=F)
+goodturtles <- loggerhead
+gooddat <- goodturtles[which(goodturtles$turtle == turtlename), 5:6]
+points(gooddat[, 1], gooddat[, 2], col = "black", lwd = 2, pch = 3, cex = 1.1)
+legend("bottomright", c("bad locations", "estimated true location", "good location data"), pch = c(1, -1, 3), lty = c(-1, 1, -1), col = c("blue", "red", "black"), bty = F)
 
 # add the proposed fishery areas
-lines(c(-77,-78,-78,-77,-77),c(33.5,33.5,32.5,32.5,33.5),
-   col="red",lwd=2)
-lines(c(-75,-76,-76,-75,-75),c(38,38,37,37,38),
-   col="red",lwd=2)
+lines(c(-77, -78, -78, -77, -77), c(33.5, 33.5, 32.5, 32.5, 33.5),
+  col = "red", lwd = 2
+)
+lines(c(-75, -76, -76, -75, -75), c(38, 38, 37, 37, 38),
+  col = "red", lwd = 2
+)
 
 ###########################################
 # Calculate the average miles traveled each day using
 # the function GCDF defined above
 # You must select and run the GCDF code first
 ###########################################
-distance = array(NA, dim=c(dim(dat)[2]-1,1))
-for(i in 2:dim(dat)[2])
-   distance[i-1]=GCDF(pred.lon[i-1],pred.lon[i],
-   pred.lat[i-1],pred.lat[i])
+distance <- array(NA, dim = c(dim(dat)[2] - 1, 1))
+for (i in 2:dim(dat)[2]) {
+  distance[i - 1] <- GCDF(
+    pred.lon[i - 1], pred.lon[i],
+    pred.lat[i - 1], pred.lat[i]
+  )
+}
 
-par(op) #reset plotting pars back to normal
-par(mfrow=c(1,2))  #make a 2 panel graph
-hist(distance) #make a histogram of distance traveled per day
-print(paste("KalmanEM estimate of ave. mile per day for ",
-  turtlename," = ", mean(distance) ))
+par(op) # reset plotting pars back to normal
+par(mfrow = c(1, 2)) # make a 2 panel graph
+hist(distance) # make a histogram of distance traveled per day
+print(paste(
+  "KalmanEM estimate of ave. mile per day for ",
+  turtlename, " = ", mean(distance)
+))
 
 # Compare to the distance traveled per day if you used the raw data
-distance = array(NA, dim=c(dim(dat)[2]-1,1))
-for(i in 2:dim(dat)[2])
-   distance[i-1]=GCDF(dat[1,i-1],dat[1,i],dat[2,i-1],dat[2,i])
-hist(distance) #make a histogram of distance traveled per day
-mean(distance) 
-print(paste("Raw estimate of ave. mile per day for ",
-  turtlename," = ", mean(distance) ))
+distance <- array(NA, dim = c(dim(dat)[2] - 1, 1))
+for (i in 2:dim(dat)[2]) {
+  distance[i - 1] <- GCDF(dat[1, i - 1], dat[1, i], dat[2, i - 1], dat[2, i])
+}
+hist(distance) # make a histogram of distance traveled per day
+mean(distance)
+print(paste(
+  "Raw estimate of ave. mile per day for ",
+  turtlename, " = ", mean(distance)
+))
 @

@@ -785,7 +785,7 @@ Alternatively, you can use the \verb@residuals()@ function to obtain a summary o
 require(ggplot2)
 alpha <- 0.05
 theme_set(theme_bw())
-d <- residuals(the.fit, type="smoothations")
+d <- residuals(the.fit, type = "smoothations")
 d$up <- qnorm(1 - alpha / 2) * d$.sigma + d$.fitted
 d$lo <- qnorm(alpha / 2) * d$.sigma + d$.fitted
 ggplot(data = d) +

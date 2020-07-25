@@ -5,7 +5,7 @@
 
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
 library(MARSS)
-options(prompt=" ", continue=" ")
+options(prompt = " ", continue = " ")
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Harbor seals in the Puget Sound, WA.}
@@ -17,28 +17,28 @@ In this application, we will use multivariate state-space models\index{MARSS mod
 We have five regions (or sites) where harbor seals were censused from 1978-1999 while hauled out of land \citet{Jeffriesetal2003}.  During the period of this dataset, harbor seals were recovering steadily after having been reduced to low levels by hunting prior to protection.  The methodologies were consistent throughout the 20 years of the data but we do not know what fraction of the population that each region represents nor do we know the observation-error variance for each region.  Given differences between behaviors of animals in different regions and the numbers of haul-outs in each region, the observation errors may be quite different.  The regions have had different levels of sampling; the best sampled region has only 4 years missing while the worst has over half the years missing (Figure~\ref{fig:CS2.fig1}).  
 
 <<noshowlegend, echo=FALSE, results=hide>>=
-d=harborSealWA
-legendnames = (unlist(dimnames(d)[2]))[2:ncol(d)]
-for(i in 1:length(legendnames)) cat(paste(i,legendnames[i],"\n",sep=" "))
+d <- harborSealWA
+legendnames <- (unlist(dimnames(d)[2]))[2:ncol(d)]
+for (i in 1:length(legendnames)) cat(paste(i, legendnames[i], "\n", sep = " "))
 @
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
 <<label=fig1,fig=TRUE,echo=FALSE,width=5,height=5>>=
-d=harborSealWA
-dat = d[,2:ncol(d)] #first col is years
-x = d[,1] #first col is years
-n = ncol(dat) #num time series
+d <- harborSealWA
+dat <- d[, 2:ncol(d)] # first col is years
+x <- d[, 1] # first col is years
+n <- ncol(dat) # num time series
 
-#set up the graphical parameters to give each data a unique line, color and width
-options(warn=-99)
-ltys=matrix(1,nrow=n)
-cols=matrix(1:4,nrow=n)
-lwds=matrix(1:2,nrow=n)
-pchs=matrix(as.character(c(1:n)),nrow=n)
-options(warn=0)
+# set up the graphical parameters to give each data a unique line, color and width
+options(warn = -99)
+ltys <- matrix(1, nrow = n)
+cols <- matrix(1:4, nrow = n)
+lwds <- matrix(1:2, nrow = n)
+pchs <- matrix(as.character(c(1:n)), nrow = n)
+options(warn = 0)
 
-graphics::matplot(x,dat,xlab="",ylab="log(counts)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds,bty="L")
+graphics::matplot(x, dat, xlab = "", ylab = "log(counts)", type = "b", pch = pchs, lty = ltys, col = cols, lwd = lwds, bty = "L")
 title("Puget Sound Harbor Seal Surveys")
 @
 \end{center}
@@ -51,14 +51,14 @@ We will assume that the underlying population process is a stochastic exponentia
 
 The harbor seal data are included in the MARSS package.   The data have time running down the rows and years in the first column. We need time across the columns for the \verb@MARSS()@ function, so we will transpose the data:
 <<Cs2-readindata, echo=TRUE, keep.source=TRUE>>=
-dat=t(harborSealWA) #Transpose
-years = dat[1,] #[1,] means row 1
-n = nrow(dat)-1
-dat = dat[2:nrow(dat),] #no years
+dat <- t(harborSealWA) # Transpose
+years <- dat[1, ] # [1,] means row 1
+n <- nrow(dat) - 1
+dat <- dat[2:nrow(dat), ] # no years
 @
 \noindent The years are in column 1 of \texttt{dat} and the logged data are in the rest of the columns. The number of observation time series ($n$) is the number of rows in \verb@dat@ minus 1 (for years row).  Let's look at the first few years of data:
 <<Cs2-showdata>>=
-print(harborSealWA[1:8,], digits=3)
+print(harborSealWA[1:8, ], digits = 3)
 @
 The \texttt{NA}'s in the data are missing values.   
 
@@ -145,19 +145,19 @@ $\ZZ$ specifies which observation time series, $y_{i,1:T}$, is associated with w
 \subsection{Fitting the model}
 We have specified the mathematical form of our state-space model. The next step is to fit this model with \texttt{MARSS()}.  The function call will now look like:
 <<funccallwithconstraints, eval=FALSE>>=
-kem1 = MARSS(dat, model=list(Z=Z.model, R=R.model) ) 
+kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 @
 The \verb@model@ list argument tells the \texttt{MARSS()} function the model structure, i.e. the form of  $\ZZ$, $\uu$, $\QQ$, etc.  For our first analysis, we only need to set the model structure for $\ZZ$ and $\RR$.  Since there is only one population, there is only one $\uu$ and $\QQ$ (they are scalars), so they have no 'structure'.
 
 First we specify the $\ZZ$ matrix.  We need to tell the \texttt{MARSS} function that $\ZZ$ is a $5 \times 1$ matrix of 1s (as in Equation \ref{eq:meas}).  We can do this two ways. We can pass in \verb@Z.model@ as a matrix of ones, \verb@matrix(1,5,1)@, just like in  Equation \eqref{eq:meas} or we can pass in a vector of five factors,  \verb@factor(c(1,1,1,1,1))@. The $i$-th factor specifies which population trajectory the $i$-th observation time series belongs to.  Since there is only one population trajectory in this first analysis, we will have a vector of five $1$'s: every observation time series is measuring the first, and only, population trajectory. 
 <<setwhichPop, eval=TRUE>>=
-Z.model = factor(c(1,1,1,1,1))
+Z.model <- factor(c(1, 1, 1, 1, 1))
 @
 Note, the vector (the \verb@c()@ bit) must be wrapped in \verb@factor()@ so that \verb@MARSS@ recognizes what it is.  You can use either numeric or character vectors: \verb@c(1,1,1,1,1)@ is the same as \verb@c("PS","PS","PS","PS","PS")@.
 
 Next we specify that the $\RR$ variance-covariance matrix only has terms on the diagonal (the variances) with the off-diagonal terms (the covariances) equal to zero:  
 <<setvarcov1>>=
-R.model = "diagonal and equal" 
+R.model <- "diagonal and equal"
 @
 The `and equal' part specifies that the variances are the same value. We will relax this assumption later.  
 
@@ -166,13 +166,15 @@ The `and equal' part specifies that the variances are the same value. We will re
 \begin{figure}[htp]
 \begin{center}
 <<fig2,fig=TRUE,echo=FALSE,width=6,height=6, results=hide>>=
-kem1 = MARSS(dat, model=
-       list(Z=factor(c(1,1,1,1,1)), R="diagonal and equal"))
-graphics::matplot(years, t(dat),xlab="",ylab="index of log abundance",pch=c("1","2","3","4","5"),ylim=c(5,9),bty="L")
-lines(years,kem1$states-1.96*kem1$states.se,type="l",lwd=1,lty=2,col="red")
-lines(years,kem1$states+1.96*kem1$states.se,type="l",lwd=1,lty=2,col="red")
-lines(years,kem1$states,type="l",lwd=2)
-title("Observations and total population estimate",cex.main=.9)
+kem1 <- MARSS(dat,
+  model =
+    list(Z = factor(c(1, 1, 1, 1, 1)), R = "diagonal and equal")
+)
+graphics::matplot(years, t(dat), xlab = "", ylab = "index of log abundance", pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L")
+lines(years, kem1$states - 1.96 * kem1$states.se, type = "l", lwd = 1, lty = 2, col = "red")
+lines(years, kem1$states + 1.96 * kem1$states.se, type = "l", lwd = 1, lty = 2, col = "red")
+lines(years, kem1$states, type = "l", lwd = 2)
+title("Observations and total population estimate", cex.main = .9)
 @
 \end{center}
 \caption{Plot of the estimate of ``log total harbor seals in Puget Sound''. The estimate of the total count has been scaled relative to the first time series. The 95\% confidence intervals on the population estimates are the dashed lines.  These are not the confidence intervals on the observations, and the observations (the numbers) will not fall between the confidence interval lines.}
@@ -184,36 +186,42 @@ Code \ref{CS2.ex1} shows you how to fit the single population model (Equations \
 
 \exbegin{Code \ref{CS2.ex1}}
 <<label=Cs2_Code1,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
-#Code to fit the single population model with i.i.d. errors
-#Read in data
-dat=t(harborSealWA) #Transpose since MARSS needs time ACROSS columns
-years = dat[1,]      
-n = nrow(dat)-1
-dat = dat[2:nrow(dat),]
-legendnames = (unlist(dimnames(dat)[1]))
+# Code to fit the single population model with i.i.d. errors
+# Read in data
+dat <- t(harborSealWA) # Transpose since MARSS needs time ACROSS columns
+years <- dat[1, ]
+n <- nrow(dat) - 1
+dat <- dat[2:nrow(dat), ]
+legendnames <- (unlist(dimnames(dat)[1]))
 
-#estimate parameters
-Z.model = factor(c(1,1,1,1,1))
-R.model = "diagonal and equal" 
-kem1 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+# estimate parameters
+Z.model <- factor(c(1, 1, 1, 1, 1))
+R.model <- "diagonal and equal"
+kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 
-#make figure
-graphics::matplot(years, t(dat),xlab="",ylab="index of log abundance",
-  pch=c("1","2","3","4","5"),ylim=c(5,9),bty="L")
-lines(years,kem1$states-1.96*kem1$states.se,type="l",
-  lwd=1,lty=2,col="red")
-lines(years,kem1$states+1.96*kem1$states.se,type="l",
-  lwd=1,lty=2,col="red")
-lines(years,kem1$states,type="l",lwd=2)
-title("Observations and total population estimate",cex.main=.9)
+# make figure
+graphics::matplot(years, t(dat),
+  xlab = "", ylab = "index of log abundance",
+  pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L"
+)
+lines(years, kem1$states - 1.96 * kem1$states.se,
+  type = "l",
+  lwd = 1, lty = 2, col = "red"
+)
+lines(years, kem1$states + 1.96 * kem1$states.se,
+  type = "l",
+  lwd = 1, lty = 2, col = "red"
+)
+lines(years, kem1$states, type = "l", lwd = 2)
+title("Observations and total population estimate", cex.main = .9)
 
-coef(kem1, type="vector")  #show the estimated parameter elements as a vector
+coef(kem1, type = "vector") # show the estimated parameter elements as a vector
 
-#show estimated elements for each parameter matrix as a list
-coef(kem1) 
+# show estimated elements for each parameter matrix as a list
+coef(kem1)
 
-kem1$logLik   #show the log-likelihood
-kem1$AIC  #show the AIC
+kem1$logLik # show the log-likelihood
+kem1$AIC # show the AIC
 @
 \exend
 
@@ -237,7 +245,7 @@ The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  
 \label{CS2.ex2}
 Here is the estimated $\RR$ matrix for our first model:
 <<Cs2-analysis2obsvariance>>=
-coef(kem1,type="matrix")$R
+coef(kem1, type = "matrix")$R
 @
 Notice that the variances along the diagonal are all the same---we estimated one observation variance and it applied to all observation time series.  We might be able to improve the fit (at the cost of more parameters) by assuming that the observation variance is different across regions while the errors are still independent.  This means we estimate five observation variances instead of one.  In this case, $\RR$ has the form:
 \begin{equation}
@@ -250,19 +258,19 @@ Notice that the variances along the diagonal are all the same---we estimated one
 \end{equation}
 To impose this model, we set the $\RR$ model to 
 <<label=Cs2-setgroups>>=
-R.model="diagonal and unequal"
+R.model <- "diagonal and unequal"
 @
 This tells \verb@MARSS@ that all the $r$'s along the diagonal in $\RR$ are different.  To fit this model to the data, call \texttt{MARSS()} as:
 <<Cs2-fitanalysis2, results=hide>>=
-Z.model = factor(c(1,1,1,1,1))
-R.model = "diagonal and unequal" 
-kem2 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+Z.model <- factor(c(1, 1, 1, 1, 1))
+R.model <- "diagonal and unequal"
+kem2 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 @
 
 We estimated  one initial $x$, one process variance, one $u$, four $a$'s, and five observation variances. So $K=11$ parameters.
 The AIC for this new model compared to the old model with one observation variance is:
 <<Cs2-AIC2, eval=TRUE>>=
-c(kem1$AIC,kem2$AIC)
+c(kem1$AIC, kem2$AIC)
 @
 A smaller AIC means a better model\index{model selection!AIC}.  The difference between the one observation variance versus the unique observation variances is >10, suggesting that the unique observation variances model is better.
 
@@ -272,16 +280,16 @@ A smaller AIC means a better model\index{model selection!AIC}.  The difference b
 \begin{figure}[htp]
 \begin{center}
 <<Cs2-fig5,fig=TRUE,echo=FALSE,width=5,height=5>>=
-plotdat = t(dat)
-matrix.of.biases = matrix(coef(kem2, type="matrix")$A,nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
-xs = matrix(kem2$states,nrow=dim(plotdat)[1],ncol=dim(plotdat)[2],byrow=F)
-resids = plotdat-matrix.of.biases-xs
-par(mfrow=c(2,3))
-for(i in 1:n){
-	plot(resids[!is.na(resids[,i]),i],ylab="residuals")
-	title(legendnames[i])
-	}
-par(mfrow=c(1,1))
+plotdat <- t(dat)
+matrix.of.biases <- matrix(coef(kem2, type = "matrix")$A, nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T)
+xs <- matrix(kem2$states, nrow = dim(plotdat)[1], ncol = dim(plotdat)[2], byrow = F)
+resids <- plotdat - matrix.of.biases - xs
+par(mfrow = c(2, 3))
+for (i in 1:n) {
+  plot(resids[!is.na(resids[, i]), i], ylab = "residuals")
+  title(legendnames[i])
+}
+par(mfrow = c(1, 1))
 @
 \end{center}
 \caption{Residuals for the model with a single population. The plots of the residuals should not have trends with time, but they do.  This is an indication that the single population model is inconsistent with the data.  The code to make this plot is given in the script file for this chapter.}
@@ -291,29 +299,31 @@ par(mfrow=c(1,1))
 
 \exbegin{Code \ref{CS2.ex2}}
 <<Cs2_Code2,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
-#Code to fit the single population model with independent and unequal errors 
+# Code to fit the single population model with independent and unequal errors
 
-Z.model = factor(c(1,1,1,1,1))
-R.model = "diagonal and unequal" 
-kem2 = MARSS(dat, model=list(Z=Z.model, R=R.model))
+Z.model <- factor(c(1, 1, 1, 1, 1))
+R.model <- "diagonal and unequal"
+kem2 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 
-coef(kem2) #the estimated parameter elements
-kem2$logLik #log likelihood
-c(kem1$AIC,kem2$AIC)  #AICs
+coef(kem2) # the estimated parameter elements
+kem2$logLik # log likelihood
+c(kem1$AIC, kem2$AIC) # AICs
 
-#plot residuals
-plotdat = t(dat)
-matrix.of.biases = matrix(coef(kem2, type="matrix")$A,
-  nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
-xs = matrix(kem2$states,
-  nrow=dim(plotdat)[1],ncol=dim(plotdat)[2],byrow=F)
-resids = plotdat-matrix.of.biases-xs
-par(mfrow=c(2,3))
-for(i in 1:n){
-  plot(resids[!is.na(resids[,i]),i],ylab="residuals")
+# plot residuals
+plotdat <- t(dat)
+matrix.of.biases <- matrix(coef(kem2, type = "matrix")$A,
+  nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T
+)
+xs <- matrix(kem2$states,
+  nrow = dim(plotdat)[1], ncol = dim(plotdat)[2], byrow = F
+)
+resids <- plotdat - matrix.of.biases - xs
+par(mfrow = c(2, 3))
+for (i in 1:n) {
+  plot(resids[!is.na(resids[, i]), i], ylab = "residuals")
   title(legendnames[i])
 }
-par(mfrow=c(1,1))
+par(mfrow = c(1, 1))
 @
 \exend
 
@@ -387,16 +397,16 @@ For the observation process, we use the $\ZZ$ matrix to associate the regions wi
 \subsection{Specifying the \texttt{model} elements}
 We need to change the $\ZZ$ specification to indicate that there are two subpopulations (north and south), and that regions 1 and 2 are in the north subpopulation and regions 3,4 and 5 are in the south subpopulation.  There are a few ways, we can specify this $\ZZ$ matrix for \verb@MARSS()@:
 <<label=Cs2-analysis3-Z, eval=FALSE>>=
-Z.model = matrix(c(1,1,0,0,0,0,0,1,1,1),5,2) 
-Z.model = factor(c(1,1,2,2,2)) 
-Z.model = factor(c("N","N","S","S","S")) 
+Z.model <- matrix(c(1, 1, 0, 0, 0, 0, 0, 1, 1, 1), 5, 2)
+Z.model <- factor(c(1, 1, 2, 2, 2))
+Z.model <- factor(c("N", "N", "S", "S", "S"))
 @
 Which you choose is a matter of preference as they all specify the same form for $\ZZ$.
 
 We also want to specify that the $u$'s are the same for each subpopulation and that $\QQ$ is diagonal with equal $q$'s.  To do this, we set
 <<label=Cs2-analysis3-UQ, eval=FALSE>>=
-U.model = "equal" 
-Q.model = "diagonal and equal" 
+U.model <- "equal"
+Q.model <- "diagonal and equal"
 @
 
 \noindent This says that there is one $u$ and one $q$ parameter and both subpopulations share it (if we wanted the $u$'s to be different, we would use \verb@U.model="unequal"@ or leave off the $\uu$ model since the default behavior is \verb@U.model="unequal"@).  
@@ -405,26 +415,29 @@ Code \ref{CS2.ex3} puts all the pieces together and shows you how to fit the nor
 
 \exbegin{Code \ref{CS2.ex3}}
 <<label=Cs2_Code3,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
-#fit the north and south population model
-Z.model = factor(c(1,1,2,2,2))
-U.model = "equal" 
-Q.model = "diagonal and equal"
-R.model = "diagonal and unequal" 
-kem3 = MARSS(dat, model=list(Z=Z.model, 
-  R=R.model, U=U.model, Q=Q.model))
-#plot residuals
-plotdat = t(dat)
-matrix.of.biases = matrix(coef(kem3,type="matrix")$A,
-  nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
-par(mfrow=c(2,3))
-for(i in 1:n){
-  j=c(1,1,2,2,2)
-  xs = kem3$states[j[i],]
-  resids = plotdat[,i]-matrix.of.biases[,i]-xs
-  plot(resids[!is.na(resids)],ylab="residuals")
+# fit the north and south population model
+Z.model <- factor(c(1, 1, 2, 2, 2))
+U.model <- "equal"
+Q.model <- "diagonal and equal"
+R.model <- "diagonal and unequal"
+kem3 <- MARSS(dat, model = list(
+  Z = Z.model,
+  R = R.model, U = U.model, Q = Q.model
+))
+# plot residuals
+plotdat <- t(dat)
+matrix.of.biases <- matrix(coef(kem3, type = "matrix")$A,
+  nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T
+)
+par(mfrow = c(2, 3))
+for (i in 1:n) {
+  j <- c(1, 1, 2, 2, 2)
+  xs <- kem3$states[j[i], ]
+  resids <- plotdat[, i] - matrix.of.biases[, i] - xs
+  plot(resids[!is.na(resids)], ylab = "residuals")
   title(legendnames[i])
 }
-par(mfrow=c(1,1))
+par(mfrow = c(1, 1))
 @
 \exend
 
@@ -432,17 +445,17 @@ par(mfrow=c(1,1))
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs2-residuals-analysis3-fig6,fig=TRUE,echo=FALSE,width=5,height=5>>=
-plotdat = t(dat)
-matrix.of.biases = matrix(coef(kem3, type="matrix")$A,nrow=nrow(plotdat),ncol=ncol(plotdat),byrow=T)
-par(mfrow=c(2,3))
-for(i in 1:n){
-  j=c(1,1,2,2,2)
-	xs = kem3$states[j[i],]
-	resids = plotdat[,i]-matrix.of.biases[,i]-xs
-	plot(resids[!is.na(resids)],ylab="residuals")
-	title(legendnames[i])
-	}
-par(mfrow=c(1,1))
+plotdat <- t(dat)
+matrix.of.biases <- matrix(coef(kem3, type = "matrix")$A, nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T)
+par(mfrow = c(2, 3))
+for (i in 1:n) {
+  j <- c(1, 1, 2, 2, 2)
+  xs <- kem3$states[j[i], ]
+  resids <- plotdat[, i] - matrix.of.biases[, i] - xs
+  plot(resids[!is.na(resids)], ylab = "residuals")
+  title(legendnames[i])
+}
+par(mfrow = c(1, 1))
 @
 \end{center}
 \caption{The residuals for the analysis with a north and south subpopulation.  The plots of the residuals should not have trends with time.  Compare with the residuals for the analysis with one subpopulation.}
@@ -461,12 +474,14 @@ Analyze the data using a model with five subpopulations, where each of the five 
 
 \exbegin{Code \ref{CS2.ex4}}
 <<label=Cs2_Code4,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
-Z.model=factor(c(1,2,3,4,5))
-U.model="equal"
-Q.model="diagonal and equal"
-R.model="diagonal and unequal"
-kem=MARSS(dat, model=list(Z=Z.model, 
-  U=U.model, Q=Q.model, R=R.model) )
+Z.model <- factor(c(1, 2, 3, 4, 5))
+U.model <- "equal"
+Q.model <- "diagonal and equal"
+R.model <- "diagonal and unequal"
+kem <- MARSS(dat, model = list(
+  Z = Z.model,
+  U = U.model, Q = Q.model, R = R.model
+))
 @
 \exend
 
@@ -584,8 +599,8 @@ Analyze the data using a model with two subpopulations with the  divisions being
  
 To specify that $\QQ$ has one value on the diagonal (one variance) and one value on the off-diagonal (covariance) you can specify \verb@Q.model@ two ways:
 <<norun3, eval=FALSE>>=
-Q.model = "equalvarcov" 
-Q.model = matrix(c("q","c","c","q"),2,2)
+Q.model <- "equalvarcov"
+Q.model <- matrix(c("q", "c", "c", "q"), 2, 2)
 @  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -594,21 +609,21 @@ Q.model = matrix(c("q","c","c","q"),2,2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Analyze the data using a model with three subpopulations as follows: north (regions 1 and 2), south (regions 3 and 4), Hood Canal (region 5). You can specify that some subpopulations share parameters while others do not.  First, let's specify that each population is affected by independent environmental variability, but that the variance of that variability is the same for the two interior populations:
 <<eval=FALSE,keep.source=TRUE>>=
-Q.model=matrix(list(0),3,3)
-diag(Q.model)=c("coastal","interior","interior")
+Q.model <- matrix(list(0), 3, 3)
+diag(Q.model) <- c("coastal", "interior", "interior")
 print(Q.model)
 @
 Notice that $\QQ$ is a diagonal matrix (independent year-to-year environmental variability) but the variance of two of the populations is the same.  Notice too that the off-diagonal terms are numeric; they do not have quotes.  We specified $\QQ$ using a matrix of class list, so that we could have numeric values (fixed) and character values (estimated parameters).
 
 In a similar way, we specify that the observation errors are independent but that estimates from a plane do not have the same variance as those from a boat:
 <<eval=FALSE,keep.source=TRUE>>=
-R.model=matrix(list(0),5,5)
-diag(R.model)=c("boat","boat","plane","plane","plane")
+R.model <- matrix(list(0), 5, 5)
+diag(R.model) <- c("boat", "boat", "plane", "plane", "plane")
 @
 
 For the long-term trends, we specify that $x_1$ and $x_2$ share a long-term trend (``puget sound'') while $x_3$ is allowed to have a separate trend (``hood canal'').   
 <<eval=F,keep.source=TRUE>>=
-U.model=matrix(c("puget sound","puget sound","hood canal"),3,1)
+U.model <- matrix(c("puget sound", "puget sound", "hood canal"), 3, 1)
 @
 
 \section{Discussion}
@@ -631,28 +646,28 @@ Do assumptions about the underlying structure of the population affect your esti
 The confidence intervals for the first two analyses are very tight because the estimated process variance, $\QQ$, was very small.  Why do you think process variance ($q$) was forced to be so small?  [Hint: We are forcing there to be one and only one true population trajectory and all the observation time series have to fit that one time series. Look at the AICs too.]
 
 <<Reset, echo=FALSE>>=
-options(prompt="> ", continue="+ ")
+options(prompt = "> ", continue = "+ ")
 @
 
 <<label=Cs2_Code5_7, eval=TRUE, echo=FALSE, results=hide>>=
-#Two subpopulations with different population parameters
-Z.model=factor(c(1,1,2,2,2))
-U.model="unequal"
-Q.model="diagonal and unequal"
-R.model="diagonal and unequal"
-kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+# Two subpopulations with different population parameters
+Z.model <- factor(c(1, 1, 2, 2, 2))
+U.model <- "unequal"
+Q.model <- "diagonal and unequal"
+R.model <- "diagonal and unequal"
+kem <- MARSS(dat, model = list(Z = Z.model, U = U.model, Q = Q.model, R = R.model))
 
-#Hood Canal covaries with the other regions
-Z.model=factor(c(1,1,1,1,2))
-U.model="unequal"
-Q.model="equalvarcov"
-R.model="diagonal and unequal"
-kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+# Hood Canal covaries with the other regions
+Z.model <- factor(c(1, 1, 1, 1, 2))
+U.model <- "unequal"
+Q.model <- "equalvarcov"
+R.model <- "diagonal and unequal"
+kem <- MARSS(dat, model = list(Z = Z.model, U = U.model, Q = Q.model, R = R.model))
 
-#Three subpopulations with shared parameter values
-Z.model=factor(c(1,1,2,2,3))
-U.model="unequal"
-Q.model="diagonal and unequal"
-R.model="diagonal and unequal"
-kem = MARSS(dat, model=list(Z=Z.model, U=U.model, Q=Q.model, R=R.model) )
+# Three subpopulations with shared parameter values
+Z.model <- factor(c(1, 1, 2, 2, 3))
+U.model <- "unequal"
+Q.model <- "diagonal and unequal"
+R.model <- "diagonal and unequal"
+kem <- MARSS(dat, model = list(Z = Z.model, U = U.model, Q = Q.model, R = R.model))
 @

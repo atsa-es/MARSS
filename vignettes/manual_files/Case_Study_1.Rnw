@@ -5,7 +5,7 @@
 
 <<RUNFIRST, echo=FALSE, keep.source=TRUE>>=
 library(MARSS)
-options(prompt=" ", continue=" ")
+options(prompt = " ", continue = " ")
 @
 
 <<Cs1_a_required_libraries, echo=FALSE>>=
@@ -39,32 +39,34 @@ We will start by using simulated data to see the difference between data and est
 
 First, set things up:
 <<initvals, keep.source=TRUE>>=
-sim.u = -0.05         # growth rate
-sim.Q = 0.02          # process error variance
-sim.R = 0.05          # non-process error variance
-nYr= 50               # number of years of data to generate
-fracmissing = 0.1     # fraction of years that are missing
-init = 7              # log of initial pop abundance
-years = seq(1:nYr)    # sequence 1 to nYr
-x = rep(NA,nYr)       # replicate NA nYr times 
-y = rep(NA,nYr)	
+sim.u <- -0.05 # growth rate
+sim.Q <- 0.02 # process error variance
+sim.R <- 0.05 # non-process error variance
+nYr <- 50 # number of years of data to generate
+fracmissing <- 0.1 # fraction of years that are missing
+init <- 7 # log of initial pop abundance
+years <- seq(1:nYr) # sequence 1 to nYr
+x <- rep(NA, nYr) # replicate NA nYr times
+y <- rep(NA, nYr)
 @
 
 Then generate the population sizes using Equation \ref{eqn:1a}:
 <<fakepopdata, keep.source=TRUE>>=
-x[1]=init	
-for(t in 2:nYr){
-   x[t] = x[t-1]+ sim.u + rnorm(1,mean=0,sd=sqrt(sim.Q)) }
+x[1] <- init
+for (t in 2:nYr) {
+  x[t] <- x[t - 1] + sim.u + rnorm(1, mean = 0, sd = sqrt(sim.Q))
+}
 @
 
 Lastly, add observation error using Equation \ref{eqn:1b} and then add missing values:
 <<fakeobsdata, keep.source=TRUE>>=
-for(t in 1:nYr){
-  y[t]= x[t] + rnorm(1,mean=0,sd=sqrt(sim.R))
+for (t in 1:nYr) {
+  y[t] <- x[t] + rnorm(1, mean = 0, sd = sqrt(sim.R))
 }
-missYears = sample(years[2:(nYr-1)],floor(fracmissing*nYr),
-   replace = FALSE)
-y[missYears]=NA
+missYears <- sample(years[2:(nYr - 1)], floor(fracmissing * nYr),
+  replace = FALSE
+)
+y[missYears] <- NA
 @
 
  Stochastic population trajectories show much variation, so it is best to look at a few simulated data sets at once.  In Figure \ref{fig:CS1.9sim}, nine simulations from the identical parameters are shown.
@@ -73,28 +75,28 @@ y[missYears]=NA
 \begin{figure}[htp]
 \begin{center}
 <<label=sim3x3,fig=TRUE, echo=FALSE, include.source=FALSE, keep.source=TRUE, width=6, height=6>>=
-par(mfrow=c(3,3))
-sim.u = -0.05        # growth rate
-sim.Q = 0.02         # process error variance
-sim.R = 0.05         # non-process error variance
-nYr= 50              # number of years of data to generate
-fracmissing = 0.1    # fraction of years that are missing
-init = 7             # log of initial pop abundance
+par(mfrow = c(3, 3))
+sim.u <- -0.05 # growth rate
+sim.Q <- 0.02 # process error variance
+sim.R <- 0.05 # non-process error variance
+nYr <- 50 # number of years of data to generate
+fracmissing <- 0.1 # fraction of years that are missing
+init <- 7 # log of initial pop abundance
 
-years = seq(1:nYr)   # col of years
-x.tss = matrix(NA,nrow=9,ncol=nYr) # creates vector for ts w/o obs. error 
-y.tss = matrix(NA,nrow=9,ncol=nYr) # creates vector for ts w/ obs. error
-for(i in 1:9){ 
-   x.tss[i,1]=init			
-   for(t in 2:nYr)	x.tss[i,t] = x.tss[i,t-1]+ sim.u + rnorm(1, mean=0, sd=sqrt(sim.Q))
-   for(t in 1:nYr) y.tss[i,t]= x.tss[i,t] + rnorm(1,mean=0,sd=sqrt(sim.R))
-   missYears = sample(years[2:(nYr-1)], floor(fracmissing*nYr), replace = FALSE)
-   y.tss[i,missYears]=NA
-   plot(years, y.tss[i,],xlab="",ylab="index of log abundance",lwd=2,bty="l")
-   lines(years,x.tss[i,],type="l",lwd=2,lty=2)
-   title(paste("simulation ",i) )
+years <- seq(1:nYr) # col of years
+x.tss <- matrix(NA, nrow = 9, ncol = nYr) # creates vector for ts w/o obs. error
+y.tss <- matrix(NA, nrow = 9, ncol = nYr) # creates vector for ts w/ obs. error
+for (i in 1:9) {
+  x.tss[i, 1] <- init
+  for (t in 2:nYr) x.tss[i, t] <- x.tss[i, t - 1] + sim.u + rnorm(1, mean = 0, sd = sqrt(sim.Q))
+  for (t in 1:nYr) y.tss[i, t] <- x.tss[i, t] + rnorm(1, mean = 0, sd = sqrt(sim.R))
+  missYears <- sample(years[2:(nYr - 1)], floor(fracmissing * nYr), replace = FALSE)
+  y.tss[i, missYears] <- NA
+  plot(years, y.tss[i, ], xlab = "", ylab = "index of log abundance", lwd = 2, bty = "l")
+  lines(years, x.tss[i, ], type = "l", lwd = 2, lty = 2)
+  title(paste("simulation ", i))
 }
-#legend("topright", c("Observed","True"),lty = c(-1, 2), pch = c(1, -1))
+# legend("topright", c("Observed","True"),lty = c(-1, 2), pch = c(1, -1))
 @
 \end{center}
 \caption{Plot of nine simulated population time series with process and observation error.  Circles are observation and the dashed line is the true population size.}
@@ -114,32 +116,36 @@ Typical vertebrate $\sigma^2$ values are 0.002 to 0.02, and typical $\eta^2$ val
 \exbegin{Example \ref{CS1.ex1} code}
 \newline
 <<label=Cs1_Exercise1, fig=FALSE, echo=TRUE, keep.source=TRUE, results=hide >>=
-par(mfrow=c(3,3))
-sim.u = -0.05 
-sim.Q = 0.02 
-sim.R = 0.05 
-nYr= 50 
-fracmiss = 0.1 
-init = 7 
-years = seq(1:nYr)
-for(i in 1:9){
-  x = rep(NA,nYr) # vector for ts w/o measurement error 
-  y = rep(NA,nYr) # vector for ts w/ measurement error
-  x[1]=init			
-  for(t in 2:nYr){	
-    x[t] = x[t-1]+ sim.u + rnorm(1, mean=0, sd=sqrt(sim.Q)) }
-  for(t in 1:nYr){ 
-    y[t]= x[t] + rnorm(1,mean=0,sd=sqrt(sim.R)) }
-  missYears = 
-    sample(years[2:(nYr-1)],floor(fracmiss*nYr),replace = FALSE)
-  y[missYears]=NA
+par(mfrow = c(3, 3))
+sim.u <- -0.05
+sim.Q <- 0.02
+sim.R <- 0.05
+nYr <- 50
+fracmiss <- 0.1
+init <- 7
+years <- seq(1:nYr)
+for (i in 1:9) {
+  x <- rep(NA, nYr) # vector for ts w/o measurement error
+  y <- rep(NA, nYr) # vector for ts w/ measurement error
+  x[1] <- init
+  for (t in 2:nYr) {
+    x[t] <- x[t - 1] + sim.u + rnorm(1, mean = 0, sd = sqrt(sim.Q))
+  }
+  for (t in 1:nYr) {
+    y[t] <- x[t] + rnorm(1, mean = 0, sd = sqrt(sim.R))
+  }
+  missYears <-
+    sample(years[2:(nYr - 1)], floor(fracmiss * nYr), replace = FALSE)
+  y[missYears] <- NA
   plot(years, y,
-    xlab="",ylab="log abundance",lwd=2,bty="l")
-  lines(years,x,type="l",lwd=2,lty=2)
-  title(paste("simulation ",i) )
+    xlab = "", ylab = "log abundance", lwd = 2, bty = "l"
+  )
+  lines(years, x, type = "l", lwd = 2, lty = 2)
+  title(paste("simulation ", i))
 }
-legend("topright", c("Observed","True"),
-  lty = c(-1, 2), pch = c(1, -1))
+legend("topright", c("Observed", "True"),
+  lty = c(-1, 2), pch = c(1, -1)
+)
 @
 \exend
 
@@ -152,18 +158,18 @@ legend("topright", c("Observed","True"),
 \subsection{Model with process and observation error}
 \index{estimation!EM}\index{estimation!maximum-likelihood}Using the simulated  data, we estimate the parameters, $u$, $\sigma^2$, and $\eta^2$, and the hidden population sizes.   These are the estimates using a model with process and observation variability.  The function call is \verb@kem = MARSS(data)@, where \verb@data@ is a vector of logged (base e) counts with missing values denoted by NA.  After this call, the maximum-likelihood parameter estimates are shown with \verb@coef(kem)@.  There are numerous other outputs from the \texttt{MARSS()} function.  To get a list of the standard model output available type in \verb@?print.MARSS@.  Note that \verb@kem@ is just a name; the output could have been called \verb@foo@.  Here's code to fit to the simulated time series:
 <<fitKalmanEM1, eval=FALSE,include.source=FALSE>>=
-kem = MARSS(y) 
+kem <- MARSS(y)
 @
 <<fitKalmanEM2, echo=FALSE,include.source=FALSE>>=
-kem.params = matrix(NA, nrow=11, ncol=3, dimnames=list(c(paste("sim",1:9),"mean sim","true"),c("kem.U","kem.Q","kem.R")))
-kem.states = matrix(NA, nrow=9, ncol=nYr)
-for(i in 1:9){
-  kem = MARSS(y.tss[i,],silent=TRUE) 
-  kem.params[i,] = coef(kem, type="vector")[c(2,3,1)]
-  kem.states[i,]=kem$states
-	}	
-kem.params[10,]=apply(kem.params[1:9,],2,mean)
-kem.params[11,]=c(sim.u,sim.Q,sim.R)
+kem.params <- matrix(NA, nrow = 11, ncol = 3, dimnames = list(c(paste("sim", 1:9), "mean sim", "true"), c("kem.U", "kem.Q", "kem.R")))
+kem.states <- matrix(NA, nrow = 9, ncol = nYr)
+for (i in 1:9) {
+  kem <- MARSS(y.tss[i, ], silent = TRUE)
+  kem.params[i, ] <- coef(kem, type = "vector")[c(2, 3, 1)]
+  kem.states[i, ] <- kem$states
+}
+kem.params[10, ] <- apply(kem.params[1:9, ], 2, mean)
+kem.params[11, ] <- c(sim.u, sim.Q, sim.R)
 @
 Let's look at the parameter estimates for the nine simulated time series in Figure \ref{fig:CS1.9sim} to get a feel for the variation. The \verb@MARSS()@ function was used on each time series to produce parameter estimate for each simulation.  The estimates are followed by the mean (over the nine simulations) and the true values:
 <<nineparams, echo=FALSE>>=
@@ -177,14 +183,14 @@ The MARSS model fit also gives an estimate of the true population size with obse
 \begin{figure}[htp]
 \begin{center}
 <<label=plotkemstates,fig=TRUE,echo=FALSE,width=6, height=6, include.source=FALSE>>=
-par(mfrow=c(3,3))
-for(i in 1:9){
-plot(years, y.tss[i,], xlab="",ylab="index of log abundance",lwd=2,bty="l")
-lines(years,x.tss[i,],type="l",lwd=2,lty=2)
-lines(years, kem.states[i,], type="l",col=2,lwd=1,lty=1)
-title(paste("simulation ",i) )
+par(mfrow = c(3, 3))
+for (i in 1:9) {
+  plot(years, y.tss[i, ], xlab = "", ylab = "index of log abundance", lwd = 2, bty = "l")
+  lines(years, x.tss[i, ], type = "l", lwd = 2, lty = 2)
+  lines(years, kem.states[i, ], type = "l", col = 2, lwd = 1, lty = 1)
+  title(paste("simulation ", i))
 }
-#legend("topright", c("Observed","True","KalmanEM estimate"),lty = c(-1, 2, 1), pch = c(1, -1, -1),col=c(1,1,2))
+# legend("topright", c("Observed","True","KalmanEM estimate"),lty = c(-1, 2, 1), pch = c(1, -1, -1),col=c(1,1,2))
 @
 \end{center}
 \caption{The circles are the observed population sizes with error.  The dashed lines are the true population sizes.  The solid thin lines are the estimates of the true population size from the MARSS model.  When the process error variance is 0, these lines are straight.}
@@ -199,34 +205,34 @@ title(paste("simulation ",i) )
 
 Using the estimation method in \citet{Dennisetal1991}, our data need to be re-specified as the observed population changes (\texttt{delta.pop}) between censuses along with the time between censuses (\texttt{tau}).  We re-specify the data as follows: 
 <<recode.data.as.transitions, echo=TRUE, keep.source=TRUE>>=
-den.years = years[!is.na(y)] # the non missing years
-den.y = y[!is.na(y)] # the non missing counts
-den.n.y = length(den.years) 	
-delta.pop = rep(NA, den.n.y-1 ) # population transitions
-tau = rep(NA, den.n.y-1 ) # step sizes
-for (i in 2:den.n.y ){
-  delta.pop[i-1] = den.y[i] - den.y[i-1]
-  tau[i-1] =  den.years[i] - den.years[i-1]
+den.years <- years[!is.na(y)] # the non missing years
+den.y <- y[!is.na(y)] # the non missing counts
+den.n.y <- length(den.years)
+delta.pop <- rep(NA, den.n.y - 1) # population transitions
+tau <- rep(NA, den.n.y - 1) # step sizes
+for (i in 2:den.n.y) {
+  delta.pop[i - 1] <- den.y[i] - den.y[i - 1]
+  tau[i - 1] <- den.years[i] - den.years[i - 1]
 } # end i loop
 @
 Next, we regress the changes in population size between censuses (\texttt{delta.pop}) on the time between censuses (\texttt{tau}) while setting the regression intercept to 0.  The slope of the resulting regression line is an estimate of $u$, while the variance of the residuals around the line is an estimate of $\sigma^2$. The regression is shown in Figure \ref{fig:CS1.den91}.  Here is the code to do that regression:
 <<dennisEsts,echo=TRUE,keep.source=TRUE>>=
 den91 <- lm(delta.pop ~ -1 + tau)
 # note: the "-1" specifies no intercept
-den91.u = den91$coefficients 
-den91.Q = var(resid(den91))
-#type ?lm to learn about the linear regression function in R
-#form is lm(dependent.var ~ response.var1 + response.var2 + ...)
-#type summary(den91) to see other info about our regression fit
+den91.u <- den91$coefficients
+den91.Q <- var(resid(den91))
+# type ?lm to learn about the linear regression function in R
+# form is lm(dependent.var ~ response.var1 + response.var2 + ...)
+# type summary(den91) to see other info about our regression fit
 @
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \setkeys{Gin}{}
 \begin{figure}[ht]
 \begin{center}
 <<label=dennisregression,fig=TRUE,echo=FALSE,width=4,height=4,include.source=FALSE>>=
-par(mfrow=c(1,1))
-plot(tau, delta.pop,xlab="time step size (tau)",ylab="population transition size",xlim=c(0,max(tau)),bty="l")
-abline(den91,col=2)
+par(mfrow = c(1, 1))
+plot(tau, delta.pop, xlab = "time step size (tau)", ylab = "population transition size", xlim = c(0, max(tau)), bty = "l")
+abline(den91, col = 2)
 @
 \end{center}
 \caption{The regression of $log(N_{t+\tau})-log(N_t)$ against $\tau$.  The slope is the estimate of $u$ and the variance of the residuals is the estimate of $\sigma^2$. The regression is constrained to go through (0,0).}
@@ -236,22 +242,22 @@ abline(den91,col=2)
 
 Here are the parameter values for the data in Figure \ref{fig:CS1.showstates} using the process-error only model:
 <<paramvals, echo=FALSE,include.source=FALSE>>=
-den91.params = matrix(NA, nrow=11, ncol=2, dimnames=list(c(paste("sim",1:9),"mean sim","true"),c("den91.U","den91.Q")))
-for(i in 1:9){
-	den.years = years[!is.na(y.tss[i,])] 		# the non missing years
-	den.yts = y.tss[i,!is.na(y.tss[i,])] 		# the non missing counts
-	den.n.yts = length(den.years) 	
-	delta.pop = rep(NA, den.n.yts-1 ) 	# create a vector to store transitions
-	tau = rep(NA, den.n.yts-1 )	# create a vector of time step sizes
-	for (t in 2:den.n.yts ){
-		delta.pop[t-1] = den.yts[t] - den.yts[t-1]     	# store each transition
-		tau[t-1] =  den.years[t]-den.years[t-1] 	# the transitions
-		} # end t loop
-	den91 <- lm(delta.pop ~ -1+tau) # note: the "-1" specifies no intercept
-	den91.params[i, ] = c(den91$coefficients, var(resid(den91))) 
+den91.params <- matrix(NA, nrow = 11, ncol = 2, dimnames = list(c(paste("sim", 1:9), "mean sim", "true"), c("den91.U", "den91.Q")))
+for (i in 1:9) {
+  den.years <- years[!is.na(y.tss[i, ])] # the non missing years
+  den.yts <- y.tss[i, !is.na(y.tss[i, ])] # the non missing counts
+  den.n.yts <- length(den.years)
+  delta.pop <- rep(NA, den.n.yts - 1) # create a vector to store transitions
+  tau <- rep(NA, den.n.yts - 1) # create a vector of time step sizes
+  for (t in 2:den.n.yts) {
+    delta.pop[t - 1] <- den.yts[t] - den.yts[t - 1] # store each transition
+    tau[t - 1] <- den.years[t] - den.years[t - 1] # the transitions
+  } # end t loop
+  den91 <- lm(delta.pop ~ -1 + tau) # note: the "-1" specifies no intercept
+  den91.params[i, ] <- c(den91$coefficients, var(resid(den91)))
 }
-den91.params[10,]=apply(den91.params[1:9,],2,mean)
-den91.params[11,]=c(sim.u,sim.Q)
+den91.params[10, ] <- apply(den91.params[1:9, ], 2, mean)
+den91.params[11, ] <- c(sim.u, sim.Q)
 @
 <<den91params, echo=FALSE>>=
 den91.params
@@ -269,55 +275,62 @@ Run the example code a few times to compare the estimates using a state-space mo
 \exbegin{Example \ref{CS1.ex2} code}
 \newline
 <<label=Cs1_Exercise2, echo=TRUE, keep.source=TRUE, results=hide>>=
-sim.u = -0.05   # growth rate
-sim.Q = 0.02    # process error variance
-sim.R = 0.05    # non-process error variance
-nYr= 50         # number of years of data to generate
-fracmiss = 0.1  # fraction of years that are missing
-init = 7        # log of initial pop abundance (~1100 individuals)
-nsim = 9
-years = seq(1:nYr)  # col of years
-params = matrix(NA, nrow=(nsim+2), ncol=5, 
-  dimnames=list(c(paste("sim",1:nsim),"mean sim","true"),
-c("kem.U","den91.U","kem.Q","kem.R", "den91.Q")))
-x.ts = matrix(NA,nrow=nsim,ncol=nYr)  # ts w/o measurement error 
-y.ts = matrix(NA,nrow=nsim,ncol=nYr)  # ts w/ measurement error
-for(i in 1:nsim){ 
-  x.ts[i,1]=init			
-  for(t in 2:nYr){	
-    x.ts[i,t] = x.ts[i,t-1]+sim.u+rnorm(1,mean=0,sd=sqrt(sim.Q))}
-  for(t in 1:nYr){ 
-    y.ts[i,t] = x.ts[i,t]+rnorm(1,mean=0,sd=sqrt(sim.R))}
-  missYears = sample(years[2:(nYr-1)], floor(fracmiss*nYr),
-    replace = FALSE) 
-  y.ts[i,missYears]=NA
+sim.u <- -0.05 # growth rate
+sim.Q <- 0.02 # process error variance
+sim.R <- 0.05 # non-process error variance
+nYr <- 50 # number of years of data to generate
+fracmiss <- 0.1 # fraction of years that are missing
+init <- 7 # log of initial pop abundance (~1100 individuals)
+nsim <- 9
+years <- seq(1:nYr) # col of years
+params <- matrix(NA,
+  nrow = (nsim + 2), ncol = 5,
+  dimnames = list(
+    c(paste("sim", 1:nsim), "mean sim", "true"),
+    c("kem.U", "den91.U", "kem.Q", "kem.R", "den91.Q")
+  )
+)
+x.ts <- matrix(NA, nrow = nsim, ncol = nYr) # ts w/o measurement error
+y.ts <- matrix(NA, nrow = nsim, ncol = nYr) # ts w/ measurement error
+for (i in 1:nsim) {
+  x.ts[i, 1] <- init
+  for (t in 2:nYr) {
+    x.ts[i, t] <- x.ts[i, t - 1] + sim.u + rnorm(1, mean = 0, sd = sqrt(sim.Q))
+  }
+  for (t in 1:nYr) {
+    y.ts[i, t] <- x.ts[i, t] + rnorm(1, mean = 0, sd = sqrt(sim.R))
+  }
+  missYears <- sample(years[2:(nYr - 1)], floor(fracmiss * nYr),
+    replace = FALSE
+  )
+  y.ts[i, missYears] <- NA
 
-  #MARSS estimates 
-  kem = MARSS(y.ts[i,], silent=TRUE)
-  #type=vector outputs the estimates as a vector instead of a list
-  params[i,c(1,3,4)] = coef(kem,type="vector")[c(2,3,1)]
-	
-  #Dennis et al 1991 estimates
-  den.years = years[!is.na(y.ts[i,])]  # the non missing years
-  den.yts = y.ts[i,!is.na(y.ts[i,])]   # the non missing counts
-  den.n.yts = length(den.years) 	
-  delta.pop = rep(NA, den.n.yts-1 ) # transitions
-  tau = rep(NA, den.n.yts-1 )       # time step lengths
-  for (t in 2:den.n.yts ){
-    delta.pop[t-1] = den.yts[t] - den.yts[t-1] # transitions
-    tau[t-1] =  den.years[t]-den.years[t-1]    # time step length
+  # MARSS estimates
+  kem <- MARSS(y.ts[i, ], silent = TRUE)
+  # type=vector outputs the estimates as a vector instead of a list
+  params[i, c(1, 3, 4)] <- coef(kem, type = "vector")[c(2, 3, 1)]
+
+  # Dennis et al 1991 estimates
+  den.years <- years[!is.na(y.ts[i, ])] # the non missing years
+  den.yts <- y.ts[i, !is.na(y.ts[i, ])] # the non missing counts
+  den.n.yts <- length(den.years)
+  delta.pop <- rep(NA, den.n.yts - 1) # transitions
+  tau <- rep(NA, den.n.yts - 1) # time step lengths
+  for (t in 2:den.n.yts) {
+    delta.pop[t - 1] <- den.yts[t] - den.yts[t - 1] # transitions
+    tau[t - 1] <- den.years[t] - den.years[t - 1] # time step length
   } # end i loop
   den91 <- lm(delta.pop ~ -1 + tau) # -1 specifies no intercept
-  params[i,c(2,5)] = c(den91$coefficients, var(resid(den91))) 
+  params[i, c(2, 5)] <- c(den91$coefficients, var(resid(den91)))
 }
-params[nsim+1,]=apply(params[1:nsim,],2,mean)
-params[nsim+2,]=c(sim.u,sim.u,sim.Q,sim.R,sim.Q)
+params[nsim + 1, ] <- apply(params[1:nsim, ], 2, mean)
+params[nsim + 2, ] <- c(sim.u, sim.u, sim.Q, sim.R, sim.Q)
 @
 \exend
 
 Here is an example of the output from the Example \ref{CS1.ex2} code:
 <<Ex2_results, echo=TRUE, include.source=FALSE>>=
-print(params,digits=3)
+print(params, digits = 3)
 @
 
 \end{example}
@@ -337,13 +350,13 @@ where $x_e$ is the threshold and is defined as $x_e = \log(N_0/N_e)$.  $N_0$ is 
 
 Here is the \R code for that computation:
 <<probextcalc, eval=FALSE, echo=TRUE, include.source=FALSE, keep.source=TRUE>>=
-pd = 0.1 #means a 90 percent decline
-tyrs = 1:100 
-xd = -log(pd)
-p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) #Q=sigma2
-for (i in 1:100){      
- Pi[i] = p.ever * pnorm((-xd+abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))+
-   exp(2*xd*abs(u)/Q)*pnorm((-xd-abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))
+pd <- 0.1 # means a 90 percent decline
+tyrs <- 1:100
+xd <- -log(pd)
+p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q)) # Q=sigma2
+for (i in 1:100) {
+  Pi[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) +
+    exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
 }
 @
 
@@ -357,53 +370,56 @@ Looking at the figure, it is obvious that the probability estimates are highly v
 \begin{figure}[htp]
 \begin{center}
 <<Exercise3_figure, fig=TRUE, echo=FALSE, include.source=TRUE, width=6, height=6>>=
-#Needs Example 2 to be run first
-par(mfrow=c(3,3))
-pd = 0.1
-te = 100  				# extinction time horizon
-tyrs = 1:te 
-xd = -log(pd)
+# Needs Example 2 to be run first
+par(mfrow = c(3, 3))
+pd <- 0.1
+te <- 100 # extinction time horizon
+tyrs <- 1:te
+xd <- -log(pd)
 
-for(j in c(10,1:8)){
-	real.ex = matrix(nrow=te) 
-	denn.ex = matrix(nrow=te) 
-	kal.ex  = matrix(nrow=te)
+for (j in c(10, 1:8)) {
+  real.ex <- matrix(nrow = te)
+  denn.ex <- matrix(nrow = te)
+  kal.ex <- matrix(nrow = te)
 
-	#MARSS
-	u=params[j,1]
-	Q=params[j,3]
-  if(Q==0) Q=1e-4  #just so the extinction calc doesn't choke
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) 
-	for (i in 1:100){      
-    if(is.finite(exp(2*xd*abs(u)/Q))){ #Q!=0
-	  part2 = exp(2*xd*abs(u)/Q)*pnorm((-xd-abs(u)* tyrs[i])/sqrt(Q*tyrs[i]))
-    }else part2=0  #Q=0    
-    kal.ex[i]=p.ever*pnorm((-xd+abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))+ part2
-		} # end i loop
+  # MARSS
+  u <- params[j, 1]
+  Q <- params[j, 3]
+  if (Q == 0) Q <- 1e-4 # just so the extinction calc doesn't choke
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    if (is.finite(exp(2 * xd * abs(u) / Q))) { # Q!=0
+      part2 <- exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+    } else {
+      part2 <- 0
+    } # Q=0
+    kal.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) + part2
+  } # end i loop
 
-	#Dennis et al 1991
-	u=params[j,2]
-	Q=params[j,5]
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) 
-	for (i in 1:100){      
-  	denn.ex[i] = p.ever*pnorm(( -xd + abs(u)*tyrs[i])/ (sqrt(Q)*sqrt(tyrs[i]))) + exp(2*xd*abs(u)/Q) * pnorm((-xd - abs(u)* tyrs[i]) / (sqrt(Q)*sqrt(tyrs[i])))
-		} # end i loop
+  # Dennis et al 1991
+  u <- params[j, 2]
+  Q <- params[j, 5]
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    denn.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / (sqrt(Q) * sqrt(tyrs[i]))) + exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / (sqrt(Q) * sqrt(tyrs[i])))
+  } # end i loop
 
-	#True
-	u=sim.u; Q=sim.Q
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) 
-	for (i in 1:100){      
-  	real.ex[i] = p.ever*pnorm(( -xd + abs(u)*tyrs[i])/ sqrt(Q*tyrs[i])) + exp(2*xd*abs(u)/Q) * pnorm((-xd - abs(u)* tyrs[i]) / sqrt(Q*tyrs[i]))
-		} # end i loop
+  # True
+  u <- sim.u
+  Q <- sim.Q
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    real.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) + exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+  } # end i loop
 
-	#plot it
-	plot(tyrs,real.ex,xlab="time steps into future",ylab="probability of extinction",ylim=c(0,1),bty="l")
-	if(j<=8) title(paste("simulation ",j) )
-	if(j==10) title("average over sims")
-	lines(tyrs,denn.ex,type="l",col="red",lwd=2,lty=1) #red solid line
-	lines(tyrs,kal.ex,type="l",col="green",lwd=2,lty=2) #green dashed line
+  # plot it
+  plot(tyrs, real.ex, xlab = "time steps into future", ylab = "probability of extinction", ylim = c(0, 1), bty = "l")
+  if (j <= 8) title(paste("simulation ", j))
+  if (j == 10) title("average over sims")
+  lines(tyrs, denn.ex, type = "l", col = "red", lwd = 2, lty = 1) # red solid line
+  lines(tyrs, kal.ex, type = "l", col = "green", lwd = 2, lty = 2) # green dashed line
 }
-legend("bottomright",c("True","Dennis","KalmanEM"),pch=c(1,-1,-1),col=c(1,2,3),lty=c(-1,1,2),lwd=c(-1,2,2),bty="n")
+legend("bottomright", c("True", "Dennis", "KalmanEM"), pch = c(1, -1, -1), col = c(1, 2, 3), lty = c(-1, 1, 2), lwd = c(-1, 2, 2), bty = "n")
 @
 \end{center}
 \caption{Plot of the true and estimated probability of declining 90\% in different time horizons for nine simulated population time series with observation error. The plot may look like a step-function if the $\sigma^2$ estimate is very small (<1e-4 or so).}
@@ -428,50 +444,61 @@ Last change the extinction threshold (\texttt{pd} in the Example \ref{CS1.ex3} c
 \exbegin{Example \ref{CS1.ex3} code}
 \newline
 <<label=Cs1_Exercise3, fig=FALSE, echo=TRUE, keep.source=TRUE, results=hide>>=
-#Needs Example 2 to be run first
-par(mfrow=c(3,3))
-pd = 0.1; xd = -log(pd)   # decline threshold
-te = 100; tyrs = 1:te   # extinction time horizon 
-for(j in c(10,1:8)){
-  real.ex = denn.ex = kal.ex = matrix(nrow=te) 
+# Needs Example 2 to be run first
+par(mfrow = c(3, 3))
+pd <- 0.1
+xd <- -log(pd) # decline threshold
+te <- 100
+tyrs <- 1:te # extinction time horizon
+for (j in c(10, 1:8)) {
+  real.ex <- denn.ex <- kal.ex <- matrix(nrow = te)
 
-  #MARSS parameter estimates
-  u=params[j,1];   Q=params[j,3]
-  if(Q==0) Q=1e-4  #just so the extinction calc doesn't choke
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q))
-  for (i in 1:100){      
-    if(is.finite(exp(2*xd*abs(u)/Q))){
-	  sec.part = exp(2*xd*abs(u)/Q)*pnorm((-xd-abs(u)* tyrs[i])/sqrt(Q*tyrs[i]))
-    }else sec.part=0      
-    kal.ex[i]=p.ever*pnorm((-xd+abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))+sec.part
+  # MARSS parameter estimates
+  u <- params[j, 1]
+  Q <- params[j, 3]
+  if (Q == 0) Q <- 1e-4 # just so the extinction calc doesn't choke
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    if (is.finite(exp(2 * xd * abs(u) / Q))) {
+      sec.part <- exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+    } else {
+      sec.part <- 0
+    }
+    kal.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) + sec.part
   } # end i loop
 
-  #Dennis et al 1991 parameter estimates
-  u=params[j,2];   Q=params[j,5]
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) 
-  for (i in 1:100){      
-    denn.ex[i]=p.ever*pnorm((-xd+abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))+
-      exp(2*xd*abs(u)/Q)*pnorm((-xd-abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))
+  # Dennis et al 1991 parameter estimates
+  u <- params[j, 2]
+  Q <- params[j, 5]
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    denn.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) +
+      exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
   } # end i loop
 
-  #True parameter values
-  u=sim.u;   Q=sim.Q
-  p.ever = ifelse(u<=0,1,exp(-2*u*xd/Q)) 
-  for (i in 1:100){      
-    real.ex[i]=p.ever*pnorm((-xd+abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))+
-      exp(2*xd*abs(u)/Q)*pnorm((-xd-abs(u)*tyrs[i])/sqrt(Q*tyrs[i]))
+  # True parameter values
+  u <- sim.u
+  Q <- sim.Q
+  p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
+  for (i in 1:100) {
+    real.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) +
+      exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
   } # end i loop
 
-  #plot it
-  plot(tyrs, real.ex, xlab="time steps into future", 
-    ylab="probability of extinction", ylim=c(0,1), bty="l")
-  if(j<=8) title(paste("simulation ",j) )
-  if(j==10) title("average over sims")
-  lines(tyrs,denn.ex,type="l",col="red",lwd=2,lty=1) 
-  lines(tyrs,kal.ex,type="l",col="green",lwd=2,lty=2) 
+  # plot it
+  plot(tyrs, real.ex,
+    xlab = "time steps into future",
+    ylab = "probability of extinction", ylim = c(0, 1), bty = "l"
+  )
+  if (j <= 8) title(paste("simulation ", j))
+  if (j == 10) title("average over sims")
+  lines(tyrs, denn.ex, type = "l", col = "red", lwd = 2, lty = 1)
+  lines(tyrs, kal.ex, type = "l", col = "green", lwd = 2, lty = 2)
 }
-legend("bottomright",c("True","Dennis","KalmanEM"),pch=c(1,-1,-1),
-  col=c(1,2,3),lty=c(-1,1,2),lwd=c(-1,2,2),bty="n")
+legend("bottomright", c("True", "Dennis", "KalmanEM"),
+  pch = c(1, -1, -1),
+  col = c(1, 2, 3), lty = c(-1, 1, 2), lwd = c(-1, 2, 2), bty = "n"
+)
 @
 \exend
 
@@ -492,8 +519,8 @@ One way to show this is to plot the uncertainty as a function of the forecast, w
 \begin{figure}[htp]
 \begin{center}
 <<figTMU,fig=T,echo=FALSE, include.source=FALSE,width=5,height=5>>=
-par(mfrow=c(1,1))
-CSEGtmufigure(N=nYr, u= sim.u, s2p=sim.Q)
+par(mfrow = c(1, 1))
+CSEGtmufigure(N = nYr, u = sim.u, s2p = sim.Q)
 @
 \end{center}
 \caption{This figure shows your region of high uncertainty (dark gray).  In this region, the minimum 95\% confidence intervals (meaning if you had no observation error) span 80\% of the 0 to 1 probability.  That is, you are uncertain if the probability of a specified decline is close to 0 or close to 1.  The white area shows where your upper 95\% CIs does not exceed P=0.05.  So you are quite sure the probability of a specified decline is less than 0.05.  The black area shows where your lower 95\% confidence interval is above P=.95.  So you are quite sure the probability is greater than P=0.95.  The light gray is between these two certain/uncertain extremes.}
@@ -511,8 +538,8 @@ Use the Example \ref{CS1.ex4} code to re-create Figure \ref{fig:CS1.TMU} and get
 \exbegin{Example \ref{CS1.ex4} code}
 \newline
 <<label=Cs1_Exercise4, fig=FALSE, echo=TRUE, keep.source=FALSE, results=hide>>=
-par(mfrow=c(1,1))
-CSEGtmufigure(N=50, u=-0.05, s2p=0.02)
+par(mfrow = c(1, 1))
+CSEGtmufigure(N = 50, u = -0.05, s2p = 0.02)
 @
 \exend
 
@@ -523,8 +550,8 @@ CSEGtmufigure(N=50, u=-0.05, s2p=0.02)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The previous sections have focused on the probability of hitting thresholds because this is an important and common risk metric used in population viability analysis and it appears in IUCN Red List criteria.  However, as you have seen, there is high uncertainty associated with such estimates.  Part of the problem is that probability is constrained to be 0 to 1, and it is easy to get estimates with confidence intervals that span 0 to 1.  Other metrics of risk, $\hat{u}$ and the distribution of the time to hit a threshold \citep{Dennisetal1991}, do not have this problem and may be more informative.  Figure \ref{fig:CS1.riskfigure} shows different risk metrics from \citet{Dennisetal1991} on a single plot.  This figure is generated by a call to the function \texttt{CSEGriskfigure()}:
 <<noevalriskfigure, eval=FALSE>>=
-dat=read.table(datafile, skip=1)
-dat=as.matrix(dat)
+dat <- read.table(datafile, skip = 1)
+dat <- as.matrix(dat)
 CSEGriskfigure(dat)
 @
 The \texttt{datafile} is the name of the data file, with years in column 1 and population count (logged) in column 2.  \verb@CSEGriskfigure()@ has a number of arguments that can be passed in to change the default behavior.  The variable \texttt{te} is the forecast length (default is 100 years), \texttt{threshold} is the extinction threshold either as an absolute number, if \texttt{absolutethresh=TRUE}, or as a fraction of current population count, if \texttt{absolutethresh=FALSE}. The default is \texttt{absolutethresh=FALSE} and \texttt{threshold=0.1}.  \texttt{datalogged=TRUE} means the data are already logged; this is the default.
@@ -533,10 +560,10 @@ The \texttt{datafile} is the name of the data file, with years in column 1 and p
 \begin{figure}[htp]
 \begin{center}
 <<label=riskfigure,fig=TRUE,echo=FALSE,width=6,height=8>>=
-#the data are loaded into package so don't need to be input
-#dat=read.table("wilddogs.txt", skip=1)
-#dat=as.matrix(dat)
-CSEGriskfigure(wilddogs,silent=TRUE)
+# the data are loaded into package so don't need to be input
+# dat=read.table("wilddogs.txt", skip=1)
+# dat=as.matrix(dat)
+CSEGriskfigure(wilddogs, silent = TRUE)
 @
 \end{center}
 \caption{Risk figure using data for the critically endangered African Wild Dog (data from Ginsberg et al. 1995).  This population went extinct after 1992.}
@@ -550,25 +577,25 @@ CSEGriskfigure(wilddogs,silent=TRUE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Use the Example \ref{CS1.ex5} code to re-create Figure \ref{fig:CS1.riskfigure}.  The package includes other data for you to run: \verb@prairiechicken@ from the endangered Attwater Prairie Chicken, \verb@graywhales@ from \citet{Gerberetal1999}, and  \verb@grouse@ from the Sharptailed Grouse (a species of U.S. federal concern) in Washington State.  Note for some of these other datasets, the Hessian matrix cannot be inverted and you will need to use \verb@CI.method="parametric"@. If you have other text files of data, you can run those too.  The commented lines show how to read in data from a tab-delimited text file with a header line.
 <<label=Testing_Exercise5,echo=FALSE,results=hide>>=
-#make sure the other examples work
-dat = prairiechicken
-CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
-dat = grouse
-CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
-dat = graywhales
-CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
+# make sure the other examples work
+dat <- prairiechicken
+CSEGriskfigure(dat, CI.method = "hessian", silent = TRUE)
+dat <- grouse
+CSEGriskfigure(dat, CI.method = "hessian", silent = TRUE)
+dat <- graywhales
+CSEGriskfigure(dat, CI.method = "hessian", silent = TRUE)
 @
 \exbegin{Example \ref{CS1.ex5} code}
 \newline
 <<label=Cs1_Exercise5, keep.source=TRUE, results=hide>>=
-#If you have your data in a tab delimited file with a header
-#This is how you would read it in using file.choose() 
-#to call up a directory browser.
-#However, the package has the datasets for the examples
-#dat=read.table(file.choose(), skip=1)
-#dat=as.matrix(dat)
-dat = wilddogs
-CSEGriskfigure(dat, CI.method="hessian", silent=TRUE)
+# If you have your data in a tab delimited file with a header
+# This is how you would read it in using file.choose()
+# to call up a directory browser.
+# However, the package has the datasets for the examples
+# dat=read.table(file.choose(), skip=1)
+# dat=as.matrix(dat)
+dat <- wilddogs
+CSEGriskfigure(dat, CI.method = "hessian", silent = TRUE)
 @
 \exend
  
@@ -596,5 +623,5 @@ In the function \verb@CSEGriskfigure()@,  you can set \verb@CI.method = c("hessi
 Data with cycles, from age-structure or predator-prey interactions, are difficult to analyze and the EM algorithm used in the MARSS package will give poor estimates for this type of data.  The slope method \citep{Holmes2001} is more robust to those problems.  \citet{Holmesetal2007} used the slope method in a large study of data from endangered and threatened species, and  \citet{EllnerHolmes2008}  showed that the slope estimates are close to the theoretical minimum uncertainty.  Especially, when doing a population viability analysis using a time series with fewer than 25 years of data, the slope method is often less biased and (much) less variable because that method is less data-hungry \citep{Holmes2004}.  However the slope method is not a true maximum-likelihood method and thus constrains the types of further analyses you can do (such as model selection).
 
 <<Reset, echo=FALSE>>=
-options(prompt="> ", continue="+ ")
+options(prompt = "> ", continue = "+ ")
 @
