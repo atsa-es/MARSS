@@ -43,8 +43,8 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
       \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
       \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates with confidence intervals } 
-      \item{\code{\link[dest=tsSmooth.marssMLE]{tsSmooth}}}{ x and y estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t. From the Kalman filter and smoother output. } 
-      \item{\code{\link[dest=fitted.marssMLE]{fitted}}}{ Model x or y predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
+      \item{\code{\link[=tsSmooth.marssMLE]{tsSmooth}}}{ x and y estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t. From the Kalman filter and smoother output. } 
+      \item{\code{\link[=fitted.marssMLE]{fitted}}}{ Model x or y predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
       \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a data frame. } 
       \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame or matrices. Normal user interface to residuals is \code{residuals.marssMLE}.} 
       \item{\code{\link{predict.marssMLE}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
