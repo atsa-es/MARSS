@@ -25,9 +25,9 @@ forecast.marssMLE <- function(object, h=10,
   if( length(level) == 0 ) interval <- "none"
   if (!is.numeric(h) ||  length(h) != 1 || h < 0 || (h %% 1) != 0)
     stop("forecast.marssMLE: h must be an integer > 0.", call. = FALSE)
-  if (substr(type)=="xtT" && interval=="prediction"){
+  if ( substr(type, 1, 1)=="x" && interval=="prediction"){
     interval <- "confidence"
-    message("forecast.marssMLE: only confidence intervals (intervals on the expected value) are available for xtT.\ninterval reset to confidence.")
+    message("forecast.marssMLE: only confidence intervals (intervals on the expected value) are available for x.\ninterval reset to confidence.")
   }
 
   # We need the model in marxss form
