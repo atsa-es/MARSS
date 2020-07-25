@@ -48,8 +48,8 @@ plot.marssPredict <- function(x, include, pi.int = TRUE, main=NULL,
   plot.ncol <- ceiling(nX / plot.nrow)
   par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
   for (plt in unique(xf$.rownames)) {
-      if(x$type=="xtT") maintit <- paste(main, "State ", plt, sep = "")
-      if(x$type=="ytT") maintit <- paste(main, "Data ", plt, sep = "")
+      if(substr(x$type,1,1)=="x") maintit <- paste(main, "State ", plt, sep = "")
+      if(substr(x$type,1,1)=="y") maintit <- paste(main, "Data ", plt, sep = "")
     tmp <- subset(xf, xf$.rownames == plt)
     if(h > 0) pt <- c((nx - include + 1):nx, nx + 1:h)
     if(h == 0) pt <- (nx - include + 1):nx
