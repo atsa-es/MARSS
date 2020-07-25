@@ -25,7 +25,7 @@
 \item{shadecols}{ Colors for shaded prediction intervals. }
 \item{col}{ Color for the data line.}
 \item{fcol}{ Color for the forecast line.}
-\item{pi.col}{ If shaded=FALSE and PI=TRUE, the prediction intervals are plotted in this colour.}
+\item{pi.col}{ If shaded=FALSE and PI=TRUE, the prediction intervals are plotted in this color.}
 \item{pi.lty}{ If shaded=FALSE and PI=TRUE, the prediction intervals are plotted using this line type.}
 \item{ylim}{ Limits on y-axis.}
 \item{xlab}{ X-axis label. }

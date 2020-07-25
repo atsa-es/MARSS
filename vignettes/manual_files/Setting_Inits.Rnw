@@ -26,7 +26,7 @@ the.sigma = sqrt(apply(dat,1,var,na.rm=TRUE))
 dat = (dat-the.mean)*(1/the.sigma)
 @
 
-The covariates for this example are temperature and total phosporous.
+The covariates for this example are temperature and total phosphorous.
 <<Cs_mci_002>>=
 covariates = rbind(
    Temp = fulldat[years,"Temp"],

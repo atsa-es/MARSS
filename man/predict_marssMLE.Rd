@@ -5,7 +5,7 @@
 \description{
 This function will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} conditioned on the data (either data used to fit the data or data in \code{newdata}). For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}.  \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the smoothed state estimate at time \eqn{t} conditioned on all the data (either data used to fit the model or the optional data passed into \code{newdata}).
 
-If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data (i.e. output from the Kalman filter or smoother), then use \code{\link{tsSmooth.marssMLE}}. Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother.
+If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data (i.e. output from the Kalman filter or smoother), then use \code{\link[dest=tsSmooth.marssMLE]{tsSmooth}()}. Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother.
 
 If \code{h} is passed in, \code{predict(object)} will return a forecast \eqn{h} steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} or \code{ggplot2::autoplot()}for automatic plotting of predictions and forecasts with intervals.
 }
@@ -24,7 +24,7 @@ If \code{h} is passed in, \code{predict(object)} will return a forecast \eqn{h} 
 \item{level}{ Level for the intervals if \code{interval != "none".}}
 \item{type}{ \code{ytT}, \code{ytt} or \code{ytt1}: predictions for the observations based on the states estimate at time \eqn{t} conditioned on all the data, data up to \eqn{t} or data up to \eqn{t-1}. \code{xtT} or \code{xtt1}: predictions for the states at time \eqn{t} based on the states estimate at time \eqn{t-1} conditioned on all the data or data up to \eqn{t-1}. The data are the data used to fit the model unless \code{y} is passed in in \code{newdata}.}
 \item{newdata}{ An optional list with new \code{y} (data), \code{c} or \code{d} (covariates) to use for the predictions or forecasts. \code{y}, \code{c} or \code{d} must have the same structure (matrix dimensions) as used in the \code{\link{MARSS}()} call but the number of time steps can be different. \code{t} is used if there is ambuiquity as to which time steps the \code{newdata} refer to. You can use \code{y="model"} or \code{y="none"} to specify the model data or no data. See examples and details. }
-\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the predictions are returned. If \code{interval="prediction"}, prediction intervals are returned. See \code{\link{fitted.marssMLE}} for a discusion of the intervals. }
+\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals of the predictions are returned. If \code{interval="prediction"}, prediction intervals are returned. See \code{\link[dest=fitted.marssMLE]{fitted}} for a discussion of the intervals. }
 \item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
 \item{x0}{ If "reestimate" (the default), then the initial value for the states is re-estimated. If \code{"use.model"}, then the initial values in the fitted model (\code{object}) are used. If you change the data, then this initial condition may not be appropriate. You can also pass in a new \code{x0} to use. It must be a matrix that is the same dimensions as \code{x0} in the model. \code{x0} is ignored if \code{h!=0} since in that case a forecast is being done. See example. }
 \item{...}{ Other arguments. Not used. }
@@ -36,12 +36,12 @@ If \code{h} is passed in, \code{predict(object)} will return a forecast \eqn{h} 
 \item{method}{The method used for fitting, e.g. MARSS kem. }
 \item{model}{The \code{\link{marssMLE}} object passed into predict(). }
 \item{newdata}{The \code{newdata} list if passed in.}
-\item{level}{The confidence or predition intervals \code{level}.}
+\item{level}{The confidence or prediction intervals \code{level}.}
 \item{pred}{A data frame the predictions or forecasts along with the intervals. }
 \item{type}{The \code{type} passed in.}
 \item{t}{The time steps in the pred data frame.}
 \item{n.ahead and h}{The number of forecast time steps.}
-\item{x0}{The x0 used for the predicitons.}
+\item{x0}{The x0 used for the predictions.}
 \item{tinitx}{The tinitx used.}
 
 The pred data frame has the following columns:
@@ -49,8 +49,8 @@ The pred data frame has the following columns:
 \item{.rownames}{ Names of the data or states. }
 \item{t}{ Time step. }
 \item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
-\item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type="xtT"}. From \code{\link{tsSmooth.marssMLE}()}. }
-\item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type="xtt1"}. From \code{\link{tsSmooth.marssMLE}()}. }
+\item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type="xtT"}. From \code{\link[dest=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type="xtt1"}. From \code{\link[dest=tsSmooth.marssMLE]{tsSmooth}()}. }
 \item{estimate}{Model predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
 
 If intervals are returned, the following are added to the data frame:
@@ -73,7 +73,7 @@ If the model has time-varying parameters, the value of the parameters at the las
 
 \strong{Model predictions \code{n.ahead == 0}}
 
-If \code{newdata} is not passed in, then the model data (\eqn{\mathbf{y}}{y}) and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} (if part of model) are used for the predictions. \code{\link{fitted.marssMLE}()} is the internal function for model predictions.
+If \code{newdata} is not passed in, then the model data (\eqn{\mathbf{y}}{y}) and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} (if part of model) are used for the predictions. \code{\link[dest=fitted.marssMLE]{fitted}()} is the internal function for model predictions.
 
 If \code{newdata} is passed in, then the predictions are computed using \code{newdata} but with the MARSS model estimated from the original data, essentially the Kalman filter/smoother is run using the estimated MARSS model but with data (and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} if in the model) in \code{newdata}.  \code{y}, \code{c} and \code{d} in the \code{newdata} list must all have the same number of columns (time-steps) and the length of \code{t} in \code{newdata} must be the same as the number of columns and must be sequential.
 

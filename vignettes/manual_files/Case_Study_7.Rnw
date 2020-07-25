@@ -220,7 +220,7 @@ abline(v=c(52*(1:6)))
 abline(h=0)
 @
 \end{center}
-\caption{Plot of the de-meaned plankton data. Zooplankton are the thicker lines.  Phytoplankton are the thinner lines.}
+\caption{Plot of the demeaned plankton data. Zooplankton are the thicker lines.  Phytoplankton are the thinner lines.}
 \label{fig:plankton}
 \end{figure}
 \setkeys{Gin}{width=.8\textwidth}

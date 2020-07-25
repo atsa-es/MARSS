@@ -14,7 +14,7 @@
   \item{...}{ Other arguments for print. }
   \item{what}{ What to print.  Default is "fit".  If you input what as a vector, print returns a list. See examples.
   \itemize{
-    \item{ "model"}{ The model parameters with names for the estimted parameters.  The output is customized by the form of the model that was fit.  This info is in \code{ attr(x$model, "form") }. }
+    \item{ "model"}{ The model parameters with names for the estimated parameters.  The output is customized by the form of the model that was fit.  This info is in \code{ attr(x$model, "form") }. }
     \item{ "par" }{ A list of only the estimated values in each matrix. Each model matrix has it's own list element. Standard function: \code{coef(x)}}
     \item{ "start" or "inits" }{ The values that the optimization algorithm was started at. Note, \code{x$start} shows this in form="marss" while \code{print} shows it in whatever form is in \code{ attr(x$model, "form") }.}
     \item{ "paramvector" }{ A vector of all the estimated values in each matrix. Standard function: \code{coef(x, type="vector")}.  See \code{\link{coef.marssMLE}}.}

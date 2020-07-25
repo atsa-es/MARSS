@@ -34,7 +34,7 @@ MARSSkemcheck <- function(MLEobj) {
   } # end for over time to check B
 
   ############ Check that if R has 0s, then the corresponding row of A and Z are fixed
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   el <- "R"
   # extracts the r=0 rows (or cols)
   diag.rows <- 1 + 0:(par.dims[[el]][1] - 1) * (par.dims[[el]][1] + 1)
@@ -89,7 +89,7 @@ MARSSkemcheck <- function(MLEobj) {
 
 
   ############ Check that II_q^{0} is time constant
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   Tmax <- 0
   for (par.test in c("Q")) {
     Tmax <- max(Tmax, dim(fixed[[par.test]])[3], dim(free[[par.test]])[3])
@@ -116,7 +116,7 @@ MARSSkemcheck <- function(MLEobj) {
 
 
   ############ Check that if R and Q both have 0s, then the U and Bs are appropriately fixed
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   Tmax <- 0
   for (par.test in c("R", "Q", "U", "B", "Z")) {
     Tmax <- max(Tmax, dim(fixed[[par.test]])[3], dim(free[[par.test]])[3])
@@ -150,7 +150,7 @@ MARSSkemcheck <- function(MLEobj) {
   } # end for loop over time
 
   ############ Check that B^{0} is fixed
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   Tmax <- 0
   for (par.test in c("B")) {
     Tmax <- max(Tmax, dim(fixed[[par.test]])[3], dim(free[[par.test]])[3])
@@ -179,7 +179,7 @@ MARSSkemcheck <- function(MLEobj) {
 
 
   ############ Check that if u^{0} or xi^{0} are estimated, B adjacency matrix is time invariant
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   Tmax <- 0
   for (par.test in c("U")) {
     Tmax <- max(Tmax, dim(fixed[[par.test]])[3], dim(free[[par.test]])[3])
@@ -226,7 +226,7 @@ MARSSkemcheck <- function(MLEobj) {
   } # if the adj test needs to be done
 
   ############ Check that II_q^{d} and II_q^{is} are time constant
-  # See Summary of Requirements for Degenenate Models in EMDerivations.pdf
+  # See Summary of Requirements for Degenenate Models in EMDerivation.pdf
   Tmax <- 0
   for (par.test in c("Q")) {
     Tmax <- max(Tmax, dim(fixed[[par.test]])[3], dim(free[[par.test]])[3])

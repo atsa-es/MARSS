@@ -1,12 +1,16 @@
 \name{tsSmooth.marssMLE}
 \alias{tsSmooth.marssMLE}
-\title{Return expected value of X(t) and Y(t) with summary information}
+\alias{tsSmooth}
+
+\title{ Smoothed and filtered x and y time series }
 \description{
 
-\code{tsSmooth.marssMLE} and \code{\link{fitted.marssMLE}} are companion functions to return the expected value of the right side of the MARSS equations with and without the error terms, respectively. 
-\code{tsSmooth.marssMLE} returns the estimated state and observations conditioned on the data. This is output from the Kalman filter and smoother \code{\link{MARSSkf}()} for the \eqn{\mathbf{x}}{x} and from the corresponding function \code{\link{MARSShatyt}()} for the \eqn{\mathbf{y}}{y}. These are the expected value of the full right side of the MARSS equations with the error terms. Conditioning on data 1 to \eqn{t-1} (one-step ahead), \eqn{t} (contemporaneous), or \eqn{T} (smoothed) is provided. This is in contrast to \code{\link{fitted.marssMLE}} which returns the expected value of the right side without the error term, aka model predictions.
 
-In the state-space literature, the \eqn{\mathbf{y}}{y} "estimates" would normally refer to the expected value of the right-side of the \eqn{\mathbf{y}}{y} equation without the error term (i.e. the expected value of \eqn{\mathbf{Z} \mathbf{X}_t + \mathbf{a}}{Z X(t) + a}). That is provided in \code{\link{fitted.marssMLE}}. \code{tsSmooth.marssMLE} provides the expected value with the error terms conditioned on the data from 1 to \eqn{t-1}, \eqn{t}, or \eqn{T}. These estimates are used to estimate missing values in the data. If \eqn{\mathbf{y}}{y} is multivariate, some \eqn{y} are missing at time \eqn{t} and some not, and \eqn{\mathbf{R}}{R} is non-diagonal, then the expected value of \eqn{\mathbf{y}_t}{y(t)} from the right-side of the \eqn{\mathbf{y}}{y} without the error terms would be incorrect because it would not take into account the information in the observed data at time \eqn{t} on the missing data at time \eqn{t} (except as it influences \eqn{\mathbf{x}_t}{x(t)}). 
+\code{tsSmooth.marssMLE} returns the estimated state and observations conditioned on the data. This function will return either the smoothed values (conditioned on all the data) or the filtered values (conditioned on data 1 to \eqn{t} or \eqn{t-1}). This is output from the Kalman filter and smoother \code{\link{MARSSkf}()} for the \eqn{\mathbf{x}}{x} and from the corresponding function \code{\link{MARSShatyt}()} for the \eqn{\mathbf{y}}{y}. 
+
+These are the expected value of the full right side of the MARSS equations with the error terms (expected value of X(t) and Y(t)). Conditioning on data 1 to \eqn{t-1} (one-step ahead), \eqn{t} (contemporaneous), or \eqn{T} (smoothed) is provided. This is in contrast to \code{\link[dest=fitted.marssMLE]{fitted}} which returns the expected value of the right side without the error term, aka model predictions.
+
+In the state-space literature, the \eqn{\mathbf{y}}{y} "estimates" would normally refer to the expected value of the right-side of the \eqn{\mathbf{y}}{y} equation without the error term (i.e. the expected value of \eqn{\mathbf{Z} \mathbf{X}_t + \mathbf{a}}{Z X(t) + a}). That is provided in \code{\link[dest=fitted.marssMLE]{fitted}}. \code{tsSmooth.marssMLE} provides the expected value with the error terms conditioned on the data from 1 to \eqn{t-1}, \eqn{t}, or \eqn{T}. These estimates are used to estimate missing values in the data. If \eqn{\mathbf{y}}{y} is multivariate, some \eqn{y} are missing at time \eqn{t} and some not, and \eqn{\mathbf{R}}{R} is non-diagonal, then the expected value of \eqn{\mathbf{y}_t}{y(t)} from the right-side of the \eqn{\mathbf{y}}{y} without the error terms would be incorrect because it would not take into account the information in the observed data at time \eqn{t} on the missing data at time \eqn{t} (except as it influences \eqn{\mathbf{x}_t}{x(t)}). 
 
 Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y(t)} (with error terms) conditioned on the data from 1 to \eqn{t} or \eqn{T} is simply \eqn{\mathbf{y}_t}{y(t)}. The expectation is only useful when there are missing values for which an estimate is needed. The expectation of the \eqn{\mathbf{y}}{y} with the error terms is used in the EM algorithm for the general missing values case and the base function is \code{\link{MARSShatyt}}.
 }
@@ -21,7 +25,7 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
   
   \item{type}{ Type of estimates to return. Smoothed states (xtT), one-step-ahead states (xtt1), contemporaneous states (xtt), the model ytT (Z xtT + A), the model ytt (Z xtt + A)the model ytt1 (Z xtt1 + A), the expected value of y conditioned on data 1 to \eqn{t-1} (ytt1), the expected value of y conditioned on data 1 to \eqn{t} (ytt), or the expected value of y conditioned on data 1 to \eqn{T} (ytT). See details.}
   
-\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals are returned. There are no prediction intervals for estimated states and observations except for ytT (which is a unusual case.) If you are looking for prediction intervals, then you want \code{\link{fitted.marssMLE}} or \code{\link{predict.marssMLE}}.}
+\item{interval}{ If \code{interval="confidence"}, then the standard error and confidence intervals are returned. There are no prediction intervals for estimated states and observations except for ytT (which is a unusual case.) If you are looking for prediction intervals, then you want \code{\link[dest=fitted.marssMLE]{fitted}} or \code{\link{predict.marssMLE}}.}
 
   \item{level}{ Confidence level. alpha=1-level }
  
@@ -59,9 +63,9 @@ Below, X and Y refers to the random variable and x and y refer to a specific rea
   
 \strong{state estimates (x)}
 
-For \code{type="xtT}, \code{tsSmooth.marssMLE} returns the confidence intervals of the state at time \eqn{t} conditioned on the data from 1 to \eqn{T} using the estimated model parameters as true values. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the \eqn{\mathbf{x}}{x}). However, these intervals do not include parameter uncertainty. If you want state residuals (for residuals analysis), use \code{\link{MARSSresiduals}} or \code{\link{residuals.marssMLE}}.
+For \code{type="xtT"}, \code{tsSmooth.marssMLE} returns the confidence intervals of the state at time \eqn{t} conditioned on the data from 1 to \eqn{T} using the estimated model parameters as true values. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the \eqn{\mathbf{x}}{x}). However, these intervals do not include parameter uncertainty. If you want state residuals (for residuals analysis), use \code{\link{MARSSresiduals}} or \code{\link{residuals.marssMLE}}.
 
-\strong{Quantiles} The state \eqn{\mathbf{X}_t}{X(t)} in a MARSS model has a conditional multivariate normal distribution, that can be computed from the model parameters and data. In Holmes (2012, Eqn. 11) notation, its expected value conditioned on the observed data and the model parameters \eqn{\Theta}{Theta} is \eqn{\tilde{\mathbf{x}}_t}{tildex(t)}. In \code{\link{MARSSkf}}, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X(t)} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Note that \code{VtT[,,t] != B VtT[,,t-1] t(B) + Q}, which you might think by looking at the MARSS equations. That is because the variance of \eqn{\mathbf{W}_t}{W(t)} conditioned on the data (past, current and FUTURE) is not equal to  \eqn{\mathbf{Q}}{Q} (\eqn{\mathbf{Q}}{Q} is the unconditional variance).
+\strong{Quantiles} The state \eqn{\mathbf{X}_t}{X(t)} in a MARSS model has a conditional multivariate normal distribution, that can be computed from the model parameters and data. In Holmes (2012, Equation 11) notation, its expected value conditioned on the observed data and the model parameters \eqn{\Theta}{Theta} is \eqn{\tilde{\mathbf{x}}_t}{tildex(t)}. In \code{\link{MARSSkf}}, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X(t)} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Note that \code{VtT[,,t] != B VtT[,,t-1] t(B) + Q}, which you might think by looking at the MARSS equations. That is because the variance of \eqn{\mathbf{W}_t}{W(t)} conditioned on the data (past, current and FUTURE) is not equal to  \eqn{\mathbf{Q}}{Q} (\eqn{\mathbf{Q}}{Q} is the unconditional variance).
 
 \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} (\code{xtT}) is an estimate of \eqn{\mathbf{x}_t}{x(t)} (the true value), and the standard error of that estimate is given by \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Let \code{se.xt} denote the sqrt of the diagonal of \code{VtT}. The equation for the \eqn{\alpha/2}{alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.xt + xtT}). \eqn{\mathbf{x}_t}{x(t)} is multivariate and this interval is for one of the \eqn{x}'s in isolation. You could compute the m-dimensional confidence region for the multivariate \eqn{\mathbf{x}_t}{x(t)}, also, but \code{tsSmooth.marssMLE} returns the univariate confidence intervals. 
 
@@ -75,7 +79,7 @@ H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
 
-For \code{type="xtt} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data 1 to \eqn{t} or 1 to \eqn{t-1}. 
+For \code{type="xtt"} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data 1 to \eqn{t} or 1 to \eqn{t-1}. 
 
 
 \strong{observation estimates (y)}
@@ -97,11 +101,11 @@ Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and uncons
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
-MLEobj <- MARSS(dat)
+fit <- MARSS(dat)
 
 # Make a plot of the estimated states
 library(ggplot2)
-d <- tsSmooth.marssMLE(MLEobj, type = "xtT")
+d <- tsSmooth(fit, type = "xtT", interval="confidence")
 ggplot(data = d) +
   geom_line(aes(t, .estimate)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.3) +
@@ -110,14 +114,14 @@ ggplot(data = d) +
 
 # Make a plot of the estimates for the missing values
 library(ggplot2)
-d <- tsSmooth.marssMLE(MLEobj, type = "ytT", interval="confidence")
-d2 <- tsSmooth.marssMLE(MLEobj, type = "ytT", interval="prediction")
+d <- tsSmooth(fit, type = "ytT", interval="confidence")
+d2 <- tsSmooth(fit, type = "ytT", interval="prediction")
 d$.lwr <- d2$.lwr
 d$.upr <- d2$.upr
 ggplot(data = d) +
   geom_point(aes(t, .estimate)) +
   geom_line(aes(t, .estimate)) +
-  geom_point(aes(t, y), color = "blue") +
+  geom_point(aes(t, y), color = "blue", na.rm=TRUE) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), alpha = 0.3) +
   geom_line(aes(t, .lwr), linetype = 2) +
   geom_line(aes(t, .upr), linetype = 2) +
@@ -129,18 +133,17 @@ ggplot(data = d) +
 # Intervals are for new data not the blue dots 
 # (which were used to fit the model so are not new)
 library(ggplot2)
-d <- fitted(MLEobj, type = "ytT", interval="confidence", level=0.95)
-d2 <- fitted(MLEobj, type = "ytT", interval="prediction", level=0.95)
+d <- fitted(fit, type = "ytT", interval="confidence", level=0.95)
+d2 <- fitted(fit, type = "ytT", interval="prediction", level=0.95)
 d$.lwr <- d2$.lwr
 d$.upr <- d2$.upr
 ggplot(data = d) +
   geom_line(aes(t, .fitted), size=1) +
-  geom_point(aes(t, y), color = "blue") +
+  geom_point(aes(t, y), color = "blue", na.rm=TRUE) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), alpha = 0.3) +
   geom_line(aes(t, .lwr), linetype = 2) +
   geom_line(aes(t, .upr), linetype = 2) +
   facet_grid(~.rownames) +
   xlab("Time Step") + ylab("Count") +
-  ggtitle("Blue=data, Black=estimate, grey=CI, dash=prediction interval") +
-  geom_text(x=15, y=7, label="The intervals are for \n new data not the blue dots")
+  ggtitle("Blue=data, Black=estimate, grey=CI, dash=prediction interval")
 }

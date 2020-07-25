@@ -34,14 +34,14 @@ A data frame with estimates, sample standard errors, and confidence intervals.
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
-MLEobj <- MARSS(dat)
+fit <- MARSS(dat)
 
 # A data frame of the estimated parameters
-tidy.marssMLE(MLEobj)
+tidy.marssMLE(fit)
 
 # If broom is used
 
 library(broom)
-tidy(MLEobj)
+tidy(fit)
 
 }

@@ -33,9 +33,9 @@
 \examples{ 
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]
-MLEobj <- MARSS(dat)
+fit <- MARSS(dat)
 
-print(MLEobj$model)
+print(fit$model)
 # this is identical to
-print(MLEobj, what = "model")
+print(fit, what = "model")
 }

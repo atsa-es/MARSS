@@ -79,7 +79,7 @@ vec(x)
   \item{t}{ The time index or third dimension of a 3D matrix }
   \item{nu, V}{ Parameters of a Wishart distribution. }
   \item{param.matrix}{ The list matrix version of a time-invariant MARSS model. }
-  \item{n}{ An interger for the power function. }
+  \item{n}{ An integer for the power function. }
   \item{ zero.rows.ok, zero.cols.ok }{ Means the design matrix can have all zero rows or columns. }
   \item{ strict }{ Specifies whether the design matrix must be only 0s and 1s. }
   \item{ by.row }{ For is.fixed, reports whether is.fixed by row rather than for the whole matrix. }
@@ -103,8 +103,8 @@ vec(x)
   \item \code{ rwishart } generates random draws from a wishart distribution.
   \item \code{ matrix.power } is a faster way to get the n-th power of a matrix.
   \item \code{ pinv } is the pseudoinverse based on singular value decomposition PInv=UD^+V' where a diagonal matrix with non-zero diagonal values of D (from svd) replaced with 1/D.
-  \item \code{ pcholinv } is the inverse based on the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
-  \item \code{ pchol } returns the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
+  \item \code{ pcholinv } is the inverse based on the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
+  \item \code{ pchol } returns the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
