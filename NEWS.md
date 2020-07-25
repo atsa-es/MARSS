@@ -43,7 +43,7 @@ ENHANCEMENTS
 * Revamped `tidy.marssMLE`. `tsSmooth.marssMLE` now returns the estimates from the Kalman filter or smoother which `tidy.marssMLE` had returned. `tidy.marssMLE` only returns a data frame for the parameter estimates.
 * V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
 * `predict.marssMLE` updated to return ytt1, ytt, ytt1.
-* Added state innovations residuals to `MARSSresiduals.tt1` but not printed. Only model innovation residuals are printed.
+* Added state innovations residuals to `MARSSresiduals.tt1` but not returned by `residuals.marssMLE()`. Only returned by `MARSSresiduals.tt1()`.
 
 BUGS
 
