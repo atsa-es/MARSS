@@ -384,8 +384,8 @@ List marsskemcheck_impl(List& MLEobjin)
       else {
 	if (any(vectorise(adjB != adjB_1))) {
 	  std::ostringstream smsg;
-	  smsg << "t=" << t << ": If u^{0} or xi^{0} are estimated, "
-	    "the adjacency matrix specified by B must be ",
+	  smsg << "t=" << t << ": If u^{0} or xi^{0} are estimated, " <<
+	    "the adjacency matrix specified by B must be " <<
 	    "time constant.\n";
 	  msg.push_back(smsg.str());
 	}
@@ -442,7 +442,7 @@ List marsskemcheck_impl(List& MLEobjin)
       if (Q0rows_adjmat.n_rows != 0) {
 	mat tmpproduct = Q0rows_adjmat * OMGp[el].t();
 	mat tmpndx(tmpproduct.n_rows, 1, fill::zeros);
-	for (int i = 0; i < tmpndx.n_rows; ++i) {
+	for (unsigned int i = 0; i < tmpndx.n_rows; ++i) {
 	  if (all(tmpproduct.row(i) == 0)) {
 	    tmpndx(i, 0) = 1;
 	  }
