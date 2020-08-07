@@ -415,7 +415,7 @@ The MARSS package has a plot method for marssPredict objects returned by \verb@p
 The plots from the \verb@StructTS@ and \verb@marssMLE@ objects are similar though they have slightly different formats.
 \begin{figure}[htp]
 \begin{center}
-<<label=Cs16_predict-bsm-compare, keep.source=TRUE, fig=TRUE, fig.width=6>>=
+<<label=Cs15_predict-bsm-compare, keep.source=TRUE, fig=TRUE, fig.width=6>>=
 fr1 <- forecast::forecast(fit1, h = 10)
 fr2 <- forecast::forecast(fit2, h = 10)
 p1 <- ggplot2::autoplot(fr1, include = 8)
@@ -430,20 +430,67 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 \subsection{Fitted values}
 \index{structural ts models!fitted}
 
-`fitted(x)` applied to a `StructTS` object will return the expected value of $X_t$ conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). There is a plot method for ts and mts objects.
-<<label=Cs16_fitted-bsm-sts>>=
+\verb@fitted(x)@ applied to a \verb@StructTS@ object will return the expected value of $\XX_t$  conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed times series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs16_fitted-bsm-sts, fig=TRUE>>=
 fitted1 <- fitted(fit1)
 plot(fitted1)
 @
-In the MARSS package, this is returned with `broom::tidy(x, type="ytt")`. The `"tt"` means at $t$ conditioned on data 1 to $t$. It is returned as a data frame.
-
-<<label=Cs16_fitted-bsm-compare>>=
-fitted2 <- fitted(fit2, type = "ytt")
-ggplot(fitted2, aes(x = t, y = estimate)) +
-  geom_line() +
-  facet_wrap(~.rownames)
+\end{center}
+\caption{Output from a plot of a fitted StructTS object.}
+\label{fig:STS.fig.bsm.fitted}
+\end{figure}
+In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.
+<<label=Cs17_fitted-bsm-compare>>=
+fitted2 <- tsSmooth(fit2, type = "xtt")
+fitted2 <- subset(fitted2, .rownames  %in% c("X1", "X2", "X3"))
 @
+This is a data frame in long-form which we can plot with ggplot.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs18_fitted-bsm-compare-plot, fig=TRUE>>=
+ggplot(fitted2, aes(x = t, y = .estimate)) +
+  geom_line() +
+  facet_wrap(~.rownames, ncol=1, scale="free_y")
+@
+\end{center}
+\caption{Output from a plot of the states from the marssMLE object using tsSmooth() output.}
+\label{fig:STS.fig.bsm.tsSmooth.marss}
+\end{figure}
+Alternatively we can use \verb@MARSSkfss(x)$xtt@ to return the state estimates as a matrix. Converting the matrix to a ts objet makes it easier to plot.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs19_fitted-bsm-compare, fig=TRUE>>=
+fitted3 <- MARSSkfss(fit2)$xtt
+fitted3 <- ts(t(fitted3[1:3,]))
+plot(fitted3)
+@
+\end{center}
+\caption{Output from a plot of states from a marssMLE object using MARSSkfss().}
+\label{fig:STS.fig.bsm.kfss.marss}
+\end{figure}
 
+To output the model fitted value for $y$, we add the level and season states together if using \verb@StructTS()@ because for the BSM model, the model for $y_t$ is $m_t+s_t$. With MARSS, this would be output with \verb@fitted(x, type="ytt")@. Alternative we could add the $m_t$ and $s_t$ states from the MARSS output, but \verb@fitted(x, type="ytt")@ allows you to easily compute this for cases that are more complex with a non-identity $\ZZ$, non-zero $\aa$ and covariates $\dd$.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs20_model-est-bsm-compare-plot, fig=TRUE>>=
+fit2 <- fitted(fit2, type="ytt")
+df2 <- data.frame(t=as.numeric(time(fitted1)), fitted=fit2$.fitted, name="MARSS")
+df1 <- data.frame(t=df2$t, fitted=as.numeric(fitted1[,1]+fitted1[,3]), name="StructTS")
+df <- rbind(df1, df2)
+df$y <- fit2$y
+
+ggplot(df) +
+  geom_line(aes(x = t, y = fitted)) + geom_point(aes(x = t, y = y), col="blue") +
+  facet_wrap(~name, ncol=1)
+@
+\end{center}
+\caption{Data and model fitted values.}
+\label{fig:STS.fig.bsm.fitted.marss}
+\end{figure}
+
+Duplicating the output between these two functions helps show exactly what Kalman filter output StructTS is showing with \verb@fitted()@.
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
