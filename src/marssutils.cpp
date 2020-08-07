@@ -81,7 +81,7 @@ List degentest(const std::string& elem, List& MLEobj, int iter)
   List model_dims = as<List>(MLEobj["marss"]).attr("model.dims");
   int dim_elem = as<IntegerVector>(model_dims[elem])[0];
 
-  for(int i = 0; i < degen_par.size(); ++i) {
+  for(unsigned int i = 0; i < degen_par.size(); ++i) {
     // best to use iterators, as we don't know which if any indices
     // are valid.
 	
@@ -131,7 +131,7 @@ List degentest(const std::string& elem, List& MLEobj, int iter)
 	    mat kfxtT = as<mat>(new_kf["xtT"]);
 	    mat cmb0t = join_rows(kfx0T, kfxtT);
 	    vec xbar(cmb0t.n_rows);
-	    for (int ii=0; ii < cmb0t.n_rows; ++ii) {
+	    for (unsigned int ii=0; ii < cmb0t.n_rows; ++ii) {
 	      xbar[ii] = std::accumulate(cmb0t.begin_row(ii),
 					 cmb0t.end_row(ii), 0);
 	      xbar[ii] /= cmb0t.n_cols;
@@ -365,7 +365,7 @@ LogicalVector isfixed(NumericVector rr, bool byrow)
       } else {
 	cube rcube(rr.begin(), rrdims[0], rrdims[1], rrdims[2], false);
 	ret = LogicalVector(rcube.n_rows);
-	for (int i = 0; i < rcube.n_rows; ++i) {
+	for (unsigned int i = 0; i < rcube.n_rows; ++i) {
 	  mat rowmat(rcube.tube(i, 0, i, rcube.n_cols - 1));
 	  ret[i] = !any(vectorise(rowmat));
 	}
