@@ -11,7 +11,7 @@ Status
 
 To do 8-6-2020
 
-* Work on residuals() for StructTS models.
+* Work on residuals() for StructTS models. Why is .std.res = NA?
 * Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
 * need to fix equations in Rd files. changed to x(t+1) and messed up time indexing for the 

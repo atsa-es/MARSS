@@ -475,7 +475,7 @@ To output the model fitted value for $y$, we add the level and season states tog
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs20_model-est-bsm-compare-plot, fig=TRUE>>=
-fit2 <- fitted(fit2, type="ytt")
+fitted2 <- fitted(fit2, type="ytt")
 df2 <- data.frame(t=as.numeric(time(fitted1)), fitted=fit2$.fitted, name="MARSS")
 df1 <- data.frame(t=df2$t, fitted=as.numeric(fitted1[,1]+fitted1[,3]), name="StructTS")
 df <- rbind(df1, df2)
@@ -491,6 +491,12 @@ ggplot(df) +
 \end{figure}
 
 Duplicating the output between these two functions helps show exactly what Kalman filter output StructTS is showing with \verb@fitted()@.
+
+\subsection{Residuals}
+\index{structural ts models!residuals}
+
+
+
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
