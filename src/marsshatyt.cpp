@@ -50,7 +50,7 @@ List marsshatyt(Rcpp::List& MLEobjin)
   NumericMatrix v0p = as<NumericMatrix>(parmat(MLEobj, "V0", aargt)["V0"]);
   mat mv0p = as<mat>(v0p);
   vec dv0p = diagvec(mv0p);
-  if (dv0p.size() != m) { dv0p.resize(m); }
+  if (dv0p.size() != (unsigned int)m) { dv0p.resize(m); }
   mat mdv0p = diagmat(dv0p);                             // arma version of IIz$V0
   NumericMatrix IIzV0 = wrap(mdv0p);
   List IIz = List::create(_["V0"] = IIzV0);
