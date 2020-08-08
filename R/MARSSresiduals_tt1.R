@@ -122,7 +122,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   E.obs.v <- et[1:n,,drop=FALSE]
   var.obs.v <- array(0, dim = c(n, n, TT))
   # this will be 0 for observed data
-  for( t in 1:TT) var.obs.v[,,t] <- Ey$Ott[,,t] - tcrossprod(Ey$ytt[,t])
+  for( t in 1:TT) var.obs.v[,,t] <- Ey$Ott1[,,t] - tcrossprod(Ey$ytt1[,t])
 
   # the observed model residuals are data - E(data), so NA for missing data.
   model.et <- et[1:n, , drop = FALSE]
