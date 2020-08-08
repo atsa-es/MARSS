@@ -37,6 +37,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
     model.et <- Ey$ytt - fitted(MLEobj, type = "ytt1", output = "matrix") # model residuals
     et[1:n,] <- model.et
 
+    cov.et <- matrix(0, n, m)
     for (t in 1:TT) {
       # model residuals
       if(time.varying$R) Rt <- parmat(MLEobj, "R", t = t)$R # returns matrix
@@ -45,7 +46,6 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
       if(time.varying$Z) Zt <- parmat(MLEobj, "Z", t = t)$Z
       model.var.et[, , t] <- Rt + tcrossprod(Zt %*% kf$Vtt1[, , t], Zt)
 
-    cov.et <- matrix(0, n, m)
       if(t < TT){
         Ktp <- sub3D(kf$Kt, t=t+1)
         et[(n + 1):(n + m), t] <- Ktp %*% model.et[, t+1]
