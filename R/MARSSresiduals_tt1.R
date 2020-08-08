@@ -132,7 +132,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   # add rownames
   Y.names <- attr(MLEobj$model, "Y.names")
   X.names <- attr(MLEobj$model, "X.names")
-  rownames(et) <- rownames(st.et) <- rownames(var.et) <- colnames(var.et) <- c(Y.names, X.names)
+  rownames(et) <- rownames(st.et) <- rownames(mar.st.et) <- rownames(var.et) <- colnames(var.et) <- c(Y.names, X.names)
   rownames(E.obs.v) <- Y.names
   rownames(var.obs.v) <- colnames(var.obs.v) <- Y.names
   
