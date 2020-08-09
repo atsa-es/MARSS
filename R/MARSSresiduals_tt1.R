@@ -38,6 +38,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
     et[1:n,] <- model.et
 
     cov.et <- matrix(0, n, m)
+    # get the model residual variance
     for (t in 1:TT) {
       # model residuals
       if(time.varying$R) Rt <- parmat(MLEobj, "R", t = t)$R # returns matrix
@@ -45,7 +46,9 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
       if(time.varying$R || time.varying$H ) Rt <- Ht %*% Rt %*% t(Ht)
       if(time.varying$Z) Zt <- parmat(MLEobj, "Z", t = t)$Z
       model.var.et[, , t] <- Rt + tcrossprod(Zt %*% kf$Vtt1[, , t], Zt)
-
+    }
+    # Then the states since that needs model var at t+1
+    for (t in 1:TT){
       if(t < TT){
         Ktp <- sub3D(kf$Kt, t=t+1)
         et[(n + 1):(n + m), t] <- Ktp %*% model.et[, t+1]
