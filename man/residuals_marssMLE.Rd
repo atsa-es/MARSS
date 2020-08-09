@@ -23,7 +23,7 @@
 
 }
 \description{
-\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{y}) or  state (\eqn{x}) and the "fitted" value.  At time t (in the returned data frame), the model residuals are for time t. For the the state smoothation residuals, the residual is for the transition from t to t+1 following the convention in Harvey, Koopman and Penzer (1998). For the the state innovation residuals, the residual is for the transition from t-1 to t because the conditioning is for 1 to t-1 (and you cannot have different conditioning for the model and state residuals at time t).
+\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{y}) or  state (\eqn{x}) and the "fitted" value.  At time t (in the returned data frame), the model residuals are for time t. For the the state residuals, the residual is for the transition from t to t+1 following the convention in Harvey, Koopman and Penzer (1998). For the the state innovation residuals, this means that \code{state.residual[,t]} is for the transition from \eqn{t} to \eqn{t+1} and is conditioned on data 1 to \eqn{t} while \code{model.residual[,t]} is is conditioned on data 1 to \eqn{t-1}. State innovation residuals are not normally used while state smoothation residuals are used in trend outlier analysis.
 }
 \value{
 A data frame with the following columns:
@@ -54,11 +54,14 @@ The standard errors help visualize how well the model fits to the data.  See \co
 
 The state residuals are in the data frame with \code{.type="state"}.
 
-If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. 
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
 
-The state residuals are only for state-space models. At time t, the state residuals are the difference between the state estimate at time t and the predicted value of the state given the estimate of the state at time t-1, thus it is the residual for the state transition from t-1 to t (or t to t+1). For the state residuals, the "value"" depends on whether you are compute smoothations or innovations state residuals. If \code{type="tT"}, the value is the smoothed estimate (\code{xtT}) at time t+1 and the predicted value is the expected value of \eqn{x} computed using the smoothed estimated of \eqn{x} at time t, so is \code{B xtT[,t] + u}).  If \code{type="tt1"}, the value is expected value of \eqn{x} conditioned on the data up to time t-1 and the predicted value is computed using the expected value of \eqn{x} conditioned on the data up to time t-1, i.e. \code{B xtt[,t-1]} + u.
+The state residuals are only for state-space models. At time \eqn{t}, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state at time \eqn{t+1} given the estimate of the state at time \eqn{t}. For smoothation state residuals, this is 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw_t+1 = xt+1T - B xtT - u}
+For innovations state residuals, this is 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw_t+1 = xt+1t+1 - B xtt - u}
 
-Smoothation residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state smoothation residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
+Smoothation state sresiduals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
 
 }
 
