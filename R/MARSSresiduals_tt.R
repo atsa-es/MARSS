@@ -44,7 +44,9 @@ MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=
       if(time.varying$H) Ht <- parmat(MLEobj, "H", t = t)$H
       if(time.varying$R || time.varying$H ) Rt <- Ht %*% Rt %*% t(Ht)
       if(time.varying$Z) Zt <- parmat(MLEobj, "Z", t = t)$Z
-      model.var.et[, , t] <- Rt + tcrossprod(Zt %*% kf$Vtt[, , t], Zt)
+      # compute the variance of the residuals and state.et
+      St <- Ey$yxtt[, , t] - tcrossprod(Ey$ytt[, t, drop = FALSE], kf$xtt[, t, drop = FALSE])
+      model.var.et[, , t] <- Rt - tcrossprod(Zt %*% kf$Vtt[, , t], Zt) + tcrossprod(St, Zt) + tcrossprod(Zt, St)
 
       tmpvar.state.et <- matrix(NA, m, m)
       var.et[1:n, , t] <- cbind(model.var.et[, , t], cov.et)
