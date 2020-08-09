@@ -95,6 +95,7 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
   class(ret) <- c("marssResiduals", "data.frame")
   attr(ret, "standardization") <- standardization
   attr(ret, "residual.type") <- type
+  attr(ret, "msg") <- resids$msg
   ret
 }
 
