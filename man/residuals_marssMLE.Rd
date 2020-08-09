@@ -6,7 +6,8 @@
 \method{residuals}{marssMLE}(object, ..., 
            type=c("tt1", "tT", "tt"),
            standardization=c("Cholesky", "marginal"),
-           form=attr(object[["model"]], "form")[1])
+           form=attr(object[["model"]], "form")[1]),
+           clean=TRUE
 }
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
@@ -16,8 +17,9 @@
   \item{standardization}{"Cholesky" means it is standardized by the lower triangle of the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
 "marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. }
 
+  \item{form}{ For developers. Can be ignored. If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
 
-  \item{form}{If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating. This can be ignored in almost all cases.}
+  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{.type=="state"}. }
   
   \item{...}{Not used.}
 
