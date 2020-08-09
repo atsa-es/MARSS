@@ -5,13 +5,11 @@
 #  residuals_dfa is just residuals_marxss
 ##############################################################################################################################################
 residuals.marssMLE <- function(object, ...,
-                               type=c("innovations", "smoothations"),
+                               type=c("tt1", "tT", "tt"),
                                standardization=c("Cholesky", "marginal"),
                                form = attr(object[["model"]], "form")[1]) {
   ## Argument checking
   type <- match.arg(type)
-  if (type == "smoothations") type <- "tT"
-  if (type == "innovations") type <- "tt1"
   standardization <- match.arg(standardization)
   
   resids.fun <- paste("residuals_", form, sep = "")
@@ -77,8 +75,9 @@ residuals_marxss <- function(x, type, standardization, ...) {
     if(standardization=="marginal") 
       state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
     fit.list <- fitted.marssMLE(x, type = type1, interval="none")
-    if (type1=="xtt1") fit.list$value <- fit.list$.xtt
-    if (type1=="xtT") fit.list$value <- fit.list$.xtT
+    if (type1=="xtt1") fit.list$value <- fit.list$.xtt1
+    if (type1=="xtt") fit.list$value <- fit.list$.xtt
+    if (type1=="xtT") c(fit.list$value <- fit.list$.xtT[2:TT],NA)
     ret2 <- data.frame(
       .rownames = fit.list$.rownames,
       type = "state",
