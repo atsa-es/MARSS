@@ -726,6 +726,8 @@ where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matr
 
 \subsubsection{with the state residuals defined from $t$ to $t+1$}
 
+\emph{Note that the model residual is conditioned on data 1 to $t-1$ and the state residual on data 1 to $t$ in this case.}
+
 Define the one-step ahead residuals as
 \begin{equation}
 \overline{\varepsilon}_t^* = \begin{bmatrix}\checkvt\\ \checkwtp \end{bmatrix}
