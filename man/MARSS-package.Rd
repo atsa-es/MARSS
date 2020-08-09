@@ -41,20 +41,20 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
 \strong{Main MARSS functions}:
 \describe{
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
-      \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
+      \item{\code{\link[=coef.marssMLE]{coef}}}{ Returns the estimated parameters in a variety of formats. }    
       \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates with confidence intervals } 
       \item{\code{\link[=tsSmooth.marssMLE]{tsSmooth}}}{ x and y estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t. From the Kalman filter and smoother output. } 
       \item{\code{\link[=fitted.marssMLE]{fitted}}}{ Model x or y predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
-      \item{\code{\link{residuals.marssMLE}}}{ Model residuals as a data frame. } 
+      \item{\code{\link[=residuals.marssMLE]{residuals}}}{ Model residuals as a data frame. } 
       \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame or matrices. Normal user interface to residuals is \code{residuals.marssMLE}.} 
-      \item{\code{\link{predict.marssMLE}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
-      \item{\code{\link{plot.marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
-      \item{\code{\link{autoplot.marssMLE}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
-      \item{\code{\link{glance.marssMLE}}}{ Brief summary of fit. } 
-      \item{\code{\link{logLik.marssMLE}}}{ Log-likelihood. }
-      \item{\code{\link{print.marssMLE}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
+      \item{\code{\link[=predict.marssMLE]{predict}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
+      \item{\code{\link[=plot.marssMLE]{plot for marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
+      \item{\code{\link[=autoplot.marssMLE]{autoplot}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
+      \item{\code{\link[=glance.marssMLE]{glance}}}{ Brief summary of fit. } 
+      \item{\code{\link[=logLik.marssMLE]{logLik}}}{ Log-likelihood. }
+      \item{\code{\link[=print.marssMLE]{print}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
       \item{\code{\link{print.marssMODEL}}}{ Prints description of the MARSS model (\code{\link{marssMODEL}} object). }
-      \item{\code{\link{plot.marssPredict}}}{ Plot a prediction or forecast. } 
+      \item{\code{\link{plot.marssPredict}}{ Plot a prediction or forecast. } 
       \item{\code{\link{toLatex.marssMODEL}}}{ Outputs a LaTeX version of the model. }
     }
 

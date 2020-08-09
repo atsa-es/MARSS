@@ -11,7 +11,7 @@
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
   
-  \item{type}{"tt1" means innovations residuals. The fitted values are computed conditioned on the data up to t-1. See \code{\link{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. "tT" means smoothation residuals. the fitted values are computed conditioned on all the data. See \code{\link{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "tt" means contemporaneous residuals. The fitted values are computed conditioned on the data up to t. In MARSS functions, estimates at time t conditioned on data 1 to T are denoted "tT", conditioned on the data from 1 to t-1 are denoted "tt1" and conditioned on data 1 to t are "tt".}
+  \item{type}{"tt1" means innovations residuals. The fitted values are computed conditioned on the data up to t-1. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. "tT" means smoothation residuals. the fitted values are computed conditioned on all the data. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "tt" means contemporaneous residuals. The fitted values are computed conditioned on the data up to t. In MARSS functions, estimates at time t conditioned on data 1 to T are denoted "tT", conditioned on the data from 1 to t-1 are denoted "tt1" and conditioned on data 1 to t are "tt".}
 
   \item{standardization}{"Cholesky" means it is standardized by the lower triangle of the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
 "marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. }

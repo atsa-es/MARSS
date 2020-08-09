@@ -15,8 +15,8 @@
 
 \code{type} 
 \itemize{
-\item "tT" means the fitted values are computed conditioned on all the data. See \code{\link{fitted}} with \code{type="ytT"} or \code{type="xtT"}.
-\item "tt1" means the fitted values are computed conditioned on the data up to t-1. See \code{\link{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}.
+\item "tT" means the fitted values are computed conditioned on all the data. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytT"} or \code{type="xtT"}.
+\item "tt1" means the fitted values are computed conditioned on the data up to t-1. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}.
 
 }
 
