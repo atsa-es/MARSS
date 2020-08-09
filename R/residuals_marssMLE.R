@@ -16,7 +16,7 @@ residuals.marssMLE <- function(object, ...,
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(resids.fun, object, type = type, standardization = standardization))
+    ret <- eval(call(resids.fun, object, type = type, standardization = standardization, clean=clean))
   } else {
     ret <- paste("No residuals_", form[1], " is available.\n", sep = "")
   }
@@ -28,7 +28,7 @@ residuals.marssMLE <- function(object, ...,
 #  returns fitted values, residuals, std err of residuals and std residuals
 #  the other forms use this
 ##############################################################################################################################################
-residuals_marxss <- function(x, type, standardization, ...) {
+residuals_marxss <- function(x, type, standardization, clean, ...) {
   # rotate means to rotate the Z matrix; this is used in DFA
   # but the user is allowed to do this for other cases also
   model <- x[["model"]]
@@ -98,10 +98,10 @@ residuals_marxss <- function(x, type, standardization, ...) {
   ret
 }
 
-residuals_dfa <- function(x, type, standardization, ...) {
-  return(residuals_marxss(x, type, standardization))
+residuals_dfa <- function(x, type, standardization, clean, ...) {
+  return(residuals_marxss(x, type, standardization, clean))
 }
 
-residuals_marss <- function(x, type, standardization, ...) {
-  return(residuals_marxss(x, type, standardization))
+residuals_marss <- function(x, type, standardization, clean, ...) {
+  return(residuals_marxss(x, type, standardization, clean))
 }
