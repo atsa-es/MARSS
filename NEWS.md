@@ -11,10 +11,17 @@ Status
 
 To do 8-6-2020
 
-* Double check that MARSSresiduals.tt1 is returning [vt, wt] not [vt, wtp1] because I want et[,t] to be conditioned on t-1 and vt would be conditioned on t-1 and wtp1 conditioned on t. Also last time step for state not NA because of this.
-* Update the joint variance section in .tt1. See Residuals.Rnw for why the residuals are independent.
+* check apply(MARSS:::MARSSresiduals.tT(fit2)$mar.resid,1,var,na.rm=TRUE); not that close to 1
+```
+dat <- t(harborSealWA)
+dat <- dat[2:4, ] # remove the year row
+# fit a model with 1 hidden state and 3 observation time series
+kemfit <- MARSS(dat, model = list(
+  Z = matrix(1, 3, 1),
+  R = "diagonal and equal"
+))
+```
 
-* Work on residuals() for StructTS models. Why is .std.res = NA?
 * Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
 * need to fix equations in Rd files. changed to x(t+1) and messed up time indexing for the 
@@ -46,7 +53,7 @@ ENHANCEMENTS
 * Revamped `tidy.marssMLE`. `tsSmooth.marssMLE` now returns the estimates from the Kalman filter or smoother which `tidy.marssMLE` had returned. `tidy.marssMLE` only returns a data frame for the parameter estimates.
 * V0T was computed with an inverse of Vtt1[,,1]. This led to unstable numerics when V00 was like matrix(big, m, m). Changed to use `solve(t(Vtt1[,,1]), B%*%V00)` which should be faster and seems to have lower numerical error.
 * `predict.marssMLE` updated to return ytt1, ytt, ytt1.
-* Added state innovations residuals to `MARSSresiduals.tt1` but not returned by `residuals.marssMLE()`. Only returned by `MARSSresiduals.tt1()`.
+* Added state innovations and contemporaneous residuals to `MARSSresiduals.tt1` and `MARSSresiduals.tt` but not returned by `residuals.marssMLE()` (unless `clean=FALSE`). Only returned by `MARSSresiduals()`.
 
 BUGS
 
@@ -70,7 +77,7 @@ DOCUMENTATION and MAN FILES
 
 OTHER
 
-* Changed `fitted.marssMLE` to have column with .xtt when type="xtt1" instead of .xtT.
+* Changed `fitted.marssMLE` to have column with .x which is conceptually the same as the y column for observations. It is the left-side of the x equation (with error term) while fitted is the right-side without the error term.
 * Changed the x0 estimation behavior for `predict.marssMLE()` when no data passed in.
 * Added x0 argument to `predict.marssMLE()` so that user can specify x0 if needed.
 * Removed the tibble class from the data frames returned by `residuals.marssMLE()`. The data frames are still in tibble form. Removed all reference to tibbles in the documentation.
