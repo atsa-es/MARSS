@@ -54,7 +54,7 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
       \item{\code{\link[=logLik.marssMLE]{logLik}}}{ Log-likelihood. }
       \item{\code{\link[=print.marssMLE]{print}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
       \item{\code{\link{print.marssMODEL}}}{ Prints description of the MARSS model (\code{\link{marssMODEL}} object). }
-      \item{\code{\link{plot.marssPredict}}{ Plot a prediction or forecast. } 
+      \item{\code{\link{plot.marssPredict}}}{ Plot a prediction or forecast. } 
       \item{\code{\link{toLatex.marssMODEL}}}{ Outputs a LaTeX version of the model. }
     }
 
