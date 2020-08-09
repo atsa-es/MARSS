@@ -39,7 +39,7 @@ The observed model residuals \eqn{\hat{\mathbf{v}}_t}{hatv_t} are the difference
 \deqn{ \hat{\mathbf{v}}_t = \mathbf{y}_t - \mathbf{Z}\tilde{\mathbf{x}}_t^{t} - \mathbf{a} }{ hatv_t = y_t - Z xtt - a}
 where \eqn{\tilde{\mathbf{x}}_t^{t}}{xtt} is the expected value of \eqn{\mathbf{X}_t}{X_t} conditioned on the data from 1 to \eqn{t} from the Kalman filter. \eqn{\mathbf{y}_t}{y_t} are your data and missing values will appear as NA. These will be returned in \code{residuals}.
 
-\code{var.residuals} returned by the function is the conditional variance of the residuals conditioned on the data up to \eqn{t} and the parameter set \eqn{\Theta}.  The conditional variance is 
+\code{var.residuals} returned by the function is the conditional variance of the residuals conditioned on the data up to \eqn{t} and the parameter set \eqn{\Theta}{Theta}.  The conditional variance is 
 \deqn{ \hat{\Sigma}_t = \mathbf{R}+\mathbf{Z}_t \mathbf{V}_t^{t} \mathbf{Z}_t^\top }{hatSigma_t = R + Z_t Vtt t(Z_t)}
 where \eqn{\mathbf{V}_t^{t}}{Vtt} is the variance of \eqn{\mathbf{X}_t}{X_t} conditioned on the data up to time \eqn{t}. This is returned by \code{\link{MARSSkf}} in \code{Vtt}.
 
