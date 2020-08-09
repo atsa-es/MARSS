@@ -37,6 +37,7 @@ fitted.marssMLE <- function(object, ...,
     Z.time.varying <- model.dims[["Z"]][3] != 1
     A.time.varying <- model.dims[["A"]][3] != 1
     R.time.varying <- model.dims[["R"]][3] != 1
+    H.time.varying <- model.dims[["H"]][3] != 1
     
     val <- matrix(NA, n, TT)
     rownames(val) <- attr(MLEobj$marss, "Y.names")
@@ -45,6 +46,8 @@ fitted.marssMLE <- function(object, ...,
     Zt <- parmat(MLEobj, "Z", t = 1)$Z
     At <- parmat(MLEobj, "A", t = 1)$A
     Rt <- parmat(MLEobj, "R", t = 1)$R
+    Ht <- parmat(MLEobj, "H", t = 1)$H
+    Rt <- Ht %*%  tcrossprod(Rt, Ht)
     
     for (t in 1:TT) {
       # parmat returns marss form
@@ -55,6 +58,8 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt))
       if(interval=="prediction"){
         if (R.time.varying) Rt <- parmat(MLEobj, "R", t = t)$R
+        if (H.time.varying) Ht <- parmat(MLEobj, "H", t = t)$H
+        if (R.time.varying | H.time.varying) Rt <- Ht %*% tcrossprod(Rt, Ht)
         se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt) + Rt)
       }
     }
@@ -86,6 +91,7 @@ fitted.marssMLE <- function(object, ...,
     B.time.varying <- model.dims[["B"]][3] != 1
     U.time.varying <- model.dims[["U"]][3] != 1
     Q.time.varying <- model.dims[["Q"]][3] != 1
+    G.time.varying <- model.dims[["G"]][3] != 1
     
     val <- matrix(NA, m, TT)
     rownames(val) <- attr(MLEobj[["marss"]], "X.names")
@@ -96,6 +102,9 @@ fitted.marssMLE <- function(object, ...,
     Bt <- parmat(MLEobj, "B", t = 1)[["B"]]
     Ut <- parmat(MLEobj, "U", t = 1)[["U"]]
     Qt <- parmat(MLEobj, "Q", t = 1)[["Q"]]
+    Gt <- parmat(MLEobj, "G", t = 1)[["G"]]
+    Qt <- Gt %*% tcrossprod(Qt, Gt)
+    
     if (MLEobj$model$tinitx == 0){
       val[, 1] <- Bt %*% x0 + Ut
       if (interval=="confidence") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt))
@@ -113,6 +122,8 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt))
       if (interval=="prediction"){
         if (Q.time.varying) Qt <- parmat(MLEobj, "Q", t = t)[["Q"]]
+        if (G.time.varying) Gt <- parmat(MLEobj, "G", t = t)[["G"]]
+        if (Q.time.varying | G.time.varying) Qt <- Gt %*% tcrossprod(Qt, Gt)
         se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt) + Qt)
       } 
     }
