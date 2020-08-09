@@ -17,10 +17,10 @@ MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE)
 \value{
 A list with the following components  
   \item{model.residuals}{ The the observed smoothed model residuals: data minus the model predictions conditioned on all observed data. This is different than the Kalman filter innovations which use on the data up to time \eqn{t-1} for the predictions. See details. }
-  \item{state.residuals}{ The smoothed state residuals \eqn{\tilde{\mathbf{x}}_{t+1}^T - \mathbf{Z}\tilde{\mathbf{x}}_t^T - \mathbf{u}}{E(X_{t+1}|y(1:T))-E(X_{t+1}|E(x_t|y(1:T)))}. The last time step will be NA because the last step would be for T to T+1 (past the end of the data).}
+  \item{state.residuals}{ The smoothed state residuals \eqn{\tilde{\mathbf{x}}_{t+1}^T - \mathbf{Z}\tilde{\mathbf{x}}_t^T - \mathbf{u}}{E(X_{t+1}|y(1:T))-Z E(X_t|y(1:T)) - u}. The last time step will be NA because the last step would be for T to T+1 (past the end of the data).}
   \item{residuals}{ The residuals conditioned on the observed data. Returned as a (n+m) x T matrix with \code{model.residuals} in rows 1 to n and \code{state.residuals} in rows n+1 to n+m.  NAs will appear in rows 1 to n in the places where data are missing. }
   \item{var.residuals}{ The joint variance of the model and state residuals conditioned on observed data. Returned as a (n+m) x (n+m) x T matrix. For Harvey=FALSE, this is Holmes (2014) equation 57. For Harvey=TRUE, this is the residual variance in eqn. 24, page 113, in Harvey et al. (1998). They are identical except for missing values, for those Harvey=TRUE returns 0s. For the state residual variance, the last time step will be all NA because the last step would be for T to T+1 (past the end of the data).}
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. }
+  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. }
   \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
     \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed residuals (values in \code{model.residuals}). For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See details. }
     \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See details. }
@@ -29,9 +29,9 @@ A list with the following components
 }
 \details{
 
-This function returns the raw, Cholesky standardized and marginal standardized smoothed model and state residuals.  'smoothed' means conditioned on all the observed data and a set of parameters. These are the residuals presented in Harvey, Koopman and Penzer (1998) pages 112-113, with the addition of the values for unobserved data (Holmes 2014).  If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report (Holmes 2014).  Unlike the innovations residuals, the smoothed residuals are autocorrelated (section 4.1 in Harvey and Koopman 1992) and thus an ACF test on these residuals would not reveal model inadequacy.
+This function returns the raw, the Cholesky standardized and the marginal standardized smoothed model and state residuals.  'smoothed' means conditioned on all the observed data and a set of parameters. These are the residuals presented in Harvey, Koopman and Penzer (1998) pages 112-113, with the addition of the values for unobserved data (Holmes 2014).  If Harvey=TRUE, the function uses the algorithm on page 112 of Harvey, Koopman and Penzer (1998) to compute the conditional residuals and variance of the residuals.  If Harvey=FALSE, the function uses the equations in the technical report (Holmes 2014).  Unlike the innovations residuals, the smoothed residuals are autocorrelated (section 4.1 in Harvey and Koopman 1992) and thus an ACF test on these residuals would not reveal model inadequacy.
 
-The residuals matrix has a value for each time step.  The residuals in column \eqn{t} rows 1 to n are the model residuals associated with the data at time \eqn{t}. The residuals in rows n+1 to n+m are the state residuals associated with the transition from \eqn{\mathbf{x}_t}{x(t)} to \eqn{\mathbf{x}_{t+1}}{x(t+1)}, not the transition from \eqn{\mathbf{x}_t}{x(t-1)} to \eqn{\mathbf{x}_{t}}{x(t)}. Because \eqn{\mathbf{x}_{t+1}}{x(t+1)} does not exist at time \eqn{T}, the state residuals and associated variances at time \eqn{T} are NA.
+The residuals matrix has a value for each time step.  The residuals in column \eqn{t} rows 1 to n are the model residuals associated with the data at time \eqn{t}. The residuals in rows n+1 to n+m are the state residuals associated with the transition from \eqn{\mathbf{x}_t}{x(t)} to \eqn{\mathbf{x}_{t+1}}{x(t+1)}, not the transition from \eqn{\mathbf{x}_{t-1}}{x(t-1)} to \eqn{\mathbf{x}_{t}}{x(t)}. Because \eqn{\mathbf{x}_{t+1}}{x(t+1)} does not exist at time \eqn{T}, the state residuals and associated variances at time \eqn{T} are NA.
 
 Below the conditional residuals and their variance are discussed. The random variables are capitalized and the realizations from the random variables are lower case. The random variables are \eqn{\mathbf{X}}{X}, \eqn{\mathbf{Y}}{Y}, \eqn{\mathbf{V}}{V} and \eqn{\mathbf{W}}{W}. There are two types of \eqn{\mathbf{Y}}{Y}. The observed \eqn{\mathbf{Y}}{Y} that are used to estimate the states \eqn{\mathbf{x}}{x}. These are termed \eqn{\mathbf{Y}^{(1)}}{Y(1)}. The unobserved  \eqn{\mathbf{Y}}{Y} are termed \eqn{\mathbf{Y}^{(2)}}{Y(2)}. These are not used to estimate the states \eqn{\mathbf{x}}{x} and we may or may not know the values of \eqn{\mathbf{y}^{(2)}}{y(2)}. Typically we treat \eqn{\mathbf{y}^{(2)}}{y(2)} as unknown but it may be known but we did not include it in our model fitting.  Note that the model parameters \eqn{\Theta}{Theta} are treated as fixed or known. The 'fitting' does not involve estimating \eqn{\Theta}{Theta}; it involves estimating \eqn{\mathbf{x}}{x}. All MARSS parameters can be time varying but the \eqn{t} subscripts are left off parameters to reduce clutter.
 
@@ -45,34 +45,34 @@ where \eqn{\tilde{\mathbf{x}}_t^T}{xtT} is the expected value of \eqn{\mathbf{X}
 
 \code{res1} and \code{res2} in the code below will be the same.
 \preformatted{dat = t(harborSeal)[2:3,]
-MLEobj = MARSS(dat)
-Z = coef(MLEobj, type="matrix")$Z
-A = coef(MLEobj, type="matrix")$A
-res1 = dat - Z \%*\% MLEobj$states - A \%*\% matrix(1,1,ncol(dat))
-res2 = MARSSresiduals(MLEobj, type="tT")$model.residuals
+fit = MARSS(dat)
+Z = coef(fit, type="matrix")$Z
+A = coef(fit, type="matrix")$A
+res1 = dat - Z \%*\% fit$states - A \%*\% matrix(1,1,ncol(dat))
+res2 = MARSSresiduals(fit, type="tT")$model.residuals
 }
 
-\strong{state.residuals}
+\strong{State residuals}
 
-\eqn{\mathbf{w}_t}{w_t} are the difference between the state at time \eqn{t} and the expected value of the state at time \eqn{t} given the state at time \eqn{t-1}:
-\deqn{ \mathbf{w}_t = \mathbf{x}_t - \mathbf{B} \mathbf{x}_{t-1} - \mathbf{u} }{ w_t = x_t - B x_{t-1} - u}
-The estimated state residuals \eqn{\hat{\mathbf{w}}_t}{hatw_t} are the difference between estimate of \eqn{\mathbf{x}_t}{x_t} minus the estimate using \eqn{\mathbf{x}_{t-1}}{x_{t-1}}. 
-\deqn{ \hat{\mathbf{w}}_t = \tilde{\mathbf{x}}_t^T - \mathbf{B}\tilde{\mathbf{x}}_{t-1}^T - \mathbf{u} }{ hatw_t = xtT - B xt1T - u}
-where \eqn{\tilde{\mathbf{x}}_t^T}{xtT} is the Kalman smoother estimate of the states at time \eqn{t} and \eqn{\tilde{\mathbf{x}}_{t-1}^T}{xt1T} is the Kalman smoother estimate of the states at time \eqn{t-1}.
-The estimated state residuals are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. There are no NAs in the estimated state residuals as an estimate of the state exists whether or not there are associated data.
+\eqn{\mathbf{w}_{t+1}}{w_t+1} are the difference between the state at time \eqn{t+1} and the expected value of the state at time \eqn{t+1} given the state at time \eqn{t}:
+\deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u} }{ w_t+1 = x_t+1 - B x_t - u}
+The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw_t+1} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x_t+1} minus the estimate using \eqn{\mathbf{x}_{t}}{x_t}. 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw_t+1 = xt+1T - B xtT - u}
+where \eqn{\tilde{\mathbf{x}}_{t+1}^T}{xt+1T} is the Kalman smoother estimate of the states at time \eqn{t+1} and \eqn{\tilde{\mathbf{x}}_{t}^T}{xt1T} is the Kalman smoother estimate of the states at time \eqn{t}.
+The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w_t+1} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w_t+1} (notice time subscript difference). There are no NAs in the estimated state residuals as an estimate of the state exists whether or not there are associated data.
 
 \code{res1} and \code{res2} in the code below will be the same.
 \preformatted{dat = t(harborSeal)[2:3,]
 TT = ncol(dat)
-MLEobj = MARSS(dat)
-B = coef(MLEobj, type="matrix")$B
-U = coef(MLEobj, type="matrix")$U
-statest = MLEobj$states[,2:TT]
-statestm1 = MLEobj$states[,1:(TT-1)]
-res1 = statest - B \%*\% statestm1 - U \%*\% matrix(1,1,TT-1)
-res2 = MARSSresiduals(MLEobj, type="tT")$state.residuals
+fit = MARSS(dat)
+B = coef(fit, type="matrix")$B
+U = coef(fit, type="matrix")$U
+statestp1 = MARSSkf(fit)$xtT[,2:TT]
+statest = MARSSkf(fit)$xtT[,1:(TT-1)]
+res1 = statestp1 - B \%*\% statest - U \%*\% matrix(1,1,TT-1)
+res2 = MARSSresiduals(fit, type="tT")$state.residuals[,1:(TT-1)]
 }
-Note that the state residual at the last time step (\eqn{T}) will be NA because it is the residual associated with \eqn{\mathbf{x}_T}{x_T} to \eqn{\mathbf{x}_{T+1}}{x_{T+1}} and \eqn{T+1} is beyond the data.  Similarly, the variance matrix at the last time step will have NAs for the same reason.
+Note that the state residual at the last time step (not shown) will be NA because it is the residual associated with \eqn{\mathbf{x}_T}{x_T} to \eqn{\mathbf{x}_{T+1}}{x_{T+1}} and \eqn{T+1} is beyond the data.  Similarly, the variance matrix at the last time step will have NAs for the same reason.
 
 \strong{Variance of the residuals}
 
@@ -83,7 +83,7 @@ To standardize the observed residuals, we will use \eqn{ \hat{\Sigma}_t }{ hatSi
 
 \strong{Standardized residuals}
 
-\code{MARSSresiduals} will return the Cholesky standardized residuals sensu Harvey et al. (1998) in \code{std.residuals} for outlier and shock detection.  These are the model and state residuals multiplied by the inverse of the upper triangle of the Cholesky decomposition of \code{var.residuals} (note \code{chol()} in R returns the lower triangle thus a transpose is needed). The standardized model residuals are set to NA when there are missing data. The standardized state residuals however always exist since the expected value of the states exist without data. The calculation of the standardized residuals for both the observations and states requires the full residuals variance matrix. Since the state residuals variance is NA at the last time step, the standardized residual in the last time step will be all NA.
+\code{MARSSresiduals} will return the Cholesky standardized residuals sensu Harvey et al. (1998) in \code{std.residuals} for outlier and shock detection.  These are the model and state residuals multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals} (note \code{chol()} in R returns the upper triangle thus a transpose is needed). The standardized model residuals are set to NA when there are missing data. The standardized state residuals however always exist since the expected value of the states exist without data. The calculation of the standardized residuals for both the observations and states requires the full residuals variance matrix. Since the state residuals variance is NA at the last time step, the standardized residual in the last time step will be all NA (for both model and state residuals).
 
 The interpretation of the Cholesky standardized residuals is not straight-forward when the \eqn{\mathbf{Q}}{Q} and \eqn{\mathbf{R}}{R} variance-covariance matrices are non-diagonal.  The residuals which were generated by a non-diagonal variance-covariance matrices are transformed into orthogonal residuals in MVN(0,I) space.  For example, if v is 2x2 correlated errors with variance-covariance matrix R. The transformed residuals (from this function) for the i-th row of v is a combination of the row 1 effect and the row 1 effect plus the row 2 effect.  So in this case, row 2 of the transformed residuals would not be regarded as solely the row 2 residual but rather how different row 2 is from row 1, relative to expected.  If the errors are highly correlated, then the transformed residuals can look rather non-intuitive.
 
@@ -126,24 +126,27 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
+  fit <- MARSS(dat)
   
   #state residuals
-  state.resids1 <- MARSSresiduals(MLEobj, type="tT")$state.residuals
+  state.resids1 <- MARSSresiduals(fit, type="tT")$state.residuals
   #this is the same as hatx_t-(hatx_{t-1}+u)
-  states <- MLEobj$states
-  state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
+  states <- fit$states
+  state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(fit,type="matrix")$U,2,29)
   #compare the two
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #normalize the state residuals to a variance of 1
-  Q <- coef(MLEobj,type="matrix")$Q
-  state.resids1 <- MARSSresiduals(MLEobj, type="tT", normalize=TRUE)$state.residuals
+  Q <- coef(fit,type="matrix")$Q
+  state.resids1 <- MARSSresiduals(fit, type="tT", normalize=TRUE)$state.residuals
   state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
   cbind(t(state.resids1[,-30]), t(state.resids2))
 
   #Cholesky standardized (by joint variance) model & state residuals
-  MARSSresiduals(MLEobj, type="tT")$std.residuals
+  MARSSresiduals(fit, type="tT")$std.residuals
+  
+  # Returns residuals in a data frame in long form
+  residuals(fit, type="tT")
 }
 \references{
 Harvey, A., S. J. Koopman, and J. Penzer. 1998. Messy time series: a unified approach. Advances in Econometrics 13: 103-144  (see page 112-113).  Equation 21 is the Kalman eqns.  Eqn 23 and 24 is the backward recursion to compute the smoothations.  This function uses the MARSSkf output for eqn 21 and then implements the backwards recursion in equation 23 and equation 24.  Pages 120-134 discuss the use of standardized residuals for outlier and structural break detection.
