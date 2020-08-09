@@ -11,6 +11,9 @@ Status
 
 To do 8-6-2020
 
+* Double check that MARSSresiduals.tt1 is returning [vt, wt] not [vt, wtp1] because I want et[,t] to be conditioned on t-1 and vt would be conditioned on t-1 and wtp1 conditioned on t. Also last time step for state not NA because of this.
+* Update the joint variance section in .tt1. See Residuals.Rnw for why the residuals are independent.
+
 * Work on residuals() for StructTS models. Why is .std.res = NA?
 * Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
