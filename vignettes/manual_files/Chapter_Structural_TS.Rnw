@@ -430,7 +430,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 \subsection{Fitted values}
 \index{structural ts models!fitted}
 
-\verb@fitted(x)@ applied to a \verb@StructTS@ object will return the expected value of $\XX_t$  conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed times series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
+\verb@fitted(x)@ applied to a \verb@StructTS@ object will return the expected value of the $\XX_t$  (the first 3 states) conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed times series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs16_fitted-bsm-sts, fig=TRUE>>=
@@ -441,7 +441,7 @@ plot(fitted1)
 \caption{Output from a plot of a fitted StructTS object.}
 \label{fig:STS.fig.bsm.fitted}
 \end{figure}
-In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.
+In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.  The function \verb@fitted()@ in the MARSS package has the more typical meaning of \emph{fitted} for a statistical model (model prediction of $\yy$ or $\xx$).
 <<label=Cs17_fitted-bsm-compare>>=
 fitted2 <- tsSmooth(fit2, type = "xtt")
 fitted2 <- subset(fitted2, .rownames  %in% c("X1", "X2", "X3"))
@@ -476,10 +476,10 @@ To output the model fitted value for $y$, we add the level and season states tog
 \begin{center}
 <<label=Cs20_model-est-bsm-compare-plot, fig=TRUE>>=
 fitted2 <- fitted(fit2, type="ytt")
-df2 <- data.frame(t=as.numeric(time(fitted1)), fitted=fit2$.fitted, name="MARSS")
+df2 <- data.frame(t=as.numeric(time(fitted1)), fitted=fitted2$.fitted, name="MARSS")
 df1 <- data.frame(t=df2$t, fitted=as.numeric(fitted1[,1]+fitted1[,3]), name="StructTS")
 df <- rbind(df1, df2)
-df$y <- fit2$y
+df$y <- fitted2$y
 
 ggplot(df) +
   geom_line(aes(x = t, y = fitted)) + geom_point(aes(x = t, y = y), col="blue") +
@@ -495,8 +495,31 @@ Duplicating the output between these two functions helps show exactly what Kalma
 \subsection{Residuals}
 \index{structural ts models!residuals}
 
+\verb@residuals(x)@ applied to a \verb@StructTS@ object will return the difference between $y_t$ and the expected value of $\YY_t$  conditioned on the data up to time $t$. This is $m_t+s_t$ for the BSM model. It is returned as a ts  object. The residuals are standardized (divided by the square root of the variance of residuals). Note the variance of the residuals is not \code{var(resids)}; see \verb@?MARSSresiduals@ for a discussion of how the variance of state-space residuals is computed.
+<<label=Cs16_residuals-bsm-sts, fig=TRUE>>=
+resids1 <- residuals(fit1)
+@
+In the MARSS package, the residuals function will return the model residuals conditioned on all the data, data up to time $t-1$ or up to time $t$. To replicate the behavior for \verb@StructTS@ objects, we need to use conditioning up to time $t$ which is \vers@type="tt"@.
+<<label=Cs17_residuals-bsm-compare>>=
+resids2 <- residuals(fit2, type = "tt", standardization="marginal")
+@
+This is a data frame in long-form which we can plot with ggplot.
+\begin{figure}[htp]
+\begin{center}
+<<label=Cs18_fitted-bsm-compare-plot, fig=TRUE>>=
+df2 <- data.frame(t=as.numeric(time(resids1)), resids=resids2$.std.resid, name="MARSS")
+df1 <- data.frame(t=df2$t, resids=as.numeric(resids1), name="StructTS")
+df3 <- data.frame(t=df2$t, resids=df1$resids-df2$resids, name="difference")
+df <- rbind(df1, df2, df3)
 
-
+ggplot(df, aes(x = t, y = resids)) +
+  geom_line() + facet_wrap(~name, ncol=1, scale="free_y") +
+  ggtitle("Marginal standardized model residuals")
+@
+\end{center}
+\caption{Output from a plot of the states from the marssMLE object using tsSmooth() output. The initial difference is due to the small value added to the diagonal of V0 to allow MARSS to fit this model.}
+\label{fig:STS.fig.bsm.residuals}
+\end{figure}
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
