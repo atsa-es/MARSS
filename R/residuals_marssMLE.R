@@ -75,9 +75,9 @@ residuals_marxss <- function(x, type, standardization, ...) {
     if(standardization=="marginal") 
       state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
     fit.list <- fitted.marssMLE(x, type = type1, interval="none")
-    if (type1=="xtt1") fit.list$value <- fit.list$.xtt1
-    if (type1=="xtt") fit.list$value <- fit.list$.xtt
-    if (type1=="xtT") c(fit.list$value <- fit.list$.xtT[2:TT],NA)
+    if (type1=="xtt1") fit.list$value <- c(fit.list$.xtt[2:TT],NA) #yes xtt! See Residluals.Rnw
+    if (type1=="xtt") fit.list$value <- NA
+    if (type1=="xtT") fit.list$value <- c(fit.list$.xtT[2:TT],NA)
     ret2 <- data.frame(
       .rownames = fit.list$.rownames,
       type = "state",
