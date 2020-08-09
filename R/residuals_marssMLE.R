@@ -65,20 +65,19 @@ residuals_marxss <- function(x, type, standardization, ...) {
     ret <- cbind(ret, .std.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
   
   # Second x
-    type1 <- paste0("x", type)
-    state.names <- attr(model, "X.names")
-    state.dims <- attr(model, "model.dims")[["x"]]
-    mm <- state.dims[1]
-    state.se.resids <- se.resids[(nn + 1):(nn + mm), , drop = FALSE]
-    state.resids <- resids$state.residuals
-    if(standardization=="Cholesky") 
-      state.std.resids <- resids$std.residuals[(nn + 1):(nn + mm), , drop = FALSE]
-    if(standardization=="marginal") 
-      state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
+  type1 <- paste0("x", type)
+  state.names <- attr(model, "X.names")
+  state.dims <- attr(model, "model.dims")[["x"]]
+  mm <- state.dims[1]
+  state.se.resids <- se.resids[(nn + 1):(nn + mm), , drop = FALSE]
+  state.resids <- resids$state.residuals
+  if(standardization=="Cholesky") 
+    state.std.resids <- resids$std.residuals[(nn + 1):(nn + mm), , drop = FALSE]
+  if(standardization=="marginal") 
+    state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
+  if (type!="tt" && (type=="tT" || !clean)){
     fit.list <- fitted.marssMLE(x, type = type1, interval="none")
-    if (type=="tt1") fit.list$value <- c(fit.list$.xtt[2:TT],NA) #yes xtt! See Residluals.Rnw
-    if (type=="tt") fit.list$value <- NA
-    if (type=="tT") fit.list$value <- c(fit.list$.xtT[2:TT],NA)
+    fit.list$value <- c(fit.list$.x[2:TT],NA)
     ret2 <- data.frame(
       .rownames = fit.list$.rownames,
       type = "state",
@@ -90,9 +89,9 @@ residuals_marxss <- function(x, type, standardization, ...) {
       .std.resid = vec(t(state.std.resids)),
       stringsAsFactors = FALSE
     )
-    # add states if type=tT or clean=FALSE
-    if(type=="tT" || !clean) ret <- rbind(ret, ret2)
-
+    ret <- rbind(ret, ret2)
+  }
+  
   class(ret) <- c("marssResiduals", "data.frame")
   attr(ret, "standardization") <- standardization
   attr(ret, "residual.type") <- type

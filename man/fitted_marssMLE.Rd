@@ -5,7 +5,7 @@
 
 \code{fitted.marssMLE} returns the different types of fitted values for \eqn{\mathbf{x}_t}{x(t)} and \eqn{\mathbf{y}_t}{y(t)} in a MARSS model. The fitted values are the expected value of the right side of the MARSS equations without the error terms, thus are the model predictions of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)}. \code{fitted.marssMLE} is a companion function to \code{\link[=tsSmooth.marssMLE]{tsSmooth}} which returns the expected value of the right side of the MARSS equations with the error terms (the Kalman filter and smoother output).
 
-\deqn{\mathbf{x}_{t+1} = \mathbf{B} \mathbf{x}_t + \mathbf{u} + \mathbf{C} \mathbf{c}_t + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t+1) = B x(t) + u + C c(t) + G w(t)}
+\deqn{\mathbf{x}_{t} = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{C} \mathbf{c}_t + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t) = B x(t-1) + u + C c(t) + G w(t)}
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}_t + \mathbf{a} + \mathbf{D} \mathbf{d}_t + \mathbf{H} \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R})}{y(t) = Z x(t) + a + D d(t) + H v(t)}
 
 Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_{t}}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother (only conditioning on 1 to \eqn{t-1}, \eqn{t} or \eqn{T} is output).
@@ -28,13 +28,12 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
 \value{
 If \code{output="data.frame"} (the default), a data frame with the following columns is returned. If If \code{output="matrix"}, the columns are returned as matrices in a list. Information computed from the model has a leading "." in the column name.
 
-If \code{interval="none"}, the following are returned:
+If \code{interval="none"}, the following are returned (colnames with \code{.} in front are computed values):
   
 \item{.rownames}{ Names of the data or states. }
 \item{t}{ Time step. }
 \item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
-\item{.xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type} is \code{"xtT"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
-\item{.xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type} is \code{"xtt1"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{.x}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type} is \code{"xtT"} or data up to time \eqn{t} if \code{type} is \code{"xtt1"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. This is the expected value of the right-side of the x equation with the errors terms while \code{.fitted} is the expected value without the error term \eqn{\mathbf{w}_t}{w(t)}.}
 \item{.fitted}{Predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
 
 
@@ -74,7 +73,7 @@ Intervals returned by \code{MARSSpredict()} are not for the data used in the mod
 
 \strong{state fitted values}
 
-The model predicted \eqn{\mathbf{x}(t)}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)} is \eqn{\mathbf{B}(t)\tilde{\mathbf{x}}(t-1)+\mathbf{u}(t)}{B(t) tildex(t-1)+u(t)}, where the model is written in marss form (\code{\link{MARSS.marss}}). If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)}, go to \code{\link[=fitted.marssMLE]{fitted}()}. This function returns the states estimate conditioned on all the data, on the data up to time \eqn{t-1} or up to time \eqn{t}. Which one you want depends on your objective and application. 
+The model predicted \eqn{\mathbf{x}(t)}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)} is \eqn{\mathbf{B}(t)\tilde{\mathbf{x}}(t-1)+\mathbf{u}(t)}{B(t) tildex(t-1)+u(t)}, where the model is written in marss form (\code{\link{MARSS.marss}}). If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)}, go to \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. Which function you want depends on your objective and application. 
   
 \eqn{\tilde{\mathbf{x}}_{t-1}}{tildex(t-1)} used in the prediction is the expected value of the states at time \eqn{t-1}. If \code{type="xtT"}, this is the expected value at time \eqn{t-1} conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}()}.  If \code{type="xtt1"}, it is the expected value conditioned on the data up to time \eqn{t-1}, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}()}. The predicted state values conditioned on data up to \eqn{t} are not provided. This would require the expected value of states at time \eqn{t} conditioned on data up to time \eqn{t+1}, and this is not output by the Kalman filter. Only conditioning on data up to \eqn{t-1} and \eqn{T} are output.
 

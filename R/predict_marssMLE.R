@@ -228,8 +228,8 @@ predict.marssMLE <- function(object, n.ahead = 0,
     )
   } # end setting up newMLEobj
 
-  if (type == "xtT") estcol=".xtT"
-  if (type == "xtt1") estcol=".xtt"
+  if (type == "xtT") estcol=".x"
+  if (type == "xtt1") estcol=".x"
   if (type %in% c("ytT", "ytt", "ytt1")) estcol="y"
   cols <- switch(interval,
                    prediction = c(".rownames", "t", estcol, ".fitted", ".sd", ".lwr", ".upr"),

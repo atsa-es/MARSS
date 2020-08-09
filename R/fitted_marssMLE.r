@@ -124,18 +124,10 @@ fitted.marssMLE <- function(object, ...,
       mm <- state.dims[1]
       TT <- state.dims[2]
       
-      if (conditioning == "T")
-        ret <- data.frame(
+      ret <- data.frame(
           .rownames = rep(state.names, each = TT),
           t = rep(1:TT, mm),
-          .xtT = vec(t(hatxt)),
-          stringsAsFactors = FALSE
-        )
-      if (conditioning == "t1")
-        ret <- data.frame(
-          .rownames = rep(state.names, each = TT),
-          t = rep(1:TT, mm),
-          .xtt = vec(t(hatxt)),
+          .x = vec(t(hatxt)),
           stringsAsFactors = FALSE
         )
     }
