@@ -120,10 +120,14 @@
 \def\hatPtmt{\widetilde{\PP}_{t-1,t}}
 \def\hatVt{\widehat{\VV}_t}
 \def\hatvt{\widehat{\vv}_t}
+\def\checkvt{\overline{\vv}_t}
 \def\checkvtp{\overline{\vv}_{t+1}}
 \def\checkVtp{\overline{\VV}_{t+1}}
 \def\checkVt{\overline{\VV}_t}
-\def\checkvt{\overline{\vv}_t}
+\def\dotvt{\dot{\vv}_t}
+\def\dotvtp{\dot{\vv}_{t+1}}
+\def\dotVtp{\dot{\VV}_{t+1}}
+\def\dotVt{\dot{\VV}_t}
 \def\hatVtT{\widetilde{\VV}_t^T}
 \def\hatVtt1{\widetilde{\VV}_t^{t-1}}
 \def\hatVtmT{\widetilde{\VV}_{t-1}^T}
@@ -647,7 +651,7 @@ where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditi
 
 This is conceptually different than the observed `innovations'. First, this is the random variable `innovation'.  $\yy^{(1)}_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$ and $\checkvt$ is a sample from the innovations you could observe. Second, $\checkvt$ includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$ (observed and unobserved $\yy$). Normally, the innovations for missing data would appear as 0s (e.g. from a call to \verb@MARSSfss()@). For missing data, $\checkvt$ is not necessarily 0. For example if $\yy$ is multivariate and correlated with each other through $\RR$ or a shared $\xx$ dependency.
 
-The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus we can write the variance directly as:
+The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus using Equation \ref{eq:first.and.secons.vvtgeneral}, we can write the variance directly as:
 \begin{equation}\label{eq:innov.model}
 \var[\checkVt] = \RR_t - \ZZ_t \hatVtt1 \ZZ_t^\top + \hatStt1\ZZ_t^\top + \ZZ_t(\hatStt1)^\top
 \end{equation}
@@ -758,6 +762,26 @@ The marginal standardized joint residuals for $\overline{\varepsilon}_t^*$ are:
 \dg(\overline{\Sigma}_t^*)^{-1/2} \overline{\varepsilon}_t^*
 \end{equation}
 where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
+
+\section{Distribution of the MARSS contemporaneous model residuals}
+
+Contemporaneous model residuals are the difference between the data at time $t$ minus the prediction of $\yy_t$ given data up to $t$. This section gives the residual variance for these residuals. There are no state residuals for this case as that would require the expected value of $\XX_t$ conditioned on the data up to $t+1$. 
+
+Define the contemporaneous model residuals $\dotvt$ as:
+\begin{equation}\label{eq:vtt1}
+\dotvt = E[\YY_t|\yy^{(1)}_t] - \ZZ_t\hatxtt - \aa_t,
+\end{equation}
+where $\hatxtt$ is $\E[\XX_t|\yy^{(1),t}]$ (expected value of $\XX_t$ conditioned on the data up to time $t$). The random variable, contemporaneous model residuals over all possible $\yy_t$, is $\dotVt$. Its mean is 0 and we want to find its variance. 
+
+The derivation of the variance of $\dotVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t$ not up to $T$. Thus using Equation \ref{eq:first.and.secons.vvtgeneral}, we can write the variance directly as:
+\begin{equation}\label{eq:contemp.model}
+\var[\dotVt] = \RR_t - \ZZ_t \hatVtt \ZZ_t^\top + \hatStt\ZZ_t^\top + \ZZ_t(\hatStt)^\top
+\end{equation}
+where the $\hatVtt$ and $\hatStt$ are now conditioned on only the data from 1 to $t$.
+$\hatStt = \cov[\YY_t,\XX_t|\yy^{(1), t}] = \cov[\ZZ_t \XX_t + \aa_t+\VV_t,\XX_t|\yy^{(1), t}]$. 
+If $\yy_t$ has no missing values, this reduces to $\RR_t - \ZZ_t \hatVtt \ZZ_t^\top$ while if $\yy_t$ is all missing values, this reduces to $\RR_t + \ZZ_t \hatVtt \ZZ_t^\top$. See discussion of this after Equation \ref{eq:first.and.secons.vvtgeneral}.
+
+Equation \ref{eq:contemp.model} gives the equation for the case where $\yy_t$ is partially observed. $\hatStt$ is output by the \verb@MARSShatyt()@ function in the MARSS package and $\hatVtt$ is output by the \verb@MARSSkfss()@ function.
 
 \bibliography{./EMDerivation}
 \bibliographystyle{apalike}
