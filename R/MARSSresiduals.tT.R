@@ -193,6 +193,17 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
 
     tmpvar[abs(tmpvar) < sqrt(.Machine$double.eps)] <- 0
 
+    # inverse of diagonal of variance matrix for marginal standardization
+    # psolve deals with 0s on diagonal
+    tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
+    if (inherits(tmpvarinv, "try-error")) {
+      mar.st.et[, t] <- NA
+      msg <- c(msg, paste('MARSSresiduals.tT warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for mar.residuals at t =", t, "\n'))
+    }else{ # inverse of the diagonal is ok
+      mar.st.et[, t] <- sqrt(tmpvarinv) %*% resids
+      mar.st.et[is.miss, t] <- NA
+    }
+
     # psolve and pchol deal with 0s on diagonal
     # wrapped in try to prevent crashing if inversion not possible
     tmpchol <- try(pchol(tmpvar), silent = TRUE)
@@ -201,24 +212,15 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent=
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
-    # chol() returns the upper triangle. We need to lower triangle
+    # chol() returns the upper triangle. We need to lower triangle to t()
     tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
       msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo('residvarinv')\n"))
       next
     }
-    # inverse of diagonal of variance matrix for marginal standardization
-    tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
-    if (inherits(tmpvarinv, "try-error")) {
-      mar.st.et[, t] <- NA
-      msg <- c(msg, paste('MARSSresiduals.tT warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for mar.residuals at t =", t, "\n'))
-      next
-    }
     st.et[, t] <- tmpcholinv %*% resids
     st.et[is.miss, t] <- NA
-    mar.st.et[, t] <- sqrt(tmpvarinv) %*% resids
-    mar.st.et[is.miss, t] <- NA
   }
 
   # the state.residual at the last time step is NA because it is x(T+1) - f(x(T)) and T+1 does not exist.  For the same reason, the var.residuals at TT will have NAs

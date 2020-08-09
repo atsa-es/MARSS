@@ -13,7 +13,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   model.var.et <- array(0, dim = c(n, n, TT))
   var.et <- array(0, dim = c(n+m, n+m, TT))
   msg <- NULL
-
+  
   #### make a list of time-varying parameters
   time.varying <- list()
   for (elem in attr(MLEobj[["marss"]], "par.names")) {
@@ -23,20 +23,20 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
       time.varying[[elem]] <- TRUE
     }
   }
-
+  
   kf <- MARSSkfss(MLEobj)
   Ey <- MARSShatyt(MLEobj, only.kem=FALSE)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H
   Rt <- Ht %*% Rt %*% t(Ht)
   Zt <- parmat(MLEobj, "Z", t = 1)$Z
-
+  
   if (method=="SS") {
     # We could set model.et to 0 where no data, but Kt will have a 0 column 
     # for any missing y.
     model.et <- Ey$ytt - fitted(MLEobj, type = "ytt1", output = "matrix") # model residuals
     et[1:n,] <- model.et
-
+    
     cov.et <- matrix(0, n, m)
     # get the model residual variance
     for (t in 1:TT) {
@@ -54,11 +54,11 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
         et[(n + 1):(n + m), t] <- Ktp %*% model.et[, t+1]
         tmpvar.state.et <- tcrossprod(Ktp %*%model.var.et[, , t+1], Ktp)
       }else {
-         tmpvar.state.et <- matrix(0, m, m)
+        tmpvar.state.et <- matrix(0, m, m)
       }
       var.et[1:n, , t] <- cbind(model.var.et[, , t], cov.et)
       var.et[(n + 1):(n + m), , t] <- cbind(t(cov.et), tmpvar.state.et)
-
+      
       if (normalize) {
         Qpinv <- matrix(0, m, n + m)
         Rinv <- matrix(0, n, n + m)
@@ -74,7 +74,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
       
     }
   }
-
+  
   # prepare standardized residuals
   for (t in 1:TT) {
     tmpvar <- sub3D(var.et, t = t)
@@ -86,32 +86,34 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
     
     tmpvar[abs(tmpvar) < sqrt(.Machine$double.eps)] <- 0
     
+    # inverse of diagonal of variance matrix for marginal standardization
+    tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
+    if (inherits(tmpvarinv, "try-error")) {
+      mar.st.et[, t] <- NA
+      msg <- c(msg, paste('MARSSresiduals.tt1 warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for mar.residuals at t =", t, "\n'))
+    }else{ # inv of diagonal ok, can compute marginal std residuals
+      mar.st.et[, t] <- sqrt(tmpvarinv) %*% resids
+      mar.st.et[is.miss, t] <- NA
+    }
+    
     # psolve and pchol deal with 0s on diagonal
     # wrapped in try to prevent crashing if inversion not possible
     tmpchol <- try(pchol(tmpvar), silent = TRUE)
     if (inherits(tmpchol, "try-error")) {
       st.et[, t] <- NA
       msg <- c(msg, paste("MARSSresiduals.tt1 warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
-      next
+      next # got to next t since next inversion will fail
     }
     # chol() returns the upper triangle. We need to lower triangle
     tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
       msg <- c(msg, paste("MARSSresiduals.tt1 warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo('residvarinv')\n"))
-      next
+      next # go to next t
     }
-    # inverse of diagonal of variance matrix for marginal standardization
-    tmpvarinv <- try(psolve(makediag(takediag(tmpvar))), silent = TRUE)
-    if (inherits(tmpvarinv, "try-error")) {
-      mar.st.et[, t] <- NA
-      msg <- c(msg, paste('MARSSresiduals.tt1 warning: the diagonal matrix of the variance of the residuals at t =", t, "is not invertible.  NAs returned for mar.residuals at t =", t, "\n'))
-      next
-    }
+    # all ok, can compute Cholesky std.residuals
     st.et[, t] <- tmpcholinv %*% resids
     st.et[is.miss, t] <- NA
-    mar.st.et[, t] <- sqrt(tmpvarinv) %*% resids
-    mar.st.et[is.miss, t] <- NA
   }
   
   # the state.residual at the last time step is NA because it is x(T+1) - f(x(T)) and T+1 does not exist.  For the same reason, the var.residuals at TT will have NAs
@@ -126,7 +128,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   var.obs.v <- array(0, dim = c(n, n, TT))
   # this will be 0 for observed data
   for( t in 1:TT) var.obs.v[,,t] <- Ey$Ott1[,,t] - tcrossprod(Ey$ytt1[,t])
-
+  
   # the observed model residuals are data - E(data), so NA for missing data.
   model.et <- et[1:n, , drop = FALSE]
   model.et[is.na(y)] <- NA
@@ -141,7 +143,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   
   # output any warnings
   if(!is.null(msg) && object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tt1 reported warnings. See msg element of returned residuals object.\n")
-
+  
   return(list(
     model.residuals = et[1:n, , drop = FALSE], 
     state.residuals = et[(n + 1):(n + m), , drop = FALSE], 
