@@ -56,7 +56,7 @@ The state residuals are in the data frame with \code{.type="state"}.
 
 If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. 
 
-The state residuals are only for state-space models. At time t, the state residuals are the difference between the state estimate at time t and the predicted value of the state given the estimate of the state at time t-1, thus it is the residual for the state transition from t-1 to t (or t to t+1). For the state residuals, the "value"" depends on whether you are compute "smoothations" or "innovations" state residuals. If \code{type="tT"}, the value is the smoothed estimate (\code{xtT}) at time t+1 and the predicted value is the expected value of \eqn{x} computed using the smoothed estimated of \eqn{x} at time t, so is \code{B xtT[,t] + u}).  If \code{type="tt1"}, the value is expected value of \eqn{x} conditioned on the data up to time t-1 and the predicted value is computed using the expected value of \eqn{x} conditioned on the data up to time t-1, i.e. \code{B xtt[,t-1]} + u.
+The state residuals are only for state-space models. At time t, the state residuals are the difference between the state estimate at time t and the predicted value of the state given the estimate of the state at time t-1, thus it is the residual for the state transition from t-1 to t (or t to t+1). For the state residuals, the "value"" depends on whether you are compute smoothations or innovations state residuals. If \code{type="tT"}, the value is the smoothed estimate (\code{xtT}) at time t+1 and the predicted value is the expected value of \eqn{x} computed using the smoothed estimated of \eqn{x} at time t, so is \code{B xtT[,t] + u}).  If \code{type="tt1"}, the value is expected value of \eqn{x} conditioned on the data up to time t-1 and the predicted value is computed using the expected value of \eqn{x} conditioned on the data up to time t-1, i.e. \code{B xtt[,t-1]} + u.
 
 Smoothation residuals are used for outlier detection or shock detection in the state process.  They are also used for model diagnostics.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state smoothation residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
 
@@ -72,7 +72,7 @@ library(ggplot2)
 theme_set(theme_bw())
 
 # Make a plot of the model residuals (innovations) with intervals
-d <- residuals(fit, type="innovations")
+d <- residuals(fit, type="tt1")
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
 d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
@@ -83,7 +83,7 @@ ggplot(data = d) +
   xlab("Time Step") + ylab("Count")
 
 # Make a plot of the smoothed residuals with intervals
-d <- residuals(fit, type="smoothations")
+d <- residuals(fit, type="tT")
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
 d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
@@ -96,7 +96,7 @@ ggplot(data = d) +
 
 # Make a plot of xtT versus prediction of xt from xtT[t-1]
 # This is NOT the estimate of the smoothed states with CIs. Use tsSmooth() for that.
-d <- residuals(fit, type = "smoothations")
+d <- residuals(fit, type = "tT")
 ggplot(data = d) +
   geom_point(aes(t, value), na.rm=TRUE) +
   geom_line(aes(x = t, .fitted), color="blue") +

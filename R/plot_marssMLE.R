@@ -15,10 +15,10 @@ plot.marssMLE <-
     
     # run residuals if needed
     if (any(str_detect(plot.type, "acf"))) {
-      tt1.resids <- residuals.marssMLE(x, type = "innovations", standardization = "Cholesky")
+      tt1.resids <- residuals.marssMLE(x, type = "tt1", standardization = "Cholesky")
     }
     if (any(str_detect(plot.type, "resids"))) {
-      tT.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
+      tT.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
     }
     
     if (missing(form)) {

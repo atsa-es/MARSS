@@ -59,10 +59,10 @@ autoplot.marssMLE <-
     plts <- list()
 
     if (any(str_detect(plot.type, "acf"))) {
-      tt1.resids <- residuals.marssMLE(x, type = "innovations", standardization = "Cholesky")
+      tt1.resids <- residuals.marssMLE(x, type = "tt1", standardization = "Cholesky")
     }
     if (any(str_detect(plot.type, "resids"))) {
-      std.resids <- residuals.marssMLE(x, type = "smoothations", standardization = "Cholesky")
+      std.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
     }
     
     if ("xtT" %in% plot.type) {
