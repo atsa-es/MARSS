@@ -2,6 +2,9 @@
 \chapter{Short Examples}
 \label{chap:Examples}
 \chaptermark{Examples}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Quick\_Examples.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
 
 <<RUNFIRST, echo=F, include.source=F>>=
 library(MARSS)
