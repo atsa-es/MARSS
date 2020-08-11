@@ -1,3 +1,6 @@
+## Rcpp support
+useDynLib(MARSS)
+importFrom(Rcpp, evalCpp)
 
 ## export functions
 export(
@@ -72,14 +75,3 @@ if(getRversion() >= "3.6.0") {
   S3method(forecast::accuracy, marssMLE)
   S3method(forecast::accuracy, marssPredict)
 }
-
-
-# Another approach for the broom and ggplot2 S3 methods is 
-# to put broom and ggplot2 in imports
-# importFrom(broom, augment, glance, tidy)
-# importFrom(ggplot2, autoplot)
-# S3method(augment, marssMLE)
-# S3method(glance, marssMLE)
-# S3method(tidy, marssMLE)
-# S3method(autoplot, marssMLE)
-

@@ -1,13 +1,30 @@
 Package: MARSS
 Type: Package
 Title: Multivariate Autoregressive State-Space Modeling
-Version: 3.10.14
-Date: 2020-03-03
-Depends: R (>= 3.1.0)
+Version: 4.1.0
+Date: 2018-3-30
+Depends: R (>= 2.15.0)
 Imports: 
-    graphics, grDevices, KFAS (>= 1.0.1), mvtnorm, nlme, stats, utils
+    graphics, 
+    grDevices,
+    KFAS (>= 1.0.1), 
+    mvtnorm, 
+    nlme, 
+    stats, 
+    utils,
+    Rcpp (>= 0.12.5),
+    RcppArmadillo
 Suggests: 
-    broom, Formula, ggplot2, Hmisc, lattice, lme4, maps, Matrix, stringr, survival, xtable, forecast
+    broom,
+    Formula, 
+    ggplot2, 
+    Hmisc, 
+    lattice, 
+    lme4, 
+    maps, 
+    stringr, 
+    survival, 
+    xtable 
 Author: Eli Holmes, Eric Ward, Mark Scheuerell, and Kellie Wills, NOAA, Seattle, USA
 Maintainer: Elizabeth Holmes - NOAA Federal <eli.holmes@noaa.gov>
 Description: The MARSS package provides maximum-likelihood parameter estimation for constrained and unconstrained linear multivariate autoregressive state-space (MARSS) models fit to multivariate time-series data.  Fitting is primarily via an Expectation-Maximization (EM) algorithm, although fitting via the BFGS algorithm (using the optim function) is also provided.  MARSS models are a class of dynamic linear model (DLM) and vector autoregressive model (VAR) model.  Functions are provided for parametric and innovations bootstrapping, Kalman filtering and smoothing, bootstrap model selection criteria (AICb), confidences intervals via the Hessian approximation and via bootstrapping and calculation of auxiliary residuals for detecting outliers and shocks.  The user guide shows examples of using MARSS for parameter estimation for a variety of applications, model selection, dynamic factor analysis, outlier and shock detection, and addition of covariates.  Type RShowDoc("UserGuide", package="MARSS") at the R command line to open the MARSS user guide.  Online workshops (lectures and computer labs) at <https://nwfsc-timeseries.github.io/>  See the NEWS file for update information.
@@ -17,3 +34,4 @@ BuildVignettes: yes
 ByteCompile: TRUE
 URL: https://nwfsc-timeseries.github.io/MARSS
 BugReports: https://github.com/nwfsc-timeseries/MARSS/issues
+LinkingTo: Rcpp, RcppArmadillo
