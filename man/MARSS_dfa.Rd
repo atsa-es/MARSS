@@ -6,7 +6,7 @@
 
 \description{
 The Dynamic Factor Analysis model in MARSS is
-\deqn{x(t+1) = x(t) + w(t), where w(t) ~ MVN(0,I)}
+\deqn{x(t) = x(t-1) + w(t), where w(t) ~ MVN(0,I)}
 \deqn{y(t) = Z(t) x(t) + D(t) d(t) + v(t), where v(t) ~ MVN(0,R(t))}
 \deqn{x(1) ~ MVN(0, 5*I)}
 

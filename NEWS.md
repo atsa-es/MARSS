@@ -22,14 +22,8 @@ kemfit <- MARSS(dat, model = list(
 ))
 ```
 
-* Then move to multivariate examples.
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
-* need to fix equations in Rd files. changed to x(t+1) and messed up time indexing for the 
-time-varying parameters.
-x(t) = B(t)*x(t-1)+u(t)+C(t)c(t)
-so 
-x(t+1) = B(t+1)x(t)+u(t+1)
-Go back to x(t). That's how it is in the User Guide.
+* 
 
 * In quick examples, I talk about ACF diagnostics. Check that innovations are used.
 * changed default residuals(fit) to return innovations.

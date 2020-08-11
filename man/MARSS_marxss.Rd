@@ -5,7 +5,7 @@
 \title{ Multivariate AR-1 State-space Model with Inputs }
 \description{
 The argument \code{form="marxss"} in a \code{\link{MARSS}()} function call specifies a MAR-1 model with eXogenous variables model.  This is a MARSS(1) model of the form:
-\deqn{x(t+1) = B(t) x(t) + U(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
+\deqn{x(t) = B(t) x(t-1) + U(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
 \deqn{y(t) = Z(t) x(t) + A(t) + D(t) d(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
 \deqn{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }
 Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x(1)} or \eqn{x(0)} is treated as an estimated parameter not a diffuse prior.

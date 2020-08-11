@@ -8,7 +8,7 @@
 The form of MARSS models for users is "marxss", the MARSS models with inputs.  See \code{\link{MARSS.marxss}}.  In the internal algorithms (e.g. \code{\link{MARSSkem}}), the "marss" form is used and the D and d are incorporated into the A matrix and C and c are incorporated into the U matrix.
 
 This is a MARSS(1) model of the marss form:
-\deqn{x(t+1) = B(t) x(t) + U(t)  + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
+\deqn{x(t) = B(t) x(t-1) + U(t)  + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
 \deqn{y(t) = Z(t) x(t) + A(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
 \deqn{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }
 Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x(1)} or \eqn{x(0)} is treated as an estimated parameter not a diffuse prior.

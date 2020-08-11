@@ -59,9 +59,9 @@ The state residuals are in the data frame with \code{.type="state"}.
 If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
 
 The state residuals are only for state-space models. At time \eqn{t}, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state at time \eqn{t+1} given the estimate of the state at time \eqn{t}. For smoothation state residuals, this is 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw_t+1 = xt+1T - B xtT - u}
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw(t+1) = xt+1T - B xtT - u}
 For innovations state residuals, this is 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw_t+1 = xt+1t+1 - B xtt - u}
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u}
 
 Smoothation state sresiduals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
 

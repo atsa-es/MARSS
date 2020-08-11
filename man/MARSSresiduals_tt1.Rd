@@ -42,12 +42,12 @@ where \eqn{\tilde{\mathbf{x}}_t^{t-1}}{xtt1} is the expected value of \eqn{\math
 
 \strong{State residuals}
 
-\eqn{\mathbf{w}_{t+1}}{w_t+1} are the difference between the state at time \eqn{t+1} and the expected value of the state at time \eqn{t+1} given the state at time \eqn{t}:
-\deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u} }{ w_t+1 = x_t+1 - B x_t - u}
-The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw_t+1} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x_t+1} minus the estimate using \eqn{\mathbf{x}_{t}}{x_t}. 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw_t+1 = xt+1t+1 - B xtt - u}
+\eqn{\mathbf{w}_{t+1}}{w(t+1)} are the difference between the state at time \eqn{t+1} and the expected value of the state at time \eqn{t+1} given the state at time \eqn{t}:
+\deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u} }{ w(t+1) = x(t+1) - B x(t) - u}
+The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw(t+1)} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x(t+1)} minus the estimate using \eqn{\mathbf{x}_{t}}{x(t)}. 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u}
 where \eqn{\tilde{\mathbf{x}}_{t+1}^{t+1}}{xt+1t+1} is the Kalman filter estimate of the states at time \eqn{t+1} conditioned on the data up to time \eqn{t+1} and \eqn{\tilde{\mathbf{x}}_{t}^t}{xtt} is the Kalman filter estimate of the states at time \eqn{t} conditioned on the data up to time \eqn{t}.
-The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w_t+1} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w_t+1} (notice time subscript difference). There are no NAs in the estimated state residuals (excecpt for the last time step) as an estimate of the state exists whether or not there are associated data.
+The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals (excecpt for the last time step) as an estimate of the state exists whether or not there are associated data.
 
 \code{res1} and \code{res2} in the code below will be the same.
 \preformatted{dat = t(harborSeal)[2:3,]
@@ -63,10 +63,10 @@ res2 = MARSSresiduals(fit, type="tt1")$state.residuals
 
 \strong{Joint residual variance}
 
-In a state-space model, \eqn{\mathbf{X}}{X} and \eqn{\mathbf{Y}}{Y} are stochastic, and the model and state residuals are random variables \eqn{\hat{\mathbf{V}}_t}{hatV_t} and \eqn{\hat{\mathbf{W}}_{t+1}}{hatW_t+1}. The joint distribution of \eqn{\hat{\mathbf{V}}_t, \hat{\mathbf{W}}_{t+1}}{hatV_t, hatW_t+1} is the distribution across all the different possible data sets that our MARSS equations with parameters \eqn{\Theta}{Theta} might generate. Denote the matrix of \eqn{\hat{\mathbf{V}}_t, \hat{\mathbf{W}}_{t+1}}{hatV_t, hatW_t+1}, as \eqn{\widehat{\mathcal{E}}_t}{Epsilon_t}. That distribution has an expected value (mean) and variance:
+In a state-space model, \eqn{\mathbf{X}}{X} and \eqn{\mathbf{Y}}{Y} are stochastic, and the model and state residuals are random variables \eqn{\hat{\mathbf{V}}_t}{hatV(t)} and \eqn{\hat{\mathbf{W}}_{t+1}}{hatW(t+1)}. The joint distribution of \eqn{\hat{\mathbf{V}}_{t}, \hat{\mathbf{W}}_{t+1}}{hatV(t), hatW(t+1)} is the distribution across all the different possible data sets that our MARSS equations with parameters \eqn{\Theta}{Theta} might generate. Denote the matrix of \eqn{\hat{\mathbf{V}}_{t}, \hat{\mathbf{W}}_{t+1}}{hatV(t), hatW(t+1)}, as \eqn{\widehat{\mathcal{E}}_{t}}{Epsilon(t)}. That distribution has an expected value (mean) and variance:
 \deqn{ \textrm{E}[\widehat{\mathcal{E}}_t] = 0; \textrm{var}[\widehat{\mathcal{E}}_t] = \hat{\Sigma}_t }{ E[Epsilon_t] = 0; var[Epsilon_t] = hatSigma_t}
 Our observed residuals \code{residuals} are one sample from this distribution.
-To standardize the observed residuals, we will use \eqn{ \hat{\Sigma}_t }{ hatSigma_t }. \eqn{ \hat{\Sigma}_t }{ hatSigma_t } is returned in \code{var.residuals}. Rows/columns 1 to \eqn{n} are the conditional variances of the model residuals and rows/columns \eqn{n+1} to \eqn{n+m} are the conditional variances of the state residuals. The off-diagonal blocks are the covariances between the two types of residuals. For one-step-ahead residuals (unlike smoothation residuals \link{MARSSresiduals.tT}), the covariance is zero.
+To standardize the observed residuals, we will use \eqn{ \hat{\Sigma}_t }{ hatSigma(t) }. \eqn{ \hat{\Sigma}_t }{ hatSigma(t) } is returned in \code{var.residuals}. Rows/columns 1 to \eqn{n} are the conditional variances of the model residuals and rows/columns \eqn{n+1} to \eqn{n+m} are the conditional variances of the state residuals. The off-diagonal blocks are the covariances between the two types of residuals. For one-step-ahead residuals (unlike smoothation residuals \link{MARSSresiduals.tT}), the covariance is zero.
 
 \code{var.residuals} returned by this function is the conditional variance of the residuals conditioned on the data up to \eqn{t-1} and the parameter set \eqn{\Theta}{Theta}.  The conditional variance for the model residuals is 
 \deqn{ \hat{\Sigma}_t = \mathbf{R}+\mathbf{Z}_t \mathbf{V}_t^{t-1} \mathbf{Z}_t^\top }{hatSigma_t = R + Z_t Vtt1 t(Z_t)}

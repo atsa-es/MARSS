@@ -25,18 +25,18 @@ A \code{\link{marssMODEL}} object is an R representation of a MARSS model along 
 
 The base MARSS model (form=marss) is
 \describe{
-\item{x(t+1) = B(t) x(t) + U(t) + w(t), where w(t) ~ MVN(0,Q(t))}{}
+\item{x(t) = B(t) x(t-1) + U(t) + w(t), where w(t) ~ MVN(0,Q(t))}{}
 \item{y(t) = Z(t) x(t) + A(t) + v(t), where v(t) ~ MVN(0,R(t))}{}
-\item{x(1) ~ MVN(x0, V0)}{} 
+\item{x(0) ~ MVN(x0, V0) or x(1) ~ MVN(x0, V0)}{} 
 }
 
 The marssMODEL(form=marss) object describes this MARSS model but written in vec form:
 \describe{
-\item{x(t+1) = kron(x(t),I)(f_b(t)+D_b(t)b) + (f_u(t)+D_u(t)u) + w(t), where w(t) ~ MVN(0,Q)}{}
+\item{x(t) = kron(x(t-1),I)(f_b(t)+D_b(t)b) + (f_u(t)+D_u(t)u) + w(t), where w(t) ~ MVN(0,Q)}{}
 \item{vec(Q) = f_q(t)+D_q(t)q}{} 
 \item{y(t) = kron(x(t),I)(f_z(t)+D_z(t)z) + (f_a(t)+D_a(t)a) + v(t), where v(t) ~ MVN(0,R)}{}
 \item{vec(R) = f_r(t)+D_r(t)r}{} 
-\item{x(1) ~ MVN(f_p+D_p p, V0)}{}
+\item{x(0) ~ MVN(f_p+D_p p, V0) or x(1) ~ MVN(f_p+D_p p, V0}{}
 \item{vec(V0) = f_l+D_l l}{}  
 }
 In the marssMODEL(form=marss) object, f(t) + D(t)m, is the vec of a matrix M(t), so f_b(t)+D_b(t)b would be vec(B(t)). The estimated parameters are in the column vectors: b, u, q, z, a, r, p, and l.  Each matrix M(t) is f(t)+D(t)m so is the sum of a fixed part f(t) and the linear combination, D(t), of the free (or estimated) part m.  
