@@ -12,7 +12,8 @@ The default MARSS model form is "marxss", which is Multivariate Auto-Regressive(
 All parameters (except x0 and V0) can be time-varying; \eqn{t} is left off the parameters to remove clutter. All parameters can be zero-ed out, including the variance matrices. Parameters can be estimated or fixed. The parameters are everything except \eqn{mathbf{x}}{x}, \eqn{mathbf{y}}{y}, \eqn{mathbf{v}}{v}, \eqn{mathbf{w}}{w}, \eqn{mathbf{c}}{c} and \eqn{mathbf{c}}{c}. \eqn{mathbf{y}}{y} are data (missing values allowed). c and d are inputs.
 
 The parameters can have fixed values and linear constraints. This is an example of a 3x3 matrix with linear constraints. All matrix elements can be written as a linear function of \eqn{a}, \eqn{b}, and \eqn{c}:
-\deqn{\left[\begin{array}{c c c} a+2b & 1 & a\\ 1+3a+b & 0 & b \\ 0 & -2 & c\end{array}\right]}{ [a+2b  1   a \\n 1+3a+b   0   b \\n 0   -2    c ]}
+\deqn{\left[\begin{array}{c c c} a+2b & 1 & a\\ 1+3a+b & 0 & b \\ 0 & -2 & c\end{array}\right]}{[a+2b  1   a \\n 1+3a+b   0   b \\n 0   -2    c ]}
+
 Values such as \eqn{a b} or \eqn{a^2} or \eqn{log(a)} are not linear constraints.
 
 }
