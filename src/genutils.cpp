@@ -89,7 +89,7 @@ namespace dim_names {
   
     if (rowcol == (bindcols ? 1 : 0)) {  // colnames for binding cols
       // rownames for binding rows
-      if (allnames.size() < needed ) {
+      if (allnames.size() < (unsigned int)needed ) {
 	if (push(v1.attr("dimnames"), allnames, rowcol) == 0) {
 	  push(v1newnames, allnames);
 	}
@@ -103,7 +103,7 @@ namespace dim_names {
     }
     else { // rownames for binding cols
       // colnames for binding rows
-      if (allnames.size() < needed) {
+      if (allnames.size() < (unsigned int)needed) {
 	if (push(v1.attr("dimnames"), allnames, rowcol) == 0) {
 	  if (v1.attr("dim") == R_NilValue) {
 	    push(v1.attr("names"), allnames);
@@ -553,7 +553,7 @@ void unzerorows(mat& IId, const mat& Mt, const vec& diagQ)
 {
   mat tMt = trimmat(Mt, diagQ, false, false);
   vec zerorows(tMt.n_rows);
-  for (int i = 0; i < tMt.n_rows; ++i) {
+  for (unsigned int i = 0; i < tMt.n_rows; ++i) {
     zerorows[i] = all(tMt.row(i) == 0) ? 1 : 0;
   }
   uvec therows = find(diagQ == 0);
@@ -602,7 +602,7 @@ void dumpcube(std::string name, cube thecube, bool dump = false)
     std::cout << name << " cube :" << thecube.n_rows << " x " <<
       thecube.n_cols;
     std::cout << " x " << thecube.n_slices << endl;
-    for (int i = 0; i < thecube.n_slices; ++i) {
+    for (unsigned int i = 0; i < thecube.n_slices; ++i) {
       std::cout << "i: " << i << " ";
       dumpmat("slice", thecube.slice(i), true);
     }
@@ -629,7 +629,7 @@ void dumpmat(std::string name, mat themat, std::ostream& dout)
 {
   dout << name << " matrix :" << themat.n_rows << " x " <<
     themat.n_cols << endl;
-  for (int iii = 0; iii < themat.n_rows; iii++) {
+  for (unsigned int iii = 0; iii < themat.n_rows; iii++) {
     for (mat::row_iterator ri = themat.begin_row(iii);
 	 ri != themat.end_row(iii); ri++) {
       dout << *ri << " ";

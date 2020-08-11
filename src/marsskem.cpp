@@ -426,7 +426,7 @@ List marsskem(List& MLEobj)
 	for (int i = 0; i < maxT; ++i) {
 	  mat pari = (i > 0) ? complist.slice(i) :
 	    as<mat>(parmat(MLEobjiter, elem, i)[elem]);
-	  if (set_degen[elem] | iter == 0) {
+	  if (((set_degen[elem] | iter) == 0)) {
 	    vec tmppd = pari.diag();
 	    std::transform(tmppd.begin(), tmppd.end(), tmppd.begin(),
 			   [](double d){ return (d==0) ? 1 : 0; });
@@ -1486,7 +1486,7 @@ std::string Uupdate_impl(int m, List par1,
       if (any(diagQ) && !all(diagQ)) {
 	mat tMt = trimmat(Mt, diagQ, false, true);
 	vec zerorows(tMt.n_rows);
-	for (int i = 0; i < tMt.n_rows; ++i) {
+	for (unsigned int i = 0; i < tMt.n_rows; ++i) {
 	  zerorows[i] = all(tMt.row(i) == 0) ? 1 : 0;
 	}
 	uvec therows = find(diagQ == 0);
@@ -1751,7 +1751,7 @@ String x0update_impl(List& par1, std::map<std::string,cube>& star,
 	if (!all(diagQ) && any(diagQ)) {
 	  mat tMt = trimmat(Mt, diagQ, false, true);
 	  vec zerorows(tMt.n_rows);
-	  for (int i = 0; i < tMt.n_rows; ++i) {
+	  for (unsigned int i = 0; i < tMt.n_rows; ++i) {
 	    zerorows[i] = all(tMt.row(i) == 0) ? 1 : 0;
 	  }
 	  uvec therows = find(diagQ == 0);
@@ -1844,7 +1844,7 @@ String x0update_impl(List& par1, std::map<std::string,cube>& star,
 	  if (!all(diagQ) && any(diagQ)) {
 	    mat tMt = trimmat(Mt, diagQ, false, true);
 	    vec zerorows(tMt.n_rows);
-	    for (int i = 0; i < tMt.n_rows; ++i) {
+	    for (unsigned int i = 0; i < tMt.n_rows; ++i) {
 	      zerorows[i] = all(tMt.row(i) == 0) ? 1 : 0;
 	    }
 	    uvec therows = find(diagQ == 0);
@@ -2129,7 +2129,7 @@ List rerunkf(const std::string& elem, List& MLEobj, int iter)
   if ((as<List>(MLEobj["control"]))["demean.states"]) {
     mat cmb0t = join_rows(kfx0T, kfxtT);
     vec xbar(cmb0t.n_rows);
-    for (int i=0; i < cmb0t.n_rows; ++i) {
+    for (unsigned int i=0; i < cmb0t.n_rows; ++i) {
       xbar[i] = std::accumulate(cmb0t.begin_row(i),
 				cmb0t.end_row(i), 0) / cmb0t.n_cols;
     }
