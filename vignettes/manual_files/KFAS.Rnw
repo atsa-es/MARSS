@@ -211,6 +211,79 @@ cbind(V_mu=f_kfas$V_mu[1:n], fitted=var.EytT_fit[1:n], MARSShatyt=var.EytT_hatyt
 \end{itemize}
 
 
+\subsection{Confidence and prediction intervals}
+\index{confidence intervals!KFAS}\index{prediction intervals!KFAS}
+
+Both KFAS and MARSS use \verb@predict()@ for predictions. The inputs and outputs of the functions have many similarities but also many differences.
+
+\subsubsection{Smoothed predictions}
+
+With \verb@newdata@ and \verb@n.ahead@ not passed in, the model prediction for $\YY_t$ (i.e. fitted values) conditioned on all the data is returned. The is the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on all the data (so after $t$ also).
+<<>>=
+conf_kfas <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE)
+head(conf_kfas)
+@
+In MARSS, the same prediction is returned by \verb@fitted()@. By default \verb@fitted()@ returns a data frame, but the output can be changed to return matrices.
+<<>>=
+conf_marss1 <- fitted(fit_marss, type="ytT", interval="confidence")
+head(conf_marss1)
+@
+\verb@predict()@ can also be used (with type specified). \verb@predict()@ returns a list and the data frame is in \verb@pred@.
+<<>>=
+conf_marss2 <- predict(fit_marss, type="ytT", interval="confidence", level=0.95)
+head(conf_marss2$pred)
+@
+
+Prediction intervals are the intervals for new data. They are  the expected value and standard error of $\ZZ \XX_t + \aa + \vv_t$ conditioned on all the data (so after $t$ also). \verb@predict.SSModel@ returns the standard error of $\ZZ \XX_t + \aa$ (so standard error of the expected value).
+<<>>= 
+pred_kfas <- predict(fit_kfas$model, interval = "prediction", se.fit = TRUE)
+head(pred_kfas)
+@
+In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. These functions return the standard deviation of $\ZZ \XX_t + \aa + \vvt$ (so standard deviation of new data).
+<<>>=
+pred_marss1 <- fitted(fit_marss, type="ytT", interval="prediction")
+head(pred_marss1)
+@
+This would return the same values.
+<<results="hide">>=
+pred_marss2 <- predict(fit_marss, type="ytT", interval="prediction", level=0.95)
+@
+
+\subsubsection{One step ahead predictions}
+
+The default for \verb@predict.SSModel()@ is to return model fitted values conditioned on all the data. For the one-step ahead predictions, set \verb@filtered=TRUE@. This returns the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on the data up to $t-1$ only.
+<<>>=
+conf_kfas_t1 <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE, filtered=TRUE)
+head(conf_kfas_t1)
+@
+In MARSS, this output is returned by setting \verb@type="ytt1"@.
+<<>>=
+conf_marss1_t1 <- fitted(fit_marss, type="ytt1", interval="confidence")
+head(conf_marss1_t1)
+@
+With \verb@predict()@, the one-step ahead predictions are returned using:
+<<>>=
+conf_marss2_t1 <- predict(fit_marss, type="ytt1", interval="confidence", level=0.95)
+head(conf_marss2_t1$pred)
+@
+
+As before, we can get prediction intervals for the one-step ahead new data also.
+<<>>= 
+pred_kfas_t1 <- predict(fit_kfas$model, interval = "prediction", se.fit = TRUE, filtered=TRUE)
+head(pred_kfas_t1)
+@
+In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. Again, these functions return the standard deviation of $\ZZ \XX_t + \aa + \vvt$ (so standard deviation of new data) not the standard error of the mean prediction.
+<<>>=
+pred_marss1_t1 <- fitted(fit_marss, type="ytt1", interval="prediction")
+head(pred_marss1_t1)
+@
+This would return the same values.
+<<results="hide">>=
+pred_marss2_t1 <- predict(fit_marss, type="ytt1", interval="prediction", level=0.95)
+@
+
+
+
 # Confidence and prediction intervals for the expected value and the observations.
 # Note that predict uses original model object, not the output from KFS.
 conf_Nile <- predict(model_Nile, interval = "confidence", level = 0.9)
