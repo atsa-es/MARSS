@@ -22,13 +22,16 @@ kemfit <- MARSS(dat, model = list(
 ))
 ```
 
+8-11 
+
+Working on KFAS chapter
+
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
-* 
+* Check how doc looks https://www.rdocumentation.org/packages/MARSS
+* add var.ytt1, var.Eytt1 and var.ytt, var.Eytt to MARSShatyt() 
 
 * In quick examples, I talk about ACF diagnostics. Check that innovations are used.
-* changed default residuals(fit) to return innovations.
-    * don't return the state innovation residuals (only via MARSSresiduals())
-    * check all refs to residuals in the documentation [done but recheck text]
+* check all refs to residuals in the documentation [done but recheck text]
 * Check getDFAfits(). does it return smoothations like the chap says it does?
 
     
