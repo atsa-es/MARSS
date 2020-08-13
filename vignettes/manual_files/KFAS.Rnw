@@ -2,10 +2,7 @@
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
 options(prompt = " ", continue = " ", width = 60)
 @
-<<label=Cs01_required-libraries, echo=FALSE>>=
-library(MARSS)
-library(KFAS)
-@
+
 \chapter{Comparison to KFAS Package}
 \label{chap:kfas}
 \chaptermark{KFAS}
@@ -13,6 +10,14 @@ library(KFAS)
 \blfootnote{Type \texttt{RShowDoc("Chapter\_KFAS.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 The MARSS package uses the Kalman filter and smoother in the KFAS package \citep{Helske2017} which implements the more stable filter and smoother algorithm by \citet{KoopmanDurbin2000, DurbinKoopman2012}. The KFAS package also provides fitting of MARSS models in the general exponential class, i.e. with non-Gaussian errors. \verb@MARSSkfas(..., return.kfas.model=TRUE)@ will return the KFAS model object which can then be used in KFAS functions. This chapter shows the KFAS versus MARSS functions for fitting state-space models using the examples in \verb@?KFAS@.
+
+This chapter uses the following packages:
+<<label=Cs00_required-libraries>>=
+library(MARSS)
+library(KFAS)
+library(ggplot2) # plotting
+library(tidyr) # data frame manipulation
+@
 
 \section{Nile River example}
 \index{structural ts models!univariate}
@@ -39,7 +44,7 @@ y_t = 1 \times x_t + 0 + v_t \text{ where } v_t \sim \N(0,r)  \\
 \subsection{Fitting models}
 
 \verb@KFAS::SSModel@ sets up the KFAS model which will be passed to the fitting functions. \verb@KFAS::SSMtrend(degree = 1)@ designates a local level model. \verb@KFAS::fitSSM@ fits the KFAS model. 
-<<Cs1_nile-model, results="hide">>=
+<<Cs101_fitting-models, results="hide">>=
 model_Nile <- SSModel(Nile ~ SSMtrend(degree = 1, Q = list(matrix(NA))), H = matrix(NA))
 fit_kfas_default <- fitSSM(model_Nile, c(log(var(Nile)), log(var(Nile))), method = "BFGS")
 @
@@ -47,7 +52,7 @@ fit_kfas_default <- fitSSM(model_Nile, c(log(var(Nile)), log(var(Nile))), method
 KFAS uses a stochastic prior on the initial condition and the fitting function does not estimate $x_0$. By default, a diffuse prior on $x_0$ is used. The default method for MARSS, in contrast, is to estimate $x_0$ as a parameter and fix $V_0$ (the variance of $x_0$) at 0. This will lead to small differences between the fits. The EM algorithm in MARSS does implement a true diffuse prior but we can specify a stochastic prior to mimic a KFAS fit.
 
 We will set a stochastic prior on $x_1$ with a mean of 0 and variance of 10 by changing \verb@P1@, \verb@P1inf@, and \verb@a1@. Setting \verb@P1inf@ to 0, turns off the diffuse prior. 
-<<Cs2_kfas-stoch-prior, results="hide">>=
+<<Cs102_fitting-models, results="hide">>=
 model_Nile_stoch <- model_Nile
 model_Nile_stoch$a1[1,1] <- 0
 model_Nile_stoch$P1[1,1] <- 10000
@@ -57,7 +62,7 @@ fit_kfas_stoch <- fitSSM(model_Nile_stoch, c(log(var(Nile)), log(var(Nile))), me
 
 
 With MARSS, the model is specified as:
-<<Cs03_marss-nile-mod>>=
+<<Cs103_fitting-models>>=
 mod.nile <- list(
   Z = matrix(1), A = matrix(0), R = matrix("r"),
   B = matrix(1), U = matrix(0), Q = matrix("q"),
@@ -67,7 +72,7 @@ mod.nile <- list(
 The default initial conditions for MARSS is to estimate $x_1$ as a parameter (and set $V_1$ to zero). This default behavior prevents prior information about the covariance structure of the states from affecting the estimates, though for some models, the initial conditions estimation is not well defined (in which case setting a stochastic prior is helpful).
 
 We will fit with the EM and BFGS algorithm in MARSS. We will start the BFGS algorithm at the same initial conditions used in our KFAS fitting call, although this isn't quite the same because MARSS and KFAS are using different approaches to ensure that the variances stay positive-definite during the BFGS maximization steps.
-<<Cs04_marss-fit, eval=TRUE>>=
+<<Cs104_fitting-models, eval=TRUE>>=
 dat <- t(as.matrix(Nile))
 rownames(dat) <- "Nile"
 fit_em_default <- MARSS(dat, model = mod.nile, silent = TRUE)
@@ -76,7 +81,7 @@ fit_bfgs_default <- MARSS(dat, model = mod.nile, inits = inits, method="BFGS", s
 @
 
 We will also fit a stochastic prior so that we can compare more directly to the same model fit with KFAS.
-<<Cs05_marss-stoch-prior>>=
+<<Cs105_fitting-models>>=
 mod.nile.stoch <- mod.nile
 mod.nile.stoch$x0 <- matrix(0)
 mod.nile.stoch$V0 <- matrix(10000)
@@ -85,7 +90,7 @@ fit_bfgs_stoch <- MARSS(dat, model = mod.nile.stoch, inits = inits, method="BFGS
 @
 
 \verb@MARSSkfas()@ will return the SSModel object that is passed to \verb@KFAS::KFS()@ (internally in the MARSS functions). MARSS does not use \verb@KFAS::fitSSM()@ but it does use \verb@KFAS::KFS()@ for the filter, smoother and log-likelihood. The SSModel used inside MARSS looks different than \verb@model_Nile@ because the $\aa$ term is in \verb@T@ and the $\uu$ term is in \verb@T@. We can set \verb@Q@ and \verb@H@ to NA to estimate those values. The results are the same as for \verb@fit_kfas_stoch@.
-<<Cs06_marss-kfas-model-fit>>=
+<<Cs106_fitting-models>>=
 marss_kfas_model <- MARSSkfas(fit_em_stoch, return.kfas.model=TRUE, return.lag.one=FALSE)$kfas.model
 marss_kfas_model$Q[1,1,1] <- NA
 marss_kfas_model$H[1,1,1] <- NA
@@ -93,7 +98,7 @@ fit_marss_kfas <- fitSSM(marss_kfas_model, c(log(var(Nile)), log(var(Nile))), me
 @
 
 The KFAS parameter estimates are in \verb@$optim.out$par@ and the variances are logged. The negative log-likelihood is in \verb@$optim.out$value@. Here is the comparison of all the models. Note that the default KFAS model is fundamentally different than the default MARSS model because the former uses a diffuse prior while the later is estimating $x_1$ as a parameter.
-<<Cs06_compare-fits>>=
+<<Cs107_fitting-models>>=
 vals <- rbind(
   c( exp(fit_kfas_default$optim.out$par), -1*fit_kfas_default$optim.out$value),
   c(coef(fit_em_default)$Q, coef(fit_em_default)$R, logLik(fit_em_default)),
@@ -114,46 +119,46 @@ vals
 \index{Kalman filter and smoother!KFAS}
 
 For this section, we will compare filter and smoother output from the two packages. For this we need identical models. 
-<<>>=
+<<Cs201_state-filtering>>=
 fit_kfas <- fit_kfas_stoch
 fit_marss <- fit_em_stoch
 fit_marss$par$Q[1,1] <- exp(fit_kfas$optim.out$par)[1]
 fit_marss$par$R[1,1] <- exp(fit_kfas$optim.out$par)[2]
 @
 The Kalman filter and smoother function in KFAS is \verb@KFS()@. This returns a variety of output:
-<<Cs1_nile-model, results="hide">>=
+<<Cs202_state-filtering, results="hide">>=
 kf_kfas <- KFS(fit_kfas$model, filtering = "state", smoothing = "state", simplify = FALSE)
 @
 The analogous function in MARSS is \verb@MARSSkfas()@. It uses \verb@KFAS::KFS()@ for the implementation of the Koopman and Durbin Kalman filter and smoother algorithm \citep{KoopmanDurbin2000} but transforms the state-space model passed into that function in order to get a variety of variables needed for the EM algorithm, specifically the lag-1 smoother values. 
-<<Cs1_nile-model, results="hide">>=
+<<Cs203_state-filtering, results="hide">>=
 kf_marss <- MARSSkfss(fit_marss)
 @
 
 The terminology of the filter/smoother variables is different between \verb@MARSSkfas()@ and \verb@KFAS::KFS()@. Note MARSS also includes \verb@MARSSkfss()@, which is the classic (less stable) Kalman filter and smoother; see for example the chapter on the Kalman filter in \citet{ShumwayStoffer2006}.
-<<Cs1_nile-model, results="hide">>=
+<<Cs204_state-filtering, results="hide">>=
 names(kf_kfas)
 names(kf_marss)
 @
 
 The MARSS semantics are first letter x or y process, second letter time (usually t), and third letter the time conditioning. So \verb@xtT@ means the estimate of the $\xx$ process conditioned on all the data while \verb@xtt1@ means the estimate of the $\xx$ process conditioned on the data 1 to $t-1$. 
-<<Cs10_n, echo=FALSE>>=
+<<Cs205_state-filtering, echo=FALSE>>=
 n <- 10
 @
 \begin{itemize}
 \item \verb@kf_kfas$a@ is \verb@kf_marss$xtt1@. This is the expected value of $X_t$ conditioned on the data up to time $t-1$. \verb@kf_kfas$att@ is \verb@kf_marss$xtt@. This is the expected value of $X_t$ conditioned on the data up to time $t$.
-<<>>=
+<<Cs206_state-filtering>>=
 cbind(a=kf_kfas$a[1:n], xtt1=kf_marss$xtt1[1:n], att=kf_kfas$att[1:n], xtt=kf_marss$xtt[1:n])
 @
 \item \verb@kf_kfas$alphahat@ is \verb@kf_marss$xtT@. This is the expected value of $X_t$ conditioned on all the data.
-<<>>=
+<<Cs207_state-filtering>>=
 cbind(kf_kfas$alphahat[1:n], kf_marss$xtT[1:n])
 @
 \item \verb@kf_kfas$v@ is \verb@kf_marss$Innov@. These are the innovations or one-step-ahead model residuals. \verb@kf_kfas$F@ is \verb@kf_marss$Sigma@. These are variance of innovations.
-<<>>=
+<<Cs208_state-filtering>>=
 cbind(v=kf_kfas$v[1:n], Innov=kf_marss$Innov[1:n], F=kf_kfas$F[1:n], Sigma=kf_marss$Sigma[1:n])
 @
 \item \verb@kf_kfas$P@ is \verb@kf_marss$Vtt1@. This is the conditional variance of $X_t$ conditioned on the data up to time $t-1$. \verb@kf_kfas$Ptt@ is \verb@kf_marss$Vtt@. This is the conditional variance of $X_t$ conditioned on the data up to time $t$.
-<<>>=
+<<Cs209_state-filtering>>=
 cbind(P=kf_kfas$P[1:n], Vtt1=kf_marss$Vtt1[1:n], Ptt=kf_kfas$Ptt[1:n], Vtt=kf_marss$Vtt[1:n])
 @
 \item "r", "r0", "r1", "N", "N0", "N1" and "N2" are specific to the Koopman and Durbin algorithm and are not returned by \verb@MARSSkfss()@ though you could get them by using the SSModel object returned by \verb@MARSSkfas()@.
@@ -163,49 +168,49 @@ cbind(P=kf_kfas$P[1:n], Vtt1=kf_marss$Vtt1[1:n], Ptt=kf_kfas$Ptt[1:n], Vtt=kf_ma
 \index{Observation filtering and smoothing!KFAS}
 
 Both KFAS and MARSS return the smoothed and filtered (one-step ahead) model predictions via \verb@fitted()@. However, with KFAS this just returns the values. The \verb@KFAS::KFS()@ will also return the filtered and smoothed model predictions in matrix form along with other filter and smoother output.
-<<Cs1_nile-model, results="hide">>=
+<<Cs301_obs-filtering, results="hide">>=
 f_kfas <- KFS(fit_kfas$model, filtering = "signal", smoothing = "signal", simplify = FALSE)
 @
 Note, \verb@fitted(fit_kfas$model)@ will return just the fitted model prediction, which is \verb@f_kfas$muhat@.
 
 The analogous function in MARSS is \verb@fitted(..., type=...)@ with type "ytT", "ytt" and "ytt1". You can specify the output to be a data frame or a list of matrices. Let's use a list of matrices to be analogous to \verb@KFS()@ output.
-<<Cs1_nile-model, results="hide">>=
+<<Cs302_obs-filtering, results="hide">>=
 f_marss <- fitted(fit_marss, only.kem=FALSE, output="matrix")
 @
 
 Note, the function \verb@MARSShatyt()@ is the counterpart to \verb@MARSSkfss()@ and returns the equivalent values but for the observation equation. This is very different than what \verb@KFS()@ (or \verb@fitted()@) or returns for the signal. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on $\YY_t = \yy_t$. If there are no missing data, this is simply $\yy_t$ and the covariance of $\YY_t$ and $\XX_t$ conditioned on $\YY_t=\yy_t$ would be 0. These values are not this when there are missing values and these expectations are crucial to the general EM algorithm for missing values.
 
 The terminology of the filter/smoother variables is again different.
-<<Cs1_nile-model, results="hide">>=
+<<Cs303_obs-filtering, results="hide">>=
 names(f_kfas)
 names(f_marss)
 @
 
 The MARSS semantics are first letter x or y process, second letter time (usually t), and third letter the time conditioning. So \verb@xtT@ means the estimate of the $\xx$ process conditioned on all the data while \verb@xtt1@ means the estimate of the $\xx$ process conditioned on the data 1 to $t-1$. 
-<<Cs10_n, echo=FALSE>>=
+<<Cs304_obs-filtering, echo=FALSE>>=
 n <- 10
 @
 \begin{itemize}
 \item \verb@f_kfas$m@ is the one-step ahead prediction of $\yy_t$. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytt1")$.fitted@. "ytt1" means the expected value of $\y_t$ conditioned on the data up to time $t-1$. 
-<<>>=
+<<Cs305_obs-filtering>>=
 ytt1_fit <- fitted(fit_marss, type="ytt1")$.fitted
 ytt1_hatyt <- MARSShatyt(fit_marss)$ytt1
 cbind(m=f_kfas$m[1:n], fitted=ytt1_fit[1:n], MARSShatyt=ytt1_hatyt[1:n])
 @
 \item \verb@kf_kfas$P_mu@ is is the variance of the expected value of $\YY_t$ conditioned on the data 1 to $t-1$. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Confidence intervals are the intervals on the expected value (i.e. mean). \verb@MARSShatyt(fit_marss)$var.Eytt1@ returns the same values but only because with conditioning 1 to $t-1$ there is no data at time $t$. \verb@fitted()@ is the correct function to use if you want the model fitted values, such as "m", "muhat" returned by \verb@KFS()@. You can output the values as matrices instead of a data frame if you need the variance-covariance matrices not just standard errors.
-<<>>=
+<<Cs306_obs-filtering>>=
 var.Eytt1_fit <- fitted(fit_marss, type="ytt1", interval="confidence")$.se^2
 var.Eytt1_hatyt <- MARSShatyt(fit_marss, only.kem=FALSE)$var.Eytt1
 cbind(P_mu=kf_kfas$P_mu[1:n], fitted=var.Eytt1_fit[1:n], MARSShatyt=var.Eytt1_hatyt[1:n])
 @
 \item \verb@f_kfas$muhat@ is the smoothed prediction of $\yy_t$. It is the expected value of $\ZZ \XX_t+\aa$ conditioned on the data up to time $T$, i.e. all the data. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytT")$.fitted@. \verb@MARSShatyt(fit_marss)$ytT@ does not return this. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on the data up to time $T$, i.e. all the data, which if there are no missing data is simply the observed data.
-<<>>=
+<<Cs307_obs-filtering>>=
 ytT_fit <- fitted(fit_marss, type="ytT")$.fitted
 ytT_hatyt <- MARSShatyt(fit_marss)$ytT
 cbind(a=f_kfas$muhat[1:n], fitted=ytt1_fit[1:n], MARSShatyt=ytt1_hatyt[1:n], Nile=Nile[1:n])
 @
 \item \verb@f_kfas$V_mu@ is is the variance of the expected value of $Y_t$ conditioned on all the data. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Again, \verb@var.Eytt1@ returned by \verb@MARSShatyt()@ is not this because it returns the variance of the expected value of $\YY_t|\YY_t=\yy_t$ not $\ZZ \XX_t + \aa|\YY_t=\yy_t$. The latter is the model prediction. In this case, there are no missing values so $\YY_t|\YY_t=\yy_t$ is 0.
-<<>>=
+<<Cs308_obs-filtering>>=
 var.EytT_fit <- fitted(fit_marss, type="ytT", interval="confidence")$.se^2
 var.EytT_hatyt <- MARSShatyt(fit_marss, only.kem=FALSE)$var.EytT
 cbind(V_mu=f_kfas$V_mu[1:n], fitted=var.EytT_fit[1:n], MARSShatyt=var.EytT_hatyt[1:n])
@@ -221,33 +226,33 @@ Both KFAS and MARSS use \verb@predict()@ for predictions. The inputs and outputs
 \subsubsection{Smoothed predictions}
 
 With \verb@newdata@ and \verb@n.ahead@ not passed in, the model prediction for $\YY_t$ (i.e. fitted values) conditioned on all the data is returned. The is the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on all the data (so after $t$ also).
-<<>>=
+<<Cs401_conf-int>>=
 conf_kfas <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE)
 head(conf_kfas)
 @
 In MARSS, the same prediction is returned by \verb@fitted()@. By default \verb@fitted()@ returns a data frame, but the output can be changed to return matrices.
-<<>>=
+<<Cs402_conf-int>>=
 conf_marss1 <- fitted(fit_marss, type="ytT", interval="confidence")
 head(conf_marss1)
 @
 \verb@predict()@ can also be used (with type specified). \verb@predict()@ returns a list and the data frame is in \verb@pred@.
-<<>>=
+<<Cs403_conf-int>>=
 conf_marss2 <- predict(fit_marss, type="ytT", interval="confidence", level=0.95)
 head(conf_marss2$pred)
 @
 
 Prediction intervals are the intervals for new data. They are  the expected value and standard error of $\ZZ \XX_t + \aa + \vv_t$ conditioned on all the data (so after $t$ also). \verb@predict.SSModel@ returns the standard error of $\ZZ \XX_t + \aa$ (so standard error of the expected value).
-<<>>= 
+<<Cs404_conf-int>>= 
 pred_kfas <- predict(fit_kfas$model, interval = "prediction", se.fit = TRUE)
 head(pred_kfas)
 @
 In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. These functions return the standard deviation of $\ZZ \XX_t + \aa + \vvt$ (so standard deviation of new data).
-<<>>=
+<<Cs405_conf-int>>=
 pred_marss1 <- fitted(fit_marss, type="ytT", interval="prediction")
 head(pred_marss1)
 @
 This would return the same values but as a marssPredict object instead of a data frame.
-<<results="hide">>=
+<<Cs406_conf-int, results="hide">>=
 pred_marss2 <- predict(fit_marss, type="ytT", interval="prediction", level=0.95)
 @
 
@@ -255,33 +260,33 @@ pred_marss2 <- predict(fit_marss, type="ytT", interval="prediction", level=0.95)
 \subsubsection{One step ahead predictions}
 
 The default for \verb@predict.SSModel()@ is to return model fitted values conditioned on all the data. For the one-step ahead predictions, set \verb@filtered=TRUE@. This returns the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on the data up to $t-1$ only.
-<<>>=
+<<Cs407_conf-int>>=
 conf_kfas_t1 <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE, filtered=TRUE)
 head(conf_kfas_t1)
 @
 In MARSS, this output is returned by setting \verb@type="ytt1"@.
-<<>>=
+<<Cs408_conf-int>>=
 conf_marss1_t1 <- fitted(fit_marss, type="ytt1", interval="confidence")
 head(conf_marss1_t1)
 @
 With \verb@predict()@, the one-step ahead predictions are returned using:
-<<>>=
+<<Cs409_conf-int>>=
 conf_marss2_t1 <- predict(fit_marss, type="ytt1", interval="confidence", level=0.95)
 head(conf_marss2_t1$pred)
 @
 
 As before, we can get prediction intervals for the one-step ahead new data also.
-<<>>= 
+<<Cs410_conf-int>>= 
 pred_kfas_t1 <- predict(fit_kfas$model, interval = "prediction", se.fit = TRUE, filtered=TRUE)
 head(pred_kfas_t1)
 @
 In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. Again, these functions return the standard deviation of $\ZZ \XX_t + \aa + \vvt$ (so standard deviation of new data) not the standard error of the mean prediction.
-<<>>=
+<<Cs411_conf-int>>=
 pred_marss1_t1 <- fitted(fit_marss, type="ytt1", interval="prediction")
 head(pred_marss1_t1)
 @
 This would return the same values.
-<<results="hide">>=
+<<Cs412_conf-int, results="hide">>=
 pred_marss2_t1 <- predict(fit_marss, type="ytt1", interval="prediction", level=0.95)
 @
 
@@ -294,9 +299,41 @@ model: \widehat{\vv}_t = E[\ZZ \XX_{t} + \aa + \vv_t|\YY=\yy] - E[\ZZ \XX_{t} + 
 state: \widehat{\ww}_t = E[\BB \XX_{t-1} + \uu + \ww_t|\YY=\yy] - E[\BB \XX_{t-1} + \uu|\YY=\yy] \\
 joint: \varepsilon_t \sim \MVN\left(\begin{bmatrix}\widehat{\vv}_t\\\widehat{\ww}_{t+1}\end{bmatrix}, \Sigma_t\right)
 \end{equation}
-The expectation can be conditioned on all the data (smoothation), data 1 to $t-1$ (one-step ahead), or data 1 to $t$ (contemporaneous). $\Sigma_t$ is the conditional (on data) variance of the joint residuals (state and observation); note the residuals for the $\widehat{\vv}_t$ and $\widehat{\ww}_t$ in $\varepsilon_t$ have different time indexing\footnote{The joint residuals for MARSS models are traditionally written this way but you can certainly write them with the same time indexing. It doesn't really matter though if written with the same time indexing.} Residuals can be standardized 
+The expectation can be conditioned on all the data (smoothation), data 1 to $t-1$ (one-step ahead), or data 1 to $t$ (contemporaneous). $\Sigma_t$ is the conditional (on data) variance of the joint residuals (state and observation); note the residuals for the $\widehat{\vv}_t$ and $\widehat{\ww}_t$ in $\varepsilon_t$ have different time indexing\footnote{The joint residuals for MARSS models are traditionally written this way but you can certainly write them with the same time indexing. It doesn't really matter though if written with the same time indexing.} Residuals can be standardized by either the full $\Sigma$ matrix via the inverse of the lower triangle of the Cholesky matrix or via the inverse of the square root of the diagonal of the $\Sigma$ matrix (aka marginal or Pearson residuals).
 
-<<>>=
+The MARSS residuals function will return all combinations of state versus observations, three conditioning types, and three standardization types (none, Cholesky or marginal). This amounts to 2 times 3 times 3 = 18 possible residuals (except that state contemporaneous residuals do not exist so really 18 - 3 = 15 residual types). KFAS has two residuals functions: \verb@residuals()@ and \verb@rstandard()@. These will return some of the 15 possible residuals types but the names used in KFAS versus MARSS are different. MARSS has two residuals functions, which return the same information in different forms. The normal one for users is \verb@residuals()@ and returns a data frame. With \verb@residuals()@, one must specify the conditioning (tT, tt or tt1) and the standardization (none, Cholesky or marginal). \verb@MARSSresiduals()@ returns matrices for all 3 standardizations along with the full $\Sigma$ matrices. With \verb@MARSSresiduals()@, only the conditioning (tT, tt or tt1) needs to be specified. For normal use, \verb@residuals()@ is the function to use. For those needing to develop new functions or doing research on the properties of state-space residuals, the full matrices will be helpful.
+
+Here is a table of the correspondence between the KFAS and MARSS residual functions. The header is the MARSS naming scheme for state versus observation (x versus y) and conditioning (all data = tT, 1 to t = tt, and 1 to t-1 = tt1). This shows the corresponding KFAS function for a call to \newline
+\verb@residuals(marss_fit, type=..., conditioning=...)@
+\newline
+\verb@marss_fit@ is output from \verb@MARSS()@. In the KFAS functions, \verb@kfas_fit@ is output from \verb@fitSSM()@.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{rr|cc}
+  \hline
+& \multicolumn{6}{c|}{type} & \multicolumn{3}{c|}{standardization}\\
+& ytT & ytt & ytt1 & xtT & xtt & xtt1 & none & Cholesky & marginal\\ 
+  \hline
+\texttt{residuals(kfas_obj, type = "recursive")}&&&X&&&&X&& \\
+\texttt{residuals(kfas_obj, type = "pearson")}&&&X&&&&&&X \\
+\texttt{residuals(kfas_obj, type = "response")}&X&&&&&&&&X \\
+\texttt{residuals(kfas_obj, type = "state")}&&&&X&&&X&& \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "marginal")}&&&X&&&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "cholesky")}&&&X&&&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "marginal")}&X&&&&&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "cholesky")}&X&&&&&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "marginal")}&&&&X&&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "cholesky")}&&&&X&&&&X& \\
+\end{tabular} 
+\end{center}
+\end{table}
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<Cs501_residuals>>=
 resid_kfas <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE)
 head(conf_kfas)
 @
@@ -328,32 +365,32 @@ pred_marss2 <- predict(fit_marss, type="ytT", interval="prediction", level=0.95)
 
 \subsubsection{Plotting}
 
-We can plot the confidence intervals and predictions as:
+We can plot the confidence intervals and predictions (Figure \ref{fig:plotting.1}).
 \begin{figure}[htp]
 \begin{center}
-<<label=Cs31_marss-mult-fig-2, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
+<<Cs501_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
 ts.plot(cbind(Nile, pred_kfas[,c("fit","lwr","upr")], conf_kfas[, c("lwr","upr")]), col = c(1:2, 3, 3, 4, 4),
         ylab = "Predicted Annual flow", main = "River Nile")
 @
 \end{center}
 \caption{KFAS smooth model fit (expected value of $\ZZ \XX_t + \aa$) confidence intervals and predictions.}
-\label{fig:KFAS.smooth.pred}
+\label{fig:plotting.1}
 \end{figure}
 
-With MARSS, there is a plot method (and ggplot2::autoplot method) for marssMLE objects which will make the smoothed model predictions with CIs and PIs.
+With MARSS, there is a plot method (and ggplot2::autoplot method) for marssMLE objects which will make the smoothed model predictions with CIs and PIs (Figure \ref{fig:plotting.2}).
 \begin{figure}[htp]
 \begin{center}
-<<label=Cs31_marss-mult-fig-2, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
+<<Cs502_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
 plot(fit_marss, plot.type="model.ytT", pi.int=TRUE)
 @
 \end{center}
 \caption{MARSS smooth model fit (expected value of $\ZZ \XX_t + \aa$) confidence intervals and predictions.}
-\label{fig:MARSS.smooth.pred}
+\label{fig:plotting.2}
 \end{figure}
-Alternatively you could used the fitted output.
+Alternatively you could used the fitted output (Figure \ref{fig:plotting.3}).
 \begin{figure}[htp]
 \begin{center}
-<<label=Cs31_marss-mult-fig-2, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
+<<Cs503_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
 require(ggplot2)
 df <- cbind(conf_marss1, pred_marss1[,c(".lwr", ".upr")])
 ggplot(df, aes(x=t, y=.fitted)) +
@@ -365,33 +402,16 @@ ggplot(df, aes(x=t, y=.fitted)) +
 @
 \end{center}
 \caption{MARSS smooth model fit with confidence intervals and predictions using ggplot.}
-\label{fig:MARSS.smooth.pred.manual}
+\label{fig:plotting.3}
 \end{figure}
 
-Alternatively you could used the fitted output.
-\begin{figure}[htp]
-\begin{center}
-<<label=Cs31_marss-mult-fig-2, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
-require(ggplot2)
-df <- cbind(conf_marss1, pred_marss1[,c(".lwr", ".upr")])
-ggplot(df, aes(x=t, y=.fitted)) +
-  geom_ribbon(aes(ymin=.lwr, ymax=.upr), fill="grey") +
-  geom_ribbon(aes(ymin=.conf.low, ymax=.conf.up), fill="blue", alpha=0.25) +
-  geom_line(linetype=2) +
-  ylab("Predicted Annual Flow") + xlab("") +
-  ggtitle("River Nile")
-@
-\end{center}
-\caption{MARSS smooth model fit with confidence intervals and predictions using ggplot.}
-\label{fig:MARSS.smooth.pred.manual}
-\end{figure}
 
 \subsubsection{Missing observations}
 \index{missing values}
 
 Missing values are handled seamlessly in both KFAS and MARSS. We will use a model with a stochastic $x_1$ again so we can compare directly to MARSS output.
 
-<<label=Cs32_NileNA>>=
+<<Cs601_missing-values>>=
 NileNA <- Nile
 NileNA[c(21:40, 61:80)] <- NA
 model_NileNA_stoch <- SSModel(NileNA ~ SSMtrend(degree = 1, Q = list(matrix(NA))), H = matrix(NA))
@@ -402,7 +422,7 @@ fit_kfas_NA <- fitSSM(model_NileNA_stoch, c(log(var(Nile)), log(var(Nile))), met
 fit_marss_NA <- MARSS(as.vector(NileNA), model=mod.nile.stoch, inits = inits,  method = "BFGS", silent=TRUE)
 @
 The fits are close. The difference is due to the maximization stopping at different places.
-<<>>=
+<<Cs602_missing-values>>=
 rbind(MARSS=c(Q=coef(fit_marss_NA, type="matrix")$Q, 
               R=coef(fit_marss_NA, type="matrix")$R, 
               logLik=logLik(fit_marss_NA)),
@@ -421,8 +441,8 @@ fit_marss_NA <- MARSS(as.vector(NileNA), model=mod.nile.stoch.kfas, inits = init
 @
 -->
 
-Get the confidence intervals on the estimate of the river flow (model fit conditioned on all the data).
-<<>>=
+Plot the confidence intervals on the estimate of the river flow (Figure \ref{fig:missing.values.1}). This is the model fit conditioned on all the data.
+<<Cs603_missing-values>>=
 conf_kfas_NA <- predict(fit_kfas_NA$model, interval = "confidence", filtered=FALSE)
 conf_marss_NA <- predict(fit_marss_NA, interval = "confidence", type="ytT", level=0.95)$pred
 @
@@ -444,11 +464,11 @@ ggplot(df, aes(x=t, y=fit)) +
 @
 \end{center}
 \caption{Estimates of the river flow. When there are NAs, the estimate is less certain.}
-\label{fig:MARSS.smooth.conf.NA}
+\label{fig:missing.values.1}
 \end{figure}
 
-Compare model fitted values using all the data (smoothed) versus one-step-ahead estimates.
-<<>>=
+Compare model fitted values using all the data (smoothed) to one-step-ahead estimates (Figure \ref{fig:missing.values.2}).
+<<Cs604_missing-values>>=
 fitted_kfas_NA <- data.frame(smooth=as.vector(fitted(fit_kfas_NA$model)), 
                           one.step.ahead=as.vector(fitted(fit_kfas_NA$model, filtered = TRUE)), 
                           name="KFAS")
@@ -458,7 +478,7 @@ fitted_marss_NA <- data.frame(smooth=fitted(fit_marss_NA, type="ytT")$.fitted,
 @
 \begin{figure}[htp]
 \begin{center}
-<<label=Cs31_marss-mult-fig-2, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
+<<Cs605_missing-values, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
 require(ggplot2)
 require(tidyr)
 df <- rbind(fitted_kfas_NA, fitted_marss_NA)
@@ -473,15 +493,16 @@ ggplot(df, aes(x=t, y=value, col=type)) +
 @
 \end{center}
 \caption{Smoothed (all data) or filtered (one-step ahead) estimates of the river flow.}
-\label{fig:KFAS.fitted.NA}
+\label{fig:missing.values.2}
 \end{figure}
 
 
 \section{Global temperature example}
 \index{structural ts models!multivariate}
 
-This example uses two series of average global temperature deviations for years 1880-1987 using two observation time series. This is a multivariate local level model with only one state process but two observation processes.
-# See Shumway and Stoffer (2006), p. 327 for details
+This example uses two series of average global temperature deviations for years 1880-1987 using two observation time series \citep[p. 327]{ShumwayStoffer2006}. This is a multivariate local level model with only one state process but two observation processes.
+
+\begin{comment}
 
 data("GlobalTemp")
 
@@ -846,11 +867,11 @@ lines(x = mcycle$times, y = pred[, 3], lty = 2)
 
 # }
 
+\end{comment}
+
 \section{Summary}
 
-This chapter illustrates how to fit the structural equation models fit by the \verb@StructTS()@ function in base R. The initial conditions used in that function were used here, however that should not be assumed to be the best choice. The default behavior for in the MARSS package is to treat $\xx_0$ as an estimated parameter with $\VV_0$ set to all 0. These models can be a challenge for the EM algorithm and for most examples the BFGS algorithm was used. If using EM, the algorithm will need to be run longer to achieve the maximum likelihood. 
 
-The MARSS package allows you to fit multivariate versions of these models with a flexible data structure and flexible relationships between the data. It allows you to include covariates and model intervention effects. You can model multiple observations of the same process or different observations of independent processes that share some or all parameter values. You can also model cases where the trend (or seasonality) is shared across processes but not the levels. The ability to use multiple data sets can improve estimation and allow you to estimate an underlying process which might remain hidden if one one data set is used for estimation.
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
