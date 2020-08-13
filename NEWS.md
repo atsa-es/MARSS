@@ -29,6 +29,7 @@ Working on KFAS chapter
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
 * Check how doc looks https://www.rdocumentation.org/packages/MARSS
 * add var.ytt1, var.Eytt1 and var.ytt, var.Eytt to MARSShatyt() 
+* Annoying for predict to output a list. better to put extra info into attributes
 
 * In quick examples, I talk about ACF diagnostics. Check that innovations are used.
 * check all refs to residuals in the documentation [done but recheck text]
