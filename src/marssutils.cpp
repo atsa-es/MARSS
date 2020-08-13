@@ -402,7 +402,7 @@ List parmat(List& MLEobj, CharacterVector elem, const IntegerVector& tt,
 
   List dims;
   try {
-    if (dimsin.length() == 0 || dimsin[0] == 0) {
+    if (((int)dimsin.length()) == 0 || dimsin[0] == 0) {
       dims = model.attr("model.dims");
     }
     else {
@@ -535,7 +535,7 @@ std::map<std::string, arma::cube> parmat_cube(List& MLEobj, CharacterVector elem
 
   List dims;
   try {
-    if (dimsin.length() == 0 || dimsin[0] == 0) {
+    if (((int)dimsin.length()) == 0 || dimsin[0] == 0) { 
       dims = model.attr("model.dims");
     }
     else {
