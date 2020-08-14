@@ -79,7 +79,6 @@ List degentest(const std::string& elem, List& MLEobj, int iter)
   bool set_degen = false;
 
   List model_dims = as<List>(MLEobj["marss"]).attr("model.dims");
-  int dim_elem = as<IntegerVector>(model_dims[elem])[0];
 
   for(unsigned int i = 0; i < degen_par.size(); ++i) {
     // best to use iterators, as we don't know which if any indices
@@ -402,7 +401,7 @@ List parmat(List& MLEobj, CharacterVector elem, const IntegerVector& tt,
 
   List dims;
   try {
-    if (((int)dimsin.length()) == 0 || dimsin[0] == 0) {
+    if (((int)dimsin.length()) == (int)0 || (int)dimsin[0] == (int)0) {
       dims = model.attr("model.dims");
     }
     else {
@@ -535,7 +534,7 @@ std::map<std::string, arma::cube> parmat_cube(List& MLEobj, CharacterVector elem
 
   List dims;
   try {
-    if (((int)dimsin.length()) == 0 || dimsin[0] == 0) { 
+    if (((int)dimsin.length()) == (int)0 || (int)dimsin[0] == (int)0) { 
       dims = model.attr("model.dims");
     }
     else {
