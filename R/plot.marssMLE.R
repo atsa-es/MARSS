@@ -132,7 +132,7 @@ plot.marssMLE <-
     
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, type = "ytT", form = "marxss")
+      df <- augment.marssMLE(x, type = "ytT")
       df$.resids[is.na(df$y)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -181,7 +181,7 @@ plot.marssMLE <-
     
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- augment.marssMLE(x, type = "xtT", form = "marxss")
+      df <- augment.marssMLE(x, type = "xtT")
       df$.rownames <- paste0("State ", df$.rownames)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
@@ -242,7 +242,7 @@ plot.marssMLE <-
     
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- augment.marssMLE(x, type = "ytT", form = "marxss")
+      df <- augment.marssMLE(x, type = "ytT")
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
       nY <- min(9, attr(x$model, "model.dims")$y[1])
@@ -267,7 +267,7 @@ plot.marssMLE <-
     
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
-      df <- augment.marssMLE(x, type = "xtT", form = "marxss")
+      df <- augment.marssMLE(x, type = "xtT")
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
