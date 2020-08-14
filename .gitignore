@@ -5,4 +5,5 @@ MARSS.Rproj
 .RData
 .Rhistory
 src/*.o
+src/*.so
 src/*.dll
