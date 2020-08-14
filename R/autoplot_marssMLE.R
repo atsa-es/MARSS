@@ -53,9 +53,9 @@ autoplot.marssMLE <-
     
     # augment is very slow because the residuals() function is slow. Don't call multiple times
     if(any(c("state.resids", "qqplot.state.resids", "acf.state.resids") %in% plot.type))
-      augxdf <- augment.marssMLE(x, type = "xtT", form = "marxss")
+      augxdf <- augment.marssMLE(x, type = "xtT")
     if(any(c("model.resids", "qqplot.model.resids", "acf.model.resids") %in% plot.type))
-      augydf <- augment.marssMLE(x, type = "ytT", form = "marxss")
+      augydf <- augment.marssMLE(x, type = "ytT")
     
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
