@@ -18,7 +18,7 @@ MARSSresiduals(object, ..., type=c("tT", "tt1", "tt"), normalize=FALSE, silent=F
 \value{
 A list of the following components
   \item{model.residuals}{ The model residuals (data minus model predicted values) as a n x T matrix. }
-  \item{state.residuals}{ The  state residuals. This is the state residual for the transition from t to t+1 thus the last time step will be NA (since T+1 is past the data). State residuals do not exist for the \code{type="tt"} case (since this would required the expeced value of \eqn{X_t} conditioned on data to \eqn{t+1}). }
+  \item{state.residuals}{ The  state residuals. This is the state residual for the transition from t to t+1 thus the last time step will be NA (since T+1 is past the data). State residuals do not exist for the \code{type="tt"} case (since this would required the expected value of \eqn{X_t} conditioned on data to \eqn{t+1}). }
   \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
   \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x T matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. The last time step will be all NA since the state residual is for t to t+1.}
   \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. }

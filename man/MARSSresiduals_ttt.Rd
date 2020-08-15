@@ -19,7 +19,7 @@ A list with the following components
   \item{model.residuals}{ The the observed contemporaneous model residuals: data minus the model predictions conditioned on the data 1 to t. A n x T matrix. NAs will appear where the data are missing. }
   \item{state.residuals}{ All NA. There are no contemporaneous residuals for the states. }
   \item{residuals}{ The residuals. \code{model.residuals} are in rows 1:n and \code{state.residuals} are in rows n+1:n+m. }
-  \item{var.residuals}{ The joint variance of the residuals conditioned on observed data from 1 to t-. This only has values in the 1:n,1:n upper block for the model residuala. }
+  \item{var.residuals}{ The joint variance of the residuals conditioned on observed data from 1 to t-. This only has values in the 1:n,1:n upper block for the model residuals. }
   \item{std.residuals}{ The Cholesky standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. Note because the contemporaneous state residuals do not exist, rows n+1:n+m are all NA. }
   \item{mar.residuals}{ The marginal standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
   \item{bchol.residuals}{ Because state residuals do not exist, this will be equivalent to the Cholesky standardized residuals, \code{std.residuals}. }

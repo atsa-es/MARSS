@@ -64,7 +64,7 @@ The state residuals are only for state-space models. At time \eqn{t}, the state 
 For innovations state residuals, this is 
 \deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u}
 
-Smoothation state sresiduals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
+Smoothation state residuals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
 
 }
 

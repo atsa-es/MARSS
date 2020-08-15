@@ -48,7 +48,7 @@ where \eqn{\tilde{\mathbf{x}}_t^{t-1}}{xtt1} is the expected value of \eqn{\math
 The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw(t+1)} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x(t+1)} minus the estimate using \eqn{\mathbf{x}_{t}}{x(t)}. 
 \deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u}
 where \eqn{\tilde{\mathbf{x}}_{t+1}^{t+1}}{xt+1t+1} is the Kalman filter estimate of the states at time \eqn{t+1} conditioned on the data up to time \eqn{t+1} and \eqn{\tilde{\mathbf{x}}_{t}^t}{xtt} is the Kalman filter estimate of the states at time \eqn{t} conditioned on the data up to time \eqn{t}.
-The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals (excecpt for the last time step) as an estimate of the state exists whether or not there are associated data.
+The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals (except for the last time step) as an estimate of the state exists whether or not there are associated data.
 
 \code{res1} and \code{res2} in the code below will be the same.
 \preformatted{dat = t(harborSeal)[2:3,]
