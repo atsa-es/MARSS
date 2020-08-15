@@ -1,26 +1,27 @@
 \name{utility.functions}
-\alias{utility.functions}
-\alias{makediag}
-\alias{takediag}
-\alias{is.blockdiag}
-\alias{is.identity}
-\alias{is.diagonal}
-\alias{is.equaltri}
-\alias{is.validvarcov}
-\alias{is.design}
-\alias{is.fixed}
-\alias{is.zero}
-\alias{is.unitcircle}
-\alias{ is.solvable }
-\alias{vec}
-\alias{unvec}
-\alias{is.wholenumber}
-\alias{Imat}
-\alias{rwishart}
+\alias{ utility.functions}
+\alias{ makediag}
+\alias{ takediag}
+\alias{ is.blockdiag}
+\alias{ is.design}
+\alias{ is.diagonal}
+\alias{ is.equaltri}
+\alias{ is.fixed}
+\alias{ is.identity}
+\alias{ is.solvable}
+\alias{ is.timevarying}
+\alias{ is.unitcircle}
+\alias{ is.validvarcov}
+\alias{ is.zero}
+\alias{ vec}
+\alias{ unvec}
+\alias{ is.wholenumber}
+\alias{ Imat}
+\alias{ rwishart}
 \alias{ mystrsplit }
 \alias{ convert.model.mat }
 \alias{ parmat }
-\alias{fixed.free.to.formula }
+\alias{ fixed.free.to.formula }
 \alias{ matrix.power }
 \alias{ sub3D }
 \alias{ pinv }
@@ -29,9 +30,9 @@
 \alias{ all.equal.vector }
 \keyword{internal}
 
-\title{ Matrix Utilities }
+\title{ Utility Functions }
 \description{
-  Matrix utilities for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
+  Utility functions for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
 }
 \usage{
 all.equal.vector(x)
@@ -45,7 +46,7 @@ is.diagonal(x, na.rm=FALSE)
 is.equaltri(x)
 is.fixed(x, by.row=FALSE)
 is.identity(x, dim=NULL)
-is.identity(x, dim=NULL)
+is.timevarying(MLEobj)
 is.solvable(A,y=NULL)
 is.validvarcov(x, method="kem")
 is.wholenumber(x, tol = .Machine$double.eps^0.5)
@@ -91,7 +92,8 @@ vec(x)
 }
 \details{
 \itemize{
-  \item \code{is...} tests for various matrix properties.  isDiagonal() from the Matrix package is used to test numeric matrices for diagonality.  is.diagonal() is only used to determine if list matrices (that combine numeric and character values) are diagonal. is.zero tests for near zeroness and give TRUE for is.zero((.5-.3)-(.3-.1)) unlike ==0.
+  \item \code{is...} tests for various matrix properties.  isDiagonal() from the Matrix package is used to test numeric matrices for diagonality.  is.diagonal() is only used to determine if list matrices (that combine numeric and character values) are diagonal. is.zero tests for near zeroness and gives TRUE for is.zero((.5-.3)-(.3-.1)) unlike ==0.
+  \item \code{is.timevarying(MLEobj)} returns a list of which parameters are time-varying.
   \item \code{vec(x)} creates a column vector from a matrix per the standard vec math function.
   \item \code{unvec(c,dim)} takes the vector c and creates a matrix with the specified dimensions.
   \item \code{Imat(nrow)} returns the identity matrix of dimension nrow.
