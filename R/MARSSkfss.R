@@ -431,10 +431,10 @@ MARSSkfss <- function(MLEobj) {
         } else {
           # when R(i,i) is 0 then vt_t(i) will be zero and Sigma[i,i,1] will be 0 if V0=0.
           # OmgF1 makes sure we don't try to take 1/0
-          if (length(OmgF1 %*% Ft[, , t] %*% t(OmgF1)) == 1) {
-            detFt <- OmgF1 %*% Ft[, , t] %*% t(OmgF1)
+          if (length(OmgF1 %*% tcrossprod(Ft[, , t], OmgF1)) == 1) {
+            detFt <- OmgF1 %*% tcrossprod(Ft[, , t], OmgF1)
           } else {
-            detFt <- det(OmgF1 %*% Ft[, , t] %*% t(OmgF1))
+            detFt <- det(OmgF1 %*% tcrossprod(Ft[, , t], OmgF1))
           }
         }
         # get the inv of Ft

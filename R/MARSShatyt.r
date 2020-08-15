@@ -130,7 +130,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
       t.DZ <- matrix(Delta.r %*% pari$Z, m, n, byrow = TRUE)
       hatOt[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2 + tcrossprod(hatyt[, t, drop = FALSE])
       hatyxt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVt[, , t]
-      hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% t(hatVtpt[, , t])
+      hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE]) + Delta.r %*% tcrossprod(pari$Z, hatVtpt[, , t])
       
       if(!only.kem){
         hatytt[, t] <- y[, t, drop = FALSE] - Delta.r %*% (y[, t, drop = FALSE] - pari$Z %*% hatxtt[, t, drop = FALSE] - pari$A)

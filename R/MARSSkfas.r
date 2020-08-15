@@ -167,7 +167,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     stack.P1[1:m, 1:m] <- V10
     stack.P1[(m + 2):(2 * m + 1), (m + 2):(2 * m + 1)] <- V00
     stack.P1[1:m, (m + 2):(2 * m + 1)] <- par.1$B %*% V00
-    stack.P1[(m + 2):(2 * m + 1), 1:m] <- V00 %*% t(par.1$B)
+    stack.P1[(m + 2):(2 * m + 1), 1:m] <- tcrossprod(V00, par.1$B)
   }
   
   if (!return.lag.one) {

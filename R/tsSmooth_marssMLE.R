@@ -69,7 +69,7 @@ tsSmooth.marssMLE <- function(object,
         states <- H %*% states # rotated states
         states.var <- kfss[[vtype]]
         for (t in 1:TT) {
-          states.se[, t] <- sqrt(takediag(H %*% states.var[, , t] %*% t(H)))
+          states.se[, t] <- sqrt(takediag(H %*% tcrossprod(states.var[, , t], H)))
         }
       }
     }

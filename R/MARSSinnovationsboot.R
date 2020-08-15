@@ -51,7 +51,7 @@ MARSSinnovationsboot <- function(MLEobj, nboot = 1000, minIndx = 3) {
   for (i in 1:TT) {
     std.innovations <- stdInnov(kf$Sigma, kf$Innov) # standardized innovations; time across rows
     eig <- eigen(kf$Sigma[, , i]) # calculate inv sqrt(sigma[1])
-    sigma.Sqrt[, , i] <- eig$vectors %*% makediag(sqrt(eig$values)) %*% t(eig$vectors)
+    sigma.Sqrt[, , i] <- eig$vectors %*% tcrossprod(makediag(sqrt(eig$values)), eig$vectors)
     if (time.varying$B & i > 1) pari$B <- parmat(MLEobj, "B", t = i)$B
     BKS[, , i] <- pari$B %*% kf$Kt[, , i] %*% sigma.Sqrt[, , i] # this is m x n
   }
