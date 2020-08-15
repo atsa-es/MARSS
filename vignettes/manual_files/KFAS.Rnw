@@ -314,55 +314,123 @@ Here is a table of the correspondence between the KFAS and MARSS residual functi
 \begin{center}
 \begin{tabular}{rr|cc}
   \hline
-& \multicolumn{6}{c|}{type} & \multicolumn{3}{c|}{standardization}\\
-& ytT & ytt & ytt1 & xtT & xtt & xtt1 & none & Cholesky & marginal\\ 
+& \multicolumn{3}{c|}{type} & \multicolumn{2}{c|}{name} & \multicolumn{3}{c|}{standardization}\\
+& tT & tt & tt1 & model & state & none & Cholesky & marginal\\ 
   \hline
-\texttt{residuals(kfas_obj, type = "recursive")}&&&X&&&&X&& \\
-\texttt{residuals(kfas_obj, type = "pearson")}&&&X&&&&&&X \\
-\texttt{residuals(kfas_obj, type = "response")}&X&&&&&&&&X \\
-\texttt{residuals(kfas_obj, type = "state")}&&&&X&&&X&& \\
-\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "marginal")}&&&X&&&&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "cholesky")}&&&X&&&&&X& \\
-\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "marginal")}&X&&&&&&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "cholesky")}&X&&&&&&&X& \\
-\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "marginal")}&&&&X&&&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "cholesky")}&&&&X&&&&X& \\
+\texttt{residuals(kfas_obj, type = "recursive")}&&&X&X&&X&& \\
+\texttt{residuals(kfas_obj, type = "pearson")}&&&X&X&&&&X \\
+\texttt{residuals(kfas_obj, type = "response")}&X&&&X&&&&X \\
+\texttt{residuals(kfas_obj, type = "state")}&X&&&&X&X&& \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "marginal")}&&&X&X&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "cholesky")}&&&X&X&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "marginal")}&X&&&X&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "cholesky")}&X&&&X&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "marginal")}&X&&&&X&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "cholesky")}&X&&&&X&&X& \\
 \end{tabular} 
 \end{center}
 \end{table}
 \bigskip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsubsection{Case 1. Recursive residuals}
+
 <<Cs501_residuals>>=
-resid_kfas <- predict(fit_kfas$model, interval = "confidence", se.fit = TRUE)
-head(conf_kfas)
-@
-In MARSS, the same prediction is returned by \verb@fitted()@. By default \verb@fitted()@ returns a data frame, but the output can be changed to return matrices.
-<<>>=
-conf_marss1 <- fitted(fit_marss, type="ytT", interval="confidence")
-head(conf_marss1)
-@
-\verb@predict()@ can also be used (with type specified). \verb@predict()@ returns a list and the data frame is in \verb@pred@.
-<<>>=
-conf_marss2 <- predict(fit_marss, type="ytT", interval="confidence", level=0.95)
-head(conf_marss2$pred)
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- residuals(kfs, type = "recursive")
+resid_marss <- residuals(fit_marss, type="tt1", standardization = "marginal")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.resids, KFAS = as.vector(resid_kfas))
+head(df)
 @
 
-Prediction intervals are the intervals for new data. They are  the expected value and standard error of $\ZZ \XX_t + \aa + \vv_t$ conditioned on all the data (so after $t$ also). \verb@predict.SSModel@ returns the standard error of $\ZZ \XX_t + \aa$ (so standard error of the expected value).
-<<>>= 
-pred_kfas <- predict(fit_kfas$model, interval = "prediction", se.fit = TRUE)
-head(pred_kfas)
-@
-In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. These functions return the standard deviation of $\ZZ \XX_t + \aa + \vvt$ (so standard deviation of new data).
-<<>>=
-pred_marss1 <- fitted(fit_marss, type="ytT", interval="prediction")
-head(pred_marss1)
-@
-This would return the same values but as a marssPredict object instead of a data frame.
-<<results="hide">>=
-pred_marss2 <- predict(fit_marss, type="ytT", interval="prediction", level=0.95)
+<<Cs502_residuals>>=
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- rstandard(kfs, type = "recursive", standardization_type = "marginal")
+resid_marss <- residuals(fit_marss, type="tt1", standardization = "marginal")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
 @
 
+<<Cs503_residuals>>=
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- rstandard(kfs, type = "recursive", standardization_type = "cholesky")
+resid_marss <- residuals(fit_marss, type="tt1", standardization = "Cholesky")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+\subsubsection{Case 2. Pearson residuals}
+
+<<Cs504_residuals>>=
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- residuals(kfs, type = "pearson")
+resid_marss <- residuals(fit_marss, type="tT")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.resids, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+<<Cs505_residuals>>=
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- rstandard(kfs, type = "pearson", standardization_type = "marginal")
+resid_marss <- residuals(fit_marss, type="tT", standardization = "marginal")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+<<Cs506_residuals>>=
+kfs <- KFS(fit_kfas$model)
+resid_kfas <- rstandard(kfs, type = "pearson", standardization_type = "cholesky")
+resid_marss <- residuals(fit_marss, type="tT", standardization = "Cholesky")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+\subsubsection{Case 3. Response residuals}
+
+<<Cs507_residuals>>=
+kfs <- KFS(fit_kfas$model, smoothing="signal")
+resid_kfas <- residuals(kfs, type = "response")
+resid_marss <- residuals(fit_marss, type="tT")
+resid_marss <- subset(resid_marss, name=="model")
+df <- cbind(MARSS=resid_marss$.resids, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+\subsubsection{Case 4. State residuals}
+
+<<Cs508_residuals>>=
+kfs <- KFS(fit_kfas$model, smoothing="disturbance")
+resid_kfas <- residuals(kfs, type = "state")
+resid_marss <- residuals(fit_marss, type="tT")
+resid_marss <- subset(resid_marss, name=="state")
+df <- cbind(MARSS=resid_marss$.resids, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+<<Cs509_residuals>>=
+kfs <- KFS(fit_kfas$model, smoothing="disturbance")
+resid_kfas <- rstandard(kfs, type = "state", standardization_type = "marginal")
+resid_marss <- residuals(fit_marss, type="tT", standardization = "marginal")
+resid_marss <- subset(resid_marss, name=="state")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
+@
+
+The standardized 
+<<Cs509_residuals>>=
+kfs <- KFS(fit_kfas$model, smoothing="disturbance")
+resid_kfas <- rstandard(kfs, type = "state", standardization_type = "cholesky")
+resid_marss <- residuals(fit_marss, type="tT", standardization = "Cholesky")
+resid_marss <- subset(resid_marss, name=="state")
+df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+head(df)
+@
 \subsubsection{Plotting}
 
 We can plot the confidence intervals and predictions (Figure \ref{fig:plotting.1}).
