@@ -287,7 +287,7 @@ B.Ives <- B.Ives.Obs
 rownames(B.Ives) <- colnames(B.Ives) <- c("LP", "SP", "D", "ND")
 print(B.Ives, digits = 2, na.print = "--")
 @
-First, thing you will notice is that the Ives et al. matrix is missing values.  The matrix they show is after a model selection step to determine which interactions had little data support and thus could be set to zero.  Also, they fixed apriori the interactions between Daphnia and non-Daphnia at zero because they do not prey on each other.   The second thing you will notice is that the estimates are not particularly similar.  Next we will try some other ways of fitting the data that are closer to the way that Ives et al. fitted the data.
+First, thing you will notice is that the Ives et al. matrix is missing values.  The matrix they show is after a model selection step to determine which interactions had little data support and thus could be set to zero.  Also, they fixed the interactions between Daphnia and non-Daphnia at zero because they do not prey on each other.   The second thing you will notice is that the estimates are not particularly similar.  Next we will try some other ways of fitting the data that are closer to the way that Ives et al. fitted the data.
 
 By the way, if you are curious what would happen if we removed all those NAs, you can run the following code. 
 <<Cs18_test-rm-NAs,eval=FALSE, keep.source=FALSE>>=

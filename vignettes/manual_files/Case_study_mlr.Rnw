@@ -196,7 +196,7 @@ The full Longley dataset is often used to test the performance of numerical meth
 pairs(longley)
 @
 \end{center}
-\caption{Pairs plot showing colliniearity in the Longley explanatory variables.}
+\caption{Pairs plot showing collinearity in the Longley explanatory variables.}
 \label{fig:longley.fig2}
 \end{figure}
 

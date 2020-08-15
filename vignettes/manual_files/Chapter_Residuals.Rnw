@@ -82,7 +82,7 @@ m_0 \sim \N(y_1, 10000\times\var(y))
 Here the model is fit to 20 time steps of tree ring data. \verb@fit1@ is the \verb@StructTS()@ output, 
 \verb@fit2@ shows how to form the model as a MARSS model and fits using the \verb@fit1@ estimated values, \verb@fit3@ fits the model with \verb@MARSS()@ using BFGS (though slightly different algorithm), and \verb@fit4@ fits the model using EM. \verb@fit3@ and \verb@fit4@ are slightly different than \verb@fit1@ because the optimization algorithm is a hill-climbing algorithm for all these fits and stops at slightly different points on the likelihood 'hill'.
 
-Another difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate) is the estimate of the state conditioned on the data up to $t$ not $T$. In MARSS, the state estimate (in the \verb@states@ element) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ (the classic Kalman filter as opposed to the faste one that avoids matrix inversion) to get \verb@xtt$ (the estimate of $x$ conditioned on data up to $t$).
+Another difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate) is the estimate of the state conditioned on the data up to $t$ not $T$. In MARSS, the state estimate (in the \verb@states@ element) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ (the classic Kalman filter as opposed to the faster one that avoids matrix inversion) to get \verb@xtt$ (the estimate of $x$ conditioned on data up to $t$).
 
 <<label=structTS.level, keep.source=TRUE>>=
 y <- window(treering, start = 0, end=20)
