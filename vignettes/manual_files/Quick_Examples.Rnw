@@ -1,4 +1,4 @@
-\SweaveOpts{keep.source=TRUE, prefix.string=./figures/QE-, eps=FALSE, split=FALSE}
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/QE-, eps=FALSE, split=TRUE}
 \chapter{Short Examples}
 \label{chap:Examples}
 \chaptermark{Examples}
@@ -27,16 +27,16 @@ The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave 
 
 MARSS provides the following functions for output from fitted model objects. These functions output data frames in long form. There are companion functions which return the same information as lists in matrix form.
 
-\begin{description}
-\item [\verb@fitted(fit)@] Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
-\item [\verb@tidy::tidy(fit)@ or \verb@tidy.marssMLE(fit)@] Parameter estimates and confidence intervals.
-\item [\verb@logLik(fit)@, \verb@AIC(fit)@] Log-likelihood and AIC.
-\item [\verb@residuals(fit)@] Innovations, smoothations, and contemporaneous model and state residuals.
-\item [\verb@predict(fit)@, \verb@forecast(fit)@] Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@], where \verb@fr <- forecast(fit)@], plots the forecasts.
-\item [\verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@] A series of informative and diagnostic plots. Individual plots can be selected.
-\item [\verb@tsSmooth(fit)@] Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.
-\item [\verb@MARSShatyt(fit)@] Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation.
-\end{description}
+\begin{itemize}
+\item \verb@fitted(fit)@ Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
+\item \verb@tidy::tidy(fit)@ or \verb@tidy.marssMLE(fit)@ Parameter estimates and confidence intervals.
+\item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.
+\item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.
+\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@], where \verb@fr <- forecast(fit)@], plots the forecasts.
+\item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.
+\item \verb@tsSmooth(fit)@ Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.
+\item \verb@MARSShatyt(fit)@ Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation.
+\end{itemize}
 
 \section{Fixed and estimated elements in parameter matrices}
 Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following structure:
