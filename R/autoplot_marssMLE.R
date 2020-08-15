@@ -62,7 +62,7 @@ autoplot.marssMLE <-
       tt1.resids <- residuals.marssMLE(x, type = "tt1", standardization = "Cholesky")
     }
     if (any(str_detect(plot.type, "resids"))) {
-      std.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
+      tT.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
     }
     
     if ("xtT" %in% plot.type) {
@@ -171,7 +171,7 @@ autoplot.marssMLE <-
 
     if ("model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- subset(std.resids, std.resids$type == "model")
+      df <- subset(tT.resids, tT.resids$name == "model")
       df$.rownames <- factor(df$.rownames) # drop levels
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$value)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(
@@ -200,7 +200,7 @@ autoplot.marssMLE <-
 
     if ("state.resids" %in% plot.type) {
       # make plot of process residuals; set form='marxss' to get process resids
-      df <- subset(std.resids, std.resids$type == "state")
+      df <- subset(tT.resids, tT.resids$name == "state")
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
@@ -242,7 +242,7 @@ autoplot.marssMLE <-
 
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
-      df <- subset(std.resids, std.resids$type == "model")
+      df <- subset(tT.resids, tT.resids$name == "model")
       df$.rownames <- factor(df$.rownames) # drop levels
       slope <- tapply(df$.std.resid, df$.rownames, slp)
       intercept <- tapply(df$.std.resid, df$.rownames, int)
@@ -267,7 +267,7 @@ autoplot.marssMLE <-
 
     if ("qqplot.state.resids" %in% plot.type) {
       # make qqplot of state residuals
-      df <- subset(std.resids, std.resids$type == "state")
+      df <- subset(tT.resids, tT.resids$name == "state")
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
       slope <- tapply(df$.std.resid, df$.rownames, slp)
@@ -302,7 +302,7 @@ autoplot.marssMLE <-
       return(ciline)
     }
     if ("acf.state.resids" %in% plot.type) {
-      df <- subset(tt1.resids, tt1.resids$type == "state")
+      df <- subset(tt1.resids, tt1.resids$name == "state")
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
 
@@ -343,7 +343,7 @@ autoplot.marssMLE <-
       }
     }
     if ("acf.model.resids" %in% plot.type) {
-      df <- subset(tt1.resids, tt1.resids$type == "model")
+      df <- subset(tt1.resids, tt1.resids$name == "model")
       df$.rownames <- factor(df$.rownames) # drop state levels
       acfdf <- tapply(df$.resids, df$.rownames, acffun)
       fun <- function(x, y) {
