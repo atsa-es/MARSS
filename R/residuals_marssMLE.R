@@ -48,8 +48,9 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
   data.names <- attr(model, "Y.names")
   fit.list <- fitted.marssMLE(x, type = type1, interval="none")
   ret <- data.frame(
+    type = paste0("y",type),
     .rownames = fit.list$.rownames,
-    type = "model",
+    name = "model",
     t = fit.list$t,
     value = fit.list$y,
     .fitted = fit.list$.fitted,
@@ -79,8 +80,9 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
     fit.list <- fitted.marssMLE(x, type = type1, interval="none")
     fit.list$value <- c(fit.list$.x[2:TT],NA)
     ret2 <- data.frame(
+      type = paste0("x",type),
       .rownames = fit.list$.rownames,
-      type = "state",
+      name = "state",
       t = fit.list$t,
       value = fit.list$value,
       .fitted = fit.list$.fitted,
