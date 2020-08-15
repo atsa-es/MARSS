@@ -244,8 +244,8 @@ autoplot.marssMLE <-
       # make plot of observation residuals
       df <- subset(tT.resids, tT.resids$name == "model")
       df$.rownames <- factor(df$.rownames) # drop levels
-      slope <- tapply(df$.std.resid, df$.rownames, slp)
-      intercept <- tapply(df$.std.resid, df$.rownames, int)
+      slope <- tapply(df$.std.resids, df$.rownames, slp)
+      intercept <- tapply(df$.std.resids, df$.rownames, int)
       abline.dat <- data.frame(
         .rownames = names(slope),
         slope = slope,
@@ -253,7 +253,7 @@ autoplot.marssMLE <-
         stringsAsFactors = FALSE
       )
       p1 <- ggplot2::ggplot(df) +
-        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
+        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resids), na.rm = TRUE) +
         ggplot2::xlab("Theoretical quantiles") +
         ggplot2::ylab("Cholesky standardized model smoothed residuals") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
@@ -270,8 +270,8 @@ autoplot.marssMLE <-
       df <- subset(tT.resids, tT.resids$name == "state")
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
-      slope <- tapply(df$.std.resid, df$.rownames, slp)
-      intercept <- tapply(df$.std.resid, df$.rownames, int)
+      slope <- tapply(df$.std.resids, df$.rownames, slp)
+      intercept <- tapply(df$.std.resids, df$.rownames, int)
       abline.dat <- data.frame(
         .rownames = names(slope),
         slope = slope,
@@ -279,7 +279,7 @@ autoplot.marssMLE <-
         stringsAsFactors = FALSE
       )
       p1 <- ggplot2::ggplot(df) +
-        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resid), na.rm = TRUE) +
+        ggplot2::geom_qq(ggplot2::aes_(sample = ~.std.resids), na.rm = TRUE) +
         ggplot2::xlab("Theoretical quantiles") +
         ggplot2::ylab("Cholesky standardized state smoothed residuals") +
         ggplot2::facet_wrap(~.rownames, scales = "free_y") +

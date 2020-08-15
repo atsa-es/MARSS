@@ -22,7 +22,8 @@ A list with the following components
   \item{var.residuals}{ The joint variance of the residuals conditioned on observed data from 1 to t-. This only has values in the 1:n,1:n upper block for the model residuala. }
   \item{std.residuals}{ The Cholesky standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. Note because the contemporaneous state residuals do not exist, rows n+1:n+m are all NA. }
   \item{mar.residuals}{ The marginal standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
-    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data 1 to t. Returned as a n x T matrix. }
+  \item{bchol.residuals}{ Because state residuals do not exist, this will be equivalent to the Cholesky standardized residuals, \code{std.residuals}. }
+  \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data 1 to t. Returned as a n x T matrix. }
     \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See  \code{\link{MARSSresiduals.tT}} for a discussion of these residuals and where they might be used. }
   \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
 

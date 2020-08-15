@@ -193,7 +193,7 @@ plot.marssMLE <-
     if ("std.model.resids" %in% plot.type) {
       # make plot of standardized observation residuals
       df <- subset(tT.resids, tT.resids$name == "model")
-      df$.std.resid[is.na(df$value)] <- NA
+      df$.std.resids[is.na(df$value)] <- NA
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
@@ -201,7 +201,7 @@ plot.marssMLE <-
       for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
           ylims <- c(min(.resids, na.rm = TRUE), max(.resids, na.rm = TRUE))
-          plot(t, .std.resid,
+          plot(t, .std.resids,
             type = "p", xlab = "",
             ylab = "", ylim = ylims,
             col = plotpar$point.col, pch = plotpar$point.pch,
@@ -285,15 +285,15 @@ plot.marssMLE <-
     if ("qqplot.model.resids" %in% plot.type) {
       # make plot of observation residuals
       df <- subset(tT.resids, tT.resids$name == "model")
-      slope <- tapply(df$.std.resid, df$.rownames, slp)
-      intercept <- tapply(df$.std.resid, df$.rownames, int)
+      slope <- tapply(df$.std.resids, df$.rownames, slp)
+      intercept <- tapply(df$.std.resids, df$.rownames, int)
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
       for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
-          qqnorm(.std.resid, main = plt)
+          qqnorm(.std.resids, main = plt)
           abline(a = intercept[plt], b = slope[plt], col = plotpar$line.col, lwd = plotpar$line.lwd)
         })
       }
@@ -311,15 +311,15 @@ plot.marssMLE <-
       # make qqplot of state residuals
       df <- subset(tT.resids, tT.resids$name == "state")
       df$.rownames <- paste0("State ", df$.rownames)
-      slope <- tapply(df$.std.resid, df$.rownames, slp)
-      intercept <- tapply(df$.std.resid, df$.rownames, int)
+      slope <- tapply(df$.std.resids, df$.rownames, slp)
+      intercept <- tapply(df$.std.resids, df$.rownames, int)
       nX <- min(9, attr(x$model, "model.dims")$x[1])
       plot.nrow <- round(sqrt(nX))
       plot.ncol <- ceiling(nX / plot.nrow)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
       for (plt in unique(df$.rownames)) {
         with(subset(df, df$.rownames == plt), {
-          qqnorm(.std.resid, main = plt)
+          qqnorm(.std.resids, main = plt)
           abline(a = intercept[plt], b = slope[plt], col = plotpar$line.col, lwd = plotpar$line.lwd)
         })
       }

@@ -1,5 +1,9 @@
 MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE) {
   # These are the residuals and their variance conditioned on the data up to time t
+  # state residuals do not exist for this case
+
+  ######################################
+  # Set up variables
   MLEobj <- object
   method <- match.arg(method)
   model.dims <- attr(MLEobj$marss, "model.dims")
@@ -14,22 +18,16 @@ MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=
   var.et <- array(0, dim = c(n+m, n+m, TT))
   msg <- NULL
   
-  #### make a list of time-varying parameters
-  time.varying <- list()
-  for (elem in attr(MLEobj[["marss"]], "par.names")) {
-    if (model.dims[[elem]][3] == 1) {
-      time.varying[[elem]] <- FALSE
-    } else {
-      time.varying[[elem]] <- TRUE
-    }
-  }
+  #### list of time-varying parameters
+  time.varying <- is.timevarying(MLEobj)
   
   kf <- MARSSkfss(MLEobj)
   Ey <- MARSShatyt(MLEobj, only.kem=FALSE)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H
-  Rt <- Ht %*% Rt %*% t(Ht)
+  Rt <- Ht %*% tcrossprod(Rt, Ht)
   Zt <- parmat(MLEobj, "Z", t = 1)$Z
+  Qtp <- parmat(MLEobj, "Q", t = 2)$Q
   
   if (method=="SS") {
     # We could set model.et to 0 where no data, but Kt will have a 0 column 
@@ -42,7 +40,7 @@ MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=
       # model residuals
       if(time.varying$R) Rt <- parmat(MLEobj, "R", t = t)$R # returns matrix
       if(time.varying$H) Ht <- parmat(MLEobj, "H", t = t)$H
-      if(time.varying$R || time.varying$H ) Rt <- Ht %*% Rt %*% t(Ht)
+      if(time.varying$R || time.varying$H ) Rt <- Ht %*% tcrossprod(Rt, Ht)
       if(time.varying$Z) Zt <- parmat(MLEobj, "Z", t = t)$Z
       # compute the variance of the residuals and state.et
       St <- Ey$yxtt[, , t] - tcrossprod(Ey$ytt[, t, drop = FALSE], kf$xtt[, t, drop = FALSE])
@@ -134,10 +132,11 @@ MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=
     model.residuals = et[1:n, , drop = FALSE], 
     state.residuals = et[(n + 1):(n + m), , drop = FALSE], 
     residuals = et, 
+    var.residuals = var.et, 
     std.residuals = st.et, 
     mar.residuals = mar.st.et, 
-    var.residuals = var.et, 
+    bchol.residuals = st.et, 
     E.obs.residuals = E.obs.v, 
-    var.obs.residuals = var.obs.v, msg = msg))
-  
+    var.obs.residuals = var.obs.v, 
+    msg = msg))
 }

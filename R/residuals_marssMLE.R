@@ -6,7 +6,7 @@
 ##############################################################################################################################################
 residuals.marssMLE <- function(object, ...,
                                type=c("tt1", "tT", "tt"),
-                               standardization=c("Cholesky", "marginal"),
+                               standardization=c("Cholesky", "marginal", "Block.Cholesky"),
                                form = attr(object[["model"]], "form")[1],
                                clean = TRUE) {
   ## Argument checking
@@ -61,9 +61,11 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
                .sigma = vec(t(model.se.resids))
   )
   if(standardization=="Cholesky") 
-    ret <- cbind(ret, .std.resid = vec(t(resids$std.residuals[1:nn, , drop = FALSE])))
+    ret <- cbind(ret, .std.resids = vec(t(resids$std.residuals[1:nn, , drop = FALSE])))
   if(standardization=="marginal") 
-    ret <- cbind(ret, .std.resid = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
+    ret <- cbind(ret, .std.resids = vec(t(resids$mar.residuals[1:nn, , drop = FALSE])))
+  if(standardization=="Block.Cholesky") 
+    ret <- cbind(ret, .std.resids = vec(t(resids$bchol.residuals[1:nn, , drop = FALSE])))
   
   # Second x
   type1 <- paste0("x", type)
@@ -76,6 +78,8 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
     state.std.resids <- resids$std.residuals[(nn + 1):(nn + mm), , drop = FALSE]
   if(standardization=="marginal") 
     state.std.resids <- resids$mar.residuals[(nn + 1):(nn + mm), , drop = FALSE]
+  if(standardization=="Block.Cholesky") 
+    state.std.resids <- resids$bchol.residuals[(nn + 1):(nn + mm), , drop = FALSE]
   if (type!="tt" && (type=="tT" || !clean)){
     fit.list <- fitted.marssMLE(x, type = type1, interval="none")
     fit.list$value <- c(fit.list$.x[2:TT],NA)
@@ -88,7 +92,7 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
       .fitted = fit.list$.fitted,
       .resids = vec(t(state.resids)),
       .sigma = vec(t(state.se.resids)),
-      .std.resid = vec(t(state.std.resids)),
+      .std.resids = vec(t(state.std.resids)),
       stringsAsFactors = FALSE
     )
     ret <- rbind(ret, ret2)
