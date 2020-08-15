@@ -314,19 +314,19 @@ Here is a table of the correspondence between the KFAS and MARSS residual functi
 \begin{center}
 \begin{tabular}{rr|cc}
   \hline
-& \multicolumn{3}{c|}{type} & \multicolumn{2}{c|}{name} & \multicolumn{3}{c|}{standardization}\\
-& tT & tt & tt1 & model & state & none & Cholesky & marginal\\ 
+& \multicolumn{3}{c|}{type} & \multicolumn{2}{c|}{name} & \multicolumn{4}{c|}{standardization}\\
+& tT & tt & tt1 & model & state & none & Cholesky & marginal & Block Cholesky\\ 
   \hline
-\texttt{residuals(kfas_obj, type = "recursive")}&&&X&X&&X&& \\
-\texttt{residuals(kfas_obj, type = "pearson")}&&&X&X&&&&X \\
-\texttt{residuals(kfas_obj, type = "response")}&X&&&X&&&&X \\
-\texttt{residuals(kfas_obj, type = "state")}&X&&&&X&X&& \\
-\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "marginal")}&&&X&X&&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "cholesky")}&&&X&X&&&X& \\
-\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "marginal")}&X&&&X&&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "cholesky")}&X&&&X&&&X& \\
-\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "marginal")}&X&&&&X&&&X \\
-\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "cholesky")}&X&&&&X&&X& \\
+\texttt{residuals(kfas_obj, type = "recursive")}&&&X&X&&X&&&X \\
+\texttt{residuals(kfas_obj, type = "pearson")}&&&X&X&&&&X& \\
+\texttt{residuals(kfas_obj, type = "response")}&X&&&X&&&&X& \\
+\texttt{residuals(kfas_obj, type = "state")}&X&&&&X&&&&X \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "marginal")}&&&X&X&&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "recursive", standardization_type = "cholesky")}&&&X&X&&&X&&X \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "marginal")}&X&&&X&&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "pearson", standardization_type = "cholesky")}&X&&&X&&&X&&X \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "marginal")}&X&&&&X&&&X& \\
+\texttt{rstandard(kfas_fit$model, type = "state", standardization_type = "cholesky")}&X&&&&X&&&&X \\
 \end{tabular} 
 \end{center}
 \end{table}
@@ -349,21 +349,23 @@ kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "recursive", standardization_type = "marginal")
 resid_marss <- residuals(fit_marss, type="tt1", standardization = "marginal")
 resid_marss <- subset(resid_marss, name=="model")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
+In the univariate case, the Cholesky standardization is not different.
 <<Cs503_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "recursive", standardization_type = "cholesky")
 resid_marss <- residuals(fit_marss, type="tt1", standardization = "Cholesky")
 resid_marss <- subset(resid_marss, name=="model")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
 \subsubsection{Case 2. Pearson residuals}
 
+No standardization is done for \verb@residuals(kfs, type = "pearson")@.
 <<Cs504_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- residuals(kfs, type = "pearson")
@@ -378,23 +380,24 @@ kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "pearson", standardization_type = "marginal")
 resid_marss <- residuals(fit_marss, type="tT", standardization = "marginal")
 resid_marss <- subset(resid_marss, name=="model")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
+In the univariate case, the Cholesky standardization is not different.
 <<Cs506_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "pearson", standardization_type = "cholesky")
 resid_marss <- residuals(fit_marss, type="tT", standardization = "Cholesky")
 resid_marss <- subset(resid_marss, name=="model")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
 \subsubsection{Case 3. Response residuals}
 
 <<Cs507_residuals>>=
-kfs <- KFS(fit_kfas$model, smoothing="signal")
+kfs <- KFS(fit_kfas$model)
 resid_kfas <- residuals(kfs, type = "response")
 resid_marss <- residuals(fit_marss, type="tT")
 resid_marss <- subset(resid_marss, name=="model")
@@ -404,6 +407,7 @@ head(df)
 
 \subsubsection{Case 4. State residuals}
 
+No standardization.
 <<Cs508_residuals>>=
 kfs <- KFS(fit_kfas$model, smoothing="disturbance")
 resid_kfas <- residuals(kfs, type = "state")
@@ -413,24 +417,26 @@ df <- cbind(MARSS=resid_marss$.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
+Marginal standardization.
 <<Cs509_residuals>>=
 kfs <- KFS(fit_kfas$model, smoothing="disturbance")
 resid_kfas <- rstandard(kfs, type = "state", standardization_type = "marginal")
 resid_marss <- residuals(fit_marss, type="tT", standardization = "marginal")
 resid_marss <- subset(resid_marss, name=="state")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
 
-The standardized 
+The Cholesky standardization is "block" style in KFAS and treats the model and state smoothed residuals as independent (they are not). 
 <<Cs509_residuals>>=
 kfs <- KFS(fit_kfas$model, smoothing="disturbance")
 resid_kfas <- rstandard(kfs, type = "state", standardization_type = "cholesky")
-resid_marss <- residuals(fit_marss, type="tT", standardization = "Cholesky")
+resid_marss <- residuals(fit_marss, type="tT", standardization = "Block.Cholesky")
 resid_marss <- subset(resid_marss, name=="state")
-df <- cbind(MARSS=resid_marss$.std.resid, KFAS = as.vector(resid_kfas))
+df <- cbind(MARSS=resid_marss$.std.resids, KFAS = as.vector(resid_kfas))
 head(df)
 @
+
 \subsubsection{Plotting}
 
 We can plot the confidence intervals and predictions (Figure \ref{fig:plotting.1}).
