@@ -130,6 +130,7 @@
 \def\dotVt{\dot{\VV}_t}
 \def\hatVtT{\widetilde{\VV}_t^T}
 \def\hatVtt1{\widetilde{\VV}_t^{t-1}}
+\def\hatVtt{\widetilde{\VV}_t^{t}}
 \def\hatVtmT{\widetilde{\VV}_{t-1}^T}
 \def\hatVtmt1{\widetilde{\VV}_{t-1}^{t-1}}
 \def\hatVttmT{\widetilde{\VV}_{t,t-1}^T}
@@ -144,6 +145,7 @@
 \def\hatUtt1{\widetilde{\UU}_t^{t-1}}
 \def\hatStT{\widetilde{\Ss}_t^T}
 \def\hatStt1{\widetilde{\Ss}_t^{t-1}}
+\def\hatStt{\widetilde{\Ss}_t^{t}}
 \def\hatSttmT{\widetilde{\Ss}_{t,t-1}^T}
 \def\hatSttmt1{\widetilde{\Ss}_{t,t-1}^{t-1}}
 \def\hatSttpT{\widetilde{\Ss}_{t,t+1}^T}
@@ -673,11 +675,11 @@ Define the state residuals conditioned on the data from 1 to $t-1$ as $\checkwt$
 \end{equation}
 where $\hatxtmt1$ is $\E[\XX_{t-1}|\yy^{(1),t-1}]$ (expected value of $\XX_{t-1}$ conditioned on the data up to time $t-1$) and $\hatxtt$ is $\E[\XX_{t}|\yy^{(1),t}]$ (expected value of $\XX_{t}$ conditioned on the data up to time $t$). 
 From the Kalman filter equations:
-\begin{equation}\label{eq:wtt1}
+\begin{equation}\label{eq:wtt1.2}
 \hatxtt = \BB_t\hatxtmt1 + \uu_t + \KK_t \checkvt
 \end{equation}
 Thus, $\checkwt$ is a transformed $\checkvt$:
-\begin{equation}\label{eq:wtt1.2}
+\begin{equation}\label{eq:wtt1.3}
 \checkwt = \KK_t \checkvt,
 \end{equation}
 where $\KK_t$ is the Kalman gain. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$ and $\ZZ_t$ is the missing values modified $\ZZ_t$ where if the $i$-th $\yy_t$ is missing, the $i$-th row of $\ZZ_t$ is set to all 0s (Shumway and Stoffer 2006, equation 6.78).
@@ -738,7 +740,7 @@ Define the one-step ahead residuals as
 \end{equation}
 
 The covariance of $\checkVt$ and $\checkWtp$ is
-\begin{equation}\label{eq:covhatVtWtp.onestep}
+\begin{equation}\label{eq:covhatVtWtp.onestep.2}
 \cov[\checkVt,\checkWtp] = \cov[\checkVt,\KK_{t+1}\checkVtp] = \cov[\checkVt, \checkVtp]\KK_{t+1}^\top
 \end{equation}
 Innovations residuals are temporally uncorrelated, thus $\cov[\checkVt,\checkVtp]=0$ and thus $\cov[\checkVt,\checkWtp]=0$.
@@ -768,7 +770,7 @@ where $dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matr
 Contemporaneous model residuals are the difference between the data at time $t$ minus the prediction of $\yy_t$ given data up to $t$. This section gives the residual variance for these residuals. There are no state residuals for this case as that would require the expected value of $\XX_t$ conditioned on the data up to $t+1$. 
 
 Define the contemporaneous model residuals $\dotvt$ as:
-\begin{equation}\label{eq:vtt1}
+\begin{equation}\label{eq:vtt}
 \dotvt = E[\YY_t|\yy^{(1)}_t] - \ZZ_t\hatxtt - \aa_t,
 \end{equation}
 where $\hatxtt$ is $\E[\XX_t|\yy^{(1),t}]$ (expected value of $\XX_t$ conditioned on the data up to time $t$). The random variable, contemporaneous model residuals over all possible $\yy_t$, is $\dotVt$. Its mean is 0 and we want to find its variance. 
