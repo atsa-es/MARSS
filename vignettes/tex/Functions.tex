@@ -9,7 +9,7 @@ The function \verb@MARSS()@ is an interface to the core fitting functions in the
 \end{description}
 
 \section{The \texttt{MARSS()} function: outputs}
-The marssMLE object returned by a MARSS() call includes the estimated parameters, states, and expected values of any missing data.  Derived statistics, such as confidence intervals and standard errors, can be computed using the functions described below.  The \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the R command line to see the print help file.\index{functions!print}
+The marssMLE object returned by a \verb@MARSS()@ call includes the estimated parameters, states, and expected values of any missing data.  Derived statistics, such as confidence intervals and standard errors, can be computed using the functions described below.  The \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the R command line to see the print help file.\index{functions!print}
 \begin{description}
   \item[estimated parameters]\verb@coef(MLEobj)@  The coef function can output parameters in a variety of formats.  See \verb@?coef.marssMLE@. \index{functions!coef}
   \item[residuals]\verb@MARSSresiduals(MLEobj)@  and \verb@residuals.marssMLE(MLEobj)@. See \verb@?MARSSresiduals@ for a discussion of standardized residuals in the context of MARSS models.\index{functions!residuals}

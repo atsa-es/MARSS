@@ -69,7 +69,8 @@ mod.list <- list(
   Q = matrix("s2xi"), R = matrix("s2eps")
 )
 fit3 <- MARSS(as.vector(y), model = mod.list, method = "BFGS")
-fit4 <- MARSS(as.vector(y), model = mod.list, control = list(allow.degen = FALSE))
+fit4 <- MARSS(as.vector(y), model = mod.list, 
+              control = list(allow.degen = FALSE))
 @
 
 A difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate)\index{Kalman filter and smoother!StructTS} is the estimate of the state conditioned on the data up to $t$ not $T$. In the MARSS package, the state estimate (in the \verb@states@ element of the fitted object) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$). 
@@ -174,8 +175,9 @@ mod.list <- list(
   Q = diag(fit1$coef[1:2]), R = matrix(fit1$coef[3]),
   V0 = matrix(1e+06 * vy, 2, 2), Z = Z, B = B
 )
-fit2 <- MARSS(as.vector(y), model = mod.list, fit = FALSE, control = list(trace = -1))
-fit2$par <- fit2$start # otherwise par is NULL because we did not estimate the model
+fit2 <- MARSS(as.vector(y), model = mod.list, fit = FALSE, 
+              control = list(trace = -1))
+fit2$par <- fit2$start # otherwise par is NULL since fit=FALSE
 @
 
 Now estimate the parameters with \verb@MARSS()@.
@@ -186,7 +188,8 @@ mod.list <- list(
   V0 = matrix(1e+06 * vy, 2, 2) + diag(1e-10, 2), Z = Z, B = B
 )
 fit3 <- MARSS(as.vector(y), model = mod.list, method = "BFGS")
-fit4 <- MARSS(as.vector(y), model = mod.list, control = list(allow.degen = FALSE))
+fit4 <- MARSS(as.vector(y), model = mod.list, 
+              control = list(allow.degen = FALSE))
 @
 
 Figure \ref{fig:STS.fig.trend} shows the comparisons for the full level and trend estimates.  The EM algorithm would need a lower tolerance to get closer to the maximum likelihood parameter values.
@@ -337,11 +340,13 @@ Q <- ldiag(list("s2xi", "s2zeta", "s2w", 0, 0))
 R <- matrix("s2eps")
 V0 <- matrix(1e+06 * vy, nf + 1, nf + 1) + diag(1e-10, nf + 1)
 mod.list <- list(
-  x0 = matrix(c(y[1], rep(0, nf)), ncol = 1), U = "zero", A = "zero", tinitx = 0,
+  x0 = matrix(c(y[1], rep(0, nf)), ncol = 1), 
+  U = "zero", A = "zero", tinitx = 0,
   Q = Q, R = R, V0 = V0, Z = Z, B = B
 )
 fit3 <- MARSS(as.vector(y), model = mod.list, method = "BFGS")
-fit4 <- MARSS(as.vector(y), model = mod.list, control = list(allow.degen = FALSE))
+fit4 <- MARSS(as.vector(y), model = mod.list, c
+              ontrol = list(allow.degen = FALSE))
 fit4$kf <- MARSSkfss(fit4)
 fit3$kf <- MARSSkfss(fit3)
 @

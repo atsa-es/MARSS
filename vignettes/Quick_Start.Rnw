@@ -144,7 +144,7 @@ Z1 <- matrix(list("1*z1+-1*z2",0,"z2","2*z1","z1",0),3,2)
 model.list <- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 @
 
-Fit as usual with and best to call `toLatex()` on your model to make sure you and `MARSS()` agree on what model you a trying to fit:
+Fit as usual with and best to call \verb@toLatex()@ on your model to make sure you and \verb@MARSS()@ agree on what model you a trying to fit:
 <<marss.call2, eval=FALSE>>=
 fit <- MARSS(data, model=model.list)
 toLatex(fit$model)

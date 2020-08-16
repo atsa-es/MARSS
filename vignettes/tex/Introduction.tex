@@ -114,7 +114,7 @@ dat = data.frame(Yr = floor(time(z) + .Machine$double.eps),
      Month = cycle(z), z)
 \end{Sinput}
 \end{Schunk}
-When you call MARSS, \verb@dat[c("Temp1","Temp2"),]@ are the data and \verb@dat[c("Yr","Month","Sal"),]@ are your covariates.  
+When you call MARSS, \verb@dat[c("Temp1","Temp2"),]@ are the data and your covariates are \verb@dat[c("Yr","Month","Sal"),]@.  
 
 See the chapters that discuss seasonality for examples of how to model seasonality.  The brute force method of treating month or quarter as a factor requires estimation of more parameters than necessary in many cases.
 
@@ -147,7 +147,7 @@ There is a large class of models in the statistical finance literature that have
 \yy_t = \ZZ\xx_t  + \et_t\\
 \end{gathered}
 \end{equation*}
-For example, ARMA(p,q) models can be written in this form.  The MARSS model framework in this package will not allow you to write models in that form.  You can put the $\et_t$ into the $\xx_t$ vector and set $\RR=0$ to make models of this form using the MARSS form, but the EM algorithm in the MARSS package won't let you estimate parameters because the parameters will drop out of the full likelihood being maximized in the algorithm.  You can try using BFGS by passing in the \texttt{method} argument to the MARSS() call.
+For example, ARMA(p,q) models can be written in this form.  The MARSS model framework in this package will not allow you to write models in that form.  You can put the $\et_t$ into the $\xx_t$ vector and set $\RR=0$ to make models of this form using the MARSS form, but the EM algorithm in the MARSS package won't let you estimate parameters because the parameters will drop out of the full likelihood being maximized in the algorithm.  You can try using BFGS by passing in the \texttt{method} argument to the \verb@MARSS()@ call.
 
 \section{Troubleshooting}
 \index{troubleshooting}Numerical errors due to ill-conditioned matrices are not uncommon when fitting MARSS models\index{errors!ill-conditioned}\index{troubleshooting!ill-conditioning}\index{likelihood!troubleshooting}. The Kalman and EM algorithms need inverses of matrices. If those matrices become ill-conditioned, for example all elements are close to the same value, then the algorithm becomes unstable.  Warning messages will be printed if the algorithms are becoming unstable\index{troubleshooting!numerical instability} and you can set \verb@control$trace=1@, to see details of where the algorithm is becoming unstable.  Whenever possible, you should avoid using shared $\pipi$ values in your model\footnote{An example of a $\pipi$ with shared values is $\pipi=\bigl[\begin{smallmatrix} a\\a\\a \end{smallmatrix} \bigr]$.}.  The way our algorithm deals with $\LAM$ tends to make this case unstable, especially if $\RR$ is not diagonal.  In general, estimation of a non-diagonal $\RR$ is more difficult, more prone to ill-conditioning, and more data-hungry.

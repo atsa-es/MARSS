@@ -188,7 +188,7 @@ Code \ref{CS2.ex1} shows you how to fit the single population model (Equations \
 <<label=Cs2_Code1,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
 # Code to fit the single population model with i.i.d. errors
 # Read in data
-dat <- t(harborSealWA) # Transpose since MARSS needs time ACROSS columns
+dat <- t(harborSealWA) # MARSS needs time ACROSS columns
 years <- dat[1, ]
 n <- nrow(dat) - 1
 dat <- dat[2:nrow(dat), ]
@@ -215,7 +215,7 @@ lines(years, kem1$states + 1.96 * kem1$states.se,
 lines(years, kem1$states, type = "l", lwd = 2)
 title("Observations and total population estimate", cex.main = .9)
 
-coef(kem1, type = "vector") # show the estimated parameter elements as a vector
+coef(kem1, type = "vector") # parameter estimates as a vector
 
 # show estimated elements for each parameter matrix as a list
 coef(kem1)
@@ -299,8 +299,7 @@ par(mfrow = c(1, 1))
 
 \exbegin{Code \ref{CS2.ex2}}
 <<Cs2_Code2,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
-# Code to fit the single population model with independent and unequal errors
-
+# Fit the single population model with independent and unequal errors
 Z.model <- factor(c(1, 1, 1, 1, 1))
 R.model <- "diagonal and unequal"
 kem2 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
@@ -309,7 +308,6 @@ coef(kem2) # the estimated parameter elements
 kem2$logLik # log likelihood
 c(kem1$AIC, kem2$AIC) # AICs
 
-# plot residuals
 plotdat <- t(dat)
 matrix.of.biases <- matrix(coef(kem2, type = "matrix")$A,
   nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T

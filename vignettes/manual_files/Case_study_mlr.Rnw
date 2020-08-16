@@ -20,7 +20,7 @@ library(lme4)
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_MLR.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the MARSS() function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
+This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the \verb@MARSS()@ function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
 
 In a classic linear regression, the response variable ($y$) is univariate and there may one to multiple explanatory variables ($d_1$, $d_2$, $\dots$) plus an optional intercept ($\alpha$):
 \begin{equation}\label{eqn:lm}
@@ -179,7 +179,7 @@ ests.gls <- c(
   logLik = logLik(mod2.gls)
 )
 @
-Note we need to set \verb@method="ML"@ to maximize the likelihood because the default is to maximize the restricted maximum-likelihood (\verb@method="REML"@) and that gives a different answer from the MARSS() function since MARSS() is maximizing the likelihood.
+Note we need to set \verb@method="ML"@ to maximize the likelihood because the default is to maximize the restricted maximum-likelihood (\verb@method="REML"@) and that gives a different answer from the \verb@MARSS()@ function since \verb@MARSS()@ is maximizing the likelihood.
 
 Both functions return similar values though \verb@gls()@ is much faster and the EM algorithm has not quite converged even with 1000 iterations.
 <<Cs_014b_compare_marss_gls>>=
@@ -249,7 +249,8 @@ We fit as usual and compare the EM-algorithm (the default) to fits using BFGS.  
 <<Cs_022_full-correrr-fit-hide, results=hide>>=
 inits <- list(A = coef(mod3.em)$A, D = coef(mod3.em)$D)
 mod4.em <- MARSS(Employed, model = longley.correrr.model, inits = inits)
-mod4.bfgs <- MARSS(Employed, model = longley.correrr.model, inits = inits, method = "BFGS")
+mod4.bfgs <- MARSS(Employed, model = longley.correrr.model, 
+                   inits = inits, method = "BFGS")
 @
 Here are the EM estimates with the log-likelihood.  We only show $\phi$ (the $b$ term in the AR(1) error equation) and the log-likelihood.
 <<Cs_023_full-correrr-em-ests>>=
@@ -296,7 +297,7 @@ xyplot(Reaction ~ Days | Subject, sleepstudy,
 \end{figure}
 
 
-We set up the data into the form required for the MARSS() function.
+We set up the data into the form required for the \verb@MARSS()@ function.
 <<Cs_028_setupdata, keep.source=TRUE>>=
 # number of subjects
 nsub <- length(unique(sleepstudy$Subject))
@@ -443,7 +444,7 @@ print(thetable, type = "latex", file = paste(tabledir, "tablesleepstudy.tex", se
 \input{figures/tablesleepstudy}
 
 \section{Discussion}
-The purpose of the is chapter is to illustrate how linear regression models with multivariate explanatory variable or response variables can be written in MARSS form and fit with the MARSS() function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many packages for linear regression and generalized linear regression (non-Gaussian errors).  While the MARSS package can fit a variety of linear regression models with Gaussian errors, that is not what it is designed to do.  The MARSS package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables).
+The purpose of the is chapter is to illustrate how linear regression models with multivariate explanatory variable or response variables can be written in MARSS form and fit with the \verb@MARSS()@ function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many excellent packages for linear regression and generalized linear regression (non-Gaussian errors).  While the MARSS package can fit a variety of linear regression models with Gaussian errors, that is not what the package is designed to do.  The MARSS package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables) and linear constraints.
 
 <<reset, echo=FALSE, include.source=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)

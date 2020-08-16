@@ -135,7 +135,8 @@ The $C_{21}$, $C_{22}$, etc. terms are the effect of winter temperature, winter 
 
 First we prepare the covariate data and select the winter temperature and precipitation data and the summer temperature  data.  We need to use the previous year's climate data with this winter's abundance data, so 1959 to 2010.
 <<Cs07_prep-cov-wolf-moose, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
-clim.variables <- c("jan.feb.ave.temp", "jan.feb.ave.precip", "july.sept.ave.temp")
+clim.variables <- c("jan.feb.ave.temp", "jan.feb.ave.precip", 
+                    "july.sept.ave.temp")
 yr1959to2010 <- isleRoyal[, "Year"] >= 1959 & isleRoyal[, "Year"] <= 2010
 clim.dat <- t(isleRoyal[yr1959to2010, clim.variables])
 z.score.clim.dat <- zscore(clim.dat)

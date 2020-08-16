@@ -69,7 +69,8 @@ U <- matrix(c("u", "u"), 2, 1)
 Q <- matrix(c("q1", "q3", "q3", "q2"), 2, 2)
 x0 <- matrix(c("pi1", "pi2"), 2, 1)
 V0 <- diag(1, 2)
-model.gen <- list(Z = Z, A = A, R = R, B = B, U = U, Q = Q, x0 = x0, V0 = V0, tinitx = 0)
+model.gen <- list(Z = Z, A = A, R = R, B = B, U = U, 
+                  Q = Q, x0 = x0, V0 = V0, tinitx = 0)
 @
 Notice that there is a one-to-one correspondence between the model list in \R and the model on paper.  Fitting the model is then just a matter of passing the data and model list to the MARSS function:
 <<Cs2_model-general, eval=FALSE, keep.source=TRUE>>=
@@ -333,7 +334,7 @@ In MARSS models with covariates, the covariates are often treated as inputs and 
 
 $\CC_t$ is an $m \times p$ matrix of coefficients relating the effects of $\cc_t$ to the $m \times 1$ state vector $\xx_t$, and $\DD_t$ is an $n \times q$ matrix of coefficients relating the effects of $\dd_t$ to the $n \times 1$ observation vector $\yy_t$.  The elements of $\CC$ and $\DD$ can be estimated, and their form is specified much like the other matrices.
 
-With the \verb@MARSS()@ function, one can fit a model with inputs by simply passing in \verb@model$c@ and/or \verb@model$d@ in the MARSS() call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  If $\CC$ and $\DD$ are not time-varying, they are passed in as a 2-dimensional matrix.  If they are time-varying, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps if they are time-varying.
+With the \verb@MARSS()@ function, one can fit a model with inputs by simply passing in \verb@model$c@ and/or \verb@model$d@ in the \verb@MARSS()@ call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  If $\CC$ and $\DD$ are not time-varying, they are passed in as a 2-dimensional matrix.  If they are time-varying, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps if they are time-varying.
 
 See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  Also note that it is not necessary to have your covariates appear in $\cc$ and/or $\dd$.  That is a common form, however in some MARSS models, covariates will appear in one of the parameter matrices as fixed values.
 
@@ -476,13 +477,12 @@ MARSSkf(kem.sim.2)$logLik
 @ 
 
 \section{Bootstrap AIC} 
-The function \verb@MARSSaic()@\index{model selection!MARSSaic function}\index{functions!MARSSaic} computes a bootstrap AIC for model selection purposes.  Use \verb@output="AICbp"@ to produce a parameter bootstrap\index{model selection!bootstrap AIC, AICbp}.  Use \verb@output="AICbb"@ to produce a non-parametric bootstrap\index{model selection!bootstrap AIC, AICbb} AIC. You will need a large number of bootstraps (\verb@nboot@). We use only 10 bootstraps to show you how to compute AICb with the MARSS package, but the AICbp estimate will be terrible with this few bootstraps.
+The function \verb@MARSSaic()@\index{model selection!MARSSaic function}\index{functions!MARSSaic} computes a bootstrap AIC for model selection purposes.  \verb@output="AICbp"@ will produce a parameter bootstrap\index{model selection!bootstrap AIC, AICbp}.  Use \verb@output="AICbb"@ to produce a non-parametric bootstrap\index{model selection!bootstrap AIC, AICbb} AIC. You will need a large number of bootstraps (\verb@nboot@). We use only 10 bootstraps to show you how to compute AICb with the MARSS package, but the AICbp estimate will be terrible with this few bootstraps. \verb@nboot@ should be more like 1000.
 <<Cs39_AICb, keep.source=TRUE>>= 
 kemfit.with.AICb <- MARSSaic(kemfit,
   output = "AICbp",
   Options = list(nboot = 10, silent = TRUE)
 )
-# nboot should be more like 1000, but set low here for example sake
 
 print(kemfit.with.AICb)
 @

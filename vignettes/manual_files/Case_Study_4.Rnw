@@ -390,7 +390,8 @@ V0 <- diag(5, 3)
 
 Finally, we make a list of the model parameters to pass to the \verb@MARSS()@ function and set the control list:
 <<Cs13_define_model_list>>=
-dfa.model <- list(Z = Z, A = "zero", R = R, B = B, U = U, Q = Q, x0 = x0, V0 = V0)
+dfa.model <- list(Z = Z, A = "zero", R = R, B = B, U = U, 
+                  Q = Q, x0 = x0, V0 = V0)
 cntl.list <- list(maxit = 50)
 @
 For the examples in this chapter, we have set the maximum iterations to 50 to speed up model fitting.  Note, however, that the parameter estimates will not have converged to their maximum likelihood values, which would likely take 100s, if not 1000+, iterations.
