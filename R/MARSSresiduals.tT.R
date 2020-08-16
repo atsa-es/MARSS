@@ -61,7 +61,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
       if (t < TT) { # fill in var.et for t (model resid)
         if(time.varying$Q) Qtp <- parmat(MLEobj, "Q", t = t + 1)$Q
         if(time.varying$G) Gtp <- parmat(MLEobj, "G", t = t + 1)$G
-        if(time.varying$Q || time.varying$G ) Qtp <- Gtp %*% tcrossprod(Qtpm, Gtp)
+        if(time.varying$Q || time.varying$G ) Qtp <- Gtp %*% tcrossprod(Qtp, Gtp)
 
         if(time.varying$B) Btp <- parmat(MLEobj, "B", t = t + 1)$B
         if(time.varying$U) utp <- parmat(MLEobj, "U", t = t + 1)$U
