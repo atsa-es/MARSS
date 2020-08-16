@@ -6,8 +6,8 @@
 \method{residuals}{marssMLE}(object, ..., 
            type=c("tt1", "tT", "tt"),
            standardization=c("Cholesky", "marginal", "Block.Cholesky"),
-           form=attr(object[["model"]], "form")[1]),
-           clean=TRUE
+           form=attr(object[["model"]], "form")[1],
+           clean=TRUE)
 }
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
