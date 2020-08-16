@@ -27,6 +27,8 @@ kemfit <- MARSS(dat, model = list(
 Working on KFAS chapter
 
 * KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
+* MARSShatyt(fit_marss)$ytt1 is NULL
+* MARSShatyt(fit_marss, only.kem=FALSE)$var.Eytt1 is NULL
 
 * Check how doc looks https://www.rdocumentation.org/packages/MARSS
 * add var.ytt1, var.Eytt1 and var.ytt, var.Eytt to MARSShatyt() 
