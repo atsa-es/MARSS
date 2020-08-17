@@ -6,13 +6,14 @@
   Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{MARSSresiduals(object, type="tt1")}. To get the residuals as a data frame in long-form, use \code{\link[=residuals.marssMLE]{residuals}(object, type="tt1")}.
 }
 \usage{
-MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, silent=FALSE)
+MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{method}{ Algorithm to use. Currently only "SS". }
   \item{normalize}{ TRUE/FALSE See details. }
   \item{silent}{ If TRUE, don't print inversion warnings. }
+  \item{fun.kf}{ Kalman filter function to use. Can be ignored. }
 }
 \value{
 A list with the following components  

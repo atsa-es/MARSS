@@ -1,4 +1,4 @@
-MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent = FALSE) {
+MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent = FALSE, fun.kf = c("MARSSkfas", "MARSSkfss")) {
   # These are the residuals and their variance conditioned on all the data
   # Harvey=TRUE uses Harvey et al (1998) algorithm to compute these
   # Harvey=FALSE uses the straight smoother output
@@ -25,7 +25,8 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
   #### list of time-varying parameters
   time.varying <- is.timevarying(MLEobj)
 
-  kf <- MARSSkfss(MLEobj)
+  if(fun.kf=="MARSSkfss") kf <- MARSSkfss(MLEobj)
+  if(fun.kf=="MARSSkfas") kf <- MARSSkfas(MLEobj)
   Ey <- MARSShatyt(MLEobj)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H
@@ -209,7 +210,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
     tmpchol <- try(pchol(tmpvar[(n + 1):(n + m), (n + 1):(n + m), drop = FALSE]), silent = TRUE)
     if (inherits(tmpchol, "try-error")) {
       bchol.st.et[(n + 1):(n + m), t] <- NA
-      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the state residuals at t =", t, "is not invertible.  NAs returned for bchol.std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
+      msg <- c(msg, paste("MARSSresiduals.tT warning: the chol of the variance of the state residuals at t =", t, "returned errors.  NAs returned for bchol.std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
     } else {
       # chol() returns the upper triangle. We need to lower triangle to t()
       tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
@@ -226,7 +227,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
     tmpchol <- try(pchol(tmpvar), silent = TRUE)
     if (inherits(tmpchol, "try-error")) {
       st.et[, t] <- NA
-      msg <- c(msg, paste("MARSSresiduals.tT warning: the variance of the residuals at t =", t, "is not invertible.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
+      msg <- c(msg, paste("MARSSresiduals.tT warning: the chol of the variance of the residuals at t =", t, "returned errors.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
     # chol() returns the upper triangle. We need to lower triangle to t()

@@ -1,4 +1,4 @@
-MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE) {
+MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE, fun.kf = c("MARSSkfas", "MARSSkfss")) {
   # These are the residuals and their variance conditioned on the data up to time t-1
 
   ######################################
@@ -20,7 +20,8 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   #### list of time-varying parameters
   time.varying <- is.timevarying(MLEobj)
   
-  kf <- MARSSkfss(MLEobj)
+  if(fun.kf=="MARSSkfss") kf <- MARSSkfss(MLEobj)
+  if(fun.kf=="MARSSkfas") kf <- MARSSkfas(MLEobj)
   Ey <- MARSShatyt(MLEobj, only.kem=FALSE)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H

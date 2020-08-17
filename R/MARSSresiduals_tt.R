@@ -1,4 +1,4 @@
-MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE) {
+MARSSresiduals.tt <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE, fun.kf = "MARSSkfss") {
   # These are the residuals and their variance conditioned on the data up to time t
   # state residuals do not exist for this case
 

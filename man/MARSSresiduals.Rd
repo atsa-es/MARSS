@@ -6,7 +6,7 @@
   The normal residuals function is \code{\link[=residuals.marssMLE]{residuals}()}. \code{MARSSresiduals()} returns residuals as a list of matrices while \code{\link[=residuals.marssMLE]{residuals}()} returns the same information in a data frame.  This function calculates the residuals, residuals variance, and standardized residuals for the one-step-ahead (conditioned on data up to t-1), the smoothed (conditioned on all the data), and contemporaneous (conditioned on data up to t) residuals.
 }
 \usage{
-MARSSresiduals(object, ..., type=c("tT", "tt1", "tt"), normalize=FALSE, silent=FALSE)
+MARSSresiduals(object, ..., type=c("tT", "tt1", "tt"), normalize=FALSE, silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{marssMLE}.}
@@ -14,6 +14,7 @@ MARSSresiduals(object, ..., type=c("tT", "tt1", "tt"), normalize=FALSE, silent=F
   \item{type}{ "tT" for smoothed residuals conditioned on all the data 1 to T, aka smoothation residuals. "tt1" for one-step-ahead residuals, aka innovations residuals. "tt" for contemporaneous residuals.}
   \item{normalize}{ TRUE/FALSE See details.}
   \item{silent}{ If TRUE, do not print inversion warnings. }
+  \item{fun.kf}{ Kalman filter function to use. Can be ignored. }
 }
 \value{
 A list of the following components
