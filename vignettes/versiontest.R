@@ -24,14 +24,14 @@ if(Sys.info()['sysname']=="Windows"){
   lib.new <- "C:/Program Files/R/R-3.6.2/library"
 }
 if(Sys.info()['sysname']=="Darwin"){
-  setwd("~/Dropbox/MARSS unit tests 2019")
+  setwd("~/Dropbox/MARSS unit tests 2020")
   lib.new <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
 }
 lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
-# Mac: install.packages("~/Dropbox/MARSS_3.11.00.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.1.tar.gz", lib=lib.new, repos=NULL)
 # Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
