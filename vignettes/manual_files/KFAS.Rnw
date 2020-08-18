@@ -4,12 +4,14 @@ options(prompt = " ", continue = " ", width = 60)
 @
 
 \chapter{Comparison to KFAS Package}
-\label{chap:kfas}
+\label{chap:KFAS}
 \chaptermark{KFAS}
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_KFAS.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-The MARSS package uses the Kalman filter and smoother in the KFAS package \citep{Helske2017} which implements the more stable filter and smoother algorithm by \citet{KoopmanDurbin2000, DurbinKoopman2012}. The KFAS package also provides fitting of MARSS models in the general exponential class, i.e. with non-Gaussian errors. This chapter shows the KFAS versus MARSS functions for fitting state-space models using the examples in \verb@?KFAS@.
+The MARSS package uses the Kalman filter and smoother in the KFAS package (KFAS: Kalman Filter and Smoother for Exponential Family State Space Models) \citep{Helske2017} which implements the more stable filter and smoother algorithm by \citet{KoopmanDurbin2000, DurbinKoopman2012}. The KFAS package also provides filtering and smoothing for the general exponential class for the observation errors, e.g. Gaussian, Poisson, binomial, negative binomial, and gamma distributions. 
+
+This chapter compares the KFAS versus MARSS functions for the filter and smoother, fitted values, residuals and predictions for state-space models. Understanding the relationship between the package functions can help understand the state-space output. State-space output is complex because there are two processes (state and observation), three possible data conditionings (1 to $t-1$, 1 to $t$, and 1 to $T$ where $T$ is the last time step), and conditional fitted values versus conditional expected values which the conditional expectation of the right side of the process equation without or with the error term.
 
 This chapter uses the following packages:
 <<label=Cs00_required-libraries>>=
@@ -44,9 +46,9 @@ kinits <- c(log(var(Nile)), log(var(Nile)))
 fit_kfas_default <- fitSSM(model_Nile, kinits, method = "BFGS")
 @
 
-KFAS uses a stochastic prior on the initial condition and the fitting function does not estimate $x_0$. By default, a diffuse prior on $x_0$ is used. The default method for MARSS, in contrast, is to estimate $x_0$ as a parameter and fix $V_0$ (the variance of $x_0$) at 0. This will lead to small differences between the fits. The EM algorithm in MARSS does implement a true diffuse prior but we can specify a stochastic prior to mimic a KFAS fit.
+KFAS uses a stochastic prior on the initial condition and the fitting function does not estimate $x_0$. By default, a diffuse prior on $x_0$ is used. The default behavior for MARSS, in contrast, is to estimate $x_0$ as a parameter and fix $V_0^0$ (the conditional variance of $x_0$) to 0. This will lead to small differences between the fits. The EM algorithm in MARSS does not implement a true diffuse prior but we can specify a stochastic prior to mimic a KFAS fit.
 
-We will set a stochastic prior on $x_1$ with a mean of 0 and variance of 10 by changing \verb@P1@, \verb@P1inf@, and \verb@a1@. Setting \verb@P1inf@ to 0, turns off the diffuse prior. 
+We will set a stochastic prior on $x_1$ with a mean of 0 and variance of 1000 by changing \verb@P1@, \verb@P1inf@, and \verb@a1@. Setting \verb@P1inf@ to 0, turns off the diffuse prior. 
 <<Cs102_fitting-models, results=hide>>=
 model_Nile_stoch <- model_Nile
 model_Nile_stoch$a1[1,1] <- 0
@@ -117,7 +119,7 @@ vals
 
 
 \subsection{State filtering and smoothing}
-\index{Kalman filter and smoother!KFAS}
+\index{Kalman filter and smoother!KFAS}\index{Kalman filter and smoother}
 
 For this section, we will compare filter and smoother output from the two packages. For this we need identical models. 
 <<Cs201_state-filtering>>=
@@ -183,7 +185,7 @@ f_marss <- MARSSkf(fit_marss)
 @
 Note, the function \verb@MARSShatyt()@ is the statistical counterpart to \verb@MARSSkf()@ and returns the equivalent values but for the observation equation. This is very different than what \verb@KFS()@ (or \verb@MARSS::fitted()@) or returns for the signal. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on $\YY_t = \yy_t$. If there are no missing data, this is simply $\yy_t$ and the covariance of $\YY_t$ and $\XX_t$ conditioned on $\YY_t=\yy_t$ would be 0. These values are not this when there are missing values and these expectations are crucial to the general EM algorithm for missing values.
 
-The MARSS semantics are first letter x or y process, second letter time (usually t), and third letter the time conditioning. So \verb@ytT@ means the estimate of the $\yy$ process conditioned on all the data while \verb@ytt1@ means the estimate of the $\yy$ process conditioned on the data 1 to $t-1$. 
+\verb@ytT@ means the estimate of the $\yy$ process conditioned on all the data while \verb@ytt1@ means the estimate of the $\yy$ process conditioned on the data 1 to $t-1$. 
 <<Cs304_obs-filtering, echo=FALSE>>=
 n <- 10
 @
@@ -1108,9 +1110,9 @@ lines(x = mcycle$times, y = pred[, 3], lty = 2)
 
 \section{Summary}
 
-KFAS fits state-space models in the general exponential family, of which MARSS models with Gaussian errors are a part. The KFAS package relies on the Durbin and Koopman algorithms which avoid the inversions in the classical algorithms. These inversions lead to numerical instability and are slow, and avoiding them greatly improves the stability of the fitting of state-space models. The KFAS package also includes an exact algorithm for including diffuse priors. The KFAS package has a number of functions to create a variety of structural time-series models. 
+KFAS fits state-space models in the general exponential family, of which MARSS models with Gaussian errors are a part. The KFAS package relies, largely, on the Durbin and Koopman algorithms which avoid the inversions in the classical algorithms. These inversions lead to numerical instability and are slow, and avoiding them greatly improves the stability of the fitting of state-space models. The KFAS package also includes an exact algorithm for including diffuse priors. The KFAS package has a number of functions to create a variety of structural time-series models. 
 
-The MARSS package implements a general EM algorithm which allows seamless incorporation of linear constraints within matrices, including the $\QQ$ and $\RR$ matrices. It normally treats initial conditions as an estimated parameter to avoid adding any information regarding the covariance structure of the initial conditions, specifically to avoid a diagonal initial conditions variance matrix.
+The MARSS package implements a general EM algorithm which allows seamless incorporation of linear constraints within matrices, including importantly the $\QQ$ and $\RR$ matrices. It normally treats initial conditions as an estimated parameter to avoid adding any information regarding the covariance structure of the initial conditions, specifically to avoid a diagonal initial conditions variance matrix.
 
 The syntax of the KFAS and MARSS packages are different and the output functions and semantics are different. This chapter illustrates how to fit the same models with each package and obtain the same output.
 
