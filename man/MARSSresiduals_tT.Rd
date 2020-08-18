@@ -6,7 +6,8 @@
   Calculates the standardized (or auxiliary) smoothed residuals sensu Harvey, Koopman and Penzer (1998). The expected values and variance for missing (or left-out) data are also returned (Holmes 2014). Not exported. Access this function with \code{MARSSresiduals(object, type="tT")}. At time \eqn{t} (in the returned matrices), the model residuals are for time \eqn{t}, while the state residuals are for the transition from \eqn{t} to \eqn{t+1} following the convention in Harvey, Koopman and Penzer (1998).
 }
 \usage{
-MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
+MARSSresiduals.tT(object, Harvey=FALSE, normalize=FALSE, 
+    silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}

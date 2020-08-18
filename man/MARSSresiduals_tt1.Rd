@@ -6,7 +6,8 @@
   Calculates the standardized (or auxiliary) one-step-ahead residuals, aka the innovations residuals and their variance.  Not exported. Access this function with \code{MARSSresiduals(object, type="tt1")}. To get the residuals as a data frame in long-form, use \code{\link[=residuals.marssMLE]{residuals}(object, type="tt1")}.
 }
 \usage{
-MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, silent=FALSE, fun.kf="MARSSkfss")
+MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, 
+    silent=FALSE, fun.kf="MARSSkfss")
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
