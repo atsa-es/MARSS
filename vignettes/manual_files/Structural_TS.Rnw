@@ -345,8 +345,8 @@ mod.list <- list(
   Q = Q, R = R, V0 = V0, Z = Z, B = B
 )
 fit3 <- MARSS(as.vector(y), model = mod.list, method = "BFGS")
-fit4 <- MARSS(as.vector(y), model = mod.list, c
-              ontrol = list(allow.degen = FALSE))
+fit4 <- MARSS(as.vector(y), model = mod.list, 
+              control = list(allow.degen = FALSE))
 fit4$kf <- MARSSkfss(fit4)
 fit3$kf <- MARSSkfss(fit3)
 @
