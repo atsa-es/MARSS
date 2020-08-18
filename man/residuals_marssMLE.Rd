@@ -12,7 +12,7 @@
 \arguments{
   \item{object}{a \code{\link{marssMLE}} object}
   
-  \item{type}{"tt1" means innovations residuals. The fitted values are computed conditioned on the data up to t-1. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. "tT" means smoothation residuals. the fitted values are computed conditioned on all the data. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytT"} or \code{type="xtT"}. "tt" means contemporaneous residuals. The fitted values are computed conditioned on the data up to t. In MARSS functions, estimates at time t conditioned on data 1 to T are denoted "tT", conditioned on the data from 1 to t-1 are denoted "tt1" and conditioned on data 1 to t are "tt".}
+  \item{type}{\code{tt1} means innovations residuals. The fitted values are computed conditioned on the data up to \eqn{t-1}. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. \code{tT} means smoothation residuals. the fitted values are computed conditioned on all the data. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytT"} or \code{type="xtT"}. \code{tt} means contemporaneous residuals. The fitted values are computed conditioned on the data up to \eqn{t}. In MARSS functions, estimates at time t conditioned on data 1 to \eqn{T} are denoted \code{tT}, conditioned on the data from 1 to \eqn{t-1} are denoted \code{tt1} and conditioned on data 1 to \eqn{t} are \code{tt}.}
 
   \item{standardization}{"Cholesky" means it is standardized by the lower triangle of the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
 "marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. 
@@ -26,7 +26,7 @@
 
 }
 \description{
-\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{y}) or  state (\eqn{x}) and the "fitted" value.  At time t (in the returned data frame), the model residuals are for time t. For the the state residuals, the residual is for the transition from t to t+1 following the convention in Harvey, Koopman and Penzer (1998). For the the state innovation residuals, this means that \code{state.residual[,t]} is for the transition from \eqn{t} to \eqn{t+1} and is conditioned on data 1 to \eqn{t} while \code{model.residual[,t]} is is conditioned on data 1 to \eqn{t-1}. State innovation residuals are not normally used while state smoothation residuals are used in trend outlier analysis. If warnings are reported, use \code{attr(residuals(fit), "msg")} to retrieve the messages.
+\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{\mathbf{y}}{y}) or  state (\eqn{\mathbf{x}}{x}) and the fitted value.  At time \eqn{t} (in the returned data frame), the model residuals are for time \eqn{t}. For the the state residuals, the residual is for the transition from \eqn{t} to \eqn{t+1} following the convention in Harvey, Koopman and Penzer (1998). For the the state innovation residuals, this means that \code{state.residual[,t]} is for the transition from \eqn{t} to \eqn{t+1} and is conditioned on data 1 to \eqn{t} while \code{model.residual[,t]} is is conditioned on data 1 to \eqn{t-1}. State innovation residuals are not normally used while state smoothation residuals are used in trend outlier analysis. If warnings are reported, use \code{attr(residuals(fit), "msg")} to retrieve the messages.
 }
 \value{
 A data frame with the following columns:
@@ -49,7 +49,7 @@ See \code{\link{MARSSresiduals}} for a discussion of the residuals calculations 
 
 The model residuals are in the data frame with \code{.type="model"}.
 
-The model residuals are the familiar type of residuals, they are the difference between the data at time t and the predicted value at time t. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="tT"}, the predicted value is the expected value of \eqn{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{x} at time t (\code{xtT}).  If \code{type="tt1"}, the predicted value is the expected value of \eqn{y} conditioned on the data up to time t-1, i.e. is computed using the estimate of \eqn{x} at time t conditioned on the data up to time t-1 (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
+The model residuals are the familiar type of residuals, they are the difference between the data at time t and the predicted value at time t. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="tT"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{\mathbf{x}}{x} at time \eqn{t} (\code{xtT}).  If \code{type="tt1"}, the predicted value is the expected value of \eqn{y} conditioned on the data up to time \eqn{t-1}, i.e. is computed using the estimate of \eqn{x} at time t conditioned on the data up to time \eqn{t-1} (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
 
 The standard errors help visualize how well the model fits to the data.  See \code{\link[=fitted.marssMLE]{fitted}} for a discussion of the calculation of the model predictions for the observations.  The standardized smoothation residuals can be used for outlier detection.  See the references in \code{\link{MARSSresiduals}} and the chapter on shock detection in the MARSS User Guide.
 
@@ -60,11 +60,11 @@ The state residuals are in the data frame with \code{.type="state"}.
 If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
 
 The state residuals are only for state-space models. At time \eqn{t}, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state at time \eqn{t+1} given the estimate of the state at time \eqn{t}. For smoothation state residuals, this is 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw(t+1) = xt+1T - B xtT - u}
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtT[,t+1] - B xtT - u - C c(t+1)}
 For innovations state residuals, this is 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u}
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u}  - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u - C c(t+1) }
 
-Smoothation state residuals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time T (the last time step) is NA since this would be the transition from T to T+1 (past the end of the data).
+Smoothation state residuals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time \eqn{T} (the last time step) is NA since this would be the transition from \eqn{T} to \eqn{T+1} (past the end of the data).
 
 }
 

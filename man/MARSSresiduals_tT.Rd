@@ -40,9 +40,9 @@ Below the conditional residuals and their variance are discussed. The random var
 \strong{Model residuals}
 
 \eqn{\mathbf{v}_{t}}{v(t)} is the difference between the data and the predicted data at time \eqn{t} given \eqn{\mathbf{x}_{t}}{x(t)}:
-\deqn{ \mathbf{v}_{t} = \mathbf{y}_{t} - \mathbf{Z} \mathbf{x}_{t} - \mathbf{a} }{ v(t) = y(t) - Z x(t) - a}
-The observed model residuals \eqn{\hat{\mathbf{v}}_{t}}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tT} fits the model using all the data. So
-\deqn{ \hat{\mathbf{v}}_{t} = \mathbf{y}_{t} - \mathbf{Z}\tilde{\mathbf{x}}_{t}^T - \mathbf{a} }{ hatv(t) = y(t) - Z xtT - a}
+\deqn{ \mathbf{v}_{t} = \mathbf{y}_{t} - \mathbf{Z} \mathbf{x}_{t} - \mathbf{a} - \mathbf{D}\mathbf{d}_t}{ v(t) = y(t) - Z x(t) - a - D d(t)}
+\eqn{\mathbf{x}_{t}}{x(t)} is unknown (hidden) and our data are one realization of \mathbf{y}_{t}. The observed model residuals \eqn{\hat{\mathbf{v}}_{t}}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tT} fits the model using all the data, thus
+\deqn{ \hat{\mathbf{v}}_{t} = \mathbf{y}_{t} - \mathbf{Z}\tilde{\mathbf{x}}_{t}^T - \mathbf{a} - \mathbf{D}\mathbf{d}_t}{ hatv(t) = y(t) - Z xtT - a - D d(t)}
 where \eqn{\tilde{\mathbf{x}}_{t}^T}{xtT} is the expected value of \eqn{\mathbf{X}_{t}}{X(t)} conditioned on the data from 1 to \eqn{T} (all the data), i.e. the Kalman smoother estimate of the states at time \eqn{t}. \eqn{\mathbf{y}_{t}}{y(t)} are your data and missing values will appear as NA in the observed model residuals. These are returned as \code{model.residuals} and rows 1 to \eqn{n} of \code{residuals}.
 
 \code{res1} and \code{res2} in the code below will be the same.
@@ -57,9 +57,9 @@ res2 = MARSSresiduals(fit, type="tT")$model.residuals
 \strong{State residuals}
 
 \eqn{\mathbf{w}_{t+1}}{w(t+1)} are the difference between the state at time \eqn{t+1} and the expected value of the state at time \eqn{t+1} given the state at time \eqn{t}:
-\deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u} }{ w(t+1) = x(t+1) - B x(t) - u}
+\deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ w(t+1) = x(t+1) - B x(t) - u - C c(t+1)}
 The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw(t+1)} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x(t+1)} minus the estimate using \eqn{\mathbf{x}_{t}}{x(t)}. 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} }{ hatw(t+1) = xt+1T - B xtT - u}
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xt+1T - B xtT - u - C c(t+1)}
 where \eqn{\tilde{\mathbf{x}}_{t+1}^T}{xt+1T} is the Kalman smoother estimate of the states at time \eqn{t+1} and \eqn{\tilde{\mathbf{x}}_{t}^T}{xtT} is the Kalman smoother estimate of the states at time \eqn{t}.
 The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals as an estimate of the state exists whether or not there are associated data.
 
@@ -80,7 +80,7 @@ Note that the state residual at the last time step (not shown) will be NA becaus
 
 In a state-space model, \eqn{\mathbf{X}}{X} and \eqn{\mathbf{Y}}{Y} are stochastic, and the model and state residuals are random variables \eqn{\hat{\mathbf{V}}_{t}}{hatV(t)} and \eqn{\hat{\mathbf{W}}_{t+1}}{hatW(t+1)}. To evaluate the residuals we observed (with \eqn{\mathbf{y}^{(1)}}{y(1)}), we use the joint distribution of \eqn{\hat{\mathbf{V}}_{t}, \hat{\mathbf{W}}_{t+1}}{hatV(t), hatW(t+1)} across all the different possible data sets that our MARSS equations with parameters \eqn{\Theta}{Theta} might generate. Denote the matrix of \eqn{\hat{\mathbf{V}}_{t}, \hat{\mathbf{W}}_{t+1}}{hatV(t), hatW(t+1)}, as \eqn{\widehat{\mathcal{E}}_{t}}{Epsilon(t)}. That distribution has an expected value (mean) and variance:
 \deqn{ \textrm{E}[\widehat{\mathcal{E}}_{t}] = 0; \textrm{var}[\widehat{\mathcal{E}}_{t}] = \hat{\Sigma}_{t} }{ E[Epsilon(t)] = 0; var[Epsilon(t)] = hatSigma(t)}
-Our observed residuals \code{residuals} are one sample from this distribution.
+Our observed residuals (returned in \code{residuals}) are one sample from this distribution.
 To standardize the observed residuals, we will use \eqn{ \hat{\Sigma}_{t} }{ hatSigma(t) }. \eqn{ \hat{\Sigma}_{t} }{ hatSigma(t) } is returned in \code{var.residuals}. Rows/columns 1 to \eqn{n} are the conditional variances of the model residuals and rows/columns \eqn{n+1} to \eqn{n+m} are the conditional variances of the state residuals. The off-diagonal blocks are the covariances between the two types of residuals.
 
 \strong{Standardized residuals}

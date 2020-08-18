@@ -3,7 +3,7 @@
 
 \title{ predict and forecast MARSS MLE objects }
 \description{
-This function will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} conditioned on the data (either data used to fit the data or data in \code{newdata}). For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t}{Z(t) tildex(t)+a(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t}{B(t) tildex(t-1)+u(t)}.  \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the smoothed state estimate at time \eqn{t} conditioned on all the data (either data used to fit the model or the optional data passed into \code{newdata}).
+This function will return the modeled value of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} conditioned on the data (either data used to fit the data or data in \code{newdata}). For \eqn{\mathbf{y}_t}{y(t)}, this is \eqn{\mathbf{Z}_t\tilde{\mathbf{x}}_t+\mathbf{a}_t+\mathbf{D}_t\mathbf{d}_t}{Z(t) tildex(t) + a(t) + D(t) d(t)}. For \eqn{\mathbf{x}_t}{x(t)}, this is \eqn{\mathbf{B}_t\tilde{\mathbf{x}}_{t-1}+\mathbf{u}_t+\mathbf{C}_t\mathbf{c}_{t}}{B(t) tildex(t-1) + u(t) + C(t) c(t)}.  \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the smoothed state estimate at time \eqn{t} conditioned on all the data (either data used to fit the model or the optional data passed into \code{newdata}).
 
 If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data (i.e. output from the Kalman filter or smoother), then use \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on data 1 to \eqn{t+1}, which is not output from the Kalman filter or smoother.
 
@@ -67,7 +67,7 @@ If intervals are returned, the following are added to the data frame:
 
 The \code{type="xtT"} forecast is the states forecast conditioned on all the data. If \code{n.ahead !=0}, then 'data' that is being conditioned on is the original data (model data) plus any data in \code{newdata$y} for the h forecast time steps. Note, typically forecasts would not have data, since they are forecasts, but \code{predict.marssMLE()} allows you to specify data for the forecast time steps if you need to. If the model includes covariates (\eqn{\mathbf{c}}{c} and/or \eqn{\mathbf{d}}{d} matrices passed into the \code{model} list in the \code{\link{MARSS}()} call), then \code{c} and/or \code{d} must be passed into \code{newdata}. 
 
-The \code{type="ytT"} forecast is the expected value of NEW data (\eqn{\mathbf{y}}{y}) conditioned on the data used for fitting. The data used for fitting is the same as for \code{type="xtT"} (above). The \eqn{\mathbf{y}}{y} forecast is \eqn{Z xtT + A}. 
+The \code{type="ytT"} forecast is the expected value of NEW data (\eqn{\mathbf{y}}{y}) conditioned on the data used for fitting. The data used for fitting is the same as for \code{type="xtT"} (above). The \eqn{\mathbf{y}}{y} forecast is \code{Z xtT[,T+i] + A + D d[,T+i]}. 
 
 If the model has time-varying parameters, the value of the parameters at the last time step are used for the forecast.
 

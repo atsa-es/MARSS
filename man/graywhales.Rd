@@ -37,8 +37,8 @@ The data are supplied as a matrix with years in the first column and counts in t
 \item{prairiechicken }{ Peterson M. J. and Silvy N. J. (1996) Reproductive stages limiting productivity of the endangered Attwater's prairie chicken. Conservation Biology, 10, 1264-1276.}
 \item{wilddogs }{ Ginsberg, J. R., Mace, G. M. and Albon, S. (1995). Local extinction in a small and declining population: Wild Dogs in the Serengeti. Proc. R. Soc. Lond. B, 262, 221-228.}
 \item{okanaganRedds }{ A data set of Chinook salmon redd (egg nest) surveys.  This data comes from the Okanagan River in Washington state, a major tributary of the Columbia River (headwaters in British Columbia). Unlogged.}
-\item{rockfish }{ LOGGED catch per unit effort data for Puget Sound total total rockfish (mix of species) from a series of different types of surveys.}
-\item{kestrel }{ Three time series of American kestrel logged abundance from adjacent Canadian provinces along a longitudinal gradient (British Columbia, Alberta, Saskatchewan).  Data have been collected annually, and corrected for changes in observer coverage and detectability. LOGGED.}
+\item{rockfish }{ Logged catch per unit effort data for Puget Sound total total rockfish (mix of species) from a series of different types of surveys.}
+\item{kestrel }{ Three time series of American kestrel logged abundance from adjacent Canadian provinces along a longitudinal gradient (British Columbia, Alberta, Saskatchewan).  Data have been collected annually, corrected for changes in observer coverage and detectability, and logged.}
 \item{redstart}{ 1966 to 1995 counts for American Redstart from the North American Breeding Bird Survey (BBS record number 0214332808636; Peterjohn 1994) used in Dennis et al. (2006).  Peterjohn, B.G. 1994. The North American Breeding Bird Survey. Birding 26, 386--398. and Dennis et al. 2006. Estimating density dependence, process noise, and observation error. Ecological Monographs 76:323-341.}
 }
 }

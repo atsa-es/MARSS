@@ -28,10 +28,10 @@ The measures calculated are:
   \item MASE: Mean Absolute Scaled Error
   \item ACF1: Autocorrelation of errors at lag 1.
 }
-The MASE calculation is scaled using MAE of training set naive
-forecasts which is simply y(i) at t-1.
+The MASE calculation is scaled using MAE of the training set naive
+forecasts which are simply \eqn{\mathbf{y}_{t-1}}{y(t-1)}.
 
-For the training data, the metrics are shown for the one-step-ahead predictions by default (\code{type="ytt1"}). This is the prediction of y(t) conditioned on the data up to t-1 (and the model estimated from all the data). With type="ytT", you can compute the metrics for the fitted ytT, which is the expected value of new data at t conditioned on all the data. \code{type} does not affect test data (forecasts past the end of the training data).
+For the training data, the metrics are shown for the one-step-ahead predictions by default (\code{type="ytt1"}). This is the prediction of \eqn{\mathbf{y}_t}{y(t)} conditioned on the data up to \eqn{t-1} (and the model estimated from all the data). With \code{type="ytT"}, you can compute the metrics for the fitted \code{ytT}, which is the expected value of new data at \eqn{t} conditioned on all the data. \code{type} does not affect test data (forecasts are past the end of the training data).
 }
 \examples{
 dat <- t(harborSeal)

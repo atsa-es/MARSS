@@ -39,18 +39,17 @@
 \details{
 
 The ytT forecast for \eqn{T+i}  is 
-\deqn{Z\tilde{x}_{T+i} + a + Dd_{T+i}}
-where \eqn{Z}, \eqn{a} and \eqn{D} are estimated form the data from 1 to \eqn{T}. If the model does include \eqn{d} then \code{newdata} with \eqn{d} must be passed in. Either confidence or prediction intervals can be shown. Prediction intervals would be the norm for forecasts and show the intervals for new data which based on the conditional variance of \eqn{ZX_{T+i} + V_{t+i}}. Confidence intervals would show the variance of the mean of the new data (such as if you ran a simulation multiple times and recoded only the mean observation time series). It is based on the conditional variance of \eqn{ZX_{T+i}}. The intervals shown are computed with \code{\link[=fitted.marssMLE]{fitted}()}.
+\deqn{\mathbf{Z}\tilde{x}_{T+i} + \mathbf{a} + \mathbf{D}\mathbf{d}_{T+i}}{Z tildex(T+i) + a + D d(T+i)}
+where \eqn{\mathbf{Z}}{Z}, \eqn{\mathbf{a}}{a} and \eqn{\mathbf{D}}{d} are estimated from the data from 1 to \eqn{T}. If the model includes \eqn{\mathbf{d}}{d} then \code{newdata} with \code{d} must be passed in. Either confidence or prediction intervals can be shown. Prediction intervals would be the norm for forecasts and show the intervals for new data which based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i} + \mathbf{V}_{T+i}}{Z X(T+i) + V(T+i)}. Confidence intervals would show the variance of the mean of the new data (such as if you ran a simulation multiple times and recorded only the mean observation time series). It is based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i}}{Z X(T+i)}. The intervals shown are computed with \code{\link[=fitted.marssMLE]{fitted}()}.
 
 The xtT forecast for \eqn{T+i}  is 
-\deqn{B\tilde{x}_{T+i-1} + u + Cc_{T+i}}
-where \eqn{B} and \eqn{u} and \eqn{C} are estimated form the data from 1 to \eqn{T} (i.e. the estimates in the marssMLE object). \eqn{Cc_{T+i}} is only present if the model includes \eqn{c}. If the model does include \eqn{c} then \code{newdata} with \eqn{c} must be passed in. The only intervals are confidence intervals which based on the conditional variance of \eqn{BX_{T+i-1} + W_{t+i}}. If you pass in data for your forecast time steps, then the forecast will be computed conditioned on the original data plus the data in the forecast period. The intervals shown are computed with the Kalman smoother (or filter if \code{type="xtt"} or \code{type="xtt1"} specified) via \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}.
+\deqn{\mathbf{B}\tilde{\mathbf{x}}_{T+i-1} + \mathbf{u} + \mathbf{C}\mathbf{c}_{T+i}}{B tildex(T+i-1) + u + C c(T+i)}
+where \eqn{\mathbf{B}}{B} and \eqn{\mathbf{u}}{u} and \eqn{\mathbf{C}}{C} are estimated form the data from 1 to \eqn{T} (i.e. the estimates in the marssMLE object). If the model includes \eqn{\mathbf{c}}{c} then \code{newdata} with \code{c} must be passed in. The only intervals are confidence intervals which based on the conditional variance of \eqn{\mathbf{B}\mathbf{X}_{T+i-1} + \mathbf{W}_{T+i}}{B X(T+i-1) + W(T+i)}. If you pass in data for your forecast time steps, then the forecast will be computed conditioned on the original data plus the data in the forecast period. The intervals shown are computed with the Kalman smoother (or filter if \code{type="xtt"} or \code{type="xtt1"} specified) via \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}.
 
-If the model has time-varying parameters, the parameter estimates at time \eqn{T} will be used for the whole forecast. If new data \eqn{c} or \eqn{d} is passed in, it must have \eqn{h} time steps. 
+If the model has time-varying parameters, the parameter estimates at time \eqn{T} will be used for the whole forecast. If new data \code{c} or \code{d} are passed in, it must have \code{h} time steps. 
 
-Note: \eqn{y} in \code{newdata}. Data along with covariates can be passed into \code{newdata}. In this case, the data in \code{newdata} (\eqn{T+1} to \eqn{T+h}) are conditioned on for the expected value of \eqn{\mathbf{x}_t}{x(t)} 
- but parameters used are only estimated using the data in the marssMLE object (t=1 to T). The expected value of \eqn{y} conditioned on observed \eqn{y} is simply \eqn{y}.
- 
+Note: \code{y} in \code{newdata}. Data along with covariates can be passed into \code{newdata}. In this case, the data in \code{newdata} (\eqn{T+1} to \eqn{T+h}) are conditioned on for the expected value of \eqn{\mathbf{X}_t}{X(t)}
+ but parameters used are only estimated using the data in the marssMLE object (\eqn{t=1} to \eqn{T}). 
 }
 \seealso{
 \code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}()}

@@ -11,16 +11,14 @@ MARSShessian(MLEobj, method=c("Harvey1989", "fdHess", "optim"))
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 
   This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}}. }
-  \item{method}{ The method to use for computing the Hessian. Options are 'Harvey1989' to use the Harvey (1989) recursion, which is an analytical solution, 'fdHess' or 'optim' which are two numerical methods.  Although 'optim' can be passed to the function, 'fdHess' is used for all numerical estimates used in the package.}
+  \item{method}{ The method to use for computing the Hessian. Options are \code{Harvey1989} to use the Harvey (1989) recursion, which is an analytical solution, \code{fdHess} or \code{optim} which are two numerical methods.  Although \code{optim} can be passed to this function, in the internal functions which call this function, \code{fdHess} will be used if a numerical estimate is requested.}
  }
 \details{
 See \code{\link{MARSSFisherI}} for a discussion of the observed Fisher Information matrix and references.
 
-   Method 'fdHess' uses \code{\link{fdHess}} from package \code{\link{nlme}} to numerically estimate the Hessian matrix
-   (the matrix of partial 2nd derivatives of the negative log-likelihood function at the MLE).     Method 'optim' uses \code{\link{optim}} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object.
-   Method 'Harvey1989' (the default) uses the recursion in Harvey (1989) to compute the observed Fisher Information of a MARSS model analytically.
+   Method \code{fdHess} uses \code{\link[nlme]{fdHess}} from package nlme to numerically estimate the Hessian matrix (the matrix of partial 2nd derivatives of the negative log-likelihood function at the MLE).     Method \code{optim} uses \code{\link{optim}} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object. Method \code{Harvey1989} (the default) uses the recursion in Harvey (1989) to compute the observed Fisher Information of a MARSS model analytically.
    
-   Note that the parameter confidence intervals computed with the observed Fisher Information matrix are based on the asymptotic normality of ML estimates under a large-sample approximation. 
+   Note that the parameter confidence intervals computed with the observed Fisher Information matrix are based on the asymptotic normality of maximum-likelihood estimates under a large-sample approximation. 
    
 }
 \value{
