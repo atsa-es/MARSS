@@ -41,7 +41,7 @@ Below the conditional residuals and their variance are discussed. The random var
 
 \eqn{\mathbf{v}_{t}}{v(t)} is the difference between the data and the predicted data at time \eqn{t} given \eqn{\mathbf{x}_{t}}{x(t)}:
 \deqn{ \mathbf{v}_{t} = \mathbf{y}_{t} - \mathbf{Z} \mathbf{x}_{t} - \mathbf{a} - \mathbf{D}\mathbf{d}_t}{ v(t) = y(t) - Z x(t) - a - D d(t)}
-\eqn{\mathbf{x}_{t}}{x(t)} is unknown (hidden) and our data are one realization of \mathbf{y}_{t}. The observed model residuals \eqn{\hat{\mathbf{v}}_{t}}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tT} fits the model using all the data, thus
+\eqn{\mathbf{x}_{t}}{x(t)} is unknown (hidden) and our data are one realization of \eqn{\mathbf{y}_{t}}{y(t)}. The observed model residuals \eqn{\hat{\mathbf{v}}_{t}}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tT} fits the model using all the data, thus
 \deqn{ \hat{\mathbf{v}}_{t} = \mathbf{y}_{t} - \mathbf{Z}\tilde{\mathbf{x}}_{t}^T - \mathbf{a} - \mathbf{D}\mathbf{d}_t}{ hatv(t) = y(t) - Z xtT - a - D d(t)}
 where \eqn{\tilde{\mathbf{x}}_{t}^T}{xtT} is the expected value of \eqn{\mathbf{X}_{t}}{X(t)} conditioned on the data from 1 to \eqn{T} (all the data), i.e. the Kalman smoother estimate of the states at time \eqn{t}. \eqn{\mathbf{y}_{t}}{y(t)} are your data and missing values will appear as NA in the observed model residuals. These are returned as \code{model.residuals} and rows 1 to \eqn{n} of \code{residuals}.
 
