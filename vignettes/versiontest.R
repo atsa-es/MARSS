@@ -51,6 +51,14 @@ MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
 MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
 MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
 
+file <- paste("AR2SS", TT, ".RData", sep = "")
+if (file %in% dir("./manual_files")) {
+  load(paste("./manual_files/", file, sep = ""))
+  sims.exist <- TRUE
+} else {
+  sims.exist <- FALSE
+}
+
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
   #clean the workspace but keep objects needed for the unit test
@@ -83,16 +91,17 @@ unittestvrs
 library(MARSS, lib.loc = lib.old)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun", "MARSSresiduals_tt.fun"))])
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
   if(!exists("zscore")){zscore=zscore.fun}
-  if(!exists("MARSSresiduals")){
+#  if(!exists("MARSSresiduals")){
     MARSSresiduals = MARSSresiduals.fun
     MARSSresiduals.tT = MARSSresiduals_tT.fun
     MARSSresiduals.tt1 = MARSSresiduals_tt1.fun
-  }
+    MARSSresiduals.tt = MARSSresiduals_tt.fun
+#  }
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
