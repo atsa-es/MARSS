@@ -6,43 +6,19 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
+
 Status
 -----------------------------------
 
-To do 8-6-2020
+8-18
 
-* check apply(MARSS:::MARSSresiduals.tT(fit2)$mar.resid,1,var,na.rm=TRUE); not that close to 1
-```
-dat <- t(harborSealWA)
-dat <- dat[2:4, ] # remove the year row
-# fit a model with 1 hidden state and 3 observation time series
-kemfit <- MARSS(dat, model = list(
-  Z = matrix(1, 3, 1),
-  R = "diagonal and equal"
-))
-```
-
-8-11 
-
-Working on KFAS chapter
-
-* KFAS examples: https://www.rdocumentation.org/packages/KFAS/versions/1.3.7/topics/KFAS
-* MARSShatyt(fit_marss)$ytt1 is NULL
-* MARSShatyt(fit_marss, only.kem=FALSE)$var.Eytt1 is NULL
-
-* Check how doc looks https://www.rdocumentation.org/packages/MARSS
-* add var.ytt1, var.Eytt1 and var.ytt, var.Eytt to MARSShatyt() 
-* Annoying for predict to output a list. better to put extra info into attributes
-* check normalize for Harvey=TRUE versus Harvey=FALSE something looks off
-
-* In quick examples, I talk about ACF diagnostics. Check that innovations are used.
-* Check getDFAfits(). does it return smoothations like the chap says it does?
-
-
+* check manual
+* versiontest.R
+* CRAN checks
     
-MARSS 3.11.01 (resids_update for CRAN)
+MARSS 3.11.1 (resids_update for CRAN)
 ------------------------------------
-Version 3.11.01 is focused on the `predict`, `fitted` and `residuals` functions and documentation. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
+Version 3.11.1 is focused on the `predict`, `fitted` and `residuals` functions and documentation. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
 
 
 ENHANCEMENTS
