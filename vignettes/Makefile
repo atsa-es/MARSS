@@ -22,6 +22,7 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/MARp.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Covariates.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Structural_TS.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/KFAS.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Manual.Rnw
 	 
 stangle: 
@@ -40,6 +41,7 @@ stangle:
 	Rscript -e "Stangle('./manual_files/Covariates.Rnw')"
 	Rscript -e "Stangle('./manual_files/MARp.Rnw')"
 	Rscript -e "Stangle('./manual_files/Structural_TS.Rnw')"
+	Rscript -e "Stangle('./manual_files/KFAS.Rnw')"
 
 makeRfiles:
 	cat ./figures/QE--Cs*.R > ../inst/doc/Quick_Examples.R
@@ -57,6 +59,7 @@ makeRfiles:
 	cat ./figures/MCI--Cs_mci_*.R > ../inst/doc/Chapter_inits.R
 	cat ./figures/ARMAp--Cs_*.R > ../inst/doc/Chapter_MARp.R
 	cat ./figures/STS--Cs*.R > ../inst/doc/Chapter_Structural_TS.R
+	cat ./figures/KFAS--Cs*.R > ../inst/doc/Chapter_KFAS.R
 
 pdf:	
 	pdflatex EMDerivation.tex
