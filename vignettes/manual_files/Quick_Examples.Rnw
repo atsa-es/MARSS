@@ -6,9 +6,12 @@
 \blfootnote{Type \texttt{RShowDoc("Quick\_Examples.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 
-<<RUNFIRST, echo=F, include.source=F>>=
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
 library(MARSS)
 options(prompt = " ", continue = " ", width = 60)
+@
+<<Cs00_load_library, echo=FALSE>>=
+library(MARSS)
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 In this chapter, we work through a series of short examples to illustrate the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with MARSS models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS models might want to start with the application chapters. 
@@ -59,7 +62,7 @@ Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following s
 Notice how this model mixes fixed values, estimated values and shared values.
 
 In MARSS, model structure is specified using a list with the names, \verb@Z@, \verb@A@, \verb@R@, \verb@B@, \verb@U@, \verb@Q@, \verb@x0@ and \verb@V0@.  Each element is matrix (class matrix) with the same dimensions as the matrix of the same name in the MARSS model.  MARSS distinguishes between the estimated and fixed values in a matrix by using a list matrix in which you can have numeric and character elements.  Numeric elements are fixed; character elements are names of things to be estimated.  The model above would be specified as:
-<<Cs1_model-gen-spec, eval=TRUE>>=
+<<Cs01_model-gen-spec, eval=TRUE>>=
 Z <- matrix(list("z1", "z2", 0, 0, "z2", 3), 3, 2)
 A <- matrix(0, 3, 1)
 R <- matrix(list(0), 3, 3)
@@ -73,7 +76,7 @@ model.gen <- list(Z = Z, A = A, R = R, B = B, U = U,
                   Q = Q, x0 = x0, V0 = V0, tinitx = 0)
 @
 Notice that there is a one-to-one correspondence between the model list in \R and the model on paper.  Fitting the model is then just a matter of passing the data and model list to the MARSS function:
-<<Cs2_model-general, eval=FALSE, keep.source=TRUE>>=
+<<Cs02_model-general, eval=FALSE, keep.source=TRUE>>=
 kemfit <- MARSS(dat, model = model.gen)
 @
 
@@ -81,7 +84,7 @@ kemfit <- MARSS(dat, model = model.gen)
 
 \section{Different numbers of state processes}
 Here we show a series of short examples using a dataset on Washington harbor seals (\verb@?harborSealWA@), which has five observation time series.   The dataset is a little unusual in that it has four missing years from years 2 to 5.  This causes some interesting issues with prior specification.  Before starting the harbor seal examples, we set up the data, making time go across the columns and removing the year column:
-<<Cs3_enterdata, include.source=FALSE, keep.source=T>>=
+<<Cs03_enterdata, include.source=FALSE, keep.source=T>>=
 dat <- t(harborSealWA)
 dat <- dat[2:nrow(dat), ] # remove the year row
 @
@@ -104,13 +107,13 @@ This is the default model for the \verb@MARSS()@ function.  In this case, $n=m$,
  \textrm{ } \vv_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix},\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
 \end{gather*}
 This is the default model, so you can fit it by simply passing \verb@dat@ to \verb@MARSS()@\index{functions!MARSS}.  
-<<Cs4_model-default, include.source=FALSE, keep.source=TRUE>>=
+<<Cs04_model-default, include.source=FALSE, keep.source=TRUE>>=
 kemfit <- MARSS(dat)
 @
 The output warns you that the convergence tolerance is high.  You can set it lower by passing in \verb@control=list(conv.test.slope.tol=0.1)@.  \verb@MARSS()@ is automatically creating parameter names since you did not tell it the names. To see exactly where each parameter element appears in its parameter matrix, type \verb@summary(kemfit$model)@.
  
  Though it is not necessary to specify the model for this example since it is the default, here is how you could do so using matrices: 
-<<Cs5_B-setup, eval=FALSE>>=
+<<Cs05_B-setup, eval=FALSE>>=
 B <- Z <- diag(1, 5)
 U <- matrix(c("u1", "u2", "u3", "u4", "u5"), 5, 1)
 x0 <- A <- matrix(0, 5, 1)
@@ -119,21 +122,21 @@ diag(R) <- "r"
 diag(Q) <- c("q1", "q2", "q3", "q4", "q5")
 @
 Notice that when a matrix has both fixed and estimated elements (like $\RR$ and $\QQ$), a list matrix is used to allow you to specify the fixed elements as numeric and to give the estimated elements character names.
-<<Cs6_model-default-time, echo=FALSE, results=hide>>=
+<<Cs06_model-default-time, echo=FALSE, results=hide>>=
 kemfit.time <- system.time(MARSS(dat, silent = TRUE))
 @
 
 The default MLE method is the EM algorithm (\verb@method="kem"@).  You can also use a quasi-Newton method\index{estimation!quasi-Newton} (BFGS) 
 by setting \verb@method="BFGS"@\index{estimation!BFGS}.  
-<<Cs7_model-bfgs, include.source=FALSE>>=
+<<Cs07_model-bfgs, include.source=FALSE>>=
 kemfit.bfgs <- MARSS(dat, method = "BFGS")
 @
-<<Cs8_model-bfgs-time, echo=FALSE, results=hide>>=
+<<Cs08_model-bfgs-time, echo=FALSE, results=hide>>=
 bfgsfit.time <- system.time(MARSS(dat, silent = TRUE, method = "BFGS"))
 @
 Using the default EM convergence criteria, the EM algorithm stops at a log-likelihood a little lower than the BFGS algorithm does, but the EM algorithm was faster, $\Sexpr{ round(bfgsfit.time[1]/kemfit.time[1],1) }$ times faster, in this case.
 If you wanted to use the EM fit as the initial conditions\index{initial conditions!setting for BFGS}, pass in the \verb@inits@ argument using the \verb@$par@ element (or \verb@coef(fit,form="marss")@) of the EM fit.  
-<<Cs9_model-bfgs2, keep.source=TRUE, results=hide >>=
+<<Cs09_model-bfgs2, keep.source=TRUE, results=hide >>=
 kemfit.bfgs2 <- MARSS(dat, method = "BFGS", inits = kemfit$par)
 @
 The BFGS algorithm now converges in $\Sexpr{ kemfit.bfgs2$numIter }$ iterations. Output not shown.
