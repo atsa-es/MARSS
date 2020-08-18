@@ -45,10 +45,11 @@ unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/
 unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.new)
-zscore.fun = zscore #3.9 does not have this
+#zscore.fun = zscore #3.9 does not have this
 MARSSresiduals.fun = MARSSresiduals
 MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
 MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
+MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
