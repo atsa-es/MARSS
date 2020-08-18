@@ -274,19 +274,16 @@ c(kem1$AIC, kem2$AIC)
 @
 A smaller AIC means a better model\index{model selection!AIC}.  The difference between the one observation variance versus the unique observation variances is >10, suggesting that the unique observation variances model is better.
 
-\index{diagnostics}One of the key diagnostics when you are comparing fits from multiple models is whether the model is flexible enough to fit the data.  This can be checked by looking for temporal trends in the the residuals between the estimated population states (e.g. \verb@kem2$states@) and the data.  In Figure \ref{fig:CS2.resids2}, the residuals for the second analysis are shown.  Ideally, these residuals should not have a temporal trend. They should look cloud-like.  The fact that the residuals have a strong temporal trend is an indication that our one population model is too restrictive for the data\footnote{When comparing models via AIC, it is important that you only compare models that are flexible enough to fit the data.  Fortunately if you neglect to do this, the inadequate models will usually have very high AICs and fall out of the mix anyhow.}.  Code \ref{CS2.ex2} shows you how to fit the second model and make the diagnostics plot.
+\index{diagnostics}One of the key diagnostics when you are comparing fits from multiple models is whether the model is flexible enough to fit the data.  This can be checked by looking for temporal trends in the residuals between the estimated population states (e.g. \verb@kem2$states@) and the data.  In Figure \ref{fig:CS2.resids2}, the residuals for the second analysis are shown.  Ideally, these residuals should not have a temporal trend. They should look cloud-like.  The fact that the residuals have a strong temporal trend is an indication that our one population model is too restrictive for the data\footnote{When comparing models via AIC, it is important that you only compare models that are flexible enough to fit the data.  Fortunately if you neglect to do this, the inadequate models will usually have very high AICs and fall out of the mix anyhow.}.  Code \ref{CS2.ex2} shows you how to fit the second model and make the diagnostics plot.
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
 <<Cs2-fig5,fig=TRUE,echo=FALSE,width=5,height=5>>=
-plotdat <- t(dat)
-matrix.of.biases <- matrix(coef(kem2, type = "matrix")$A, nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T)
-xs <- matrix(kem2$states, nrow = dim(plotdat)[1], ncol = dim(plotdat)[2], byrow = F)
-resids <- plotdat - matrix.of.biases - xs
+resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[!is.na(resids[, i]), i], ylab = "residuals")
+  plot(resids[i,], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -308,17 +305,10 @@ coef(kem2) # the estimated parameter elements
 kem2$logLik # log likelihood
 c(kem1$AIC, kem2$AIC) # AICs
 
-plotdat <- t(dat)
-matrix.of.biases <- matrix(coef(kem2, type = "matrix")$A,
-  nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T
-)
-xs <- matrix(kem2$states,
-  nrow = dim(plotdat)[1], ncol = dim(plotdat)[2], byrow = F
-)
-resids <- plotdat - matrix.of.biases - xs
+resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[!is.na(resids[, i]), i], ylab = "residuals")
+  plot(resids[i,], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -423,16 +413,10 @@ kem3 <- MARSS(dat, model = list(
   R = R.model, U = U.model, Q = Q.model
 ))
 # plot residuals
-plotdat <- t(dat)
-matrix.of.biases <- matrix(coef(kem3, type = "matrix")$A,
-  nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T
-)
+resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  j <- c(1, 1, 2, 2, 2)
-  xs <- kem3$states[j[i], ]
-  resids <- plotdat[, i] - matrix.of.biases[, i] - xs
-  plot(resids[!is.na(resids)], ylab = "residuals")
+  plot(resids[i,], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -443,14 +427,10 @@ par(mfrow = c(1, 1))
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs2-residuals-analysis3-fig6,fig=TRUE,echo=FALSE,width=5,height=5>>=
-plotdat <- t(dat)
-matrix.of.biases <- matrix(coef(kem3, type = "matrix")$A, nrow = nrow(plotdat), ncol = ncol(plotdat), byrow = T)
+resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  j <- c(1, 1, 2, 2, 2)
-  xs <- kem3$states[j[i], ]
-  resids <- plotdat[, i] - matrix.of.biases[, i] - xs
-  plot(resids[!is.na(resids)], ylab = "residuals")
+  plot(resids[i,], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
