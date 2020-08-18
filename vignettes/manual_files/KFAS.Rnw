@@ -172,49 +172,42 @@ cbind(P=kf_kfas$P[1:n], Vtt1=kf_marss$Vtt1[1:n],
 \subsection{Observation filtering and smoothing}
 \index{Observation filtering and smoothing!KFAS}
 
-Both KFAS and MARSS return the smoothed and filtered (one-step ahead) model predictions via \verb@fitted()@. However, with KFAS this just returns the values. The \verb@KFAS::KFS()@ function will also return the filtered and smoothed model predictions in matrix form along with other filter and smoother output.
+Both KFAS and MARSS return the smoothed and filtered (one-step ahead) model predictions via \verb@fitted()@. However, for KFAS this just returns the smoothed values. The \verb@KFAS::KFS()@ function will  return the filtered and smoothed model predictions in matrix form along with other filter and smoother output.
 <<Cs301_obs-filtering, results=hide>>=
 f_kfas <- KFS(fit_kfas$model, filtering = "signal", 
               smoothing = "signal", simplify = FALSE)
 @
-Note, \verb@fitted(fit_kfas$model)@ will return just the fitted model prediction, which is \verb@f_kfas$muhat@.
-
-The analogous function in MARSS is \verb@fitted(..., type=...)@ with type "ytT", "ytt" and "ytt1". You can specify the output to be a data frame or a list of matrices. Let's use a list of matrices to be analogous to \verb@KFS()@ output.
+The function to obtain these output in MARSS is \verb@fitted()@.
 <<Cs302_obs-filtering, results=hide>>=
-f_marss <- fitted(fit_marss, only.kem=FALSE, output="matrix")
+f_marss <- MARSSkf(fit_marss)
 @
+Note, the function \verb@MARSShatyt()@ is the statistical counterpart to \verb@MARSSkf()@ and returns the equivalent values but for the observation equation. This is very different than what \verb@KFS()@ (or \verb@MARSS::fitted()@) or returns for the signal. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on $\YY_t = \yy_t$. If there are no missing data, this is simply $\yy_t$ and the covariance of $\YY_t$ and $\XX_t$ conditioned on $\YY_t=\yy_t$ would be 0. These values are not this when there are missing values and these expectations are crucial to the general EM algorithm for missing values.
 
-Note, the function \verb@MARSShatyt()@ is the counterpart to \verb@MARSSkfss()@ and returns the equivalent values but for the observation equation. This is very different than what \verb@KFS()@ (or \verb@fitted()@) or returns for the signal. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on $\YY_t = \yy_t$. If there are no missing data, this is simply $\yy_t$ and the covariance of $\YY_t$ and $\XX_t$ conditioned on $\YY_t=\yy_t$ would be 0. These values are not this when there are missing values and these expectations are crucial to the general EM algorithm for missing values.
-
-The terminology of the filter/smoother variables is again different.
-<<Cs303_obs-filtering>>=
-names(f_kfas)
-names(f_marss)
-@
-
-The MARSS semantics are first letter x or y process, second letter time (usually t), and third letter the time conditioning. So \verb@xtT@ means the estimate of the $\xx$ process conditioned on all the data while \verb@xtt1@ means the estimate of the $\xx$ process conditioned on the data 1 to $t-1$. 
+The MARSS semantics are first letter x or y process, second letter time (usually t), and third letter the time conditioning. So \verb@ytT@ means the estimate of the $\yy$ process conditioned on all the data while \verb@ytt1@ means the estimate of the $\yy$ process conditioned on the data 1 to $t-1$. 
 <<Cs304_obs-filtering, echo=FALSE>>=
 n <- 10
 @
 
-\verb@f_kfas$m@ is the one-step ahead prediction of $\yy_t$. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytt1")$.fitted@. "ytt1" means the expected value of $\yy_t$ conditioned on the data up to time $t-1$. 
+\begin{itemize}
+
+\item \verb@f_kfas$m@ is the one-step ahead prediction of $\yy_t$. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytt1")$.fitted@. "ytt1" means the expected value of $\yy_t$ conditioned on the data up to time $t-1$. 
 <<Cs305_obs-filtering>>=
 ytt1_fit <- fitted(fit_marss, type="ytt1")$.fitted
-ytt1_hatyt <- MARSShatyt(fit_marss)$ytt1
+ytt1_hatyt <- MARSShatyt(fit_marss, only.kem=FALSE)$ytt1
 cbind(m=f_kfas$m[1:n], fitted=ytt1_fit[1:n], MARSShatyt=ytt1_hatyt[1:n])
 @
 
-\verb@kf_kfas$P_mu@ is the variance of the expected value of $\YY_t$ conditioned on the data 1 to $t-1$. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Confidence intervals are the intervals on the expected value (i.e. mean). \verb@MARSShatyt(fit_marss)$var.Eytt1@ returns the same values but only because with conditioning 1 to $t-1$ there is no data at time $t$. \verb@fitted()@ is the correct function to use if you want the model fitted values, such as "m", "muhat" returned by \verb@KFS()@. You can output the values as matrices instead of a data frame if you need the variance-covariance matrices not just standard errors.
+\item \verb@kf_kfas$P_mu@ is the variance of the expected value of $\YY_t$ conditioned on the data 1 to $t-1$. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Confidence intervals are the intervals on the expected value (i.e. mean). \verb@MARSShatyt(fit_marss)$var.Eytt1@ returns the same values but only because with conditioning 1 to $t-1$ there is no data at time $t$. \verb@fitted()@ is the correct function to use if you want the model fitted values, such as "m", "muhat" returned by \verb@KFS()@. You can output the values as matrices instead of a data frame if you need the variance-covariance matrices not just standard errors.
 <<Cs306_obs-filtering>>=
 var.Eytt1_fit <- 
   fitted(fit_marss, type="ytt1", interval="confidence")$.se^2
 var.Eytt1_hatyt <- 
   MARSShatyt(fit_marss, only.kem=FALSE)$var.Eytt1
-cbind(P_mu=kf_kfas$P_mu[1:n], fitted=var.Eytt1_fit[1:n], 
+cbind(P_mu=f_kfas$P_mu[1:n], fitted=var.Eytt1_fit[1:n], 
       MARSShatyt=var.Eytt1_hatyt[1:n])
 @
 
-\verb@f_kfas$muhat@ is the smoothed prediction of $\yy_t$. It is the expected value of $\ZZ \XX_t+\aa$ conditioned on the data up to time $T$, i.e. all the data. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytT")$.fitted@. \verb@MARSShatyt(fit_marss)$ytT@ does not return this. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on the data up to time $T$, i.e. all the data, which if there are no missing data is simply the observed data.
+\item \verb@f_kfas$muhat@ is the smoothed prediction of $\yy_t$. It is the expected value of $\ZZ \XX_t+\aa$ conditioned on the data up to time $T$, i.e. all the data. In MARSS, this is returned by \verb@fitted(fit_marss, type="ytT")$.fitted@. \verb@MARSShatyt(fit_marss)$ytT@ does not return this. \verb@MARSShatyt()@ returns the expected value of $\YY_t$ conditioned on the data up to time $T$, i.e. all the data, which if there are no missing data is simply the observed data.
 <<Cs307_obs-filtering>>=
 ytT_fit <- fitted(fit_marss, type="ytT")$.fitted
 ytT_hatyt <- MARSShatyt(fit_marss)$ytT
@@ -222,7 +215,7 @@ cbind(a=f_kfas$muhat[1:n], fitted=ytT_fit[1:n],
       MARSShatyt=ytT_hatyt[1:n], Nile=Nile[1:n])
 @
 
-\verb@f_kfas$V_mu@ is the variance of the expected value of $\YY_t$ conditioned on all the data. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Again, \verb@var.Eytt1@ returned by \verb@MARSShatyt()@ is not this because it returns the variance of the expected value of $\YY_t|\YY_t=\yy_t$ not $\ZZ \XX_t + \aa|\YY_t=\yy_t$. The latter is the model prediction. In this case, there are no missing values so $\YY_t|\YY_t=\yy_t$ is 0.
+\item \verb@f_kfas$V_mu@ is the variance of the expected value of $\YY_t$ conditioned on all the data. In MARSS, this is returned in the standard errors returned by \verb@fitted()@ with interval="confidence". Again, \verb@var.Eytt1@ returned by \verb@MARSShatyt()@ is not this because it returns the variance of the expected value of $\YY_t|\YY_t=\yy_t$ not $\ZZ \XX_t + \aa|\YY_t=\yy_t$. The latter is the model prediction. In this case, there are no missing values so $\YY_t|\YY_t=\yy_t$ is 0.
 <<label=Cs308_obs-filtering>>=
 var.EytT_fit <- 
   fitted(fit_marss, type="ytT", interval="confidence")$.se^2
@@ -231,6 +224,8 @@ var.EytT_hatyt <-
 cbind(V_mu=f_kfas$V_mu[1:n], fitted=var.EytT_fit[1:n], 
       MARSShatyt=var.EytT_hatyt[1:n])
 @
+
+\end{itemize}
 
 
 \subsection{Confidence and prediction intervals}
