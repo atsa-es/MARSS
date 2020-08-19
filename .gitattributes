@@ -19,5 +19,5 @@ vignettes/tex export-ignore
 vignettes/figures export-ignore
 vignettes/manual_files export-ignore
 vignettes/debugger_template.Rnw export-ignore
-inst/WORDLIST
-man/MARSS_out.Rd
+inst/WORDLIST export-ignore
+man/MARSS_out.Rd export-ignore
