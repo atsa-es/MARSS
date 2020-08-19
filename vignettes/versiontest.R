@@ -51,7 +51,7 @@ MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
 MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
 MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
 
-file <- paste("AR2SS", TT, ".RData", sep = "")
+file <- "AR2SS100.RData"
 if (file %in% dir("./manual_files")) {
   load(paste("./manual_files/", file, sep = ""))
   sims.exist <- TRUE
