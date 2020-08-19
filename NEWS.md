@@ -4,21 +4,12 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
+New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.2 and issues to be addressed in that release are marked with 3.11.2 milestone.
 
 
-Status
------------------------------------
-
-8-18
-
-* check manual
-* versiontest.R
-* CRAN checks
-    
-MARSS 3.11.1 (resids_update for CRAN)
+MARSS 3.11.1
 ------------------------------------
-Version 3.11.1 is focused on the `predict`, `fitted` and `residuals` functions and documentation. Most of the `predict` changes are listed below for 3.10.13 release on GitHub.
+Version 3.11.1 is focused on addition of the `predict`, `forecast`, `fitted` and `residuals` functions along with plotting functions for the output. Documentation for these functions along with background literature and the derivation of the Residuals algorithms have been updated. Residuals in state-space models are complex as there are two processes (observation and state), three types of conditioning (data to t-1, t or T), and four types of standardization used in the literature (none, marginal, Cholesky on the full variance matrix, and Cholesky on only model or state residual variance). The MARSS package computes all the variants of residuals. Many of the `predict` changes are listed below for 3.10.13 release on GitHub. New chapters illustrating structural equation models using MARSS versus `StructTS` and the KFAS package were added. The KFAS chapter compares the residuals to the MARSS. The two packages use different algorithms to compute the same residuals.
 
 
 ENHANCEMENTS
