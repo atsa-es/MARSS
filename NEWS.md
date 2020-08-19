@@ -7,7 +7,7 @@ MARSS Development site
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.2 and issues to be addressed in that release are marked with 3.11.2 milestone.
 
 
-MARSS 3.11.1
+MARSS 3.11.1 (released 2020-08-18 on GitHub)
 ------------------------------------
 Version 3.11.1 is focused on addition of the `predict`, `forecast`, `fitted` and `residuals` functions along with plotting functions for the output. Documentation for these functions along with background literature and the derivation of the Residuals algorithms have been updated. Residuals in state-space models are complex as there are two processes (observation and state), three types of conditioning (data to t-1, t or T), and four types of standardization used in the literature (none, marginal, Cholesky on the full variance matrix, and Cholesky on only model or state residual variance). The MARSS package computes all the variants of residuals. Many of the `predict` changes are listed below for 3.10.13 release on GitHub. New chapters illustrating structural equation models using MARSS versus `StructTS` and the KFAS package were added. The KFAS chapter compares the residuals to the MARSS. The two packages use different algorithms to compute the same residuals.
 
@@ -32,7 +32,7 @@ BUGS
 * `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were a message instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
 * `MARSSkfas()` had bug on the line where `V0T` was computed when `tinitx=0`. It was using `*` instead of `%*%` for the last `J0` multiplication. It would affect models with a non-zero `V0` under certain `B` matrices, such as structural models fit by `StructTS()`.
-* The following bug was in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`. This caused `residuals()` to fail if `trace=2`.
+* The following bug was in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` but was in the old `residuals.marssMLE()` also. If MLE object had the `kf` element, `kf` was not assigned in code since there was no `kf <- MLEobj$kf` line for that case. Normally MLE objects do not have the `kf` element, but it could be added or is added for some settings of `control$trace`. This caused `residuals()` to fail if `trace=2`.
 
 DOCUMENTATION and MAN FILES
 
