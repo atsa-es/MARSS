@@ -403,7 +403,7 @@ kemz.3 <- MARSS(dat.z, model = dfa.model, control = cntl.list)
 @
 <<load_results_if_present, results=hide, echo=FALSE>>=
 # This is being done to speed up building the user guide
-file <- "CS4--model.fits.Rdata"
+file <- "CS4--model_fits.RData"
 if (file %in% dir(file.path(here::here(), "vignettes/manual_files"))) {
   load(file.path(here::here(), "vignettes/manual_files", file))
   saved.res <- TRUE
@@ -859,7 +859,7 @@ if (!saved.res) {
 
 
 <<save_results, results=hide, eval=TRUE, echo=FALSE>>=
-file <- paste(Sys.getenv("TEMP"), "\\CS4--model.fits.Rdata", sep = "")
+file <- paste(Sys.getenv("TEMP"), "\\CS4--model_fits.RData", sep = "")
 save(file = file, list = c("model.data", ls(pattern = "^kemz.")))
 @
 
