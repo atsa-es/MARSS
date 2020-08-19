@@ -7,12 +7,13 @@
   Provides Kalman filter and smoother output for MARSS models with (or without) time-varying parameters. \code{MARSSkf()} is a small helper function to select which Kalman filter/smoother function to use based on the value in \code{MLEobj$fun.kf}.  The choices are \code{MARSSkfas} which uses the filtering and smoothing algorithms in the \link[KFAS]{KFAS} package based on algorithms in Koopman and Durbin (2001-2003), and \code{MARSSkfss()} which uses the algorithms in Shumway and Stoffer. The default function is \code{MARSSkfas()} which is faster and generally more stable (fewer matrix inversions), but there are some cases where \code{MARSSkfss()} will be more stable and \code{MARSSkfss()} returns some values that \code{MARSSkfas()} does not.
 }
 \usage{
-MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, newdata=NULL)
+MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, 
+           newdata=NULL)
 MARSSkfss(MLEobj)
 MARSSkfas(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE)
 }
 \arguments{
-  \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specificitions.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}
+  \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specifications.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}
   \item{ only.logLik }{ Used by \code{MARSSkfas}.  If set, only the log-likelihood is returned using the \link[KFAS]{KFAS} package function \code{\link[KFAS]{logLik.SSModel}}.  This is much faster if only the log-likelihood is needed. }
   \item{ return.lag.one }{ Used by \code{MARSSkfas}.  If set to FALSE, the smoothed lag-one covariance  values are not returned (Vtt1T is set to NULL).  This speeds up \code{MARSSkfas} because to return the smoothed lag-one covariance a stacked MARSS model is used with twice the number of state vectors---thus the state matrices are larger and take more time to work with. }
   \item{ return.kfas.model }{ Used by \code{MARSSkfas}.  If set to TRUE, it returns the MARSS model in \link[KFAS]{KFAS} model form (class \code{\link[KFAS]{SSModel}}).  This is useful if you want to use other KFAS functions or write your own functions to work with \code{\link{optim}} to do optimization.  This can speed things up since there is a bit of code overhead in \code{\link{MARSSoptim}} associated with the \code{\link{marssMODEL}} model specification needed for the constrained EM algorithm (but not strictly needed for \code{\link{optim}}; useful but not required.). }
@@ -32,8 +33,8 @@ The likelihood returned for both functions is the exact likelihood when there ar
 \value{
 A list with the following components (m is the number of state processes). "V" elements are called "P" in Shumway and Stoffer (S&S eqn 6.17 with s=T).  The output is referenced against equations in Shumway and Stoffer (2006); the Kalman filter and smoother implemented in MARSS is for a more general MARSS model than that shown in S&S but the output has the same meaning.  In the expectations below, the parameters are left off, so E[x | y] is really E[x | theta, y] where theta is the parameter list.
   \item{xtT}{ State first moment conditioned on y(1:T): E[x(t) | y(1:T)] (m x T matrix). Kalman smoother output.}
-  \item{VtT}{ State variance conditioned on y(1:T): E[(x(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)] (m x m x T array). Kalman smoother output. P_t^T in S&S (S&S eqn 6.18 with s=T, t1=t2=t). State second moment E[x(t)x(t)'| y(1:T)] = VtT(t)+xtT(t)xtT(t)'}
-  \item{Vtt1T}{ State lag-one covariance E[(x(t)-xtT(t))(x(t-1)-xtT(t-1))' | y(1:T)] (m x m x T). Kalman smoother output. P_{t,t-1}^T in S&S (S&S eqn 6.18 with s=T, t1=t, t2=t-1). State lag-one second moments E[x(t)x(t-1)'| y(1:T)] = Vtt1T(t)+xtT(t)xtT(t-1)'. }
+  \item{VtT}{ State variance matrix conditioned on y(1:T): E[(x(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)] (m x m x T array). Kalman smoother output. P_t^T in S&S (S&S eqn 6.18 with s=T, t1=t2=t). State second moment E[x(t)x(t)'| y(1:T)] = VtT(t)+xtT(t)xtT(t)'}
+  \item{Vtt1T}{ State lag-one cross-covariance matrix E[(x(t)-xtT(t))(x(t-1)-xtT(t-1))' | y(1:T)] (m x m x T). Kalman smoother output. P_{t,t-1}^T in S&S (S&S eqn 6.18 with s=T, t1=t, t2=t-1). State lag-one second moments E[x(t)x(t-1)'| y(1:T)] = Vtt1T(t)+xtT(t)xtT(t-1)'. }
   \item{x0T}{ Initial state estimate E[x(i) | y(1:T)] (m x 1). If control$kf.x0="x00", i=0; if ="x10", i=1. Kalman smoother output.}
   \item{V0T}{ Estimate of initial state covariance matrix E[x(i)x(i)' | y(1:T)] (m x m). If model$tinitx=0, i=0; if =1, i=1.  Kalman smoother output. P_0^T in S&S.}
   \item{J}{ (m x m x T) Kalman smoother output.  Only for \code{MARSSkfss}. (ref S&S eqn 6.49)}
@@ -61,7 +62,7 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \code{R
 
 Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. \code{http://CRAN.R-project.org/package=KFAS}
   
-Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Assosiation, 92, 1630-38.
+Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Association, 92, 1630-38.
 
 Koopman, S.J. and Durbin J. (2001). Time series analysis by state space methods. Oxford: Oxford University Press.
 
@@ -81,13 +82,13 @@ The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) An
 \examples{
 dat <- t(harborSeal)
 dat <- dat[2:nrow(dat), ]
-# you can use MARSS to construct a MLEobj
+# you can use MARSS to construct a marssMLE object
 # MARSS calls MARSSinits to construct default initial values
-# with fit = FALSE, the $par element of MLEobj will be NULL
-MLEobj <- MARSS(dat, fit = FALSE)
-# MARSSkf needs a marss MLE object with the par element set
-MLEobj$par <- MLEobj$start
+# with fit = FALSE, the $par element of the marssMLE object will be NULL
+fit <- MARSS(dat, fit = FALSE)
+# MARSSkf needs a marssMLE object with the par element set
+fit$par <- fit$start
 # Compute the kf output at the params used for the inits
-kfList <- MARSSkf(MLEobj)
+kfList <- MARSSkf(fit)
 }
 

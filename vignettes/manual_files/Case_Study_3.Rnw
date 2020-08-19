@@ -96,7 +96,7 @@ The $\ZZ$ matrices specify the relationship between the survey regions and the s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-To tell MARSS() the form of $\ZZ$, we construct the same matrix in R.  For example, for hypotheses 1, we can write:
+To tell \verb@MARSS()@ the form of $\ZZ$, we construct the same matrix in R.  For example, for hypotheses 1, we can write:
 <<Z.model, keep.source=TRUE>>=
 Z.model=matrix(0,11,3)
 Z.model[c(1,2,9,10),1]=1  #which elements in col 1 are 1
@@ -136,7 +136,7 @@ q_1&0&0\\
 0&0&q_3
 \end{bmatrix}
 $$
-This matrix has fixed numeric values, the zeros, combined with symbols $q_1$, $q_2$ and $q_3$, representing estimated values.  We specified this for MARSS() using a list matrix which combines numeric values (the fixed zeros) with character values (names of the estimated elements).  The following produces this and printing it shows that it combines numeric values and character strings in quotes.
+This matrix has fixed numeric values, the zeros, combined with symbols $q_1$, $q_2$ and $q_3$, representing estimated values.  We specified this for \verb@MARSS()@ using a list matrix which combines numeric values (the fixed zeros) with character values (names of the estimated elements).  The following produces this and printing it shows that it combines numeric values and character strings in quotes.
 <<Q.model1, keep.source=TRUE>>=
 Q.model=matrix(list(0),3,3)
 diag(Q.model)=c("q1","q2","q3")
@@ -230,10 +230,12 @@ for(i in 1:length(Z.models)){
      fit.model = c(list(Z=Z.models[[i]], Q=Q.model), model.constant)
      fit = MARSS(sealData, model=fit.model,
             silent=TRUE, control=list(maxit=1000))
-    out=data.frame(H=names(Z.models)[i], Q=Q.model, U=U.model,
-            logLik=fit$logLik, AICc=fit$AICc, num.param=fit$num.params,
-            m=length(unique(Z.models[[i]])),
-            num.iter=fit$numIter, converged=!fit$convergence)
+    out=data.frame(
+          H=names(Z.models)[i], Q=Q.model, U=U.model,
+          logLik=fit$logLik, AICc=fit$AICc, num.param=fit$num.params,
+          m=length(unique(Z.models[[i]])),
+          num.iter=fit$numIter, converged=!fit$convergence,
+          stringsAsFactors = FALSE)
     out.tab=rbind(out.tab,out)
     fits=c(fits,list(fit))
     if(i==5) next #one m for panmictic so only run 1 Q
@@ -280,7 +282,7 @@ Figure \ref{fig:northsouth} shows the the four subpopulation trajectories estima
 \begin{center}
 <<Cs11_fignorthsouth,fig=TRUE,echo=FALSE,width=5,height=5>>=
 best.fit=fits[min.AICc][[1]]
-matplot(years, t(best.fit$states-best.fit$states[,1]), 
+graphics::matplot(years, t(best.fit$states-best.fit$states[,1]), 
         xlab="abundance index", ylab="",
         type="l",lwd=2,col="black")
 legend("topleft",c("North Coastal","Inland Straits","Puget Sound","South Coastal"),lwd=2,lty=c(1:4),bty="n")
@@ -328,7 +330,8 @@ for(i in 1:length(Z.models)){
        out=data.frame(H=names(Z.models)[i], Q=Q.model, U=U.model,
             logLik=fit$logLik, AICc=fit$AICc, num.param=fit$num.params,
             m=length(unique(Z.models[[i]])),
-            num.iter=fit$numIter, converged=!fit$convergence)
+            num.iter=fit$numIter, converged=!fit$convergence,
+            stringsAsFactors = FALSE)
        out.tab=rbind(out.tab,out)
        fits=c(fits,list(fit))
     }
@@ -428,7 +431,8 @@ for(i in 1:length(Z.models.hc)){
     out=data.frame(H=names(Z.models.hc)[i], Q=names(Q.models)[j], U=U.model,
             logLik=fit$logLik, AICc=fit$AICc, num.param=fit$num.params,
             m=length(unique(Z.models.hc[[i]])),
-            num.iter=fit$numIter, converged=!fit$convergence)
+            num.iter=fit$numIter, converged=!fit$convergence,
+            stringsAsFactors = FALSE)
     out.tab.hc=rbind(out.tab.hc, out)
     fits.hc=c(fits.hc,list(fit))
   }

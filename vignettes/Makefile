@@ -21,9 +21,12 @@ sweave:
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Setting_Inits.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/MARp.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Covariates.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Structural_TS.Rnw
+	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/KFAS.Rnw
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Manual.Rnw
 	 
 stangle: 
+	Rscript -e "Stangle('./manual_files/Quick_Examples.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_1.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_2.Rnw')"
 	Rscript -e "Stangle('./manual_files/Case_Study_3.Rnw')"
@@ -37,8 +40,11 @@ stangle:
 	Rscript -e "Stangle('./manual_files/Setting_Inits.Rnw')"
 	Rscript -e "Stangle('./manual_files/Covariates.Rnw')"
 	Rscript -e "Stangle('./manual_files/MARp.Rnw')"
+	Rscript -e "Stangle('./manual_files/Structural_TS.Rnw')"
+	Rscript -e "Stangle('./manual_files/KFAS.Rnw')"
 
 makeRfiles:
+	cat ./figures/QE--Cs*.R > ../inst/doc/Quick_Examples.R
 	cat ./figures/CS1--Cs1_*.R > ../inst/doc/Chapter_PVA.R
 	cat ./figures/CS2--Cs2_*.R > ../inst/doc/Chapter_SealTrend.R
 	cat ./figures/CS3--Cs*_*.R > ../inst/doc/Chapter_SealPopStructure.R
@@ -52,6 +58,8 @@ makeRfiles:
 	cat ./figures/MLR--Cs_*.R > ../inst/doc/Chapter_MLR.R
 	cat ./figures/MCI--Cs_mci_*.R > ../inst/doc/Chapter_inits.R
 	cat ./figures/ARMAp--Cs_*.R > ../inst/doc/Chapter_MARp.R
+	cat ./figures/STS--Cs*.R > ../inst/doc/Chapter_Structural_TS.R
+	cat ./figures/KFAS--Cs*.R > ../inst/doc/Chapter_KFAS.R
 
 pdf:	
 	pdflatex EMDerivation.tex
@@ -86,10 +94,12 @@ clean:
 	$(RM) ./figures/*.*
 	$(RM) ./manual_files/*.*
 	$(RM) debug_manual.R debugger_template.Rnw
+	cat ./index.html > ../inst/doc/index.html
+	$(RM) ./index.html
 	rm -rf ./manual_files
 	rm -rf ./tex
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
-	$(RM) ../R/predict_marssMLE.R ../man/predict_marssMLE.Rd ../man/MARSS_out.Rd
+	$(RM) ../man/MARSS_out.Rd
 	

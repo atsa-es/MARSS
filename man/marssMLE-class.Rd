@@ -13,7 +13,7 @@
 \description{
 \code{\link{marssMLE}} objects specify fitted multivariate autoregressive state-space models (maximum-likelihood) in the package \code{\link{MARSS-package}}.
 
-  A marssMLE object in the  \code{\link{MARSS-package}} that has all the elements needed for maximum-likelihood estimation of multivariate autoregressive state-space model: the data, model, estimation methods, and any control options needed for the method.  If the model has been fit and parameters estimated, the object will also have the MLE parameters.  Other functions add other elements to the marssMLE object, such as CIs, s.e.'s, AICs, and the observed Fisher Information matrix. There are print, summary, coef, residuals, predict and simulate methods for \code{\link{marssMLE}} objects and a bootstrap function.  Rather than working directly with the elements of a \code{\link{marssMLE}} object, use \code{\link{print.marssMLE}}, \code{\link{tidy.marssMLE}}, or \code{\link{augment.marssMLE}} to extract output.
+  A marssMLE object in the  \code{\link{MARSS-package}} that has all the elements needed for maximum-likelihood estimation of multivariate autoregressive state-space model: the data, model, estimation methods, and any control options needed for the method.  If the model has been fit and parameters estimated, the object will also have the MLE parameters.  Other functions add other elements to the marssMLE object, such as CIs, s.e.'s, AICs, and the observed Fisher Information matrix. There are print, summary, coef, fitted, residuals, predict and simulate methods for \code{\link{marssMLE}} objects and a bootstrap function.  Rather than working directly with the elements of a \code{\link{marssMLE}} object, use \code{\link[=print.marssMLE]{print}()}, \code{\link[=tidy.marssMLE]{tidy}()}, \code{\link[=fitted.marssMLE]{fitted}()}, \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}, \code{\link[=predict.marssMLE]{predict}()}, or \code{\link[=residuals.marssMLE]{residuals}()} to extract output.
   }
 
 \section{Methods}{
@@ -22,6 +22,8 @@
     \item{summary}{\code{signature(object = "marssMLE")}: ... }
     \item{coef}{\code{signature(object = "marssMLE")}: ... }
     \item{predict}{\code{signature(object = "marssMLE")}: ... }
+    \item{fitted}{\code{signature(object = "marssMLE")}: ... }
+    \item{logLik}{\code{signature(object = "marssMLE")}: ... }
     \item{simulate}{\code{signature(object = "marssMLE")}: ... }
 	 }
 }

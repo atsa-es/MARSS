@@ -1,11 +1,11 @@
 ###############################################################################################################################################
-#  fitted method for class marssMLE.
+#  fitted method for marssMLE objects; expected value of rhs minus error term
 ##############################################################################################################################################
 fitted.marssMLE <- function(object, ...,
-                            type = c("ytT", "xtT", "ytt", "ytt1", "xtt1"),
+                            type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
-                            conf.level = 0.95,
-                            output = c("tibble", "matrix")) {
+                            level = 0.95,
+                            output = c("data.frame", "matrix")) {
   type <- match.arg(type)
   output <- match.arg(output)
   interval <- match.arg(interval)
@@ -15,21 +15,16 @@ fitted.marssMLE <- function(object, ...,
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
-  if (interval != "none" && (!is.numeric(conf.level) || length(conf.level) != 1 || conf.level > 1 || conf.level < 0))
-    stop("fitted.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
-  alpha <- 1-conf.level
-  extras <- list()
-  if (!missing(...)) {
-    extras <- list(...)
-    if ("one.step.ahead" %in% names(extras)) stop("fitted.marssMLE: Use type='ytt1' or 'xtt1' instead of one.step.ahead=TRUE.", call. = FALSE)
-  }
+  if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0))
+    stop("fitted.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
+  alpha <- 1-level
 
   # need the model dims in marss form with c in U and d in A
   model.dims <- attr(MLEobj[["marss"]], "model.dims")
   TT <- model.dims[["x"]][2]
   n <- model.dims[["y"]][1]
   m <- model.dims[["x"]][1]
-
+  
   if (type == "y") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
@@ -42,14 +37,17 @@ fitted.marssMLE <- function(object, ...,
     Z.time.varying <- model.dims[["Z"]][3] != 1
     A.time.varying <- model.dims[["A"]][3] != 1
     R.time.varying <- model.dims[["R"]][3] != 1
+    H.time.varying <- model.dims[["H"]][3] != 1
     
     val <- matrix(NA, n, TT)
     rownames(val) <- attr(MLEobj$marss, "Y.names")
     if(interval!="none") se <- val
-
+    
     Zt <- parmat(MLEobj, "Z", t = 1)$Z
     At <- parmat(MLEobj, "A", t = 1)$A
     Rt <- parmat(MLEobj, "R", t = 1)$R
+    Ht <- parmat(MLEobj, "H", t = 1)$H
+    Rt <- Ht %*%  tcrossprod(Rt, Ht)
     
     for (t in 1:TT) {
       # parmat returns marss form
@@ -60,12 +58,14 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt))
       if(interval=="prediction"){
         if (R.time.varying) Rt <- parmat(MLEobj, "R", t = t)$R
+        if (H.time.varying) Ht <- parmat(MLEobj, "H", t = t)$H
+        if (R.time.varying | H.time.varying) Rt <- Ht %*% tcrossprod(Rt, Ht)
         se[, t] <- takediag(Zt %*% tcrossprod( hatVt[, , t], Zt) + Rt)
       }
     }
     
     # Set up output
-    if(output=="tibble"){
+    if(output=="data.frame"){
       data.names <- attr(MLEobj[["model"]], "Y.names")
       data.dims <- attr(MLEobj[["model"]], "model.dims")[["y"]]
       nn <- data.dims[1]
@@ -73,12 +73,13 @@ fitted.marssMLE <- function(object, ...,
       ret <- data.frame(
         .rownames = rep(data.names, each = TT),
         t = rep(1:TT, nn),
-        y = vec(t(MLEobj[["model"]]$data))
+        y = vec(t(MLEobj[["model"]]$data)),
+        stringsAsFactors = FALSE
       )
     }
     
   }
-
+  
   if (type == "x") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
@@ -90,6 +91,7 @@ fitted.marssMLE <- function(object, ...,
     B.time.varying <- model.dims[["B"]][3] != 1
     U.time.varying <- model.dims[["U"]][3] != 1
     Q.time.varying <- model.dims[["Q"]][3] != 1
+    G.time.varying <- model.dims[["G"]][3] != 1
     
     val <- matrix(NA, m, TT)
     rownames(val) <- attr(MLEobj[["marss"]], "X.names")
@@ -100,6 +102,9 @@ fitted.marssMLE <- function(object, ...,
     Bt <- parmat(MLEobj, "B", t = 1)[["B"]]
     Ut <- parmat(MLEobj, "U", t = 1)[["U"]]
     Qt <- parmat(MLEobj, "Q", t = 1)[["Q"]]
+    Gt <- parmat(MLEobj, "G", t = 1)[["G"]]
+    Qt <- Gt %*% tcrossprod(Qt, Gt)
+    
     if (MLEobj$model$tinitx == 0){
       val[, 1] <- Bt %*% x0 + Ut
       if (interval=="confidence") se[, 1] <- takediag(Bt %*% tcrossprod(V0, Bt))
@@ -117,22 +122,25 @@ fitted.marssMLE <- function(object, ...,
         se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt))
       if (interval=="prediction"){
         if (Q.time.varying) Qt <- parmat(MLEobj, "Q", t = t)[["Q"]]
+        if (G.time.varying) Gt <- parmat(MLEobj, "G", t = t)[["G"]]
+        if (Q.time.varying | G.time.varying) Qt <- Gt %*% tcrossprod(Qt, Gt)
         se[, t] <- takediag(Bt %*% tcrossprod( hatVt[, ,t-1], Bt) + Qt)
       } 
     }
     
     # Set up output
-    if(output=="tibble"){
-    state.names <- attr(MLEobj[["model"]], "X.names")
-    state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
-    mm <- state.dims[1]
-    TT <- state.dims[2]
-    
-    ret <- data.frame(
-      .rownames = rep(state.names, each = TT),
-      t = rep(1:TT, mm),
-      xtT = vec(t(MLEobj[["states"]]))
-    )
+    if(output=="data.frame"){
+      state.names <- attr(MLEobj[["model"]], "X.names")
+      state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
+      mm <- state.dims[1]
+      TT <- state.dims[2]
+      
+      ret <- data.frame(
+          .rownames = rep(state.names, each = TT),
+          t = rep(1:TT, mm),
+          .x = vec(t(hatxt)),
+          stringsAsFactors = FALSE
+        )
     }
   }
   
@@ -144,31 +152,21 @@ fitted.marssMLE <- function(object, ...,
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
     retlist <- list(
-        .fitted = val, 
-        .se.fit = se,
-        .conf.low = val + qnorm(alpha/2) * se,
-        .conf.up = val + qnorm(1- alpha/2) * se
+      .fitted = val, 
+      .se = se,
+      .conf.low = val + qnorm(alpha/2) * se,
+      .conf.up = val + qnorm(1- alpha/2) * se
     )
   }
   if (interval=="prediction"){
     se[se<0 & abs(se)<sqrt(.Machine$double.eps)] <- 0
     se <- sqrt(se) # was not sqrt earlier
-    if (type == "x"){
       retlist <-list(
-      .fitted = val, 
-      .sd.x = se, 
-      .lwr = val + qnorm(alpha/2) * se,
-      .upr = val + qnorm(1- alpha/2) * se
-    )
-    }
-  if (type == "y"){
-    retlist <- list(
-      .fitted=val,
-      .sd.y=se,
-      .lwr = val + qnorm(alpha/2) * se,
-      .upr = val + qnorm(1- alpha/2) * se
-    )
-  }
+        .fitted = val, 
+        .sd = se, 
+        .lwr = val + qnorm(alpha/2) * se,
+        .upr = val + qnorm(1- alpha/2) * se
+      )
   }
   if(output=="matrix") return(retlist)
   return(cbind(ret, as.data.frame(lapply(retlist, function(x){vec(t(x))}))))

@@ -7,7 +7,7 @@
 \description{
 \code{marssPredict} objects are returned by \code{\link{predict.marssMLE}} and \code{\link{forecast.marssMLE}}.
 
-  A marssPredict object in the  \code{\link{MARSS-package}} has the tibble output with intervals, the original model and values needed for plotting. The object is mainly used for \code{\link{plot.marssPredict}} and \code{\link{print.marssPredict}}.
+  A marssPredict object in the  \code{\link{MARSS-package}} has the output with intervals, the original model and values needed for plotting. The object is mainly used for \code{\link{plot.marssPredict}} and \code{\link{print.marssPredict}}.
   }
 
 \section{Methods}{

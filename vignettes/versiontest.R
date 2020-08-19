@@ -4,7 +4,7 @@
 # Install one version of MARSS into the base R library R_HOME
 # Install a second version into the local R library R_LIBS_USER
 # RStudio will use R_LIBS_USER if it exists.  It does not by default so
-#  you might have to create this folder to hav a local library.
+#  you might have to create this folder to have a local library.
 #  look at Sys.getenv("R_LIBS_USER"). Click Install under Packages tab and see
 #  where it is installing
 # Open the unit test.R file
@@ -24,15 +24,16 @@ if(Sys.info()['sysname']=="Windows"){
   lib.new <- "C:/Program Files/R/R-3.6.2/library"
 }
 if(Sys.info()['sysname']=="Darwin"){
-  setwd("~/Dropbox/MARSS unit tests 2019")
+  setwd("~/Dropbox/MARSS unit tests 2020")
   lib.new <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
 }
 lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
-# Mac: install.packages("~/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
-# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.old, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.1.tar.gz", lib=lib.new, repos=NULL)
+# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
@@ -44,12 +45,24 @@ unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/
 unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.new)
-zscore.fun = zscore #3.9 does not have this
+#zscore.fun = zscore #3.9 does not have this
+MARSSresiduals.fun = MARSSresiduals
+MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
+MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
+MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
+
+file <- "AR2SS100.RData"
+if (file %in% dir("./manual_files")) {
+  load(paste("./manual_files/", file, sep = ""))
+  sims.exist <- TRUE
+} else {
+  sims.exist <- FALSE
+}
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
   #clean the workspace but keep objects needed for the unit test
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun"))])
   #set up name for log files
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
@@ -78,11 +91,17 @@ unittestvrs
 library(MARSS, lib.loc = lib.old)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun", "MARSSresiduals_tt.fun"))])
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
   if(!exists("zscore")){zscore=zscore.fun}
+#  if(!exists("MARSSresiduals")){
+    MARSSresiduals = MARSSresiduals.fun
+    MARSSresiduals.tT = MARSSresiduals_tT.fun
+    MARSSresiduals.tt1 = MARSSresiduals_tt1.fun
+    MARSSresiduals.tt = MARSSresiduals_tt.fun
+#  }
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
@@ -112,15 +131,17 @@ for(unittestfile in unittestfiles){
   #Compare the lists and report any differences
   cat("Checking ", tag, "\n")
   if(!identical(names(testNew), names(testOld))){
-    cat("ERROR: Names of the test lists not identical\n\n")
+    cat("ERROR: Names of the test lists not identical\n")
+    cat("testNew has these not in testOld", setdiff(names(testNew), names(testOld)), "\n")
+    cat("testOld has these not in testNew", setdiff(names(testOld), names(testNew)), "\n\n")
     next
   }
   good=rep(TRUE,length(names(testNew)))
   for(ii in 1:length(names(testNew))){
     if(inherits(testNew[[ii]], "marssMLE")){
       for(kk in c("model", "marss")){
-      attr(testNew[[ii]][[kk]], "equation") <- NULL
-      attr(testOld[[ii]][[kk]], "equation") <- NULL
+        attr(testNew[[ii]][[kk]], "equation") <- NULL
+        attr(testOld[[ii]][[kk]], "equation") <- NULL
       }
       if(inherits(testNew[[ii]]$call$inits, "marssMLE")){
         for(kk in c("model", "marss")){
@@ -130,8 +151,8 @@ for(unittestfile in unittestfiles){
       }
     }
     if(inherits(testNew[[ii]], "marssMODEL")){
-        attr(testNew[[ii]], "equation") <- NULL
-        attr(testOld[[ii]], "equation") <- NULL
+      attr(testNew[[ii]], "equation") <- NULL
+      attr(testOld[[ii]], "equation") <- NULL
     }
     if(inherits(testNew[[ii]], "list")){
       for(iii in 1:length(testNew[[ii]])){
@@ -179,6 +200,16 @@ for(unittestfile in unittestfiles){
           }
         }
       }
+      if(inherits(testNew[[ii]], "matrix") || inherits(testNew[[ii]], "array")){
+        if(!identical(dim(testNew[[ii]]), dim(testOld[[ii]]))){
+          cat("Warning: dims of", names(testNew)[ii], "not identical\n")
+          next
+        }
+        if(!all((testNew[[ii]]-testOld[[ii]])<sqrt(.Machine$double.eps)))
+          cat("Warning: values in", names(testNew)[ii], "not identical\n")
+        if(!identical(rownames(testNew[[ii]]), rownames(testOld[[ii]])))
+          cat("Warning: rownames of", names(testNew)[ii], "not identical\n")
+      }
       if(inherits(testNew[[ii]], "list")){
         for(kk in 1:length(testNew[[ii]])){
           if(inherits(testNew[[ii]][[kk]], "marssMLE")){
@@ -205,7 +236,17 @@ for(unittestfile in unittestfiles){
               }
             }
           }
-          
+          if(inherits(testNew[[ii]][[kk]], "matrix") || inherits(testNew[[ii]][[kk]], "array")){
+            if(!identical(dim(testNew[[ii]][[kk]]), dim(testOld[[ii]][[kk]]))){
+              cat("Warning: dims of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+              next
+            }
+            if(!all((testNew[[ii]][[kk]]-testOld[[ii]][[kk]])<sqrt(.Machine$double.eps)))
+              cat("Warning: values in", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+            if(!identical(rownames(testNew[[ii]][[kk]]), rownames(testOld[[ii]][[kk]])))
+              cat("Warning: rownames of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+            
+          }
         }
       }
     }

@@ -14,7 +14,7 @@
   \item{...}{ Other arguments for print. }
   \item{what}{ What to print.  Default is "fit".  If you input what as a vector, print returns a list. See examples.
   \itemize{
-    \item{ "model"}{ The model parameters with names for the estimted parameters.  The output is customized by the form of the model that was fit.  This info is in \code{ attr(x$model, "form") }. }
+    \item{ "model"}{ The model parameters with names for the estimated parameters.  The output is customized by the form of the model that was fit.  This info is in \code{ attr(x$model, "form") }. }
     \item{ "par" }{ A list of only the estimated values in each matrix. Each model matrix has it's own list element. Standard function: \code{coef(x)}}
     \item{ "start" or "inits" }{ The values that the optimization algorithm was started at. Note, \code{x$start} shows this in form="marss" while \code{print} shows it in whatever form is in \code{ attr(x$model, "form") }.}
     \item{ "paramvector" }{ A vector of all the estimated values in each matrix. Standard function: \code{coef(x, type="vector")}.  See \code{\link{coef.marssMLE}}.}
@@ -25,8 +25,8 @@
     \item{ "ytT" }{ The expected value of the data conditioned on all the data.  Returns the data if present and the expected value if missing. This is in \code{x$ytT} (ytT is analogous to xtT).}
     \item{ "states.se" }{ The state standard errors. \code{x$states.se} }
     \item{ "states.cis" }{ Approximate confidence intervals for the states. See \code{\link{MARSSparamCIs}}.}
-    \item{ "model.residuals" }{ The smoothed model residuals. y(t)-E(y(t)|xtT(t)), aka actual data at time t minus the expected value of the data conditioned on the smoothed states estimate at time t. Standard function: \code{residuals(x)$model.residuals}}  See \code{\link{residuals.marssMLE}} for a discussion of residuals in the context of MARSS models.
-    \item{ "state.residuals" }{ The smoothed state residuals. E(xtT(t))-E(x(t)|xtT(t-1)), aka the expected value of x at t conditioned on all the data minus the expected value of x at t conditioned on (x(t-1) conditioned on all the data). Standard function: \code{residuals(x)$state.residuals}}  See \code{\link{residuals.marssMLE}}.
+    \item{ "model.residuals" }{ The one-step ahead model residuals or innovations. y(t)-E(y(t)|y(1:t-1)), aka actual data at time t minus the expected value of the data conditioned on the data from 1 to t-1. Standard function: \code{residuals(x, type="tt1")}  See \code{\link{MARSSresiduals}} for a discussion of residuals in the context of MARSS models.}
+    \item{ "state.residuals" }{ The smoothed state residuals. E(xtT(t))-E(x(t)|xtT(t-1)), aka the expected value of x at t conditioned on all the data minus the expected value of x at t conditioned on (x(t-1) conditioned on all the data). Standard function: \code{residuals(x, type="tT")}  See \code{\link{MARSSresiduals}}.}
     \item{ parameter name }{ Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Standard function: \code{coef(x, type="matrix")$elem} }
     \item{ "kfs" }{ The Kalman filter and smoother output.  See \code{\link{MARSSkf}} for a description of the output. The full kf output is not normally attached to the output from a \code{\link{MARSS}()} call.  This will run the filter/smoother if needed and return the list INVISIBLY.  So assign the output as \code{foo=print(x,what="kfs")}}
     \item{ "Ey" }{ The expectations involving y conditioned on all the data.  See \code{\link{MARSShatyt}} for a discussion of these expectations.  This output is not normally attached to the output from a \code{\link{MARSS}()} call--except \code{ytT} which is the predicted value of any missing y. The list is returned INVISIBLY.  So assign the output as \code{foo=print(x,what="Ey")}.}

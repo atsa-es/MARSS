@@ -26,7 +26,7 @@ Each model parameter matrix, $\BB_t$, $\UU_t$, $\QQ_t$, $\ZZ_t$, $\AA_t$, and $\
 \vec(\pipi)= \ff_\pi+\DD_\pi\pp
 \end{gather*}
 
-The internal MARSS model specification (element \verb@$marss@ in a fitted marssMLE object output by a MARSS() call) is a list with the $\ff_t$ (``fixed") and $\DD_t$ (``free") matrices for each parameter.   
+The internal MARSS model specification (element \verb@$marss@ in a fitted marssMLE object output by a \verb@MARSS()@ call) is a list with the $\ff_t$ (``fixed") and $\DD_t$ (``free") matrices for each parameter.   
 The output from fitting are the vectors, $\bbeta$, $\uupsilon$, etc.  The trick is to rewrite the user's linear multivariate problem into the general form (Equation \ref{qeq:MARSS.ex.vec}).  MARSS does this using functions that take more familiar arguments as input and then constructs the $\ff_t$ and $\DD_t$ matrices.  Because the $\ff_t$ and $\DD_t$ can be whatever the user wants (assuming they are the right shape), this allows users to include covariates, trends (linear, sinusoidal, etc) or indicator variables in a variety of ways.  It also means that terms like $1+b+2c$ can appear in the parameter matrices.
   
 Although the above form looks unusual, it is equivalent to the commonly seen form but leads to a log-likelihood function where all terms have form 

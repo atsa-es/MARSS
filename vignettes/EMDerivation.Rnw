@@ -375,7 +375,7 @@ $\partial(\aa^\top\DD\bb)/\partial\vec(\DD) = \partial(\bb^\top\DD^\top\aa)/\par
 &\\
 \\
 \refstepcounter{equation}\label{eq:derivlogDet}
-$\CC$ is invertable.& \multirow{6}{*}{(\theequation)} \\
+$\CC$ is invertible.& \multirow{6}{*}{(\theequation)} \\
 $\partial(\log |\CC|)/\partial\CC = -\partial(\log |\CC^{-1}|)/\partial\CC=(\CC^\top)^{-1} = \CC^{-\top}$\\
 $\partial(\log |\CC|)/\partial\vec(\CC) = \big(\vec(\CC^{-\top})\big)^\top$& \\
 If $\CC$ is also symmetric and $\BB$ is not a function of $\CC$.& \\

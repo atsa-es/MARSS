@@ -1,110 +1,119 @@
 \name{residuals.marssMLE}
 \alias{residuals.marssMLE}
 
-\title{ MARSS Residuals }
-\description{
-  Calculates the residuals, residuals variance, and standardized residuals for both the one-step-ahead (conditioned on data up to t-1) and smoothed (conditioned on all the data) residuals.
-}
+\title{Model and state fitted values, residuals, and residual sigma}
 \usage{
-\method{residuals}{marssMLE}(object,..., conditioning=c("T", "t-1"), normalize=FALSE, silent=FALSE)
+\method{residuals}{marssMLE}(object, ..., 
+           type=c("tt1", "tT", "tt"),
+           standardization=c("Cholesky", "marginal", "Block.Cholesky"),
+           form=attr(object[["model"]], "form")[1],
+           clean=TRUE)
 }
 \arguments{
-  \item{object}{ An object of class \code{\link{marssMLE}}.}
-  \item{...}{ Additional arguments to be passed to the residuals functions. For conditioning="T", \code{Harvey=TRUE} can be passed into to use the Harvey et al (1998) algorithm. }
-  \item{conditioning}{ "T" for smoothed residuals and "t-1" for one-step-ahead residuals. }
-  \item{normalize}{ TRUE/FALSE }
-  \item{silent}{ If TRUE, do not print inversion warnings. }
+  \item{object}{a \code{\link{marssMLE}} object}
+  
+  \item{type}{\code{tt1} means innovations residuals. The fitted values are computed conditioned on the data up to \eqn{t-1}. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytt1"} or \code{type="xtt1"}. \code{tT} means smoothation residuals. the fitted values are computed conditioned on all the data. See \code{\link[=fitted.marssMLE]{fitted}} with \code{type="ytT"} or \code{type="xtT"}. \code{tt} means contemporaneous residuals. The fitted values are computed conditioned on the data up to \eqn{t}. In MARSS functions, estimates at time t conditioned on data 1 to \eqn{T} are denoted \code{tT}, conditioned on the data from 1 to \eqn{t-1} are denoted \code{tt1} and conditioned on data 1 to \eqn{t} are \code{tt}.}
+
+  \item{standardization}{"Cholesky" means it is standardized by the lower triangle of the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
+"marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. 
+"Block.Cholesky" means the model or state residuals are standardized by the lower triangle of the Cholesky transformation only their variance-covariance matrix. }
+
+  \item{form}{ For developers. Can be ignored. If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
+
+  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{.type=="state"}. }
+  
+  \item{...}{Not used.}
+
+}
+\description{
+\code{residuals.marssMLE} returns a data frame with fitted values, residuals, residual standard deviation (sigma), and standardized residuals. A residual is the difference between the "value" of the model (\eqn{\mathbf{y}}{y}) or  state (\eqn{\mathbf{x}}{x}) and the fitted value.  At time \eqn{t} (in the returned data frame), the model residuals are for time \eqn{t}. For the the state residuals, the residual is for the transition from \eqn{t} to \eqn{t+1} following the convention in Harvey, Koopman and Penzer (1998). For the the state innovation residuals, this means that \code{state.residual[,t]} is for the transition from \eqn{t} to \eqn{t+1} and is conditioned on data 1 to \eqn{t} while \code{model.residual[,t]} is is conditioned on data 1 to \eqn{t-1}. State innovation residuals are not normally used while state smoothation residuals are used in trend outlier analysis. If warnings are reported, use \code{attr(residuals(fit), "msg")} to retrieve the messages.
 }
 \value{
+A data frame with the following columns:
 
-\strong{Smoothed residuals}
-
-If \code{conditioning="T"}, a list with the following components  
-  \item{model.residuals}{ The smoothed model residuals (data minus model predicted values) as a n x T matrix. The residuals are conditioned on all the data and the set of model parameters.  Called the smoothations. This is different than the Kalman filter innovations which are conditioned on the data up to \eqn{t-1}.}
-  \item{state.residuals}{ The smoothed state residuals.}
-  \item{residuals}{ The residuals as a (n+m) x T matrix with \code{model.residuals} on top and \code{state.residuals} below. }
-  \item{var.residuals}{ The variance of the model residuals and state residuals as a (n+m) x (n+m) x T matrix with the model residuals variance in rows/columns 1 to n and state residuals variances in rows/columns n+1 to n+m. }
-  \item{std.residuals}{ The Cholesky standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
-  \item{mar.residuals}{ The marginal standardized residuals as a (n+m) x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
-    \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data. Returned as a n x T matrix.  For observed data, this will be the observed model residuals. For unobserved data, this will be 0 if \eqn{\mathbf{R}}{R} is diagonal but non-zero if \eqn{\mathbf{R}}{R} is non-diagonal. See \code{\link{MARSSresiduals.tT}}. }
-    \item{var.obs.residuals}{ The variance of the model residuals conditioned on the observed data. Returned as a n x n x T matrix.  For observed data, this will be 0. See \code{\link{MARSSresiduals.tT}}. }
-  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
-
-  
-\strong{One-step-ahead residuals}
-
-If \code{conditioning="t-1"}, a list with the following components  
-  \item{residuals}{ The model residuals (data minus model predicted values), as a n x T matrix. The residuals are conditioned on the data up to time \eqn{t-1} and the set of model parameters.  Called the innovations. Residuals associated with missing data will appear as NA. }
-  \item{var.residuals}{ The variance of the model residuals as a n x n x T matrix. }
-  \item{std.residuals}{ The Cholesky standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the Cholesky decomposition of \code{var.residuals}. }
-  \item{mar.residuals}{ The marginal standardized model residuals as a n x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}. }
-  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
+\item{.rownames}{Fitted values of observations or states. See details.}
+\item{type}{model or state}
+\item{t}{time step}
+\item{value}{The data value if type="model" or the x estimate if type="state". }
+\item{.fitted}{Model predicted values of observations or states. See details.}
+\item{.resids}{Model or states residuals. See details.}
+\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .fitted.}
+\item{.std.resids}{Standardized residuals. See \code{\link{MARSSresiduals}} for a discussion of residual standardization.}
 
 }
 \details{
 
-For smoothed residuals, see \code{\link{MARSSresiduals.tT}}.
+See \code{\link{MARSSresiduals}} for a discussion of the residuals calculations for MARSS models.
 
-For one-step-ahead residuals, see \code{\link{MARSSresiduals.tt1}}.
+\strong{model residuals}
 
-\strong{Standardized residuals}
+The model residuals are in the data frame with \code{.type="model"}.
 
-\code{std.residuals} are Cholesky standardized residuals. These are the residuals muliplied by the inverse of the Cholesky decomposition of the variance matrix of the residuals: 
-\deqn{ \hat{\Sigma}_t^{-1/2} \hat{\mathbf{v}}_t.}{ hatSigma_t^{-1/2} hatv_t.}
-These residuals are uncorrelated. 
+The model residuals are the familiar type of residuals, they are the difference between the data at time t and the predicted value at time t. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="tT"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{\mathbf{x}}{x} at time \eqn{t} (\code{xtT}).  If \code{type="tt1"}, the predicted value is the expected value of \eqn{y} conditioned on the data up to time \eqn{t-1}, i.e. is computed using the estimate of \eqn{x} at time t conditioned on the data up to time \eqn{t-1} (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
 
-The interpretation of the Cholesky standardized residuals is not straight-forward when the Q and R variance-covariance matrices are non-diagonal.  The residuals which were generated by a non-diagonal variance-covariance matrices are transformed into orthogonal residuals in MVN(0,I) space.  For example, if v is 2x2 correlated errors with variance-covariance matrix R. The transformed residuals (from this function) for the i-th row of v is a combination of the row 1 effect and the row 1 effect plus the row 2 effect.  So in this case, row 2 of the transformed residuals would not be regarded as solely the row 2 residual but rather how different row 2 is from row 1, relative to expected.  If the errors are highly correlated, then the Cholesky standardized residuals can look rather non-intuitive.
+The standard errors help visualize how well the model fits to the data.  See \code{\link[=fitted.marssMLE]{fitted}} for a discussion of the calculation of the model predictions for the observations.  The standardized smoothation residuals can be used for outlier detection.  See the references in \code{\link{MARSSresiduals}} and the chapter on shock detection in the MARSS User Guide.
 
-\code{mar.residuals} are the marginal standardized residuals. These are the residuals muliplied by the inverse of the diagonal matrix formed from the square-root of the diagonal of the variance matrix of the residuals: 
-\deqn{ \textrm{dg}(\hat{\Sigma}_t)^{-1/2} \hat{v}_t,}{ dg(hatSigma_t)^{-1/2} hatv_t,} where 'dg(A)' is the square matrix formed from the diagonal of A, aka \code{diag(diag(A))}. These residuals will be correlated if the variance matrix is non-diagonal. 
+\strong{state residuals}
 
-\strong{Normalized residuals}
+The state residuals are in the data frame with \code{.type="state"}.
 
-If \code{normalize=FALSE}, the unconditional variance of \eqn{V_t} and \eqn{W_t} are R and Q and the model is assumed to be written as
-\deqn{ y_t = Z x_t + a + v_t}
-\deqn{ x_t = B x_{t-1} + u + w_t}
-If normalize=TRUE, the model is assumed to be written
-\deqn{ y_t = Z x_t + a + Hv_t}
-\deqn{ x_t = B x_{t-1} + u + Gw_t}
-with the variance of \eqn{V_t} and \eqn{W_t} equal to I (identity).
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
 
-\strong{Missing or left-out data}
+The state residuals are only for state-space models. At time \eqn{t}, the state residuals are the difference between the state estimate at time t+1 and the predicted value of the state at time \eqn{t+1} given the estimate of the state at time \eqn{t}. For smoothation state residuals, this is 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^T - \mathbf{B}\tilde{\mathbf{x}}_{t}^T - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtT[,t+1] - B xtT - u - C c(t+1)}
+For innovations state residuals, this is 
+\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u}  - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u - C c(t+1) }
 
-See the discussion of smoothed residuals for missing and left-out data in \code{\link{MARSSresiduals.tT}}.
+Smoothation state residuals are used for outlier detection or shock detection in the state process.  See \code{\link{MARSSresiduals}} and read the references cited. Note that the state residual at time \eqn{T} (the last time step) is NA since this would be the transition from \eqn{T} to \eqn{T+1} (past the end of the data).
 
 }
 
-\author{ 
-  Eli Holmes, NOAA, Seattle, USA.  
 
-  eli(dot)holmes(at)noaa(dot)gov
-} 
-\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
 \examples{
-  dat <- t(harborSeal)
-  dat <- dat[c(2,11),]
-  MLEobj <- MARSS(dat)
-  
-  #state smoothed residuals
-  state.resids1 <- residuals(MLEobj)$state.residuals
-  #this is the same as
-  states <- MLEobj$states
-  Q <- coef(MLEobj,type="matrix")$Q
-  state.resids2 <- states[,2:30]-states[,1:29]-matrix(coef(MLEobj,type="matrix")$U,2,29)
-  #compare the two
-  cbind(t(state.resids1[,-30]), t(state.resids2))
+dat <- t(harborSeal)
+dat <- dat[c(2, 11, 12), ]
+fit <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
-  #normalize to variance of 1
-  state.resids1 <- residuals(MLEobj, normalize=TRUE)$state.residuals
-  state.resids2 <- (solve(t(chol(Q))) \%*\% state.resids2)
-  cbind(t(state.resids1[,-30]), t(state.resids2))
+library(ggplot2)
+theme_set(theme_bw())
 
-  #one-step-ahead standardized residuals
-  residuals(MLEobj, conditioning="t-1")$std.residuals
+# Make a plot of the model residuals (innovations) with intervals
+d <- residuals(fit, type="tt1")
+d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
+ggplot(data = d) +
+  geom_line(aes(t, .fitted)) +
+  geom_point(aes(t, value), na.rm=TRUE) +
+  geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
+  ggtitle("Model residuals (innovations)") +
+  xlab("Time Step") + ylab("Count")
+
+# Make a plot of the smoothed residuals with intervals
+d <- residuals(fit, type="tT")
+d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
+d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
+ggplot(data = d) +
+  geom_line(aes(t, .fitted)) +
+  geom_point(aes(t, value), na.rm=TRUE) +
+  geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.1) +
+  facet_grid(~.rownames) +
+  ggtitle("Smoothations") +
+  xlab("Time Step") + ylab("Count")
+
+# Make a plot of xtT versus prediction of xt from xtT[t-1]
+# This is NOT the estimate of the smoothed states with CIs. Use tsSmooth() for that.
+d <- residuals(fit, type = "tT")
+ggplot(data = d) +
+  geom_point(aes(t, value), na.rm=TRUE) +
+  geom_line(aes(x = t, .fitted), color="blue") +
+  facet_grid(~.rownames) +
+  xlab("Time Step") + ylab("Count") +
+  ggtitle("xtT (points) and prediction (line)")
+
 }
+
 \references{
-Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045.
+Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045. 
 
-See also the discussion and references in \code{\link{MARSSresiduals.tT}} and \code{\link{MARSSresiduals.tt1}}.
+See also the discussion and references in \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}} and \code{\link{MARSSresiduals.tt}}.
 }
-

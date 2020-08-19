@@ -1,7 +1,7 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/MLR-, eps=FALSE, split=TRUE}
 <<RUNFIRST, echo=FALSE, include.source=FALSE>>=
-tabledir="figures/"
-options(prompt=" ", continue=" ", width=60)
+tabledir <- "figures/"
+options(prompt = " ", continue = " ", width = 60)
 @
 
 <<Cs_000_required_libraries, echo=FALSE>>=
@@ -20,7 +20,7 @@ library(lme4)
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_MLR.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the MARSS() function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
+This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the \verb@MARSS()@ function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
 
 In a classic linear regression, the response variable ($y$) is univariate and there may one to multiple explanatory variables ($d_1$, $d_2$, $\dots$) plus an optional intercept ($\alpha$):
 \begin{equation}\label{eqn:lm}
@@ -55,7 +55,7 @@ number of people employed from 1947 to 1962 and a number of predictors. For this
 \begin{center}
 <<Cs_001_example1_plot,fig=TRUE,echo=FALSE,width=6, height=6, keep.source=FALSE>>=
 data(longley)
-plot(longley$Year, longley$Employed, type="l", ylab="Employed", xlab="")
+plot(longley$Year, longley$Employed, type = "l", ylab = "Employed", xlab = "")
 @
 \end{center}
 \caption{Employment time series from the Longley dataset.}
@@ -83,47 +83,47 @@ We need to specify the parameters in Equation \ref{eqn:mlm.marss} such that we g
 First, we load the data and set up $y$, the response variable number of people employed, as a matrix with time going across the columns.
 <<Cs_002_example1-data>>=
 data(longley)
-Employed = matrix(longley$Employed, nrow=1)
+Employed <- matrix(longley$Employed, nrow = 1)
 @
 Second create a list to hold our model specification.
 <<Cs_003_example1-params>>=
-longley.model=list()
+longley.model <- list()
 @
 Set the $\uu$, $\QQ$ and $\xx_0$ parameters to 0.  We will also set $\aa$ and $\CC$ to 0 and $\BB$ and $\ZZ$ to identity although this is not necessary since these are the defaults.
 <<Cs_004_example1-params1>>=
-longley.model$U=longley.model$Q="zero"
-longley.model$C="zero"
-longley.model$B=longley.model$Z="identity"
-longley.model$x0="zero"
-longley.model$tinitx=0
+longley.model$U <- longley.model$Q <- "zero"
+longley.model$C <- "zero"
+longley.model$B <- longley.model$Z <- "identity"
+longley.model$x0 <- "zero"
+longley.model$tinitx <- 0
 @
 We will estimate $\RR$, the variance of the i.i.d. errors (residuals).
 <<Cs_005_example1-paramsR>>=
-longley.model$R=matrix("r")
+longley.model$R <- matrix("r")
 @
 The $\DD$ matrix has the two $\beta$ (slope) parameters for GNP and Population and $a$ has the intercept.\footnote{A better way to fit the model is to put the intercept into $\DD$ by adding a row of 1s to $\dd$ and putting the intercept parameter on the first row of $\DD$.  This reduces by one the number of matrices being estimated by the EM algorithm. It's not done here just so the equations look more like standard linear regression equations.}
 <<Cs_006_example1-paramsD>>=
-longley.model$A=matrix("intercept")
-longley.model$D=matrix(c("GNP","Pop"),nrow=1)
+longley.model$A <- matrix("intercept")
+longley.model$D <- matrix(c("GNP", "Pop"), nrow = 1)
 @
 Last we set up our explanatory variables.  This is the $\dd$ matrix and we need each explanatory variable in a row and time across the columns.
 <<Cs_007_example1-eVar>>=
-longley.model$d = rbind(longley$GNP, longley$Population)
+longley.model$d <- rbind(longley$GNP, longley$Population)
 @
 
 Now we can fit the model:
 <<Cs_008_example1-marss, results=hide>>=
-mod1=MARSS(Employed, model=longley.model)
+mod1 <- MARSS(Employed, model = longley.model)
 @
 and look at the estimates.
 <<Cs_009_example1-marss, results=hide>>=
-coef(mod1, type="vector")
+coef(mod1, type = "vector")
 @
 \verb@method="BFGS"@ can also be used and gives similar results.
 
 We can compare the fit to that from lm() and see that we get the same estimates:
 <<Cs_010_example1-lm>>=
-mod1.lm=lm(Employed ~ GNP + Population, data=longley)
+mod1.lm <- lm(Employed ~ GNP + Population, data = longley)
 coef(mod1.lm)
 @
 
@@ -141,38 +141,45 @@ We assume the AR(1) errors have mean 0 so $u=0$ in the $x_t$ equation.  Setting 
 
 To fit the model with autoregressive errors, we add the $x$ parameters to our the model list.  We estimate $b$ and $q$.
 <<Cs_011_example2-params>>=
-longley.ar1=longley.model
-longley.ar1$B=matrix("b")
-longley.ar1$Q=matrix("q")
+longley.ar1 <- longley.model
+longley.ar1$B <- matrix("b")
+longley.ar1$Q <- matrix("q")
 @
 
 Now we can fit the model as before
 <<Cs_012_example2-marss, results=hide>>=
-mod2=MARSS(Employed, model=longley.ar1)
+mod2 <- MARSS(Employed, model = longley.ar1)
 @
 however, this is a difficult model to fit and takes a long, long time to converge.  The default \verb@maxit@ used in the call above is not nearly enough iterations. Using \verb@method="BFGS"@ helps a little but not much.  We can improve behavior by using the fit of the model with i.i.d. errors as initial conditions for $\DD$ and $a$.\index{troubleshooting!non-convergence}
 
 <<Cs_013_example2-marss-with-inits, results=hide>>=
-inits=list(A=coef(mod1)$A, D=coef(mod1)$D)
-mod2=MARSS(Employed, model=longley.ar1, inits=inits, 
-           control=list(maxit=1000))
-ests.marss = c(b=coef(mod2)$B, alpha=coef(mod2)$A, 
-               GNP=coef(mod2)$D[1], Population=coef(mod2)$D[2],
-               logLik=logLik(mod2))
+inits <- list(A = coef(mod1)$A, D = coef(mod1)$D)
+mod2 <- MARSS(Employed,
+  model = longley.ar1, inits = inits,
+  control = list(maxit = 1000)
+)
+ests.marss <- c(
+  b = coef(mod2)$B, alpha = coef(mod2)$A,
+  GNP = coef(mod2)$D[1], Population = coef(mod2)$D[2],
+  logLik = logLik(mod2)
+)
 @
 \index{functions!logLik}
 
 We can the fit the same model using \verb@gls()@ (\verb@nlme@ package).  The $b$ term is called Phi in the \verb@gls()@ call and is somewhat difficult to recover although it is printed by \verb@summary()@.\index{functions!gls}
 <<Cs_014_example2-gls>>=
 library(nlme)
-mod2.gls=gls(Employed ~ GNP + Population, 
-        correlation=corAR1(), data=longley, method="ML")
-mod2.gls.phi = coef(mod2.gls$modelStruct[[1]], unconstrained=FALSE)
-ests.gls = c(b=mod2.gls.phi, alpha=coef(mod2.gls)[1],
-              GNP=coef(mod2.gls)[2], Population=coef(mod2.gls)[3],
-              logLik=logLik(mod2.gls))
+mod2.gls <- gls(Employed ~ GNP + Population,
+  correlation = corAR1(), data = longley, method = "ML"
+)
+mod2.gls.phi <- coef(mod2.gls$modelStruct[[1]], unconstrained = FALSE)
+ests.gls <- c(
+  b = mod2.gls.phi, alpha = coef(mod2.gls)[1],
+  GNP = coef(mod2.gls)[2], Population = coef(mod2.gls)[3],
+  logLik = logLik(mod2.gls)
+)
 @
-Note we need to set \verb@method="ML"@ to maximize the likelihood because the default is to maximize the restricted maximum-likelihood (\verb@method="REML"@) and that gives a different answer from the MARSS() function since MARSS() is maximizing the likelihood.
+Note we need to set \verb@method="ML"@ to maximize the likelihood because the default is to maximize the restricted maximum-likelihood (\verb@method="REML"@) and that gives a different answer from the \verb@MARSS()@ function since \verb@MARSS()@ is maximizing the likelihood.
 
 Both functions return similar values though \verb@gls()@ is much faster and the EM algorithm has not quite converged even with 1000 iterations.
 <<Cs_014b_compare_marss_gls>>=
@@ -189,76 +196,78 @@ The full Longley dataset is often used to test the performance of numerical meth
 pairs(longley)
 @
 \end{center}
-\caption{Pairs plot showing colliniearity in the Longley explanatory variables.}
+\caption{Pairs plot showing collinearity in the Longley explanatory variables.}
 \label{fig:longley.fig2}
 \end{figure}
 
 We can fit a regression of Employed to all the Longley explanatory variables using the following code.  The mathematical model is the same as in Equation \ref{eqn:longley1} except that instead of two explanatory variables with have all seven shown in Figure \ref{fig:longley.fig2}.
 <<Cs_016_full-model-list>>=
-eVar.names = colnames(longley)[-7]
-eVar = t(longley[,eVar.names])
-longley.model=list()
-longley.model$U=longley.model$Q="zero"
-longley.model$C="zero"
-longley.model$B=longley.model$Z="identity"
-longley.model$A=matrix("intercept")
-longley.model$R=matrix("r")
-longley.model$D=matrix(eVar.names,nrow=1)
-longley.model$d = eVar
-longley.model$x0="zero"
-longley.model$tinitx=0
+eVar.names <- colnames(longley)[-7]
+eVar <- t(longley[, eVar.names])
+longley.model <- list()
+longley.model$U <- longley.model$Q <- "zero"
+longley.model$C <- "zero"
+longley.model$B <- longley.model$Z <- "identity"
+longley.model$A <- matrix("intercept")
+longley.model$R <- matrix("r")
+longley.model$D <- matrix(eVar.names, nrow = 1)
+longley.model$d <- eVar
+longley.model$x0 <- "zero"
+longley.model$tinitx <- 0
 @
 
 And then we fit as usual.  We will fit with the EM-algorithm (the default) and compare to BFGS.
 <<Cs_017_full-model-fit, results=hide>>=
-mod3.em=MARSS(Employed, model=longley.model)
-mod3.bfgs=MARSS(Employed, model=longley.model, method="BFGS")
+mod3.em <- MARSS(Employed, model = longley.model)
+mod3.bfgs <- MARSS(Employed, model = longley.model, method = "BFGS")
 @
 Here are the EM estimates with the log-likelihood.
 <<Cs_018_full-em-ests>>=
-par.names = c("A.intercept", paste("D",eVar.names,sep="."))
-c(coef(mod3.em, type="vector")[par.names], logLik=mod3.em$logLik)
+par.names <- c("A.intercept", paste("D", eVar.names, sep = "."))
+c(coef(mod3.em, type = "vector")[par.names], logLik = mod3.em$logLik)
 @
 Compared to the BFGS estimates:
 <<Cs_019_full-bfgs-ests>>=
-c(coef(mod3.bfgs, type="vector")[par.names], logLik=mod3.bfgs$logLik)
+c(coef(mod3.bfgs, type = "vector")[par.names], logLik = mod3.bfgs$logLik)
 @
 And compared to the estimates from the lm() function:
 <<Cs_020_full-lm-ests>>=
-mod3.lm=lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed 
-         + Armed.Forces + Population + Year, data=longley)
-c(coef(mod3.lm),logLik=logLik(mod3.lm))
+mod3.lm <- lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed
+  + Armed.Forces + Population + Year, data = longley)
+c(coef(mod3.lm), logLik = logLik(mod3.lm))
 @
 As you can see the BFGS algorithm struggles with the ridge-like likelihood caused by the collinearity in the explanatory variables.
 
 We can also compare the performance of the model with AR(1) errors.  This is Equation \ref{eqn:longley.correrr} but with all seven explanatory variables.  We set up the MARSS model\footnote{Notice that $x_0$ is set at 0.  The model is having a hard time fitting $x_0$ because the time series is short.  Estimating $x_0$ or using a diffuse prior by setting $\VV_0$ big, leads to poor estimates.  Since this is just the error term, we set $x_0=0$ since the mean of the errors is assumed to be 0.} for a linear regression with correlated errors as before with the addition of $b$ (called Phi in \verb@gls()@) and $q$.\index{functions!gls}
 <<Cs_021_full-model-correrr>>=
-longley.correrr.model=longley.model
-longley.correrr.model$B=matrix("b")
-longley.correrr.model$Q=matrix("q")
+longley.correrr.model <- longley.model
+longley.correrr.model$B <- matrix("b")
+longley.correrr.model$Q <- matrix("q")
 @
 
 We fit as usual and compare the EM-algorithm (the default) to fits using BFGS.  We will use the estimate from the model with i.i.d. errors as initial conditions.
 <<Cs_022_full-correrr-fit-hide, results=hide>>=
-inits=list(A=coef(mod3.em)$A, D=coef(mod3.em)$D)
-mod4.em=MARSS(Employed, model=longley.correrr.model, inits=inits)
-mod4.bfgs=MARSS(Employed, model=longley.correrr.model, inits=inits, method="BFGS")
+inits <- list(A = coef(mod3.em)$A, D = coef(mod3.em)$D)
+mod4.em <- MARSS(Employed, model = longley.correrr.model, inits = inits)
+mod4.bfgs <- MARSS(Employed, model = longley.correrr.model, 
+                   inits = inits, method = "BFGS")
 @
 Here are the EM estimates with the log-likelihood.  We only show $\phi$ (the $b$ term in the AR(1) error equation) and the log-likelihood.
 <<Cs_023_full-correrr-em-ests>>=
-c(coef(mod4.em, type="vector")["B.b"], logLik=mod4.em$logLik)
+c(coef(mod4.em, type = "vector")["B.b"], logLik = mod4.em$logLik)
 @
 Compared to the BFGS estimates:
 <<Cs_024_full-correrr-bfgs-ests>>=
-c(coef(mod4.bfgs, type="vector")["B.b"], logLik=mod4.bfgs$logLik)
+c(coef(mod4.bfgs, type = "vector")["B.b"], logLik = mod4.bfgs$logLik)
 @
 And compared to the estimates from the gls() function:
 <<Cs_025_full-gls-ests>>=
-mod4.gls=gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
-        + Armed.Forces + Population + Year, 
-        correlation=corAR1(), data=longley, method="ML")
-mod4.gls.phi = coef(mod4.gls$modelStruct[[1]], unconstrained=FALSE)
-c(mod4.gls.phi, logLik=logLik(mod4.gls))
+mod4.gls <- gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
+  + Armed.Forces + Population + Year,
+correlation = corAR1(), data = longley, method = "ML"
+)
+mod4.gls.phi <- coef(mod4.gls$modelStruct[[1]], unconstrained = FALSE)
+c(mod4.gls.phi, logLik = logLik(mod4.gls))
 @
 Again we see that the BFGS algorithm struggles with the ridge-like likelihood caused by the collinearity in the explanatory variables.
 
@@ -268,17 +277,19 @@ We will illustrate linear regression with a multivariate response using longitud
 
 We load the data from the \verb@lme4@ package:
 <<Cs_026_loadsleep>>=
-data(sleepstudy,package="lme4")
+data(sleepstudy, package = "lme4")
 @
 
 \begin{figure}[htp]
 \begin{center}
 <<Cs_027_sleep-plot, fig=TRUE, echo=FALSE>>=
 library(lattice)
-xyplot(Reaction ~ Days | Subject, sleepstudy, type = c("g","p","r"),
-       index = function(x,y) coef(lm(y ~ x))[1],
-       xlab = "Days of sleep deprivation",
-       ylab = "Average reaction time (ms)", aspect = "xy")
+xyplot(Reaction ~ Days | Subject, sleepstudy,
+  type = c("g", "p", "r"),
+  index = function(x, y) coef(lm(y ~ x))[1],
+  xlab = "Days of sleep deprivation",
+  ylab = "Average reaction time (ms)", aspect = "xy"
+)
 @
 \end{center}
 \caption{Plot of the sleep study data (package lme4).}
@@ -286,16 +297,16 @@ xyplot(Reaction ~ Days | Subject, sleepstudy, type = c("g","p","r"),
 \end{figure}
 
 
-We set up the data into the form required for the MARSS() function.
+We set up the data into the form required for the \verb@MARSS()@ function.
 <<Cs_028_setupdata, keep.source=TRUE>>=
-#number of subjects
-nsub = length(unique(sleepstudy$Subject))
-ndays=length(sleepstudy$Days)/nsub
-#each subject is a row with day across the columns
-dat = matrix(sleepstudy$Reaction, nsub, ndays,byrow=TRUE)
-rownames(dat)=paste("sub",unique(sleepstudy$Subject),sep=".")
-#the day number 0 to 9 is the explanatory variable
-exp.var=matrix(sleepstudy$Days, 1, ndays,byrow=TRUE)
+# number of subjects
+nsub <- length(unique(sleepstudy$Subject))
+ndays <- length(sleepstudy$Days) / nsub
+# each subject is a row with day across the columns
+dat <- matrix(sleepstudy$Reaction, nsub, ndays, byrow = TRUE)
+rownames(dat) <- paste("sub", unique(sleepstudy$Subject), sep = ".")
+# the day number 0 to 9 is the explanatory variable
+exp.var <- matrix(sleepstudy$Days, 1, ndays, byrow = TRUE)
 @
 
 Let's start with a simple regression where each subject has a separate intercept (reaction time at day 0) but the slope (increase in reaction time with each successive day) is the same across the 18 subjects. Mathematically the model is
@@ -309,14 +320,15 @@ The response time of subject $i$ is a subject specific intercept ($\alpha_i$) pl
 
 We specify and fit this model as follows
 <<Cs_029_sleepmod1, results=hide>>=
-sleep.model=list(
-  A="unequal",B="zero", x0="zero", U="zero",
-  D=matrix("b1",nsub,1), d=exp.var, tinitx=0, Q="zero")
-sleep.mod1 = MARSS(dat, model=sleep.model)
+sleep.model <- list(
+  A = "unequal", B = "zero", x0 = "zero", U = "zero",
+  D = matrix("b1", nsub, 1), d = exp.var, tinitx = 0, Q = "zero"
+)
+sleep.mod1 <- MARSS(dat, model = sleep.model)
 @
 This is the same as the following with \verb@lm()@:
 <<Cs_030_sleepmod1-lm>>=
-sleep.lm1 = lm(Reaction ~ -1 + Subject + Days, data=sleepstudy)
+sleep.lm1 <- lm(Reaction ~ -1 + Subject + Days, data = sleepstudy)
 @
 
 Now let's allow each subject to have different slopes (increase in reaction time with each successive day) across subjects. This model is
@@ -329,14 +341,15 @@ Now let's allow each subject to have different slopes (increase in reaction time
 
 We specify and fit this model as
 <<Cs_031_sleepmod2>>=
-sleep.model=list(
-  A="unequal",B="zero", x0="zero", U="zero",
-  D="unequal", d=exp.var, tinitx=0, Q="zero")
-sleep.mod2 = MARSS(dat, model=sleep.model, silent=TRUE)
+sleep.model <- list(
+  A = "unequal", B = "zero", x0 = "zero", U = "zero",
+  D = "unequal", d = exp.var, tinitx = 0, Q = "zero"
+)
+sleep.mod2 <- MARSS(dat, model = sleep.model, silent = TRUE)
 @
 This is the same as the following with \verb@lm()@:
 <<Cs_032_sleepmod2-lm>>=
-sleep.lm2 = lm(Reaction ~ 0 + Subject + Days:Subject, data = sleepstudy)
+sleep.lm2 <- lm(Reaction ~ 0 + Subject + Days:Subject, data = sleepstudy)
 @
 
 We can repeat the above but allow the residual variance to differ across subjects by setting \verb@R="diagonal and unequal"@. This model is
@@ -347,11 +360,12 @@ We can repeat the above but allow the residual variance to differ across subject
 \end{gathered}
 \end{equation}
 <<Cs_033_sleepmod3>>=
-sleep.model=list(
-  A="unequal",B="zero", x0="zero", U="zero",
-  D="unequal", d=exp.var, tinitx=0, Q="zero",
-  R="diagonal and unequal")
-sleep.mod3 = MARSS(dat, model=sleep.model, silent=TRUE)
+sleep.model <- list(
+  A = "unequal", B = "zero", x0 = "zero", U = "zero",
+  D = "unequal", d = exp.var, tinitx = 0, Q = "zero",
+  R = "diagonal and unequal"
+)
+sleep.mod3 <- MARSS(dat, model = sleep.model, silent = TRUE)
 @
 
 Or we can allow AR(1) errors across subjects and allow each subject to have its own AR(1) parameters for this error.  This model is \index{multivariate linear regression!with autocorrelated errors}
@@ -365,13 +379,14 @@ Or we can allow AR(1) errors across subjects and allow each subject to have its 
 \end{equation}
 We fit this model as
 <<Cs_034_sleepmod4>>=
-inits=list(A=coef(sleep.mod3)$A,D=coef(sleep.mod3)$D)
-#estimate a separate intercept for each but slope is the same
-sleep.model=list(
-  A="unequal",B="diagonal and unequal", x0="zero", U="zero",
-  D="unequal", d=exp.var, tinitx=0, Q="diagonal and unequal",
-  R="diagonal and unequal")
-sleep.mod4 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
+inits <- list(A = coef(sleep.mod3)$A, D = coef(sleep.mod3)$D)
+# estimate a separate intercept for each but slope is the same
+sleep.model <- list(
+  A = "unequal", B = "diagonal and unequal", x0 = "zero", U = "zero",
+  D = "unequal", d = exp.var, tinitx = 0, Q = "diagonal and unequal",
+  R = "diagonal and unequal"
+)
+sleep.mod4 <- MARSS(dat, model = sleep.model, inits = inits, silent = TRUE)
 @
 It is not obvious how to specify these last two models using gls() or if it is possible.
 
@@ -386,46 +401,51 @@ We can also allow each subject to have his/her own error process but specify tha
 \end{equation}
 We specify and fit this model as
 <<Cs_035_sleepmod5>>=
-inits=list(A=coef(sleep.mod3)$A,D=coef(sleep.mod3)$D)
-#estimate a separate intercept for each but slope is the same
-sleep.model=list(
-  A="unequal",B="diagonal and equal", x0="zero", U="zero",
-  D="unequal", d=exp.var, tinitx=0, Q="diagonal and equal",
-  R="diagonal and equal")
-sleep.mod5 = MARSS(dat, model=sleep.model, inits=inits, silent=TRUE)
+inits <- list(A = coef(sleep.mod3)$A, D = coef(sleep.mod3)$D)
+# estimate a separate intercept for each but slope is the same
+sleep.model <- list(
+  A = "unequal", B = "diagonal and equal", x0 = "zero", U = "zero",
+  D = "unequal", d = exp.var, tinitx = 0, Q = "diagonal and equal",
+  R = "diagonal and equal"
+)
+sleep.mod5 <- MARSS(dat, model = sleep.model, inits = inits, silent = TRUE)
 @
 This is fairly close to this model fit with gls().\index{functions!gls}
 <<Cs_036_mod5-gls>>=
-sleep.mod5.gls=gls(Reaction ~ 0 + Subject + Days:Subject, data=sleepstudy, 
-             correlation=corAR1(form=~ 1|Subject), method="ML")
+sleep.mod5.gls <- gls(Reaction ~ 0 + Subject + Days:Subject,
+  data = sleepstudy,
+  correlation = corAR1(form = ~ 1 | Subject), method = "ML"
+)
 @
 The way the variance-covariance structure is modeled is a little different but it's the same idea.
 
 <<Cs_037_makemodeltable, echo=FALSE, keep.source=FALSE>>=
-if(!exists("tabledir")) tabledir=""
-slope.names = paste("D",rownames(dat),sep=".")
-phi.names = names(coef(sleep.mod4, type="vector"))[str_detect(names(coef(sleep.mod4, type="vector")),"B.")]
+if (!exists("tabledir")) tabledir <- ""
+slope.names <- paste("D", rownames(dat), sep = ".")
+phi.names <- names(coef(sleep.mod4, type = "vector"))[str_detect(names(coef(sleep.mod4, type = "vector")), "B.")]
 
-model.data = cbind(
-c(logLik(sleep.lm2),coef(sleep.lm2)[19:36],rep(NA,nsub)),
-c(sleep.mod2$logLik, coef(sleep.mod2, type="vector")[slope.names],rep(NA,nsub)),
-c(sleep.mod3$logLik, coef(sleep.mod3, type="vector")[slope.names], rep(NA,nsub)),
-c(sleep.mod4$logLik, coef(sleep.mod4, type="vector")[c(slope.names, phi.names)]),
-c(sleep.mod5$logLik, coef(sleep.mod5, type="vector")[c(slope.names, rep("B.diag",nsub))]),
-c(logLik(sleep.mod5.gls),coef(sleep.mod5.gls)[19:36],rep(coef(sleep.mod5.gls$modelStruct[[1]], unconstrained=FALSE),nsub))
+model.data <- cbind(
+  c(logLik(sleep.lm2), coef(sleep.lm2)[19:36], rep(NA, nsub)),
+  c(sleep.mod2$logLik, coef(sleep.mod2, type = "vector")[slope.names], rep(NA, nsub)),
+  c(sleep.mod3$logLik, coef(sleep.mod3, type = "vector")[slope.names], rep(NA, nsub)),
+  c(sleep.mod4$logLik, coef(sleep.mod4, type = "vector")[c(slope.names, phi.names)]),
+  c(sleep.mod5$logLik, coef(sleep.mod5, type = "vector")[c(slope.names, rep("B.diag", nsub))]),
+  c(logLik(sleep.mod5.gls), coef(sleep.mod5.gls)[19:36], rep(coef(sleep.mod5.gls$modelStruct[[1]], unconstrained = FALSE), nsub))
 )
-rownames(model.data)=c("logLik",paste("slope", unique(sleepstudy$Subject)), paste("phi", unique(sleepstudy$Subject)))
-colnames(model.data)=c("lm","mod2 em","mod3 em","mod4 em","mod5 em","mod5 gls")
-tmpaln="c" #figure out the number of cols automatically
-for(i in 1:ncol(model.data)) tmpaln = paste(tmpaln,"c",sep="")
-thetable = xtable(model.data, caption='Parameter estimates of different versions of the model where each subject has a separate intercept (response time on normal sleep) and different slope by day (increase in response time with each day of sleep deprivation).  The model types are discussed in the text.', label='ref:tablesleepstudy', align=tmpaln, digits=2)
-print(thetable,type = "latex", file = paste(tabledir,"tablesleepstudy.tex",sep=""), include.rownames=TRUE,include.colnames=TRUE, caption.placement="top",table.placement="htp", sanitize.text.function = function(x){x},hline.after = c(-1,0,nrow(model.data)))
+rownames(model.data) <- c("logLik", paste("slope", unique(sleepstudy$Subject)), paste("phi", unique(sleepstudy$Subject)))
+colnames(model.data) <- c("lm", "mod2 em", "mod3 em", "mod4 em", "mod5 em", "mod5 gls")
+tmpaln <- "c" # figure out the number of cols automatically
+for (i in 1:ncol(model.data)) tmpaln <- paste(tmpaln, "c", sep = "")
+thetable <- xtable(model.data, caption = "Parameter estimates of different versions of the model where each subject has a separate intercept (response time on normal sleep) and different slope by day (increase in response time with each day of sleep deprivation).  The model types are discussed in the text.", label = "ref:tablesleepstudy", align = tmpaln, digits = 2)
+print(thetable, type = "latex", file = paste(tabledir, "tablesleepstudy.tex", sep = ""), include.rownames = TRUE, include.colnames = TRUE, caption.placement = "top", table.placement = "htp", sanitize.text.function = function(x) {
+  x
+}, hline.after = c(-1, 0, nrow(model.data)))
 @
 \input{figures/tablesleepstudy}
 
 \section{Discussion}
-The purpose of the is chapter is to illustrate how linear regression models with multivariate explanatory variable or response variables can be written in MARSS form and fit with the MARSS() function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many packages for linear regression and generalized linear regression (non-Gaussian errors).  While the MARSS package can fit a variety of linear regression models with Gaussian errors, that is not what it is designed to do.  The MARSS package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables).
+The purpose of the is chapter is to illustrate how linear regression models with multivariate explanatory variable or response variables can be written in MARSS form and fit with the \verb@MARSS()@ function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many excellent packages for linear regression and generalized linear regression (non-Gaussian errors).  While the MARSS package can fit a variety of linear regression models with Gaussian errors, that is not what the package is designed to do.  The MARSS package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables) and linear constraints.
 
 <<reset, echo=FALSE, include.source=FALSE>>=
-options(prompt="> ", continue=" +", width=120)
+options(prompt = "> ", continue = " +", width = 120)
 @

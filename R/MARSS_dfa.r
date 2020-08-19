@@ -8,7 +8,7 @@
 # Part 1 Set up the DFA model in MARSS.marxss form
 # Part 2 Call MARSS.marxss to finish the set-up and checking
 
-# Functions that are called by the generic functions print.marssMLE, residuals.marssMLE,
+# Functions that are called by the generic functions print.marssMLE, MARSSresiduals,
 # predict.marssMLE, coef.marssMLE, MARSSinits.marssMLE
 # print_dfa, residuals_dfa, predict_dfa, coef_dfa, MARSSinits_dfa
 ###################################################################################

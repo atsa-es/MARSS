@@ -69,6 +69,8 @@ options(width=60)
 \include{./Case_Study_dlm1}
 \include{./Case_Study_mlr}
 \include{./MARp}
+\include{./Structural_TS}
+\include{./KFAS}
 \part{Appendices}
 \appendix
 \include{./tex/warnings}

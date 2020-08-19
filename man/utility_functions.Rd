@@ -1,26 +1,27 @@
 \name{utility.functions}
-\alias{utility.functions}
-\alias{makediag}
-\alias{takediag}
-\alias{is.blockdiag}
-\alias{is.identity}
-\alias{is.diagonal}
-\alias{is.equaltri}
-\alias{is.validvarcov}
-\alias{is.design}
-\alias{is.fixed}
-\alias{is.zero}
-\alias{is.unitcircle}
-\alias{ is.solvable }
-\alias{vec}
-\alias{unvec}
-\alias{is.wholenumber}
-\alias{Imat}
-\alias{rwishart}
+\alias{ utility.functions}
+\alias{ makediag}
+\alias{ takediag}
+\alias{ is.blockdiag}
+\alias{ is.design}
+\alias{ is.diagonal}
+\alias{ is.equaltri}
+\alias{ is.fixed}
+\alias{ is.identity}
+\alias{ is.solvable}
+\alias{ is.timevarying}
+\alias{ is.unitcircle}
+\alias{ is.validvarcov}
+\alias{ is.zero}
+\alias{ vec}
+\alias{ unvec}
+\alias{ is.wholenumber}
+\alias{ Imat}
+\alias{ rwishart}
 \alias{ mystrsplit }
 \alias{ convert.model.mat }
 \alias{ parmat }
-\alias{fixed.free.to.formula }
+\alias{ fixed.free.to.formula }
 \alias{ matrix.power }
 \alias{ sub3D }
 \alias{ pinv }
@@ -29,9 +30,9 @@
 \alias{ all.equal.vector }
 \keyword{internal}
 
-\title{ Matrix Utilities }
+\title{ Utility Functions }
 \description{
-  Matrix utilities for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
+  Utility functions for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
 }
 \usage{
 all.equal.vector(x)
@@ -45,7 +46,7 @@ is.diagonal(x, na.rm=FALSE)
 is.equaltri(x)
 is.fixed(x, by.row=FALSE)
 is.identity(x, dim=NULL)
-is.identity(x, dim=NULL)
+is.timevarying(MLEobj)
 is.solvable(A,y=NULL)
 is.validvarcov(x, method="kem")
 is.wholenumber(x, tol = .Machine$double.eps^0.5)
@@ -58,7 +59,7 @@ mystrsplit(x)
 parmat(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G", "H", "L"), 
     t = 1, dims = NULL, model.loc = "marss")
 pinv(x)
-pcholinv(x)
+pcholinv(x, chol = TRUE)
 pchol(x) 
 rwishart(nu, V)
 sub3D(x,t=1)
@@ -79,10 +80,11 @@ vec(x)
   \item{t}{ The time index or third dimension of a 3D matrix }
   \item{nu, V}{ Parameters of a Wishart distribution. }
   \item{param.matrix}{ The list matrix version of a time-invariant MARSS model. }
-  \item{n}{ An interger for the power function. }
+  \item{n}{ An integer for the power function. }
   \item{ zero.rows.ok, zero.cols.ok }{ Means the design matrix can have all zero rows or columns. }
   \item{ strict }{ Specifies whether the design matrix must be only 0s and 1s. }
   \item{ by.row }{ For is.fixed, reports whether is.fixed by row rather than for the whole matrix. }
+  \item{ chol }{ For pcholinv, use chol2inv(chol()) if TRUE otherwise use solve(). }
   \item{ MLEobj}{ A \code{\link{marssMLE}} object. }
   \item{ MODELobj}{ A \code{\link{marssMODEL}} object. }
   \item{ elem }{ The parameter matrix of a marss model to return. }
@@ -90,7 +92,8 @@ vec(x)
 }
 \details{
 \itemize{
-  \item \code{is...} tests for various matrix properties.  isDiagonal() from the Matrix package is used to test numeric matrices for diagonality.  is.diagonal() is only used to determine if list matrices (that combine numeric and character values) are diagonal. is.zero tests for near zeroness and give TRUE for is.zero((.5-.3)-(.3-.1)) unlike ==0.
+  \item \code{is...} tests for various matrix properties.  isDiagonal() from the Matrix package is used to test numeric matrices for diagonality.  is.diagonal() is only used to determine if list matrices (that combine numeric and character values) are diagonal. is.zero tests for near zeroness and gives TRUE for is.zero((.5-.3)-(.3-.1)) unlike ==0.
+  \item \code{is.timevarying(MLEobj)} returns a list of which parameters are time-varying.
   \item \code{vec(x)} creates a column vector from a matrix per the standard vec math function.
   \item \code{unvec(c,dim)} takes the vector c and creates a matrix with the specified dimensions.
   \item \code{Imat(nrow)} returns the identity matrix of dimension nrow.
@@ -102,8 +105,8 @@ vec(x)
   \item \code{ rwishart } generates random draws from a wishart distribution.
   \item \code{ matrix.power } is a faster way to get the n-th power of a matrix.
   \item \code{ pinv } is the pseudoinverse based on singular value decomposition PInv=UD^+V' where a diagonal matrix with non-zero diagonal values of D (from svd) replaced with 1/D.
-  \item \code{ pcholinv } is the inverse based on the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
-  \item \code{ pchol } returns the Cholsky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
+  \item \code{ pcholinv } is the inverse based on the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
+  \item \code{ pchol } returns the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).

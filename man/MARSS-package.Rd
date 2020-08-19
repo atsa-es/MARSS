@@ -5,10 +5,10 @@
 Multivariate Autoregressive State-Space Model Estimation
 }
 \description{
-The MARSS package fits time-varying constrained and unconstrained multivariate autoregressive time-series models to multivariate time series data.  Get started quickly, go to the \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} (or at the command line, you can type \code{RShowDoc("Quick_Start", package="MARSS")}). To open the MARSS User Guide with many vignettes and examples, go to \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} (or type \code{RShowDoc("UserGuide",package="MARSS")}).  
+The MARSS package fits time-varying constrained and unconstrained multivariate autoregressive time-series models to multivariate time series data.  To get started quickly, go to the \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} (or at the command line, you can type \code{RShowDoc("Quick_Start", package="MARSS")}). To open the MARSS User Guide with many vignettes and examples, go to \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} (or type \code{RShowDoc("UserGuide",package="MARSS")}).  
 
 The default MARSS model form is a MARXSS model: Multivariate Auto-Regressive(1) eXogenous inputs State-Space model. This model has the following form:
-\deqn{\mathbf{x}_{t+1} = \mathbf{B} \mathbf{x}_t + \mathbf{u} + \mathbf{C} \mathbf{c}_t + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t+1) = B x(t) + u + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
+\deqn{\mathbf{x}_{t} = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{C} \mathbf{c}_{t} + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t) = B x(t-1) + u + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}(t) + \mathbf{a} + \mathbf{D} \mathbf{d}_t + \mathbf{H} \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R})}{y(t) = Z x(t) + a + D d(t) + H v(t), where v(t) ~ MVN(0,R)}
 \deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~ MVN(x0, V0) }
 All parameters can be time-varying; the "t" subscript is left off the parameters to remove clutter. Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x_1}{x(1)} or \eqn{x_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
@@ -34,24 +34,26 @@ The MARSS model parameters, hidden state processes (x), and observations (y) are
   }
 If a parameter is time-varying then the time dimension is the 3rd dimension. Thus a time-varying Z parameters would be n x m x T where T is the length of the data time series.
   
-The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for a variety of output including parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries in tibble format,
+The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for a variety of output including parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries.
 }
 \details{
 
 \strong{Main MARSS functions}:
 \describe{
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
-      \item{\code{\link{fitted.marssMLE}}}{ Fitted Y and X estimates output as a tibble. Output can be conditioned on all the data (T), data up to t-1, or data up to t.} 
-      \item{\code{\link{coef.marssMLE}}}{ Returns the estimated parameters in a variety of formats. }    
-      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates and fitted Y and X estimates output as a tibble. With confidence intervals if requested} 
-      \item{\code{\link{augment.marssMLE}}}{ Model residuals as a tibble. } 
-      \item{\code{\link{plot.marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
-      \item{\code{\link{autoplot.marssMLE}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
-      \item{\code{\link{glance.marssMLE}}}{ Brief summary of fit. } 
-      \item{\code{\link{logLik.marssMLE}}}{ Log-likelihood. }
-      \item{\code{\link{print.marssMLE}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
+      \item{\code{\link[=coef.marssMLE]{coef}}}{ Returns the estimated parameters in a variety of formats. }    
+      \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates with confidence intervals } 
+      \item{\code{\link[=tsSmooth.marssMLE]{tsSmooth}}}{ x and y estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t. From the Kalman filter and smoother output. } 
+      \item{\code{\link[=fitted.marssMLE]{fitted}}}{ Model x or y predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
+      \item{\code{\link[=residuals.marssMLE]{residuals}}}{ Model residuals as a data frame. } 
+      \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame or matrices. Normal user interface to residuals is \code{residuals.marssMLE}.} 
+      \item{\code{\link[=predict.marssMLE]{predict}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
+      \item{\code{\link[=plot.marssMLE]{plot for marssMLE}} }{ A series of plots of fits and residuals diagnostics. } 
+      \item{\code{\link[=autoplot.marssMLE]{autoplot}} }{ A series of plots using ggplot2 of fits and residuals diagnostics. } 
+      \item{\code{\link[=glance.marssMLE]{glance}}}{ Brief summary of fit. } 
+      \item{\code{\link[=logLik.marssMLE]{logLik}}}{ Log-likelihood. }
+      \item{\code{\link[=print.marssMLE]{print}}}{ Prints a wide variety of output from a \code{\link{marssMLE}} object. }
       \item{\code{\link{print.marssMODEL}}}{ Prints description of the MARSS model (\code{\link{marssMODEL}} object). }
-      \item{\code{\link{predict.marssMLE}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 
       \item{\code{\link{plot.marssPredict}}}{ Plot a prediction or forecast. } 
       \item{\code{\link{toLatex.marssMODEL}}}{ Outputs a LaTeX version of the model. }
     }

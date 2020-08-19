@@ -68,18 +68,28 @@ coef.marssMLE <- function(object, ..., type = "list", form = NULL, what = "par")
     par.dims <- attr(object[["model"]], "model.dims")
     if (the.type == "matrices" || the.type == "matrix") {
       par.mat <- list()
+      if(what!="par"){
+        orig.par <- modified.object[["par"]]
+        modified.object[["par"]] <- pars
+      }
       for (elem in par.names) {
         # need to tell parmat to use the model in $model; default is $marss
         # passing in par.dims[elem] keeps it as a list so that parmat doesn't have to change vector to list
         the.par <- parmat(modified.object, elem = elem, t = 1:par.dims[[elem]][3], dims = par.dims[elem], model.loc = "model")[[elem]]
         par.mat[[elem]] <- the.par
       }
+      if(what!="par") modified.object[["par"]] <- orig.par
       return.obj[[the.type]] <- par.mat
     }
     if (the.type %in% par.names) {
       # need to tell parmat to use the model in $model; default is $marss
       # passing in par.dims[the.type] keeps it as a list so that parmat doesn't have to change vector to list
+      if(what!="par"){
+        orig.par <- modified.object[["par"]]
+        modified.object[["par"]] <- pars
+      }
       the.par <- parmat(modified.object, elem = the.type, t = 1:par.dims[[the.type]][3], dims = par.dims[the.type], model.loc = "model")[[the.type]]
+      if(what!="par") modified.object[["par"]] <- orig.par
       return.obj[[the.type]] <- the.par
     }
   } # for the.type in type (user passed in type)

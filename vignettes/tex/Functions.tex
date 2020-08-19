@@ -9,12 +9,12 @@ The function \verb@MARSS()@ is an interface to the core fitting functions in the
 \end{description}
 
 \section{The \texttt{MARSS()} function: outputs}
-The marssMLE object returned by a MARSS() call includes the estimated parameters, states, and expected values of any missing data.  Derived statistics, such as confidence intervals and standard errors, can be computed using the functions described below.  The \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the R command line to see the print help file.\index{functions!print}
+The marssMLE object returned by a \verb@MARSS()@ call includes the estimated parameters, states, and expected values of any missing data.  Derived statistics, such as confidence intervals and standard errors, can be computed using the functions described below.  The \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the R command line to see the print help file.\index{functions!print}
 \begin{description}
   \item[estimated parameters]\verb@coef(MLEobj)@  The coef function can output parameters in a variety of formats.  See \verb@?coef.marssMLE@. \index{functions!coef}
-  \item[residuals]\verb@residuals(MLEobj)@  See \verb@?residuals.marssMLE@ for a discussion of standardized residuals in the context of MARSS models.\index{functions!residuals}
+  \item[residuals]\verb@MARSSresiduals(MLEobj)@  and \verb@residuals.marssMLE(MLEobj)@. See \verb@?MARSSresiduals@ for a discussion of standardized residuals in the context of MARSS models.\index{functions!residuals}
   \item[Kalman filter and smoother output] The smoothed states are in \verb@MLEobj$states@ but the full Kalman filter and smoother output is available from \verb@MARSSkf(MLEobj)@.  See \verb@?MARSSkf@ for a discussion of the Kalman filter and smoother outputs.  If you just want the estimated states conditioned on all the data, use \verb@print(MLEobj, what="xtT")@. If you want all the Kalman filter and smoother output, use \verb@print(MLEobj, what="kfs")@.\index{functions!MARSSkf}
-    \item[expected value of missing y] \verb@MARSShatyt(MLEobj)@  See \verb@?MARSShatyt@ for a discussion of the expectations involving y. If you just want the estimated missing y conditioned on all the data, use \verb@print(MLEobj, what="ytT")@. If you want all the expectations involving y conditioned on the data, use \verb@print(MLEobj, what="Ey")@.\index{functions!MARSShatyt}
+    \item[expected value of missing y] \verb@MARSShatyt(MLEobj)@  See \verb@?MARSShatyt@ for a discussion of the expectations involving y. If you just want the estimated missing y conditioned on all the data, use \verb@print(MLEobj, what="ytT")@. If you want all the expectations involving y conditioned on the data, use \verb@print(MLEobj, what="Ey")@.\index{functions!MARSShatyt}\index{Observation filtering and smoothing}
     \item[log-likelihood]\verb@logLik(MLEobj)@  The logLik function returns the log-likelihood.
     \item[AIC]\verb@AIC(MLEobj)@  The AIC function (\verb@stats@ package) returns the uncorrected AIC. Use \verb@MLEob$AICc@ to return the small sample size corrected AIC.\index{functions!AIC}
 \end{description}
@@ -33,7 +33,7 @@ The following core functions are designed to work with `unfitted' marssMLE objec
 The following functions use a marssMLE object that has a populated \verb@par@ element, i.e. a marssMLE object returned from one of the fitting functions (\verb@MARSS@, \verb@MARSSkem@, \verb@MARSSoptim@).  Below \verb@MODELobj@ means the argument is a marssMODEL object and \verb@MLEobj@ means the argument is a marssMLE object.  Type \verb@?function.name@ to see information on function usage and examples.
 \begin{description}
   \item[standard functions] The standard R functions for fitted objects are provided: \verb@residuals()@, \verb@fitted()@, \verb@logLik()@, \verb@AIC()@, and \verb@coef()@.
-  \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output using the broom R package and \verb@augment()@, \verb@tidy()@, and \verb@glance()@.
+  \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output: \verb@tidy()@ and \verb@glance()@.
 \end{description}
 
 In addition, the following are special functions for MARSS fitted models:

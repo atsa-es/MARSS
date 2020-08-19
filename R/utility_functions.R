@@ -6,9 +6,8 @@ isDiag <- function(x) {
   all(x[!diag(nrow(x))] == 0)
 }
 
-takediag <- function(x)
-############# Function to take the diagonal; deals with R trying to think too much with diag()
-{
+############# Take the diagonal; deals with R trying to think too much with diag
+takediag <- function(x) {
   if (length(x) == 1) {
     return(x)
   }
@@ -17,9 +16,8 @@ takediag <- function(x)
   return(x[1 + 0:(d1 - 1) * (d1 + 1)]) # faster diag
 }
 
-makediag <- function(x, nrow = NA)
-############# Function to make a diagonal matrix; deals with R trying to think too much with diag()
-{
+############# Make a diagonal matrix; deals with R trying to think too much with diag()
+makediag <- function(x, nrow = NA) {
   if (length(x) == 1) {
     if (is.na(nrow)) nrow <- 1
     return(diag(c(x), nrow))
@@ -32,7 +30,7 @@ makediag <- function(x, nrow = NA)
 }
 
 ############ The following functions are for testing the shapes of matrices
-# these functions use as.character(x) to deal with the "feature" that in R (.01 + .14) == .15 is FALSE!!
+# these functions use as.character(x) to deal with the fact that in R (.01 + .14) == .15 is FALSE (due to numerical imprecision though all.equal((0.01+0.14), 0.15) is TRUE
 is.equaltri <- function(x) {
   # requires 2D matrix ; works on numeric, character or list matrices
   if (!is.matrix(x)) {
@@ -99,7 +97,6 @@ is.diagonal <- function(x, na.rm = FALSE) {
   } # diagonal
   return(FALSE)
 }
-
 
 is.identity <- function(x, dim = NULL) {
   # works on 2D numeric, character or list matrices; "1" is not identical to 1 however
@@ -202,7 +199,7 @@ is.validvarcov <- function(x, method = "kem") {
         tmp <- try(eigen(test.block, only.values = TRUE), silent = TRUE)
         if (inherits(tmp, "try-error")) {
           pos.flag <- TRUE
-        } else if (!all(tmp$values >= 0)) pos.flag <- TRUE
+        } else if (!all(tmp$values > 0)) pos.flag <- TRUE
         # if there is a problem
         if (pos.flag) {
           return(list(ok = FALSE, error = "One of the fixed blocks within the varcov matrix is not positive-definite "))
@@ -418,6 +415,22 @@ is.unitcircle <- function(x, tol=.Machine$double.eps^0.5){
   all(abs(eigval) <= 1+tol)
 }
 
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
+  if (!is.numeric(x)) {
+    return(FALSE)
+  }
+  test <- abs(x - round(x)) < tol
+  if (any(is.na(test))) {
+    return(FALSE)
+  }
+  return(test)
+}
+
+is.timevarying <- function(MLEobj){
+  model.dims <- attr(MLEobj$marss, "model.dims")[attr(MLEobj[["marss"]], "par.names")]
+  lapply(model.dims, function(x){x[3] != 1})
+}
+
 vec <- function(x) {
   if (!is.array(x)) stop("vec:arg must be a 2D or 3D matrix")
   len.dim.x <- length(dim(x))
@@ -480,17 +493,6 @@ parmat <- function(MLEobj, elem = c("B", "U", "Q", "Z", "A", "R", "x0", "V0", "G
     }
   }
   return(par.mat)
-}
-
-is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) {
-  if (!is.numeric(x)) {
-    return(FALSE)
-  }
-  test <- abs(x - round(x)) < tol
-  if (any(is.na(test))) {
-    return(FALSE)
-  }
-  return(test)
 }
 
 Imat <- function(x) {
@@ -760,19 +762,28 @@ sub3D <- function(x, t = 1) {
 }
 
 # replace 0 diags with 0 row/cols; no error checking.  Need square symm matrix
-pcholinv <- function(x) {
+pcholinv <- function(x, chol=TRUE) {
+  if(all(!x)) return(x)
   dim.x <- dim(x)[1]
   diag.x <- x[1 + 0:(dim.x - 1) * (dim.x + 1)]
   if (any(diag.x == 0)) {
     if (any(diag.x != 0)) {
-      b <- chol2inv(chol(x[diag.x != 0, diag.x != 0]))
+      if(chol){
+        b <- chol2inv(chol(x[diag.x != 0, diag.x != 0]))
+      }else{
+        b <- solve(x[diag.x != 0, diag.x != 0])
+      }
       OMG.x <- diag(1, dim.x)[diag.x != 0, , drop = FALSE]
       inv.x <- t(OMG.x) %*% b %*% OMG.x
     } else {
       inv.x <- matrix(0, dim.x, dim.x)
     }
   } else {
-    inv.x <- chol2inv(chol(x))
+    if(chol){
+      inv.x <- chol2inv(chol(x))
+    }else{
+      inv.x <- solve(x)
+    }
   }
   return(inv.x)
 }
@@ -805,7 +816,7 @@ pinv <- function(x) {
   dp[dp <= tol] <- 0
   dp[dp > tol] <- 1 / dp[dp > tol]
   sigma.star <- matrix(0, dimx[1], dimx[1])
-  xinv <- b$v %*% makediag(dp) %*% t(b$u)
+  xinv <- b$v %*% tcrossprod(makediag(dp), b$u)
   return(xinv)
 }
 

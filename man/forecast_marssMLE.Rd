@@ -3,48 +3,53 @@
 
 \title{ forecast function for MARSS MLE objects }
 \description{
-  \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{forecast(object)}, where object is \code{\link{marssMLE}} object, will return the forecasts of \eqn{\mathbf{y}_t}{y(t)} or the smoothed value of \eqn{\mathbf{x}_t}{x(t)} for \code{h} steps past the end of the model data. \code{forecast(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{\link{plot.marssPredict}} for automatic plotting of the forecast. \code{forecast.marssMLE()} is used by \code{\link{predict.marssMLE}()} to generate forecasts.
+  \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{forecast(object)}, where object is \code{\link{marssMLE}} object, will return the forecasts of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} for \code{h} steps past the end of the model data. \code{forecast(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{\link{plot.marssPredict}} for automatic plotting of the forecast. \code{forecast.marssMLE()} is used by \code{\link{predict.marssMLE}()} to generate forecasts.
 }
 \usage{
-\method{forecast}{marssMLE}(object, h=1,
-    conf.level = c(0.80, 0.95),
-    type = c("ytT", "xtT"),
-    newdata = list(y=NULL, c=NULL, d=NULL),
-    interval = c("prediction", "confidence", "none"),
-    fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
+\method{forecast}{marssMLE}(object, h = 10, level = c(0.8, 0.95), 
+     type = c("ytT","xtT", "ytt", "ytt1", "xtt", "xtt1"), 
+     newdata = list(y = NULL, c = NULL, d = NULL), 
+     interval = c("prediction", "confidence", "none"), 
+     fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
    }
-  \arguments{
+\arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
-  \item{h}{ Number of steps ahead to forecast. If \code{h !=0}, then \code{newdata} is for the forecast, i.e. for the h time steps after the end of the model data. See details. }
-  \item{conf.level}{ Level for the intervals if \code{interval != "none"}.}
-  \item{type}{ Fitted values for the observations (ytT) or the states (xtT). The predictions are conditioned on all the data (if data are supplied in \code{newdata} or implicitly supplied by not passing in \code{newdata}).}
-  \item{newdata}{ An optional list with new y (data), c or d (covariates) to use for the predictions or forecasts. y, c and d must have the same form as used in the \code{\link{MARSS}()} call but the number of time steps can be different. t is used if there is ambuiquity as to which time steps the y, c and d refer to. See examples and details. }
-  \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence interval of the fitted value is returned. \code{interval="prediction"} (default) returns prediction intervals (new data). Note, in the context of a MARSS model, only confidence intervals are available for xtT.}
+  \item{h}{ Number of steps ahead to forecast. \code{newdata} is for the forecast, i.e. for the \eqn{h} time steps after the end of the model data. If there are covariates, \eqn{c} or \eqn{d}, then \code{newdata} is required. See details. }
+  \item{level}{ Level for the intervals if \code{interval != "none"}.}
+  \item{type}{ Observations (ytT) or the states (xtT). Other possible forecasts are provided for completeness. }
+  \item{newdata}{ An optional list with matrices for new covariates \eqn{c} or \eqn{d} to use for the forecasts. \eqn{c} and \eqn{d} must be in the original model and have the same matrix rows and columns as used in the \code{\link{MARSS}()} call but the number of time steps can be different. }
+  \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence interval of the expected value of \eqn{\mathbf{y}_t}{y(t)} (ytT) or \eqn{\mathbf{x}_t}{x(t)} (xtT) is returned. \code{interval="prediction"} (default) returns prediction intervals which include the uncertainty in the expected value and due to observation error (the \eqn{R} in the \eqn{y} equation). Note, in the context of a MARSS model, only confidence intervals are available for x. }
   \item{fun.kf}{ Only if you want to change the default Kalman filter. Can be ignored. }
   \item{...}{ Other arguments. Not used. }
   }
 \value{
   A list with the following components:
 
-\item{method}{The method used for fitting, e.g. MARSS kem. }
-\item{model}{The \code{\link{marssMLE}} object passed into \code{predict()}. }
-\item{newdata}{The \code{newdata} list passed into predict(). c and d must be matrices. t must be a vector (same length as the 2nd dimension of y, c, and d). If h!=0, y must be a matrix. If h==0, y can be a matrix or "none" (no data), or "model" (use the model data in object). If the latter, t can be used to specify a subset of the model data. See examples.}
-\item{level}{The \code{conf.level} passed into \code{predict()}.}
-\item{pred}{A data frame the predictions or forecasts along with the intervals. In tibble format. }
-\item{type}{The \code{type} ("ytT" or "xtT") passed into \code{predict()}.}
-\item{t}{The time steps used in pred (used for plotting).}
+\item{method}{The method used for fitting, e.g. "kem". }
+\item{model}{The \code{\link{marssMLE}} object passed into \code{forecast.marssMLE()}. }
+\item{newdata}{The \code{newdata} list if passed into \code{forecast.marssMLE()}.}
+\item{level}{The confidence \code{level} passed into \code{forecast.marssMLE()}.}
+\item{pred}{A data frame the forecasts along with the intervals. }
+\item{type}{The \code{type} ("ytT" or "xtT") passed into \code{forecast.marssMLE()}.}
+\item{t}{The time steps used to fit the model (used for plotting).}
 \item{h}{The number of forecast time steps (used for plotting).}
 
 
 }
 \details{
 
-The xtT forecast is returned with \code{\link{tidy.marssMLE}}. It is the smoothed x estimate, i.e. the estimate conditioned on all the data. If \code{h!=0}, then 'data' is the original data (model data) plus any new data passed in with y in \code{newdata} for the h forecast time steps. Note, typically forecasts would not have data, since they are forecasts, but \code{predict.marssMLE()} allows you to specify data for the forecast if you need to. If the model includes covariates (c or d matrices passed into the \code{model} list in the \code{\link{MARSS}()} call), then c and d must be passed into \code{newdata}. 
+The ytT forecast for \eqn{T+i}  is 
+\deqn{\mathbf{Z}\tilde{x}_{T+i} + \mathbf{a} + \mathbf{D}\mathbf{d}_{T+i}}{Z tildex(T+i) + a + D d(T+i)}
+where \eqn{\mathbf{Z}}{Z}, \eqn{\mathbf{a}}{a} and \eqn{\mathbf{D}}{d} are estimated from the data from 1 to \eqn{T}. If the model includes \eqn{\mathbf{d}}{d} then \code{newdata} with \code{d} must be passed in. Either confidence or prediction intervals can be shown. Prediction intervals would be the norm for forecasts and show the intervals for new data which based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i} + \mathbf{V}_{T+i}}{Z X(T+i) + V(T+i)}. Confidence intervals would show the variance of the mean of the new data (such as if you ran a simulation multiple times and recorded only the mean observation time series). It is based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i}}{Z X(T+i)}. The intervals shown are computed with \code{\link[=fitted.marssMLE]{fitted}()}.
 
-The ytT forecast is returned with \code{\link{fitted.marssMLE}}. It is the fitted ytT or, said alternatively, the expected value of NEW data (y) conditioned on the data used for fitting. The data used for fitting is the same at for xtT (above). The ytT forecast is \eqn{Z xtT + A}. 
+The xtT forecast for \eqn{T+i}  is 
+\deqn{\mathbf{B}\tilde{\mathbf{x}}_{T+i-1} + \mathbf{u} + \mathbf{C}\mathbf{c}_{T+i}}{B tildex(T+i-1) + u + C c(T+i)}
+where \eqn{\mathbf{B}}{B} and \eqn{\mathbf{u}}{u} and \eqn{\mathbf{C}}{C} are estimated form the data from 1 to \eqn{T} (i.e. the estimates in the marssMLE object). If the model includes \eqn{\mathbf{c}}{c} then \code{newdata} with \code{c} must be passed in. The only intervals are confidence intervals which based on the conditional variance of \eqn{\mathbf{B}\mathbf{X}_{T+i-1} + \mathbf{W}_{T+i}}{B X(T+i-1) + W(T+i)}. If you pass in data for your forecast time steps, then the forecast will be computed conditioned on the original data plus the data in the forecast period. The intervals shown are computed with the Kalman smoother (or filter if \code{type="xtt"} or \code{type="xtt1"} specified) via \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}.
 
-If the model has time-varying parameters, the value of the parameters at the last time step is used for the forecast.
+If the model has time-varying parameters, the parameter estimates at time \eqn{T} will be used for the whole forecast. If new data \code{c} or \code{d} are passed in, it must have \code{h} time steps. 
 
+Note: \code{y} in \code{newdata}. Data along with covariates can be passed into \code{newdata}. In this case, the data in \code{newdata} (\eqn{T+1} to \eqn{T+h}) are conditioned on for the expected value of \eqn{\mathbf{X}_t}{X(t)}
+ but parameters used are only estimated using the data in the marssMLE object (\eqn{t=1} to \eqn{T}). 
 }
 \seealso{
 \code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}()}
@@ -62,10 +67,15 @@ dat <- dat[2:4,] #remove the year row
 fit <- MARSS(dat, model=list(R="diagonal and equal"))
 
 # 2 steps ahead forecast
-fr <- predict(models[[i]], type="ytT", h=2)
+fr <- forecast.marssMLE(fit, type="ytT", h=2)
 plot(fr)
 
 # forecast and only show last 10 steps of original data
-plot(predict(fit, h=10), include=10)
-    
+fr <- forecast.marssMLE(fit, h=10)
+plot(fr, include=10)
+
+# if you load the forecast package, you can use
+library(forecast)
+fr <- forecast(fit)
+
 }

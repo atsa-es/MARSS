@@ -65,7 +65,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   # for notation purposes, 't' represents current point in time, 'TT' represents the length of the series
   # notation is horrible and leaves off the time conditioning.
   # In most, not all cases, it is 1:TT. If the last time is the conditioning, notation should be
-  # hatyt = hatytT, hatyxt = hatytxtT, hatyxtt1T=hatytxt1T, hatyxttp=hatytxtpT
+  # hatyt = hatytT, hatyxt = hatytxtT, hatyxtt1T=hatytxt1T, hatyxttp=hatytxtpT, hatyxtt=hatytxtt
   # hatOt = hatOtT, hatOtt1=is ok,
   hatyt <- matrix(0, n, TT)
   hatOt <- array(0, dim = c(n, n, TT))
@@ -75,7 +75,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
     # hatvarEytT = variance of the expected value of ytT
     hatytt1 <- hatytt <- matrix(0, n, TT)
     hatOtt1 <- hatOtt <- array(0, dim = c(n, n, TT))
-    hatyxtt1T <- hatyxtt1 <- array(0, dim = c(n, m, TT))
+    hatyxtt1T <- hatyxtt1 <- hatyxtt <- array(0, dim = c(n, m, TT))
     hatvarEytT <- hatvarytT <- array(0, dim = c(n, n, TT))
   }
 
@@ -106,6 +106,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
         hatytt[, t] <- hatyt[, t]
         hatOtt[, , t] <- hatOt[, , t]
         hatyxtt1T[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE])
+        hatyxtt[, , t] <- tcrossprod(hatytt[, t, drop = FALSE], hatxtt[, t, drop = FALSE])
         # don't need to update hatvarEytT[, , t] nor hatvarytT[, , t] since it will be 0
       }
     } else {
@@ -129,12 +130,13 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
       t.DZ <- matrix(Delta.r %*% pari$Z, m, n, byrow = TRUE)
       hatOt[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2 + tcrossprod(hatyt[, t, drop = FALSE])
       hatyxt[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVt[, , t]
-      hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% t(hatVtpt[, , t])
+      hatyxttp[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxtp[, t, drop = FALSE]) + Delta.r %*% tcrossprod(pari$Z, hatVtpt[, , t])
       
       if(!only.kem){
         hatytt[, t] <- y[, t, drop = FALSE] - Delta.r %*% (y[, t, drop = FALSE] - pari$Z %*% hatxtt[, t, drop = FALSE] - pari$A)
         hatOtt[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVtt[, , t] %*% t.DZ) %*% I.2 + tcrossprod(hatytt[, t, drop = FALSE])
         hatyxtt1T[, , t] <- tcrossprod(hatyt[, t, drop = FALSE], hatxt1[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVtt1T[, , t]
+        hatyxtt[, , t] <- tcrossprod(hatytt[, t, drop = FALSE], hatxtt[, t, drop = FALSE]) + Delta.r %*% pari$Z %*% hatVtt[, , t]
         hatvarEytT[, , t] <- I.2 %*% (Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2
         hatvarytT[, , t] <- I.2 %*% (Delta.r %*% pari$R + Delta.r %*% pari$Z %*% hatVt[, , t] %*% t.DZ) %*% I.2
       }
@@ -143,7 +145,9 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   if(only.kem){
     rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp)
   }else{
-    rtn.list <- list(ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxttpT = hatyxttp, ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1 = hatyxtt1, yxtt1T = hatyxtt1T, ytt = hatytt, Ott = hatOtt)
+    rtn.list <- list(ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxtt1T = hatyxtt1T, yxttpT = hatyxttp, 
+                     ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1 = hatyxtt1,  
+                     ytt = hatytt, Ott = hatOtt, yxtt = hatyxtt)
   }
   return(c(rtn.list, list(ok = TRUE, errors = msg)))
 }
