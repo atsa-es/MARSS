@@ -24,7 +24,7 @@ library(tidyr) # data frame manipulation
 \section{Nile River example}
 \index{structural ts models!univariate}
 
-This is the Nile River example in \citet{DurbinKoopman2012} and shown in Chapter \ref{chap:CSstrucbreak} on structural breaks. This model is
+This is the Nile River example in \citet{DurbinKoopman2012} and shown in Chapter \ref{chap:CSstrucbreak} on structural breaks. This model is\index{structural ts model!Nile}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{gathered}
@@ -37,7 +37,7 @@ y_t = x_t+v_t \text{ where } v_t \sim \N(0,r)  \\
 
 \subsection{Fitting models}
 
-\verb@KFAS::SSModel@ sets up the KFAS model which will be passed to the fitting functions. \verb@KFAS::SSMtrend(degree = 1)@ designates a local level model. \verb@KFAS::fitSSM@ fits the KFAS model. 
+\verb@KFAS::SSModel@ sets up the KFAS model which will be passed to the fitting functions. \verb@KFAS::SSMtrend(degree = 1)@ designates a local level model. \verb@KFAS::fitSSM@ fits the KFAS model.\index{estimation!KFAS}
 <<Cs101_fitting-models, results=hide>>=
 model_Nile <- SSModel(Nile ~ SSMtrend(degree = 1, 
                                       Q = list(matrix(NA))), 
@@ -174,7 +174,7 @@ cbind(P=kf_kfas$P[1:n], Vtt1=kf_marss$Vtt1[1:n],
 \subsection{Observation filtering and smoothing}
 \index{Observation filtering and smoothing!KFAS}
 
-Both KFAS and MARSS return the smoothed and filtered (one-step ahead) model predictions via \verb@fitted()@. However, for KFAS this just returns the smoothed values. The \verb@KFAS::KFS()@ function will  return the filtered and smoothed model predictions in matrix form along with other filter and smoother output.
+Both KFAS and MARSS return the smoothed and filtered (one-step ahead) model predictions via \verb@fitted()@. However, for KFAS this just returns the smoothed values. The \verb@KFAS::KFS()@ function will  return the filtered and smoothed model predictions in matrix form along with other filter and smoother output.\index{fitted values}
 <<Cs301_obs-filtering, results=hide>>=
 f_kfas <- KFS(fit_kfas$model, filtering = "signal", 
               smoothing = "signal", simplify = FALSE)
@@ -275,7 +275,7 @@ pred_marss2 <- predict(fit_marss, type="ytT",
 
 \subsubsection{One step ahead predictions}
 
-The default for \verb@predict.SSModel()@ is to return model fitted values conditioned on all the data. For the one-step ahead predictions, set \verb@filtered=TRUE@. This returns the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on the data up to $t-1$ only.
+The default for \verb@predict.SSModel()@ is to return model fitted values conditioned on all the data. For the one-step ahead predictions, set \verb@filtered=TRUE@. This returns the expected value and standard error of $\ZZ \XX_t + \aa$ conditioned on the data up to $t-1$ only.\index{standard errors!one-step-ahead}
 <<Cs407_conf-int>>=
 conf_kfas_t1 <- predict(fit_kfas$model, interval = "confidence", 
                         se.fit = TRUE, filtered=TRUE)
@@ -293,13 +293,13 @@ conf_marss2_t1 <- predict(fit_marss, type="ytt1",
 head(conf_marss2_t1$pred)
 @
 
-As before, we can get prediction intervals for the one-step ahead new data also.
+As before, we can get prediction intervals for the one-step ahead new data also.\index{prediction intervals!KFAS}
 <<Cs410_conf-int>>= 
 pred_kfas_t1 <- predict(fit_kfas$model, interval = "prediction", 
                         se.fit = TRUE, filtered=TRUE)
 head(pred_kfas_t1)
 @
-In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. Again, these functions return the standard deviation of $\ZZ \XX_t + \aa + \vv_t$ (so standard deviation of new data) not the standard error of the mean prediction.
+In MARSS, \verb@fitted()@ or \verb@predict()@ can be used. Again, these functions return the standard deviation of $\ZZ \XX_t + \aa + \vv_t$ (so standard deviation of new data) not the standard error of the mean prediction.\index{prediction intervals}
 <<Cs411_conf-int>>=
 pred_marss1_t1 <- fitted(fit_marss, type="ytt1", interval="prediction")
 head(pred_marss1_t1)
@@ -311,7 +311,7 @@ pred_marss2_t1 <- predict(fit_marss, type="ytt1",
 @
 
 \subsection{Residuals}
-\index{residuals!KFAS}
+\index{residuals!KFAS}\index{residuals}
 
 Mathematically, the state and model residuals are
 \begin{equation}
@@ -361,6 +361,7 @@ Here is a table of the correspondence between the KFAS and MARSS residual functi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Case 1. Recursive residuals}
+\index{residuals!one-step-ahead}
 
 <<Cs501_residuals>>=
 kfs <- KFS(fit_kfas$model)
@@ -373,6 +374,7 @@ df <- cbind(MARSS=resid_marss$.resids,
 head(df)
 @
 
+\index{residuals!standardized, marginal}
 <<Cs502_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "recursive", 
@@ -385,7 +387,7 @@ df <- cbind(MARSS=resid_marss$.std.resids,
 head(df)
 @
 
-In the univariate case, the Cholesky standardization is not different.
+In the univariate case, the Cholesky standardization is not different. \index{residuals!standardized, Cholesky}
 <<Cs503_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- rstandard(kfs, type = "recursive", 
@@ -400,7 +402,7 @@ head(df)
 
 \subsubsection{Case 2. Pearson residuals}
 
-No standardization is done for \verb@residuals(kfs, type = "pearson")@.
+No standardization is done for \verb@residuals(kfs, type = "pearson")@.\index{residuals!pearson}
 <<Cs504_residuals>>=
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- residuals(kfs, type = "pearson")
@@ -450,7 +452,7 @@ head(df)
 
 \subsubsection{Case 4. State residuals}
 
-No standardization.
+No standardization.\index{residuals!state}
 <<Cs508_residuals>>=
 kfs <- KFS(fit_kfas$model, smoothing="disturbance")
 resid_kfas <- residuals(kfs, type = "state")
@@ -474,7 +476,7 @@ df <- cbind(MARSS=resid_marss$.std.resids,
 head(df)
 @
 
-The Cholesky standardization is "block" style in KFAS and treats the model and state smoothed residuals as independent (they are not). 
+The Cholesky standardization is "block" style in KFAS and treats the model and state smoothed residuals as independent (they are not). \index{residuals!standardized, Block.Cholesky}
 <<Cs509_residuals>>=
 kfs <- KFS(fit_kfas$model, smoothing="disturbance")
 resid_kfas <- rstandard(kfs, type = "state", 
@@ -514,6 +516,7 @@ ts.plot(cbind(Nile, pred_kfas[,c("fit","lwr","upr")], conf_kfas[, c("lwr","upr")
 \end{figure}
 
 With MARSS, there is a plot method (and ggplot2::autoplot method) for marssMLE objects which will make the smoothed model predictions with CIs and PIs (Figure \ref{fig:plotting.2}).
+\index{confidence intervals}\index{plotting!confidence intervals}
 \begin{figure}[htp]
 \begin{center}
 <<Cs502_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
@@ -737,7 +740,7 @@ ggplot(df, aes(x=t,y=value)) + geom_line() + facet_wrap(~model)
 \label{fig:globaltemp.2}
 \end{figure}
 
-Comparison of state and model (pearson) residuals for the estimated models and a MARSS model that has the same parameters as the KFAS estimated model.
+Comparison of state and model (pearson) residuals for the estimated models and a MARSS model that has the same parameters as the KFAS estimated model.\index{residuals!pearson}
 <<Cs706_globaltemp, results=hide>>=
 mod.list <- list(
   Z = matrix(kfas_temp_stoch$model$Z, ncol=1),

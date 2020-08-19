@@ -18,7 +18,7 @@ library(xtable)
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_DFA.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-\index{MARSS model!DFA example}In this chapter, we use MARSS to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[sec. 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in Section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
+\index{MARSS model!DFA example}\index{dynamic factor analysis}In this chapter, we use MARSS to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[sec. 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in Section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
 
 DFA is conceptually different than what we have been doing in the previous applications.  Here we are trying to explain temporal variation in a set of $n$ observed time series using linear combinations of a set of $m$ hidden random walks, where $m << n$.  A DFA model is a type of MARSS model with the following structure:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -585,7 +585,7 @@ if (exists("model.data")) {
 
 \section{Using varimax rotation to determine the loadings and trends}
 
-As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivalent solutions to the dynamic factor loadings.  We arbitrarily constrained $\ZZ$ in such a way to choose only one of these solutions, but fortunately the different solutions are equivalent, and they can be related to each other by a rotation matrix $\HH$.  Let $\HH$ be any $m \times m$ non-singular matrix.  The following are then equivalent solutions:
+As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivalent solutions to the dynamic factor loadings.  We arbitrarily constrained $\ZZ$ in such a way to choose only one of these solutions, but fortunately the different solutions are equivalent, and they can be related to each other by a rotation matrix $\HH$.  Let $\HH$ be any $m \times m$ non-singular matrix.  The following are then equivalent solutions:\index{dynamic factor analysis!loadings}
 \begin{equation}
 \begin{gathered}
 \yy_t = \ZZ\xx_t+\aa+\vv_t\\
@@ -605,7 +605,7 @@ As \citet[p. 450, sec. 8.5.1]{Harvey1989} discusses, there are multiple equivale
 $\xx^\dagger$ are the rotated trends.
 
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
- $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.
+ $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.\index{dynamic factor analysis!rotation}
  
 The varimax rotation is easy to compute because R has a built in function that returns $\HH^{-1}$. We will illustrate the use of the varimax rotation with the 2-state model with $\RR$ unconstrained.  We will fit this with a large maxit.
 
@@ -699,7 +699,7 @@ for (i in 1:dim(ts.trends)[2]) {
 \label{fig:CS4.trends}
 \end{figure}
 
-\section{Examining model fits}
+\section{Examining model fits}\index{dynamic factor analysis!diagnostics}
 
 Now that we have done the appropriate factor and trends rotations, we
 should examine some plots of model fits. To do so, we will create a
@@ -778,7 +778,7 @@ for (i in 1:N.ts) {
 \label{fig:CS4.bestfits}
 \end{figure}
 
-Alternatively, you can use the \verb@residuals()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot:
+Alternatively, you can use the \verb@residuals()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot:\index{dynamic factor analysis!residuals}
 
 \begin{figure}[htp]
 \begin{center}
@@ -803,7 +803,7 @@ ggplot(data = d) +
 \end{figure}
 
 \section{Adding covariates}
-It is standard to add covariates to the analysis so that one removes known important drivers. The DFA with covariates is written:
+It is standard to add covariates to the analysis so that one removes known important drivers. The DFA with covariates is written:\index{dynamic factor analysis!covariates}
 \begin{equation}
 \begin{gathered}
 \xx_t = \xx_{t-1}+\ww_t \text{ where } \ww_t \sim \MVN(0,\QQ) \\
@@ -819,7 +819,7 @@ temp <- t(plankdat[years, "Temp", drop = FALSE])
 TP <- t(plankdat[years, "TP", drop = FALSE])
 @
 
-We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our 2-state model with $\RR$ ``unconstrained".
+We will now fit three different models that each add covariate effects (i.e., Temp, TP, Temp \& TP) to our 2-state model with $\RR$ ``unconstrained".\index{dynamic factor analysis!model selection}
 <<Cs27_fit_covar_echo, results=hide, echo=TRUE>>=
 model.list <- list(m = 2, R = "unconstrained")
 kemz.temp <- MARSS(dat.spp.1980,

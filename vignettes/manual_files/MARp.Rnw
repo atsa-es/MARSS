@@ -8,7 +8,7 @@ library(MARSS)
 
 \chapter{Lag-p models with MARSS}
 \label{chap:ARMA}
-\chaptermark{Models with lag-p}
+\chaptermark{Models with lag-p}\index{MAR(p)}
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_MARp.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
@@ -265,7 +265,7 @@ print(cbind(
 ))
 @
 
-\section{MARSS(p): models with observation error}
+\section{MARSS(p): models with observation error}\index{MAR(p)!MARSS(p)}
 We can easily fit MAR(p) processes observed with error using MARSS(p) models, but the difficulty is specifying the initial state condition.  $\pipi\equiv\xx_1$ and thus involves $\xx_1$, $\xx_0$, ....  However, we do not know the variance-covariance structure for these consecutive $\xx$.  Specifying $\LAM=0$ and estimating $\pipi$ often causes the EM algorithm to run into numerical problems.  But if we have an abundance of data, fixing $\pipi$ might not overly affect the $\BB$ and $\QQ$ estimates.  
 
 Here is an example where we set $\pipi$ to the mean of the data and set $\LAM$ to zero. Why not set $\LAM$ equal to a diagonal matrix with large values on the diagonal to approximate a vague prior?  The temporally consecutive initial states are definitely not independent.  A diagonal matrix would imply independence which will conflict with the process model and means our model would be fundamentally inconsistent with the data (and that usually has bad consequences for estimation).
@@ -301,7 +301,7 @@ Fit as usual:
 ar2ss <- MARSS(noisy.data, model = model.list.2ss)
 @
 
-We can compare the results to modeling the data as if there is no observation error, and we see that that assumption leads to poor $\BB$ estimates:
+We can compare the results to modeling the data as if there is no observation error, and we see that that assumption leads to poor $\BB$ estimates:\index{B matrix!estimation}
 <<Cs_405_fit-arss2-model, keep.source=TRUE>>=
 model.list.2ss.bad <- model.list.2ss
 # set R to zero in this model

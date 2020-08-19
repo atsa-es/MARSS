@@ -40,7 +40,7 @@ plot(Nile, ylab = "Flow volume", xlab = "Year")
 \end{figure}
 
 \section{Different models for the Nile flow levels}
-We begin by fitting different flow models to the data and compare these models with AIC.  After that, we will use the model residuals to look for outliers and structural breaks.
+We begin by fitting different flow models to the data and compare these models with AIC.  After that, we will use the model residuals to look for outliers and structural breaks.\index{structural ts model!univariate}\index{structural ts model!Nile}
 
 \subsection{Flat level model}
 We will start by modeling these data as a simple average river flow with variability around this level.  
@@ -318,7 +318,7 @@ mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
 \end{figure}
 
 \subsection{Detecting changes in the drift parameter in a random walk model}
-
+\index{structural ts model!trend}
 The model of a random walk with a fixed $u$ drift term is: 
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}

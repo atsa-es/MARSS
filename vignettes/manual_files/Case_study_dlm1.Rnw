@@ -296,7 +296,7 @@ In the literature on state-space models, the set of $e_t$ are commonly referred 
 innov <- kf.out$Innov
 @
 
-Let's see if our innovations meet the model assumptions. Beginning with (1), we can use a Q-Q plot to see whether the innovations are normally distributed with a mean of zero. We'll use the \verb@qqnorm()@ function to plot the quantiles of the innovations on the $y$-axis versus the theoretical quantiles from a Normal distribution on the $x$-axis. If the 2 distributions are similar, the points should fall on the line defined by $y = x$.
+Let's see if our innovations meet the model assumptions. Beginning with (1), we can use a Q-Q plot to see whether the innovations are normally distributed with a mean of zero. We'll use the \verb@qqnorm()@ function to plot the quantiles of the innovations on the $y$-axis versus the theoretical quantiles from a Normal distribution on the $x$-axis. If the 2 distributions are similar, the points should fall on the line defined by $y = x$. \index{diagnostics!Q-Q plot}
 <<dlm-QQplot, eval=FALSE, echo=TRUE>>=
 # Q-Q plot of innovations
 qqnorm(t(innov), main = "", pch = 16, col = "blue")
@@ -333,7 +333,7 @@ t.test(t(innov), mu = 0)$p.value
 @
 The $p$-value $>>$ 0.05 so we cannot reject the null hypothesis that $\E[e_t]=0$.
 
-Moving on to assumption (2), we can use the sample autocorrelation function (ACF) to examine whether the innovations covary with a time-lagged version of themselves. Using the \verb@acf()@ function, we can compute and plot the correlations of $e_t$ and $e_{t-k}$ for various values of $k$. Assumption (2) will be met if none of the correlation coefficients exceed the 95\% confidence intervals defined by $\pm \, z_{0.975} / \sqrt{n}$.
+Moving on to assumption (2), we can use the sample autocorrelation function (ACF) to examine whether the innovations covary with a time-lagged version of themselves. Using the \verb@acf()@ function, we can compute and plot the correlations of $e_t$ and $e_{t-k}$ for various values of $k$. Assumption (2) will be met if none of the correlation coefficients exceed the 95\% confidence intervals defined by $\pm \, z_{0.975} / \sqrt{n}$. \index{diagnostics!ACF plot}
 <<dlmACFplot, eval=FALSE, echo=TRUE>>=
 # plot ACF of innovations
 acf(t(innov), lag.max = 10)

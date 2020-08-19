@@ -369,7 +369,7 @@ data.frame(
 The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
 
 \section{Model diagnostics}\index{diagnostics}\index{functions!residuals}
-We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals (innovations) and their autocorrelation functions (ACFs) for all five taxa using the following code:
+We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals (innovations) and their autocorrelation functions (ACFs) for all five taxa using the following code: \index{diagnostics!ACF plot}
 <<Covar_sec7_01_diag-code, eval=FALSE>>=
 for (i in 1:3) {
   dev.new()
@@ -384,7 +384,7 @@ for (i in 1:3) {
   }
 }
 @
-Figures \ref{fig:mon-diagnostics-1}--\ref{fig:mon-diagnostics-3} shows these diagnostics for the three models.  The model residuals for all taxa and models appear to show significant negative autocorrelation at lag=1, suggesting that a model with seasonal effects is inadequate to capture all of the systematic variation in phytoplankton abundance. 
+Figures \ref{fig:mon-diagnostics-1}--\ref{fig:mon-diagnostics-3} shows these diagnostics for the three models.  The model residuals for all taxa and models appear to show significant negative autocorrelation at lag=1, suggesting that a model with seasonal effects is inadequate to capture all of the systematic variation in phytoplankton abundance. \index{diagnostics!ACF plot}
 
 \setkeys{Gin}{}
 \begin{figure}[htp]

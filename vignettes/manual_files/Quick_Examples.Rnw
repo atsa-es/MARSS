@@ -32,12 +32,12 @@ MARSS provides the following functions for output from fitted model objects. The
 
 \begin{itemize}
 \item \verb@fitted(fit)@ Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
-\item \verb@tidy::tidy(fit)@ or \verb@tidy.marssMLE(fit)@ Parameter estimates and confidence intervals.
-\item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.
-\item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.
-\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@], where \verb@fr <- forecast(fit)@], plots the forecasts.
-\item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.
-\item \verb@tsSmooth(fit)@ Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.
+\item \verb@tidy::tidy(fit)@ or \verb@tidy.marssMLE(fit)@ Parameter estimates and confidence intervals.\index{fitted values}
+\item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.\index{likelihood}\index{AIC}
+\item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.\index{residuals}
+\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@], where \verb@fr <- forecast(fit)@], plots the forecasts.\index{plotting!predictions}\index{forecasting}
+\item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.\index{plotting}
+\item \verb@tsSmooth(fit)@ Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.\index{Kalman filter and smoother}
 \item \verb@MARSShatyt(fit)@ Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation.
 \end{itemize}
 
@@ -453,6 +453,7 @@ kem.small <- MARSS(dat.short, model = list(
 No, there are simply not enough data to estimate both process and observation variances.  
 
 \section{Bootstrap parameter estimates}
+\index{bootstrap}
 You can easily produce bootstrap parameter estimates from a fitted model using \verb@MARSSboot()@\index{functions!MARSSboot}: 
 <<Cs35_boot, keep.source=TRUE>>=
 boot.params <- MARSSboot(kemfit,

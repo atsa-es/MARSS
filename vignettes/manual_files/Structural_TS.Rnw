@@ -73,7 +73,7 @@ fit4 <- MARSS(as.vector(y), model = mod.list,
               control = list(allow.degen = FALSE))
 @
 
-A difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate)\index{Kalman filter and smoother!StructTS} is the estimate of the state conditioned on the data up to $t$ not $T$. In the MARSS package, the state estimate (in the \verb@states@ element of the fitted object) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$). 
+A difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate)\index{Kalman filter and smoother!StructTS} is the estimate of the state conditioned on the data up to $t$ not $T$. In the MARSS package, the state estimate (in the \verb@states@ element of the fitted object) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$).\index{functions!MARSSkfss}\index{Kalman filter and smoother}
 
 <<label=Cs103_structTS-level, keep.source=TRUE>>=
 fit2$kf <- MARSSkfss(fit2)
@@ -430,7 +430,7 @@ rbind(
 @
 
 If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get a forecast object that can be printed since the forecast package has a plot method for StructTS objects.
-The MARSS package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}
+The MARSS package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
 
 The plots from the StructTS and marssMLE objects are similar though they have slightly different formats.
 \begin{figure}[htp]
@@ -448,7 +448,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 \end{figure}
 
 \subsection{Fitted values}
-\index{structural ts models!fitted}\index{functions!fitted}
+\index{structural ts models!fitted}
 
 \verb@fitted(x)@ applied to a StructTS object will return the expected value of $\XX_t$  (but only the first 3 states) conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed times series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
 \begin{figure}[htp]
@@ -461,7 +461,7 @@ plot(fitted1)
 \caption{Output from a plot of a fitted StructTS object.}
 \label{fig:STS.fig.bsm.fitted}
 \end{figure}
-In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.  The function \verb@fitted()@ in the MARSS package has the more typical meaning of \emph{fitted} for a statistical model (model prediction of $\yy$ or $\xx$).\index{functions!tsSmooth}
+In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.  The function \verb@fitted()@ in the MARSS package has the more typical meaning of \emph{fitted} for a statistical model (model prediction of $\yy$ or $\xx$).\index{functions!tsSmooth}\index{fitted values}\index{functions!fitted}
 <<label=Cs502_fitted>>=
 fitted2 <- tsSmooth(fit2, type = "xtt")
 fitted2 <- subset(fitted2, .rownames  %in% c("X1", "X2", "X3"))
