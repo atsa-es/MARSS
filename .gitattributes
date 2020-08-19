@@ -4,7 +4,10 @@ vignettes/Makefile export-ignore
 README.md export-ignore
 _config.yml export-ignore
 .Rhistory export-ignore
-inst/doc/versiontest.R export-ignore
+.Rbuildignore export-ignore
+favicon.ico export-ignore
+logo.png export-ignore
+logot.png export-ignore
 vignettes/*.sty export-ignore
 vignettes/*.cls export-ignore
 vignettes/*.bst export-ignore
@@ -13,3 +16,5 @@ vignettes/tables export-ignore
 vignettes/tex export-ignore
 vignettes/figures export-ignore
 vignettes/manual_files export-ignore
+vignettes/debugger_template.Rnw export-ignore
+inst/WORDLIST
