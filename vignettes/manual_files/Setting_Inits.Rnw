@@ -116,6 +116,7 @@ kem.bfgs <- MARSS(dat, model = model.list, inits = kem, method = "BFGS")
 @
 
 \section{Searching across initial values using a Monte Carlo routine}
+\index{initial conditions!Monte Carlo search}
 The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima and ridges.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carol search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  In our papers on the distributional properties of  MARSS parameter estimates, we rarely found that an initial conditions search changed the estimates---except in cases where $\ZZ$ and $\BB$ are estimated as unconstrained or as the fraction of missing data in the data set became large.  Regardless an initial conditions search should be done before reporting final estimates for an analysis\footnote{It is also a good idea to try method=BFGS to see if this changes the estimates.}.  
 
 The idea behind a Monte Carlo search of initial conditions is simple.  One simply randomly generates initial conditions, runs the EM algorithm a few iterations (10-20), and save the log-likelihood at the end of those iterations.  The starting initial conditions is selected from that giving the lowest log-likelihood. 
