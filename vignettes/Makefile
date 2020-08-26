@@ -101,5 +101,6 @@ clean:
 	rm -rf ./figures
 	rm -rf ./tables
 	rm -rf ../_layouts
+	$(RM) ../inst/WORDLIST
 	$(RM) ../man/MARSS_out.Rd
 	
