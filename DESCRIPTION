@@ -15,5 +15,5 @@ License: GPL-2
 LazyData: yes
 BuildVignettes: yes
 ByteCompile: TRUE
-URL: https://nwfsc-timeseries.github.io/MARSS
+URL: https://nwfsc-timeseries.github.io/MARSS/
 BugReports: https://github.com/nwfsc-timeseries/MARSS/issues
