@@ -30,12 +30,12 @@ MARSS <- function(y,
   if (is.vector(y)) y <- matrix(y, nrow = 1)
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
-  
-  if(inherits(model, "marssMLE")) model <- coef(model, type="matrix")
-  if(inherits(model, "marssMODEL")) model <- marssMODEL.to.list(model)
-  
+
+  if (inherits(model, "marssMLE")) model <- coef(model, type = "matrix")
+  if (inherits(model, "marssMODEL")) model <- marssMODEL.to.list(model)
+
   MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, ...)
-  
+
   # First make sure specified equation form has a corresponding function to do the conversion to marssMODEL (form=marss) object
   as.marss.fun <- paste("MARSS.", form[1], sep = "")
   tmp <- try(exists(as.marss.fun, mode = "function"), silent = TRUE)
@@ -44,7 +44,7 @@ MARSS <- function(y,
     cat("\n", "Errors were caught in MARSS \n", msg, sep = "")
     stop("Stopped in MARSS() due to problem(s) with required arguments.\n", call. = FALSE)
   }
-  
+
   # Build the marssMODEL object from the model argument to MARSS()
   ## The as.marss.fun() call adds the following to MARSS.inputs list:
   ## $marss Translate model strucuture names (shortcuts) into a marssMODEL (form=marss) object put in $marss
@@ -57,7 +57,7 @@ MARSS <- function(y,
   MARSS.inputs <- eval(call(as.marss.fun, MARSS.call))
   marss.object <- MARSS.inputs$marss
   if (silent == 2) cat(paste("Resulting model has ", attr(marss.object, "model.dims")$x[1], " state processes and ", attr(marss.object, "model.dims")$y[1], " observation processes.\n", sep = ""))
-  
+
   ## Check that the marssMODEL object output by MARSS.form() is ok
   ## More checking on the control list is done by is.marssMLE() to make sure the MLEobj is ready for fitting
   if (!identical(MARSS.call$control$trace, -1)) { # turn off all error checking
@@ -73,7 +73,7 @@ MARSS <- function(y,
       if (silent == 2) cat("  marssMODEL is ok.\n")
     }
   }
-  
+
   ## checkMARSSInputs() call does the following:
   ## Check that the user didn't pass in any illegal arguments
   ## and fill in defaults if some params left off
@@ -81,39 +81,39 @@ MARSS <- function(y,
   ## via the MARSS.form() function above
   if (silent == 2) cat("Running checkMARSSInputs().\n")
   MARSS.inputs <- checkMARSSInputs(MARSS.inputs, silent = FALSE)
-  
-  
+
+
   ###########################################################################################################
   ##  MODEL FITTING
   ###########################################################################################################
-  
+
   ## MLE estimation
   kem.methods <- get("kem.methods", envir = pkg_globals)
   optim.methods <- get("optim.methods", envir = pkg_globals)
   if (method %in% c(kem.methods, optim.methods)) {
-    
+
     ## Create the marssMLE object
-    
+
     MLEobj <- list(marss = marss.object, model = MARSS.inputs$model, control = c(MARSS.inputs$control, silent = silent), method = method, fun.kf = fun.kf)
     # Set the call form since that info needed for MARSSinits
     if (MLEobj$control$trace != -1) {
       MLEobj$call <- MARSS.call
     }
-    
+
     # This is a helper function to set simple inits for a marss MLE model object
     MLEobj$start <- MARSSinits(MLEobj, MARSS.inputs$inits)
-    
+
     class(MLEobj) <- "marssMLE"
-    
+
     ## Check the marssMLE object
     ## is.marssMLE() calls is.marssMODEL() to check the model,
     ## then checks dimensions of initial value matrices.
     ## it also checks the control list and add defaults if some values are NULL
-    if(MLEobj$control$trace != -1){
+    if (MLEobj$control$trace != -1) {
       if (silent == 2) cat("Checking the marssMLE object before fitting.\n")
       tmp <- is.marssMLE(MLEobj)
     }
-    
+
     # if errors, tmp will not be true, it will be error messages
     if (!isTRUE(tmp)) {
       if (!silent || silent == 2) {
@@ -124,7 +124,7 @@ MARSS <- function(y,
       MLEobj$convergence <- 2
       return(MLEobj)
     }
-    
+
     if (MLEobj$control$trace != -1) {
       MLEobj.test <- MLEobj
       MLEobj.test$par <- MLEobj$start
@@ -161,9 +161,9 @@ MARSS <- function(y,
       }
       # MLEobj$Ey=Eytest
     }
-    
+
     if (!fit) MLEobj$convergence <- 3
-    
+
     if (fit) {
       ## If no parameters are estimated, then set par element and get the states
       if (all(unlist(lapply(MLEobj$marss$free, is.fixed)))) {
@@ -176,7 +176,7 @@ MARSS <- function(y,
         if (method %in% kem.methods) MLEobj <- MARSSkem(MLEobj)
         if (method %in% optim.methods) MLEobj <- MARSSoptim(MLEobj)
       }
-      
+
       ## Add AIC and AICc and coef to the object
       ## Return as long as something was estimated and there are no errors, but might not be converged
       # If all params fixed (so no fitting), convergence==3
@@ -239,7 +239,7 @@ MARSS <- function(y,
         MLEobj <- MARSSapplynames(MLEobj)
       }
     } # fit the model
-    
+
     if ((!silent || silent == 2) & MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12)) {
       print(MLEobj)
     }
@@ -247,9 +247,9 @@ MARSS <- function(y,
       cat(MLEobj$errors)
     } # 3 added since don't print if fit=FALSE
     if ((!silent || silent == 2) & !fit) print(MLEobj$model)
-    
+
     return(MLEobj)
   } # end MLE methods
-  
+
   return("method allowed but it's not in kem.methods or optim.methods so marssMLE object was not created")
 }
