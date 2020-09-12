@@ -181,11 +181,13 @@ MARSS <- function(y,
       ## Return as long as something was estimated and there are no errors, but might not be converged
       # If all params fixed (so no fitting), convergence==3
       if ((MLEobj$convergence %in% c(0, 1)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
+        if (silent == 2) cat("Adding AIC and coefficients.\n")
         MLEobj <- MARSSaic(MLEobj)
         MLEobj$coef <- coef(MLEobj, type = "vector")
       }
       ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
       if ((MLEobj$convergence %in% c(0, 1, 3)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
+        if (silent == 2) cat("Adding states and states.se.\n")
         kf <- MARSSkf(MLEobj) # use function requested by user
         MLEobj$states <- kf$xtT
         MLEobj$logLik <- kf$logLik
