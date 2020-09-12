@@ -131,13 +131,13 @@ MARSS <- function(y,
       # Do this test with MARSSkfss since it has internal tests for problems
       kftest <- try(MARSSkfss(MLEobj.test), silent = TRUE)
       if (inherits(kftest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because MARSSkfss stopped.  Something is wrong with \n the model structure that prevents Kalman filter running.\n Try using control$trace=-1 and fit=FALSE and then look at the model that MARSS is trying to fit.\n")
+        cat("Error: Stopped in MARSS() before fitting because MARSSkfss stopped.  Something in the model structure prevents the kfss Kalman filter running.\n Try using control$trace=-1 to turn off error-checking (and MARSSkfss calls) or use fit=FALSE and check the model you are trying to fit.\n")
         MLEobj$convergence <- 2
         return(MLEobj.test)
       }
       if (!kftest$ok) {
         cat(kftest$msg)
-        cat(paste("Error: Stopped in MARSS() before fitting because the MARSSkfss (Kalman filter) function returned errors.  Something is wrong with \n the model structure. Try using control$trace=-1 and fit=FALSE and then \n look at the model that MARSS is trying to fit.\n", kftest$errors, "\n", sep = ""))
+        cat(paste("Error: Stopped in MARSS() before fitting because MARSSkfss stopped.  Something in the model structure prevents the kfss Kalman filter running.\n Try using control$trace=-1 to turn off error-checking (and MARSSkfss calls) or use fit=FALSE and check the model you are trying to fit.\n", kftest$errors, "\n", sep = ""))
         MLEobj$convergence <- 2
         return(MLEobj.test)
       }
@@ -147,14 +147,14 @@ MARSS <- function(y,
     if (MLEobj$control$trace != -1 & MLEobj$method == "kem") {
       Eytest <- try(MARSShatyt(MLEobj.test), silent = TRUE)
       if (inherits(Eytest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because MARSShatyt stopped.  Something is wrong with \n model structure that prevents MARSShatyt running.\n\n")
+        cat("Error: Stopped in MARSS() before fitting because MARSShatyt stopped.  Something is wrong with the model structure that prevents MARSShatyt running.\n\n")
         MLEobj.test$convergence <- 2
         MLEobj.test$Ey <- Eytest
         return(MLEobj.test)
       }
       if (!Eytest$ok) {
         cat(Eytest$msg)
-        cat("Error: Stopped in MARSS() before fitting because MARSShatyt returned errors.  Something is wrong with \n model structure that prevents function running.\n\n")
+        cat("Error: Stopped in MARSS() before fitting because MARSShatyt returned errors.  Something is wrong with the model structure that prevents function running.\n\n")
         MLEobj.test$convergence <- 2
         MLEobj.test$Ey <- Eytest
         return(MLEobj.test)
@@ -187,13 +187,12 @@ MARSS <- function(y,
       ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
       if ((MLEobj$convergence %in% c(0, 1, 3)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
         kf <- MARSSkf(MLEobj) # use function requested by user
-        if (fun.kf == "MARSSkfas") kfss <- MARSSkfss(MLEobj) else kfss <- kf
         MLEobj$states <- kf$xtT
         MLEobj$logLik <- kf$logLik
-        if (!is.null(kfss[["VtT"]])) {
+        if (!is.null(kf[["VtT"]])) {
           m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
           TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
-          states.se <- apply(kfss[["VtT"]], 3, function(x) {
+          states.se <- apply(kf[["VtT"]], 3, function(x) {
             takediag(x)
           })
           states.se[states.se < 0] <- NA
@@ -222,6 +221,7 @@ MARSS <- function(y,
         }
         MLEobj$ytT.se <- ytT.se
         if (MLEobj$control$trace > 0) { # then return kf and Ey
+          if (fun.kf == "MARSSkfas") kfss <- MARSSkfss(MLEobj) else kfss <- kf
           MLEobj$kf <- kf # from above will use function requested by user
           # except these are only returned by MARSSkfss
           MLEobj$Innov <- kfss$Innov
