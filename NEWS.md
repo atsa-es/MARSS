@@ -4,10 +4,13 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.2 and issues to be addressed in that release are marked with 3.11.2 milestone.
+New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.2 milestone (yes, marked with earlier release number).
 
+MARSS 3.11.2 (released 2020-09-12 on GitHub)
+------------------------------------
+This is a minor update to stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
 
-MARSS 3.11.1 (released 2020-08-18 on GitHub)
+MARSS 3.11.1 (released 2020-08-25 on CRAN)
 ------------------------------------
 Version 3.11.1 is focused on addition of the `predict`, `forecast`, `fitted` and `residuals` functions along with plotting functions for the output. Documentation for these functions along with background literature and the derivation of the residuals algorithms have been updated. Residuals in state-space models are complex as there are two processes (observation and state), three types of conditioning (data to t-1, t or T), and four types of standardization used in the literature (none, marginal, Cholesky on the full variance matrix, and Cholesky on only model or state residual variance). The MARSS package computes all the variants of residuals. Many of the `predict` changes are listed below for 3.10.13 release on GitHub. New chapters illustrating structural equation models using MARSS versus `StructTS` and the KFAS package were added. The KFAS chapter compares the KFAS residuals functions to the MARSS residuals functions. The two packages use different algorithms and different semantics to compute the same residuals.
 
