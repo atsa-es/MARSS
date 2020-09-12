@@ -181,9 +181,9 @@ MARSSkfss <- function(MLEobj) {
     # Because R diag might be 0, the bracketed bit might have 0 diagonals.  Inv by pcholinv deals with this
     # by putting 0 row/cols where 0s appear on diagonal
 
-    if (debugkf == -1) {
+    if (debugkf <= 0) { # 0 is default; -1 is no error-checking
       siginv <- pcholinv(siginv1) # skip error-checking
-    } else {
+    } else { # try is expensive so only check if extra tracing specified
       siginv <- try(pcholinv(siginv1), silent = TRUE)
       if (n == 1) diag.siginv1 <- unname(siginv1) else diag.siginv1 <- unname(siginv1)[1 + 0:(n - 1) * (n + 1)] # much faster way to get the diagonal
       # Catch errors before entering chol2inv
@@ -306,18 +306,30 @@ MARSSkfss <- function(MLEobj) {
         return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=", t, ".\n")))
       }
     }
-    if (m == 1) {
+    # If trace > 0, then use try() to check if inversion can be done.
+    if( debugkf <= 0){ # 0 is default; -1 is not checking
+    if (m == 1) { 
       Vinv <- pcholinv(matrix(Vtt1[, , t], 1, 1))
     } else {
       Vinv <- pcholinv(Vtt1[, , t])
       Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+    }
+    }else{ # this is expensive; only use if extra tracing specified
+      if (m == 1) { 
+        Vinv <- try(pcholinv(matrix(Vtt1[, , t], 1, 1)))
+      } else {
+        Vinv <- try(pcholinv(Vtt1[, , t]))
+      }
+      if (class(Vinv)[1] == "try-error") {
+        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: chol(Vtt1[,,", t, "]) error.\n", sep = "")))
+      }
+      Vinv <- symm(Vinv) # if not errors
     }
     J[, , t - 1] <- Vtt[, , t - 1] %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
 
     xtT[, t - 1] <- xtt[, t - 1, drop = FALSE] + J[, , t - 1] %*% (xtT[, t, drop = FALSE] - xtt1[, t, drop = FALSE]) # eqn 6.47
     if (m == 1) t.J <- J[, , t - 1] else t.J <- matrix(J[, , t - 1], m, m, byrow = TRUE) # faster transpose
     VtT[, , t - 1] <- Vtt[, , t - 1] + J[, , t - 1] %*% (VtT[, , t] - Vtt1[, , t]) %*% t.J # eqn 6.48
-    # VtT[,,t-1] = (VtT[,,t-1]+matrix(VtT[,,t-1],m,m,byrow=TRUE))/2     #should not be necessary here
   } # end of the smoother
 
   # define J0
