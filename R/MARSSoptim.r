@@ -78,7 +78,7 @@ MARSSoptim <- function(MLEobj) {
   } else {
     upper <- control$upper
   }
-  if (control$trace == -1) control$trace <- 0
+  if (control$trace == -1) optim.control$trace <- 0
 
   # The code is used to set things up to use MARSSvectorizeparam to just select inits for the estimated parameters
   # Q=t(chol(Q)%*%chol(Q)); t(chol(Q)) has 0 in upper triangle
