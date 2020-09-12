@@ -316,9 +316,9 @@ MARSSkfss <- function(MLEobj) {
     }
     }else{ # this is expensive; only use if extra tracing specified
       if (m == 1) { 
-        Vinv <- try(pcholinv(matrix(Vtt1[, , t], 1, 1)))
+        Vinv <- try(pcholinv(matrix(Vtt1[, , t], 1, 1)), silent = TRUE )
       } else {
-        Vinv <- try(pcholinv(Vtt1[, , t]))
+        Vinv <- try(pcholinv(Vtt1[, , t]), silent = TRUE )
       }
       if (class(Vinv)[1] == "try-error") {
         return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: chol(Vtt1[,,", t, "]) error.\n", sep = "")))
