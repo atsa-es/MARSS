@@ -131,7 +131,7 @@ MARSS <- function(y,
       MLEobj.test$par <- MLEobj$start
       kftest <- try(MARSSkf(MLEobj.test), silent = TRUE)
       if (inherits(kftest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because", fun.kf,  "stopped.  Something in the model structure prevents the Kalman filter or smoother running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output.\n")
+        cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter or smoother running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output.\n")
         MLEobj$convergence <- 2
         return(MLEobj.test)
       }
@@ -144,7 +144,7 @@ MARSS <- function(y,
       MLEobj.test$kf <- kftest
     }
     # Ey is needed for method=kem
-    if (MLEobj$control$trace != -1 && MLEobj$method  %in% kem.methods) {
+    if (MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
       Eytest <- try(MARSShatyt(MLEobj.test), silent = TRUE)
       if (inherits(Eytest, "try-error")) {
         cat("Error: Stopped in MARSS() before fitting because MARSShatyt() stopped.  Something is wrong with the model structure that prevents MARSShatyt() running.\n\n")
@@ -184,9 +184,9 @@ MARSS <- function(y,
         MLEobj <- MARSSaic(MLEobj)
         MLEobj$coef <- coef(MLEobj, type = "vector")
       }
-      
+
       ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
-      if ( MLEobj$convergence %in% c(0, 1, 3) ||( MLEobj$convergence %in% c(10, 11)  && MLEobj$method %in% kem.methods) ) {
+      if (MLEobj$convergence %in% c(0, 1, 3) || (MLEobj$convergence %in% c(10, 11) && MLEobj$method %in% kem.methods)) {
         if (silent == 2) cat("Adding states and states.se.\n")
         kf <- MARSSkf(MLEobj) # use function requested by user; default smoother=TRUE
         MLEobj$states <- kf$xtT
@@ -222,10 +222,18 @@ MARSS <- function(y,
           ytT.se <- NULL
         }
         MLEobj$ytT.se <- ytT.se
-        
+
         # Return kf and Ey, if trace = 1
-        if (MLEobj$control$trace > 0) { 
-          if (fun.kf == "MARSSkfas") kfss <- MARSSkfss(MLEobj, smoother=FALSE) else kfss <- kf
+        if (MLEobj$control$trace > 0) {
+          if (fun.kf == "MARSSkfas") {
+            kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
+            if (inherits(kfss, "try-error" || !kfss$ok)) {
+              msg <- "Not available. MARSSkfss() returned error."
+              kfss <- list(Innov = msg, Sigma = msg, xtt = msg, Vtt = msg, J = msg, Kt = msg)
+            }
+          } else {
+            kfss <- kf
+          }
           MLEobj$kf <- kf # from above will use function requested by user
           MLEobj$Ey <- Ey # from above
           # these are only returned by MARSSkfss
@@ -235,10 +243,10 @@ MARSS <- function(y,
           MLEobj$xtt <- kfss$xtt
           MLEobj$J <- kfss$J
           MLEobj$Kt <- kfss$Kt
-          if (fun.kf == "MARSSkfss"){
-            # From kfss smoother so won't necessarily be available if fun.kf=MARSSkfas
+          if (fun.kf == "MARSSkfss") {
             MLEobj$J0 <- kfss$J0
           } else {
+            # From kfss smoother so won't be available if fun.kf=MARSSkfas
             J0 <- try(MARSSkfss(MLEobj), silent = TRUE)
             if (!inherits(J0, "try-error") && J0$ok) MLEobj$J0 <- J0$J0 else MLEobj$J0 <- "Not available. MARSSkfss() smoother returned error."
           }
@@ -246,7 +254,7 @@ MARSS <- function(y,
         # apply X and Y names various X and Y related elements
         MLEobj <- MARSSapplynames(MLEobj)
       }
-    } 
+    }
     # END fit the model #################
 
     if ((!silent || silent == 2) & MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12)) {
