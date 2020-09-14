@@ -227,7 +227,7 @@ MARSS <- function(y,
         if (MLEobj$control$trace > 0) {
           if (fun.kf == "MARSSkfas") {
             kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
-            if (inherits(kfss, "try-error" || !kfss$ok)) {
+            if (inherits(kfss, "try-error") || !kfss$ok) {
               msg <- "Not available. MARSSkfss() returned error."
               kfss <- list(Innov = msg, Sigma = msg, xtt = msg, Vtt = msg, J = msg, Kt = msg)
             }
