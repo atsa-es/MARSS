@@ -6,7 +6,7 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.2 milestone (yes, marked with earlier release number).
 
-MARSS 3.11.2 (released 2020-09-12 on GitHub)
+MARSS 3.11.2 (released 2020-09-13 on GitHub)
 ------------------------------------
 This is a minor update to stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
 
