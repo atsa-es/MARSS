@@ -4,7 +4,7 @@
 #   ** All eqn refs are to 2nd ed of Shumway & Stoffer (2006): Time Series Analysis and Its Applications
 # 5-17-12  I removed the tests re inversion of Z when R=0 and put that in MARSSkem
 #######################################################################################################
-MARSSkfss <- function(MLEobj) {
+MARSSkfss <- function(MLEobj, smoother=TRUE) {
   condition.limit <- 1E10
   condition.limit.Ft <- 1E5 # because the Ft is used to compute LL and LL drop limit is about 2E-8
 
@@ -268,6 +268,7 @@ MARSSkfss <- function(MLEobj) {
   ######################################################
   # BACKWARD PASS (Kalman smoother) gets you E[x(t)|y(1:T)] from E[x(t)|y(1:t)]
   ######################################################
+  if (smoother){
   xtT[, TT] <- xtt[, TT, drop = FALSE]
   VtT[, , TT] <- Vtt[, , TT]
   # indexing is 0 to T for the backwards smoother recursions
@@ -406,8 +407,11 @@ MARSSkfss <- function(MLEobj) {
     Vtt1T[, , 1] <- Vtt[, , 1] %*% t(J0) + J[, , 1] %*% (Vtt1T[, , 2] - B %*% Vtt[, , 1]) %*% t(J0)
   }
   if (init.state == "x10") Vtt1T[, , 1] <- NA
-
-  ###########################################################
+  } else {
+  x0T <- V0T <- VtT <- xtT <- J0 <- Vtt1T <- NULL
+  }
+  ## END SMOOTHER #########################################################
+  
   rtn.list <- list(
     xtT = xtT, VtT = VtT, Vtt1T = Vtt1T, x0T = x0T, V0T = V0T, Vtt = Vtt,
     Vtt1 = Vtt1, J = J, J0 = J0, Kt = Kt, xtt1 = xtt1, xtt = xtt, Innov = vt, Sigma = Ft
@@ -417,7 +421,11 @@ MARSSkfss <- function(MLEobj) {
   MODELobj <- MLEobj[["marss"]]
   X.names <- attr(MODELobj, "X.names")
   Y.names <- attr(MODELobj, "Y.names")
-  for (el in c("xtT", "xtt1", "xtt", "x0T")) rownames(rtn.list[[el]]) <- X.names
+  if (smoother){
+    for (el in c("xtT", "xtt1", "xtt", "x0T")) rownames(rtn.list[[el]]) <- X.names
+  } else {
+    for (el in c("xtt1", "xtt")) rownames(rtn.list[[el]]) <- X.names
+  }
   rownames(rtn.list[["Innov"]]) <- Y.names
 
   # Calculate log likelihood, see eqn 6.62
@@ -431,11 +439,11 @@ MARSSkfss <- function(MLEobj) {
           ok = FALSE, logLik = NaN,
           errors = paste("One of the diagonal elements of Sigma[,,", t, "]=0. That should never happen when t>1 or t=1 and tinitx=0.  \n Are both Q[i,i] and R[i,i] being set to 0?\n", sep = "")
         )))
-      } else { # t=1 so ok. get the det of Ft and deal with 0s that might appear on diag of Ft when t=1 and V0=0 and R=0 and tinitx=1
-        # 2-5-15 This isn't an error.  x10 can be != y[1] when R=0; x11 cannot be.
-        #          if(any(abs(vt[diag.Ft==0,1])>1E-16)){
-        #              return(c(rtn.list,list(ok=FALSE, logLik = -Inf, errors = "V0=0, tinitx=1, R=0 and y[1] does not match x0. You shouldn't estimate x0 when R=0.\n")))
-        #          }
+      } else { 
+        # t=1 so ok. get the det of Ft and deal with 0s that might appear on 
+        #   diag of Ft when t=1 and V0=0 and R=0 and tinitx=1
+        #   Note, x10 can be != y[1] when R=0; x11 cannot be.
+        
         OmgF1 <- makediag(1, n)[diag.Ft != 0, , drop = FALSE] # permutation matrix
         # need to remove those y[1] associated with Ft[,,1]==0 that were non-missing
         loglike <- loglike + sum(diag.Ft == 0 & YM[, 1] != 0) / 2 * log(2 * base::pi)
@@ -451,7 +459,7 @@ MARSSkfss <- function(MLEobj) {
             detFt <- det(OmgF1 %*% tcrossprod(Ft[, , t], OmgF1))
           }
         }
-        # get the inv of Ft
+        # get the inverse of Ft
         if (n == 1) {
           Ftinv <- pcholinv(matrix(Ft[, , t], 1, 1))
         } else {
