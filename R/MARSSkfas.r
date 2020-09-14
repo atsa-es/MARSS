@@ -237,7 +237,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   
   if (!return.kfas.model) kfas.model <- NULL
   
-  # not using ks.out$v (Innov) and ks.out$F (Sigma) since I think there might be a bug (I misunderstand KFAS) when R is not diagonal.
+  # not using ks.out$v (Innov) and ks.out$F (Sigma) since I think there might be a bug (or I misunderstand KFS output) when R is not diagonal.
   rtn.list <- list(
     xtT = ks.out$alphahat[1:m, , drop = FALSE],
     VtT = VtT,

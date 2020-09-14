@@ -8,12 +8,13 @@
 }
 \usage{
 MARSSkf(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE, 
-           newdata=NULL)
-MARSSkfss(MLEobj)
+           newdata=NULL, smoother=TRUE)
+MARSSkfss(MLEobj, smoother=TRUE)
 MARSSkfas(MLEobj, only.logLik=FALSE, return.lag.one=TRUE, return.kfas.model=FALSE)
 }
 \arguments{
   \item{ MLEobj }{ A \code{\link{marssMLE}} object with the \code{par} element of estimated parameters, \code{marss} element with the model description (in marss form) and data, and \code{control} element for the fitting algorithm specifications.  \code{control$debugkf} specifies that detailed error reporting will be returned (only used by \code{MARSSkf}).  \code{model$diffuse=TRUE} specifies that a diffuse prior be used (only used by \code{MARSSkfas}). See \link[KFAS]{KFS} documentation. When the diffuse prior is set, V0 should be non-zero since the diffuse prior variance is V0*kappa, where kappa goes to infinity.}
+  \item{ smoother }{ Used by \code{MARSSkfss}.  If set to FALSE, only the Kalman filter is run. xtT, VtT, x0T, Vtt1T, V0T, and J0 will be NULL. }
   \item{ only.logLik }{ Used by \code{MARSSkfas}.  If set, only the log-likelihood is returned using the \link[KFAS]{KFAS} package function \code{\link[KFAS]{logLik.SSModel}}.  This is much faster if only the log-likelihood is needed. }
   \item{ return.lag.one }{ Used by \code{MARSSkfas}.  If set to FALSE, the smoothed lag-one covariance  values are not returned (Vtt1T is set to NULL).  This speeds up \code{MARSSkfas} because to return the smoothed lag-one covariance a stacked MARSS model is used with twice the number of state vectors---thus the state matrices are larger and take more time to work with. }
   \item{ return.kfas.model }{ Used by \code{MARSSkfas}.  If set to TRUE, it returns the MARSS model in \link[KFAS]{KFAS} model form (class \code{\link[KFAS]{SSModel}}).  This is useful if you want to use other KFAS functions or write your own functions to work with \code{\link{optim}} to do optimization.  This can speed things up since there is a bit of code overhead in \code{\link{MARSSoptim}} associated with the \code{\link{marssMODEL}} model specification needed for the constrained EM algorithm (but not strictly needed for \code{\link{optim}}; useful but not required.). }

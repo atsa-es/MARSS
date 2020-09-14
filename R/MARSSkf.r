@@ -2,7 +2,7 @@
 #   MARSSkf function
 #   Utility function to choose the Kalman filter and smoother
 #######################################################################################################
-MARSSkf <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return.kfas.model = FALSE, newdata = NULL) {
+MARSSkf <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return.kfas.model = FALSE, newdata = NULL, smoother = TRUE) {
   if (is.null(MLEobj$par)) {
     stop("Stopped in MARSSkf(): par element of marssMLE object is required.\n")
   }
@@ -18,7 +18,7 @@ MARSSkf <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return.k
     MLEobj[["marss"]][["data"]] <- newdata
   }
   if (MLEobj$fun.kf == "MARSSkfss") {
-    return(MARSSkfss(MLEobj))
+    return(MARSSkfss(MLEobj, smoother = smoother))
   }
   if (MLEobj$fun.kf == "MARSSkfas") {
     return(MARSSkfas(MLEobj, only.logLik = only.logLik, return.lag.one = return.lag.one, return.kfas.model = return.kfas.model))
