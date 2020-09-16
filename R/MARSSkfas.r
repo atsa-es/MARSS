@@ -175,6 +175,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   } else {
     kfas.model <- SSModel(yt ~ -1 + SSMcustom(Z = stack.Zt, T = stack.Tt, R = stack.Rt, Q = stack.Qt, a1 = stack.a1, P1 = stack.P1, P1inf = stack.P1inf), H = Ht)
   }
+  if( !diffuse ) kfas.model$tol <- 0 # per J Helske to turn of machine tol adjustment.
   
   if (only.logLik) {
     return(list(logLik = logLik(kfas.model)))
@@ -203,7 +204,8 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Vtt1T <- NULL
   } else {
     Vtt1T <- ks.out$V[1:m, (m + 2):(2 * m + 1), , drop = FALSE]
-  }
+    if (MODELobj$tinitx == 1) Vtt1T[,,1] <- matrix(NA, m, m)
+    }
   # zero out rows cols as needed when R diag = 0
   # Check that if any R are 0 then model is solveable
   if (any(diag.R == 0)) {
