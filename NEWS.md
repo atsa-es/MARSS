@@ -6,6 +6,17 @@ MARSS Development site
 ------------------------------------
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.2 milestone (yes, marked with earlier release number).
 
+MARSS 3.11.3 (master on GitHub)
+------------------------------------
+
+ENHANCEMENTS
+
+* Beginning to add testthat tests to the package. These are set with `skip_on_cran()` as they are for internal testing. 
+
+BUGS
+
+* In `KFS()`, a tolerance correction affected the log-likelihood value when R was below square root of machine tolerance or condition number was very high (if R non-diagonal). This created a large (incorrect) jump in the log-likelihood. This would be reported with a warning that the log-likelihood dropped if using the EM algorithm. Solution was to set the tolerance to 0 in the KFAS model in `MARSSkfas()`. Note this did not happen for all cases of small R and a warning would have been generated alerting the user to a problem.
+
 MARSS 3.11.2 (released 2020-09-13 on GitHub)
 ------------------------------------
 This is a minor update to stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
