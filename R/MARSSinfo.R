@@ -42,12 +42,15 @@ If you used test=MARSS(foo), then test is the MLE object.  If the function exite
 
   if (number == "denominv") {
     writeLines(strwrap(
-      "This is telling you that you specified a model that is logically indeterminant. First check your data and covariates (if you have them).  Make sure you didn't make a mistake when entering the data.  For example, a row of data that is all NAs or two rows of c or dthat are the same.  Then look at your model by passing in fit=FALSE to the MARSS() call.  Are you trying to estimate B butyou set Q to zero?  That won't work.  
+      "This is usually telling you that you specified a model that is logically indeterminant. First check your data and covariates (if you have them).  Make sure you didn't make a mistake when entering the data.  For example, a row of data that is all NAs or two rows of c or d that are the same.  Then look at your model by passing in fit=FALSE to the MARSS() call.  Are you trying to estimate B but you set Q to zero?  That won't work.  
 
 Note if you are estimating D, your error will report problems in A update. If you are estimating C, your error will report problems in U update.  This is because in the MARSS algorithms, the models with D and C are rewritten into a simpler MARSS model with time-varying A and U. If you have set R=0, you might get this error if you are trying to estimate A (or D).
 
+Note if you are estimating B, the EM algorithm is often more stable if you set tinitx=1 because then the data at t=1 can help constrain the B estimate. This is particularly true if you have missing data at t=1 or t=2.
+
 Did you set a VO (say, diagonal), that is inconsisent with V0T (the covariance matrix implied by the model)?  That can cause problems with the Q update.  Are you estimating C or D, but have rows of c or d that are all zero?  That won't work.  Are you estimating C or D with only one column (one time point) of c or d? Depending on your constraints in C or D that might not work.
-\n"
+
+If you are satisfied that your model is fine (not logially indeterminant), then problem maybe numerical in nature. This denom inverse is only in the EM algorithm. You can try method='BFGS' to use the BFGS algorithm, but do check with different initial conditions since if the EM algorithm is struggling, it suggests ridges in the likelihood surface that can lead the BFGS algorithm astray.\n"
     ))
     return(invisible(number))
   }
