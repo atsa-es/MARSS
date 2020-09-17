@@ -236,7 +236,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
       msg <- c(msg, paste("MARSSresiduals.tT warning: the chol of the variance of the residuals at t =", t, "returned errors.  NAs returned for std.residuals at t =", t, ". See MARSSinfo(\"residvarinv\")\n"))
       next
     }
-    # chol() returns the upper triangle. We need to lower triangle to t()
+    # chol() returns the upper triangle. We need the lower triangle so t()
     tmpcholinv <- try(psolve(t(tmpchol)), silent = TRUE)
     if (inherits(tmpcholinv, "try-error")) {
       st.et[, t] <- NA
