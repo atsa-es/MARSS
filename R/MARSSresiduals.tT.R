@@ -8,11 +8,17 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
   # for missing values, Harvey=TRUE returns 0 for var for y_i missing and Harvey=FALSE returns R + Z VtT t(Z)
   # Note, I think there is a problem with the Harvey algorithm when the variance of the state residuals (Q)
   # is non-diagonal and there are missing values; it can become non-invertible
-  if(fun.kf=="MARSSkfas" & Harvey==TRUE) stop("MARSSresiduals.tT: Harvey=TRUE requires the Kalman gain thus MARSSkfss must be used.\n", call. = FALSE)
+  if(fun.kf=="MARSSkfas" & Harvey==TRUE) stop("MARSSresiduals.tT: Harvey=TRUE requires the Kalman gain thus MARSSkfss must be used. Pass in fun.kf='MARSSkfss'.\n", call. = FALSE)
   
   ######################################
   # Set up variables
   MLEobj <- object
+  if ( missing(fun.kf) ){
+    fun.kf <- MLEobj$fun.kf
+  }else{
+    MLEobj$fun.kf <- fun.kf 
+    # to ensure that MARSSkf, MARSShatyt and fitted() use the spec'd fun
+  }
   model.dims <- attr(MLEobj$marss, "model.dims")
   TT <- model.dims[["x"]][2]
   m <- model.dims[["x"]][1]
@@ -26,8 +32,7 @@ MARSSresiduals.tT <- function(object, Harvey = FALSE, normalize = FALSE, silent 
   #### list of time-varying parameters
   time.varying <- is.timevarying(MLEobj)
 
-  if(fun.kf=="MARSSkfss") kf <- MARSSkfss(MLEobj)
-  if(fun.kf=="MARSSkfas") kf <- MARSSkfas(MLEobj)
+  kf <- MARSSkf(MLEobj)
   Ey <- MARSShatyt(MLEobj)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H
