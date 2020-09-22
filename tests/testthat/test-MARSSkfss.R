@@ -58,18 +58,6 @@ for( Q in list("unconstrained", "diagonal and equal", "equalvarcov", "zero"))
        })
     }
 
-for( Q in list("unconstrained", "diagonal and equal", "equalvarcov")){
-  R <- "zero"
-  mod <- list(Q = Q, Z = "identity", R = R, B = "identity", U = "zero")
-  kf1 <- MARSSkfss(kemfit1)
-  kf2 <- MARSSkfas(kemfit1)
-  kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "logLik")]
-  kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "logLik")]
-  test_that(paste("compare kfss to kfas", Q, R, B), {
-  expect_equal(kf1_list, kf2_list)
-})
-}
-
 
 # Wonky model
 context("Comparison to kfas Structural")
