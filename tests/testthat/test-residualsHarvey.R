@@ -1,5 +1,7 @@
 skip_on_cran()
 
+# test Harvey = TRUE with and without normalize
+
 context("Residuals algorithms treering")
 
 library(MARSS)
