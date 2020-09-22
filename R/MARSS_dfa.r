@@ -48,11 +48,12 @@ MARSS.dfa <- function(MARSS.call) {
   msg <- c()
   # check that data and covariates elements are matrix or vector, no dataframes, and is numeric
   for (el in c("data", "covariates"[!is.null(MARSS.call[["covariates"]])])) {
-    if (!(is.matrix(MARSS.call[[el]]) || is.vector(MARSS.call[[el]]))) {
+    if (!(is.matrix(MARSS.call[[el]]) || is.vector(MARSS.call[[el]]) || inherits(MARSS.call[[el]], "ts"))) {
       problem <- TRUE
-      msg <- c(msg, paste(el, " must be a matrix or vector (not a data frame or 3D array).\n"))
+      msg <- c(msg, paste(el, " must be a matrix, vector or ts/mts ojbect (not a data frame or 3D array).\n"))
     } else {
       if (is.vector(MARSS.call[[el]])) MARSS.call[[el]] <- matrix(MARSS.call[[el]], 1)
+      if (inherits(MARSS.call[[el]], "ts")) MARSS.call[[el]] <- t(MARSS.call[[el]])
     }
   }
   if (!is.null(MARSS.call[["covariates"]])) {

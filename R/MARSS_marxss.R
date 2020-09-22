@@ -174,6 +174,7 @@ MARSS.marxss <- function(MARSS.call) {
     }
     # if(!any(is.na(model[[el]])) & all(model[[el]]==0)) model[[toupper(el)]]="zero"
     if (is.vector(model[[el]])) model[[el]] <- matrix(model[[el]], 1, length(model[[el]]))
+    if(inherits(model[[el]], "ts")) model[[el]] <- t(model[[el]])
   }
   # Now set c1 and d1 based on c and d, which should now be a matrix of some sort.  This ensures that c1 and d1 are set
   # if c and C or d and D conflict, this will be picked up the error checking because dims of C or D and model.dims won't match
