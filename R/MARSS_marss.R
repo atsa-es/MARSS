@@ -74,9 +74,12 @@ MARSS.marss <- function(MARSS.call) {
   model <- MARSS.call$model
   model.elem <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   dat <- MARSS.call[["data"]]
+  model.tsp <- stats::tsp(dat)
   if (is.vector(dat)) dat <- matrix(dat, 1, length(dat))
+  if(inherits(dat, "ts")) dat <- t(dat)
   n <- dim(dat)[1]
   TT <- dim(dat)[2]
+  if(is.null(model.tsp)) model.tsp <- c(1, TT, 1)
   if (is.null(rownames(dat))) {
     Y.names <- paste("Y", seq(1, n), sep = "") # paste(seq(1, n), sep="") #
     rownames(dat) <- Y.names
@@ -319,6 +322,7 @@ MARSS.marss <- function(MARSS.call) {
   attr(marss_object, "obj.elements") <- c("fixed", "free", "data", "tinitx", "diffuse")
   attr(marss_object, "form") <- "marss"
   attr(marss_object, "model.dims") <- model.dims
+  attr(marss_object, "tsp") <- model.tsp
   # par.names are what needs to be in fixed/free pair
   attr(marss_object, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   attr(marss_object, "X.names") <- X.names

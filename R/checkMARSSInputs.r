@@ -85,9 +85,9 @@ checkMARSSInputs <- function(MARSS.inputs, silent = FALSE) {
   problem <- FALSE
   msg <- c("")
   # check that data element is matrix or vector, no dataframes, and is numeric
-  if (!(is.matrix(MARSS.inputs$data) || is.vector(MARSS.inputs$data))) {
+  if (!(is.matrix(MARSS.inputs$data) || is.vector(MARSS.inputs$data) || inherits(MARSS.inputs$data, "ts"))) {
     problem <- TRUE
-    msg <- c(msg, " Data must be a matrix or vector (not a data frame).\n")
+    msg <- c(msg, " Data must be a matrix, vector or ts/mts object (not a data frame).\n")
   }
   if (!is.numeric(MARSS.inputs$data)) {
     problem <- TRUE

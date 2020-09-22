@@ -20,6 +20,7 @@ accuracy.marssPredict <- function (f, x, test=NULL, type="ytt1", verbose=FALSE, 
       testset$t <- rep(1:h,n)
       
       if(is.vector(x)) x <- matrix(x, nrow=1)
+      if(inherits(x, "ts")) x <- t(x)
       if(!is.matrix(x) && !is.data.frame(x))
         stop("accuracy.marssMLE: Test data must be a matrix or data frame.\n", call.=FALSE)
       Y.names <- attr(f$model$model, "Y.names")

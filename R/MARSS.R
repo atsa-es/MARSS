@@ -25,9 +25,10 @@ MARSS <- function(y,
   if (is.ts(y)) {
     stop("MARSS: Please convert the ts object to a matrix with time going across columns.\nThis command will work to convert the data: t(as.data.frame.ts(y)).\nThis command will make a row of the frequency info (if you need this as a covariate): t(as.data.frame.ts(stats:::cycle.ts(y))).\nType MARSSinfo(\"ts\") for more info.", call. = FALSE)
   }
-  if (!(is.vector(y) | is.matrix(y))) stop("MARSS: Data (y) must be a vector or matrix (time going across columns).", call. = FALSE)
+  if (!(is.vector(y) | is.matrix(y) | inherits(y, "ts"))) stop("MARSS: Data (y) must be a vector, matrix (time going across columns) or ts/mts object.", call. = FALSE)
   if (length(y) == 0) stop("MARSS: Data (y) is length 0.", call. = FALSE)
   if (is.vector(y)) y <- matrix(y, nrow = 1)
+  if (inherits(y, "ts")) y <- t(y)
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
 
