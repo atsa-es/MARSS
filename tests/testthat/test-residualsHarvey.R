@@ -1,6 +1,6 @@
 skip_on_cran()
 
-context("Residuals algorithms")
+context("Residuals algorithms treering")
 
 library(MARSS)
 
@@ -27,7 +27,16 @@ test_that(paste("StructTS compare residuals Harvey = TRUE and FALSE"), {
 test_that(paste("StructTS compare residuals kfss vs kfas"), {
   expect_equal(resids3, resids2) })
 
+resids1 <- MARSSresiduals(fit2, type = "tT", Harvey = TRUE, fun.kf='MARSSkfss', normalize= TRUE)
+resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf='MARSSkfss', normalize= TRUE)
+
+test_that(paste("StructTS compare normalized residuals Harvey = TRUE and FALSE"), {
+  expect_equal(resids1, resids2) })
+
 # Little harder model
+
+context("Residuals algorithms harborseal with NAs")
+
 
 dat <- t(harborSealWA)
 dat <- dat[2:4, ] # remove the year row; no miss values
@@ -43,10 +52,14 @@ for( Q in list("unconstrained", "diagonal and equal", "equalvarcov", "zero"))
       fit2 <- MARSS(dat[,c(1,6:12,14:22)], model = mod, fun.kf = "MARSSkfas", silent=TRUE)
       resids1 <- MARSSresiduals(fit2, type = "tT", Harvey = TRUE, fun.kf='MARSSkfss')
       resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf='MARSSkfss')
-
       test_that(paste("harborseal test 1", Q, R, B), {
         expect_equal(resids1, resids2) })
 
+      resids1 <- MARSSresiduals(fit2, type = "tT", Harvey = TRUE, fun.kf='MARSSkfss', normalize = TRUE)
+      resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf='MARSSkfss', normalize = TRUE)
+      test_that(paste("harborseal test 1 normalized", Q, R, B), {
+        expect_equal(resids1, resids2) })
+      
       fit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent=TRUE)
       resids1 <- MARSSresiduals(fit2, type = "tT", fun.kf='MARSSkfss')
       resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf='MARSSkfas')
