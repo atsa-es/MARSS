@@ -75,7 +75,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   }
   
   # Build the Ht (R) matrix which is n x n or n x n x T
-  if (model.dims$R[3] == 1) {
+  if (model.dims$R[3] == 1 && model.dims$H[3] == 1) {
     # not time-varying
     Ht <- tcrossprod(par.1$H %*% par.1$R, par.1$H)
   } else {
