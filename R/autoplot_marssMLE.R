@@ -1,6 +1,6 @@
 autoplot.marssMLE <-
   function(x,
-           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
+           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
@@ -300,47 +300,6 @@ autoplot.marssMLE <-
     acfci <- function(x) {
       ciline <- qnorm((1 - conf.level) / 2) / sqrt(length(x))
       return(ciline)
-    }
-    if ("acf.state.resids" %in% plot.type) {
-      df <- subset(tt1.resids, tt1.resids$name == "state")
-      df$.rownames <- factor(df$.rownames) # drop levels
-      df$.rownames <- paste0("State ", df$.rownames)
-
-      acfdf <- tapply(df$.resids, df$.rownames, acffun)
-      fun <- function(x, y) {
-        data.frame(.rownames = y, lag = x$lag, acf = x$acf, stringsAsFactors = FALSE)
-      }
-      acfdf <- mapply(fun, acfdf, names(acfdf), SIMPLIFY = FALSE)
-      acf.dat <- data.frame(
-        .rownames = unlist(lapply(acfdf, function(x) {
-          x$.rownames
-        })),
-        lag = unlist(lapply(acfdf, function(x) {
-          x$lag
-        })),
-        acf = unlist(lapply(acfdf, function(x) {
-          x$acf
-        })),
-        stringsAsFactors = FALSE
-      )
-
-      cidf <- tapply(df$.resids, df$.rownames, acfci)
-      ci.dat <- data.frame(.rownames = names(cidf), ci = cidf, stringsAsFactors = FALSE)
-
-      p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
-        ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
-        ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0)) +
-        ggplot2::xlab("Lag") +
-        ggplot2::ylab("ACF") +
-        ggplot2::facet_wrap(~.rownames, scales = "free_y") +
-        ggplot2::ggtitle("State one-step ahead residuals ACF")
-      p1 <- p1 +
-        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
-        ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ -ci), color = "blue", linetype = 2)
-      plts[["acf.state.resids"]] <- p1
-      if (identical(plot.type, "acf.state.resids")) {
-        return(p1)
-      }
     }
     if ("acf.model.resids" %in% plot.type) {
       df <- subset(tt1.resids, tt1.resids$name == "model")

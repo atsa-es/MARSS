@@ -1,6 +1,6 @@
 plot.marssMLE <-
   function(x,
-           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids", "acf.state.resids"),
+           plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(), ...) {
@@ -353,7 +353,7 @@ plot.marssMLE <-
           title(tit)
           if (conf.int) polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border)
           points(t, y, col = plotpar$point.col, pch = plotpar$point.pch, cex = plotpar$point.size)
-          lines(t, estimate, col = plotpar$line.col, lwd = plotpar$line.lwd)
+          lines(t, .estimate, col = plotpar$line.col, lwd = plotpar$line.lwd)
           box()
         })
       }
@@ -391,28 +391,4 @@ plot.marssMLE <-
       }
     }
 
-    if ("acf.state.resids" %in% plot.type) {
-      df <- subset(tt1.resids, tt1.resids$name == "state")
-      df$.rownames <- paste0("State ", df$.rownames)
-      nX <- min(9, attr(x$model, "model.dims")$x[1])
-      plot.nrow <- round(sqrt(nX))
-      plot.ncol <- ceiling(nX / plot.nrow)
-      par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
-      for (plt in unique(df$.rownames)) {
-        tit <- plt
-        with(subset(df, df$.rownames == plt), {
-          stats::acf(.resids, na.action = na.pass, main = "")
-          title(tit)
-          box()
-        })
-      }
-      plot.type <- plot.type[plot.type != "acf.state.resids"]
-      cat(paste("plot type = \"acf.state.resids\" State one-step ahead residuals ACF\n"))
-      if (length(plot.type) != 0) {
-        ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
-        if (tolower(ans) == "q") {
-          return()
-        }
-      }
-    }
   }
