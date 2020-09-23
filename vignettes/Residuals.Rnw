@@ -625,6 +625,17 @@ In Equation 20 in \citet{Harveyetal1998}, their $T_t$ is my $\BB_{t+1}$ and thei
 
 $\KK_t$ is the Kalman gain output by the MARSS R package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the MARSS R package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
 
+\subsection{Computing the normalized residuals}
+
+To compute the normalized residuals and residuals variance, a block diagonal matrix with the inverse of the $\RR$ and $\QQ$ matrices is used. The normalized residuals are:
+\begin{equation}
+\begin{bmatrix}\RR^{-1}_t&0\\0&\QQ^{-1}_t\end{bmatrix} \widehat{\varepsilon}_t
+\end{equation}
+The variance of the normalized residuals is
+\begin{equation}
+\begin{bmatrix}\RR^{-1}_t&0\\0&\QQ^{-1}_t\end{bmatrix} \widehat{\Sigma]}_t \begin{bmatrix}\RR^{-1}_t&0\\0&\QQ^{-1}_t\end{bmatrix}
+\end{equation}
+
 \subsection{Computing the Cholesky standardized residuals}
 
 The Cholesky standardized residuals are computed by multiplying $\widehat{\varepsilon}_t$ by $(\widehat{\Sigma}_t)^{-1/2}$ (the inverse of the Cholesky decomposition of  the variance-covariance matrix for $\widehat{\varepsilon}_t$):
