@@ -57,13 +57,14 @@ forecast.marssMLE <- function(object, h=10,
         next
       }
       if(is.vector(newdata[[elem]])) newdata[[elem]] <- matrix(newdata[[elem]], nrow = 1)
+      if(inherits(newdata[[elem]], "ts")) newdata[[elem]] <- t(newdata[[elem]])
       if(!is.matrix(newdata[[elem]])) stop(paste0("Stopped in forecast.marssMLE(): newdata ", elem, " must be a matrix with ", model.dims[[elem]][1], " rows.\n"), call.=FALSE)
-      if(dim(newdata[[elem]])[1]!=model.dims[[elem]][1]) stop(paste0("Stopped in forecast.marssMLE(): model ", elem, " has ", model.dims[[elem]][1], " rows. ", elem, " in newdata does not.\n"), call.=FALSE)
+      if(dim(newdata[[elem]])[1]!=model.dims[[elem]][1]) stop(paste0("Stopped in forecast.marssMLE(): model ", elem, " has ", model.dims[[elem]][1], " time-series. ", elem, " in newdata does not.\n"), call.=FALSE)
       if(dim(newdata[[elem]])[2] > h){
-        message(paste0("forecast.marssMLE(): time steps in ", elem, " in newdata is greater than h. Only first h time steps (columns) will be used.\n"))
+        message(paste0("forecast.marssMLE(): time steps in ", elem, " in newdata is greater than h, (h=", h, "). Only first h time steps will be used.\n"))
         newdata[[elem]] <- newdata[[elem]][,1:h, drop=FALSE]
       }
-      if(dim(newdata[[elem]])[2] < h) stop(paste0("forecast.marssMLE(): time steps in ", elem, " in newdata is less than h. Must be equal or greater.\n"), call.=FALSE)
+      if(dim(newdata[[elem]])[2] < h) stop(paste0("forecast.marssMLE(): time steps in ", elem, " in newdata is less than h, (h=", h, "). Must be equal or greater.\n"), call.=FALSE)
       
       if(elem != "y") new.MODELlist[[elem]] <- cbind(new.MODELlist[[elem]], newdata[[elem]])
       if(elem == "y") new.data <- cbind(object[["model"]][["data"]], newdata[[elem]])
