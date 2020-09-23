@@ -74,9 +74,10 @@ MARSS.marss <- function(MARSS.call) {
   model <- MARSS.call$model
   model.elem <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   dat <- MARSS.call[["data"]]
-  model.tsp <- stats::tsp(dat)
+  model.tsp <- attr(dat, "model.tsp")
+  # Note dat is changed to matrix in MARSS()
   if (is.vector(dat)) dat <- matrix(dat, 1, length(dat))
-  if(inherits(dat, "ts")) dat <- t(dat)
+  if(inherits(dat, "ts")){ model.tsp <- stats::tsp(dat); dat <- t(dat) }
   n <- dim(dat)[1]
   TT <- dim(dat)[2]
   if(is.null(model.tsp)) model.tsp <- c(1, TT, 1)

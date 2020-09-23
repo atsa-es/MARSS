@@ -43,6 +43,7 @@ tsSmooth.marssMLE <- function(object,
     model <- object[["model"]]
     state.names <- attr(model, "X.names")
     state.dims <- attr(model, "model.dims")[["x"]]
+    model.tsp <- attr(model, "model.tsp")
     mm <- state.dims[1]
     TT <- state.dims[2]
     if(type=="xtt"){ 
@@ -75,7 +76,7 @@ tsSmooth.marssMLE <- function(object,
     }
     ret <- data.frame(
       .rownames = rep(state.names, each = TT),
-      t = rep(1:TT, mm),
+      t = rep(seq(model.tsp[1], model.tsp[2], 1/model.tsp[3]), mm),
       .estimate = vec(t(states)),
       .se = vec(t(states.se)),
       stringsAsFactors = FALSE
@@ -95,13 +96,14 @@ tsSmooth.marssMLE <- function(object,
     model <- object[["model"]]
     Y.names <- attr(model, "Y.names")
     Y.dims <- attr(model, "model.dims")[["y"]]
+    model.tsp <- attr(model, "model.tsp")
     nn <- Y.dims[1]
     TT <- Y.dims[2]
     hatyt <- MARSShatyt(object, only.kem=FALSE)
     Ey <- hatyt[[ytype]]
     ret <- data.frame(
       .rownames = rep(Y.names, each = TT),
-      t = rep(1:TT, nn),
+      t = rep(seq(model.tsp[1], model.tsp[2], 1/model.tsp[3]), nn),
       y = vec(t(object[["model"]][["data"]])),
       .estimate = vec(t(Ey)),
       stringsAsFactors = FALSE

@@ -79,7 +79,7 @@ forecast.marssMLE <- function(object, h=10,
       tmp[,,1:TT] <- new.MODELlist[[elem]]
       tmp[,,(TT+1):(TT+h)] <- new.MODELlist[[elem]][,,TT, drop=FALSE]
       new.MODELlist[[elem]] <- tmp
-      message(paste0(elem, " is time-varying. The value at t =", TT, " is used for the forecast.\n"))
+      message(paste0(elem, " is time-varying. The value at the last time step in the training data is used for the forecast.\n"))
     }
   }
   
@@ -139,14 +139,15 @@ forecast.marssMLE <- function(object, h=10,
   }
   
   # Set up output
+  model.tsp <- attr(object[["model"]], "model.tsp")
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
     level = 100*level,
     type = type,
     pred = ret,
-    t = 1:(TT+h),
-    ft = (TT+1):(TT+h),
+    t = seq(model.tsp[1], model.tsp[2]+h/model.tsp[3], 1/model.tsp[3]),
+    ft = seq(model.tsp[2]+1/model.tsp[3], model.tsp[2]+h/model.tsp[3], 1/model.tsp[3]),
     h = h,
     n.ahead = h,
     x0 = coef(object, type = "matrix")[["x0"]],

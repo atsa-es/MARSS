@@ -202,7 +202,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
         if (nstart <= TT && nend > TT) {
           tmp[, , 1:(TT - nstart + 1)] <- new.MODELlist[[elem]][, , nstart:TT, drop = FALSE]
           tmp[, , (TT - nstart + 2):ncol.newdata] <- new.MODELlist[[elem]][, , TT, drop = FALSE]
-          message(paste0(elem, " is time-varying. The value at t = ", TT, " is used for any newdata t past the original data."))
+          message(paste0(elem, " is time-varying. The value at the last time step of the training data is used for any newdata past the original data."))
         }
         if (nstart > TT) {
           tmp[, , 1:ncol.newdata] <- new.MODELlist[[elem]][, , TT, drop = FALSE]

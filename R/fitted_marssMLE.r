@@ -68,11 +68,12 @@ fitted.marssMLE <- function(object, ...,
     if(output=="data.frame"){
       data.names <- attr(MLEobj[["model"]], "Y.names")
       data.dims <- attr(MLEobj[["model"]], "model.dims")[["y"]]
+      model.tsp <- attr(MLEobj[["model"]], "model.tsp")
       nn <- data.dims[1]
       TT <- data.dims[2]
       ret <- data.frame(
         .rownames = rep(data.names, each = TT),
-        t = rep(1:TT, nn),
+        t = rep(seq(model.tsp[1], model.tsp[2], 1/model.tsp[3]), nn),
         y = vec(t(MLEobj[["model"]]$data)),
         stringsAsFactors = FALSE
       )
@@ -132,12 +133,12 @@ fitted.marssMLE <- function(object, ...,
     if(output=="data.frame"){
       state.names <- attr(MLEobj[["model"]], "X.names")
       state.dims <- attr(MLEobj[["model"]], "model.dims")[["x"]]
+      model.tsp <- attr(MLEobj[["model"]], "model.tsp")
       mm <- state.dims[1]
       TT <- state.dims[2]
-      
       ret <- data.frame(
           .rownames = rep(state.names, each = TT),
-          t = rep(1:TT, mm),
+          t = rep(seq(model.tsp[1], model.tsp[2], 1/model.tsp[3]), mm),
           .x = vec(t(hatxt)),
           stringsAsFactors = FALSE
         )

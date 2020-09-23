@@ -25,7 +25,13 @@ MARSS <- function(y,
   if (!(is.vector(y) | is.matrix(y) | inherits(y, "ts"))) stop("MARSS: Data (y) must be a vector, matrix (time going across columns) or ts/mts object.", call. = FALSE)
   if (length(y) == 0) stop("MARSS: Data (y) is length 0.", call. = FALSE)
   if (is.vector(y)) y <- matrix(y, nrow = 1)
-  if (inherits(y, "ts")) y <- t(y)
+  if (inherits(y, "ts")){ 
+    model.tsp <- stats::tsp(y)
+    y <- t(y)
+  }else{
+    model.tsp <- c(1, TT, 1)
+  }
+  attr(y, "model.tsp") <- model.tsp
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
 
