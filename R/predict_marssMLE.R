@@ -164,7 +164,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
           stop("predict.marssMLE: y, c, and d in newdata must be numeric (use class() and is.numeric() to test what you are passing in).", call. = FALSE)
         }
         if (is.vector(newdata[[elem]])) newdata[[elem]] <- matrix(newdata[[elem]], nrow = 1)
-        if (inherits(newdata[[elem]]), "ts") newdata[[elem]] <- t(newdata[[elem]])
+        if (inherits(newdata[[elem]], "ts")) newdata[[elem]] <- t(newdata[[elem]])
         if (!is.matrix(newdata[[elem]])) stop(paste0("predict.marssMLE(): newdata ", elem, " must be a matrix with ", model.dims[[elem]][1], " rows."), call. = FALSE)
         if (dim(newdata[[elem]])[1] != model.dims[[elem]][1]) stop(paste0("predict.marssMLE(): model ", elem, " has ", model.dims[[elem]][1], " rows.", elem, " in newdata does not."), call. = FALSE)
 

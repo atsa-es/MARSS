@@ -100,7 +100,7 @@ MARSS.marxss <- function(MARSS.call) {
   dat <- MARSS.call[["data"]]
   model.tsp <- stats::tsp(dat)
   if (is.vector(dat)) dat <- matrix(dat, 1, length(dat))
-  if (iherits(dat, "ts")) dat <- t(dat)
+  if (inherits(dat, "ts")) dat <- t(dat)
   n <- dim(dat)[1]
   TT <- dim(dat)[2]
   if(is.null(model.tsp)) model.tsp <- c(1, TT, 1)
@@ -430,7 +430,7 @@ MARSS.marxss <- function(MARSS.call) {
   attr(marxss_object, "obj.elements") <- c("fixed", "free", "data", "tinitx", "diffuse")
   attr(marxss_object, "form") <- "marxss"
   attr(marxss_object, "model.dims") <- model.dims
-  attr(marxss_object, "tsp") <- model.tsp
+  attr(marxss_object, "model.tsp") <- model.tsp
   # par.names are what needs to be in fixed/free pair
   attr(marxss_object, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "D", "C", "d", "c", "G", "H", "L")
   attr(marxss_object, "X.names") <- X.names
@@ -719,6 +719,7 @@ marxss_to_marss <- function(x, only.par = FALSE) {
   attr(marss.model, "form") <- "marss"
   attr(marss.model, "obj.elements") <- c("fixed", "free", "data", "tinitx", "diffuse")
   attr(marss.model, "model.dims") <- marss.dims
+  attr(marss.model, "model.tsp") <- attr(marxss.model, "model.tsp")
   attr(marss.model, "par.names") <- marss.elem
   attr(marss.model, "X.names") <- attr(marxss.model, "X.names")
   attr(marss.model, "Y.names") <- attr(marxss.model, "Y.names")

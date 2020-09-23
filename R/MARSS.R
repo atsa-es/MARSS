@@ -22,9 +22,6 @@ MARSS <- function(y,
   if (is.null(y)) {
     stop("MARSS: No data (y) passed in.", call. = FALSE)
   }
-  if (is.ts(y)) {
-    stop("MARSS: Please convert the ts object to a matrix with time going across columns.\nThis command will work to convert the data: t(as.data.frame.ts(y)).\nThis command will make a row of the frequency info (if you need this as a covariate): t(as.data.frame.ts(stats:::cycle.ts(y))).\nType MARSSinfo(\"ts\") for more info.", call. = FALSE)
-  }
   if (!(is.vector(y) | is.matrix(y) | inherits(y, "ts"))) stop("MARSS: Data (y) must be a vector, matrix (time going across columns) or ts/mts object.", call. = FALSE)
   if (length(y) == 0) stop("MARSS: Data (y) is length 0.", call. = FALSE)
   if (is.vector(y)) y <- matrix(y, nrow = 1)

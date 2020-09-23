@@ -322,7 +322,7 @@ MARSS.marss <- function(MARSS.call) {
   attr(marss_object, "obj.elements") <- c("fixed", "free", "data", "tinitx", "diffuse")
   attr(marss_object, "form") <- "marss"
   attr(marss_object, "model.dims") <- model.dims
-  attr(marss_object, "tsp") <- model.tsp
+  attr(marss_object, "model.tsp") <- model.tsp
   # par.names are what needs to be in fixed/free pair
   attr(marss_object, "par.names") <- c("Z", "A", "R", "B", "U", "Q", "x0", "V0", "G", "H", "L")
   attr(marss_object, "X.names") <- X.names
