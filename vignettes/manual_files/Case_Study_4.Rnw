@@ -631,6 +631,16 @@ Z.rot <- Z.est %*% H.inv
 trends.rot <- solve(H.inv) %*% the.fit$states
 @
 
+The following will get the confidence intervals on the rotated loadings:
+<<Cs22_rotations_cis, eval=TRUE>>=
+dfa_temp <- MARSSparamCIs(dfa_temp)
+Z.low <- coef(dfa_temp, type = "Z", what="par.lowCI")
+Z.up <- coef(dfa_temp, type = "Z", what="par.upCI")
+Z.rot.up <- Z.up %*% H.inv
+Z.rot.low <- Z.low %*% H.inv
+df <- data.frame(est=as.vector(Z.rot), conf.up=as.vector(Z.rot.up), conf.low=as.vector(Z.rot.low))
+@
+
 Rotated factor loadings for the model are shown in Figure \ref{fig:CS4.facloadings}.  Oddly, some taxa appear to have no loadings on some trends (e.g., diatoms on trend 1).  The reason is that, merely for display purposes, we chose to plot only those loadings that are greater than 0.05, and it turns out that after varimax rotation, several loadings are close to 0.
 
 Recall that we set Var($\ww_t$) = $\QQ = \II_m$ in order to make our DFA model identifiable. Does the variance in the process errors also change following varimax rotation? Interestingly, no. Because $\HH$ is a non-singular, orthogonal matrix, Var($\HH\ww_t$) = $\HH$Var($\ww_t$)$\HH^\top$ = $\HH\II_m\HH^\top$ = $\II_m$.
@@ -698,6 +708,7 @@ for (i in 1:dim(ts.trends)[2]) {
 \caption{Plot of the unobserved trends (following varimax rotation) from the 2-state model fit to the phytoplankton data.}
 \label{fig:CS4.trends}
 \end{figure}
+
 
 \section{Examining model fits}\index{dynamic factor analysis!diagnostics}
 
