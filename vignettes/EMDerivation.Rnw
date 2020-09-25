@@ -310,29 +310,41 @@ In this section, I show the derivation of the update equations when all elements
 To derive the update equations, one must find the $\Theta$, where $\Theta$ is comprised of the MARSS parameters $\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$, $\RR$, $\xixi$, and $\LAM$,  that maximizes $\Psi$ (equation \ref{eq:expLL}) by partial differentiation of $\Psi$  with respect to $\Theta$.  However, I will be using the EM equation where one maximizes each parameter matrix in $\Theta$ one-by-one (equation \ref{eq:EMalg.j}).  In this case, the parameters that are not being maximized are set at their iteration $j$ values, and then one takes the derivative of $\Psi$ with respect to the parameter of interest.  Then solve for the parameter value that sets the partial derivative to zero.  The partial differentiation is with respect to each individual parameter element, for example each $u_{i,j}$ in matrix $\uu$. The idea is to single out those terms in equation \eqref{eq:expLL} that involve $u_{i,j}$ (say), differentiate by $u_{i,j}$, set this to zero and solve for $u_{i,j}$.  This gives the new $u_{i,j}$ that maximizes the partial derivative with respect to $u_{i,j}$ of the expected log-likelihood.  Matrix calculus gives us a way to jointly maximize $\Psi$ with respect to all elements (not just element $i,j$) in a parameter matrix. 
 
 \subsection{Matrix calculus need for the derivation}\label{sec:MatrixDerivatives}
-Before commencing, some definitions from matrix calculus will be needed.  The partial derivative of a scalar ($\Psi$ is a scalar) with respect to some column vector $\bb$ (which has elements $b_1$, $b_2$ . . .) is 
+A number of derivatives of a scalar with respect to vectors and matrices will be needed in the derivation and are shown in table \ref{tab:MatrixDerivatives}. The partial derivative of a scalar ($\Psi$ is a scalar) with respect to some column vector $\bb$ (which has elements $b_1$, $b_2$ . . .) is 
 \begin{equation*}
 \frac{\partial\Psi}{\partial\bb}=
 \begin{bmatrix}
-\dfrac{\partial\Psi}{\partial b_1}& \dfrac{\partial\Psi}{\partial b_2}& \cdots& \dfrac{\partial\Psi}{\partial b_n}
+\dfrac{\partial\Psi}{\partial b_1}& \dfrac{\partial\Psi}{\partial b_2}& \cdots& \dfrac{\partial\Psi}{\partial b_m}
 \end{bmatrix}
 \end{equation*}
- Note that the derivative of a column vector $\bb$ is a row vector. The partial derivatives of a scalar with respect to some $n \times n$ matrix $\BB$ is
+ Note that the derivative of scalar with respect to a column vector $\bb$ is a row vector. The partial derivatives of a scalar with respect to some $m \times m$ matrix $\BB$ is
 \begin{equation*}
 \frac{\partial\Psi}{\partial\BB}=
 \begin{bmatrix}
-\dfrac{\partial\Psi}{\partial b_{1,1}}& \dfrac{\partial\Psi}{\partial b_{2,1}}& \cdots& \dfrac{\partial\Psi}{\partial b_{n,1}}\\
+\dfrac{\partial\Psi}{\partial b_{1,1}}& \dfrac{\partial\Psi}{\partial b_{2,1}}& \cdots& \dfrac{\partial\Psi}{\partial b_{m,1}}\\
 \\
-\dfrac{\partial\Psi}{\partial b_{1,2}}& \dfrac{\partial\Psi}{\partial b_{2,2}}& \cdots& \dfrac{\partial\Psi}{\partial b_{n,2}}\\
+\dfrac{\partial\Psi}{\partial b_{1,2}}& \dfrac{\partial\Psi}{\partial b_{2,2}}& \cdots& \dfrac{\partial\Psi}{\partial b_{m,2}}\\
 \\
 \cdots&  \cdots&  \cdots&  \cdots\\
 \\
-\dfrac{\partial\Psi}{\partial b_{1,n}}& \dfrac{\partial\Psi}{\partial b_{2,n}}& \cdots& \dfrac{\partial\Psi}{\partial b_{n,n}}\\
+\dfrac{\partial\Psi}{\partial b_{1,m}}& \dfrac{\partial\Psi}{\partial b_{2,m}}& \cdots& \dfrac{\partial\Psi}{\partial b_{m,m}}\\
 \end{bmatrix}
 \end{equation*} 
-Note that the indexing is interchanged; $\partial\Psi/\partial b_{i,j}=\big[\partial\Psi/\partial\BB\big]_{j,i}$. For $\QQ$ and $\RR$, this is unimportant because they are variance-covariance matrices and are symmetric. For $\BB$ and $\ZZ$, one must be careful because these may not be symmetric. 
+Note that the indexing is interchanged; $\partial\Psi/\partial b_{i,j}=\big[\partial\Psi/\partial\BB\big]_{j,i}$. For $\QQ$ and $\RR$, this is unimportant because they are variance-covariance matrices and are symmetric. For $\BB$ and $\ZZ$, one must be careful because these may not be symmetric. The partial derivatives of a column vector $\aa$ with respect to a column vector $\bb$.
+\begin{equation*}
+\frac{\partial\Psi}{\partial\BB}=
+\begin{bmatrix}
+\dfrac{\partial a_1}{\partial b_1& \dfrac{\partial a_1}{\partial b_2}& \cdots& \dfrac{\partial a_1}{\partial b_m}\\
+\\
+\dfrac{\partial a_2}{\partial b_1& \dfrac{\partial\Psi}{\partial b_2}}& \cdots& \dfrac{\partial a_2}{\partial b_{m}\\
+\\
+\cdots&  \cdots&  \cdots&  \cdots\\
+\\
+\dfrac{\partial a_n}{\partial b_1}& \dfrac{\partial a_n}{\partial b_2}& \cdots& \dfrac{\partial a_n}{\partial b_m\\
+\end{bmatrix}
+\end{equation*}  
 
-A number of derivatives of a scalar with respect to vectors and matrices will be needed in the derivation and are shown in table \ref{tab:MatrixDerivatives}.  In the table, both the vectorized and non-vectorized versions are shown. The vectorized version of a matrix $\DD$ with dimension $n \times m$ is
+In table \ref{tab:MatrixDerivatives}, both the vectorized and non-vectorized versions are shown. The vectorized version of a matrix $\DD$ with dimension $n \times m$ is
 \begin{gather*}
 \vec(\DD_{n,m})\equiv
 \begin{bmatrix}
@@ -357,10 +369,12 @@ d_{n,m}
 \hline
 \\
 \refstepcounter{equation}\label{eq:derivproductrule}
-$\partial(\ff^\top\gg)/\partial\aa = \ff^\top\partial(\gg)/\partial\aa + \gg^\top\partial(\ff)/\partial\aa$ 
+$\partial(\ff^\top\gg)/\partial\aa = \ff^\top\partial\gg/\partial\aa + \gg^\top\partial\ff/\partial\aa$ 
 & \multirow{2}{*}{(\theequation)} \\
-$\ff=f(\aa)$ and \gg=$g(\aa)$ are some functions of $\aa$ and are column vectors. & \\
-$\partial \ff /\partial\aa = \partial \ff /\partial \gg \, \partial\gg/\partial\aa$
+$\ff=f(\aa)$ and \gg=$g(\aa)$ are $m \times 1$ column vectors and functions of $\aa$. & \\
+$\partial a /\partial\aa = \frac{1}{m} \partial a /\partial \gg \, \partial\gg/\partial\aa$
+&\\
+$\partial \ff /\partial\aa = \frac{1}{m} \partial \ff /\partial \gg \, \partial\gg/\partial\aa$
 &\\
 \\
 \refstepcounter{equation}\label{eq:derivaTc}
