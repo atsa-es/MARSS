@@ -177,9 +177,11 @@ The first part of this report will review the derivation of an EM algorithm for 
 \begin{gathered}
 \xx_t = \BB_t\xx_{t-1} + \uu_t + \GG_t\ww_t, \text{ where } \WW_t \sim \mathrm{MVN}(0,\QQ_t)\\
 \yy_t = \ZZ_t\xx_t + \aa_t + \HH_t\vv_t, \text{ where } \VV_t \sim \mathrm{MVN}(0,\RR_t)\\
-\xx_{t_0} = \xixi + \FF\ll, \text{ where }  \ll \sim \mathrm{MVN}(0,\LAM)
+\xx_{0} = \xixi + \FF\ll, \text{ where }  \ll \sim \mathrm{MVN}(0,\LAM)
 \end{gathered}
 \end{equation}
+The initial state can either defined at $t=0$, as is done in equation \ref{eq:MARSS.ex}, or at $t=1$.  
+
 The linear constraints appear as the vectorization of each parameter ($\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$, $\RR$, $\xixi$, $\LAM$) is described by the relation $\ff_t+\DD_t\mm$. This relation  specifies linear constraints of the form $\beta_i + \beta_{a,i} a + \beta_{b,i} b + \dots$ on the elements in each MARSS parameter matrix. Equation \eqref{eq:MARSS.ex} is a much broader class of MARSS models that includes MARSS models with exogenous variable (covariates), AR-p models, moving average models, constrained MARSS models and models that are combinations of these. The derivation also includes partially deterministic systems where $\GG_t$, $\HH_t$ and $\FF$ may have all zero rows.
 
 \subsection{The joint log-likelihood function}
@@ -217,9 +219,9 @@ $n$ is the number of data points. This is the same as equation 6.64 in \citet{Sh
 &\quad  -\sum_1^T \frac{1}{2} (\xx_t - \BB \xx_{t-1} - \uu)^\top \QQ^{-1} (\xx_t - \BB \xx_{t-1} - \uu) - \sum_1^T\frac{1}{2}\log |\QQ|
 \end{split}
 \end{equation}
-Note that in this case, $\xx_0$ is no longer a realization of a random variable $\XX_0$; it is a fixed (but unknown) parameter.  Equation \ref{eq:logL.V0.is.0} is written as if all the $\xx_0$ are fixed, however when the general derivation is presented, it allowed that some $\xx_0$ are fixed ($\LAM$=0) and others are stochastic.
+$\xixi$ appears in the likelihood for $\xx_{t-1}$ when $t=1$ in the summation. Note that in this case, $\xx_0$ is no longer a realization of a random variable $\XX_0$; it is a fixed (but unknown) parameter.  Equation \ref{eq:logL.V0.is.0} is written as if all the $\xx_0$ are fixed, however when the general derivation is presented, it is allowed that some $\xx_0$ are fixed ($\LAM$=0) and others are stochastic.
 
-If $\RR$ is constant through time, then $\sum_1^T\frac{1}{2} \log |\RR|$ in the likelihood equation reduces to $\frac{T}{2}\log |\RR|$, however sometimes one needs to includes time-dependent weighting on $\RR$\footnote{If for example, one wanted to include a temporally dependent weighting on $\RR$ replace $|\RR|$ with $|\alpha_t\RR|=\alpha_t^n|\RR|$, where $\alpha_t$ is the weighting at time $t$ and is fixed not estimated.}.  The same applies to $\sum_1^T\frac{1}{2}\log |\QQ|$.
+If $\RR$ is constant through time, then $\sum_1^T\frac{1}{2} \log |\RR|$ in the likelihood equation reduces to $\frac{T}{2}\log |\RR|$, however $\RR$ might be time-varying or one may need to include a time-dependent weighting on $\RR$\footnote{If for example, one wanted to include a temporally dependent weighting on $\RR$ replace $|\RR|$ with $|\alpha_t\RR|=\alpha_t^n|\RR|$, where $\alpha_t$ is the weighting at time $t$ and is fixed not estimated.}.  The same applies to $\sum_1^T\frac{1}{2}\log |\QQ|$.
 
 All bolded elements are column vectors (lower case) and matrices (upper case).  $\AA^\top$ is the transpose of matrix $\AA$, $\AA^{-1}$ is the inverse of $\AA$, and $|\AA|$ is the determinant of $\AA$.  Parameters are non-italic while elements that are slanted are realizations of a random variable ($\xx$ and $\yy$ are slated)\footnote{In matrix algebra, a capitol bolded letter indicates a matrix.  Unfortunately in statistics, the capitol letter convention is used for random variables.  Fortunately, this derivation does not need to reference random variables except indirectly when using expectations.  Thus, I use capitols to refer to matrices not random variables.  The one exception is the reference to $\XX$ and $\YY$. In this case a bolded {\it slanted} capitol is used.}
  
@@ -261,7 +263,7 @@ We denote this expected log-likelihood by $\Psi$. The goal is to find the $\Thet
 -\frac{n}{2}\log\pi
 \end{split}
 \end{equation}
-All the $\E[\quad]$ appearing here denote $\EXy[g()|\YY(1)=\yy(1),\Theta_j]$.  In the rest of the derivation, I drop the conditional and the $XY$ subscript on $\E$ to remove clutter, but it is important to remember that whenever $\E$ appears, it refers to a specific conditional multivariate expectation.  If $\xx_0$ is treated as fixed, then $\XX_0=\xixi$ and the last two lines involving $\LAM$ are dropped.
+All the $\E[\quad]$ appearing here denote $\EXy[g()|\YY(1)=\yy(1),\Theta_j]$.  In the rest of the derivation, I drop the conditional and the $XY$ subscript on $\E$ to remove clutter, but it is important to remember that whenever $\E$ appears, it refers to a specific conditional multivariate expectation.  If $\xx_0$ is treated as fixed, then $\XX_0=\xixi$ and the last line involving $\LAM$ is dropped but it will appear in place of $\XX_{t-1}$ when $t=1$ in the summation.
 
 Keep in mind that $\Theta$ and $\Theta_j$ are different.  $\Theta$ is a parameter appearing in function $g(\XX,\YY,\Theta)$ (i.e. the parameters in equation \ref{eq:logL}).  $\XX$ and $\YY$ are random variables which means that $g(\XX,\YY,\Theta)$ is a random variable.  We take the expectation of $g(\XX,\YY,\Theta)$, meaning we take integral over the joint distribution of $\XX$ and $\YY$.  We need to specify what that distribution is and the conditioning on $\Theta_j$ (meaning the $\Theta_j$ appearing to the right of the $|$ in $\E(g()|\Theta_j)$) is specifying this distribution. This conditioning affects the value of the expectation of $g(\XX,\YY,\Theta)$, but it does not affect the value of $\Theta$, which are the $\RR$, $\QQ$, $\uu$, etc. values on the right side of equation \eqref{eq:expLL}.  We will first take the expectation of $g(\XX,\YY,\Theta)$ conditioned on $\Theta_j$ (using integration) and then take the differential of that expectation with respect to $\Theta$.
 
@@ -811,7 +813,7 @@ Thus,
 \begin{equation}\label{eq:pi.update.unconstrained}
 \xixi_{j+1} = \widetilde{\mbox{$\mathbf x$}}_0
 \end{equation}
-$\widetilde{\mbox{$\mathbf x$}}_0$ is the expected value of $\XX_0$ conditioned on the data from $t=1$ to $T$, which comes from the Kalman smoother recursions with initial conditions defined as $\E[\XX_0|\YY_0=\yy_0] \equiv \xixi$ and $\var(\XX_0 \XX_0^\top|\YY_0=\yy_0)\equiv \LAM$.
+$\widetilde{\mbox{$\mathbf x$}}_0$ is the expected value of $\XX_0$ conditioned on the data from $t=1$ to $T$, which comes from the Kalman smoother recursions with initial conditions defined as $\E[\XX_0|\YY_0=\yy_0] \equiv \xixi_j$ and $\var(\XX_0 \XX_0^\top|\YY_0=\yy_0)\equiv \LAM_j$ (meaning the filter recursions start with $t=1$ with  $\tilde{x}_{t-1}^{t-1} = \tilde{x}_0^0 = \xixi_j$).
 A similar set of steps gets us to the update equation for $\LAM$,
 \begin{equation}\label{eq:V0.update.unconstrained}
 \LAM_{j+1} = \widetilde{\VV}_0
@@ -825,7 +827,7 @@ If the initial state is defined as at $t=1$ instead of $t=0$, the update equatio
 \begin{equation}
 \LAM_{j+1} = \widetilde{\VV}_1
 \end{equation}
-These are output from the Kalman smoother recursions with initial conditions defined as $\E[\XX_1|\YY_0=\yy_0] \equiv \xixi$ and $\var(\XX_1 \XX_1^\top|\YY_0=\yy_0)\equiv \LAM$.  Notice that the recursions are initialized slightly differently; you will see the Kalman filter and smoother equations presented with both types of initializations depending on whether the author defines the initial state at $t=0$ or $t=1$.
+These are output from the Kalman smoother recursions with initial conditions defined as $\E[\XX_1|\YY_0=\yy_0] \equiv \xixi_j$ and $\var(\XX_1 \XX_1^\top|\YY_0=\yy_0)\equiv \LAM_j$  (meaning the filter recursions start with $t=1$ with  $\tilde{x}_{t}^{t-1} = \tilde{x}_1^0 = \xixi_j$).  Notice that the recursions are initialized slightly differently. In the literature, you will see the Kalman filter and smoother equations presented with both types of initializations depending on whether the author defines the initial state at $t=0$ or $t=1$.
 
 \subsection{Update equation for $\xixi$ (unconstrained), fixed $\xx_0$}
 For the case where $\xx_0$ is treated as fixed, i.e. as another parameter, then there is no $\LAM$, and we need to maximize $\partial\Psi/\partial\xixi$ using the slightly different $\Psi$ shown in equation \eqref{eq:logL.V0.is.0}.  Now $\xixi$ appears in the state equation part of the likelihood.
@@ -2011,7 +2013,7 @@ The Kalman smoother provides the expectations involving only $\XX_t$ conditioned
 \end{subequations}
 The $\hatPt$ and $\hatPttm$ equations arise from the computational formula for variance (equation \ref{eq:comp.formula.variance}). Note the smoother is different than the Kalman filter as the filter does not provide the expectations of $\XX_t$ conditioned on all the data (time 1 to $T$) but only on the data up to time $t$.
 
-The first part of the Kalman smoother algorithm is the Kalman filter which gives the expectation at time $t$ conditioned on the data up to time $t$.  The following the filter as shown in \citep[sec. 6.2, p. 331]{ShumwayStoffer2006}, although the notation is a little different.  
+The first part of the Kalman smoother algorithm is the Kalman filter which gives the expectation at time $t$ conditioned on the data up to time $t$.  The following the filter as shown in \citep[sec. 6.2, p. 331]{ShumwayStoffer2006}, although the notation is a little different. The recursion starts at time $t=1$ and repeats until $t=T$.
 \begin{subequations}\label{eq:kffilter}
 \begin{align}
 &\xx_t^{t-1}=\BB_t\xx_{t-1}^{t-1}+\uu_t\label{eq:xtt1}\\
@@ -2021,6 +2023,8 @@ The first part of the Kalman smoother algorithm is the Kalman filter which gives
 &\KK_t=\VV_t^{t-1}\ZZ_t^\top(\ZZ_t\VV_t^{t-1}\ZZ_t^\top+\HH_t\RR_t\HH_t^\top)^{-1}\label{eq:Kt}
 \end{align}
 \end{subequations}
+If the initial value is defined at $t=0$, then the filter starts at $t=1$ with the first two equations with $\xx_{0}^{0} \equiv \xixi$ and $\VV_{0}^{}\equiv\LAM$. If the initial value is defined at $t=1$, then the filter starts at $t=1$ with the third and fourth equations with $\xx_{1}^{0}\equiv\xixi$ and $\VV_{1}^{0}\equiv\LAM$.
+
 
 The Kalman smoother and lag-1 covariance smoother compute the expectations conditioned on all the data, 1 to $T$:
 \begin{subequations}\label{eq:kfsmoother}

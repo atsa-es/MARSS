@@ -214,12 +214,12 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     if (return.lag.one) Vtt1T[abs(Vtt1T) < .Machine$double.eps] <- 0
   }
   
-  x10T <- ks.out$alphahat[1:m, 1, drop = FALSE]
+  x01T <- ks.out$alphahat[1:m, 1, drop = FALSE]
   V10T <- matrix(VtT[, , 1], m, m)
   if (MODELobj$tinitx == 1) {
     x00 <- matrix(NA, m, 1)
     V00 <- matrix(NA, m, m)
-    x0T <- x10T
+    x0T <- x01T
     V0T <- V10T
   } else { # MODELobj$tinitx==0
     Vtt1.1 <- sub3D(Vtt1, t = 1)
@@ -246,7 +246,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Vtt1T = Vtt1T,
     x0T = x0T,
     V0T = V0T,
-    x10T = ks.out$alphahat[1:m, 1, drop = FALSE],
+    x01T = ks.out$alphahat[1:m, 1, drop = FALSE],
     V10T = V10T,
     x00T = x00,
     V00T = V00,
@@ -266,6 +266,6 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   )
   # apply names
   X.names <- attr(MODELobj, "X.names")
-  for(el in c("xtT", "xtt1", "x0T", "x00T", "x10T")) rownames(rtn.list[[el]]) <- X.names
+  for(el in c("xtT", "xtt1", "x0T", "x00T", "x01T")) rownames(rtn.list[[el]]) <- X.names
   return(rtn.list)
 }

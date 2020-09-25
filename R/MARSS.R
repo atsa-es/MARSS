@@ -29,7 +29,7 @@ MARSS <- function(y,
     model.tsp <- stats::tsp(y)
     y <- t(y)
   }else{
-    model.tsp <- c(1, TT, 1)
+    model.tsp <- c(1, ncol(y), 1)
   }
   attr(y, "model.tsp") <- model.tsp
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
