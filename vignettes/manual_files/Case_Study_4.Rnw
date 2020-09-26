@@ -404,7 +404,7 @@ kemz.3 <- MARSS(dat.z, model = dfa.model, control = cntl.list)
 <<load_results_if_present, results=hide, echo=FALSE>>=
 # This is being done to speed up building the user guide
 file <- "CS4--model_fits.RData"
-if (file %in% dir("./manual_files"))) {
+if (file %in% dir("./manual_files")) {
   load(paste("./manual_files/", file, sep = ""))
   saved.res <- TRUE
 } else {
