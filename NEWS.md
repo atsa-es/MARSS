@@ -4,7 +4,7 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.2 milestone (yes, marked with earlier release number).
+New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.3 milestone.
 
 MARSS 3.11.3 (master on GitHub)
 ------------------------------------
@@ -13,13 +13,29 @@ ENHANCEMENTS
 
 * Beginning to add testthat tests to the package. These are set with `skip_on_cran()` as they are for internal testing. 
 
-BUGS
-
-* In `KFS()`, a tolerance correction affected the log-likelihood value when R was below square root of machine tolerance or condition number was very high (if R non-diagonal). This created a large (incorrect) jump in the log-likelihood. This would be reported with a warning that the log-likelihood dropped if using the EM algorithm. Solution was to set the tolerance to 0 in the KFAS model in `MARSSkfas()`. Note this did not happen for all cases of small R and a warning would have been generated alerting the user to a problem.
 
 MARSS 3.11.2 (released 2020-09-13 on GitHub)
 ------------------------------------
-This is a minor update to stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
+This is a minor update to make the testing a bit less reliant on `MARSSkfss()`, which can be overly picky. Also fixed a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+
+ENHANCEMENTS
+
+* Stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
+* Allow data, covariates and newdata to be a ts object. model.tsp attribute added to model and marss elements of marssMLE object and this information used for plotting and for `t` column in fitted, residuals and tsSmooth output.
+
+BUGS
+
+* In `KFS()`, a tolerance correction affected the log-likelihood value when R was below square root of machine tolerance or condition number was very high (if R non-diagonal). This created a large (incorrect) jump in the log-likelihood. This would be reported with a warning that the log-likelihood dropped if using the EM algorithm. Solution was to set the tolerance to 0 in the KFAS model in `MARSSkfas()`. Note this did not happen for all cases of small R and a warning would have been generated alerting the user to a problem.
+* `MARSSkfas()` did not recognize if H was time-varying.
+* No ACF should be plotted for state smoothation residuals. Fix to `plot.marssMLE()` and `autoplot.marssMLE()`.
+* `marssMLE$fun.kf` was not always being passed to `MARSShatyt()` so it didn't necessarily use the function requested by the user.
+* `coef.marssMLE()` would not allow you to change type to, say, `par.se`.
+
+DOCUMENTATION
+* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section.
+* Added information on how to get CIs on rotated loadings to DFA chapter.
+* Cleaned up MARSSkf.Rd sections on initial conditions.
+* Added section on normalization calculations to Residuals.Rnw.
 
 MARSS 3.11.1 (released 2020-08-25 on CRAN)
 ------------------------------------
