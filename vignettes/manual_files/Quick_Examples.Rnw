@@ -309,6 +309,26 @@ kemfit <- MARSS(dat, model = list(Z = Z, Q = Q, U = U))
 @
 You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples.  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$,$\QQ$,$\RR$, and $\LAM$).
 
+\section{Linear constraints}
+
+Your model can have simple linear constraints within all the parameters except $\QQ$, $\RR$ and $\LAM$.  For example $1+2a-3b$ is a linear constraint. When entering this value for you matrix, you specify this as \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so use \verb@"+-3*b"@ to specify $-3b$. Anything after `*` is a parameter. So `1*1` has a parameter called `"1"`. Example, let's specify the following $\BB$, $\QQ$ and $\ZZ$ matrices:
+\begin{equation*}
+\UU = \begin{bmatrix}u-0.1\\ u+0.1\end{bmatrix}\quad
+\QQ = \begin{bmatrix}q_{11}&0\\ 0.01&0\end{bmatrix}\quad
+\ZZ = \begin{bmatrix}z_1-z_2&2*z_1\\ 0&z_1\\ z_2&0 \\ 0&z_3 \\ 0&1+z_3\end{bmatrix}
+\end{equation*}
+
+This would be specified as (notice \verb@"1*z1+-1*z2"@ for $z_1-z_2$):
+<<model.spec2, eval=FALSE>>=
+U <- matrix(list("-0.1+1*u","0.1+1*u"),2,1)
+Q <- matrix(list("q11",0,0,0.01),2,2)
+Z <- matrix(list("1*z1+-1*z2",0,"z2",0,0,"2*z1","z1",0,"z3","1+z3"),5,2)
+@
+We need to fix $\AA$ if $\ZZ$ is estimated.
+<<Cs17_model-two2, keep.source=TRUE, results=hide>>=
+kemfit <- MARSS(dat, model = list(Z = Z, Q = Q, U = U, A="zero"))
+@
+
 \section{Time-varying parameters}
 Time-varying parameters are specified by passing in an array of matrices (list, numeric or character) where the 3rd dimension of the array is time and must be the same value as the 2nd (time) dimension of the data matrix.  No text shortcuts are allowed for time-varying parameters; you need to use the matrix form.
 
