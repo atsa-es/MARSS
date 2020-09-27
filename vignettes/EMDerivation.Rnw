@@ -336,9 +336,9 @@ Note that the indexing is interchanged; $\partial\Psi/\partial b_{i,j}=\big[\par
 \begin{equation*}
 \frac{\partial\Psi}{\partial\BB}=
 \begin{bmatrix}
-\dfrac{\partial a_1}{\partial b_1& \dfrac{\partial a_1}{\partial b_2}& \cdots& \dfrac{\partial a_1}{\partial b_m}\\
+\dfrac{\partial a_1}{\partial b_1}& \dfrac{\partial a_1}{\partial b_2}& \cdots& \dfrac{\partial a_1}{\partial b_m}\\
 \\
-\dfrac{\partial a_2}{\partial b_1& \dfrac{\partial\Psi}{\partial b_2}}& \cdots& \dfrac{\partial a_2}{\partial b_{m}\\
+\dfrac{\partial a_2}{\partial b_1}& \dfrac{\partial\Psi}{\partial b_2}}& \cdots& \dfrac{\partial a_2}{\partial b_{m}\\
 \\
 \cdots&  \cdots&  \cdots&  \cdots\\
 \\
