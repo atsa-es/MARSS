@@ -205,7 +205,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   } else {
     Vtt1T <- ks.out$V[1:m, (m + 2):(2 * m + 1), , drop = FALSE]
     if (MODELobj$tinitx == 1) Vtt1T[,,1] <- matrix(NA, m, m)
-    }
+  }
   # zero out rows cols as needed when R diag = 0
   # Check that if any R are 0 then model is solveable
   if (any(diag.R == 0)) {
@@ -222,14 +222,26 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     x0T <- x01T
     V0T <- V10T
   } else { # MODELobj$tinitx==0
-    Vtt1.1 <- sub3D(Vtt1, t = 1)
-    if(any(takediag(Vtt1.1)==0)){
-      Vinv <- pcholinv(Vtt1.1, chol=FALSE)
-      if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
-      J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+    if(identical(V00, matrix(0, m, m))){ 
+      J0 <- V00
     }else{
-      t.J0 <- solve(matrix(Vtt1.1, m, m, byrow = TRUE), par.1$B%*%V00)
-      if (m==1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE)
+      # Vtt1.1 inverse can be unstable. The following code tries to find an
+      # inverse that will work by trying various options
+      Vtt1.1 <- sub3D(Vtt1, t = 1)
+      if(any(takediag(Vtt1.1)==0)){
+        Vinv <- try(pcholinv(Vtt1.1, chol=FALSE), silent=TRUE)
+        if(inherits(Vinv, "try-error")) Vinv <- pcholinv(Vtt1.1, chol=TRUE)
+        if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+        J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+      }else{
+        # solve will be more stable/faster generally but can fail if var is very small
+        t.J0 <- try(solve(matrix(Vtt1.1, m, m, byrow = TRUE), par.1$B%*%V00), silent=TRUE)
+        if(inherits(t.J0, "try-error")){
+          Vinv <- pcholinv(Vtt1.1) # chol inverse
+          if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+          J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+        }else{ if (m==1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE) }
+      }
     }
     xtT.1 <- ks.out$alphahat[1:m, 1, drop = FALSE]
     x0T <- x00 + J0 %*% (ks.out$alphahat[1:m, 1, drop = FALSE] - ks.out$a[1:m, 1, drop = FALSE]) # eqn 6.47
