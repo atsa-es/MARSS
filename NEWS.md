@@ -32,7 +32,7 @@ BUGS
 * `coef.marssMLE()` would not allow you to change type to, say, `par.se`.
 
 DOCUMENTATION
-* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section.
+* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts.
 * Added information on how to get CIs on rotated loadings to DFA chapter.
 * Cleaned up MARSSkf.Rd sections on initial conditions.
 * Added section on normalization calculations to Residuals.Rnw.
