@@ -137,7 +137,7 @@ U <-  matrix(0,p,1)
 
 model.gen <- list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=0)
 
-fit <- MARSS(df_marss, model=model.gen, method="BFGS", fun.kf="MARSSkfas")
+fit <- MARSS(df_marss, model=model.gen, method="BFGS", fun.kf="MARSSkfas", silent=TRUE)
 kf1 <- MARSSkfss(kemfit1, smoother=FALSE)
 kf2 <- MARSSkfas(kemfit1)
 kf1_list <- kf1[c("xtt1", "Vtt1", "logLik")]
