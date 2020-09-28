@@ -228,7 +228,7 @@ All bolded elements are column vectors (lower case) and matrices (upper case).  
 \subsection{Missing values}\label{sec:missing}
 In Shumway and Stoffer and other presentations of the EM algorithm for MARSS models \citep{ShumwayStoffer2006,Zuuretal2003a}, the missing values case is treated separately from the non-missing values case.  In these derivations, a series of modifications are given for the EM update equations when there are missing values.  In my derivation, I present the missing values treatment differently, and there is only one set of update equations and these equations apply in both the missing values and non-missing values cases. My derivation does this by keeping $\E[\YY_t|\text{data}]$ and $\E[\YY_t\XX_t^\top|\text{data}]$ in the update equations (much like $\E[\XX_t|\text{data}]$ is kept in the equations) while Shumway and Stoffer replace these expectations involving $\YY_t$ by their values, which depend on whether or not the data are a complete observation of $\YY_t$ with no missing values.  Section \ref{sec:compexpectations} shows how to compute the expectations involving $\YY_t$ when the data are an incomplete observation of $\YY_t$.
 
-\section{The EM algorithm}
+\section{The EM algorithm}\label{sec:EMalgorithm}
 The EM algorithm cycles iteratively between an expectation step (the integration in the equation) followed by a maximization step (the arg max in the equation):
 \begin{equation}\label{eq:EMalg}
 \Theta_{j+1} = \arg \underset{\Theta}{\max} \int_{\xx}{\int_{\yy}{\log\LL(\xx,\yy;\Theta) f(\xx,\yy|\YY(1)=\yy(1),\Theta_j)d\xx d\yy}}
@@ -245,6 +245,7 @@ Now the maximization is only over $\alpha$, the part that appears after the ``;'
 
 After one iteration of the expectation and maximization steps, the cycle is then repeated. New expectations  are computed using $\Theta_{j+1}$, and then a new set of parameters $\Theta_{j+2}$ is generated.  This cycle is continued until the likelihood no longer increases more than a specified tolerance level.   This algorithm is guaranteed to increase in likelihood at each iteration (if it does not, it means there is an error in one's update equations).  The algorithm must be started from an initial set of parameter values $\Theta_1$.  The algorithm is not particularly sensitive to the initial conditions but the surface could definitely be multi-modal and have local maxima.  See section \ref{sec:implementation} on using Monte Carlo initialization to ensure that the global maximum is found.
 
+\textbf{Dividing the parameters into parts}: Above the parameter set is written as $\Theta$. However $\Theta$ is composed of multiple components: $\BB$, $\uu$, $\RR$, etc. The EM iteration $j$ is broken into subparts for each parameter matrix and both the maximization and expectation steps are done for each part. For example, the expectation step is run with parameters $\{\BB_j, \uu_j, \RR_j, \dots}$ and then $\BB$ is updated to $\BB_{j+1}$ with the maximization step. The expectation step is run with parameters $\{\BB_{j+1}, \uu_j, \RR_j, \dots}$ and the $\uu$is updated to $\uu_{j+1}$ with the maximization step. The expectation step is run with parameters $\{\BB_{j+1}, \uu_{j+1}, \RR_j, \dots}$ and the $\RR$ is updated. This is continued until all parameters in $\Theta$ are updated and that completes the $j+1$ update.
 
 \subsection{The expected log-likelihood function}\label{sec:expLL}
 The function that is maximized in the ``M'' step is the expected value of the log-likelihood function. This expectation is conditioned on two things: 1) the observed $\YY$'s which are denoted $\YY(1)$ and which are equal to the fixed values $\yy(1)$ and 2) the parameter set $\Theta_j$.  Note that since there may be missing values in the data, $\YY(1)$ can be a subset of $\YY$, that is, only some $\YY$ have a corresponding $\yy$ value at time $t$.  Mathematically what we are doing is $\EXy[g(\XX,\YY)|\YY(1)=\yy(1),\Theta_j]$.  This is a multivariate conditional expectation because $\XX,\YY$ is multivariate (a $m \times n \times T$ vector). The function $g(\Theta)$ that we are taking the expectation of is $\log\LL(\YY,\XX ; \Theta)$. Note that $g(\Theta)$ is a random variable involving the random variables, $\XX$ and $\YY$, while $\log\LL(\yy,\xx ; \Theta)$ is not a random variable but rather a specific value since $\yy$ and $\xx$ are a set of specific values.
@@ -309,7 +310,9 @@ $\E_X[\XX|\XX=\xx]=\xx$ \\
 \section{The unconstrained update equations}\label{sec:generalupdate}
 In this section, I show the derivation of the update equations when all elements of a parameter matrix are estimated and are all allowed to be different, i.e. the unconstrained case. These are similar to the update equations one will see in \citet{ShumwayStoffer2006}.  Section \ref{sec:constrained} shows the update equations when there are unestimated (fixed) or estimated but shared values in the parameter matrices, i.e. the constrained update equations.   
 
-To derive the update equations, one must find the $\Theta$, where $\Theta$ is comprised of the MARSS parameters $\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$, $\RR$, $\xixi$, and $\LAM$,  that maximizes $\Psi$ (equation \ref{eq:expLL}) by partial differentiation of $\Psi$  with respect to $\Theta$.  However, I will be using the EM equation where one maximizes each parameter matrix in $\Theta$ one-by-one (equation \ref{eq:EMalg.j}).  In this case, the parameters that are not being maximized are set at their iteration $j$ values, and then one takes the derivative of $\Psi$ with respect to the parameter of interest.  Then solve for the parameter value that sets the partial derivative to zero.  The partial differentiation is with respect to each individual parameter element, for example each $u_{i,j}$ in matrix $\uu$. The idea is to single out those terms in equation \eqref{eq:expLL} that involve $u_{i,j}$ (say), differentiate by $u_{i,j}$, set this to zero and solve for $u_{i,j}$.  This gives the new $u_{i,j}$ that maximizes the partial derivative with respect to $u_{i,j}$ of the expected log-likelihood.  Matrix calculus gives us a way to jointly maximize $\Psi$ with respect to all elements (not just element $i,j$) in a parameter matrix. 
+To derive the update equations, one must find the $\Theta$, where $\Theta$ is comprised of the MARSS parameters $\BB$, $\uu$, $\QQ$, $\ZZ$, $\aa$, $\RR$, $\xixi$, and $\LAM$,  that maximizes $\Psi$ (equation \ref{eq:expLL}) by partial differentiation of $\Psi$  with respect to $\Theta$.  However, I will be using the EM equation where one maximizes each parameter matrix in $\Theta$ one-by-one (equation \ref{eq:EMalg.j}).  In this case, the parameters that are not being maximized are fixed (and set at their current iteration value), and then one takes the derivative of $\Psi$ with respect to the parameter of interest.  Then solve for the parameter value that sets the partial derivative to zero.  The partial differentiation is with respect to each individual parameter element, for example each $u_{i,j}$ in matrix $\uu$. The idea is to single out those terms in equation \eqref{eq:expLL} that involve $u_{i,j}$ (say), differentiate by $u_{i,j}$, set this to zero and solve for $u_{i,j}$.  This gives the new $u_{i,j}$ that maximizes the partial derivative with respect to $u_{i,j}$ of the expected log-likelihood.  Matrix calculus gives us a way to jointly maximize $\Psi$ with respect to all elements (not just element $i,j$) in a parameter matrix.
+
+Note, see the comments on the EM algorithm implementation (Section \ref{sec:EMalgorithm}) when the parameter set $\Theta$ is broken into parts (e.g. $\BB$, $\uu$, $\QQ$, etc.). In the implementation of the algorithm, one updates the $\Theta$ parts sequentially and the expectation step is re-run with the new $\Theta$ at each step (meaning the Kalman smoother is re-run with the updated parameters). Thus the algorithm is applied as follows (order that the parameters are updated is unimportant): E-step with $\{\BB_j, \uu_j, \QQ_j, etc.\}$, M-step updates $\BB_j$ to $\BB_{j+1}$, E-step with $\{\BB_{j+1}, \uu_j, \QQ_j, etc.\}$, M-step updates $\uu_j$ to $\uu_{j+1}$, E-step with $\{\BB_{j+1}, \uu_{j+1}, \QQ_j, etc.\}$, M-step updates $\QQ_j$ to $\QQ_{j+1}$, continuing until all parameters are updates which completes the $j+1$ update.
 
 \subsection{Matrix calculus need for the derivation}\label{sec:MatrixDerivatives}
 A number of derivatives of a scalar with respect to vectors and matrices will be needed in the derivation and are shown in table \ref{tab:MatrixDerivatives}. The partial derivative of a scalar ($\Psi$ is a scalar) with respect to some column vector $\bb$ (which has elements $b_1$, $b_2$ . . .) is 
@@ -338,11 +341,11 @@ Note that the indexing is interchanged; $\partial\Psi/\partial b_{i,j}=\big[\par
 \begin{bmatrix}
 \dfrac{\partial a_1}{\partial b_1}& \dfrac{\partial a_1}{\partial b_2}& \cdots& \dfrac{\partial a_1}{\partial b_m}\\
 \\
-\dfrac{\partial a_2}{\partial b_1}& \dfrac{\partial\Psi}{\partial b_2}}& \cdots& \dfrac{\partial a_2}{\partial b_{m}\\
+\dfrac{\partial a_2}{\partial b_1}& \dfrac{\partial\Psi}{\partial b_2}& \cdots& \dfrac{\partial a_2}{\partial b_m}\\
 \\
 \cdots&  \cdots&  \cdots&  \cdots\\
 \\
-\dfrac{\partial a_n}{\partial b_1}& \dfrac{\partial a_n}{\partial b_2}& \cdots& \dfrac{\partial a_n}{\partial b_m\\
+\dfrac{\partial a_n}{\partial b_1}& \dfrac{\partial a_n}{\partial b_2}& \cdots& \dfrac{\partial a_n}{\partial b_m}\\
 \end{bmatrix}
 \end{equation*}  
 
@@ -483,13 +486,13 @@ Set the left side to zero (an $m \times m$ matrix of zeros), cancel out $\QQ^{-1
 \begin{equation}\label{eq:B.unconstrained4}
 \begin{split}
 &\mathbf{0}  =  \sum_{t=1}^T\big(\E[\XX_t\XX_{t-1}^\top] - \BB \E[\XX_{t-1}\XX_{t-1}^\top] - \uu \E[\XX_{t-1}^\top]\big)\\ 
-&\quad =  \sum_{t=1}^T \big( \hatPttm  - \BB \hatPtm - \uu^\top\hatxtm^\top \big)
+&\quad =  \sum_{t=1}^T \big( \hatPttm  - \BB \hatPtm - \uu \hatxtm^\top \big)
 \end{split}
 \end{equation}
 The last line replaced the expectations  with their names shown in  equation \eqref{eq:expectations}.
 Solving for $\BB$ and noting that $\hatPtm$ is like a variance-covariance matrix and is invertible, gives us the new $\BB$ that maximizes $\Psi$, 
 \begin{equation}\label{eq:B.update.unconstrained}
-\BB_{j+1}= \bigg( \sum_{t=1}^T \big( \hatPttm  - \uu^\top\hatxtm^\top \big)\bigg) \bigg(\sum_{t=1}^T \hatPtm\bigg)^{-1}
+\BB_{j+1}= \bigg( \sum_{t=1}^T \big( \hatPttm  - \uu \hatxtm^\top \big)\bigg) \bigg(\sum_{t=1}^T \hatPtm\bigg)^{-1}
 \end{equation}
 
 Because all the equations above also apply to block-diagonal matrices, the derivation immediately generalizes to the case where $\BB$ is an unconstrained block diagonal matrix:
@@ -515,7 +518,7 @@ b_{3,1}&b_{3,2}&b_{3,3}&0&0&0&0&0\\
 
 For the block diagonal $\BB$,
 \begin{equation}\label{eq:B.update.blockdiag}
-\BB_{i,j+1}= \bigg( \sum_{t=1}^T \big( \hatPttm  - \uu^\top\hatxtm^\top \big) \bigg)_i \bigg(\sum_{t=1}^T \hatPtm \bigg)_i^{-1}
+\BB_{i,j+1}= \bigg( \sum_{t=1}^T \big( \hatPttm  - \uu \hatxtm^\top \big) \bigg)_i \bigg(\sum_{t=1}^T \hatPtm \bigg)_i^{-1}
 \end{equation}
 where the subscript $i$ means to take the parts of the matrices that are analogous to $\BB_i$; take the whole part within the parentheses not the individual matrices inside the parentheses.  If $\BB_i$ is comprised of rows $a$ to $b$ and columns $c$ to $d$ of matrix $\BB$, then  take rows $a$ to $b$ and columns $c$ to $d$ of the matrices subscripted by $i$ in equation \eqref{eq:B.update.blockdiag}.
 
@@ -1273,7 +1276,7 @@ The vec of the model parameters are defined as follows:
 \end{equation*}
 
 \section{The constrained update equations}\label{sec:constrained}
-The derivation proceeds by taking the partial derivative of equation \ref{eq:logL.vec.general} with respect to the estimated terms, the $\zzeta$, $\aalpha$, etc, setting the derivative to zero, and solving for those estimated terms.  Conceptually, the algebraic steps in the derivation are similar to those in  the unconstrained derivation.  
+The derivation proceeds by taking the partial derivative of equation \ref{eq:logL.vec.general} with respect to the estimated terms, the $\zzeta$, $\aalpha$, etc, setting the derivative to zero, and solving for those estimated terms.  Conceptually, the algebraic steps in the derivation are similar to those in  the unconstrained derivation. See the notes in Sections \ref{sec:generalupdate} and \ref{sec:EMalgorithm} regarding implementation of the EM algorithm when $\Theta$ is broken into parts (e.g. $\BB$, $\uu$, $\QQ$, etc.).
 
 \subsection{The general $\uu$ update equations}
 We take the derivative of $\Psi$ (equation \ref{eq:logL.vec.general}) with respect to $\uupsilon$.
