@@ -8,6 +8,7 @@ AZR
 Abstol
 Advis
 Albon
+alphahat
 AnimalTracking
 arima
 Arxiv
@@ -271,6 +272,7 @@ getDFAfits
 ggplot
 github
 globals
+GlobalTemp
 graywhales
 greek
 grey
@@ -368,6 +370,7 @@ pred
 predation
 progressBar
 pseudoinverse
+Ptt
 qnorm
 qqline
 qqplots
@@ -384,6 +387,7 @@ resubmission
 richardsi
 rmvnorm
 rockfish
+RShowDoc
 rstudio
 runif
 sapply
@@ -399,6 +403,7 @@ showgap
 sightability
 smoothation
 smoothations
+smoothations
 solvability
 sparverius
 spawner
@@ -406,11 +411,14 @@ SpeciesInteractions
 spi
 splitter
 ss
+SSModel
 standardizations
 standardly
 stochasticity
+stochasticity
 stringr
 StructuralBreaks
+StructTS
 STS
 subfunctions
 subpopulation
