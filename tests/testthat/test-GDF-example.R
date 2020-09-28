@@ -9,8 +9,9 @@ library(quantmod)
 
 # 2) Get data from Quantmod and prepare data frame for estimation
 
-getSymbols('GDPC1',src='FRED')
-getSymbols('PAYEMS',from = "1947-01-01",src='FRED')
+#getSymbols('GDPC1',src='FRED')
+#getSymbols('PAYEMS',from = "1947-01-01",src='FRED')
+load("GDP.Rdata")
 
 GDP <-  data.frame(date=index(GDPC1), coredata(GDPC1))
 Emp <-  data.frame(date=index(PAYEMS), coredata(PAYEMS))
@@ -97,35 +98,108 @@ Q <- matrix (list("q1",0,0,0,0,0,0,0,0,0,0,0,
                   0,0,0,0,0,0,0,0,0,0,"q11",0,
                   0,0,0,0,0,0,0,0,0,0,0,0),12,12)
 
-# Other options for matrix Q
-
-# Q <- matrix(list(0),12,12)
-# Q <- ldiag(list("q1", 0,0,0,0,"q6",0,0,0,0,"q11",0))
-
-# Q <- "diagonal and unequal"
-
-# Rest of matrices
-
 x0 <-  matrix(0,p,1)
 A  <- matrix(0,(length(df)-1),1)
 U <- matrix(0,p,1)
 V0 <- 5*diag(1,p)
 U <-  matrix(0,p,1)
 
-
 # 4) Estimation
 
 # Define model
 
-model.gen =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=0)
+model.gen = list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0, tinitx=0)
 
 # Estimation
 
-kf_ss= try(MARSS(df_marss, model=model.gen,control= list(trace=1,maxit = 300), method="BFGS"), silent=TRUE)
+kf_ss= try(MARSS(df_marss, model=model.gen, method="BFGS", silent=TRUE), silent=TRUE)
 
 test_that("GDF example for numerical stabilty", {
   expect_true(!inherits(kf_ss, "try-error"))
 })
 
-kf_ss= try(MARSS(df_marss, model=model.gen,control= list(trace=0, maxit = 300), method="BFGS"), silent=TRUE)
+test_that("GDF example for numerical stabilty", {
+  expect_true(kf_ss$convergence==54)
+})
 
+test_that("GDF example for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, -86.3201321))
+})
+
+model.gen =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0, tinitx=1)
+kf_ss= try(MARSS(df_marss, model=model.gen, method="BFGS", silent=TRUE), silent=TRUE)
+
+test_that("GDF example for numerical stabilty", {
+  expect_true(!inherits(kf_ss, "try-error"))
+})
+
+test_that("GDF example for numerical stabilty", {
+  expect_true(kf_ss$convergence==54)
+})
+
+test_that("GDF example for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, -991.2024293))
+})
+
+# THIS One should work; scaling is different
+
+GDP <-  data.frame(date=index(GDPC1), coredata(GDPC1))
+Emp <-  data.frame(date=index(PAYEMS), coredata(PAYEMS))
+Emp <- Emp %>%  filter(date>=as.Date("1947-01-01")&date<=as.Date("2020-06-01"))
+
+Emp$PAYEMS <- as.numeric(Emp$PAYEMS)
+Emp <- Emp %>% mutate(rate = PAYEMS/lag(PAYEMS,1)-1)
+GDP <- GDP %>% mutate(rate =GDPC1/lag(GDPC1,1)-1)
+GDP <- select(GDP, -c(GDPC1))
+
+months <- lapply(X = GDP$date, FUN = seq.Date, by = "month", length.out = 3)
+months <- data.frame(date = do.call(what = c, months))
+
+m_GDP <- left_join(x = months, y = GDP , by = "date")
+
+df <- cbind(m_GDP,Emp$rate)
+
+names(df) <- c("date","S01_GDP","S02_Emp")
+
+df_marss  <- df %>% gather(key = "serie", value = "value", -date)
+
+df_marss <- df_marss  %>% spread(key=date,value=value)
+
+df_marss$serie <- NULL
+
+df_marss <- as.matrix(df_marss)
+
+
+# Define model
+
+model.gen =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=0)
+kf_ss= try(MARSS(df_marss, model=model.gen, method="BFGS", silent=TRUE), silent=TRUE)
+
+# Estimation
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(!inherits(kf_ss, "try-error"))
+})
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(kf_ss$convergence==0)
+})
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, 4260.399772))
+})
+
+model.gen =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0, tinitx=1)
+kf_ss= try(MARSS(df_marss, model=model.gen, method="BFGS", silent=TRUE), silent=TRUE)
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(!inherits(kf_ss, "try-error"))
+})
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(kf_ss$convergence==0)
+})
+
+test_that("GDF works example for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, 4301.624359))
+})
