@@ -108,7 +108,9 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
           if (!(x$convergence %in% c(0, 1, 2, 3, 10, 11, 12, 13, 51, 52, 62))) {
             cat("WARNING: convergence test errors\n")
           }
-
+          if ((x$convergence %in% c(54))) {
+            cat("WARNING: Kalman filter-smoother error.\n")
+          }
           cat("Log-likelihood:", x$logLik, "\n")
           if (!is.null(x[["AIC"]])) cat("AIC:", x$AIC, "  ")
           if (!is.null(x[["AICc"]])) cat("AICc:", x$AICc, "  ")

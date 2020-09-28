@@ -50,7 +50,7 @@ Note if you are estimating B, the EM algorithm is often more stable if you set t
 
 Did you set a VO (say, diagonal), that is inconsisent with V0T (the covariance matrix implied by the model)?  That can cause problems with the Q update.  Are you estimating C or D, but have rows of c or d that are all zero?  That won't work.  Are you estimating C or D with only one column (one time point) of c or d? Depending on your constraints in C or D that might not work.
 
-If you are satisfied that your model is fine (not logially indeterminant), then problem maybe numerical in nature. This denom inverse is only in the EM algorithm. You can try method='BFGS' to use the BFGS algorithm, but do check with different initial conditions since if the EM algorithm is struggling, it suggests ridges in the likelihood surface that can lead the BFGS algorithm astray.\n"
+If you are satisfied that your model is fine (not logially indeterminant), then the problem may be numerical in nature. This denom inverse is only in the EM algorithm. You can try method='BFGS' to use the BFGS algorithm, but do check with different initial conditions since if the EM algorithm is struggling, it suggests ridges in the likelihood surface that can lead the BFGS algorithm astray.\n"
     ))
     return(invisible(number))
   }
@@ -276,7 +276,6 @@ A Hessian with many NAs is probably a sign that you have a poor model (meaning y
     return(invisible(number))
   }
 
-
   if (number == "AZR0") {
     writeLines(strwrap(
       'This is a constraint imposed by the EM algorithm.  What is happening is that the rows of Z, A or D matching 0s on the diagonal of R cannot be solved for because the 0s on the diagonal are causing those rows to disappear from the likelihood equation. You can still compute the likelihood, it is just that the EM algorithm needs the parameters in the equation because it differentiates with respect to them to solve for their updates.
@@ -292,6 +291,14 @@ What to do? This is not a bug. It is simply a constraint of the update equations
     return(invisible(number))
   }
 
+  if (number == "optimerror54") {
+    writeLines(strwrap(
+      "This is an unusual error and means that KFAS:::logLik.SSModel() was able to run but that KFAS:::KFS() was not. Your model probably became numerically unstable, likely one of your variances became very large or very small. Or perhaps your B matrix became ill-conditioned. If you are estimating B, use tintix=1 in the model list to constrain the initial variance by the data at t=1. If you have many NAs at t=1, try removing those and starting where your have more data. If you are using a non-zero V0, make sure it does not conflict with your model. For example, if V0 is diagonal, then VtT[,,1] should also be diagonal.
+"
+    ))
+    return(invisible(number))
+  }
+  
   writeLines(strwrap(
     "You entered an invalid error code. Type MARSSinfo() to see the valid options."
   ))

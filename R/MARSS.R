@@ -261,10 +261,10 @@ MARSS <- function(y,
     }
     # END fit the model #################
 
-    if ((!silent || silent == 2) & MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12)) {
+    if ((!silent || silent == 2) & MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12, 54)) {
       print(MLEobj)
     }
-    if ((!silent || silent == 2) & !(MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12))) {
+    if ((!silent || silent == 2) & !(MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
     } # 3 added since don't print if fit=FALSE
     if ((!silent || silent == 2) & !fit) print(MLEobj$model)
