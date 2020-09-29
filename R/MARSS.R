@@ -233,7 +233,7 @@ MARSS <- function(y,
             kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
             if (inherits(kfss, "try-error") || !kfss$ok) {
               msg <- "Not available. MARSSkfss() returned error."
-              kfss <- list(Innov = msg, Sigma = msg, xtt = msg, Vtt = msg, J = msg, Kt = msg)
+              kfss <- list(Innov = msg, Sigma = msg, J = msg, Kt = msg)
             }
           } else {
             kfss <- kf
@@ -243,14 +243,13 @@ MARSS <- function(y,
           # these are only returned by MARSSkfss
           MLEobj$Innov <- kfss$Innov
           MLEobj$Sigma <- kfss$Sigma
-          MLEobj$Vtt <- kfss$Vtt
-          MLEobj$xtt <- kfss$xtt
           MLEobj$J <- kfss$J
           MLEobj$Kt <- kfss$Kt
           if (fun.kf == "MARSSkfss") {
             MLEobj$J0 <- kfss$J0
           } else {
             # From kfss smoother so won't be available if fun.kf=MARSSkfas
+            # Line above used smoother = FALSE; here smoother = TRUE
             J0 <- try(MARSSkfss(MLEobj), silent = TRUE)
             if (!inherits(J0, "try-error") && J0$ok) MLEobj$J0 <- J0$J0 else MLEobj$J0 <- "Not available. MARSSkfss() smoother returned error."
           }

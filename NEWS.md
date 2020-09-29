@@ -16,12 +16,13 @@ ENHANCEMENTS
 
 MARSS 3.11.2 (released 2020-09-13 on GitHub)
 ------------------------------------
-This is a minor update to make the testing a bit less reliant on `MARSSkfss()`, which can be overly picky. Also fixed a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+This is a minor update to make the testing and output (plots, residuals, tsSmooth, fitted) less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` which can become ill-conditioned thus preventing inversion. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
 
 ENHANCEMENTS
 
 * Stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
 * Allow data, covariates and newdata to be a ts object. model.tsp attribute added to model and marss elements of marssMLE object and this information used for plotting and for `t` column in fitted, residuals and tsSmooth output.
+* Add `xtt` and `Vtt` to `MARSSkfas()` to avoid `MARSSkfss()` calls when unnecessary.
 
 BUGS
 

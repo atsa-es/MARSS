@@ -28,11 +28,11 @@ fitted.marssMLE <- function(object, ...,
   if (type == "y") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
     if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt1"]]
-    if (conditioning == "t") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
+    if (conditioning == "t") hatxt <- MARSSkf(MLEobj)[["xtt"]]
     if(interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
       if (conditioning == "t1") hatVt <- MARSSkf(MLEobj)[["Vtt1"]]
-      if (conditioning == "t") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
+      if (conditioning == "t") hatVt <- MARSSkf(MLEobj)[["Vtt"]]
     }
     Z.time.varying <- model.dims[["Z"]][3] != 1
     A.time.varying <- model.dims[["A"]][3] != 1
@@ -83,10 +83,10 @@ fitted.marssMLE <- function(object, ...,
   
   if (type == "x") {
     if (conditioning == "T") hatxt <- MARSSkf(MLEobj)[["xtT"]]
-    if (conditioning == "t1") hatxt <- MARSSkfss(MLEobj)[["xtt"]]
+    if (conditioning == "t1") hatxt <- MARSSkf(MLEobj)[["xtt"]]
     if (interval!="none"){
       if (conditioning == "T") hatVt <- MARSSkf(MLEobj)[["VtT"]]
-      if (conditioning == "t1") hatVt <- MARSSkfss(MLEobj)[["Vtt"]]
+      if (conditioning == "t1") hatVt <- MARSSkf(MLEobj)[["Vtt"]]
     }
     
     B.time.varying <- model.dims[["B"]][3] != 1

@@ -32,10 +32,10 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
   hatVtpt[, , 1:(TT - 1)] <- kfList$Vtt1T[, , 2:TT, drop = FALSE]
   if(!only.kem){
     hatxtt1 <- kfList$xtt1
-    hatxtt <- MARSSkfss(MLEobj)$xtt
+    hatxtt <- kfList$xtt
     hatxt1 <- cbind(E.x0, kfList$xtT[, 1:(TT - 1), drop = FALSE])
     hatVtt1 <- kfList$Vtt1
-    hatVtt <- MARSSkfss(MLEobj)$Vtt
+    hatVtt <- kfList$Vtt
     hatVtt1T <- kfList$Vtt1T
   } 
   

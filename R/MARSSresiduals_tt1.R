@@ -1,9 +1,15 @@
-MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE, fun.kf = "MARSSkfss") {
+MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent=FALSE, fun.kf = c("MARSSkfas", "MARSSkfss") ) {
   # These are the residuals and their variance conditioned on the data up to time t-1
 
   ######################################
   # Set up variables
   MLEobj <- object
+  if ( missing(fun.kf) ){
+    fun.kf <- MLEobj$fun.kf
+  }else{
+    MLEobj$fun.kf <- fun.kf 
+    # to ensure that MARSSkf, MARSShatyt and fitted() use the spec'd fun
+  }
   method <- match.arg(method)
   model.dims <- attr(MLEobj$marss, "model.dims")
   TT <- model.dims[["x"]][2]
@@ -20,8 +26,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   #### list of time-varying parameters
   time.varying <- is.timevarying(MLEobj)
   
-  if(fun.kf=="MARSSkfss") kf <- MARSSkfss(MLEobj)
-  if(fun.kf=="MARSSkfas") kf <- MARSSkfas(MLEobj)
+  kf <- MARSSkf(MLEobj)
   Ey <- MARSShatyt(MLEobj, only.kem=FALSE)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H

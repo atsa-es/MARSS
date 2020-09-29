@@ -196,10 +196,12 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   if (packageVersion("KFAS") != "0.9.11") {
     ks.out$a <- t(ks.out$a)
     ks.out$alphahat <- t(ks.out$alphahat)
+    ks.out$att <- t(ks.out$att)
   }
   
   VtT <- ks.out$V[1:m, 1:m, , drop = FALSE]
   Vtt1 <- ks.out$P[1:m, 1:m, 1:TT, drop = FALSE]
+  Vtt <- ks.out$Ptt[1:m, 1:m, 1:TT, drop = FALSE]
   if (!return.lag.one) {
     Vtt1T <- NULL
   } else {
@@ -211,6 +213,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   if (any(diag.R == 0)) {
     VtT[abs(VtT) < .Machine$double.eps] <- 0
     Vtt1[abs(Vtt1) < .Machine$double.eps] <- 0
+    Vtt[abs(Vtt) < .Machine$double.eps] <- 0
     if (return.lag.one) Vtt1T[abs(Vtt1T) < .Machine$double.eps] <- 0
   }
   
@@ -262,13 +265,13 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     V10T = V10T,
     x00T = x00,
     V00T = V00,
-    Vtt = "Use MARSSkfss to get Vtt",
+    Vtt = Vtt,
     Vtt1 = Vtt1,
     J = "Use MARSSkfss to get J",
     J0 = "Use MARSSkfss to get J0",
     Kt = "Use MARSSkfss to get Kt",
     xtt1 = ks.out$a[1:m, 1:TT, drop = FALSE],
-    xtt = "Use MARSSkfss to get xtt",
+    xtt = ks.out$att[1:m, 1:TT, drop = FALSE],
     Innov = "Use MARSSkfss to get Innov",
     Sigma = "Use MARSSkfss to get Sigma",
     kfas.model = kfas.model,
@@ -278,6 +281,6 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   )
   # apply names
   X.names <- attr(MODELobj, "X.names")
-  for(el in c("xtT", "xtt1", "x0T", "x00T", "x01T")) rownames(rtn.list[[el]]) <- X.names
+  for(el in c("xtT", "xtt1", "xtt", "x0T", "x00T", "x01T")) rownames(rtn.list[[el]]) <- X.names
   return(rtn.list)
 }

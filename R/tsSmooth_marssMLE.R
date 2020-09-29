@@ -46,11 +46,8 @@ tsSmooth.marssMLE <- function(object,
     model.tsp <- attr(model, "model.tsp")
     mm <- state.dims[1]
     TT <- state.dims[2]
-    if(type=="xtt"){ 
-      kfss <- MARSSkfss(object)
-    }else{
-      kfss <- MARSSkfas(object)
-    }
+    kfss <- MARSSkf(object)
+
     states <- kfss[[xtype]]
     vtype <- paste0("V", substr(xtype, 2, nchar(type)))
     states.se <- apply(kfss[[vtype]], 3, function(x) {
