@@ -13,6 +13,14 @@ test_that("compare logLik simple R small tinitx=1", {
   expect_equal(kemfit1$logLik, kemfit2$logLik)
 })
 
+kf1 <- MARSSkfss(kemfit1)
+kf2 <- MARSSkfas(kemfit1)
+kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt")]
+kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt")]
+test_that("compare kf list simple R small tinitx=1", {
+  expect_equal(kf1_list, kf2_list)
+})
+
 kemfit1 <- MARSS(dat, model=list(tinitx=0, U="zero", R="unconstrained", Q="unconstrained", B="unconstrained"), silent=TRUE)
 kemfit2 <- MARSS(dat, model=list(tinitx=0, U="zero", R="unconstrained", Q="unconstrained", B="unconstrained"), fun.kf="MARSSkfss", silent=TRUE)
 
@@ -22,8 +30,8 @@ test_that("compare logLik simple R small tinitx=0", {
 
 kf1 <- MARSSkfss(kemfit1)
 kf2 <- MARSSkfas(kemfit1)
-kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1")]
-kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1")]
+kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
   test_that("compare kf list simple R small", {
     expect_equal(kf1_list, kf2_list)
   })
@@ -51,15 +59,84 @@ for( Q in list("unconstrained", "diagonal and equal", "equalvarcov", "zero"))
 })
       kf1 <- MARSSkfss(kemfit1)
       kf2 <- MARSSkfas(kemfit1)
-      kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "logLik")]
-      kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "logLik")]
+      kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+      kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
       test_that(paste("compare kfss to kfas", Q, R, B), {
          expect_equal(kf1_list, kf2_list)
        })
     }
 
+# test B unconstrained
 
-# Wonky model
+Q <- "diagonal and unequal"
+B <- "unconstrained"
+R <- "diagonal and unequal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0="unequal", tinitx=1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent=TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent=TRUE)
+      
+test_that("compare logLik B unconstrained", {
+        expect_true(kemfit2$logLik-kemfit1$logLik < 0.000644)
+      })
+test_that("compare par kfss to kfas fits B unconstrained", {
+  expect_equal(kemfit1$par, kemfit2$par)
+})
+
+kf1 <- MARSSkfss(kemfit1)
+kf2 <- MARSSkfas(kemfit1)
+kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+test_that("compare kf list kfss to kfas B unconstrained", {
+        expect_equal(kf1_list, kf2_list)
+      })
+
+# test Q with some zeros
+
+Q <- ldiag(list("q1", 0, "q2"))
+B <- "identity"
+R <- "diagonal and equal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0="unequal", tinitx=1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent=TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent=TRUE)
+
+test_that("compare logLik Q with 0", {
+  expect_equal(kemfit2$logLik, kemfit1$logLik)
+})
+test_that("compare par kfss to kfas fits Q w zero", {
+  expect_equal(kemfit1$par, kemfit2$par)
+})
+
+kf1 <- MARSSkfss(kemfit1)
+kf2 <- MARSSkfas(kemfit1)
+kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+test_that("compare kf list kfss to kfas Q w zero", {
+  expect_equal(kf1_list, kf2_list)
+})
+
+R <- ldiag(list("r1", 0, "r2"))
+B <- "identity"
+Q <- "diagonal and equal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0="unequal", tinitx=1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent=TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent=TRUE)
+
+test_that("compare logLik R with 0", {
+  expect_equal(kemfit2$logLik, kemfit1$logLik)
+})
+test_that("compare par kfss to kfas fits R w zero", {
+  expect_equal(kemfit1$par, kemfit2$par)
+})
+
+kf1 <- MARSSkfss(kemfit1)
+kf2 <- MARSSkfas(kemfit1)
+kf1_list <- kf1[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+kf2_list <- kf2[c("xtT", "VtT", "Vtt1T", "x0T", "V0T", "xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+test_that("compare kf list kfss to kfas R w zero", {
+  expect_equal(kf1_list, kf2_list)
+})
+
+# Wonky model; this is simple version of the GDP test
 context("Comparison to kfas Structural")
 
 # 1) Define some data
@@ -140,8 +217,8 @@ model.gen <- list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=0)
 fit <- MARSS(df_marss, model=model.gen, method="BFGS", fun.kf="MARSSkfas", silent=TRUE)
 kf1 <- MARSSkfss(kemfit1, smoother=FALSE)
 kf2 <- MARSSkfas(kemfit1)
-kf1_list <- kf1[c("xtt1", "Vtt1", "logLik")]
-kf2_list <- kf2[c("xtt1", "Vtt1", "logLik")]
+kf1_list <- kf1[c("xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
+kf2_list <- kf2[c("xtt1", "Vtt1", "xtt", "Vtt", "logLik")]
 test_that(paste("compare kfss to kfas structural"), {
   expect_equal(kf1_list, kf2_list) })
   
