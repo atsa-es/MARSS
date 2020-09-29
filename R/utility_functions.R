@@ -966,7 +966,7 @@ str_replace <- function(string, pattern, replacement) {
 
 ################################################################
 
-zscore <- function(x) {
+zscore <- function(x, mean.only=FALSE) {
   ismat <- is.matrix(x) # else is vector
   if (ismat) {
     Sigma <- sqrt(apply(x, 1, var, na.rm = TRUE))
@@ -975,7 +975,8 @@ zscore <- function(x) {
     Sigma <- sqrt(var(x, na.rm = TRUE))
     x.bar <- mean(x, na.rm = TRUE)
   }
-  x.z <- (x - x.bar) * (1 / Sigma)
+  x.z <- (x - x.bar)
+  if (!mean.only) x.z <- (x - x.bar) * (1 / Sigma)
   if (ismat) rownames(x.z) <- rownames(x)
   x.z
 }
