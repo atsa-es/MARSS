@@ -6,7 +6,8 @@ library(MARSS)
 context("Comparison to kfas small R")
 set.seed(123)
 dat <- cumsum(rnorm(20))
-kemfit1 <- MARSS(dat, model=list(tinitx=1, U="zero", R="unconstrained", Q="unconstrained", B="unconstrained", x0=matrix(dat[1]*1.0001)), silent=TRUE)
+mod.list <- list(tinitx=1, U="zero", R="unconstrained", Q="unconstrained", B="unconstrained", x0=matrix(dat[1]*1.0001))
+kemfit1 <- MARSS(dat, model=mod.list, silent=TRUE)
 kemfit2 <- MARSS(dat, model=list(tinitx=1, U="zero", R="unconstrained", Q="unconstrained", B="unconstrained", x0=matrix(dat[1]*1.0001)), fun.kf="MARSSkfss", silent=TRUE)
 
 test_that("compare logLik simple R small tinitx=1", {

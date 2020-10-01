@@ -348,9 +348,19 @@ model.gen_1 =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=1)
 
 # Estimation
 
-kf_ss_1= MARSS(df_marss, model=model.gen_1,control= list(trace=1,maxit = 300),method="BFGS") 
+kf_ss= try(MARSS(df_marss, model=model.gen_1,method="BFGS", silent=TRUE), silent=TRUE )
 
-summary(kf_ss_1)
+test_that("GDF example 3 for numerical stabilty", {
+  expect_true(!inherits(kf_ss, "try-error"))
+})
+
+test_that("GDF example 3 for numerical stabilty", {
+  expect_true(kf_ss$convergence==0)
+})
+
+test_that("GDF example 3 for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, 7380.469127))
+})
 
 # 4) Model 2: one quarterly series and three monthly series
 
@@ -447,5 +457,16 @@ model.gen_2 =list(Z=Z,A=A,R=R,B=B,U=U,Q=Q,x0=x0,V0=V0,tinitx=1)
 
 # Estimation
 
-kf_ss_2= MARSS(df_marss, model=model.gen_2,control= list(trace=1,maxit = 300),method="BFGS")
+kf_ss= try(MARSS(df_marss, model=model.gen_2,method="BFGS",silent=TRUE), silent=TRUE)
 
+test_that("GDF example 4 for numerical stabilty", {
+  expect_true(!inherits(kf_ss, "try-error"))
+})
+
+test_that("GDF example 4 for numerical stabilty", {
+  expect_true(kf_ss$convergence==0)
+})
+
+test_that("GDF example 4 for numerical stabilty", {
+  expect_true(all.equal(kf_ss$logLik, 10014.90035))
+})
