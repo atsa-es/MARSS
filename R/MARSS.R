@@ -176,7 +176,14 @@ MARSS <- function(y,
       } else { # there is something to estimate
         if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
         ## Fit and add param estimates to the object
-        if (method %in% kem.methods) MLEobj <- MARSSkem(MLEobj)
+        if (method %in% kem.methods){
+          MLEobj <- try(MARSSkem(MLEobj), silent=TRUE)
+          if( inherits(MLEobj, "try-error")){
+            cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
+            MLEobj.test$convergence <- 2
+            return(MLEobj.test)
+            }
+        }
         if (method %in% optim.methods) MLEobj <- MARSSoptim(MLEobj)
       }
 
