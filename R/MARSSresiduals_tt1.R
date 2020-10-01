@@ -27,6 +27,15 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   time.varying <- is.timevarying(MLEobj)
   
   kf <- MARSSkf(MLEobj)
+  Kt.ok <- TRUE
+  if(MLEobj$fun.kf=="MARSSkfas"){
+    Kt <- try(MARSSkfss(MLEobj), silent=TRUE)
+    if (inherits(Kt, "try-error") || !Kt$ok ){
+      Kt <- array(0, dim=c(m, n, TT))
+      Kt.ok <- FALSE
+    }else{ Kt <- Kt$Kt }
+    kf$Kt <- Kt
+  }
   Ey <- MARSShatyt(MLEobj, only.kem=FALSE)
   Rt <- parmat(MLEobj, "R", t = 1)$R # returns matrix
   Ht <- parmat(MLEobj, "H", t = 1)$H
@@ -182,7 +191,14 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
   if(!is.null(msg) && object[["control"]][["trace"]] >= 0 & !silent) cat("MARSSresiduals.tt1 reported warnings. See msg element of returned residuals object.\n")
   ######################################
   
-  return(list(
+  if( !Kt.ok ){
+    et[(n + 1):(n + m),] <- NA
+    var.et[(n + 1):(n + m),(n+1):(n+m),] <- NA
+    st.et[(n + 1):(n + m),] <- NA
+    mar.st.et[(n + 1):(n + m),] <- NA
+    bchol.st.et[(n + 1):(n + m),] <- NA
+  }
+  ret <- list(
     model.residuals = et[1:n, , drop = FALSE], 
     state.residuals = et[(n + 1):(n + m), , drop = FALSE], 
     residuals = et, 
@@ -192,5 +208,7 @@ MARSSresiduals.tt1 <- function(object, method=c("SS"), normalize = FALSE, silent
     bchol.residuals = bchol.st.et, 
     E.obs.residuals = E.obs.v, 
     var.obs.residuals = var.obs.v, 
-    msg = msg))
+    msg = msg)
+  return(ret)
+  
 }

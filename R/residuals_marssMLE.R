@@ -16,7 +16,9 @@ residuals.marssMLE <- function(object, ...,
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
-    ret <- eval(call(resids.fun, object, type = type, standardization = standardization, clean=clean))
+    ret <- try(eval(call(resids.fun, object, type = type, standardization = standardization, clean=clean)), silent=TRUE)
+    if(inherits(ret, "try-error")) stop("Stopped in residuals.marssMLE: MARSSresiduals() failed. \n", call.=FALSE)
+    
   } else {
     ret <- paste("No residuals_", form[1], " is available.\n", sep = "")
   }
