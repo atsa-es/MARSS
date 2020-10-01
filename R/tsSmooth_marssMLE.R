@@ -12,7 +12,7 @@ tsSmooth.marssMLE <- function(object,
   interval <- match.arg(interval)
   form = attr(object[["model"]], "form")[1]
   if(interval == "prediction" && type != "ytT")
-    stop("tsSmooth.marssMLE: prediction intervals only available for ytT.")
+    stop("tsSmooth.marssMLE: prediction intervals are only available for ytT.")
   if(interval != "none" && type == "ytt")
     stop("tsSmooth.marssMLE: MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
   if(interval != "none" && type == "ytt1")
