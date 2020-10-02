@@ -31,8 +31,8 @@ predict.marssMLE <- function(object, n.ahead = 0,
     stop("predict.marssMLE: level must be between 0 and 1.", call. = FALSE)
   }
   if (length(level) == 0) interval <- "none"
-  if (!missing(n.ahead) && (!is.numeric(n.ahead) || length(n.ahead) != 1 
-                            || n.ahead < 0 || (n.ahead %% 1) != 0)) {
+  if (!missing(n.ahead) && (!is.numeric(n.ahead) || length(n.ahead) != 1
+  || n.ahead < 0 || (n.ahead %% 1) != 0)) {
     stop("predict.marssMLE: n.ahead must be an integer >= 0.", call. = FALSE)
   }
   missingx0 <- TRUE
@@ -71,7 +71,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
       type = type, newdata = newdata,
       fun.kf = fun.kf, ...
     )
-    
+
     return(outlist)
   }
 
@@ -224,42 +224,46 @@ predict.marssMLE <- function(object, n.ahead = 0,
     newMLEobj <- MARSS(newdata[["y"]],
       model = new.MODELlist, silent = TRUE,
       method = object[["method"]], control = object$call$control,
-      inits = object$call$inits, 
+      inits = object$call$inits,
       fun.kf = object$call$fun.kf, form = "marxss"
     )
   } # end setting up newMLEobj
 
-  if (type == "xtT") estcol=".x"
-  if (type == "xtt1") estcol=".x"
-  if (type %in% c("ytT", "ytt", "ytt1")) estcol="y"
+  if (type == "xtT") estcol <- ".x"
+  if (type == "xtt1") estcol <- ".x"
+  if (type %in% c("ytT", "ytt", "ytt1")) estcol <- "y"
   cols <- switch(interval,
-                   prediction = c(".rownames", "t", estcol, ".fitted", ".sd", ".lwr", ".upr"),
-                   none = c(".rownames", "t", estcol, ".fitted"),
-                   confidence = c(".rownames", "t", estcol, ".fitted", ".se", ".conf.low", ".conf.up")
-    )
-    ret <- fitted.marssMLE(newMLEobj, type = type, interval = interval, 
-                        level = level[1], output="data.frame")[cols]
-    colnames(ret)[which(colnames(ret) == ".fitted")] <- "estimate"
-    colnames(ret)[which(colnames(ret) == ".sd")] <- "se"
-    colnames(ret)[which(colnames(ret) == ".se")] <- "se"
-    colnames(ret)[which(colnames(ret) == ".lwr")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".upr")] <- paste("Hi", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".conf.low")] <- paste("Lo", 100 * level[1])
-    colnames(ret)[which(colnames(ret) == ".conf.up")] <- paste("Hi", 100 * level[1])
-    if (interval != "none" && length(level) > 1) {
-      for (i in 2:length(level)) {
-        cols <- switch(interval,
-                       prediction = c(".lwr", ".upr"),
-                       confidence = c(".conf.low", ".conf.up")
-        )
-        tmp <- fitted.marssMLE(newMLEobj, type = type, interval = interval, 
-                            level = level[i], output="data.frame")[cols]
-        colnames(tmp) <- paste(c("Lo", "Hi"), 100 * level[i])
-        ret <- cbind(ret, tmp)
-      }
+    prediction = c(".rownames", "t", estcol, ".fitted", ".sd", ".lwr", ".upr"),
+    none = c(".rownames", "t", estcol, ".fitted"),
+    confidence = c(".rownames", "t", estcol, ".fitted", ".se", ".conf.low", ".conf.up")
+  )
+  ret <- fitted.marssMLE(newMLEobj,
+    type = type, interval = interval,
+    level = level[1], output = "data.frame"
+  )[cols]
+  colnames(ret)[which(colnames(ret) == ".fitted")] <- "estimate"
+  colnames(ret)[which(colnames(ret) == ".sd")] <- "se"
+  colnames(ret)[which(colnames(ret) == ".se")] <- "se"
+  colnames(ret)[which(colnames(ret) == ".lwr")] <- paste("Lo", 100 * level[1])
+  colnames(ret)[which(colnames(ret) == ".upr")] <- paste("Hi", 100 * level[1])
+  colnames(ret)[which(colnames(ret) == ".conf.low")] <- paste("Lo", 100 * level[1])
+  colnames(ret)[which(colnames(ret) == ".conf.up")] <- paste("Hi", 100 * level[1])
+  if (interval != "none" && length(level) > 1) {
+    for (i in 2:length(level)) {
+      cols <- switch(interval,
+        prediction = c(".lwr", ".upr"),
+        confidence = c(".conf.low", ".conf.up")
+      )
+      tmp <- fitted.marssMLE(newMLEobj,
+        type = type, interval = interval,
+        level = level[i], output = "data.frame"
+      )[cols]
+      colnames(tmp) <- paste(c("Lo", "Hi"), 100 * level[i])
+      ret <- cbind(ret, tmp)
     }
+  }
 
-  
+
   # set t in ret with t in newdata
   ret$t <- rep(newdata[["t"]], nx)
 

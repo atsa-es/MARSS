@@ -19,7 +19,7 @@ MARSShessian <- function(MLEobj, method = c("Harvey1989", "fdHess", "optim")) {
     MLEobj$errors <- c(MLEobj$errors, msg)
   }
   # set diags with NA to 1 and non-diag to 0 so that Hessian can be inverted
-  diag(Hess.tmp)[ na.diag ] <- 1
+  diag(Hess.tmp)[na.diag] <- 1
   Hess.tmp[is.na(Hess.tmp)] <- 0 #
 
   hessInv <- try(solve(Hess.tmp), silent = TRUE)
@@ -30,7 +30,7 @@ MARSShessian <- function(MLEobj, method = c("Harvey1989", "fdHess", "optim")) {
     MLEobj$errors <- c(MLEobj$errors, msg)
   } else {
     # Set NAs values to 0
-    diag(hessInv)[ na.diag ] <- NA
+    diag(hessInv)[na.diag] <- NA
     MLEobj$parSigma <- hessInv
   }
 

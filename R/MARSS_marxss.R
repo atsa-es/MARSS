@@ -101,10 +101,13 @@ MARSS.marxss <- function(MARSS.call) {
   model.tsp <- attr(dat, "model.tsp")
   # Note dat is changed to matrix in MARSS()
   if (is.vector(dat)) dat <- matrix(dat, 1, length(dat))
-  if (inherits(dat, "ts")){ model.tsp <- stats::tsp(dat); dat <- t(dat) }
+  if (inherits(dat, "ts")) {
+    model.tsp <- stats::tsp(dat)
+    dat <- t(dat)
+  }
   n <- dim(dat)[1]
   TT <- dim(dat)[2]
-  if(is.null(model.tsp)) model.tsp <- c(1, TT, 1)
+  if (is.null(model.tsp)) model.tsp <- c(1, TT, 1)
   if (is.null(rownames(dat))) {
     Y.names <- paste("Y", seq(1, n), sep = "") # paste(seq(1, n), sep="")
     rownames(dat) <- Y.names
@@ -175,7 +178,7 @@ MARSS.marxss <- function(MARSS.call) {
     }
     # if(!any(is.na(model[[el]])) & all(model[[el]]==0)) model[[toupper(el)]]="zero"
     if (is.vector(model[[el]])) model[[el]] <- matrix(model[[el]], 1, length(model[[el]]))
-    if(inherits(model[[el]], "ts")) model[[el]] <- t(model[[el]])
+    if (inherits(model[[el]], "ts")) model[[el]] <- t(model[[el]])
   }
   # Now set c1 and d1 based on c and d, which should now be a matrix of some sort.  This ensures that c1 and d1 are set
   # if c and C or d and D conflict, this will be picked up the error checking because dims of C or D and model.dims won't match
@@ -452,13 +455,13 @@ MARSS.marxss <- function(MARSS.call) {
   assign("alldefaults", alldefaults, pkg_globals)
 
   ## Check that the marssMODEL object output by MARSS.form() is ok since marxss_to_marss will go south otherwise
-  if(!identical(MARSS.call$control$trace, -1)){ # turn off all error checking if trace = -1
-  if (MARSS.call$silent == 2) cat(paste("  Running is.marssMODEL on the marxss model.\n", sep = ""))
-  tmp <- is.marssMODEL(marxss_object, method = MARSS.call$method)
-  if (!isTRUE(tmp)) {
-    cat(tmp)
-    stop("Stopped in MARSS.marxss() due to problem(s) with model specification.", call. = FALSE)
-  }
+  if (!identical(MARSS.call$control$trace, -1)) { # turn off all error checking if trace = -1
+    if (MARSS.call$silent == 2) cat(paste("  Running is.marssMODEL on the marxss model.\n", sep = ""))
+    tmp <- is.marssMODEL(marxss_object, method = MARSS.call$method)
+    if (!isTRUE(tmp)) {
+      cat(tmp)
+      stop("Stopped in MARSS.marxss() due to problem(s) with model specification.", call. = FALSE)
+    }
   }
 
   # Put the marxss model into $model since model holds the model in the 'form' form

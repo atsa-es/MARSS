@@ -246,12 +246,12 @@ is.marssMODEL <- function(MODELobj, method = "kem") {
   if (!identical(attr(MODELobj, "Y.names"), rownames(MODELobj$data))) {
     msg <- c(msg, paste("The rownames of the data and the attribute Y.names don't match.\n", sep = ""))
   }
-  
+
   ###########################
   # tsp is present and right length
   ###########################
   model.tsp <- attr(MODELobj, "model.tsp")
-  if((model.tsp[2] - model.tsp[1])*model.tsp[3]+1 != TT) {
+  if ((model.tsp[2] - model.tsp[1]) * model.tsp[3] + 1 != TT) {
     msg <- c(msg, paste("The model tsp attribute and the data length do not match.\n", sep = ""))
   }
 

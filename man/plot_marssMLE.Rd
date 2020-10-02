@@ -11,13 +11,13 @@
                  "state.resids", "qqplot.model.resids",
                  "qqplot.state.resids", "ytT", "acf.model.resids"), form = c("marxss", "marss",
                  "dfa"), conf.int = TRUE, conf.level = 0.95, 
-                 decorate = TRUE, pi.int = FALSE, plot.par = list(), ...)
+                 decorate = TRUE, pi.int = FALSE, plot.par = list(), ..., silent = FALSE)
 \method{autoplot}{marssMLE}(x, plot.type = c("model.ytT", "xtT", "model.resids", 
     "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", 
     "acf.model.resids"),
     form=c("marxss", "marss", "dfa"),
     conf.int=TRUE, conf.level=0.95, decorate=TRUE, pi.int = FALSE,
-    plot.par = list(), ...)
+    plot.par = list(), ..., silent = FALSE)
   }
 \arguments{
   \item{x}{ A \code{\link{marssMLE}} object.  }
@@ -31,6 +31,7 @@
                     line.col = "black", line.size = 1, line.linetype = "solid",
                     ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
                     ci.linesize = 0, ci.alpha = 0.6). }
+  \item{silent}{ No console interaction or output. }
   \item{...}{ Other arguments, not used. }
   }
 \value{

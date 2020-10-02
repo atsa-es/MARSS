@@ -4,7 +4,7 @@
 #   ** All eqn refs are to 2nd ed of Shumway & Stoffer (2006): Time Series Analysis and Its Applications
 # 5-17-12  I removed the tests re inversion of Z when R=0 and put that in MARSSkem
 #######################################################################################################
-MARSSkfss <- function(MLEobj, smoother=TRUE) {
+MARSSkfss <- function(MLEobj, smoother = TRUE) {
   condition.limit <- 1E10
   condition.limit.Ft <- 1E5 # because the Ft is used to compute LL and LL drop limit is about 2E-8
 
@@ -268,150 +268,150 @@ MARSSkfss <- function(MLEobj, smoother=TRUE) {
   ######################################################
   # BACKWARD PASS (Kalman smoother) gets you E[x(t)|y(1:T)] from E[x(t)|y(1:t)]
   ######################################################
-  if (smoother){
-  xtT[, TT] <- xtt[, TT, drop = FALSE]
-  VtT[, , TT] <- Vtt[, , TT]
-  # indexing is 0 to T for the backwards smoother recursions
-  s <- seq(TT, 2)
-  for (i in 1:(TT - 1)) {
-    t <- s[i]
-    # Zt = Z; Zt[YM[,t]==0,]=0   #MUCH faster than defining Mt using diag(YM); commented out since doesn't seem to be used
-    if ("B" %in% time.varying) {
-      B <- parmat(MLEobj, "B", t = t)$B # t since in 6.49, B[t] appears
-      if (m == 1) t.B <- B else t.B <- matrix(B, m, m, byrow = TRUE)
-    }
-    if ("Q" %in% time.varying || "G" %in% time.varying) {
-      Q <- parmat(MLEobj, "Q", t = t)$Q
-      G <- parmat(MLEobj, "G", t = t)$G
-      Q <- tcrossprod(G %*% Q, G)
-      if (m == 1) {
-        diag.Q <- unname(Q)
-      } else {
-        diag.Q <- unname(Q)[1 + 0:(m - 1) * (m + 1)]
+  if (smoother) {
+    xtT[, TT] <- xtt[, TT, drop = FALSE]
+    VtT[, , TT] <- Vtt[, , TT]
+    # indexing is 0 to T for the backwards smoother recursions
+    s <- seq(TT, 2)
+    for (i in 1:(TT - 1)) {
+      t <- s[i]
+      # Zt = Z; Zt[YM[,t]==0,]=0   #MUCH faster than defining Mt using diag(YM); commented out since doesn't seem to be used
+      if ("B" %in% time.varying) {
+        B <- parmat(MLEobj, "B", t = t)$B # t since in 6.49, B[t] appears
+        if (m == 1) t.B <- B else t.B <- matrix(B, m, m, byrow = TRUE)
       }
+      if ("Q" %in% time.varying || "G" %in% time.varying) {
+        Q <- parmat(MLEobj, "Q", t = t)$Q
+        G <- parmat(MLEobj, "G", t = t)$G
+        Q <- tcrossprod(G %*% Q, G)
+        if (m == 1) {
+          diag.Q <- unname(Q)
+        } else {
+          diag.Q <- unname(Q)[1 + 0:(m - 1) * (m + 1)]
+        }
+      }
+      # deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
+      # 0s on diag of Vtt1 will break the Kalman smoother if t>1
+      if (m == 1) diag.Vtt1 <- unname(Vtt1[, , t]) else diag.Vtt1 <- unname(Vtt1[, , t])[1 + 0:(m - 1) * (m + 1)] # much faster way to get the diagonal
+      if (any(diag.Vtt1 < 0)) { # abandon if problems like this
+        return(list(
+          ok = FALSE,
+          errors = paste("Stopped in MARSSkfss: solution became unstable and negative values appeared on the diagonal of Vtt1.\n")
+        ))
+      }
+
+      # Error-checking for 0s on diagonal of Vtt1 that they are allowed
+      if (debugkf != -1 & any(diag.Vtt1 == 0)) {
+        # deal with 0s that are ok if there are corresponding 0s on Q diagonal
+        Q0s <- all(which(diag.Vtt1 == 0) %in% which(diag.Q == 0))
+        # Q0s=identical(which(diag.Q==0),which(diag.Vtt1==0))
+        if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
+          return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=", t, ".\n")))
+        }
+      }
+      # If trace > 0, then use try() to check if inversion can be done.
+      if (debugkf <= 0) { # 0 is default; -1 is not checking
+        if (m == 1) {
+          Vinv <- pcholinv(matrix(Vtt1[, , t], 1, 1))
+        } else {
+          Vinv <- pcholinv(Vtt1[, , t])
+          Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+        }
+      } else { # this is expensive; only use if extra tracing specified
+        if (m == 1) {
+          Vinv <- try(pcholinv(matrix(Vtt1[, , t], 1, 1)), silent = TRUE)
+        } else {
+          Vinv <- try(pcholinv(Vtt1[, , t]), silent = TRUE)
+        }
+        if (class(Vinv)[1] == "try-error") {
+          return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: chol(Vtt1[,,", t, "]) error.\n", sep = "")))
+        }
+        Vinv <- symm(Vinv) # if not errors
+      }
+      J[, , t - 1] <- Vtt[, , t - 1] %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
+
+      xtT[, t - 1] <- xtt[, t - 1, drop = FALSE] + J[, , t - 1] %*% (xtT[, t, drop = FALSE] - xtt1[, t, drop = FALSE]) # eqn 6.47
+      if (m == 1) t.J <- J[, , t - 1] else t.J <- matrix(J[, , t - 1], m, m, byrow = TRUE) # faster transpose
+      VtT[, , t - 1] <- Vtt[, , t - 1] + J[, , t - 1] %*% (VtT[, , t] - Vtt1[, , t]) %*% t.J # eqn 6.48
+    } # end of the smoother
+
+    # define J0
+    if (init.state == "x00") { # Shumway and Stoffer treatment of initial conditions; LAM and pi defined for x_0
+      if ("B" %in% time.varying) {
+        B <- parmat(MLEobj, "B", t = 1)$B
+        if (m == 1) t.B <- B else t.B <- matrix(B, m, m, byrow = TRUE)
+      }
+      if ("Q" %in% time.varying) {
+        Q <- parmat(MLEobj, "Q", t = 1)$Q
+        if (m == 1) {
+          diag.Q <- unname(Q)
+        } else {
+          diag.Q <- takediag(unname(Q))
+        }
+      }
+      # deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
+      # 0s on diag of Vtt1 will break the Kalman smoother if t>1
+      diag.Vtt1 <- unname(Vtt1[, , 1])
+      diag.Vtt1 <- diag.Vtt1[1 + 0:(m - 1) * (m + 1)] # much faster way to get the diagonal
+      if (debugkf != -1 & any(diag.Vtt1 == 0)) {
+        # deal with 0s that are ok if there are corresponding 0s on Q diagonal
+        Q0s <- identical(which(diag.Q == 0), which(diag.Vtt1 == 0))
+        if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
+          return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=1.\n")))
+        }
+      }
+      Vtt1.1 <- sub3D(Vtt1, t = 1)
+      if (any(takediag(Vtt1.1) == 0)) {
+        Vinv <- pcholinv(Vtt1.1, chol = FALSE)
+        if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
+        J0 <- V0 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
+      } else {
+        t.J0 <- solve(matrix(Vtt1.1, m, m, byrow = TRUE), B %*% V0)
+        if (m == 1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE)
+      }
+      x0T <- x0 + J0 %*% (xtT[, 1, drop = FALSE] - xtt1[, 1, drop = FALSE]) # eqn 6.47
+      V0T <- V0 + tcrossprod(J0 %*% (VtT[, , 1] - Vtt1[, , 1]), J0) # eqn 6.48
+      V0T <- symm(V0T) # enforce symmetry
     }
-    # deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
-    # 0s on diag of Vtt1 will break the Kalman smoother if t>1
-    if (m == 1) diag.Vtt1 <- unname(Vtt1[, , t]) else diag.Vtt1 <- unname(Vtt1[, , t])[1 + 0:(m - 1) * (m + 1)] # much faster way to get the diagonal
-    if (any(diag.Vtt1 < 0)) { # abandon if problems like this
-      return(list(
-        ok = FALSE,
-        errors = paste("Stopped in MARSSkfss: solution became unstable and negative values appeared on the diagonal of Vtt1.\n")
-      ))
+    if (init.state == "x10") { # Ghahramani treatment of initial states; LAM and pi defined for x_1
+      if (m == 1) J0 <- matrix(J[, , 1], 1, 1) else J0 <- J[, , 1]
+      x0T <- xtT[, 1, drop = FALSE]
+      if (m == 1) V0T <- matrix(VtT[, , 1], 1, 1) else V0T <- VtT[, , 1]
     }
 
-    # Error-checking for 0s on diagonal of Vtt1 that they are allowed
-    if (debugkf != -1 & any(diag.Vtt1 == 0)) {
-      # deal with 0s that are ok if there are corresponding 0s on Q diagonal
-      Q0s <- all(which(diag.Vtt1 == 0) %in% which(diag.Q == 0))
-      # Q0s=identical(which(diag.Q==0),which(diag.Vtt1==0))
-      if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
-        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=", t, ".\n")))
-      }
-    }
-    # If trace > 0, then use try() to check if inversion can be done.
-    if (debugkf <= 0) { # 0 is default; -1 is not checking
-      if (m == 1) {
-        Vinv <- pcholinv(matrix(Vtt1[, , t], 1, 1))
-      } else {
-        Vinv <- pcholinv(Vtt1[, , t])
-        Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
-      }
-    } else { # this is expensive; only use if extra tracing specified
-      if (m == 1) {
-        Vinv <- try(pcholinv(matrix(Vtt1[, , t], 1, 1)), silent = TRUE)
-      } else {
-        Vinv <- try(pcholinv(Vtt1[, , t]), silent = TRUE)
-      }
-      if (class(Vinv)[1] == "try-error") {
-        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: chol(Vtt1[,,", t, "]) error.\n", sep = "")))
-      }
-      Vinv <- symm(Vinv) # if not errors
-    }
-    J[, , t - 1] <- Vtt[, , t - 1] %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[t]
-
-    xtT[, t - 1] <- xtt[, t - 1, drop = FALSE] + J[, , t - 1] %*% (xtT[, t, drop = FALSE] - xtt1[, t, drop = FALSE]) # eqn 6.47
-    if (m == 1) t.J <- J[, , t - 1] else t.J <- matrix(J[, , t - 1], m, m, byrow = TRUE) # faster transpose
-    VtT[, , t - 1] <- Vtt[, , t - 1] + J[, , t - 1] %*% (VtT[, , t] - Vtt1[, , t]) %*% t.J # eqn 6.48
-  } # end of the smoother
-
-  # define J0
-  if (init.state == "x00") { # Shumway and Stoffer treatment of initial conditions; LAM and pi defined for x_0
+    # LAG 1 Covariance smoother
+    # run another backward recursion to get E[x(t)x(t-1)|y(T)]
+    if ("Z" %in% time.varying) {
+      Z <- parmat(MLEobj, "Z", t = TT)$Z
+    } # in 6.55, Z[TT] appears
+    Zt <- Z
+    Zt[YM[, TT] == 0, ] <- 0 # much faster than Mt%*%Z
     if ("B" %in% time.varying) {
-      B <- parmat(MLEobj, "B", t = 1)$B
-      if (m == 1) t.B <- B else t.B <- matrix(B, m, m, byrow = TRUE)
+      B <- parmat(MLEobj, "B", t = TT)$B
+    } # in 6.55, B[TT] appears
+    KT <- matrix(Kt[, , TT], m, n) # funny array call to prevent R from restructuring dims
+    Vtt1T[, , TT] <- (I.m - KT %*% Zt) %*% B %*% Vtt[, , TT - 1] # eqn. 6.55 this is Var(x(T)x(T-1)|y(T)); not symmetric
+    s <- seq(TT, 3)
+    for (i in 1:(TT - 2)) {
+      t <- s[i]
+      if ("B" %in% time.varying) {
+        B <- parmat(MLEobj, "B", t = t)$B
+      } # in 6.56, B[t] appears
+      if (m == 1) t.J <- J[, , t - 2] else t.J <- matrix(J[, , t - 2], m, m, byrow = TRUE) # faster transpose
+      Vtt1T[, , t - 1] <- Vtt[, , t - 1] %*% t.J + J[, , t - 1] %*% (Vtt1T[, , t] - B %*% Vtt[, , t - 1]) %*% t.J # eqn 6.56
     }
-    if ("Q" %in% time.varying) {
-      Q <- parmat(MLEobj, "Q", t = 1)$Q
-      if (m == 1) {
-        diag.Q <- unname(Q)
-      } else {
-        diag.Q <- takediag(unname(Q))
+    if (init.state == "x00") {
+      if ("B" %in% time.varying) {
+        B <- parmat(MLEobj, "B", t = 2)$B
       }
+      Vtt1T[, , 1] <- Vtt[, , 1] %*% t(J0) + J[, , 1] %*% (Vtt1T[, , 2] - B %*% Vtt[, , 1]) %*% t(J0)
     }
-    # deal with any 0s on diagonal of Vtt1; these can arise due to 0s in V0, B, + Q
-    # 0s on diag of Vtt1 will break the Kalman smoother if t>1
-    diag.Vtt1 <- unname(Vtt1[, , 1])
-    diag.Vtt1 <- diag.Vtt1[1 + 0:(m - 1) * (m + 1)] # much faster way to get the diagonal
-    if (debugkf != -1 & any(diag.Vtt1 == 0)) {
-      # deal with 0s that are ok if there are corresponding 0s on Q diagonal
-      Q0s <- identical(which(diag.Q == 0), which(diag.Vtt1 == 0))
-      if (!Q0s && (init.state == "x00" || (init.state == "x10" && t > 1))) {
-        return(list(ok = FALSE, errors = paste("Stopped in MARSSkfss: solution became unstable when zeros appeared on the diagonal of Vtt1 at t=1.\n")))
-      }
-    }
-    Vtt1.1 <- sub3D(Vtt1, t = 1)
-    if (any(takediag(Vtt1.1) == 0)) {
-      Vinv <- pcholinv(Vtt1.1, chol = FALSE)
-      if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
-      J0 <- V0 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
-    } else {
-      t.J0 <- solve(matrix(Vtt1.1, m, m, byrow = TRUE), B %*% V0)
-      if (m == 1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE)
-    }
-    x0T <- x0 + J0 %*% (xtT[, 1, drop = FALSE] - xtt1[, 1, drop = FALSE]) # eqn 6.47
-    V0T <- V0 + tcrossprod(J0 %*% (VtT[, , 1] - Vtt1[, , 1]), J0) # eqn 6.48
-    V0T <- symm(V0T) # enforce symmetry
-  }
-  if (init.state == "x10") { # Ghahramani treatment of initial states; LAM and pi defined for x_1
-    if (m == 1) J0 <- matrix(J[, , 1], 1, 1) else J0 <- J[, , 1]
-    x0T <- xtT[, 1, drop = FALSE]
-    if (m == 1) V0T <- matrix(VtT[, , 1], 1, 1) else V0T <- VtT[, , 1]
-  }
-
-  # LAG 1 Covariance smoother
-  # run another backward recursion to get E[x(t)x(t-1)|y(T)]
-  if ("Z" %in% time.varying) {
-    Z <- parmat(MLEobj, "Z", t = TT)$Z
-  } # in 6.55, Z[TT] appears
-  Zt <- Z
-  Zt[YM[, TT] == 0, ] <- 0 # much faster than Mt%*%Z
-  if ("B" %in% time.varying) {
-    B <- parmat(MLEobj, "B", t = TT)$B
-  } # in 6.55, B[TT] appears
-  KT <- matrix(Kt[, , TT], m, n) # funny array call to prevent R from restructuring dims
-  Vtt1T[, , TT] <- (I.m - KT %*% Zt) %*% B %*% Vtt[, , TT - 1] # eqn. 6.55 this is Var(x(T)x(T-1)|y(T)); not symmetric
-  s <- seq(TT, 3)
-  for (i in 1:(TT - 2)) {
-    t <- s[i]
-    if ("B" %in% time.varying) {
-      B <- parmat(MLEobj, "B", t = t)$B
-    } # in 6.56, B[t] appears
-    if (m == 1) t.J <- J[, , t - 2] else t.J <- matrix(J[, , t - 2], m, m, byrow = TRUE) # faster transpose
-    Vtt1T[, , t - 1] <- Vtt[, , t - 1] %*% t.J + J[, , t - 1] %*% (Vtt1T[, , t] - B %*% Vtt[, , t - 1]) %*% t.J # eqn 6.56
-  }
-  if (init.state == "x00") {
-    if ("B" %in% time.varying) {
-      B <- parmat(MLEobj, "B", t = 2)$B
-    }
-    Vtt1T[, , 1] <- Vtt[, , 1] %*% t(J0) + J[, , 1] %*% (Vtt1T[, , 2] - B %*% Vtt[, , 1]) %*% t(J0)
-  }
-  if (init.state == "x10") Vtt1T[, , 1] <- NA
+    if (init.state == "x10") Vtt1T[, , 1] <- NA
   } else {
-  x0T <- V0T <- VtT <- xtT <- J0 <- Vtt1T <- NULL
+    x0T <- V0T <- VtT <- xtT <- J0 <- Vtt1T <- NULL
   }
   ## END SMOOTHER #########################################################
-  
+
   rtn.list <- list(
     xtT = xtT, VtT = VtT, Vtt1T = Vtt1T, x0T = x0T, V0T = V0T, Vtt = Vtt,
     Vtt1 = Vtt1, J = J, J0 = J0, Kt = Kt, xtt1 = xtt1, xtt = xtt, Innov = vt, Sigma = Ft
@@ -421,7 +421,7 @@ MARSSkfss <- function(MLEobj, smoother=TRUE) {
   MODELobj <- MLEobj[["marss"]]
   X.names <- attr(MODELobj, "X.names")
   Y.names <- attr(MODELobj, "Y.names")
-  if (smoother){
+  if (smoother) {
     for (el in c("xtT", "xtt1", "xtt", "x0T")) rownames(rtn.list[[el]]) <- X.names
   } else {
     for (el in c("xtt1", "xtt")) rownames(rtn.list[[el]]) <- X.names
@@ -439,11 +439,11 @@ MARSSkfss <- function(MLEobj, smoother=TRUE) {
           ok = FALSE, logLik = NaN,
           errors = paste("One of the diagonal elements of Sigma[,,", t, "]=0. That should never happen when t>1 or t=1 and tinitx=0.  \n Are both Q[i,i] and R[i,i] being set to 0?\n", sep = "")
         )))
-      } else { 
-        # t=1 so ok. get the det of Ft and deal with 0s that might appear on 
+      } else {
+        # t=1 so ok. get the det of Ft and deal with 0s that might appear on
         #   diag of Ft when t=1 and V0=0 and R=0 and tinitx=1
         #   Note, x10 can be != y[1] when R=0; x11 cannot be.
-        
+
         OmgF1 <- makediag(1, n)[diag.Ft != 0, , drop = FALSE] # permutation matrix
         # need to remove those y[1] associated with Ft[,,1]==0 that were non-missing
         loglike <- loglike + sum(diag.Ft == 0 & YM[, 1] != 0) / 2 * log(2 * base::pi)

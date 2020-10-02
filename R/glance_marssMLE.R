@@ -2,8 +2,8 @@
 #  glance method for class marssMLE. For package broom
 ##############################################################################################################################################
 glance.marssMLE <- function(x, ...) {
-  a <- residuals.marssMLE(x, type="tt1")
-  a <- subset(a, a$name=="model")
+  a <- residuals.marssMLE(x, type = "tt1")
+  a <- subset(a, a$name == "model")
   a <- na.omit(a)
   ret <- data.frame(
     coef.det = cor(a$.fitted, a$value)^2,

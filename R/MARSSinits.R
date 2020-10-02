@@ -87,7 +87,7 @@ MARSSinits <- function(MLEobj, inits = list(B = 1, U = 0, Q = 0.05, Z = 1, A = 0
         if (identical(unname(inits$x0), -99)) { # get estimate of x0
           y1 <- y[, 1, drop = FALSE]
           # replace NAs (missing vals) with 0s
-          y1[ is.na(y1) ] <- 0
+          y1[is.na(y1)] <- 0
           Zmat <- sub3D(f$Z, t = 1) + sub3D(d$Z, t = 1) %*% parlist$Z
           Zmat <- unvec(Zmat, dim = c(n, m))
           Amat <- sub3D(f$A, t = 1) + sub3D(d$A, t = 1) %*% parlist$A

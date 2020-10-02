@@ -6,8 +6,8 @@
 \usepackage{Sweave}
 <<RUNFIRST, echo=F, include.source=F>>=
 library(MARSS)
-options(prompt=" ", continue=" ")
-options(width=60)
+options(prompt = " ", continue = " ")
+options(width = 60)
 @
 
 \setcounter{tocdepth}{1} %no subsections in toc
@@ -87,8 +87,8 @@ options(width=60)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <<Reset, echo=F>>=
-options(prompt="> ", continue="+ ")
-options(width=120)
+options(prompt = "> ", continue = "+ ")
+options(width = 120)
 @
 
 \end{document}

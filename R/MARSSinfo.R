@@ -298,7 +298,7 @@ What to do? This is not a bug. It is simply a constraint of the update equations
     ))
     return(invisible(number))
   }
-  
+
   writeLines(strwrap(
     "You entered an invalid error code. Type MARSSinfo() to see the valid options."
   ))

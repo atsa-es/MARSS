@@ -4,7 +4,7 @@ autoplot.marssMLE <-
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
-           ...) {
+           ..., silent = FALSE) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
@@ -64,7 +64,7 @@ autoplot.marssMLE <-
     if (any(str_detect(plot.type, "resids"))) {
       tT.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
     }
-    
+
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
 
@@ -142,8 +142,8 @@ autoplot.marssMLE <-
 
     if ("ytT" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
-      df <- tsSmooth.marssMLE(x, type = "ytT", ifelse(conf.int, "confidence", "none"), level=conf.level)
-      if(conf.int){
+      df <- tsSmooth.marssMLE(x, type = "ytT", ifelse(conf.int, "confidence", "none"), level = conf.level)
+      if (conf.int) {
         df$ymin <- df$.conf.low
         df$ymax <- df$.conf.up
       }
@@ -342,14 +342,14 @@ autoplot.marssMLE <-
     }
     for (i in plot.type) {
       print(plts[[i]])
-      cat(paste("plot.type =", i, "\n"))
-      if (i != plot.type[length(plot.type)]) {
+      if (!silent) cat(paste("plot.type =", i, "\n"))
+      if (i != plot.type[length(plot.type)] && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
         }
       } else {
-        cat("Finished plots.\n")
+        if (!silent) cat("Finished plots.\n")
       }
     }
   }

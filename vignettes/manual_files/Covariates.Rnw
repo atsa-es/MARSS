@@ -99,8 +99,10 @@ d <- covariates
 A <- "zero"
 D <- "unconstrained"
 y <- dat # to show relationship between dat & the equation
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, 
-                   D = D, d = d, x0 = x0)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A,
+  D = D, d = d, x0 = x0
+)
 kem <- MARSS(y, model = model.list)
 @
 We set \verb@A="zero"@ because the data and covariates have been demeaned.   Of course, one can do multiple regression in \R using, say, \verb@lm()@, and that would be much, much faster.  The EM algorithm is over-kill here, but it is shown so that you see how a standard multivariate linear regression model is written as a MARSS model in matrix form.
@@ -125,8 +127,10 @@ R <- "diagonal and equal"
 d <- covariates
 D <- "unconstrained"
 y <- dat
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, 
-                   R = R, D = D, d = d, x0 = x0)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A,
+  R = R, D = D, d = d, x0 = x0
+)
 control.list <- list(maxit = 1500)
 kem <- MARSS(y, model = model.list, control = control.list)
 @
@@ -146,8 +150,10 @@ B <- Z <- "identity"
 Q <- "equalvarcov"
 C <- "unconstrained"
 x <- dat # to show the relation between dat & the equations
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, 
-                   R = R, C = C, c = covariates)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A,
+  R = R, C = C, c = covariates
+)
 kem <- MARSS(x, model = model.list)
 @
 Now, it looks like temperature has a strong negative effect on algae?  Also our log-likelihood dropped a lot.  Well, the data do not look at all like a random walk model (\emph{i.e.}, where $\BB=1$), which we can see from the plot of the data (Figure \ref{fig:plank-plot}).  The data are fluctuating about some mean so let's switch to a better autoregressive model---a mean-reverting model.  To do this, we will allow the diagonal elements of $\BB$ to be something other than 1.
@@ -255,8 +261,10 @@ d <- "zero"
 
 Now we can set up the model list for MARSS and fit the model (results are not shown since they are verbose with 60 different month effects).
 <<Covar_sec6_06_fit-month-factor-with-MARSS, results=hide, keep.source=TRUE>>=
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R, 
-                   C = C, c = c.in, D = D, d = d)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A, R = R,
+  C = C, c = c.in, D = D, d = d
+)
 seas.mod.1 <- MARSS(dat, model = model.list, control = list(maxit = 1500))
 
 # Get the estimated seasonal effects
@@ -290,8 +298,10 @@ c.m.poly <- matrix(month.cov, poly.order + 1, TT + period, byrow = FALSE)
 c.m.poly <- c.m.poly[, (1:TT) + (per.1st - 1)]
 
 # Everything else remains the same as in the previous example
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R, 
-                   C = C, c = c.m.poly, D = D, d = d)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A, R = R,
+  C = C, c = c.m.poly, D = D, d = d
+)
 seas.mod.2 <- MARSS(dat, model = model.list, control = list(maxit = 1500))
 @
 The effect of month $m$ for taxon $i$ is $a_i + b_i \times m + c_i \times m^2 + d_i \times m^3$, where $a_i$, $b_i$, $c_i$ and $d_i$ are in the $i$-th row of $\CC$.  We can now calculate the matrix of seasonal effects as follows, where each row is a taxon and each column is a month:
@@ -316,8 +326,10 @@ c.Four <- rbind(cos.t, sin.t)
 
 Everything else remains the same and we can fit this model as follows:
 <<Covar_sec6_10_seasonal-fourier-fit, results=hide>>=
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R, 
-                   C = C, c = c.Four, D = D, d = d)
+model.list <- list(
+  B = B, U = U, Q = Q, Z = Z, A = A, R = R,
+  C = C, c = c.Four, D = D, d = d
+)
 seas.mod.3 <- MARSS(dat, model = model.list, control = list(maxit = 1500))
 @
 
@@ -379,8 +391,9 @@ for (i in 1:3) {
       ylab = "Residual", main = phytos[j]
     )
     abline(h = 0, lty = "dashed")
-    acf(MARSSresiduals(modn, type = "tt1")$model.residuals[j, ], 
-        na.action = na.pass)
+    acf(MARSSresiduals(modn, type = "tt1")$model.residuals[j, ],
+      na.action = na.pass
+    )
   }
 }
 @

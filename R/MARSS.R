@@ -25,10 +25,10 @@ MARSS <- function(y,
   if (!(is.vector(y) | is.matrix(y) | inherits(y, "ts"))) stop("MARSS: Data (y) must be a vector, matrix (time going across columns) or ts/mts object.", call. = FALSE)
   if (length(y) == 0) stop("MARSS: Data (y) is length 0.", call. = FALSE)
   if (is.vector(y)) y <- matrix(y, nrow = 1)
-  if (inherits(y, "ts")){ 
+  if (inherits(y, "ts")) {
     model.tsp <- stats::tsp(y)
     y <- t(y)
-  }else{
+  } else {
     model.tsp <- c(1, ncol(y), 1)
   }
   attr(y, "model.tsp") <- model.tsp
@@ -176,7 +176,14 @@ MARSS <- function(y,
       } else { # there is something to estimate
         if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
         ## Fit and add param estimates to the object
-        if (method %in% kem.methods) MLEobj <- MARSSkem(MLEobj)
+        if (method %in% kem.methods) {
+          MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
+          if (inherits(MLEobj, "try-error")) {
+            cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
+            MLEobj.test$convergence <- 2
+            return(MLEobj.test)
+          }
+        }
         if (method %in% optim.methods) MLEobj <- MARSSoptim(MLEobj)
       }
 
@@ -233,7 +240,7 @@ MARSS <- function(y,
             kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
             if (inherits(kfss, "try-error") || !kfss$ok) {
               msg <- "Not available. MARSSkfss() returned error."
-              kfss <- list(Innov = msg, Sigma = msg, xtt = msg, Vtt = msg, J = msg, Kt = msg)
+              kfss <- list(Innov = msg, Sigma = msg, J = msg, Kt = msg)
             }
           } else {
             kfss <- kf
@@ -243,14 +250,13 @@ MARSS <- function(y,
           # these are only returned by MARSSkfss
           MLEobj$Innov <- kfss$Innov
           MLEobj$Sigma <- kfss$Sigma
-          MLEobj$Vtt <- kfss$Vtt
-          MLEobj$xtt <- kfss$xtt
           MLEobj$J <- kfss$J
           MLEobj$Kt <- kfss$Kt
           if (fun.kf == "MARSSkfss") {
             MLEobj$J0 <- kfss$J0
           } else {
             # From kfss smoother so won't be available if fun.kf=MARSSkfas
+            # Line above used smoother = FALSE; here smoother = TRUE
             J0 <- try(MARSSkfss(MLEobj), silent = TRUE)
             if (!inherits(J0, "try-error") && J0$ok) MLEobj$J0 <- J0$J0 else MLEobj$J0 <- "Not available. MARSSkfss() smoother returned error."
           }
