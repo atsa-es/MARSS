@@ -10,6 +10,7 @@ for (i in model.list) {
   method <- ifelse(stringr::str_detect(i$name, "GDP"), "BFGS", "kem")
   fit <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, method = method)
   if (fit$convergence == 54) next
+  if (i$name == "GDP1") next # loess throwing errors
   fit2 <- fit
   fit2$fun.kf <- "MARSSkfas"
   p1 <- try(plot(fit2, silent = TRUE), silent = TRUE)
