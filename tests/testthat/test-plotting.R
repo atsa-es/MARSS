@@ -3,9 +3,10 @@ skip_on_cran()
 library(MARSS)
 
 load("models.RData")
+context("Plotting tests")
 
 for (i in model.list) {
-  context(paste(i$name, "plotting"))
+  #context(paste(i$name, "plotting"))
 
   method <- ifelse(stringr::str_detect(i$name, "GDP"), "BFGS", "kem")
   fit <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, method = method)

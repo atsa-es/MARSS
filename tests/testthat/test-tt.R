@@ -1,11 +1,13 @@
 skip_on_cran()
 
+context("Test tt calculations")
+
 library(MARSS)
 
 load("models.RData")
 
 for (i in model.list) {
-  context(i$name)
+  #context(i$name)
   if (!i$kfss) next
   method <- ifelse(stringr::str_detect(i$name, "GDP"), "BFGS", "kem")
   fit <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, method = method)

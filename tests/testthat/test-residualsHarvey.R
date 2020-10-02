@@ -2,7 +2,7 @@ skip_on_cran()
 
 # test Harvey = TRUE with and without normalize
 
-context("Residuals algorithms treering")
+context("Harvey Residuals")
 
 library(MARSS)
 
@@ -39,9 +39,6 @@ test_that(paste("StructTS compare normalized residuals Harvey = TRUE and FALSE")
 })
 
 # Little harder model
-
-context("Residuals algorithms harborseal with NAs")
-
 
 dat <- t(harborSealWA)
 dat <- dat[2:4, ] # remove the year row; no miss values

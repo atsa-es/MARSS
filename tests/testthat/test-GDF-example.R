@@ -1,5 +1,7 @@
 skip_on_cran()
 
+context("GDF examples")
+
 library(MARSS)
 library(lubridate)
 library(tidyverse)

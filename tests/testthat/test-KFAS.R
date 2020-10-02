@@ -6,7 +6,7 @@ library(KFAS)
 ###################################################
 ### Nile
 ###################################################
-context("KFAS comparison Nile fitting")
+context("KFAS comparison Nile")
 
 model_Nile <- SSModel(Nile ~ SSMtrend(
   degree = 1,
@@ -78,7 +78,6 @@ test_that("fits Nile KFAS vs MARSS", {
 ###################################################
 ### Test state filtering
 ###################################################
-context("KFAS comparison Nile filtering and smoothing")
 
 fit_kfas <- fit_kfas_stoch
 fit_marss <- fit_em_stoch
@@ -155,7 +154,6 @@ test_that("fits Nile var.EytT", {
 ###################################################
 ### Predicting
 ###################################################
-context("KFAS comparison Nile predicting")
 
 conf_kfas <- predict(fit_kfas$model,
   interval = "confidence",
@@ -217,7 +215,6 @@ test_that("fits Nile PI t1", {
 ###################################################
 ### Residuals
 ###################################################
-context("KFAS comparison Nile residuals")
 
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- residuals(kfs, type = "recursive")
@@ -343,7 +340,6 @@ test_that("fits Nile variance of residuals", {
 ###################################################
 ### Nile with NAs
 ###################################################
-context("KFAS comparison NileNA fits")
 
 NileNA <- Nile
 NileNA[c(21:40, 61:80)] <- NA
@@ -486,7 +482,6 @@ test_that("xtT GlobalTemp MARSS bfgs vs KFAS", {
 })
 
 # residuals
-context("KFAS GlobalTemp residuals")
 
 kfs <- KFS(kfas_temp_stoch$model, smoothing = "disturbance")
 resid_kfas <- rstandard(kfs,
