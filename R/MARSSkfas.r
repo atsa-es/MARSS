@@ -11,7 +11,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   control <- MLEobj[["control"]]
   diffuse <- MODELobj[["diffuse"]]
   model.dims <- attr(MODELobj, "model.dims")
-  
+
   n <- model.dims$data[1]
   TT <- model.dims$data[2]
   m <- model.dims$x[1]
@@ -22,18 +22,18 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   t.B <- matrix(par.1$B, m, m, byrow = TRUE)
   # create the YM matrix
   YM <- matrix(as.numeric(!is.na(MODELobj$data)), n, TT)
-  
+
   # Make sure the missing vals in yt are NAs if there are any
   yt <- MODELobj$data
   yt[!YM] <- as.numeric(NA)
-  
+
   # Stack the y so that we can get the lag-1 covariance smoother from the Kalman filter output
   # stack.yt=rbind(yt[,1:TT,drop=FALSE],cbind(NA,yt[,1:(TT-1),drop=FALSE]))
   # stack.yt=t(stack.yt)
-  
+
   # KFS needs time going down rows so yt can be properly converted to ts object
   yt <- t(yt)
-  
+
   # Build the Zt matrix which is n x (m+1) or n x (m+1) x T; (m+1) because A is in Z
   if (model.dims$Z[3] == 1 & model.dims$A[3] == 1) {
     # not time-varying
@@ -48,7 +48,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Zt[1:n, m + 1, ] <- pars$A
     stack.Zt[1:n, 1:(m + 1), ] <- Zt
   }
-  
+
   # Build the Tt matrix which is (m+1) x (m+1) or (m+1) x (m+1) x T; (m+1) because x has extra row of 1s (for the A)
   #    Tt=cbind(rbind(parList$B,matrix(0,1,m)),matrix(c(parList$U,1),m+1,1))
   if (model.dims$B[3] == 1 & model.dims$U[3] == 1) {
@@ -73,7 +73,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     stack.Tt[1:(m + 1), 1:(m + 1), ] <- Tt
     stack.Tt[, , TT] <- 0 # see comment above re setting TT value
   }
-  
+
   # Build the Ht (R) matrix which is n x n or n x n x T
   if (model.dims$R[3] == 1 && model.dims$H[3] == 1) {
     # not time-varying
@@ -84,7 +84,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
       Ht[, , i] <- tcrossprod(parmat(MLEobj, "H", t = i)$H %*% parmat(MLEobj, "R", t = i)$R, parmat(MLEobj, "H", t = i)$H)
     }
   }
-  
+
   # Build the Qt matrix which is g1 x g1 or g1 x g1 x T;
   if (model.dims$Q[3] == 1) {
     # not time-varying
@@ -105,7 +105,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Qt[, , TT] <- 0
     stack.Qt[, , TT] <- 0
   }
-  
+
   # build the Rt (G) matrix; process error is G(t)%*%w(t); extra row at bottom for for U (1s row in x)
   if (model.dims$G[3] == 1) {
     # not time-varying
@@ -128,7 +128,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Rt[, , TT] <- 0
     stack.Rt[, , TT] <- 0
   }
-  
+
   # Build the a1 and P1 matrices
   # First compute x10 and V10 if tinitx=0
   if (MODELobj$tinitx == 0) { # Compute needed x_1 | x_0
@@ -169,14 +169,14 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     stack.P1[1:m, (m + 2):(2 * m + 1)] <- par.1$B %*% V00
     stack.P1[(m + 2):(2 * m + 1), 1:m] <- tcrossprod(V00, par.1$B)
   }
-  
+
   if (!return.lag.one) {
     kfas.model <- SSModel(yt ~ -1 + SSMcustom(Z = Zt, T = Tt, R = Rt, Q = Qt, a1 = a1, P1 = P1, P1inf = P1inf), H = Ht)
   } else {
     kfas.model <- SSModel(yt ~ -1 + SSMcustom(Z = stack.Zt, T = stack.Tt, R = stack.Rt, Q = stack.Qt, a1 = stack.a1, P1 = stack.P1, P1inf = stack.P1inf), H = Ht)
   }
-  if( !diffuse ) kfas.model$tol <- 0 # per J Helske to turn of machine tol adjustment.
-  
+  if (!diffuse) kfas.model$tol <- 0 # per J Helske to turn of machine tol adjustment.
+
   if (only.logLik) {
     return(list(logLik = logLik(kfas.model)))
   }
@@ -186,7 +186,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   } else {
     diag.R <- unname(par.1$R)[1 + 0:(n - 1) * (n + 1)]
   }
-  
+
   if (any(diag.R == 0)) { # because KFAS 1.0.4 added a warning message
     ks.out <- suppressWarnings(KFS(kfas.model, simplify = FALSE))
   } else {
@@ -198,7 +198,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     ks.out$alphahat <- t(ks.out$alphahat)
     ks.out$att <- t(ks.out$att)
   }
-  
+
   VtT <- ks.out$V[1:m, 1:m, , drop = FALSE]
   Vtt1 <- ks.out$P[1:m, 1:m, 1:TT, drop = FALSE]
   Vtt <- ks.out$Ptt[1:m, 1:m, 1:TT, drop = FALSE]
@@ -206,7 +206,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Vtt1T <- NULL
   } else {
     Vtt1T <- ks.out$V[1:m, (m + 2):(2 * m + 1), , drop = FALSE]
-    if (MODELobj$tinitx == 1) Vtt1T[,,1] <- matrix(NA, m, m)
+    if (MODELobj$tinitx == 1) Vtt1T[, , 1] <- matrix(NA, m, m)
   }
   # zero out rows cols as needed when R diag = 0
   # Check that if any R are 0 then model is solveable
@@ -216,7 +216,7 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     Vtt[abs(Vtt) < .Machine$double.eps] <- 0
     if (return.lag.one) Vtt1T[abs(Vtt1T) < .Machine$double.eps] <- 0
   }
-  
+
   x01T <- ks.out$alphahat[1:m, 1, drop = FALSE]
   V10T <- matrix(VtT[, , 1], m, m)
   if (MODELobj$tinitx == 1) {
@@ -225,25 +225,27 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     x0T <- x01T
     V0T <- V10T
   } else { # MODELobj$tinitx==0
-    if(identical(V00, matrix(0, m, m))){ 
+    if (identical(V00, matrix(0, m, m))) {
       J0 <- V00
-    }else{
+    } else {
       # Vtt1.1 inverse can be unstable. The following code tries to find an
       # inverse that will work by trying various options
       Vtt1.1 <- sub3D(Vtt1, t = 1)
-      if(any(takediag(Vtt1.1)==0)){
-        Vinv <- try(pcholinv(Vtt1.1, chol=FALSE), silent=TRUE)
-        if(inherits(Vinv, "try-error")) Vinv <- pcholinv(Vtt1.1, chol=TRUE)
+      if (any(takediag(Vtt1.1) == 0)) {
+        Vinv <- try(pcholinv(Vtt1.1, chol = FALSE), silent = TRUE)
+        if (inherits(Vinv, "try-error")) Vinv <- pcholinv(Vtt1.1, chol = TRUE)
         if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
         J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
-      }else{
+      } else {
         # solve will be more stable/faster generally but can fail if var is very small
-        t.J0 <- try(solve(matrix(Vtt1.1, m, m, byrow = TRUE), par.1$B%*%V00), silent=TRUE)
-        if(inherits(t.J0, "try-error")){
+        t.J0 <- try(solve(matrix(Vtt1.1, m, m, byrow = TRUE), par.1$B %*% V00), silent = TRUE)
+        if (inherits(t.J0, "try-error")) {
           Vinv <- pcholinv(Vtt1.1) # chol inverse
           if (m != 1) Vinv <- symm(Vinv) # to enforce symmetry after chol2inv call
           J0 <- V00 %*% t.B %*% Vinv # eqn 6.49 and 1s on diag when Q=0; Here it is t.B[1]
-        }else{ if (m==1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE) }
+        } else {
+          if (m == 1) J0 <- t.J0 else J0 <- matrix(t.J0, m, m, byrow = TRUE)
+        }
       }
     }
     xtT.1 <- ks.out$alphahat[1:m, 1, drop = FALSE]
@@ -251,9 +253,9 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
     V0T <- V00 + tcrossprod(J0 %*% (VtT[, , 1] - Vtt1[, , 1]), J0) # eqn 6.48
     if (m != 1) V0T <- symm(V0T) # to enforce symmetry
   }
-  
+
   if (!return.kfas.model) kfas.model <- NULL
-  
+
   # not using ks.out$v (Innov) and ks.out$F (Sigma) since I think there might be a bug (or I misunderstand KFS output) when R is not diagonal.
   rtn.list <- list(
     xtT = ks.out$alphahat[1:m, , drop = FALSE],
@@ -281,6 +283,6 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   )
   # apply names
   X.names <- attr(MODELobj, "X.names")
-  for(el in c("xtT", "xtt1", "xtt", "x0T", "x00T", "x01T")) rownames(rtn.list[[el]]) <- X.names
+  for (el in c("xtT", "xtt1", "xtt", "x0T", "x00T", "x01T")) rownames(rtn.list[[el]]) <- X.names
   return(rtn.list)
 }

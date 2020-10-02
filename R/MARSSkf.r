@@ -6,14 +6,17 @@ MARSSkf <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return.k
   if (is.null(MLEobj$par)) {
     stop("Stopped in MARSSkf(): par element of marssMLE object is required.\n")
   }
-  if(!missing(newdata)){
+  if (!missing(newdata)) {
     data.dim <- attr(MLEobj[["model"]], "model.dims")[["data"]]
-    if(!identical(dim(newdata), data.dim))
+    if (!identical(dim(newdata), data.dim)) {
       stop("Stopped in MARSSkf(): newdata must be the same dimensions as the data used to fit the model.\n")
-    if(!is.numeric(newdata))
+    }
+    if (!is.numeric(newdata)) {
       stop("Stopped in MARSSkf(): newdata must be numeric.\n")
-    if(dim(MLEobj[["model"]][["free"]][["x0"]])[2]!=0)
-      message("MARSSkf(): x0 was estimated and this x0 will be used with newdata.\n")    
+    }
+    if (dim(MLEobj[["model"]][["free"]][["x0"]])[2] != 0) {
+      message("MARSSkf(): x0 was estimated and this x0 will be used with newdata.\n")
+    }
     MLEobj[["model"]][["data"]] <- newdata
     MLEobj[["marss"]][["data"]] <- newdata
   }

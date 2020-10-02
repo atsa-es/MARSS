@@ -64,7 +64,7 @@ autoplot.marssMLE <-
     if (any(str_detect(plot.type, "resids"))) {
       tT.resids <- residuals.marssMLE(x, type = "tT", standardization = "Cholesky")
     }
-    
+
     if ("xtT" %in% plot.type) {
       # make plot of states and CIs
 
@@ -142,8 +142,8 @@ autoplot.marssMLE <-
 
     if ("ytT" %in% plot.type) {
       # make plot of expected value of Y condtioned on y(1)
-      df <- tsSmooth.marssMLE(x, type = "ytT", ifelse(conf.int, "confidence", "none"), level=conf.level)
-      if(conf.int){
+      df <- tsSmooth.marssMLE(x, type = "ytT", ifelse(conf.int, "confidence", "none"), level = conf.level)
+      if (conf.int) {
         df$ymin <- df$.conf.low
         df$ymax <- df$.conf.up
       }
@@ -349,7 +349,7 @@ autoplot.marssMLE <-
           return()
         }
       } else {
-        if(!silent) cat("Finished plots.\n")
+        if (!silent) cat("Finished plots.\n")
       }
     }
   }

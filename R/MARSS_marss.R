@@ -77,10 +77,13 @@ MARSS.marss <- function(MARSS.call) {
   model.tsp <- attr(dat, "model.tsp")
   # Note dat is changed to matrix in MARSS()
   if (is.vector(dat)) dat <- matrix(dat, 1, length(dat))
-  if(inherits(dat, "ts")){ model.tsp <- stats::tsp(dat); dat <- t(dat) }
+  if (inherits(dat, "ts")) {
+    model.tsp <- stats::tsp(dat)
+    dat <- t(dat)
+  }
   n <- dim(dat)[1]
   TT <- dim(dat)[2]
-  if(is.null(model.tsp)) model.tsp <- c(1, TT, 1)
+  if (is.null(model.tsp)) model.tsp <- c(1, TT, 1)
   if (is.null(rownames(dat))) {
     Y.names <- paste("Y", seq(1, n), sep = "") # paste(seq(1, n), sep="") #
     rownames(dat) <- Y.names
@@ -700,4 +703,3 @@ is.marssMODEL_marss <- function(MODELobj, method = "kem") {
     return(msg)
   }
 }
-

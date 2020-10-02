@@ -3,7 +3,7 @@
 #   Parametrically simulates from a MARSS parameter list
 #   Only works for marss form.  marxss form needs to be converted to marss before this will work.
 #######################################################################################################
-simulate.marssMLE <- function(object, nsim=1, seed, ..., tSteps = NULL, silent = TRUE, miss.loc = NULL) {
+simulate.marssMLE <- function(object, nsim = 1, seed, ..., tSteps = NULL, silent = TRUE, miss.loc = NULL) {
   MARSSsimulate(object, tSteps = tSteps, nsim = nsim, silent = silent, miss.loc = miss.loc)
 }
 MARSSsimulate <- function(object, tSteps = NULL, nsim = 1, silent = TRUE, miss.loc = NULL) {

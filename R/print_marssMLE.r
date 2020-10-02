@@ -278,7 +278,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
           return.obj[[what]] <- orig.x$states.se
         }
         if (what == "model.residuals") {
-          res <- MARSSresiduals(orig.x, type="tt1")$model.residuals
+          res <- MARSSresiduals(orig.x, type = "tt1")$model.residuals
           if (!silent) {
             cat("Innovations model residuals.\n")
             print(res)
@@ -287,7 +287,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
           return.obj[[what]] <- res
         }
         if (what == "state.residuals") {
-          res <- MARSSresiduals(orig.x, type="tT")$state.residuals
+          res <- MARSSresiduals(orig.x, type = "tT")$state.residuals
           if (!silent) {
             cat("Smoothed state residuals.\n")
             print(res)

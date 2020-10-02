@@ -190,15 +190,17 @@ map("state", region = c(
   "florida", "georgia", "south carolina", "north carolina",
   "virginia", "delaware", "new jersey", "maryland"
 ), xlim = c(-85, -70))
-points(pdat$lon[which(pdat$turtle == turtlename)], 
-       pdat$lat[which(pdat$turtle == turtlename)],
-       col = "blue", pch = 21, cex = 0.7)
+points(pdat$lon[which(pdat$turtle == turtlename)],
+  pdat$lat[which(pdat$turtle == turtlename)],
+  col = "blue", pch = 21, cex = 0.7
+)
 lines(pred.lon, pred.lat, col = "red", lwd = 2)
 
 goodturtles <- loggerhead
 gooddat <- goodturtles[which(goodturtles$turtle == turtlename), 5:6]
-points(gooddat[, 1], gooddat[, 2], 
-       col = "black", lwd = 2, pch = 3, cex = 1.1)
+points(gooddat[, 1], gooddat[, 2],
+  col = "black", lwd = 2, pch = 3, cex = 1.1
+)
 legend("bottomright", c(
   "bad locations", "estimated true location",
   "good location data"
@@ -216,12 +218,12 @@ col = c("blue", "red", "black"), bty = FALSE
 \section{Estimate speeds for each turtle}
 Turtle biologists designated one of these loggerheads ``Big Mama,'' presumably for her size and speed.  For each of the eight turtles, estimate the average miles traveled per day.  To calculate the distance traveled by a turtle each day, you use the estimate (from \texttt{MARSS()}) of the lat/lon location of turtle at day $t$ and at day $t-1$.  To calculate distance traveled in miles from lat/lon start and finish locations, we will use the function \verb@GCDF@:
 <<Cs09b_GCDF>>=
-GCDF <- function(lon1, lon2, lat1, lat2, degrees=TRUE, units="miles"){
+GCDF <- function(lon1, lon2, lat1, lat2, degrees = TRUE, units = "miles") {
   temp <- ifelse(degrees == FALSE,
     acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)),
-    acos(sin(lat1 / 57.2958) * sin(lat2 / 57.2958) + 
-           cos(lat1 / 57.2958) * cos(lat2 / 57.2958) * 
-           cos(lon2 / 57.2958 - lon1 / 57.2958))
+    acos(sin(lat1 / 57.2958) * sin(lat2 / 57.2958) +
+      cos(lat1 / 57.2958) * cos(lat2 / 57.2958) *
+        cos(lon2 / 57.2958 - lon1 / 57.2958))
   )
   r <- 3963.0 # (statute miles) , default
   if ("units" == "nm") r <- 3437.74677 # (nautical miles)

@@ -283,7 +283,7 @@ A smaller AIC means a better model\index{model selection!AIC}.  The difference b
 resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i,], ylab = "residuals")
+  plot(resids[i, ], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -308,7 +308,7 @@ c(kem1$AIC, kem2$AIC) # AICs
 resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i,], ylab = "residuals")
+  plot(resids[i, ], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -416,7 +416,7 @@ kem3 <- MARSS(dat, model = list(
 resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i,], ylab = "residuals")
+  plot(resids[i, ], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -430,7 +430,7 @@ par(mfrow = c(1, 1))
 resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i,], ylab = "residuals")
+  plot(resids[i, ], ylab = "residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))

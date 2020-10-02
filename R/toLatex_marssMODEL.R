@@ -275,7 +275,7 @@ get.mat.tex <- function(x, greek, digits) {
   tmp.tex <- strsplit(tmp.tex, "\n")[[1]]
   tmp.tex <- tmp.tex[-1]
   tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
-  #tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
+  # tmp.tex <- tmp.tex[-1 * length(tmp.tex)]
   tmp.tex[length(tmp.tex)] <- str_replace_all(tmp.tex[length(tmp.tex)], "[\\]", "")
 
   tmp.body <- paste(tmp.tex, collapse = "\n")

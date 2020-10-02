@@ -25,10 +25,10 @@ MARSS <- function(y,
   if (!(is.vector(y) | is.matrix(y) | inherits(y, "ts"))) stop("MARSS: Data (y) must be a vector, matrix (time going across columns) or ts/mts object.", call. = FALSE)
   if (length(y) == 0) stop("MARSS: Data (y) is length 0.", call. = FALSE)
   if (is.vector(y)) y <- matrix(y, nrow = 1)
-  if (inherits(y, "ts")){ 
+  if (inherits(y, "ts")) {
     model.tsp <- stats::tsp(y)
     y <- t(y)
-  }else{
+  } else {
     model.tsp <- c(1, ncol(y), 1)
   }
   attr(y, "model.tsp") <- model.tsp
@@ -176,13 +176,13 @@ MARSS <- function(y,
       } else { # there is something to estimate
         if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
         ## Fit and add param estimates to the object
-        if (method %in% kem.methods){
-          MLEobj <- try(MARSSkem(MLEobj), silent=TRUE)
-          if( inherits(MLEobj, "try-error")){
+        if (method %in% kem.methods) {
+          MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
+          if (inherits(MLEobj, "try-error")) {
             cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
             MLEobj.test$convergence <- 2
             return(MLEobj.test)
-            }
+          }
         }
         if (method %in% optim.methods) MLEobj <- MARSSoptim(MLEobj)
       }
