@@ -4,7 +4,7 @@ autoplot.marssMLE <-
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
-           ...) {
+           ..., silent = FALSE) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
@@ -343,13 +343,13 @@ autoplot.marssMLE <-
     for (i in plot.type) {
       print(plts[[i]])
       cat(paste("plot.type =", i, "\n"))
-      if (i != plot.type[length(plot.type)]) {
+      if (i != plot.type[length(plot.type)] && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
         }
       } else {
-        cat("Finished plots.\n")
+        if(!silent) cat("Finished plots.\n")
       }
     }
   }

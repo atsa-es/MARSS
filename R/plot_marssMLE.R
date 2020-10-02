@@ -3,7 +3,7 @@ plot.marssMLE <-
            plot.type = c("model.ytT", "xtT", "model.resids", "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", "acf.model.resids"),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
-           plot.par = list(), ...) {
+           plot.par = list(), ..., silent = FALSE) {
 
     # Argument checks
     plot.type <- match.arg(plot.type, several.ok = TRUE)
@@ -93,7 +93,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "model.ytT"]
       cat(paste("plot type = \"model.ytT\" Observations with fitted values\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -139,7 +139,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "xtT"]
       cat(paste("plot type = \"xtT\" Estimated states\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -182,7 +182,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "model.resids"]
       cat(paste("plot type = \"model.resids\" Model residuals\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -217,7 +217,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "std.model.resids"]
       cat(paste("plot type = \"std.model.resids\" Standardized model residuals\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -260,7 +260,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "state.resids"]
       cat(paste("plot type = \"state.resids\" State residuals\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -299,7 +299,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "qqplot.model.resids"]
       cat(paste("plot type = \"qqplot.model.resids\" QQ plot of model standardized smoothed residuals\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -325,7 +325,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "qqplot.state.resids"]
       cat(paste("plot type = \"qqplot.state.resids\" QQ plot of state standardized smoothed residuals\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -359,7 +359,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "ytT"]
       cat(paste("plot type = \"ytT\" Expected value of Y conditioned on data\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
@@ -383,7 +383,7 @@ plot.marssMLE <-
       }
       plot.type <- plot.type[plot.type != "acf.model.resids"]
       cat(paste("plot type = \"acf.model.resids\" Model innovations residuals ACF\n"))
-      if (length(plot.type) != 0) {
+      if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()
