@@ -14,9 +14,9 @@ ENHANCEMENTS
 * Beginning to add testthat tests to the package. These are set with `skip_on_cran()` as they are for internal testing. 
 
 
-MARSS 3.11.2 (released 2020-09-13 on GitHub)
+MARSS 3.11.2 (released 2020-10-02 on GitHub)
 ------------------------------------
-This is a minor update to make the testing and output (plots, residuals, tsSmooth, fitted) less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` which can become ill-conditioned thus preventing inversion. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+This is an update to make the testing and output (plots, residuals, tsSmooth, fitted) less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` which can become ill-conditioned thus preventing inversion. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
 
 ENHANCEMENTS
 
