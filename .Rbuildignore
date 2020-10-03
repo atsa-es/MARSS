@@ -11,3 +11,4 @@ _layouts
 License.md
 vignettes/debugger_template.Rnw
 vignettes/debug_manual.R
+tests

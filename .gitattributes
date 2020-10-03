@@ -21,3 +21,4 @@ vignettes/manual_files export-ignore
 vignettes/debugger_template.Rnw export-ignore
 inst/WORDLIST export-ignore
 man/MARSS_out.Rd export-ignore
+tests export-ignore
