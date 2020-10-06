@@ -7,14 +7,14 @@
 }
 \usage{
 MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE, 
-    silent=FALSE, fun.kf="MARSSkfss")
+    silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}
   \item{method}{ Algorithm to use. Currently only "SS". }
   \item{normalize}{ TRUE/FALSE See details. }
   \item{silent}{ If TRUE, don't print inversion warnings. }
-  \item{fun.kf}{ Kalman filter function to use. Can be ignored. }
+  \item{fun.kf}{ Can be ignored. This will change the Kalman filter/smoother function from the value in object$fun.kf if desired. }
 }
 \value{
 A list with the following components  

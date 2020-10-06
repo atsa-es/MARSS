@@ -11,11 +11,11 @@ The default MARSS model form is a MARXSS model: Multivariate Auto-Regressive(1) 
 \deqn{\mathbf{x}_{t} = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{C} \mathbf{c}_{t} + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t) = B x(t-1) + u + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}(t) + \mathbf{a} + \mathbf{D} \mathbf{d}_t + \mathbf{H} \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R})}{y(t) = Z x(t) + a + D d(t) + H v(t), where v(t) ~ MVN(0,R)}
 \deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~ MVN(x0, V0) }
-All parameters can be time-varying; the "t" subscript is left off the parameters to remove clutter. Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x_1}{x(1)} or \eqn{x_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
+All parameters can be time-varying; the "t" subscript is left off the parameters to remove clutter. Note, by default \eqn{\mathbf{V0}}{V0} is a matrix of all zeros and thus \eqn{\mathbf{x}_1}{x(1)} or \eqn{\mathbf{x}_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
 
 The parameter matrices can have fixed values and linear constraints. This is an example of a 3x3 matrix with fixed values and linear constraints. In this example all the matrix elements can be written as a linear function of \eqn{a}, \eqn{b}, and \eqn{c}:
 \deqn{\left[\begin{array}{c c c} a+2b & 1 & a\\ 1+3a+b & 0 & b \\ 0 & -2 & c\end{array}\right]}{ [a+2b  1   a \\n 1+3a+b   0   b \\n 0   -2    c ]}
-Values such as \eqn{a b} or \eqn{a^2} or \eqn{log(a)} are not allowed as those would not be linear.
+Values such as \eqn{a b} or \eqn{a^2} or \eqn{ln(a)} are not allowed as those would not be linear.
 
 The MARSS model parameters, hidden state processes (x), and observations (y) are matrices:
   \itemize{
@@ -32,9 +32,9 @@ The MARSS model parameters, hidden state processes (x), and observations (y) are
     \item \eqn{\mathbf{c}_t}{c(t)} is q x 1
     \item \eqn{\mathbf{d}_t}{d(t)} is p x 1
   }
-If a parameter is time-varying then the time dimension is the 3rd dimension. Thus a time-varying Z parameters would be n x m x T where T is the length of the data time series.
+If a parameter is time-varying then the time dimension is the 3rd dimension. Thus a time-varying \eqn{\mathbf{Z}}{Z} would be n x m x T where T is the length of the data time series.
   
-The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for a variety of output including parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries.
+The main fitting function is \code{\link{MARSS}()} which is used to fit a specified model to data and estimate the model parameters.  \code{\link{MARSS}()} estimates the model parameters using an EM algorithm (primarily but see \code{\link{MARSSoptim}()}).  Functions are provided for parameter confidence intervals and the observed Fisher Information matrix, smoothed state estimates with confidence intervals, all the Kalman filter and smoother outputs, residuals and residual diagnostics, printing and plotting, and summaries.
 }
 \details{
 

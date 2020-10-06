@@ -38,13 +38,13 @@
 }
 \details{
 
-The ytT forecast for \eqn{T+i}  is 
-\deqn{\mathbf{Z}\tilde{x}_{T+i} + \mathbf{a} + \mathbf{D}\mathbf{d}_{T+i}}{Z tildex(T+i) + a + D d(T+i)}
+The \code{type="ytT"} forecast for \eqn{T+i}  is 
+\deqn{\mathbf{Z}\tilde{\mathbf{x}}_{T+i} + \mathbf{a} + \mathbf{D}\mathbf{d}_{T+i}}{Z tildex(T+i) + a + D d(T+i)}
 where \eqn{\mathbf{Z}}{Z}, \eqn{\mathbf{a}}{a} and \eqn{\mathbf{D}}{d} are estimated from the data from 1 to \eqn{T}. If the model includes \eqn{\mathbf{d}}{d} then \code{newdata} with \code{d} must be passed in. Either confidence or prediction intervals can be shown. Prediction intervals would be the norm for forecasts and show the intervals for new data which based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i} + \mathbf{V}_{T+i}}{Z X(T+i) + V(T+i)}. Confidence intervals would show the variance of the mean of the new data (such as if you ran a simulation multiple times and recorded only the mean observation time series). It is based on the conditional variance of \eqn{\mathbf{Z}\mathbf{X}_{T+i}}{Z X(T+i)}. The intervals shown are computed with \code{\link[=fitted.marssMLE]{fitted}()}.
 
-The xtT forecast for \eqn{T+i}  is 
+The \code{type="xtT"} forecast for \eqn{T+i}  is 
 \deqn{\mathbf{B}\tilde{\mathbf{x}}_{T+i-1} + \mathbf{u} + \mathbf{C}\mathbf{c}_{T+i}}{B tildex(T+i-1) + u + C c(T+i)}
-where \eqn{\mathbf{B}}{B} and \eqn{\mathbf{u}}{u} and \eqn{\mathbf{C}}{C} are estimated form the data from 1 to \eqn{T} (i.e. the estimates in the marssMLE object). If the model includes \eqn{\mathbf{c}}{c} then \code{newdata} with \code{c} must be passed in. The only intervals are confidence intervals which based on the conditional variance of \eqn{\mathbf{B}\mathbf{X}_{T+i-1} + \mathbf{W}_{T+i}}{B X(T+i-1) + W(T+i)}. If you pass in data for your forecast time steps, then the forecast will be computed conditioned on the original data plus the data in the forecast period. The intervals shown are computed with the Kalman smoother (or filter if \code{type="xtt"} or \code{type="xtt1"} specified) via \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}.
+where \eqn{\mathbf{B}}{B} and \eqn{\mathbf{u}}{u} and \eqn{\mathbf{C}}{C} are estimated from the data from \eqn{t=1} to \eqn{T} (i.e. the estimates in the marssMLE object). If the model includes \eqn{\mathbf{c}}{c} then \code{newdata} with \code{c} must be passed in. The only intervals are confidence intervals which based on the conditional variance of \eqn{\mathbf{B}\mathbf{X}_{T+i-1} + \mathbf{W}_{T+i}}{B X(T+i-1) + W(T+i)}. If you pass in data for your forecast time steps, then the forecast will be computed conditioned on the original data plus the data in the forecast period. The intervals shown are computed with the Kalman smoother (or filter if \code{type="xtt"} or \code{type="xtt1"} specified) via \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}.
 
 If the model has time-varying parameters, the parameter estimates at time \eqn{T} will be used for the whole forecast. If new data \code{c} or \code{d} are passed in, it must have \code{h} time steps. 
 

@@ -9,9 +9,10 @@
 \usage{
 \method{plot}{marssMLE}(x, plot.type = c("model.ytT", "xtT", "model.resids",
                  "state.resids", "qqplot.model.resids",
-                 "qqplot.state.resids", "ytT", "acf.model.resids"), form = c("marxss", "marss",
-                 "dfa"), conf.int = TRUE, conf.level = 0.95, 
-                 decorate = TRUE, pi.int = FALSE, plot.par = list(), ..., silent = FALSE)
+                 "qqplot.state.resids", "ytT", "acf.model.resids"), 
+                 form = c("marxss", "marss", "dfa"), 
+                 conf.int = TRUE, conf.level = 0.95, decorate = TRUE, 
+                 pi.int = FALSE, plot.par = list(), ..., silent = FALSE)
 \method{autoplot}{marssMLE}(x, plot.type = c("model.ytT", "xtT", "model.resids", 
     "state.resids", "qqplot.model.resids", "qqplot.state.resids", "ytT", 
     "acf.model.resids"),

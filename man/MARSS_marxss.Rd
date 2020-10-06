@@ -5,10 +5,10 @@
 \title{ Multivariate AR-1 State-space Model with Inputs }
 \description{
 The argument \code{form="marxss"} in a \code{\link{MARSS}()} function call specifies a MAR-1 model with eXogenous variables model.  This is a MARSS(1) model of the form:
-\deqn{x(t) = B(t) x(t-1) + U(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
-\deqn{y(t) = Z(t) x(t) + A(t) + D(t) d(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
-\deqn{x(1) ~ MVN(x0, V0) or x(0) ~ MVN(x0, V0) }
-Note, by default \eqn{V0} is a matrix of all zeros and thus \eqn{x(1)} or \eqn{x(0)} is treated as an estimated parameter not a diffuse prior.
+\deqn{\mathbf{x}_{t} = \mathbf{B}_t \mathbf{x}_{t-1} + \mathbf{u}_t + \mathbf{C}_t \mathbf{c}_t + \mathbf{G}_t \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q}_t)}{x(t) = B(t) x(t-1) + u(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
+\deqn{\mathbf{y}_t = \mathbf{Z}_t \mathbf{x}_t + \mathbf{a}_t + \mathbf{D}_t \mathbf{d}_t + \mathbf{H}_t \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R}_t)}{y(t) = Z(t) x(t) + a(t) + D(t) d(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
+\deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~  MVN(x0, V0) }
+Note, by default \eqn{\mathbf{V0}}{V0} is a matrix of all zeros and thus \eqn{\mathbf{x}_1}{x(1)} or \eqn{\mathbf{x}_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
 
 Note, "marxss" is a model form.  A model form is defined by a collection of form functions discussed in \code{\link{marssMODEL}}.  These functions are not exported to the user, but are called by \code{\link{MARSS}()} using the argument \code{form}.  
 }
