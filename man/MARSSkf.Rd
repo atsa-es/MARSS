@@ -34,23 +34,23 @@ The likelihood returned for both functions is the exact likelihood when there ar
 \value{
 A list with the following components. \eqn{m} is the number of state processes and \eqn{n} is the number of observation time series. "V" elements are called "P" in Shumway and Stoffer (2006, eqn 6.17 with s=T).  The output is referenced against equations in Shumway and Stoffer (2006) denoted S&S; the Kalman filter and smoother implemented in MARSS is for a more general MARSS model than that shown in S&S but the output has the same meaning.  In the expectations below, the parameters are left off; \eqn{E[\mathbf{X} | \mathbf{y}]}{E[X | y]} is really \eqn{E[\mathbf{X} | \Theta, \mathbf{y}]}{E[X | theta, y]} where \eqn{\Theta}{theta} is the parameter list. \eqn{\mathbf{y}_1^t}{y(1:t)} denotes the data from \eqn{t=1} to \eqn{t=t}.
   \item{xtT}{ \eqn{\tilde{\mathbf{x}}_t}{xtT(t)} State first moment conditioned on \eqn{\mathbf{y}_1^T}{y(1:T)}: \eqn{E[\mathbf{X}_t|\mathbf{y}_1^T]}{E[X(t) | y(1:T)]} (m x T matrix). Kalman smoother output.}
-  \item{VtT}{ \eqn{\tilde{\mathbf{V}}_t}{VtT(t)} State variance matrix conditioned on  \eqn{\mathbf{y}_1^T}{y(1:T)}: \eqn{E[(\mathbf{X}_t-\tilde{\mathbf{x}}_t)(\mathbf{X}_t-\tilde{\mathbf{x}}_t)^\top|\mathbf{y}_1^T]}{E[(X(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)]} (m x m x T array). Kalman smoother output. Denoted \eqn{P_t^T} in S&S (S&S eqn 6.18 with \eqn{s=T}, \eqn{t1=t2=t}). The state second moment \eqn{E[\mathbf{X}_t\mathbf{X}_t^\top|\mathbf{y}_1^T]}{E[X(t)X(t)'| y(1:T)]} is equal to \eqn{\tilde{\mathbf{V}}_t + \tilde{\mathbf{x}}_t\tilde{\mathbf{x}}_t^\top}{VtT(t)+xtT(t)xtT(t)'}.
+  \item{VtT}{ \eqn{\tilde{\mathbf{V}}_t}{VtT(t)} State variance matrix conditioned on  \eqn{\mathbf{y}_1^T}{y(1:T)}: \eqn{E[(\mathbf{X}_t-\tilde{\mathbf{x}}_t)(\mathbf{X}_t-\tilde{\mathbf{x}}_t)^\top|\mathbf{y}_1^T]}{E[(X(t)-xtT(t))(x(t)-xtT(t))'| | y(1:T)]} (m x m x T array). Kalman smoother output. Denoted \eqn{P_t^T} in S&S (S&S eqn 6.18 with \eqn{s=T}, \eqn{t1=t2=t}). The state second moment \eqn{E[\mathbf{X}_t\mathbf{X}_t^\top|\mathbf{y}_1^T]}{E[X(t)X(t)'| y(1:T)]} is equal to \eqn{\tilde{\mathbf{V}}_t + \tilde{\mathbf{x}}_t\tilde{\mathbf{x}}_t^\top}{VtT(t)+xtT(t)xtT(t)'}. }
   \item{Vtt1T}{ \eqn{\tilde{\mathbf{V}}_{t,t-1}}{Vtt1T(t)} State lag-one cross-covariance matrix \eqn{E[(\mathbf{X}_t-\tilde{\mathbf{x}}_t)(\mathbf{X}_{t-1}-\tilde{\mathbf{x}}_{t-1})^\top|\mathbf{y}_1^T]}{E[(X(t)-xtT(t))(X(t-1)-xtT(t-1))' | y(1:T)]} (m x m x T). Kalman smoother output. \eqn{P_{t,t-1}^T} in S&S (S&S eqn 6.18 with \eqn{s=T}, \eqn{t1=t}, \eqn{t2=t-1}). State lag-one second moments \eqn{E[\mathbf{X}_t\mathbf{X}_{t-1}^\top|\mathbf{y}_1^T]}{E[X(t)X(t-1)'| y(1:T)]} is equa to \eqn{\tilde{\mathbf{V}}_{t, t-1} + \tilde{\mathbf{x}}_t\tilde{\mathbf{x}}_{t-1}^\top}{Vtt1T(t)+xtT(t)xtT(t-1)'}. }
-  \item{x0T}{ Initial smoothed state estimate \eqn{E[X(t0) | y(1:T)]} (m x 1). If model$tinitx=0, t0=0; if model$tinitx=1, t0=1. Kalman smoother output.}
-  \item{x01T}{ Smoothed state estimate \eqn{E[X(1) | y(1:T)]} (m x 1). }
-  \item{x00T}{ Smoothed state estimate E[X(0) | y(1:T)] (m x 1). If model$tinitx=1, this will be NA. }
-  \item{V0T}{ Initial smoothed state covariance matrix E[X(t0)X(0)' | y(1:T)] (m x m). If model$tinitx=0, t0=0 and V0T=V00T; if model$tinitx=1, t0=1 and V0T=V10T.  In the case of tinitx=0, this is \eqn{P_0^T} in S&S.}
-  \item{V10T}{ Smoothed state covariance matrix E[X(1)X(0)' | y(1:T)] (m x m).}
-  \item{V00T}{ Smoothed state covariance matrix E[X(0)X(0)' | y(1:T)] (m x m). If model$tinitx=1, this will be NA. }
-  \item{J}{ (m x m x T) Kalman smoother output.  Only for \code{MARSSkfss}. (ref S&S eqn 6.49)}
-  \item{J0}{ J at the initial time (t=0 or t=1) (m x m x T). Kalman smoother output. Only for \code{MARSSkfss}.}
-  \item{xtt}{ State first moment conditioned on y(1:t): E[X(t) | y(1:t)] (m x T).  Kalman filter output. (S&S eqn 6.17 with s=t)}
-  \item{xtt1}{ State first moment conditioned on y(1:t-1): E[X(t) | y(1:t-1)] (m x T).  Kalman filter output. (S&S eqn 6.17 with s=t-1) }
-  \item{Vtt}{ State variance conditioned on y(1:t): E[(X(t)-xtt(t))(X(t)-xtt(t))'| | y(1:t)] (m x m x T array). Kalman filter output. P_t^t in S&S (S&S eqn 6.18 with s=t, t1=t2=t). State second moment E[X(t)X(t)'| y(1:t)] = Vtt(t)+xtt(t)xtt(t)' }
+  \item{x0T}{ Initial smoothed state estimate \eqn{E[\mathbf{X}_{t0}|\mathbf{y}_1^T}{E[X(t0) | y(1:T)]} (m x 1). If \code{model$tinitx=0}, \eqn{t0=0}; if \code{model$tinitx=1}, \eqn{t0=1}. Kalman smoother output.}
+  \item{x01T}{ Smoothed state estimate \eqn{E[\mathbf{X}_1|\mathbf{y}_1^T}{E[X(1) | y(1:T)]} (m x 1). }
+  \item{x00T}{ Smoothed state estimate \eqn{E[\mathbf{X}_0 |\mathbf{y}_1^T}{E[X(0) | y(1:T)]} (m x 1). If \code{model$tinitx=1}, this will be NA. }
+  \item{V0T}{ Initial smoothed state covariance matrix \eqn{E[\mathbf{X}_{t0}\mathbf{X}_0^\top | \mathbf{y}_1^T}{E[X(t0)X(0)' | y(1:T)]} (m x m). If \code{model$tinitx=0}, \eqn{t0=0} and \code{V0T=V00T}; if \code{model$tinitx=1}, \eqn{t0=1} and \code{V0T=V10T}.  In the case of \code{tinitx=0}, this is \eqn{P_0^T} in S&S.}
+  \item{V10T}{ Smoothed state covariance matrix \eqn{E[\mathbf{X}_1\mathbf{X}_0^\top | \mathbf{y}_1^T}{E[X(1)X(0)' | y(1:T)]} (m x m).}
+  \item{V00T}{ Smoothed state covariance matrix \eqn{E[\mathbf{X}_0\mathbf{X}_0^\top | \mathbf{y}_1^T}{E[X(0)X(0)' | y(1:T)]} (m x m). If \code{model$tinitx=1}, this will be NA. }
+  \item{J}{ (m x m x T) Kalman smoother output.  Only for \code{MARSSkfss()}. (ref S&S eqn 6.49)}
+  \item{J0}{ J at the initial time (t=0 or t=1) (m x m x T). Kalman smoother output. Only for \code{MARSSkfss()}.}
+  \item{xtt}{ State first moment conditioned on \eqn{\mathbf{y}_1^t}{y(1:t)}: \eqn{E[\mathbf{X}_t | \mathbf{y}_1^t}{E[X(t) | y(1:t)]} (m x T).  Kalman filter output. (S&S eqn 6.17 with \eqn{s=t})}
+  \item{xtt1}{ State first moment conditioned on \eqn{\mathbf{y}_1^{t-1}}{y(1:t-1)}: \eqn{E[\mathbf{X}_t | \mathbf{y}_1^{t-1}}{E[X(t) | y(1:t-1)]} (m x T).  Kalman filter output. (S&S eqn 6.17 with \eqn{s=t-1}) }
+  \item{Vtt}{ State variance conditioned on \eqn{\mathbf{y}_1^t}{y(1:t)}: \eqn{E[(\mathbf{X}_t-\tilde{\mathbf{x}}_t^t)(\mathbf{X}_t-\tilde{\mathbf{x}}_t^t)^\top|\mathbf{y}_1^t]}{E[(X(t)-xtt(t))(X(t)-xtt(t))'| | y(1:t)]} (m x m x T array). Kalman filter output. P_t^t in S&S (S&S eqn 6.18 with s=t, t1=t2=t). State second moment E[X(t)X(t)'| y(1:t)] = Vtt(t)+xtt(t)xtt(t)' }
   \item{Vtt1}{ State variance conditioned on y(1:t-1): E[(X(t)-xtt1(t))(X(t)-xtt1(t))'| | y(1:t-1)] (m x m x T array). Kalman filter output. P_t^t in S&S (S&S eqn 6.18 with s=t-1, t1=t2=t). State second moment E[X(t)X(t)'| y(1:t-1)] = Vtt1(t)+xtt1(t)xtt1(t)'}
-  \item{Kt}{ Kalman gain (m x m x T). Kalman filter output (ref S&S eqn 6.23). Only for \code{MARSSkfss}.}
-  \item{Innov}{ Innovations y(t) - E[Y(t) | y(1:t-1)] (n x T). Kalman filter output. Only returned with \code{MARSSkfss}. (ref page S&S 339). }
-  \item{Sigma}{ Innovations covariance matrix. Kalman filter output. Only returned with \code{MARSSkfss}. (ref S&S eqn 6.61)}
+  \item{Kt}{ Kalman gain (m x m x T). Kalman filter output (ref S&S eqn 6.23). Only for \code{MARSSkfss()}.}
+  \item{Innov}{ Innovations y(t) - E[Y(t) | y(1:t-1)] (n x T). Kalman filter output. Only returned with \code{MARSSkfss()}. (ref page S&S 339). }
+  \item{Sigma}{ Innovations covariance matrix. Kalman filter output. Only returned with \code{MARSSkfss()}. (ref S&S eqn 6.61)}
   \item{logLik}{ Log-likelihood logL(y(1:T) | theta) (ref S&S eqn 6.62)}
   \item{kfas.model}{ The model in \link[KFAS]{KFAS} model form (class \code{\link[KFAS]{SSModel}}). Only for \code{MARSSkfas}.}
   \item{errors}{ Any error messages. }
