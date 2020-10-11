@@ -20,20 +20,20 @@
 # ###########################################
 
 if(Sys.info()['sysname']=="Windows"){
-  setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2019")
+  setwd("C:/Users/Eli.Holmes/Dropbox/MARSS unit tests 2020")
   lib.new <- "C:/Program Files/R/R-3.6.2/library"
 }
 if(Sys.info()['sysname']=="Darwin"){
   setwd("~/Dropbox/MARSS unit tests 2020")
-  lib.new <- "/Library/Frameworks/R.framework/Versions/3.6/Resources/library"
+  lib.new <- "/Library/Frameworks/R.framework/Versions/4.0/Resources/library"
 }
 lib.old <- Sys.getenv("R_LIBS_USER")
 
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
 # Mac: install.packages("~/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.old, repos=NULL)
-# Mac: install.packages("~/Dropbox/MARSS_3.11.1.tar.gz", lib=lib.new, repos=NULL)
-# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
+# Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
 try(detach("package:MARSS", unload=TRUE),silent=TRUE)
@@ -45,19 +45,26 @@ unittestfiles = unittestfiles[unittestfiles!=paste(path.expand(lib.new),"/MARSS/
 unittestvrs=packageVersion("MARSS", lib.loc = lib.new)
 unittestvrs #this should be new version
 library(MARSS, lib.loc = lib.new)
-#zscore.fun = zscore #3.9 does not have this
-MARSSresiduals.fun = MARSSresiduals
-MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
-MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
-MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
+# #zscore.fun = zscore #3.9 does not have this
+# MARSSresiduals.fun = MARSSresiduals
+# MARSSresiduals_tT.fun = MARSS:::MARSSresiduals.tT
+# MARSSresiduals_tt1.fun = MARSS:::MARSSresiduals.tt1
+# MARSSresiduals_tt.fun = MARSS:::MARSSresiduals.tt
 
-file <- "AR2SS100.RData"
-if (file %in% dir("./manual_files")) {
-  load(paste("./manual_files/", file, sep = ""))
-  sims.exist <- TRUE
-} else {
-  sims.exist <- FALSE
-}
+# file <- "AR2SS100.RData"
+# if (file %in% dir("./vignettes/manual_files")) {
+#   load(paste("./vignettes/manual_files/", file, sep = ""))
+#   sims.exist <- TRUE
+# } else {
+#   sims.exist <- FALSE
+# }
+# file <- "CS4--model_fits.RData"
+# if (file %in% dir("./vignettes/manual_files")) {
+#   load(paste("./vignettes/manual_files/", file, sep = ""))
+#   sims.exist <- TRUE
+# } else {
+#   sims.exist <- FALSE
+# }
 
 cat("Running code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
@@ -91,17 +98,17 @@ unittestvrs
 library(MARSS, lib.loc = lib.old)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
-  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun", "MARSSresiduals_tt.fun"))])
+  rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun"))])
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
-  if(!exists("zscore")){zscore=zscore.fun}
-#  if(!exists("MARSSresiduals")){
-    MARSSresiduals = MARSSresiduals.fun
-    MARSSresiduals.tT = MARSSresiduals_tT.fun
-    MARSSresiduals.tt1 = MARSSresiduals_tt1.fun
-    MARSSresiduals.tt = MARSSresiduals_tt.fun
-#  }
+#  if(!exists("zscore")){zscore=zscore.fun}
+# #  if(!exists("MARSSresiduals")){
+#     MARSSresiduals = MARSSresiduals.fun
+#     MARSSresiduals.tT = MARSSresiduals_tT.fun
+#     MARSSresiduals.tt1 = MARSSresiduals_tt1.fun
+#     MARSSresiduals.tt = MARSSresiduals_tt.fun
+# #  }
   cat("Running ",unittestfile, "\n")
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
@@ -154,9 +161,20 @@ for(unittestfile in unittestfiles){
       attr(testNew[[ii]], "equation") <- NULL
       attr(testOld[[ii]], "equation") <- NULL
     }
+    if(inherits(testNew[[ii]], "SSModel")){
+      attr(testNew[[ii]]$terms, ".Environment") <- NULL
+      attr(testOld[[ii]]$terms, ".Environment") <- NULL
+    }
+    if(inherits(testNew[[ii]], "gg")){
+      next
+    }
     if(inherits(testNew[[ii]], "list")){
       for(iii in 1:length(testNew[[ii]])){
-        if(inherits(testNew[[ii]][[iii]], "marssMLE")){
+        if(inherits(testNew[[ii]][[iii]], "SSModel")){
+            attr(testNew[[ii]][[iii]]$terms, ".Environment") <- NULL
+            attr(testOld[[ii]][[iii]]$terms, ".Environment") <- NULL
+          }
+          if(inherits(testNew[[ii]][[iii]], "marssMLE")){
           for(kk in c("model", "marss")){
             attr(testNew[[ii]][[iii]][[kk]], "equation") <- NULL
             attr(testOld[[ii]][[iii]][[kk]], "equation") <- NULL
