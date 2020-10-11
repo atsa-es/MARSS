@@ -91,7 +91,7 @@ If you are working with models with time-varying parameters, it is important to 
   \item{ytT}{ The expected value of y conditioned on the data.  Note this is just y for those y that are not missing. }
   \item{ytT.se}{ The standard errors of the expected value of y. Note this is 0 for any non-missing y.}
   \item{numIter}{ Number of iterations required for convergence. }
-  \item{convergence}{ Convergence status. 0 means converged successfully.  Anything else is a warning or error. 2 means the MLEobj has an error; the MLEobj is returned so you can debug it.  The other numbers are errors during fitting.  The error code depends on the fitting method.  See \code{\link{MARSSkem}} and \code{\link{MARSSoptim}}. }
+  \item{convergence}{ Convergence status. 0 means converged successfully and 3 means all parameters were fixed (so convergence status is not applicable).  Anything else is a warning or error. 2 means the MLEobj has an error; the MLEobj is returned so you can debug it.  The other numbers are errors during fitting.  The error code depends on the fitting method.  See \code{\link{MARSSkem}} and \code{\link{MARSSoptim}}. }
   \item{logLik}{ Log-likelihood. }
   \item{AIC}{ Akaike's Information Criterion. }
   \item{AICc}{ Sample size corrected AIC. }
