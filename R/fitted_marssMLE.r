@@ -15,6 +15,10 @@ fitted.marssMLE <- function(object, ...,
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
+  if (MLEobj[["convergence"]] == 54) {
+    stop("fitted.marssMLE: optim() successfully fit this model but MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+  }
+  
   if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0)) {
     stop("fitted.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
   }

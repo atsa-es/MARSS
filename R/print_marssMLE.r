@@ -296,6 +296,13 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
           return.obj[[what]] <- res
         }
         if (what == "kfs") {
+          if (is.null(orig.x[["par"]])) {
+            stop("print.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
+          }
+          if (orig.x[["convergence"]] == 54) {
+            stop("print.marssMLE: optim() successfully fit this model but MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+          }
+          
           kf <- MARSSkf(orig.x)
           if (x$fun.kf == "MARSSkfas") {
             tmp <- MARSSkfss(orig.x) # MARSSkfas doesn't return Innov or Sigma

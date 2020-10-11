@@ -12,6 +12,13 @@ residuals.marssMLE <- function(object, ...,
   ## Argument checking
   type <- match.arg(type)
   standardization <- match.arg(standardization)
+  if (is.null(object[["par"]])) {
+    stop("residuals.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
+  }
+  if (object[["convergence"]] == 54) {
+    stop("residuals.marssMLE: optim() successfully fit this model but MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+  }
+  
 
   resids.fun <- paste("residuals_", form, sep = "")
   tmp <- try(exists(resids.fun, mode = "function"), silent = TRUE)

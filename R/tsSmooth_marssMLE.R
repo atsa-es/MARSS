@@ -23,6 +23,13 @@ tsSmooth.marssMLE <- function(object,
   if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0)) {
     stop("tsSmooth.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
   }
+  if (is.null(object[["par"]])) {
+    stop("tsSmooth.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
+  }
+  if (object[["convergence"]] == 54) {
+    stop("tsSmooth.marssMLE: optim() successfully fit this model but MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+  }
+  
   ## End Argument checking
 
   alpha <- 1 - level

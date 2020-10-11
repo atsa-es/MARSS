@@ -96,6 +96,8 @@ forecast.marssMLE <- function(object, h = 10,
     fun.kf = fun.kf
   ))
   newMLEobj[["par"]] <- object[["par"]]
+  newMLEobj[["convergence"]] <- object[["convergence"]]
+  newMLEobj[["logLik"]] <- object[["logLik"]]
   for (elem in names(newMLEobj[["par"]])) newMLEobj[["par"]][[elem]] <- matrix(0, 0, 1)
   class(newMLEobj) <- "marssMLE"
 
