@@ -130,12 +130,12 @@ MARSS <- function(y,
     }
 
     # Check that Kalman filter/smoother will run
-    if (MLEobj$control$trace != -1) {
+    if (fit && MLEobj$control$trace != -1) {
       MLEobj.test <- MLEobj
       MLEobj.test$par <- MLEobj$start
       kftest <- try(MARSSkf(MLEobj.test), silent = TRUE)
       if (inherits(kftest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter or smoother running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output.\n")
+        cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter/smoother (KF) from running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output. You could try trace=-1 to bypass the initial KF check if you are using method='BFGS' and know the logLik function will run.\n")
         MLEobj$convergence <- 2
         return(MLEobj.test)
       }
@@ -148,7 +148,7 @@ MARSS <- function(y,
       MLEobj.test$kf <- kftest
     }
     # Ey is needed for method=kem
-    if (MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
+    if (fit && MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
       Eytest <- try(MARSShatyt(MLEobj.test), silent = TRUE)
       if (inherits(Eytest, "try-error")) {
         cat("Error: Stopped in MARSS() before fitting because MARSShatyt() stopped.  Something is wrong with the model structure that prevents MARSShatyt() running.\n\n")
@@ -165,15 +165,32 @@ MARSS <- function(y,
       }
     }
 
-    if (!fit) MLEobj$convergence <- 3
+    if (!fit){
+      # will be set to 3 if all fixed
+      MLEobj$convergence <- -1
+    }
 
-    if (fit) {
-      ## If no parameters are estimated, then set par element and get the states
-      if (all(unlist(lapply(MLEobj$marss$free, is.fixed)))) {
-        MLEobj$convergence <- 3
-        MLEobj$par <- list()
-        for (el in attr(MLEobj$marss, "par.names")) MLEobj$par[[el]] <- matrix(0, 0, 1)
-      } else { # there is something to estimate
+    # All parameters fixed, whether or not fit=TRUE
+    if (all(unlist(lapply(MLEobj[["marss"]][["free"]], is.fixed)))) {
+      if (silent == 2) cat("All parameters fixed. No estimation done.\n")
+      MLEobj$convergence <- 3
+      MLEobj$par <- list()
+      for (el in attr(MLEobj[["marss"]], "par.names")) MLEobj[["par"]][[el]] <- matrix(0, 0, 1)
+      kf.out <- try(MARSSkf(MLEobj, only.logLik=TRUE), silent = TRUE)
+      if (inherits(kf.out, "try-error")){
+        MLEobj$convergence <- 53
+      }else{
+        # rest of the output will be added below
+        MLEobj$logLik <- kf.out$logLik
+        kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
+        if (inherits(kf.out, "try-error")){
+          MLEobj$convergence <- 54
+        }
+      }
+    }
+    
+    # fit and not all parameters estimated
+    if (fit && !identical(MLEobj$convergence, 3)) {
         if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
         ## Fit and add param estimates to the object
         if (method %in% kem.methods) {
@@ -188,9 +205,8 @@ MARSS <- function(y,
       }
 
       ## Add AIC and AICc and coef to the object
-      ## Return as long as something was estimated and there are no errors, but might not be converged
-      # If all params fixed (so no fitting), convergence==3
-      if ((MLEobj$convergence %in% c(0, 1)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
+      ## Return as long as $par element and there are no errors, but might not be converged
+      if ((MLEobj$convergence %in% c(0, 1, 3, 54)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
         if (silent == 2) cat("Adding AIC and coefficients.\n")
         MLEobj <- MARSSaic(MLEobj)
         MLEobj$coef <- coef(MLEobj, type = "vector")
@@ -264,16 +280,16 @@ MARSS <- function(y,
         # apply X and Y names various X and Y related elements
         MLEobj <- MARSSapplynames(MLEobj)
       }
-    }
-    # END fit the model #################
+    # END Adding info to output #################
 
-    if ((!silent || silent == 2) & MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12, 54)) {
+    if ((!silent || silent == 2) && MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54)) {
       print(MLEobj)
     }
-    if ((!silent || silent == 2) & !(MLEobj$convergence %in% c(0, 1, 3, 10, 11, 12, 54))) {
+    if ((!silent || silent == 2) && !(MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
     } # 3 added since don't print if fit=FALSE
-    if ((!silent || silent == 2) & !fit) print(MLEobj$model)
+    if ((!silent || silent == 2) && !fit) 
+      print(MLEobj$model)
 
     return(MLEobj)
   } # end MLE methods

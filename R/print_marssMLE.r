@@ -32,12 +32,16 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
 
   if (inherits(x, "marssMLE")) { # use x to print; if print.fun returns NULL, say, nothing happens
     if (identical(what.to.print, "fit")) {
-      ## all parameters were fixed
+      ## all parameters were fixed; don't use convergence since this won't catch fixed and conv=54
       if (all(unlist(lapply(x$model$free, is.fixed)))) {
         cat("\nAll parameters were fixed so none estimated.\n")
+        cat("Log-likelihood:", x$logLik, "\n")
+        if( !identical(x$convergence, 54) ){
         cat("Expected value of the states conditioned on the model are in fit$states.\n")
         cat("Expected value of the missing data (if any) conditioned on the model are in fit$ytT.\n")
-        cat("Log-likelihood:", x$logLik, "\n")
+        }else{
+        cat("MARSSkf (the Kalman filter/smoother) returned an error with the model. No states estimates.\n")
+        }
         invisible(orig.x)
       } else {
         ## If par element present
@@ -219,6 +223,14 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
           return.obj[[what]] <- x$logLik
         }
         if (what %in% c("par.se", "par.bias", "par.upCI", "par.lowCI")) {
+          if (all(unlist(lapply(x$model$free, is.fixed)))) {
+            cat("No estimated parameters so no parameters CIs or standard errors.\n")
+            return()
+          }
+          if (x[["convergence"]] == 54) {
+            cat("No parameter CIs with Hessian possible. MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.\n")
+            return()
+          }
           if (is.null(x[[what]])) {
             if (what != "par.bias") {
               cat(paste("No ", what, " element on your marssMLE object.\nRunning MARSSparamCIs with method=hessian\n", sep = ""))

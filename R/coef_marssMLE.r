@@ -10,17 +10,21 @@ coef.marssMLE <- function(object, ..., type = "list", form = NULL, what = "par")
     stop("Stopped in coef.marssMLE() because the function needs a marssMLE object.\n", call. = FALSE)
   }
 
-  if (!(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start"))) {
+  if (!is.null(what) && !(what %in% c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start"))) {
     stop("Stopped in coef.marssMLE(): The 'what' argument must be \"par\", \"par.se\", \"par.bias\", \"par.lowCI\", \"par.upCI\", or \"start\".\n", call. = FALSE)
   }
-  if ((what %in% c("par.se", "par.bias", "par.lowCI", "par.upCI")) & !(what %in% names(object))) {
+  if (what == "par" && !(what %in% names(object))) {
+    stop("Stopped in coef.marssMLE(): marssMLE object $par element is NULL.  Parameters have not been estimated or set.
+\n", call. = FALSE)
+  }
+  if ((what %in% c("par.se", "par.bias", "par.lowCI", "par.upCI")) && !(what %in% names(object))) {
     stop("Stopped in coef.marssMLE(): The par.se and CIs have not been added to your marssMLE object. Run MARSSparamsCIs() to add.\n", call. = FALSE)
   }
 
   # for now coef only has function specific to the marssMODEL forms
   if (missing(form)) form <- attr(object[["model"]], "form")
 
-  # This will return the object with the $par element changed to a form compatable with $model
+  # This will return the object with the $par element changed to a form compatible with $model
   coef.fun <- paste("coef_", form[1], sep = "")
   tmp <- try(exists(coef.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {

@@ -28,8 +28,10 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
   \item{convergence}{ Did estimation converge successfully? 
     \describe{
       \item{convergence=0}{ Converged in less than \code{MLEobj$control$maxit} iterations and no evidence of degenerate solution. } 
+      \item{convergence=3}{ No convergence diagnostics were computed because all parameters were fixed thus no fitting required. }   
+      \item{convergence=-1}{ No convergence diagnostics were computed because the MLE object was not fit (called with fit=FALSE). This isn't a convergence error just information. There is not par element so no functions can be run with the object. }  
       \item{convergence=1}{ Maximum number of iterations \code{MLEobj$control$maxit} was reached before \code{MLEobj$control$abstol} condition was satisfied. } 
-      \item{convergence=10}{ Some of the variance elements appear to be degenerate.  T} 
+      \item{convergence=10}{ Some of the variance elements appear to be degenerate. } 
       \item{convergence=52}{ The algorithm was abandoned due to errors from the "L-BFGS-B" method.  } 
       \item{convergence=53}{ The algorithm was abandoned due to numerical errors in the likelihood calculation from \code{\link{MARSSkf}}.  If this happens with "BFGS", it can sometimes be helped with a better initial condition.  Try using the EM algorithm first (\code{method="kem"}), and then using the parameter estimates from that to as initial conditions for \code{method="BFGS"}.  } 
       \item{convergence=54}{ The algorithm successfully fit the model but the Kalman filter/smoother could not be run on the model. Consult MARSSinfo('optimerror54') for insight.  } 

@@ -38,14 +38,16 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
     \describe{
       \item{convergence=0}{ Converged in both the abstol test and the log-log plot test. }  
       \item{convergence=1}{Some of the parameter estimates did not converge (based on the log-log plot test AND abstol tests) before \code{MLEobj$control$maxit} was reached. This is not an error per se.}
+      \item{convergence=3}{ No convergence diagnostics were computed because all parameters were fixed thus no fitting required. }   
+      \item{convergence=-1}{ No convergence diagnostics were computed because the MLE object was not fit (called with fit=FALSE). This isn't a convergence error just information. There is not par element so no functions can be run with the object. }  
       \item{convergence=2}{No convergence diagnostics were computed because the MLE object had problems and was not fit. This isn't a convergence error just information.}
-      \item{convergence=3}{No convergence diagnostics were computed because the MLE object was not fit. This isn't a convergence error just information.}   
       \item{convergence=10}{Abstol convergence only. Some of the parameter estimates did not converge (based on the log-log plot test) before \code{MLEobj$control$maxit} was reached.  However \code{MLEobj$control$abstol} was reached. }
       \item{convergence=11}{Log-log convergence only. Some of the parameter estimates did not converge (based on the abstol test) before \code{MLEobj$control$maxit} was reached.  However the log-log convergence test was passed. }
       \item{convergence=12}{Abstol convergence only. Log-log convergence test was not computed because \code{MLEobj$control$maxit} was set to less than \code{control$min.iter.conv.test}. }  
       \item{convergence=13}{Lack of convergence info. Parameter estimates did not converge based on the abstol test before \code{MLEobj$control$maxit} was reached.  No log-log information since \code{control$min.iter.conv.test} is less than \code{MLEobj$control$maxit} so no log-log plot test could be done. }
       \item{convergence=42}{\code{MLEobj$control$abstol} was reached but the log-log plot test returned NAs.  This is an odd error and you should set \code{control$trace=TRUE} and look at the outputted \code{$iter.record} to see what is wrong. }
       \item{convergence=52}{The EM algorithm was abandoned due to numerical errors.  Usually this means one of the variances either went to zero or to all elements being equal.  This is not an error per se.  Most likely it means that your model is not very good for your data (too inflexible or too many parameters).  Try setting \code{control$trace=1} to view a detailed error report.}
+      \item{convergence=53}{ The algorithm was abandoned due to numerical errors in the likelihood calculation from \code{\link{MARSSkf}}.  } 
       \item{convergence=62}{The algorithm was abandoned due to errors in the log-log convergence test.  You should not get this error (it is included for debugging purposes to catch improper arguments passed into the log-log convergence test). }
       \item{convergence=63}{The algorithm was run for \code{control$maxit} iterations, \code{control$abstol} not reached, and the log-log convergence test returned errors.  You should not get this error (it is included for debugging purposes to catch improper arguments passed into the log-log convergence test).}
       \item{convergence=72}{Other convergence errors.  This is included for debugging purposes to catch misc. errors. }        
