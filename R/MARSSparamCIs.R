@@ -11,11 +11,13 @@ MARSSparamCIs <- function(MLEobj, method = "hessian", alpha = 0.05, nboot = 1000
   }
   if (!(method %in% c("hessian", "parametric", "innovations"))) stop("Stopped in MARSSparamCIs(). Current methods are hessian, parametric, innovations.\n", call. = FALSE)
   if (!(hessian.fun %in% c("Harvey1989", "fdHess", "optim"))) stop("Stopped in MARSSparamCIs(). Available functions for computing the Hessian are Harvey1989, fdHess, and optim.\n", call. = FALSE)
+  if (is.null(MLEobj[["par"]])) {
+    stop("Stopped in MARSSparamCIs(). The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
+  }
   if (MLEobj[["convergence"]] == 54 && !(method=="parametric")) {
     stop("Stopped in MARSSparamCIs(). MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
   }
   
-
   paramvec <- MARSSvectorizeparam(MLEobj)
   if (length(paramvec) == 0) stop("Stopped in MARSSparamCIs(). No estimated parameter elements.\n", call. = FALSE)
 
