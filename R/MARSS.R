@@ -178,7 +178,7 @@ MARSS <- function(y,
       MLEobj.test$kf <- kftest
     }
     # Ey is needed for method=kem
-    if (fit && MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
+    if (fit && !model.is.fixed && MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
       Eytest <- try(MARSShatyt(MLEobj.test), silent = TRUE)
       if (inherits(Eytest, "try-error")) {
         cat("Error: Stopped in MARSS() before fitting because MARSShatyt() stopped.  Something is wrong with the model structure that prevents MARSShatyt() running.\n\n")
