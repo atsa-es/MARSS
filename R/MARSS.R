@@ -105,6 +105,7 @@ MARSS <- function(y,
     }
 
     # This is a helper function to set simple inits for a marss MLE model object
+    if (silent == 2) cat("Running MARSSinits() to set start conditions.\n")
     MLEobj$start <- MARSSinits(MLEobj, MARSS.inputs$inits)
 
     class(MLEobj) <- "marssMLE"
@@ -128,9 +129,38 @@ MARSS <- function(y,
       MLEobj$convergence <- 2
       return(MLEobj)
     }
+    
+    # MLEobj is ok.
+    
+    if (!fit){
+      # will be set to 3 if all fixed
+      MLEobj$convergence <- -1
+    }
+    
+    # If all parameters fixed. Set convergence=3 whether or not fit=TRUE
+    model.is.fixed <- FALSE
+    if (all(unlist(lapply(MLEobj[["marss"]][["free"]], is.fixed)))) {
+      model.is.fixed <- TRUE
+      if (silent == 2) cat("All parameters fixed. No estimation done.\n")
+      MLEobj$convergence <- 3
+      MLEobj$par <- list()
+      for (el in attr(MLEobj[["marss"]], "par.names")) MLEobj[["par"]][[el]] <- matrix(0, 0, 1)
+      kf.out <- try(MARSSkf(MLEobj, only.logLik=TRUE), silent = TRUE)
+      if (inherits(kf.out, "try-error")){
+        MLEobj$convergence <- 53
+        MLEobj$logLik <- NA
+      }else{
+        # rest of the output will be added below
+        MLEobj$logLik <- kf.out$logLik
+        kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
+        if (inherits(kf.out, "try-error")){
+          MLEobj$convergence <- 54
+        }
+      }
+    }
 
-    # Check that Kalman filter/smoother will run
-    if (fit && MLEobj$control$trace != -1) {
+    # If fitting is needed, check that Kalman filter/smoother will run
+    if (fit && MLEobj$control$trace != -1 && !model.is.fixed) {
       MLEobj.test <- MLEobj
       MLEobj.test$par <- MLEobj$start
       kftest <- try(MARSSkf(MLEobj.test), silent = TRUE)
@@ -164,33 +194,9 @@ MARSS <- function(y,
         return(MLEobj.test)
       }
     }
-
-    if (!fit){
-      # will be set to 3 if all fixed
-      MLEobj$convergence <- -1
-    }
-
-    # All parameters fixed, whether or not fit=TRUE
-    if (all(unlist(lapply(MLEobj[["marss"]][["free"]], is.fixed)))) {
-      if (silent == 2) cat("All parameters fixed. No estimation done.\n")
-      MLEobj$convergence <- 3
-      MLEobj$par <- list()
-      for (el in attr(MLEobj[["marss"]], "par.names")) MLEobj[["par"]][[el]] <- matrix(0, 0, 1)
-      kf.out <- try(MARSSkf(MLEobj, only.logLik=TRUE), silent = TRUE)
-      if (inherits(kf.out, "try-error")){
-        MLEobj$convergence <- 53
-      }else{
-        # rest of the output will be added below
-        MLEobj$logLik <- kf.out$logLik
-        kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
-        if (inherits(kf.out, "try-error")){
-          MLEobj$convergence <- 54
-        }
-      }
-    }
     
     # fit and not all parameters estimated
-    if (fit && !identical(MLEobj$convergence, 3)) {
+    if (fit && !model.is.fixed) {
         if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
         ## Fit and add param estimates to the object
         if (method %in% kem.methods) {
