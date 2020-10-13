@@ -37,7 +37,8 @@ MARSSharveyobsFI <- function(MLEobj) {
   I.n <- diag(1, n)
 
   # Get the Kalman filter elements
-  kf <- MARSSkfss(MLEobj) # kfss needed to get Sigma
+  kf <- try(MARSSkfss(MLEobj), silent=TRUE) # kfss needed to get Sigma
+  if( inherits(kf, "try-error")) stop("Stopped in MARSSharveyobsFI(). MARSSkfss does not run for this model. Try a numerical Hessian?", call.=FALSE)
   xtt <- kf$xtt
   xtt1 <- kf$xtt1
   Vtt <- kf$Vtt
