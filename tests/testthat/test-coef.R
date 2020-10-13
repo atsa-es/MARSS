@@ -17,6 +17,18 @@ fits[[6]] <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, 
 i <- model.list$`GDP1`
 fits[[7]] <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, method = "BFGS")
 
+type <- c("list", "vector", "matrix")
+for(val in type){
+  
+  for(i in c(1:2, 4:5, 7)){
+    fit <- fits[[i]]
+      p1 <- try(coef(fit, type=val))
+      test_that(paste("coef type", i, val), {
+        expect_true(!inherits(p1, "try-error"))
+      })
+  }
+}
+
 what <- c("par", "par.se", "par.bias", "par.lowCI", "par.upCI", "start")
   
 for(val in what){
