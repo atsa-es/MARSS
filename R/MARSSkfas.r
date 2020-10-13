@@ -178,7 +178,8 @@ MARSSkfas <- function(MLEobj, only.logLik = FALSE, return.lag.one = TRUE, return
   if (!diffuse) kfas.model$tol <- 0 # per J Helske to turn of machine tol adjustment.
 
   if (only.logLik) {
-    return(list(logLik = logLik(kfas.model)))
+    if(!return.kfas.model) return(list(logLik = logLik(kfas.model)))
+    if(return.kfas.model) return(list(logLik = logLik(kfas.model), kfas.model=kfas.model))
   }
   # This works because I do not allow the location of 0s on the diagonal of R or Q to be time-varying
   if (n == 1) {
