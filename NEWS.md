@@ -23,6 +23,7 @@ ENHANCEMENTS
 * Stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
 * Allow data, covariates and newdata to be a ts object. model.tsp attribute added to model and marss elements of marssMLE object and this information used for plotting and for `t` column in fitted, residuals and tsSmooth output.
 * Add `xtt` and `Vtt` to `MARSSkfas()` to avoid `MARSSkfss()` calls when unnecessary.
+* Added graceful exiting for various functions for marssMLE objects without a par element. This occurs when `MARSS()` was run with `fit=FALSE`. Added graceful exiting for `MARSSparamCIs()` when model is fixed and thus no parameters estimated.
 
 BUGS
 
@@ -30,12 +31,13 @@ BUGS
 * `MARSSkfas()` did not recognize if H was time-varying.
 * No ACF should be plotted for state smoothation residuals. Fix to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * `marssMLE$fun.kf` was not always being passed to `MARSShatyt()` so it didn't necessarily use the function requested by the user.
-* `coef.marssMLE()` would not allow you to change type to, say, `par.se`.
+* `coef.marssMLE()` would not allow you to change what to, say, `par.se`.
+* `print.marssMLE()` would not work properly if all the parameters were fixed or `MARSS()` was run with `fit=FALSE`.
 
 DOCUMENTATION
 * Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts.
 * Added information on how to get CIs on rotated loadings to DFA chapter.
-* Cleaned up MARSSkf.Rd sections on initial conditions.
+* Cleaned up MARSSkf.Rd sections on initial conditions and cleaned up equation formatting so looks better in pdf format.
 * Added section on normalization calculations to Residuals.Rnw.
 
 MARSS 3.11.1 (released 2020-08-25 on CRAN)
