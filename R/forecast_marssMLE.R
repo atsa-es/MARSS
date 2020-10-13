@@ -20,6 +20,9 @@ forecast.marssMLE <- function(object, h = 10,
   if (is.null(object[["par"]])) {
     stop("forecast.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
+  if (identical(object[["convergence"]], 54)) {
+    stop("forecast.marssMLE: MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+  }
   if (length(level) > 0 && (!is.numeric(level) || any(level > 1) || any(level < 0))) {
     stop("forecast.marssMLE: level must be between 0 and 1.", call. = FALSE)
   }

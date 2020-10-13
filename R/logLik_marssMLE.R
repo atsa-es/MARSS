@@ -3,7 +3,7 @@
 ##############################################################################################################################################
 logLik.marssMLE <- function(object, ...) {
   if (is.null(object$par)) {
-    stop("The marssMLE object does not have the par element.  Most likely the model has not been fit.")
+    stop("logLik.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call.=FALSE)
   }
 
   val <- MARSSkf(object, only.logLik = TRUE, return.lag.one = FALSE)$logLik # don't use obj info, recompute ==> object$logLik

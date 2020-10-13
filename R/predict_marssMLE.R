@@ -26,6 +26,9 @@ predict.marssMLE <- function(object, n.ahead = 0,
   if (is.null(object[["par"]])) {
     stop("predict.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
   }
+  if (identical(object[["convergence"]], 54)) {
+    stop("predict.marssMLE: MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+  }
   if (interval == "none") level <- c()
   if (length(level) > 0 && (!is.numeric(level) || any(level > 1) || any(level < 0))) {
     stop("predict.marssMLE: level must be between 0 and 1.", call. = FALSE)
