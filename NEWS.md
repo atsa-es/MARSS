@@ -29,6 +29,7 @@ BUGS
 
 * In `KFS()`, a tolerance correction affected the log-likelihood value when R was below square root of machine tolerance or condition number was very high (if R non-diagonal). This created a large (incorrect) jump in the log-likelihood. This would be reported with a warning that the log-likelihood dropped if using the EM algorithm. Solution was to set the tolerance to 0 in the KFAS model in `MARSSkfas()`. Note this did not happen for all cases of small R and a warning would have been generated alerting the user to a problem.
 * `MARSSkfas()` did not recognize if H was time-varying.
+* If model in `MARSS()` call was a marssMLE or marssMODEL object, the tinitx and diffuse elements were not being passed in, only the parameter matrices.
 * No ACF should be plotted for state smoothation residuals. Fix to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * `marssMLE$fun.kf` was not always being passed to `MARSShatyt()` so it didn't necessarily use the function requested by the user.
 * `coef.marssMLE()` would not allow you to change what to, say, `par.se`.
