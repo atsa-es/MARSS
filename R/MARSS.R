@@ -31,14 +31,13 @@ MARSS <- function(y,
   } else {
     model.tsp <- c(1, ncol(y), 1)
   }
-  attr(y, "model.tsp") <- model.tsp
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
 
-  if (inherits(model, "marssMLE")) model <- coef(model, type = "matrix")
-  if (inherits(model, "marssMODEL")) model <- marssMODEL.to.list(model)
+  if (inherits(model, "marssMLE")) model <- c(coef(model, type = "matrix"), tinitx=model$model$tinitx, diffuse=model$model$diffuse)
+  if (inherits(model, "marssMODEL")) model <- c(marssMODEL.to.list(model), tinitx=model$tinitx, diffuse=model$diffuse)
 
-  MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, ...)
+  MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, model.tsp = model.tsp, ...)
 
   # First make sure specified equation form has a corresponding function to do the conversion to marssMODEL (form=marss) object
   as.marss.fun <- paste("MARSS.", form[1], sep = "")
