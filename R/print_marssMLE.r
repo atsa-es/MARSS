@@ -61,6 +61,11 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
     return()
   }
   ##### End error-checking on 'what'
+
+  # Set up what to return
+  return.obj <- list()
+  what.to.print <- what
+  orig.x <- x
   
   ## Run the print_form function to put x$par in the correct form
   if (is.null(form)) { # allow user to print using a different form than x$model form
@@ -75,11 +80,6 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   } else {
     x <- print_null(x)
   } # if print_form is missing use print_marss
-  
-  # Set up what to return
-  return.obj <- list()
-  what.to.print <- what
-  orig.x <- x
   
   if (identical(what.to.print, "fit")) {
     if (silent) return(orig.x) else invisible(orig.x)

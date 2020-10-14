@@ -32,7 +32,7 @@ BUGS
 * No ACF should be plotted for state smoothation residuals. Fix to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * `marssMLE$fun.kf` was not always being passed to `MARSShatyt()` so it didn't necessarily use the function requested by the user.
 * `coef.marssMLE()` would not allow you to change what to, say, `par.se`.
-* `print.marssMLE()` would not work properly if all the parameters were fixed or `MARSS()` was run with `fit=FALSE`.
+* `print.marssMLE()` and `coef.marssMLE()` would fail ungracefully if all the parameters were fixed or `MARSS()` was run with `fit=FALSE`.
 
 DOCUMENTATION
 * Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts.
