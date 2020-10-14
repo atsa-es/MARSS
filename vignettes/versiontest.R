@@ -146,11 +146,13 @@ for(unittestfile in unittestfiles){
   good=rep(TRUE,length(names(testNew)))
   for(ii in 1:length(names(testNew))){
     if(inherits(testNew[[ii]], "marssMLE")){
+      attr(testNew[[ii]][["call"]][["data"]], "model.tsp") <- NULL
       for(kk in c("model", "marss")){
         attr(testNew[[ii]][[kk]], "equation") <- NULL
         attr(testOld[[ii]][[kk]], "equation") <- NULL
       }
       if(inherits(testNew[[ii]]$call$inits, "marssMLE")){
+        attr(testNew[[ii]][["call"]][["inits"]][["call"]][["data"]], "model.tsp") <- NULL
         for(kk in c("model", "marss")){
           attr(testNew[[ii]]$call$inits[[kk]], "equation") <- NULL
           attr(testOld[[ii]]$call$inits[[kk]], "equation") <- NULL
@@ -175,11 +177,13 @@ for(unittestfile in unittestfiles){
             attr(testOld[[ii]][[iii]]$terms, ".Environment") <- NULL
           }
           if(inherits(testNew[[ii]][[iii]], "marssMLE")){
-          for(kk in c("model", "marss")){
+            attr(testNew[[ii]][[iii]][["call"]][["data"]], "model.tsp") <- NULL
+            for(kk in c("model", "marss")){
             attr(testNew[[ii]][[iii]][[kk]], "equation") <- NULL
             attr(testOld[[ii]][[iii]][[kk]], "equation") <- NULL
           }
           if(inherits(testNew[[ii]][[iii]]$call$inits, "marssMLE")){
+            attr(testNew[[ii]][[iii]][["call"]][["inits"]][["call"]][["data"]], "model.tsp") <- NULL
             for(kk in c("model", "marss")){
               attr(testNew[[ii]][[iii]]$call$inits[[kk]], "equation") <- NULL
               attr(testOld[[ii]][[iii]]$call$inits[[kk]], "equation") <- NULL
