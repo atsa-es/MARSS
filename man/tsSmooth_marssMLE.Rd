@@ -18,7 +18,7 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
 \method{tsSmooth}{marssMLE}(object, 
     type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1"),
     interval = c("none", "confidence", "prediction"),
-    level = 0.95, ...)
+    level = 0.95, fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
 }
 \arguments{
   \item{object}{A \code{\link{marssMLE}} object.}
@@ -29,6 +29,8 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
 
   \item{level}{ Confidence level. alpha=1-level }
  
+  \item{fun.kf}{ By default, \code{tsSmooth()} will use the Kalman filter/smoother function in \code{object$fun.kf} (either \code{\link{MARSSkfas}()} or \code{\link{MARSSkfss}()}). You can pass in \code{fun.kf} to force a particular Kalman filter/smoother function to be used. }
+  
   \item{...}{Optional arguments.  If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not the Z matrix).}
 
 }

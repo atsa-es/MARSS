@@ -15,7 +15,8 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),   
     interval = c("none", "confidence", "prediction"), 
     level = 0.95,
-    output = c("data.frame", "matrix"))
+    output = c("data.frame", "matrix"),
+    fun.kf = c("MARSSkfas", "MARSSkfss"))
   }
   \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
@@ -23,6 +24,7 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
   \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence interval of the predicted value is returned. If \code{interval="prediction"}, then the standard deviation and prediction interval of new data or states are returned. }
   \item{level}{ Level for the intervals if \code{interval} is not equal to \code{"none"}.}
   \item{output}{ data frame or list of matrices}
+  \item{fun.kf}{ By default, \code{tsSmooth()} will use the Kalman filter/smoother function in \code{object$fun.kf} (either \code{\link{MARSSkfas}()} or \code{\link{MARSSkfss}()}). You can pass in \code{fun.kf} to force a particular Kalman filter/smoother function to be used. }
   \item{...}{ Not used. }
   }
 \value{

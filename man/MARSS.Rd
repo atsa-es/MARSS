@@ -27,7 +27,7 @@ MARSS(y,
     fit=TRUE, 
     silent = FALSE,
     control = NULL,
-    fun.kf = "MARSSkfas",
+    fun.kf = c("MARSSkfas", "MARSSkfss"),
     ...) 
 }
 

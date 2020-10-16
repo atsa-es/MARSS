@@ -11,6 +11,9 @@ fitted.marssMLE <- function(object, ...,
   interval <- match.arg(interval)
   conditioning <- substring(type, 3)
   type <- substr(type, 1, 1)
+  # Allow user to force a particular KF function
+  if(!missing(fun.kf)) object[["fun.kf"]] <- match.arg(fun.kf)
+
   MLEobj <- object
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
