@@ -25,7 +25,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   
   # No output for these if model was not fit
   what.vals <- c("fit", "start", "inits", "par", "logLik", "paramvector", "par.se", "par.bias", "par.upCI", "par.lowCI", "xtT", "states", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis", names(x$model$fixed))
-  if( is.null(x$par) && what %in% what.vals){
+  if( is.null(x$par) && any(what %in% what.vals)){
     if( silent ) return()
     cat("marssMLE object $par element is NULL.  Parameters have not been estimated.\n")
     if (x$convergence == 2) {
@@ -48,7 +48,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   
   # No params estimated
   what.vals <- c("paramvector", "start", "inits", "par.se", "par.bias", "par.upCI", "par.lowCI")
-  if (what %in% what.vals && all(unlist(lapply(x$model$free, is.fixed)))) {
+  if ( any(what %in% what.vals) && all(unlist(lapply(x$model$free, is.fixed)))) {
     if( !silent ) cat("No estimated parameters so no paramvector, parameters CIs or standard errors.\n")
     return()
   }
@@ -56,7 +56,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   # Set up error message
   conv54msg <- "No parameter CIs with Hessian, Kalman filter/smoother output or residuals calculations possible because MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.\n"
   what.vals <- c("par.se", "par.bias", "par.upCI", "par.lowCI", "xtT", "states", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis")
-  if (what %in% what.vals && identical(x$convergence, 54)) {
+  if ( any(what %in% what.vals) && identical(x$convergence, 54)) {
     if ( !silent ) cat(conv54msg)
     return()
   }
