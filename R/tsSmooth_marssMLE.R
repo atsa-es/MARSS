@@ -6,10 +6,12 @@
 tsSmooth.marssMLE <- function(object,
                               type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1"),
                               interval = c("none", "confidence", "prediction"),
-                              level = 0.95, ...) {
+                              level = 0.95, fun.kf = c("MARSSkfas", "MARSSkfss"), ...) {
   ## Argument checking
   type <- match.arg(type)
   interval <- match.arg(interval)
+  # Allow user to force a particular KF function
+  if(!missing(fun.kf)) object[["fun.kf"]] <- match.arg(fun.kf)
   form <- attr(object[["model"]], "form")[1]
   if (interval == "prediction" && type != "ytT") {
     stop("tsSmooth.marssMLE: prediction intervals are only available for ytT.")
@@ -61,9 +63,8 @@ tsSmooth.marssMLE <- function(object,
 
     states <- kfss[[xtype]]
     vtype <- paste0("V", substr(xtype, 2, nchar(type)))
-    states.se <- apply(kfss[[vtype]], 3, function(x) {
-      takediag(x)
-    })
+    states.se <- apply(kfss[[vtype]], 3, function(x) takediag(x) )
+    states.se[states.se < 0 & states.se > -1*sqrt(.Machine$double.eps)] <- 0
     states.se[states.se < 0] <- NA
     states.se <- sqrt(states.se)
     if (mm == 1) states.se <- matrix(states.se, 1, TT)
