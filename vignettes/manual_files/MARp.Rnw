@@ -94,11 +94,11 @@ Comparison to the true values shows the estimates are close:
 <<Cs_104_ar2-fit>>=
 print(cbind(true = true.2[2:4], estimates = coef(ar2, type = "vector")))
 @
-Missing values in the data are fine.  Let's make half the data missing being careful that the first data point does not get categorized as missing:
+Missing values in the data are fine.  Let's make half the data missing being careful that the first data point does not get categorized as missing. \verb@MARSSkfss()@ is used as the Kalman filter/smoother function as this is a model where \verb@MARSSkfas()@ can return negative values on the states variance-covariance matrix.
 <<Cs_105_ar2-gappy, results=hide>>=
 gappy.data <- sim.ar2[3:TT]
 gappy.data[floor(runif(TT / 2, 2, TT))] <- NA
-ar2.gappy <- MARSS(gappy.data, model = model.list.2)
+ar2.gappy <- MARSS(gappy.data, model = model.list.2, fun.kf="MARSSkfss")
 @
 And the estimates are still close:
 <<Cs_106_ar2-gappy>>=
