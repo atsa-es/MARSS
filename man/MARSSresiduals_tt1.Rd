@@ -53,15 +53,15 @@ where \eqn{\tilde{\mathbf{x}}_{t+1}^{t+1}}{xtt[,t+1]} is the Kalman filter estim
 The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals (except for the last time step) as an estimate of the state exists whether or not there are associated data.
 
 \code{res1} and \code{res2} in the code below will be the same.
-\preformatted{dat = t(harborSeal)[2:3,]
-TT = ncol(dat)
-fit = MARSS(dat)
-B = coef(fit, type="matrix")$B
-U = coef(fit, type="matrix")$U
+\preformatted{dat <- t(harborSeal)[2:3,]
+TT <- ncol(dat)
+fit <- MARSS(dat)
+B <- coef(fit, type="matrix")$B
+U <- coef(fit, type="matrix")$U
 xt <- MARSSkfss(fit)$xtt[,1:(TT-1)] # t 1 to TT-1
 xtp1 <- MARSSkfss(fit)$xtt[,2:TT] # t 2 to TT
-res1 = xtp1 - B \%*\% xt - U \%*\% matrix(1,1,TT-1)
-res2 = MARSSresiduals(fit, type="tt1")$state.residuals
+res1 <- xtp1 - B \%*\% xt - U \%*\% matrix(1,1,TT-1)
+res2 <- MARSSresiduals(fit, type="tt1")$state.residuals
 }
 
 \strong{Joint residual variance}

@@ -119,21 +119,21 @@ plot(fr, ylim=c(8,12))
 
 
 # Covariate example
-fulldat = lakeWAplanktonTrans
-years = fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
-dat = t(fulldat[years,c("Greens", "Bluegreens")])
-dat = zscore(dat)
-covariates = rbind(
-  Temp = fulldat[years,"Temp"],
-  TP = fulldat[years,"TP"])
-covariates = zscore(covariates)
-A = U = "zero"
-B = Z = "identity"
-R = diag(0.16,2)
-Q = "equalvarcov"
-C = "unconstrained"
-model.list = list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=covariates)
-fit = MARSS(dat, model=model.list)
+fulldat <- lakeWAplanktonTrans
+years <- fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
+dat <- t(fulldat[years,c("Greens", "Bluegreens")])
+dat <- zscore(dat)
+covariates <- rbind(
+  Temp = fulldat[years, "Temp"],
+  TP = fulldat[years, "TP"])
+covariates <- zscore(covariates)
+A <- U <- "zero"
+B <- Z <- "identity"
+R <- diag(0.16,2)
+Q <- "equalvarcov"
+C <- "unconstrained"
+model.list <- list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=covariates)
+fit <- MARSS(dat, model=model.list)
 
 # Use a new c (covariate) and the first 10 time steps of model data
 fr <- predict(fit,  newdata=list(c=matrix(5,2,10)), x0="use.model")
