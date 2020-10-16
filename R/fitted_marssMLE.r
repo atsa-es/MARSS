@@ -5,7 +5,8 @@ fitted.marssMLE <- function(object, ...,
                             type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
                             level = 0.95,
-                            output = c("data.frame", "matrix")) {
+                            output = c("data.frame", "matrix"),
+                            fun.kf = c("MARSSkfas", "MARSSkfss")) {
   type <- match.arg(type)
   output <- match.arg(output)
   interval <- match.arg(interval)
