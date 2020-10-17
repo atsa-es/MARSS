@@ -39,8 +39,8 @@ This function returns the conditional expected value (mean) and variance of the 
 \eqn{\mathbf{v}_t}{v(t)} is the difference between the data and the predicted data at time \eqn{t} given \eqn{\mathbf{x}_t}{x(t)}:
 \deqn{ \mathbf{v}_t = \mathbf{y}_t - \mathbf{Z} \mathbf{x}_t - \mathbf{a} - \mathbf{d}\mathbf{d}_{t}}{ v(t) = y(t) - Z x(t) - a - D d(t)}
 The observed model residuals \eqn{\hat{\mathbf{v}}_t}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tt} fits the model using the data up to time \eqn{t}. So
-\deqn{ \hat{\mathbf{v}}_t = \mathbf{y}_t - \mathbf{Z}\tilde{\mathbf{x}}_t^{t} - \mathbf{a} - \mathbf{D}\mathbf{d}_{t}}{ hatv(t) = y(t) - Z xtt - a - D d(t)}
-where \eqn{\tilde{\mathbf{x}}_t^{t}}{xtt} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data from 1 to \eqn{t} from the Kalman filter. \eqn{\mathbf{y}_t}{y(t)} are your data and missing values will appear as NA. These will be returned in \code{residuals}.
+\deqn{ \hat{\mathbf{v}}_t = \mathbf{y}_t - \mathbf{Z}\mathbf{x}_t^{t} - \mathbf{a} - \mathbf{D}\mathbf{d}_{t}}{ hatv(t) = y(t) - Z xtt - a - D d(t)}
+where \eqn{\mathbf{x}_t^{t}}{xtt(t)} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data from 1 to \eqn{t} from the Kalman filter. \eqn{\mathbf{y}_t}{y(t)} are your data and missing values will appear as NA. These will be returned in \code{residuals}.
 
 \code{var.residuals} returned by the function is the conditional variance of the residuals conditioned on the data up to \eqn{t} and the parameter set \eqn{\Theta}{Theta}.  The conditional variance is 
 \deqn{ \hat{\Sigma}_t = \mathbf{R}+\mathbf{Z} \mathbf{V}_t^{t} \mathbf{Z}^\top }{hatSigma(t) = R + Z Vtt t(Z)}

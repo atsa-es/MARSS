@@ -19,7 +19,7 @@ MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE,
 \value{
 A list with the following components  
   \item{model.residuals}{ The the observed one-step-ahead model residuals: data minus the model predictions conditioned on the data 1 to t-1. These are termed innovations. A n x T matrix. NAs will appear where the data are missing. }
-  \item{state.residuals}{ The one-step-ahead state residuals \eqn{ \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} }{ xt+1t+1 - B xtt - u}
+  \item{state.residuals}{ The one-step-ahead state residuals \eqn{ \mathbf{x}_{t+1}^{t+1} - \mathbf{B}\mathbf{x}_{t}^t - \mathbf{u} }{ xtt(t+1) - B xtt(t) - u}
 . Note, state residual at time \eqn{t} is the transition from time \eqn{t} to \eqn{t+1}. }
   \item{residuals}{ The residuals conditioned on the observed data up to time \eqn{t-1}. Returned as a (n+m) x T matrix with \code{model.residuals} in rows 1 to n and \code{state.residuals} in rows n+1 to n+m.  NAs will appear in rows 1 to n in the places where data are missing. }
   \item{var.residuals}{ The joint variance of the one-step-ahead residuals. Returned as a n+m x n+m x T matrix. }
@@ -40,16 +40,16 @@ This function returns the conditional expected value (mean) and variance of the 
 \eqn{\mathbf{v}_t}{v_t} is the difference between the data and the predicted data at time \eqn{t} given \eqn{\mathbf{x}_t}{x_t}:
 \deqn{ \mathbf{v}_t = \mathbf{y}_t - \mathbf{Z} \mathbf{x}_t - \mathbf{a} - \mathbf{D}\mathbf{d}_t}{ v(t) = y(t) - Z x(t) - a - D d(t)}
 The observed model residuals \eqn{\hat{\mathbf{v}}_t}{hatv(t)} are the difference between the observed data and the predicted data at time \eqn{t} using the fitted model. \code{MARSSresiduals.tt1} fits the model using the data up to time \eqn{t-1}. So
-\deqn{ \hat{\mathbf{v}}_t = \mathbf{y}_t - \mathbf{Z}\tilde{\mathbf{x}}_t^{t-1} - \mathbf{a}  - \mathbf{D}\mathbf{d}_t}{ hatv(t) = y(t) - Z xtt1 - a - D d(t)}
-where \eqn{\tilde{\mathbf{x}}_t^{t-1}}{xtt1} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data from 1 to \eqn{t-1} from the Kalman filter. \eqn{\mathbf{y}_t}{y(t)} are your data and missing values will appear as NA. 
+\deqn{ \hat{\mathbf{v}}_t = \mathbf{y}_t - \mathbf{Z}\mathbf{x}_t^{t-1} - \mathbf{a}  - \mathbf{D}\mathbf{d}_t}{ hatv(t) = y(t) - Z xtt1(t) - a - D d(t)}
+where \eqn{\mathbf{x}_t^{t-1}}{xtt1(t)} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data from $t=1$ to \eqn{t-1} from the Kalman filter. \eqn{\mathbf{y}_t}{y(t)} are your data and missing values will appear as NA. 
 
 \strong{State residuals}
 
 \eqn{\mathbf{w}_{t+1}}{w(t+1)} are the difference between the state at time \eqn{t+1} and the expected value of the state at time \eqn{t+1} given the state at time \eqn{t}:
 \deqn{ \mathbf{w}_{t+1} = \mathbf{x}_{t+1} - \mathbf{B} \mathbf{x}_{t} - \mathbf{u}  - \mathbf{C}\mathbf{c}_{t+1}}{ w(t+1) = x(t+1) - B x(t) - u - C c(t+1)}
 The estimated state residuals \eqn{\hat{\mathbf{w}}_{t+1}}{hatw(t+1)} are the difference between estimate of \eqn{\mathbf{x}_{t+1}}{x(t+1)} minus the estimate using \eqn{\mathbf{x}_{t}}{x(t)}. 
-\deqn{ \hat{\mathbf{w}}_{t+1} = \tilde{\mathbf{x}}_{t+1}^{t+1} - \mathbf{B}\tilde{\mathbf{x}}_{t}^t - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtt[,t+1] - B xtt[,t] - u - C c(t+1)}
-where \eqn{\tilde{\mathbf{x}}_{t+1}^{t+1}}{xtt[,t+1]} is the Kalman filter estimate of the states at time \eqn{t+1} conditioned on the data up to time \eqn{t+1} and \eqn{\tilde{\mathbf{x}}_{t}^t}{xtt} is the Kalman filter estimate of the states at time \eqn{t} conditioned on the data up to time \eqn{t}.
+\deqn{ \hat{\mathbf{w}}_{t+1} = \mathbf{x}_{t+1}^{t+1} - \mathbf{B}\mathbf{x}_{t}^t - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtt(t+1) - B xtt(t) - u - C c(t+1)}
+where \eqn{\mathbf{x}_{t+1}^{t+1}}{xtt(t+1)} is the Kalman filter estimate of the states at time \eqn{t+1} conditioned on the data up to time \eqn{t+1} and \eqn{\mathbf{x}_{t}^t}{xtt(t)} is the Kalman filter estimate of the states at time \eqn{t} conditioned on the data up to time \eqn{t}.
 The estimated state residuals \eqn{\mathbf{w}_{t+1}}{w(t+1)} are returned in \code{state.residuals} and rows \eqn{n+1} to \eqn{n+m} of \code{residuals}. \code{state.residuals[,t]} is \eqn{\mathbf{w}_{t+1}}{w(t+1)} (notice time subscript difference). There are no NAs in the estimated state residuals (except for the last time step) as an estimate of the state exists whether or not there are associated data.
 
 \code{res1} and \code{res2} in the code below will be the same.
