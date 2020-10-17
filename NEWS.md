@@ -11,35 +11,41 @@ MARSS 3.11.3 (master on GitHub)
 
 ENHANCEMENTS
 
-* Beginning to add testthat tests to the package. These are set with `skip_on_cran()` as they are for internal testing. 
+* Addition of tests directory to the package. These are set with `skip_on_cran()` as they are for internal testing.
+* Addition of a KFAS chapter which is mainly a testing chapter. All variants of model and state residuals computed by the KFAS package are compared to the residuals produced by MARSS. Similarly the StructTS chapter is mainly a testing chapter which compares output for StructTS objects to the equivalent output for marssMLE objects. The tests in these chapters are repeated in the tests directory.
 
 
 MARSS 3.11.2 (released 2020-10-02 on GitHub)
 ------------------------------------
-This is an update to make the testing and output (plots, residuals, tsSmooth, fitted) less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` which can become ill-conditioned thus preventing inversion. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for certain variance matrices with very high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+This is an update is focused on graceful exiting for models that report errors due to ill-conditioned variance matrices or for models with fixed parameters. The testing and output (plots, residuals, tsSmooth, fitted) was made less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` and which can become ill-conditioned and report an error. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for variance matrices with extremely high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
 
 ENHANCEMENTS
 
 * Stop all `MARSSkfss()` calls when `trace=-1`. `MARSSkfss()` is used for error checks (because it has verbose information to indicate model problems) but because it uses matrix inversions, it will stop models from being fit just because they cannot be run through `MARSSkfss()` even if they run fine with `MARSSkfas()`, which doesn't use these matrix inversions.
 * Allow data, covariates and newdata to be a ts object. model.tsp attribute added to model and marss elements of marssMLE object and this information used for plotting and for `t` column in fitted, residuals and tsSmooth output.
 * Add `xtt` and `Vtt` to `MARSSkfas()` to avoid `MARSSkfss()` calls when unnecessary.
-* Added graceful exiting for various functions for marssMLE objects without a par element. This occurs when `MARSS()` was run with `fit=FALSE`. Added graceful exiting for `MARSSparamCIs()` when model is fixed and thus no parameters estimated.
+* Added graceful exiting for various functions for marssMLE objects without a par element. This occurs when `MARSS()` was run with `fit=FALSE`. 
+* Added graceful exiting for `MARSSparamCIs()` when model is fixed and thus no parameters estimated.
+* Add alert when there are negative values on the diagonal of `VtT` which sometimes happens for `MARSSkfas()`. Give user helpful suggestions for switching the Kalman filter/smoother function.
 
 BUGS
 
 * In `KFS()`, a tolerance correction affected the log-likelihood value when R was below square root of machine tolerance or condition number was very high (if R non-diagonal). This created a large (incorrect) jump in the log-likelihood. This would be reported with a warning that the log-likelihood dropped if using the EM algorithm. Solution was to set the tolerance to 0 in the KFAS model in `MARSSkfas()`. Note this did not happen for all cases of small R and a warning would have been generated alerting the user to a problem.
 * `MARSSkfas()` did not recognize if H was time-varying.
 * If model in `MARSS()` call was a marssMLE or marssMODEL object, the tinitx and diffuse elements were not being passed in, only the parameter matrices.
-* No ACF should be plotted for state smoothation residuals. Fix to `plot.marssMLE()` and `autoplot.marssMLE()`.
+* No ACF should be plotted for state smoothation residuals (smoothation residuals are not temporally uncorrelated). Fix applied to `plot.marssMLE()` and `autoplot.marssMLE()`.
 * `marssMLE$fun.kf` was not always being passed to `MARSShatyt()` so it didn't necessarily use the function requested by the user.
-* `coef.marssMLE()` would not allow you to change what to, say, `par.se`.
+* `coef.marssMLE()` did not change what to, say, `par.se` if `type` passed in so `coef(fit, what="par.lowCI", type="Z")` returned `coef(fit, type="Z")`.
 * `print.marssMLE()` and `coef.marssMLE()` would fail ungracefully if all the parameters were fixed or `MARSS()` was run with `fit=FALSE`.
 
 DOCUMENTATION
-* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts.
+* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts. Added notation definitions to the Kalman smoother algorithm section for `xtt` and `xtt1` etc.
 * Added information on how to get CIs on rotated loadings to DFA chapter.
 * Cleaned up MARSSkf.Rd sections on initial conditions and cleaned up equation formatting so looks better in pdf format.
 * Added section on normalization calculations to Residuals.Rnw.
+
+OTHER
+* If `tinitx=1`, then `Vtt1T[,,1]` does not exist. Replaced `Vtt1T[,,1]` with NA instead of 0 in this case. Note `Vtt1T[,,1]` would never be used in this case as `V10T` is used instead however a value of 0 is not correct. The value is does not exist so NA is the correct value.
 
 MARSS 3.11.1 (released 2020-08-25 on CRAN)
 ------------------------------------
@@ -62,6 +68,7 @@ ENHANCEMENTS
 BUGS
 
 * This bug affected `residuals()` in cases where R=0. In v 3.10.12, I introduced a bug into `MARSSkfss()` for cases where R has 0s on diagonal. **History**: To limit propagation of numerical errors when R=0, the row/col of Vtt for the fully determined x need to be set to 0. In v 3.10.11 and earlier, my algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. This bug (in < 3.10.12) only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a utility function `fully.spec.x()`. This returns the x that are fully determined by the data. There was a bug in these corrections which made `MARSSkfss()$xtT` wrong whenever there were 0s on diagonal of R. This would show up in `residuals()` since that was using `MARSSkfss()` (in order to get some output that `MARSSkfas()` doesn't provide.) The problem was `fully.spec.x()`. It did not recognize when Z.R0 (the Z for the R=0) was all 0 for an x and thus was not (could not be) fully specified by the data. Fix was simple check that colSums of Z.R0 was not all 0.
+* `MARSSresiduals.tt1()` was reporting the smoothations instead of innovations residuals so reporting same model residuals as `MARSSresiduals.tT()`.
 * When computing the Cholesky standardized residuals, the lower triangle of the Cholesky decomposition should be used so that the residuals are standardized to a variance of 1. `base::chol()` returns the upper triangle. Thus the lines in `MARSSresiduals.tT()` and `MARSSresiduals.tt1()` that applied the standardization need `t(chol())`.
 * `trace=1` would fail because `MARSSapplynames()` did not recognize that `kf$xtt` and `kf$Innov` were a message instead of a matrix. I had changed the `MARSSkfas()` behavior to not return these due to some questions about the values returned by the KFAS function.
 * `is.validvarcov()` used eigenvalues >= 0 as passing positive-definite test. Should be strictly positive so > 0.
