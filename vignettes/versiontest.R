@@ -32,6 +32,7 @@ lib.old <- Sys.getenv("R_LIBS_USER")
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
 # Mac: install.packages("~/Dropbox/MARSS_3.10.14.tar.gz", lib=lib.old, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.1.tar.gz", lib=lib.old, repos=NULL)
 # Mac: install.packages("~/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
 # Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
 
@@ -113,9 +114,9 @@ for(unittestfile in unittestfiles){
   sink(paste("outputOld-",tag,".txt",sep=""))
   set.seed(10)
   testfile <- unittestfile
-  if(unittestvrs=="3.10.14" && tag=="Chapter_DFA"){
+  if(unittestvrs=="3.10.14" && tag %in% c("Chapter_DFA")){
     con <- file(unittestfile)
-    sourcercode <- readLines(file(unittestfile))
+    sourcercode <- readLines(con)
     close(con)
     sourcercode <- str_replace(sourcercode, '"tT', '"smoothations')
     sourcercode <- str_replace(sourcercode, 'name==', 'type==')
@@ -125,11 +126,12 @@ for(unittestfile in unittestfiles){
     close(con)
     rm(sourcercode, con)
   }
-  if(unittestvrs=="3.10.14" && tag=="Chapter_SealTrend"){
+  if(unittestvrs=="3.10.14" && tag %in% c("Chapter_SealTrend", "Chapter_StructuralBreaks")){
     con <- file(unittestfile)
     sourcercode <- readLines(con)
     close(con)
     sourcercode <- str_replace(sourcercode, 'type = \"tt1\"', 'conditioning = \"t-1\"')
+    sourcercode <- str_replace(sourcercode, 'type = \"tT\"', 'conditioning = \"T\"')
     sourcercode <- str_replace(sourcercode, '[$]model[.]residuals', '$residuals')
     con <- file('testfile.R')
     writeLines(sourcercode, con)
@@ -172,7 +174,10 @@ detach("package:MARSS", unload=TRUE)
 
 #Now start comparing the lists made using different versions of MARSS
 cat("\n\nStarting object comparisons\n")
-idfun <- function(x, y){ isTRUE(all.equal(x, y)) }
+# for 3.10.14 since many attribute diffs
+idfun <- function(x, y){ isTRUE(all.equal(x, y, check.attributes = FALSE)) }
+# for 3.11.1
+#idfun <- function(x, y){ identical(x, y) }
 for(unittestfile in unittestfiles){
   #Get the file name
   tag=strsplit(unittestfile,"/")[[1]]
@@ -272,11 +277,13 @@ for(unittestfile in unittestfiles){
           }
         }
         for(iii in names(testNew[[ii]])){
+          if (!(iii %in% names(testOld[[ii]]))) {
+            cat("Warning:", names(testNew)[ii],iii,"not in testOld.\n")
+          } else {
           if(!idfun(testNew[[ii]][iii], testOld[[ii]][iii])){
             cat("Warning:", names(testNew)[ii],iii,"not identical\n")
-          }else{
-            #cat(names(testNew)[ii],iii,"idfun\n")
           }
+            }
         }
       }
       if(inherits(testNew[[ii]], "matrix") || inherits(testNew[[ii]], "array")){
@@ -320,7 +327,7 @@ for(unittestfile in unittestfiles){
               cat("Warning: dims of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
               next
             }
-            if(!all((testNew[[ii]][[kk]]-testOld[[ii]][[kk]])<sqrt(.Machine$double.eps)))
+            if(!idfun(testNew[[ii]][[kk]], testOld[[ii]][[kk]]))
               cat("Warning: values in", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
             if(!idfun(rownames(testNew[[ii]][[kk]]), rownames(testOld[[ii]][[kk]])))
               cat("Warning: rownames of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
