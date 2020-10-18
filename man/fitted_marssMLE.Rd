@@ -15,7 +15,8 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),   
     interval = c("none", "confidence", "prediction"), 
     level = 0.95,
-    output = c("data.frame", "matrix"))
+    output = c("data.frame", "matrix"),
+    fun.kf = c("MARSSkfas", "MARSSkfss"))
   }
   \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
@@ -23,6 +24,7 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
   \item{interval}{ If \code{interval="confidence"}, then the standard error and confidence interval of the predicted value is returned. If \code{interval="prediction"}, then the standard deviation and prediction interval of new data or states are returned. }
   \item{level}{ Level for the intervals if \code{interval} is not equal to \code{"none"}.}
   \item{output}{ data frame or list of matrices}
+  \item{fun.kf}{ By default, \code{tsSmooth()} will use the Kalman filter/smoother function in \code{object$fun.kf} (either \code{\link{MARSSkfas}()} or \code{\link{MARSSkfss}()}). You can pass in \code{fun.kf} to force a particular Kalman filter/smoother function to be used. }
   \item{...}{ Not used. }
   }
 \value{
@@ -43,7 +45,7 @@ If \code{interval = "confidence"}, the following are also returned:
 \item{.conf.low}{ Lower confidence level at \code{alpha = 1-level}. The interval is approximated using qnorm(alpha/2)*.se + .fitted }
 \item{.conf.up}{ Upper confidence level. The interval is approximated using qnorm(1-alpha/2)*.se + .fitted }
 
-The confidence interval is for the predicted value, i.e. \eqn{\mathbf{Z}\tilde{\mathbf{x}}_t+\mathbf{a}}{Z tildex(t)+a} for \eqn{\mathbf{y}}{y} or \eqn{\mathbf{B}\tilde{\mathbf{x}}_{t-1}+\mathbf{u}}{B tildex(t-1)+u} for \eqn{\mathbf{x}}{x} where \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data (to \eqn{t-1}, \eqn{t} or \eqn{T}).
+The confidence interval is for the predicted value, i.e. \eqn{\mathbf{Z}\mathbf{x}_t^n+\mathbf{a}}{Z xtn(t)+a} for \eqn{\mathbf{y}}{y} or \eqn{\mathbf{B}\mathbf{x}_{t-1}^n+\mathbf{u}}{B xtn(t-1)+u} for \eqn{\mathbf{x}}{x} where \eqn{\mathbf{x}_t^n}{xtn(t)} is the expected value of \eqn{\mathbf{X}_t}{X(t)} conditioned on the data from 1 to $n$. (n will be \eqn{t-1}, \eqn{t} or \eqn{T}).
 
 If \code{interval = "prediction"}, the following are also returned:
 
@@ -63,21 +65,21 @@ Fitted versus estimated values: The fitted states at time \eqn{t} are prediction
 
 \strong{observation fitted values}
 
-The model predicted \eqn{\hat{\mathbf{y}}_t}{y(t)} is \eqn{\mathbf{Z}\tilde{\mathbf{x}}_t+\mathbf{a} + \mathbf{D}\mathbf{d}_t}{Z tildex(t) + a + D d(t)}, where \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the expected value of the state at time \eqn{t} conditioned on the data (to \eqn{t-1}, \eqn{t} or \eqn{T}). Note, if you are using MARSS for estimating the values for missing data, then you want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}()} with \code{type="ytT"} not \code{fitted(..., type="ytT")}.
+The model predicted \eqn{\hat{\mathbf{y}}_t}{y(t)} is \eqn{\mathbf{Z}\mathbf{x}_t^n+\mathbf{a} + \mathbf{D}\mathbf{d}_t}{Z tildex(t) + a + D d(t)}, where \eqn{\mathbf{x}_t^n}{xtn(t)} is the expected value of the state at time \eqn{t} conditioned on the data from 1 to $n$ ($n$ will be \eqn{t-1}, \eqn{t} or \eqn{T}). Note, if you are using MARSS for estimating the values for missing data, then you want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}()} with \code{type="ytT"} not \code{fitted(..., type="ytT")}.
   
-\eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the expected value of the states at time \eqn{t}. If \code{type="ytT"}, \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} is the expected value conditioned on all the data, i.e. \code{xtT} returned by \code{\link{MARSSkf}()}.  If \code{type="ytt1"}, then expected value uses only the data up to time \eqn{t-1}, i.e. \code{xtt1} returned by \code{\link{MARSSkf}()}.  These are commonly known as the one step ahead predictions for a state-space model. If \code{type="ytt"}, then the expected value uses the data up to time \eqn{t}, i.e. \code{xtt} returned by \code{\link{MARSSkf}()}. 
+\eqn{\mathbf{x}_t^n}{xtn(t)} is the expected value of the states at time \eqn{t} conditioned on the data from time 1 to $n$. If \code{type="ytT"}, the expected value is conditioned on all the data, i.e. \code{xtT} returned by \code{\link{MARSSkf}()}.  If \code{type="ytt1"}, then the expected value uses only the data up to time \eqn{t-1}, i.e. \code{xtt1} returned by \code{\link{MARSSkf}()}.  These are commonly known as the one step ahead predictions for a state-space model. If \code{type="ytt"}, then the expected value uses the data up to time \eqn{t}, i.e. \code{xtt} returned by \code{\link{MARSSkf}()}. 
 
-If \code{interval="confidence"}, the standard error and interval is for the predicted \eqn{\mathbf{y}}{y}. The standard error is \eqn{\mathbf{Z} \tilde{\mathbf{V}}_t \mathbf{Z}^\top}{Z tildeV(t) t(Z)}.  If \code{interval="prediction"}, the standard deviation of new iid \eqn{\mathbf{y}}{y} data sets is returned. The standard deviation of new \eqn{\mathbf{y}}{y} is \eqn{\mathbf{Z} \tilde{\mathbf{V}}_t \mathbf{Z}^\top + \mathbf{R}_t}{Z tildeVt t(Z) + R(t)}.  \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} is either conditioned on the data \eqn{t=1} to \eqn{T}, \eqn{t}, or \eqn{t-1} depending on the value of \code{type}. 
+If \code{interval="confidence"}, the standard error and interval is for the predicted \eqn{\mathbf{y}}{y}. The standard error is \eqn{\mathbf{Z} \mathbf{V}_t^n \mathbf{Z}^\top}{Z Vtn(t) t(Z)}.  If \code{interval="prediction"}, the standard deviation of new iid \eqn{\mathbf{y}}{y} data sets is returned. The standard deviation of new \eqn{\mathbf{y}}{y} is \eqn{\mathbf{Z} \mathbf{V}_t^n \mathbf{Z}^\top + \mathbf{R}_t}{Z Vtn(t) t(Z) + R(t)}.  \eqn{\mathbf{V}_t^n}{Vtn(t)} is conditioned on the data from \eqn{t=1} to \eqn{n}. $n$ will be either \eqn{t}, \eqn{t-1} or \eqn{T} depending on the value of \code{type}. 
 
 Intervals returned by \code{MARSSpredict()} are not for the data used in the model but rather new data sets. To evaluate the data used to fit the model for residuals analysis or analysis or model inadequacy, you want the model residuals (and residual se's). Use \code{\link{residuals.marssMLE}} for model residuals and their intervals. The intervals for model residuals are narrower because the predictions for \eqn{\mathbf{y}}{y} were estimated from the model data (so is closer to the data used to estimate the predictions than new independent data will be).
 
 \strong{state fitted values}
 
-The model predicted \eqn{\mathbf{x}_t}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)} is \eqn{\mathbf{B}\tilde{\mathbf{x}}_{t-1}+\mathbf{u}+\mathbf{C}\mathbf{c}_t}{B tildex(t-1) + u + C c(t)}. If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)}, go to \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. Which function you want depends on your objective and application. 
+The model predicted \eqn{\mathbf{x}_t}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)} is \eqn{\mathbf{B}\mathbf{x}_{t-1}^n+\mathbf{u}+\mathbf{C}\mathbf{c}_t}{B xtn(t-1) + u + C c(t)}. If you want estimates of the states, rather than the model predictions based on \eqn{\mathbf{x}_{t-1}}{x(t-1)}, go to \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. Which function you want depends on your objective and application. 
   
-\eqn{\tilde{\mathbf{x}}_{t-1}}{tildex(t-1)} used in the prediction is the expected value of the states at time \eqn{t-1}. If \code{type="xtT"}, this is the expected value at time \eqn{t-1} conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}()}.  If \code{type="xtt1"}, it is the expected value conditioned on the data up to time \eqn{t-1}, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}()}. The predicted state values conditioned on data up to \eqn{t} are not provided. This would require the expected value of states at time \eqn{t} conditioned on data up to time \eqn{t+1}, and this is not output by the Kalman filter. Only conditioning on data up to \eqn{t-1} and \eqn{T} are output.
+\eqn{\mathbf{x}_{t-1}^n}{xtn(t-1)} used in the prediction is the expected value of the states at time \eqn{t-1} conditioned on the data from $t=1$ to $t=n$. If \code{type="xtT"}, this is the expected value at time \eqn{t-1} conditioned on all the data, i.e. \code{xtT[,t-1]} returned by \code{\link{MARSSkf}()}.  If \code{type="xtt1"}, it is the expected value conditioned on the data up to time \eqn{t-1}, i.e. \code{xtt[,t-1]} returned by \code{\link{MARSSkf}()}. The predicted state values conditioned on data up to \eqn{t} are not provided. This would require the expected value of states at time \eqn{t} conditioned on data up to time \eqn{t+1}, and this is not output by the Kalman filter. Only conditioning on data up to \eqn{t-1} and \eqn{T} are output.
 
-If \code{interval="confidence"}, the standard error of the predicted values (meaning the standard error of the expected value of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)}) is returned.  The standard error of the predicted value is \eqn{\mathbf{B} \tilde{\mathbf{V}}_{t-1} \mathbf{B}^\top}{B tildeV(t-1) t(B)}. If \code{interval="prediction"}, the standard deviation of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)} is output. The latter is \eqn{\mathbf{B} \tilde{\mathbf{V}}_{t-1} \mathbf{B}^\top + \mathbf{Q}}{B tildeV(t-1) t(B) + Q} . \eqn{\tilde{\mathbf{V}}_{t-1}}{tildeV(t-1)} is either conditioned on 1 to \eqn{T} or \eqn{t-1} depending on \code{type}. 
+If \code{interval="confidence"}, the standard error of the predicted values (meaning the standard error of the expected value of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)}) is returned.  The standard error of the predicted value is \eqn{\mathbf{B} \mathbf{V}_{t-1}^n \mathbf{B}^\top}{B Vtn(t-1) t(B)}. If \code{interval="prediction"}, the standard deviation of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)} is output. The latter is \eqn{\mathbf{B} \mathbf{V}_{t-1}^n \mathbf{B}^\top + \mathbf{Q}}{B Vtn(t-1) t(B) + Q} . \eqn{\mathbf{V}_{t-1}^n}{Vtn(t-1)} is either conditioned on data 1 to \eqn{T} or \eqn{t-1} depending on \code{type}. 
 
 The intervals returned by \code{MARSSpredict} are for the state predictions based on the state estimate at \eqn{t-1}. These are not typically what one uses or needs--however might be useful for simulation work. If you want confidence intervals for the state estimates, those are provided in \code{\link[=fitted.marssMLE]{fitted}}. If you want to do residuals analysis (for outliers or model inadequacy), you want the residuals intervals provided in \code{\link{residuals.marssMLE}}.
 

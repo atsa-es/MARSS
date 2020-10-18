@@ -37,7 +37,7 @@ For the training data, the metrics are shown for the one-step-ahead predictions 
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12),]
 train.dat <- dat[,1:12]
-fit<- MARSS(train.dat, model = list(Z = factor(c("WA", "OR", "OR"))))
+fit <- MARSS(train.dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
 library(forecast)
 accuracy(fit)

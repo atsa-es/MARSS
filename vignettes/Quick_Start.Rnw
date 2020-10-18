@@ -119,13 +119,13 @@ R1 <- matrix(list("r11",0,0,0,"r",0,0,0,"r"),3,3)
 pi1 <- matrix(0,2,1); V1=diag(1,2)
 model.list <- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 @
-Try printing these out and you will see the one-to-one correspondence between the model in R and the math version of the model.  For \verb@form="marxss"@ (the default), matrix names in the model list must be B, U, C, c, Q, Z, A, D, d, R, x0, and V0, just like in equation \eqref{eqn:marss}.  The \verb@tinitx@ element tells MARSS whether the initial state for $x$ is at $t=1$ (\verb@tinitx=1@) or $t=0$ (\verb@tinitx=0@).   The data must be entered as a $n \times T$ matrix; a dataframe is not a matrix nor is a vector nor is a time-series object.  MARSS has a number of text shortcuts for common parameter forms, such as ``diagonal and unequal''; see the User Guide for the possible shortcuts. You can leave off matrix names and the defaults will be used. Type ?MARSS.marxss to see the defaults for \verb@form="marxss"@.
+Try printing these out and you will see the one-to-one correspondence between the model in R and the math version of the model.  For \verb@form="marxss"@ (the default), matrix names in the model list must be B, U, C, c, Q, Z, A, D, d, R, x0, and V0, just like in equation \eqref{eqn:marss}.  The \verb@tinitx@ element tells MARSS whether the initial state for $x$ is at $t=1$ (\verb@tinitx=1@) or $t=0$ (\verb@tinitx=0@).   The data must be entered as a $n \times T$ matrix, or a ts object or vector (which will be converted to a $n \times T$ matrix).  MARSS has a number of text shortcuts for common parameter forms, such as ``diagonal and unequal''; see the User Guide for the possible shortcuts. You can leave off matrix names and the defaults will be used. Type ?MARSS.marxss to see the defaults for \verb@form="marxss"@.
 
 The call to MARSS is 
 <<marss.call, eval=FALSE>>=
 fit <- MARSS(data, model=model.list)
 @
-The \verb@R@, \verb@Q@ and \verb@V0@ variances can be set to zero to specify partially deterministic systems.  This allows you to write MAR-p models in MARSS form for example. See the User Guide for examples. 
+The \verb@R@, \verb@Q@ and \verb@V0@ variances can be set to zero to specify partially deterministic systems.  This allows you to write MAR(p) models in MARSS form for example. See the User Guide for examples. 
 
 \section*{Linear constraints}
 

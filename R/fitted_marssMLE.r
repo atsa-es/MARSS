@@ -5,12 +5,16 @@ fitted.marssMLE <- function(object, ...,
                             type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
                             interval = c("none", "confidence", "prediction"),
                             level = 0.95,
-                            output = c("data.frame", "matrix")) {
+                            output = c("data.frame", "matrix"),
+                            fun.kf = c("MARSSkfas", "MARSSkfss")) {
   type <- match.arg(type)
   output <- match.arg(output)
   interval <- match.arg(interval)
   conditioning <- substring(type, 3)
   type <- substr(type, 1, 1)
+  # Allow user to force a particular KF function
+  if(!missing(fun.kf)) object[["fun.kf"]] <- match.arg(fun.kf)
+
   MLEobj <- object
   if (is.null(MLEobj[["par"]])) {
     stop("fitted.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)

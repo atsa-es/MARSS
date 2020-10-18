@@ -428,6 +428,7 @@ MARSS.marxss <- function(MARSS.call) {
 
   # Set the marssMODEL form marxss
   # This is the f+Dp form for the MARXSS model used for user displays, printing and such
+  attr(dat, "model.tsp") <- NULL # remove model.tsp from data before adding to model object.
   marxss_object <- list(fixed = fixed, free = free, data = dat, tinitx = model$tinitx, diffuse = model$diffuse)
   # set the attributes
   class(marxss_object) <- "marssMODEL"

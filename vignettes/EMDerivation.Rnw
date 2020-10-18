@@ -2003,18 +2003,31 @@ We will define another set of matrices that zeros out the missing or non-missing
 \end{equation}
 
 \subsection{Expectations involving only $\XX_t$}\label{sec:kalman.smoother}
-The Kalman smoother provides the expectations involving only $\XX_t$ conditioned on all the data from time 1 to $T$.  
+The Kalman smoother provides the expectations involving only $\XX_t$ conditioned on all the data from time 1 to $T$. The Kalman filter provides the expectations involving only $\XX_t$ conditioned on all the data from time 1 to $t-1$ and from time 1 to $t$. For the EM algorithm, we only need the smoother output and the expected values conditioned on the data from time 1 to $T$ and these are denoted with special symbol of a tilde over a variable. 
+
+To present the algorithm for the Kalman smoother and filter, the expectations conditioned on time 1 to $t$ are needed. The notation for this general case will be $\xx_t^t$ to denote $\E[\XX_t|\YY(1)_1^t=\yy(1)_1^t,\Theta]$ where $\yy(1)_1^t$ means the observed data (the $(1)$ part) from time 1 to $t$ (the superscript). This is fairly common notation for the conditional expectations in a Kalman filter and smoother and it is important to note that the superscript is not a power notation but the upper time extent. The the expectations used in the previous sections on the EM algorithm are the following:
+ 
 \begin{subequations}\label{eq:kfsoutput}
 \begin{align}
-&\hatxt = \E[\XX_t]\label{eq:xt}\\
-&\widetilde{\VV}_t = \var[\XX_t]\\
-&\widetilde{\VV}_{t,t-1} = \cov[\XX_t,\XX_{t-1}]\\
+&\hatxt \equiv \xx_t^T = \E[\XX_t|\YY(1)_1^T=\yy(1)_1^T,\Theta]\label{eq:xt}\\
+&\widetilde{\VV}_t \equiv \VV_t^T = \var[\XX_t|\YY(1)_1^T=\yy(1)_1^T,\Theta]\\
+&\widetilde{\VV}_{t,t-1} \equiv \VV_{t,t-1}^T = \cov[\XX_t,\XX_{t-1}|\YY(1)_1^T=\yy(1)_1^T,\Theta]\\
 &\text{From $\hatxt$, $\widetilde{\VV}_t$, and $\widetilde{\VV}_{t,t-1}$, we compute}\nonumber\\
-&\hatPt=\E[\XX_t\XX_t^\top]= \widetilde{\VV}_t + \hatxt\hatxt^\top\label{eq:Pt}\\
-&\hatPttm=\E[\XX_{t}\XX_{t-1}^\top]=\widetilde{\VV}_{t,t-1} +\hatxt\hatxtm^\top\label{eq:Ptt1}
+&\hatPt \equiv \PP_t^T =\E[\XX_t\XX_t^\top|\YY(1)_1^T=\yy(1)_1^T,\Theta]= \widetilde{\VV}_t + \hatxt\hatxt^\top\label{eq:Pt}\\
+&\hatPttm \equiv \PP_{t,t-1}^T =\E[\XX_{t}\XX_{t-1}^\top|\YY(1)_1^T=\yy(1)_1^T,\Theta]=\widetilde{\VV}_{t,t-1} +\hatxt\hatxtm^\top\label{eq:Ptt1}
 \end{align}
 \end{subequations}
-The $\hatPt$ and $\hatPttm$ equations arise from the computational formula for variance (equation \ref{eq:comp.formula.variance}). Note the smoother is different than the Kalman filter as the filter does not provide the expectations of $\XX_t$ conditioned on all the data (time 1 to $T$) but only on the data up to time $t$.
+The $\hatPt$ and $\hatPttm$ equations arise from the computational formula for variance (equation \ref{eq:comp.formula.variance}). When comparing the Kalman filter and smoother algorithms here to Shumway and Stoffer, keep in mind the difference in notation: $P_t^n$ in Shumway and Stoffer is $\VV_t^T$ here not $\PP_t^T$.
+
+In the presentation of the EM algorithm, $\YY(1)_1^T=\yy(1)_1^T,\Theta$ was dropped from the expectations to remove clutter; thus $E[\dots]$ always denoted the conditional expectation $\E[\dots|\YY(1)_1^T=\yy(1)_1^T,\Theta]$. To present the smoother algorithm, we the other conditional expectations.
+\begin{subequations}\label{eq:kffilteroutput}
+\begin{align}
+&\xx_t^{t-1} = \E[\XX_t|\YY(1)_1^{t-1}=\yy(1)_1^{t-1},\Theta]\\
+&\xx_t^t = \E[\XX_t|\YY(1)_1^t=\yy(1)_1^t,\Theta]\\
+&\VV_t^{t-1} = \var[\XX_t|\YY(1)_1^{t-1}=\yy(1)_1^{t-1},\Theta]\\
+&\VV_t^t = \var[\XX_t|\YY(1)_1^t=\yy(1)_1^t,\Theta]\\
+\end{align}
+\end{subequations}
 
 The first part of the Kalman smoother algorithm is the Kalman filter which gives the expectation at time $t$ conditioned on the data up to time $t$.  The following the filter as shown in \citep[sec. 6.2, p. 331]{ShumwayStoffer2006}, although the notation is a little different. The recursion starts at time $t=1$ and repeats until $t=T$.
 \begin{subequations}\label{eq:kffilter}
@@ -2191,7 +2204,7 @@ Thus,
 \end{split}
 \end{equation}
 
-Note that since we are conditioning on $\XX_t=\xx_t$, we can replace $\YY$ by $\YY_t$ in the conditional:
+Note that since we are conditioning on $\XX_t=\xx_t$, we can replace $\YY$ (all data from time 1 to $T$) by $\YY_t$ (data at time $t$) in the conditional:
 $$\E[\YY_t|\YY(1)=\yy(1),\XX_t=\xx_t]=\E[\YY_t|\YY_t(1)=\yy_t(1),\XX_t=\xx_t].$$
 From this and the distributions in equation \eqref{eq:varY}, we can write down $\hatyt=\E[\YY_t|\YY(1)=\yy(1),\Theta_j]$:
 \begin{equation}

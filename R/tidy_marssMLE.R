@@ -17,6 +17,16 @@ tidy.marssMLE <-
     if (!(conf.int %in% c(TRUE, FALSE))) {
       stop("tidy.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     }
+    if (is.null(x[["par"]])) {
+      stop("tidy.marssMLE: The marssMLE object does not have the par element.  Most likely the model has not been fit.", call. = FALSE)
+    }
+    if (conf.int && x[["convergence"]] == 54) {
+      stop("tidy.marssMLE: MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Standard errors and confidence intervals cannot be computed. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
+    }
+    paramvec <- coef(x, type="vector")
+    if (length(paramvec) == 0) stop("tidy.marssMLE: No estimated parameter elements.\n", call. = FALSE)
+    
+    
     ## End Argument checking
 
     alpha <- 1 - conf.level

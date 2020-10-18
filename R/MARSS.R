@@ -7,8 +7,11 @@ MARSS <- function(y,
                   fit = TRUE,
                   silent = FALSE,
                   control = NULL,
-                  fun.kf = "MARSSkfas",
+                  fun.kf = c("MARSSkfas", "MARSSkfss"),
                   ...) {
+  # If user did not pass in fun.kf, then MARSSkfas will be used by default. MARSSkfss will be tried if that fails
+  if (missing(fun.kf)) missing.fun.kf <- FALSE else missing.fun.kf <- TRUE
+  fun.kf <- match.arg(fun.kf)
   allowed.methods <- get("allowed.methods", envir = pkg_globals)
   # Some error checks depend on an allowable method
   if (!method %in% allowed.methods) {
@@ -35,8 +38,8 @@ MARSS <- function(y,
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
 
-  if (inherits(model, "marssMLE")) model <- coef(model, type = "matrix")
-  if (inherits(model, "marssMODEL")) model <- marssMODEL.to.list(model)
+  if (inherits(model, "marssMLE")) model <- c(coef(model, type = "matrix"), tinitx=model$model$tinitx, diffuse=model$model$diffuse)
+  if (inherits(model, "marssMODEL")) model <- c(marssMODEL.to.list(model), tinitx=model$tinitx, diffuse=model$diffuse)
 
   MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, ...)
 
@@ -227,10 +230,16 @@ MARSS <- function(y,
         if (!is.null(kf[["VtT"]])) {
           m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
           TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
-          states.se <- apply(kf[["VtT"]], 3, function(x) {
-            takediag(x)
-          })
-          states.se[states.se < 0] <- NA
+          states.se <- apply(kf[["VtT"]], 3, function(x) takediag(x))
+          # KFS 
+          if( any(states.se < 0 & states.se > -1*sqrt(.Machine$double.eps)) ){
+            states.se[states.se < 0 & states.se > -1*sqrt(.Machine$double.eps)] <- 0
+            MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values close to machine tolerance on diagonal of VtT and the states.se values for these are set to 0. You may want to use", ifelse(MLEobj$fun.kf=='MARSSkfas', 'MARSSkfss()', 'MARSSkfas()'), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
+          } 
+          if( any(states.se < 0) ){
+            states.se[states.se < 0] <- NA
+            MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values on diagonal of VtT and the states.se values for these are set to NA. You may want to use", ifelse(MLEobj$fun.kf=='MARSSkfas', 'MARSSkfss()', 'MARSSkfas()'), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
+          } 
           states.se <- sqrt(states.se)
           if (m == 1) states.se <- matrix(states.se, 1, TT)
           rownames(states.se) <- attr(MLEobj$marss, "X.names")

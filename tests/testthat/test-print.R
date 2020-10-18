@@ -18,7 +18,7 @@ fits[[6]] <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, 
 
 for(i in 1:length(fits)){
   fit <- fits[[i]]
-  what <- c("fit", "model", "par", "logLik", "paramvector", "par.se", "par.upCI", "par.lowCI", "states", "data", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis", "start", names(fit$model), names(fit$model$fixed))
+  what <- list("fit", "model", "par", "logLik", "paramvector", "par.se", "par.upCI", "par.lowCI", "states", "data", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis", "start", names(fit$model), names(fit$model$fixed), c("par", "logLik"), c("R", "x0"))
   
 for(val in what){
   p1 <- print(fit, what=val, silent=TRUE)

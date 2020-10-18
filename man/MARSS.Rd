@@ -27,13 +27,13 @@ MARSS(y,
     fit=TRUE, 
     silent = FALSE,
     control = NULL,
-    fun.kf = "MARSSkfas",
+    fun.kf = c("MARSSkfas", "MARSSkfss"),
     ...) 
 }
 
 \arguments{
 The default settings for the optional arguments are set in \code{MARSSsettings.R} and are given below in the details section. For form specific defaults see the form help file (e.g. \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}).
-  \item{y}{ A n x T matrix of n time series over T time steps. Only y is required for the function.}
+  \item{y}{ A n x T matrix of n time series over T time steps. Only y is required for the function. A ts object (univariate or multivarite) can be used and this will be converted to a matrix with time in the columns. }
   \item{inits}{ A list with the same form as the list outputted by \code{coef(fit)} that specifies initial values for the parameters.  See also \code{\link{MARSS.marxss}}. }
   \item{model}{ Model specification using a list of parameter matrix text shortcuts or matrices. See Details and \code{\link{MARSS.marxss}} for the default form. Or better yet open the Quick Start Guide \code{RShowDoc("Quick_Start",package="MARSS")}. }
   \item{miss.value}{ Deprecated.  Denote missing values by NAs in your data. }

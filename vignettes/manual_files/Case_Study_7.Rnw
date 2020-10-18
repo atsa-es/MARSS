@@ -58,7 +58,7 @@ royale.dat <- log(t(isleRoyal[yr1960to2011, c("Wolf", "Moose")]))
 x <- isleRoyal[, "Year"]
 y <- log(isleRoyal[, c("Wolf", "Moose")])
 graphics::matplot(x, y,
-  ylab = "log count", xlab = "Year", type = "l",
+  ylab = "Log count", xlab = "Year", type = "l",
   lwd = 3, bty = "L", col = "black"
 )
 legend("topright", c("Wolf", "Moose"), lty = c(1, 2), bty = "n")
@@ -409,10 +409,10 @@ Then we fit the model as usual:
 <<Cs27_plank-model-4, results=hide>>=
 kem.plank.4 <- MARSS(d.plank.dat, model = plank.model.4)
 @
-Temperature and phosphorous have and estimated positive effect on phytoplankton:
+Here is the $\CC$ matrix. The $\CC$ terms for the zooplankton are shown as \verb@--@ since they are not applicable (have been set to 0). Temperature and phosphorous have an estimated positive effect on phytoplankton:
 <<Cs27.5_print-C, keep.source=TRUE, echo=false>>=
 # Cleaning up the B matrix for printing
-Cmat <- coef(kem.plank.2, type = "matrix")$C[1:4, 1, drop = FALSE]
+Cmat <- coef(kem.plank.4, type = "matrix")$C[1:4, 1, drop = FALSE]
 rownames(Cmat) <- c("LP", "SP", "D", "ND")
 Cmat[Cmat == 0] <- NA
 print(Cmat, digits = 2, na.print = "--")
@@ -468,7 +468,7 @@ where $\xx$ and $\yy$ are redefined as
 \text{large phyto}\\
 \text{small phyto}\\
 \text{Daphnia}\\
-\text{Non-Daphnia zooplank}\\
+\text{non-Daphnia zooplank}\\
 \text{fish biomass}
 \end{bmatrix}
 \end{equation}
@@ -613,7 +613,7 @@ tmp <- kem.plank.5
 tmp$marss$data[5, ] <- NA
 LL.variates <- MARSSkf(tmp)$logLik
 @
-\verb@MARSSkf@ is the Kalman filter function and it needs a fitted model as output by a \verb@MARSS@ call.  We set up a temporary fitted model, \verb@tmp@, equal to our fitted model and then set the covariate data in that to NAs.  Note we need to do this for the marssMODEL object used by MARSSkf, which will be in \verb@$marss@.  We then pass that temporary fitted model to \verb@MARSSkf@ to get the log-likelihood of just the variates.  
+\verb@MARSSkf()@ is the Kalman filter function and it needs a fitted model as output by a \verb@MARSS()@ call.  We set up a temporary fitted model, \verb@tmp@, equal to our fitted model and then set the covariate data in that to NAs.  Note we need to do this for the marssMODEL object used by \verb@MARSSkf()@, which will be in \verb@MLEobj$marss@.  We then pass that temporary fitted model to \verb@MARSSkf()@ to get the log-likelihood of just the variates.  
 
 \subsection{Discussion}
 The estimates for our last model are fairly close to the Ives et al. estimates, but still a bit different.  There are two big difference between our last model and the Ives et al. analysis.  Ives et al. had data from three lakes and the estimate of $\QQ$ used the data from all lakes.   

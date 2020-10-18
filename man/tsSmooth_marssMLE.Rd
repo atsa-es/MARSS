@@ -18,7 +18,7 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
 \method{tsSmooth}{marssMLE}(object, 
     type = c("xtT", "xtt", "xtt1", "ytT", "ytt", "ytt1"),
     interval = c("none", "confidence", "prediction"),
-    level = 0.95, ...)
+    level = 0.95, fun.kf = c("MARSSkfas", "MARSSkfss"), ...)
 }
 \arguments{
   \item{object}{A \code{\link{marssMLE}} object.}
@@ -29,6 +29,8 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
 
   \item{level}{ Confidence level. alpha=1-level }
  
+  \item{fun.kf}{ By default, \code{tsSmooth()} will use the Kalman filter/smoother function in \code{object$fun.kf} (either \code{\link{MARSSkfas}()} or \code{\link{MARSSkfss}()}). You can pass in \code{fun.kf} to force a particular Kalman filter/smoother function to be used. }
+  
   \item{...}{Optional arguments.  If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not the Z matrix).}
 
 }
@@ -65,9 +67,9 @@ Below, X and Y refers to the random variable and x and y refer to a specific rea
 
 For \code{type="xtT"}, \code{tsSmooth.marssMLE} returns the confidence intervals of the state at time \eqn{t} conditioned on the data from 1 to \eqn{T} using the estimated model parameters as true values. These are the standard intervals that are shown for the estimated states in state-space models. For example see, Shumway and Stoffer (2000), edition 4, Figure 6.4. As such, this is probably what you are looking for if you want to put intervals on the estimated states (the \eqn{\mathbf{x}}{x}). However, these intervals do not include parameter uncertainty. If you want state residuals (for residuals analysis), use \code{\link{MARSSresiduals}} or \code{\link{residuals.marssMLE}}.
 
-\strong{Quantiles} The state \eqn{\mathbf{X}_t}{X(t)} in a MARSS model has a conditional multivariate normal distribution, that can be computed from the model parameters and data. In Holmes (2012, Equation 11) notation, its expected value conditioned on the observed data and the model parameters \eqn{\Theta}{Theta} is \eqn{\tilde{\mathbf{x}}_t}{tildex(t)}. In \code{\link{MARSSkf}}, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X(t)} conditioned on the observed data and \eqn{\Theta} is \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Note that \code{VtT[,,t] != B VtT[,,t-1] t(B) + Q}, which you might think by looking at the MARSS equations. That is because the variance of \eqn{\mathbf{W}_t}{W(t)} conditioned on the data (past, current and FUTURE) is not equal to  \eqn{\mathbf{Q}}{Q} (\eqn{\mathbf{Q}}{Q} is the unconditional variance).
+\strong{Quantiles} The state \eqn{\mathbf{X}_t}{X(t)} in a MARSS model has a conditional multivariate normal distribution, that can be computed from the model parameters and data. In Holmes (2012, Equation 11) notation, its expected value conditioned on all the observed data and the model parameters \eqn{\Theta}{Theta} is denoted \eqn{\tilde{\mathbf{x}}_t}{tildex(t)} or equivalently \eqn{\mathbf{x}_t^T}{xtT(t)} (where the $T$ superscript is not a power but the upper extent of the time conditioning). In \code{\link{MARSSkf}}, this is \code{xtT[,t]}. The variance of \eqn{\mathbf{X}_t}{X(t)} conditioned on all the observed data and \eqn{\Theta}{Theta} is \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Note that \code{VtT[,,t] != B VtT[,,t-1] t(B) + Q}, which you might think by looking at the MARSS equations. That is because the variance of \eqn{\mathbf{W}_t}{W(t)} conditioned on the data (past, current and FUTURE) is not equal to  \eqn{\mathbf{Q}}{Q} (\eqn{\mathbf{Q}}{Q} is the unconditional variance).
 
-\eqn{\tilde{\mathbf{x}}_t}{tildex(t)} (\code{xtT}) is an estimate of \eqn{\mathbf{x}_t}{x(t)} (the true value), and the standard error of that estimate is given by \eqn{\tilde{\mathbf{V}}_t}{tildeV(t)} (\code{VtT[,,t]}). Let \code{se.xt} denote the sqrt of the diagonal of \code{VtT}. The equation for the \eqn{\alpha/2}{alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.xt + xtT}). \eqn{\mathbf{x}_t}{x(t)} is multivariate and this interval is for one of the \eqn{x}'s in isolation. You could compute the m-dimensional confidence region for the multivariate \eqn{\mathbf{x}_t}{x(t)}, also, but \code{tsSmooth.marssMLE} returns the univariate confidence intervals. 
+\eqn{\mathbf{x}_t^T}{xtT(t)} (\code{xtT[,t]}) is an estimate of \eqn{\mathbf{x}_t}{x(t)} and the standard error of that estimate is given by \eqn{\mathbf{V}_t^T}{VtT(t)} (\code{VtT[,,t]}). Let \code{se.xt} denote the sqrt of the diagonal of \code{VtT}. The equation for the \eqn{\alpha/2}{alpha/2} confidence interval is (\code{qnorm(alpha/2)*se.xt + xtT}). \eqn{\mathbf{x}_t}{x(t)} is multivariate and this interval is for one of the \eqn{x}'s in isolation. You could compute the m-dimensional confidence region for the multivariate \eqn{\mathbf{x}_t}{x(t)}, also, but \code{tsSmooth.marssMLE} returns the univariate confidence intervals. 
 
 The variance \code{VtT} gives information on the uncertainty of the true location of \eqn{\mathbf{x}_t}{x(t)} conditioned on the observed data. As more data are collected (or added to the analysis), this variance will shrink since the data, especially data at time \eqn{t}, increases the information about the locations of \eqn{\mathbf{x}_t}{x(t)}. This does not affect the estimation of the model parameters, those are fixed (we are assuming), but rather our information about the states at time \eqn{t}.
 
@@ -79,7 +81,7 @@ H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
 
-For \code{type="xtt"} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data 1 to \eqn{t} or 1 to \eqn{t-1}. 
+For \code{type="xtt"} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data $t=1$ to \eqn{t} or $t=1$ to \eqn{t-1}. 
 
 
 \strong{observation estimates (y)}
