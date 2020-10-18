@@ -4,20 +4,12 @@ output: html_document
 
 MARSS Development site
 ------------------------------------
-New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there. Next release will be 3.11.3 and issues to be addressed in that release are marked with 3.11.3 milestone.
+New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
-MARSS 3.11.3 (master on GitHub)
+
+MARSS 3.11.3
 ------------------------------------
-
-ENHANCEMENTS
-
-* Addition of tests directory to the package. These are set with `skip_on_cran()` as they are for internal testing.
-* Addition of a KFAS chapter which is mainly a testing chapter. All variants of model and state residuals computed by the KFAS package are compared to the residuals produced by MARSS. Similarly the StructTS chapter is mainly a testing chapter which compares output for StructTS objects to the equivalent output for marssMLE objects. The tests in these chapters are repeated in the tests directory.
-
-
-MARSS 3.11.2 (released 2020-10-02 on GitHub)
-------------------------------------
-This is an update is focused on graceful exiting for models that report errors due to ill-conditioned variance matrices or for models with fixed parameters. The testing and output (plots, residuals, tsSmooth, fitted) was made less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` and which can become ill-conditioned and report an error. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for variance matrices with extremely high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+This is an update based on version 3.11.2 (GitHub release). It is mainly focused on providing graceful exiting for models that report errors due to ill-conditioned variance matrices and for models with fixed parameters. The testing and output (`plot`, `residuals`, `tsSmooth`, `fitted`) was made less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` and which can become ill-conditioned and report an error. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for variance matrices with extremely high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
 
 ENHANCEMENTS
 
@@ -27,6 +19,7 @@ ENHANCEMENTS
 * Added graceful exiting for various functions for marssMLE objects without a par element. This occurs when `MARSS()` was run with `fit=FALSE`. 
 * Added graceful exiting for `MARSSparamCIs()` when model is fixed and thus no parameters estimated.
 * Add alert when there are negative values on the diagonal of `VtT` which sometimes happens for `MARSSkfas()`. Give user helpful suggestions for switching the Kalman filter/smoother function.
+* Addition of a KFAS chapter which is mainly a testing chapter. All variants of model and state residuals computed by the KFAS package are compared to the residuals produced by MARSS. Similarly the StructTS chapter is mainly a testing chapter which compares output for StructTS objects to the equivalent output for marssMLE objects. The tests in these chapters are repeated in the tests directory (which is on GitHub).
 
 BUGS
 
@@ -39,13 +32,27 @@ BUGS
 * `print.marssMLE()` and `coef.marssMLE()` would fail ungracefully if all the parameters were fixed or `MARSS()` was run with `fit=FALSE`.
 
 DOCUMENTATION
-* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts. Added notation definitions to the Kalman smoother algorithm section for `xtt` and `xtt1` etc.
+
+* Minor fixes to the derivations table in EMDerivation.Rnw and added some information on the initial conditions for the Kalman filter in the expectations section. Typo in eqn 29-31. u^T should have been u. Added information on EM algorithm when parameter set is updated by parts. 
+* Added notation definitions to the Kalman smoother algorithm section for `xtt` and `xtt1` etc.
 * Added information on how to get CIs on rotated loadings to DFA chapter.
 * Cleaned up MARSSkf.Rd sections on initial conditions and cleaned up equation formatting so looks better in pdf format.
 * Added section on normalization calculations to Residuals.Rnw.
+* Cleaned up notation for conditional expectations in the man files.
+* Fixed bug in the Covariates chapter which was not showing the B estimates for `kem.plank.4`.
 
 OTHER
+
 * If `tinitx=1`, then `Vtt1T[,,1]` does not exist. Replaced `Vtt1T[,,1]` with NA instead of 0 in this case. Note `Vtt1T[,,1]` would never be used in this case as `V10T` is used instead however a value of 0 is not correct. The value is does not exist so NA is the correct value.
+
+MARSS 3.11.2 (released 2020-10-02 on GitHub)
+------------------------------------
+This is an update is focused on graceful exiting for models that report errors due to ill-conditioned variance matrices or for models with fixed parameters. The testing and output (plots, residuals, tsSmooth, fitted) was made less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` and which can become ill-conditioned and report an error. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for variance matrices with extremely high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
+
+See notes above for version 3.11.3 (CRAN release).
+
+* Addition of tests directory to the package. These are set with `skip_on_cran()` as they are for internal testing. This directory is not part of the CRAN package but is on the GitHub site.
+
 
 MARSS 3.11.1 (released 2020-08-25 on CRAN)
 ------------------------------------
