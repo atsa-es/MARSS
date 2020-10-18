@@ -92,7 +92,7 @@ for (i in 1:9) {
   for (t in 1:nYr) y.tss[i, t] <- x.tss[i, t] + rnorm(1, mean = 0, sd = sqrt(sim.R))
   missYears <- sample(years[2:(nYr - 1)], floor(fracmissing * nYr), replace = FALSE)
   y.tss[i, missYears] <- NA
-  plot(years, y.tss[i, ], xlab = "", ylab = "index of log abundance", lwd = 2, bty = "l")
+  plot(years, y.tss[i, ], xlab = "", ylab = "Index of log abundance", lwd = 2, bty = "l")
   lines(years, x.tss[i, ], type = "l", lwd = 2, lty = 2)
   title(paste("simulation ", i))
 }
@@ -138,7 +138,7 @@ for (i in 1:9) {
     sample(years[2:(nYr - 1)], floor(fracmiss * nYr), replace = FALSE)
   y[missYears] <- NA
   plot(years, y,
-    xlab = "", ylab = "log abundance", lwd = 2, bty = "l"
+    xlab = "", ylab = "Log abundance", lwd = 2, bty = "l"
   )
   lines(years, x, type = "l", lwd = 2, lty = 2)
   title(paste("simulation ", i))
@@ -185,7 +185,7 @@ The MARSS model fit also gives an estimate of the true population size with obse
 <<label=plotkemstates,fig=TRUE,echo=FALSE,width=6, height=6, include.source=FALSE>>=
 par(mfrow = c(3, 3))
 for (i in 1:9) {
-  plot(years, y.tss[i, ], xlab = "", ylab = "index of log abundance", lwd = 2, bty = "l")
+  plot(years, y.tss[i, ], xlab = "", ylab = "Index of log abundance", lwd = 2, bty = "l")
   lines(years, x.tss[i, ], type = "l", lwd = 2, lty = 2)
   lines(years, kem.states[i, ], type = "l", col = 2, lwd = 1, lty = 1)
   title(paste("simulation ", i))
@@ -231,7 +231,7 @@ den91.Q <- var(resid(den91))
 \begin{center}
 <<label=dennisregression,fig=TRUE,echo=FALSE,width=4,height=4,include.source=FALSE>>=
 par(mfrow = c(1, 1))
-plot(tau, delta.pop, xlab = "time step size (tau)", ylab = "population transition size", xlim = c(0, max(tau)), bty = "l")
+plot(tau, delta.pop, xlab = "Time step size (tau)", ylab = "Population transition size", xlim = c(0, max(tau)), bty = "l")
 abline(den91, col = 2)
 @
 \end{center}
@@ -409,8 +409,8 @@ for (j in c(10, 1:8)) {
       exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
   } # end i loop
 
-  plot(tyrs, real.ex, xlab = "time steps into future", 
-       ylab = "probability of extinction", ylim = c(0, 1), bty = "l")
+  plot(tyrs, real.ex, xlab = "Time steps into future", 
+       ylab = "Probability of extinction", ylim = c(0, 1), bty = "l")
   if (j <= 8) title(paste("simulation ", j))
   if (j == 10) title("average over sims")
   lines(tyrs, denn.ex, type = "l", col = "red", lwd = 2, lty = 1) 
@@ -485,8 +485,8 @@ for (j in c(10, 1:8)) {
 
   # plot it
   plot(tyrs, real.ex,
-    xlab = "time steps into future",
-    ylab = "probability of extinction", ylim = c(0, 1), bty = "l"
+    xlab = "Time steps into future",
+    ylab = "Probability of extinction", ylim = c(0, 1), bty = "l"
   )
   if (j <= 8) title(paste("simulation ", j))
   if (j == 10) title("average over sims")

@@ -109,7 +109,7 @@ print(cbind(
 ))
 @
 
-By the way, there are much better and faster functions in \R for fitting univariate AR models (no observation error).  The MARSS package is really for fitting to multivariate data with observation error not AR-p models.  For example, here is how you would fit the AR(2) model using the base \verb@arima()@ function:
+By the way, there are much better and faster functions in \R for fitting univariate AR models (no observation error).  The MARSS package is really for fitting to multivariate data with observation error not AR(p) models.  For example, here is how you would fit the AR(2) model using the base \verb@arima()@ function:
 <<Cs_107_arima>>=
 arima(gappy.data, order = c(2, 0, 0), include.mean = FALSE)
 @

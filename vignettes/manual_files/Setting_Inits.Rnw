@@ -69,7 +69,7 @@ out$Q
 @
 \verb@MARSS()@ gave names to the $\DD$ and $\QQ$ estimated values.  It is important to look at the output from \verb@coef(..., what="par")@ before passing in the inits list so that you know where the parameter values fall in the parameter column vector.  For example, note that in the $\QQ$ column vector, the variance for the first row in $\xx$ (Greens) is first, the (1,1) element, then the covariance, and last value is the variance of the second row in $\xx$ (Bluegreens) which appears in the (2,2) element of $\QQ$.
 
-You can pass in \verb@inits@ for any of the parameters in \verb@coef(..., what="par")@.  You can pass in either a column vector that is the same size as that output by \verb@coef@, so for $\QQ$, the column vectors must be $3 \times 1$, or a scalar.  If a scalar, then all values in the par column vector will be set to that value---except for $\QQ$, $\RR$ and $\LAM$ which will be set to diagonal matrices with the scalar on the diagonal.
+You can pass in \verb@inits@ for any of the parameters in \verb@coef(..., what="par")@.  You can pass in either a column vector that is the same size as that output by \verb@coef()@, so for $\QQ$, the column vectors must be $3 \times 1$, or a scalar.  If a scalar, then all values in the par column vector will be set to that value---except for $\QQ$, $\RR$ and $\LAM$ which will be set to diagonal matrices with the scalar on the diagonal.
 
 \subsubsection{Examples}
 Pass in an initial value for $\QQ$ that is a diagonal matrix with 1 on the diagonal.

@@ -14,7 +14,7 @@ options(prompt = " ", continue = " ", width = 60)
 library(MARSS)
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this chapter, we work through a series of short examples to illustrate the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with MARSS models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS models might want to start with the application chapters. 
+In this chapter, we work through a series of short examples to illustrate the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with multivariate (or vector) autoregressive state-space (MARSS or VARSS) models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS (or VARSS) models might prefer to start with the application chapters. 
 
 In these examples, we will use the default \verb@form="marxss"@ argument for a \verb@MARSS()@ call.  This specifies a MARSS model of the form:
 \begin{subequations}\label{eqn:marss.qe}
@@ -35,10 +35,10 @@ MARSS provides the following functions for output from fitted model objects. The
 \item \verb@tidy::tidy(fit)@ or \verb@tidy.marssMLE(fit)@ Parameter estimates and confidence intervals.\index{fitted values}
 \item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.\index{likelihood}\index{AIC}
 \item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.\index{residuals}
-\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@], where \verb@fr <- forecast(fit)@], plots the forecasts.\index{plotting!predictions}\index{forecasting}
+\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@, where \verb@fr <- forecast(fit)@, plots the forecasts.\index{plotting!predictions}\index{forecasting}
 \item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.\index{plotting}
 \item \verb@tsSmooth(fit)@ Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.\index{Kalman filter and smoother}
-\item \verb@MARSShatyt(fit)@ Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation.
+\item \verb@tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"ytT"@, \verb@"ytt"@ or \verb@"ytt1@. These are the expected values of the y (left side of the y equation with the error terms). \verb@MARSShatyt(fit)@ returns the same in matrix form. Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation. Most users will likely want \verb@fitted()@ which is the model fitted values (expected value of the left side of the y equation without the error term). Those working on EM algorithms will need this.
 \end{itemize}
 
 \section{Fixed and estimated elements in parameter matrices}
@@ -192,7 +192,7 @@ Again $\BB$ is not shown in the top equation; it is a $m \times m$ identity matr
 <<Cs12_model-corr2, include.source=F, keep.source=T, results=hide>>=
 kemfit <- MARSS(dat, model = list(Q = "equalvarcov"))
 @
-The shortcut `\verb@"equalvarcov"@ means one value on the diagonal and one on the off-diagonal.  It can be used for all square matrices ($\BB$,$\QQ$,$\RR$, and $\LAM$).
+The shortcut `\verb@"equalvarcov"@ means one value on the diagonal and one on the off-diagonal.  It can be used for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
 
 \subsection{Five hidden state processes with a ``north'' and a ``south'' $\uu$ and $\QQ$ elements}
 Here we fit a model with five independent hidden states where each observation time series is an independent observation of a different hidden trajectory
@@ -307,7 +307,7 @@ Q <- "diagonal and equal"
 U <- "equal"
 kemfit <- MARSS(dat, model = list(Z = Z, Q = Q, U = U))
 @
-You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples.  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$,$\QQ$,$\RR$, and $\LAM$).
+You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples.  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
 
 \section{Linear constraints}
 
@@ -315,7 +315,7 @@ Your model can have simple linear constraints within all the parameters except $
 \begin{equation*}
 \UU = \begin{bmatrix}u-0.1\\ u+0.1\end{bmatrix}\quad
 \QQ = \begin{bmatrix}q_{11}&0\\ 0.01&0\end{bmatrix}\quad
-\ZZ = \begin{bmatrix}z_1-z_2&2*z_1\\ 0&z_1\\ z_2&0 \\ 0&z_3 \\ 0&1+z_3\end{bmatrix}
+\ZZ = \begin{bmatrix}z_1-z_2&2z_1\\ 0&z_1\\ z_2&0 \\ 0&z_3 \\ 0&1+z_3\end{bmatrix}
 \end{equation*}
 
 This would be specified as (notice \verb@"1*z1+-1*z2"@ for $z_1-z_2$):
@@ -401,7 +401,7 @@ broom::glance(kemfit)
 The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default alpha level of 0.05.  The default is to compute approximate confidence intervals using a the Hessian matrix (\verb@method="hessian"@).  Confidence intervals can also be computed  via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.  Note, if you want confidence intervals on variances, then it is unwise to use the Hessian approximation as it is symmetric and variances are constrained to be positive.
 
 \subsection{Approximate confidence intervals from a Hessian matrix}
-The default method for \verb@MARSSparamCIs@ computes approximate confidence intervals using an analytically computed Hessian matrix \citet[sec 3.4.5]{Harvey1989}.  The call is:
+The default method for \verb@MARSSparamCIs()@ computes approximate confidence intervals using an analytically computed Hessian matrix \citep[sec 3.4.5]{Harvey1989}.  The call is:
 <<Cs25_CIs-hessian, include.source=F, keep.source=T>>=
 kem.with.hess.CIs <- MARSSparamCIs(kemfit)
 @
@@ -421,20 +421,20 @@ print(kem.w.boot.CIs)
 @
 
 \section{Vectors of just the estimated parameters}
-Often it is useful to have a vector of the estimated parameters.  For example, if you are writing a call to \texttt{optim}, you will need a 
-vector of just the estimated parameters\index{functions!coef}.  You can use the function \verb@coef@:
+Often it is useful to have a vector of the estimated parameters.  For example, if you are writing a call to \texttt{optim()}, you will need a 
+vector of just the estimated parameters\index{functions!coef}.  You can use the function \verb@coef()@:
 <<Cs28_parvec, include.source=FALSE, keep.source=TRUE>>=
 parvec <- coef(kemfit, type = "vector")
 parvec
 @
 
 \section{Kalman filter and smoother output}
-All the standard Kalman filter and smoother output (along with the lag-one covariance smoother output) is available using the \verb@tsSmooth@\index{functions!tsSmooth} and \verb@MARSSkf@\index{functions!MARSSkf}\index{Kalman filter and smoother}\index{lag-1 covariance smoother} function.  Read the help file (\verb@?MARSSkf@) for details and meanings of the names in the output list. \verb@tsSmooth@ returns a data frame in long form. You need to pass in the type of conditioning you want (on all data, data 1 to $t$ or data 1 to $t-1$).
+All the standard Kalman filter and smoother output (along with the lag-one covariance smoother output) is available using the \verb@tsSmooth()@\index{functions!tsSmooth} and \verb@MARSSkf()@\index{functions!MARSSkf}\index{Kalman filter and smoother}\index{lag-1 covariance smoother} functions.  Read the help file (\verb@?MARSSkf@) for details and meanings of the names in the output list. \verb@tsSmooth()@ returns a data frame in long form. You need to pass in the type of conditioning you want (on all data, data 1 to $t$ or data 1 to $t-1$).
 <<Cs29_tsSmooth, keep.source=TRUE>>=
 df <- tsSmooth(kemfit)
 head(df)
 @
-\verb@MARSSkf@ returns a list with all the filter and smoother output (including variance matrices) in matrix and array form.
+\verb@MARSSkf()@ returns a list with all the filter and smoother output (including variance matrices) in matrix and array form.
 <<Cs30_marsskf, keep.source=TRUE>>=
 kf <- MARSSkf(kemfit)
 names(kf)

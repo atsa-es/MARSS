@@ -53,7 +53,7 @@ Year is in the first column, and the counts (in normal space) are in columns 2:3
 <<Cs002_fig1,fig=TRUE>>=
 # Code for plotting raw Okanagan redd counts
 plot(okanaganRedds[,1], okanaganRedds[,2],
-    xlab = "Year", ylab="Redd counts",main="", col="red", pch=1)
+    xlab = "", ylab="Redd counts",main="", col="red", pch=1)
 points(okanaganRedds[,1], okanaganRedds[,3], col="blue", pch=2)
 legend('topleft', inset=0.1, legend=c("Aerial survey","Ground survey"),
  col=c("red","blue"), pch=c(1,2))
@@ -108,7 +108,7 @@ It is possible that these surveys are measuring different population processes. 
 \begin{gathered}
 \begin{bmatrix}x_1\\x_2\end{bmatrix}_t
 = \begin{bmatrix}x_1\\x_2\end{bmatrix}_{t-1} + \begin{bmatrix}u\\u\end{bmatrix} + \ww_t, \textrm{ where } 
-\ww_t \sim \MVN(0,\begin{bmatrix}q&0\\0&q\end{bmatrix})  \\
+\ww_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}q&0\\0&q\end{bmatrix}\end{pmatrix}  \\
  \left[ \begin{array}{c}
     y_{aer} \\
     y_{gnd} \end{array} \right]_t = 
@@ -141,7 +141,7 @@ This suggests that the two different surveys are not only measuring the same und
 <<Cs006_fig2,fig=TRUE, echo=FALSE>>=
 # Code for plotting the fit from the best model
 plot(okanaganRedds[,1], logRedds[1,],
-xlab = "Year", ylab="Redd counts",main="", col="red", ylim=c(0,8))
+xlab = "", ylab="Redd counts",main="", col="red", ylim=c(0,8))
 points(okanaganRedds[,1], logRedds[2,], col="blue", pch=2)
 lines(okanaganRedds[,1], c(kem1$states), lty=1, lwd=2)
 lines(okanaganRedds[,1], c(kem1$states + 2*kem1$states.se), lty=1, lwd=1, col="grey40")
@@ -242,7 +242,7 @@ options(warn=0)
 
 meany = matrix(apply(dat,2,mean,na.rm=T),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #take off the mean; for better plotting and to mask pattern
 adj = matrix(c(1.5,0,-2,1,2,-2,-1,0,2),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #just to mask pattern in data
-graphics::matplot(x,dat-meany+adj,xlab="",ylab="index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
+graphics::matplot(x,dat-meany+adj,xlab="",ylab="Index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
 title("Puget Sound Total Rockfish Indices")
 @
 \end{center}
@@ -335,7 +335,7 @@ head(kestrel)
 \begin{center}
 <<Cs008_plot-bird-data,fig=TRUE,echo=FALSE>>=
 # Make a plot of the three time series
-plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
+plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
 points(kestrel[,1], kestrel[,3], col="blue", pch=22)
 points(kestrel[,1], kestrel[,4], col="purple", pch=25)
 legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
@@ -356,7 +356,7 @@ x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)  \\
     y_{SK} \end{bmatrix}_t = \begin{bmatrix}1\\1\\1 \end{bmatrix} x_t +  
     \begin{bmatrix}0\\ a_2\\ a_3 \end{bmatrix} + 
     \begin{bmatrix}v_{BC} \\ v_{AB} \\ v_{SK} \end{bmatrix}_t, 
-    \textrm{ where } \vv_t \sim \MVN\bigg(0, \begin{bmatrix}r&0&0\\0&r&0\\0&0&r\end{bmatrix} \bigg) 
+    \textrm{ where } \vv_t \sim \MVN\begin{pmatrix}0, \begin{bmatrix}r&0&0\\0&r&0\\0&0&r\end{bmatrix} \end{pmatrix} 
 \end{gathered}
 \end{equation}
 In MARSS, we denote the model:
@@ -374,7 +374,7 @@ We will compare this to a model where we assume that there is a separate populat
 \begin{gathered}
 \begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_t
 = \begin{bmatrix}x_{BC}\\x_{AB}\\x_{SK}\end{bmatrix}_{t-1} + \begin{bmatrix}u\\u\\u\end{bmatrix} + \ww_t, \textrm{ where } 
-\ww_t \sim \MVN(0,\begin{bmatrix}q&0&0\\0&q&0\\0&0&q\end{bmatrix})  \\
+\ww_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}q&0&0\\0&q&0\\0&0&q\end{bmatrix}\end{pmatrix}  \\
 \begin{bmatrix}
     y_{BC} \\
     y_{AB} \\
@@ -441,7 +441,7 @@ The last model is superior to the others, and lowers the AICc value compared to 
 \begin{center}
 <<Cs017_plot-bird-model-4-fits,fig=TRUE,echo=FALSE>>=
 # Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
-plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
+plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
 points(kestrel[,1], kestrel[,3], col="blue", pch=22)
 points(kestrel[,1], kestrel[,4], col="purple", pch=25)
 lines(kestrel[,1], c(kem.b4$states[1,]), lty=3, lwd=2, col="red")

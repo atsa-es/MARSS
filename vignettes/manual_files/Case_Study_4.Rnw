@@ -428,7 +428,7 @@ fit <- kemz.3
 spp <- rownames(dat.z)
 par(mfcol = c(3, 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
 for (i in 1:length(spp)) {
-  plot(dat.z[i, ], xlab = "", ylab = "abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
+  plot(dat.z[i, ], xlab = "", ylab = "Abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
   axis(1, 12 * (0:dim(dat.z)[2]) + 1, 1980 + 0:dim(dat.z)[2])
   par.mat <- coef(fit, type = "matrix")
   lines(as.vector(par.mat$Z[i, , drop = FALSE] %*% fit$states + par.mat$A[i, ]), lwd = 2)
@@ -614,7 +614,8 @@ The varimax rotation is easy to compute because R has a built in function that r
 <<Cs20_kem3_R_unconstrained, results=hide>>=
 big.maxit.cntl.list <- list(minit = 200, maxit = 5000, allow.degen = FALSE)
 model.list <- list(m = 2, R = "unconstrained")
-the.fit <- MARSS(dat.z, model = model.list, form = "dfa", control = big.maxit.cntl.list)
+the.fit <- MARSS(dat.z, model = model.list, form = "dfa", 
+                 control = big.maxit.cntl.list)
 @
 Next, we retrieve the matrix used for varimax rotation.
 
@@ -622,7 +623,8 @@ Next, we retrieve the matrix used for varimax rotation.
 # get the inverse of the rotation matrix
 Z.est <- coef(the.fit, type = "matrix")$Z
 H.inv <- 1
-if (ncol(Z.est) > 1) H.inv <- varimax(coef(the.fit, type = "matrix")$Z)$rotmat
+if (ncol(Z.est) > 1) 
+  H.inv <- varimax(coef(the.fit, type = "matrix")$Z)$rotmat
 @
 The rotation matrix that varimax returns $\HH^{-1}$ rather than $\HH$. If $\ZZ$ has one column, there is only one $\ZZ$; there is only a rotation matrix if $\ZZ$ has more than one column.  We use $\HH^{-1}$ to rotate the factor loadings and $\HH$ to rotate the trends as in Equation \ref{eq:dfa.rotated}.
 
@@ -642,7 +644,11 @@ Z.low <- coef(the.fit, type = "Z", what = "par.lowCI")
 Z.up <- coef(the.fit, type = "Z", what = "par.upCI")
 Z.rot.up <- Z.up %*% H.inv
 Z.rot.low <- Z.low %*% H.inv
-df <- data.frame(est = as.vector(Z.rot), conf.up = as.vector(Z.rot.up), conf.low = as.vector(Z.rot.low))
+df <- data.frame(
+  est = as.vector(Z.rot), 
+  conf.up = as.vector(Z.rot.up), 
+  conf.low = as.vector(Z.rot.low)
+  )
 @
 
 Rotated factor loadings for the model are shown in Figure \ref{fig:CS4.facloadings}.  Oddly, some taxa appear to have no loadings on some trends (e.g., diatoms on trend 1).  The reason is that, merely for display purposes, we chose to plot only those loadings that are greater than 0.05, and it turns out that after varimax rotation, several loadings are close to 0.
@@ -895,7 +901,7 @@ fit.b <- par.mat$Z %*% kemz.temp$states + matrix(par.mat$A, nrow = N.ts, ncol = 
 spp <- rownames(dat.z)
 par(mfcol = c(3, 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
 for (i in 1:length(spp)) {
-  plot(dat.z[i, ], xlab = "", ylab = "abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
+  plot(dat.z[i, ], xlab = "", ylab = "Abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
   axis(1, 12 * (0:dim(dat.z)[2]) + 1, 1980 + 0:dim(dat.z)[2])
   lines(fit.b[i, ], lwd = 2)
   title(spp[i])

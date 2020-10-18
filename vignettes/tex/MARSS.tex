@@ -8,7 +8,7 @@ MARSS(data, model=list(), form="marxss"))
 \end{Schunk}
 The model argument is a list with names \verb@B@, \verb@U@, \verb@C@, \verb@c@, \verb@Q@, \verb@Z@, \verb@A@, \verb@D@, \verb@d@, \verb@R@, \verb@x0@, \verb@V0@.  Elements can be left off to use default values.  The form argument tells \verb@MARSS()@ how to use the model list elements.  The default is \verb@form="marxss"@ which is the model in Equation \ref{eqn:marss}.
 
-The data must be passed in as a $n \times T$ matrix; that is time goes across columns.  A vector is not a matrix, nor is a dataframe, nor is a time-series (\texttt{ts}) object. A data matrix consisting of three time series ($n=3$) with six time steps might look like
+The data must be passed in as a $n \times T$ matrix (time goes across columns) or a ts object or vector (which will be converted to a $n \times T$ matrix with time across the columns). A data matrix consisting of three time series ($n=3$) with six time steps might look like
 \begin{equation*}
 \yy = \left[ \begin{array}{ccccccc}
     1 & 2 & NA & NA & 3.2 & 8\\

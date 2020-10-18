@@ -170,7 +170,7 @@ kem1 <- MARSS(dat,
   model =
     list(Z = factor(c(1, 1, 1, 1, 1)), R = "diagonal and equal")
 )
-graphics::matplot(years, t(dat), xlab = "", ylab = "index of log abundance", pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L")
+graphics::matplot(years, t(dat), xlab = "", ylab = "Index of log abundance", pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L")
 lines(years, kem1$states - 1.96 * kem1$states.se, type = "l", lwd = 1, lty = 2, col = "red")
 lines(years, kem1$states + 1.96 * kem1$states.se, type = "l", lwd = 1, lty = 2, col = "red")
 lines(years, kem1$states, type = "l", lwd = 2)
@@ -201,7 +201,7 @@ kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 
 # make figure
 graphics::matplot(years, t(dat),
-  xlab = "", ylab = "index of log abundance",
+  xlab = "", ylab = "Index of log abundance",
   pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L"
 )
 lines(years, kem1$states - 1.96 * kem1$states.se,
@@ -236,7 +236,7 @@ The maximum-likelihood estimates of
 ``total harbor seal population'' scaled to the first observation data series (Figure \ref{fig:CS2.fig2}) are in \verb@kem1$states@, and \verb@kem1$states.se@ are the standard errors on those estimates.  To get 95\% confidence intervals, use \verb@kem1$states +/- 1.96*kem1$states.se@.
 Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the biases, the $/aa$, cannot be estimated and arbitrarily our algorithm chooses $a_1=0$, so the population estimate is scaled to the first observation time series.   
 
-The estimated parameters are output with the function \verb@coef@: \verb@coef(kem1)@.  To get the estimate just for \texttt{U}, which is the estimated long-term population growth rate, use \verb@coef(kem1)$U@.  Multiply by 100 to get the percent increase per year.  The estimated process variance is given by \verb@coef(kem2)$Q@.
+The estimated parameters are output with the function \verb@coef()@: \verb@coef(kem1)@.  To get the estimate just for \texttt{U}, which is the estimated long-term population growth rate, use \verb@coef(kem1)$U@.  Multiply by 100 to get the percent increase per year.  The estimated process variance is given by \verb@coef(kem2)$Q@.
 
 The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  one initial $x$ ($t=1$), one process variance, one $u$, four $a$'s, and five observation variances. So $K=12$ parameters.  The AIC\index{model selection!AIC} of this model is $-2 \times \text{log-like} + 2K$, which we can show by typing \verb@kem1$AIC@.
 
@@ -283,7 +283,7 @@ A smaller AIC means a better model\index{model selection!AIC}.  The difference b
 resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -308,7 +308,7 @@ c(kem1$AIC, kem2$AIC) # AICs
 resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -416,7 +416,7 @@ kem3 <- MARSS(dat, model = list(
 resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -430,7 +430,7 @@ par(mfrow = c(1, 1))
 resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -467,7 +467,7 @@ kem <- MARSS(dat, model = list(
 \subsection{Two subpopulations with different population parameters}
 \label{CS2.ex5}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Analyze the data using a model that assumes that the Strait of Juan de Fuca and San Juan Islands census regions represent a northern Puget Sound subpopulation, while the other three regions represent a southern Puget Sound subpopulation. This time assume that each population trajectory (north and south) has different $u$ and $q$ parameters: $u_n$,$u_s$ and $q_n$,$q_s$. Also assume that each of the five census regions has a different observation variance.  Try to write your own code.  If you get stuck (or want to check your work, you can open a script file with sample R code by typing \verb@RShowDoc("Chapter_SealTrend.R",package="MARSS")@ at the R command line.
+Analyze the data using a model that assumes that the Strait of Juan de Fuca and San Juan Islands census regions represent a northern Puget Sound subpopulation, while the other three regions represent a southern Puget Sound subpopulation. This time assume that each population trajectory (north and south) has different $u$ and $q$ parameters: $u_n$, $u_s$ and $q_n$, $q_s$. Also assume that each of the five census regions has a different observation variance.  Try to write your own code.  If you get stuck (or want to check your work, you can open a script file with sample R code by typing \verb@RShowDoc("Chapter_SealTrend.R",package="MARSS")@ at the R command line.
 
 In math form, this model is:
 \begin{equation}
