@@ -28,7 +28,7 @@ Passing in \code{form="dfa"} to \code{\link{MARSS}()} invokes a helper function 
 }
 
 \arguments{
-Some arguments are common to all forms: "data", "inits", "control", "method", "form", "fit", "silent", "fun.kf". See \code{\link{MARSS}} for information on these arguments.
+Some arguments are common to all forms: "y" (data), "inits", "control", "method", "form", "fit", "silent", "fun.kf". See \code{\link{MARSS}} for information on these arguments.
 
 In addition to these, form="dfa" has some special arguments that can be passed in:
 \itemize{
