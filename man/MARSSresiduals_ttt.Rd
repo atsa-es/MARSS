@@ -65,7 +65,7 @@ If \code{normalize=FALSE}, the unconditional variance of \eqn{\mathbf{V}_t}{V(t)
 If normalize=TRUE, the model is assumed to be written
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}_t + \mathbf{a} + \mathbf{H}\mathbf{v}_t}{ y(t) = Z x(t) + a + Hv(t)}
 \deqn{\mathbf{x}_t = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{G}\mathbf{w}_t}{ x(t) = B x(t-1) + u + Gw(t)}
-with the variance of \eqn\mathbf{V}_t}{V(t)} and \eqn\mathbf{W}_t}{W(t)} equal to \eqn{\mathbf{I}}{I} (identity).
+with the variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} equal to \eqn{\mathbf{I}}{I} (identity).
 
 \code{MARSSresiduals()} returns the residuals defined as in the first equations. To get normalized residuals (second equation) as used in Harvey et al. (1998), then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of \eqn{\mathbf{R}}{R} and \eqn{\mathbf{Q}}{Q}.  Note, that the `normalized' residuals are not the same as the `standardized' residuals.  In former, the unconditional residuals have a variance of I while in the latter it is the conditional residuals that have a variance of I.
 

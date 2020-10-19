@@ -61,7 +61,7 @@ If \code{normalize=FALSE}, the unconditional variance of \eqn{\mathbf{V}_t}{V(t)
 If normalize=TRUE, the model is assumed to be written
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}_t + \mathbf{a} + \mathbf{H}\mathbf{v}_t}{ y(t) = Z x(t) + a + Hv(t)}
 \deqn{\mathbf{x}_t = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{G}\mathbf{w}_t}{ x(t) = B x(t-1) + u + Gw(t)}
-with the variance of \eqn\mathbf{V}_t}{V(t)} and \eqn\mathbf{W}_t}{W(t)} equal to \eqn{\mathbf{I}}{I} (identity).
+with the variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} equal to \eqn{\mathbf{I}}{I} (identity).
 
 \strong{Missing or left-out data}
 
