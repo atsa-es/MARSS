@@ -109,7 +109,7 @@ vec(x)
   \item \code{ pchol } returns the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
-  \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{coef(MLEobj)} (See \code{\link{coef.marssMLE}}).
+  \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{\link[=coef.marssMLE]{coef}}.
   \item \code{ fully.spec.x } returns a list with 0 and 1 showing which x are fully specified by data when R has zeros. Used by \code{\link{MARSSkfss}()}.
 
 } 

@@ -11,13 +11,13 @@ The default MARSS model form is a MARXSS model: Multivariate Auto-Regressive(1) 
 \deqn{\mathbf{x}_{t} = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{C} \mathbf{c}_{t} + \mathbf{G} \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q})}{x(t) = B x(t-1) + u + C c(t) + G w(t), where w(t) ~ MVN(0,Q)}
 \deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}(t) + \mathbf{a} + \mathbf{D} \mathbf{d}_t + \mathbf{H} \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R})}{y(t) = Z x(t) + a + D d(t) + H v(t), where v(t) ~ MVN(0,R)}
 \deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~ MVN(x0, V0) }
-All parameters can be time-varying; the "t" subscript is left off the parameters to remove clutter. Note, by default \eqn{\mathbf{V0}}{V0} is a matrix of all zeros and thus \eqn{\mathbf{x}_1}{x(1)} or \eqn{\mathbf{x}_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
+All parameters can be time-varying; the \eqn{t} subscript is left off the parameters to remove clutter. Note, by default \eqn{\mathbf{V0}}{V0} is a matrix of all zeros and thus \eqn{\mathbf{x}_1}{x(1)} or \eqn{\mathbf{x}_0}{x(0)} is treated as an estimated parameter not a diffuse prior.
 
 The parameter matrices can have fixed values and linear constraints. This is an example of a 3x3 matrix with fixed values and linear constraints. In this example all the matrix elements can be written as a linear function of \eqn{a}, \eqn{b}, and \eqn{c}:
 \deqn{\left[\begin{array}{c c c} a+2b & 1 & a\\ 1+3a+b & 0 & b \\ 0 & -2 & c\end{array}\right]}{ [a+2b  1   a \\n 1+3a+b   0   b \\n 0   -2    c ]}
 Values such as \eqn{a b} or \eqn{a^2} or \eqn{ln(a)} are not allowed as those would not be linear.
 
-The MARSS model parameters, hidden state processes (x), and observations (y) are matrices:
+The MARSS model parameters, hidden state processes (\eqn{\mathbf{x}}{x}), and observations (\eqn{\mathbf{y}}{y}) are matrices:
   \itemize{
     \item \eqn{\mathbf{x}_t}{x(t)}, \eqn{\mathbf{x0}}{x0}, and \eqn{\mathbf{u}}{u} are m x 1 
     \item \eqn{\mathbf{y}_t}{y(t)} and \eqn{\mathbf{a}}{a} are n x 1 (m<=n)
@@ -43,8 +43,8 @@ The main fitting function is \code{\link{MARSS}()} which is used to fit a specif
       \item{\code{\link{MARSS}}}{ Top-level function for specifying and fitting MARSS models. } 
       \item{\code{\link[=coef.marssMLE]{coef}}}{ Returns the estimated parameters in a variety of formats. }    
       \item{\code{\link{tidy.marssMLE}}}{ Parameter estimates with confidence intervals } 
-      \item{\code{\link[=tsSmooth.marssMLE]{tsSmooth}}}{ x and y estimates output as a data frame. Output can be conditioned on all the data (T), data up to t-1, or data up to t. From the Kalman filter and smoother output. } 
-      \item{\code{\link[=fitted.marssMLE]{fitted}}}{ Model x or y predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
+      \item{\code{\link[=tsSmooth.marssMLE]{tsSmooth}}}{ \eqn{\mathbf{x}}{x} and \eqn{\mathbf{y}}{y} estimates output as a data frame. Output can be conditioned on all the data (\eqn{T}), data up to \eqn{t-1}, or data up to \eqn{t}. From the Kalman filter and smoother output. } 
+      \item{\code{\link[=fitted.marssMLE]{fitted}}}{ Model x\eqn{\mathbf{x}}{x} and \eqn{\mathbf{y}}{y} predictions as a data frame or matrices. Another user interface for model predictions is \code{predict.marssMLE}. } 
       \item{\code{\link[=residuals.marssMLE]{residuals}}}{ Model residuals as a data frame. } 
       \item{\code{\link{MARSSresiduals}}}{ Model residuals as a data frame or matrices. Normal user interface to residuals is \code{residuals.marssMLE}.} 
       \item{\code{\link[=predict.marssMLE]{predict}}}{ Predictions and forecasts from a \code{\link{marssMLE}} object. } 

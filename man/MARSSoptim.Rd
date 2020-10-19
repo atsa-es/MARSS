@@ -2,7 +2,7 @@
 \alias{MARSSoptim}
 \title{Parameter estimation for MARSS models using optim}
 \description{
-  Parameter estimation for MARSS models using R's \code{\link{optim}} function.   This allows access to R's quasi-Newton algorithms available in that function.  The \code{MARSSoptim()} function is called when \code{\link{MARSS}()} is called with \code{method="BFGS"}.  This is an internal function in the \code{\link{MARSS-package}}. 
+  Parameter estimation for MARSS models using R's \code{\link{optim}()} function.   This allows access to R's quasi-Newton algorithms available in that function.  The \code{MARSSoptim()} function is called when \code{\link{MARSS}()} is called with \code{method="BFGS"}.  This is an internal function in the \code{\link{MARSS-package}}. 
 }
 \usage{
 MARSSoptim(MLEobj)
@@ -13,7 +13,7 @@ MARSSoptim(MLEobj)
 \details{
 Objects of class \code{\link{marssMLE}} may be built from scratch but are easier to construct using \code{\link{MARSS}()} called with \code{MARSS(..., fit=FALSE, method="BFGS")}.
 
-  Options for \code{\link{optim}} are passed in using \code{MLEobj$control}.  See \code{\link{optim}} for a list of that function's control options.  If \code{lower} and \code{upper} for \code{\link{optim}} need to be passed in, they should be passed in as part of \code{control} as \code{control$lower} and \code{control$upper}. Additional \code{control} arguments affect printing and initial conditions.
+  Options for \code{\link{optim}()} are passed in using \code{MLEobj$control}.  See \code{\link{optim}()} for a list of that function's control options.  If \code{lower} and \code{upper} for \code{\link{optim}()} need to be passed in, they should be passed in as part of \code{control} as \code{control$lower} and \code{control$upper}. Additional \code{control} arguments affect printing and initial conditions.
   \describe{
       \item{\code{MLEobj$control$kf.x0}}{ The initial condition is at $t=0$ if kf.x0="x00".  The initial condition is at $t=1$ if kf.x0="x10". }    
       \item{\code{MLEobj$marss$diffuse}}{ If diffuse=TRUE, a diffuse initial condition is used. MLEobj$par$V0 is then the scaling function for the diffuse part of the prior.  Thus the prior is V0*kappa where kappa-->Inf.  Note that setting a diffuse prior does not change the correlation structure within the prior. If diffuse=FALSE, a non-diffuse prior is used and MLEobj$par$V0 is the non-diffuse prior variance on the initial states. The the prior is V0.}      \item{\code{MLEobj$control$silent}}{ Suppresses printing of progress bars, error messages, warnings and convergence information. }    

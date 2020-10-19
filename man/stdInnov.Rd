@@ -4,14 +4,14 @@
 
 \title{ Standardized Innovations }
 \description{
-  Standardizes Kalman filter innovations. This is a helper function called by \code{\link{MARSSinnovationsboot}} in the \code{\link{MARSS-package}}. Not exported.
+  Standardizes Kalman filter innovations. This is a helper function called by \code{\link{MARSSinnovationsboot}()} in the \code{\link{MARSS-package}}. Not exported.
 }
 \usage{
 stdInnov(SIGMA, INNOV)
 }
 \arguments{
   \item{SIGMA}{ n x n x T array of Kalman filter innovations variances.  This is output from \code{\link{MARSSkf}}. }
-  \item{INNOV}{ n x T matrix of Kalman filter innovations.  This is output from  \code{\link{MARSSkf}}. }
+  \item{INNOV}{ n x T matrix of Kalman filter innovations.  This is output from  \code{\link{MARSSkf}()}. }
 }
 \details{
   n = number of observation (y) time series.   T = number of time steps in the time series.

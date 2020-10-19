@@ -13,7 +13,7 @@ MARSSinnovationsboot(MLEobj, nboot = 1000, minIndx = 3)
   \item{minIndx}{ Number of innovations to skip. Stoffer & Wall suggest not sampling from innovations 1-3. }
 }
 \details{
-  Stoffer and Wall (1991) present an algorithm for generating CIs via a non-parametric bootstrap for state-space models.  The basic idea is that the Kalman filter can be used to generate estimates of the residuals of the model fit.  These residuals are then standardized and resampled and used to generate bootstrapped data using the MARSS model and its maximum-likelihood parameter estimates.  One of the limitations of the Stoffer and Wall algorithm is that it cannot be used when there are missing data, unless all data at time t are missing.
+  Stoffer and Wall (1991) present an algorithm for generating CIs via a non-parametric bootstrap for state-space models.  The basic idea is that the Kalman filter can be used to generate estimates of the residuals of the model fit.  These residuals are then standardized and resampled and used to generate bootstrapped data using the MARSS model and its maximum-likelihood parameter estimates.  One of the limitations of the Stoffer and Wall algorithm is that it cannot be used when there are missing data, unless all data at time \eqn{t} are missing.
 }
 \value{
   A list containing the following components:

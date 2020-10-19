@@ -3,7 +3,7 @@
 
 \title{ Tests marssMLE object for completeness }
 \description{
-  Tests an marssMLE for completeness to determine if it has all the pieces and attributes necessary to be passed to MARSS functions for fitting, filtering, smoothing, or displaying. Internal function, use \code{MARSS:::} to access. This is a very slow function which should not be called repeatedly in a \code{for} loop for example.
+  Tests a marssMLE object for completeness to determine if it has all the pieces and attributes necessary to be passed to MARSS functions for fitting, filtering, smoothing, or displaying. Internal function, use \code{MARSS:::} to access. This is a very slow function which should not be called repeatedly in a \code{for} loop for example.
 }
 \usage{
 is.marssMLE(MLEobj)

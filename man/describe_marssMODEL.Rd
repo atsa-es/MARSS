@@ -4,7 +4,7 @@
 
 \title{ Describe a marssMODEL Objects }
 \description{
-  \code{describe.marssMODEL} will print out information on the model in short form (e.g. 'diagonal and equal'). It is used by \code{\link{print.marssMODEL}}. It calls form specific functions: \code{describe_dfa}, \code{describe_marss}, and \code{describe_marxss}.
+  \code{describe.marssMODEL} will print out information on the model in short form (e.g. 'diagonal and equal'). It is used by \code{\link[=print.marssMLE]{print}()}. It calls form specific functions: \code{describe_dfa}, \code{describe_marss}, and \code{describe_marxss}.
 }
 \usage{
 describe.marssMODEL(x)

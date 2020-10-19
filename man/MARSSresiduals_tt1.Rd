@@ -18,17 +18,17 @@ MARSSresiduals.tt1(object, method=c("SS"), normalize=FALSE,
 }
 \value{
 A list with the following components  
-  \item{model.residuals}{ The the observed one-step-ahead model residuals: data minus the model predictions conditioned on the data 1 to t-1. These are termed innovations. A n x T matrix. NAs will appear where the data are missing. }
+  \item{model.residuals}{ The the observed one-step-ahead model residuals: data minus the model predictions conditioned on the data \eqn{t=1} to \eqn{t-1}. These are termed innovations. A n x T matrix. NAs will appear where the data are missing. }
   \item{state.residuals}{ The one-step-ahead state residuals \eqn{ \mathbf{x}_{t+1}^{t+1} - \mathbf{B}\mathbf{x}_{t}^t - \mathbf{u} }{ xtt(t+1) - B xtt(t) - u}
-. Note, state residual at time \eqn{t} is the transition from time \eqn{t} to \eqn{t+1}. }
+. Note, state residual at time \eqn{t} is the transition from time \eqn{t=t} to \eqn{t+1}. }
   \item{residuals}{ The residuals conditioned on the observed data up to time \eqn{t-1}. Returned as a (n+m) x T matrix with \code{model.residuals} in rows 1 to n and \code{state.residuals} in rows n+1 to n+m.  NAs will appear in rows 1 to n in the places where data are missing. }
   \item{var.residuals}{ The joint variance of the one-step-ahead residuals. Returned as a n+m x n+m x T matrix. }
   \item{std.residuals}{ The Cholesky standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals}. The model standardized residuals associated with the missing data are replaced with NA. }
   \item{mar.residuals}{ The marginal standardized residuals as a n+m x T matrix. This is \code{residuals} multiplied by the inverse of the diagonal matrix formed by the square-root of the diagonal of \code{var.residuals}.  The model marginal residuals associated with the missing data are replaced with NA. }
   \item{bchol.residuals}{ The Block Cholesky standardized residuals as a (n+m) x T matrix. This is \code{model.residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals[1:n,1:n,]} and \code{state.residuals} multiplied by the inverse of the lower triangle of the Cholesky decomposition of \code{var.residuals[(n+1):(n+m),(n+1):(n+m),]}.}
-  \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data 1 to t-1. Returned as a n x T matrix. Because all the data at time t are unobserved for the purpose of estimation (since conditioning is from 1 to t-1), this will be all 0s (unlike the case where we condition on the data from 1 to T or 1 to t). This and \code{var.obs.residuals} are included for completeness since they are returned for \code{\link{MARSSresiduals.tT}}, but they are not relevant for one-step-ahead residuals. See the discussion there. }
-    \item{var.obs.residuals}{ For one-step-ahead residuals, this will be the same as the 1:n, 1:n upper diagonal block in \code{var.residuals} since none of the \eqn{t} data affect the residuals at time \eqn{t} (the model residuals are conditioned only on the data up to \eqn{t-1}). This is different for smoothation residuals which are conditioned on the data from 1 to T. This and \code{E.obs.residuals} are included for completeness since they are returned for \code{\link{MARSSresiduals.tT}}, but they are not relevant for one-step-ahead residuals. See the discussion there. Note, also included as a code check. They are computed differently, but \code{var.obs.residuals} and \code{var.residuals} should always be the same.}
-  \item{msg}{ Any warning messages. This will be printed unless Object$control$trace = -1 (suppress all error messages). }
+  \item{E.obs.residuals}{ The expected value of the model residuals conditioned on the observed data \eqn{t=1} to \eqn{t-1}. Returned as a n x T matrix. Because all the data at time \eqn{t} are unobserved for the purpose of estimation (since conditioning is from \eqn{t=1} to \eqn{t-1}), this will be all 0s (unlike the case where we condition on the data from \eqn{t=1} to \eqn{T} or to \eqn{t}). This and \code{var.obs.residuals} are included for completeness since they are returned for \code{\link{MARSSresiduals.tT}()}, but they are not relevant for one-step-ahead residuals. See the discussion there. }
+    \item{var.obs.residuals}{ For one-step-ahead residuals, this will be the same as the 1:n, 1:n upper diagonal block in \code{var.residuals} since none of the \eqn{t} data affect the residuals at time \eqn{t} (the model residuals are conditioned only on the data up to \eqn{t-1}). This is different for smoothation residuals which are conditioned on the data from \eqn{t=1} to \eqn{T}. This and \code{E.obs.residuals} are included for completeness since they are returned for \code{\link{MARSSresiduals.tT}()}, but they are not relevant for one-step-ahead residuals. See the discussion there. Note, also included as a code check. They are computed differently, but \code{var.obs.residuals} and \code{var.residuals} should always be the same.}
+  \item{msg}{ Any warning messages. This will be printed unless \code{object$control$trace = -1} (suppress all error messages). }
 
 }
 \details{
@@ -84,19 +84,19 @@ These residuals are uncorrelated unlike marginal residuals.
 The interpretation of the Cholesky standardized residuals is not straight-forward when the \eqn{\mathbf{Q}}{Q} and \eqn{\mathbf{R}}{R} variance-covariance matrices are non-diagonal.  The residuals which were generated by a non-diagonal variance-covariance matrices are transformed into orthogonal residuals in MVN(0,I) space.  For example, if v is 2x2 correlated errors with variance-covariance matrix R. The transformed residuals (from this function) for the i-th row of v is a combination of the row 1 effect and the row 1 effect plus the row 2 effect.  So in this case, row 2 of the transformed residuals would not be regarded as solely the row 2 residual but rather how different row 2 is from row 1, relative to expected.  If the errors are highly correlated, then the Cholesky standardized residuals can look rather non-intuitive.
 
 \code{mar.residuals} are the marginal standardized residuals. These are the residuals multiplied by the inverse of the diagonal matrix formed from the square-root of the diagonal of the variance matrix of the residuals: 
-\deqn{ \textrm{dg}(\hat{\Sigma}_t)^{-1/2} \hat{v}_t}{ dg(hatSigma(t))^{-1/2} hatv(t)}, where 'dg(A)' is the square matrix formed from the diagonal of A, aka \code{diag(diag(A))}. These residuals will be correlated if the variance matrix is non-diagonal. 
+\deqn{ \textrm{dg}(\hat{\Sigma}_t)^{-1/2} \hat{\mathbf{v}}_t}{ dg(hatSigma(t))^{-1/2} hatv(t)}, where 'dg(A)' is the square matrix formed from the diagonal of A, aka \code{diag(diag(A))}. These residuals will be correlated if the variance matrix is non-diagonal. 
 
 The Block Cholesky standardized residuals are like the Cholesky standardized residuals except that the full variance-covariance matrix is not used, only the variance-covariance matrix for the model or state residuals (respectively) is used for standardization. For the one-step-ahead case, the model and state residuals are independent (unlike in the smoothations case) thus the Cholesky and Block Cholesky standardized residuals will be identical (unlike in the smoothations case). 
 
 \strong{Normalized residuals}
 
-If \code{normalize=FALSE}, the unconditional variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} are \eqn{\mathbf{Q}}{Q} and \eqn{\mathbf{R}}{R} and the model is assumed to be written as
-\deqn{ y_t = Z x_t + a + v_t}
-\deqn{ x_t = B x_{t-1} + u + w_t}
+If \code{normalize=FALSE}, the unconditional variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} are \eqn{\mathbf{R}}{R} and \eqn{\mathbf{Q}}{Q} and the model is assumed to be written as
+\deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}_t + \mathbf{a} + \mathbf{v}_t}{ y(t) = Z x(t) + a + v(t)}
+\deqn{\mathbf{x}_t = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{w}_t}{ x(t) = B x(t-1) + u + w(t)}
 If normalize=TRUE, the model is assumed to be written
-\deqn{ y_t = Z x_t + a + Hv_t}
-\deqn{ x_t = B x_{t-1} + u + Gw_t}
-with the variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} equal to I (identity).
+\deqn{\mathbf{y}_t = \mathbf{Z} \mathbf{x}_t + \mathbf{a} + \mathbf{H}\mathbf{v}_t}{ y(t) = Z x(t) + a + Hv(t)}
+\deqn{\mathbf{x}_t = \mathbf{B} \mathbf{x}_{t-1} + \mathbf{u} + \mathbf{G}\mathbf{w}_t}{ x(t) = B x(t-1) + u + Gw(t)}
+with the variance of \eqn\mathbf{V}_t}{V(t)} and \eqn\mathbf{W}_t}{W(t)} equal to \eqn{\mathbf{I}}{I} (identity).
 
 \code{MARSSresiduals} returns the residuals defined as in the first equations. To get the residuals defined as Harvey et al. (1998) define them (second equations), then use \code{normalize=TRUE}.  In that case the unconditional variance of residuals will be I instead of \eqn{\mathbf{Q}}{Q} and \eqn{\mathbf{R}}{R}.  Note, that the `normalized' residuals are not the same as the `standardized' residuals.  In former, the unconditional residuals have a variance of I while in the latter it is the conditional residuals that have a variance of I.
 

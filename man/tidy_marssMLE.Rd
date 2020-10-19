@@ -27,7 +27,7 @@ A data frame with estimates, sample standard errors, and confidence intervals.
 
 \details{
 
-\code{tidy.marssMLE} assembles information available via the \code{\link{print.marssMLE}} and \code{\link{coef.marssMLE}} functions into a data frame that summarizes the estimates.  If conf.int=TRUE, \code{\link{MARSSparamCIs}} will be run to add confidence intervals to the model object if these are not already added.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}}. 
+\code{tidy.marssMLE()} assembles information available via the \code{\link[=print.marssMLE]{print}()} and \code{\link[=coef.marssMLE]{coef}()} functions into a data frame that summarizes the estimates.  If \code{conf.int=TRUE}, \code{\link{MARSSparamCIs}()} will be run to add confidence intervals to the model object if these are not already added.  The default CIs are calculated using a analytically computed Hessian matrix.  This can be changed by passing in optional arguments for \code{\link{MARSSparamCIs}()}. 
   
 }
 

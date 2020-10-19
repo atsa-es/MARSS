@@ -14,11 +14,11 @@ MARSSFisherI(MLEobj, method=c("Harvey1989", "fdHess", "optim"))
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. 
-  This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}}. }
-  \item{method}{ The method to use for computing the observed Fisher Information matrix. Options are 'Harvey1989' to use the Harvey (1989) recursion, which is an analytical solution, 'fdHess' or 'optim' which are two numerical methods.  Although 'optim' can be passed to the function, 'fdHess' is used for all numerical estimates used in the MARSS package.}
+  This object must have a \code{$par} element containing MLE parameter estimates from e.g. \code{\link{MARSSkem}()}. }
+  \item{method}{ The method to use for computing the observed Fisher Information matrix. Options are \code{"Harvey1989"} to use the Harvey (1989) recursion, which is an analytical solution, \code{"fdHess"} or \code{"optim"} which are two numerical methods.  Although 'optim' can be passed to the function, 'fdHess' is used for all numerical estimates used in the MARSS package.}
  }
 \details{
-   Method 'fdHess' uses \code{\link{fdHess}} from package \code{\link{nlme}} to numerically estimate the Hessian of the negative log-likelihood function at the MLEs. Method 'optim' uses \code{\link{optim}} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object. The \code{par} element of the \code{\link{marssMLE}} object is the MLE.  
+   Method 'fdHess' uses \code{\link{fdHess}()} from package \code{\link{nlme}} to numerically estimate the Hessian of the negative log-likelihood function at the MLEs. Method 'optim' uses \code{\link{optim}()} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object. The \code{par} element of the \code{\link{marssMLE}} object is the MLE.  
    
 Method 'Harvey1989' (the default) uses the recursion in Harvey (1989) to compute the observed Fisher Information of a MARSS model analytically. See Holmes (2016c) for a discussion of the Harvey (1989) algorithm and see Holmes (2017) on how to implement the algorithm for MARSS models with linear constraints (the type of MARSS models that the MARSS R package addresses).
    
