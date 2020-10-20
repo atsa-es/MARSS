@@ -125,7 +125,7 @@ print(out.tab.1[,c("H","Q","delta.AICc","AIC.weight")], row.names=FALSE)
 ###################################################
 best.fit=fits[min.AICc][[1]]
 graphics::matplot(years, t(best.fit$states-best.fit$states[,1]), 
-        xlab="abundance index", ylab="",
+        ylab="Abundance index", xlab="",
         type="l",lwd=2,col="black")
 legend("topleft",c("North Coastal","Inland Straits","Puget Sound","South Coastal"),lwd=2,lty=c(1:4),bty="n")
 

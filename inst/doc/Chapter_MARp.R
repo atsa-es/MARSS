@@ -47,7 +47,7 @@ print(cbind(true = true.2[2:4], estimates = coef(ar2, type = "vector")))
 ###################################################
 gappy.data <- sim.ar2[3:TT]
 gappy.data[floor(runif(TT / 2, 2, TT))] <- NA
-ar2.gappy <- MARSS(gappy.data, model = model.list.2)
+ar2.gappy <- MARSS(gappy.data, model = model.list.2, fun.kf="MARSSkfss")
 
 
 ###################################################

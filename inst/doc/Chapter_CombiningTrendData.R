@@ -16,7 +16,7 @@ logRedds = log(t(okanaganRedds)[2:3,])
 ###################################################
 # Code for plotting raw Okanagan redd counts
 plot(okanaganRedds[,1], okanaganRedds[,2],
-    xlab = "Year", ylab="Redd counts",main="", col="red", pch=1)
+    xlab = "", ylab="Redd counts",main="", col="red", pch=1)
 points(okanaganRedds[,1], okanaganRedds[,3], col="blue", pch=2)
 legend('topleft', inset=0.1, legend=c("Aerial survey","Ground survey"),
  col=c("red","blue"), pch=c(1,2))
@@ -63,7 +63,7 @@ c(mod1=kem1$AICc, mod2=kem2$AICc, mod3=kem3$AICc)
 ###################################################
 # Code for plotting the fit from the best model
 plot(okanaganRedds[,1], logRedds[1,],
-xlab = "Year", ylab="Redd counts",main="", col="red", ylim=c(0,8))
+xlab = "", ylab="Redd counts",main="", col="red", ylim=c(0,8))
 points(okanaganRedds[,1], logRedds[2,], col="blue", pch=2)
 lines(okanaganRedds[,1], c(kem1$states), lty=1, lwd=2)
 lines(okanaganRedds[,1], c(kem1$states + 2*kem1$states.se), lty=1, lwd=1, col="grey40")
@@ -81,7 +81,7 @@ head(kestrel)
 ### code chunk number 27: Cs008_plot-bird-data
 ###################################################
 # Make a plot of the three time series
-plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
+plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
 points(kestrel[,1], kestrel[,3], col="blue", pch=22)
 points(kestrel[,1], kestrel[,4], col="purple", pch=25)
 legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
@@ -140,7 +140,7 @@ c(mod1=kem.b1$AICc, mod2=kem.b2$AICc, mod3=kem.b3$AICc, mod4=kem.b4$AICc)
 ### code chunk number 33: Cs017_plot-bird-model-4-fits
 ###################################################
 # Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
-plot(kestrel[,1], kestrel[,2], xlab = "Year", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
+plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
 points(kestrel[,1], kestrel[,3], col="blue", pch=22)
 points(kestrel[,1], kestrel[,4], col="purple", pch=25)
 lines(kestrel[,1], c(kem.b4$states[1,]), lty=3, lwd=2, col="red")

@@ -144,7 +144,7 @@ fit <- kemz.3
 spp <- rownames(dat.z)
 par(mfcol = c(3, 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
 for (i in 1:length(spp)) {
-  plot(dat.z[i, ], xlab = "", ylab = "abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
+  plot(dat.z[i, ], xlab = "", ylab = "Abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
   axis(1, 12 * (0:dim(dat.z)[2]) + 1, 1980 + 0:dim(dat.z)[2])
   par.mat <- coef(fit, type = "matrix")
   lines(as.vector(par.mat$Z[i, , drop = FALSE] %*% fit$states + par.mat$A[i, ]), lwd = 2)
@@ -235,7 +235,8 @@ if (exists("model.data")) {
 ###################################################
 big.maxit.cntl.list <- list(minit = 200, maxit = 5000, allow.degen = FALSE)
 model.list <- list(m = 2, R = "unconstrained")
-the.fit <- MARSS(dat.z, model = model.list, form = "dfa", control = big.maxit.cntl.list)
+the.fit <- MARSS(dat.z, model = model.list, form = "dfa", 
+                 control = big.maxit.cntl.list)
 
 
 ###################################################
@@ -244,7 +245,8 @@ the.fit <- MARSS(dat.z, model = model.list, form = "dfa", control = big.maxit.cn
 # get the inverse of the rotation matrix
 Z.est <- coef(the.fit, type = "matrix")$Z
 H.inv <- 1
-if (ncol(Z.est) > 1) H.inv <- varimax(coef(the.fit, type = "matrix")$Z)$rotmat
+if (ncol(Z.est) > 1) 
+  H.inv <- varimax(coef(the.fit, type = "matrix")$Z)$rotmat
 
 
 ###################################################
@@ -266,7 +268,11 @@ Z.low <- coef(the.fit, type = "Z", what = "par.lowCI")
 Z.up <- coef(the.fit, type = "Z", what = "par.upCI")
 Z.rot.up <- Z.up %*% H.inv
 Z.rot.low <- Z.low %*% H.inv
-df <- data.frame(est = as.vector(Z.rot), conf.up = as.vector(Z.rot.up), conf.low = as.vector(Z.rot.low))
+df <- data.frame(
+  est = as.vector(Z.rot), 
+  conf.up = as.vector(Z.rot.up), 
+  conf.low = as.vector(Z.rot.low)
+  )
 
 
 ###################################################
@@ -398,11 +404,11 @@ theme_set(theme_bw())
 d <- residuals(the.fit, type = "tT")
 d$up <- qnorm(1 - alpha / 2) * d$.sigma + d$.fitted
 d$lo <- qnorm(alpha / 2) * d$.sigma + d$.fitted
-ggplot(data = d) +
-  geom_line(aes(t, .fitted)) +
+ggplot(data = subset(d, name=="model")) +
   geom_point(aes(t, value)) +
   geom_ribbon(aes(x = t, ymin = lo, ymax = up), linetype = 2, alpha = 0.2) +
-  facet_grid(~.rownames) +
+  geom_line(aes(t, .fitted), col="blue") +
+  facet_wrap(~.rownames) +
   xlab("Time Step") +
   ylab("Count")
 
@@ -452,7 +458,7 @@ fit.b <- par.mat$Z %*% kemz.temp$states + matrix(par.mat$A, nrow = N.ts, ncol = 
 spp <- rownames(dat.z)
 par(mfcol = c(3, 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
 for (i in 1:length(spp)) {
-  plot(dat.z[i, ], xlab = "", ylab = "abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
+  plot(dat.z[i, ], xlab = "", ylab = "Abundance index", bty = "L", xaxt = "n", ylim = c(-4, 3), pch = 16, col = "blue")
   axis(1, 12 * (0:dim(dat.z)[2]) + 1, 1980 + 0:dim(dat.z)[2])
   lines(fit.b[i, ], lwd = 2)
   title(spp[i])

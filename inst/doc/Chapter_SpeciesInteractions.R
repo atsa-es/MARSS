@@ -11,7 +11,7 @@ royale.dat <- log(t(isleRoyal[yr1960to2011, c("Wolf", "Moose")]))
 x <- isleRoyal[, "Year"]
 y <- log(isleRoyal[, c("Wolf", "Moose")])
 graphics::matplot(x, y,
-  ylab = "log count", xlab = "Year", type = "l",
+  ylab = "Log count", xlab = "Year", type = "l",
   lwd = 3, bty = "L", col = "black"
 )
 legend("topright", c("Wolf", "Moose"), lty = c(1, 2), bty = "n")
@@ -266,7 +266,7 @@ plank.model.4$c <- d.phos
 ### code chunk number 31: Cs27.5_print-C
 ###################################################
 # Cleaning up the B matrix for printing
-Cmat <- coef(kem.plank.2, type = "matrix")$C[1:4, 1, drop = FALSE]
+Cmat <- coef(kem.plank.4, type = "matrix")$C[1:4, 1, drop = FALSE]
 rownames(Cmat) <- c("LP", "SP", "D", "ND")
 Cmat[Cmat == 0] <- NA
 print(Cmat, digits = 2, na.print = "--")

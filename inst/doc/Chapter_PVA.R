@@ -23,7 +23,7 @@ for (i in 1:9) {
     sample(years[2:(nYr - 1)], floor(fracmiss * nYr), replace = FALSE)
   y[missYears] <- NA
   plot(years, y,
-    xlab = "", ylab = "log abundance", lwd = 2, bty = "l"
+    xlab = "", ylab = "Log abundance", lwd = 2, bty = "l"
   )
   lines(years, x, type = "l", lwd = 2, lty = 2)
   title(paste("simulation ", i))
@@ -134,8 +134,8 @@ for (j in c(10, 1:8)) {
 
   # plot it
   plot(tyrs, real.ex,
-    xlab = "time steps into future",
-    ylab = "probability of extinction", ylim = c(0, 1), bty = "l"
+    xlab = "Time steps into future",
+    ylab = "Probability of extinction", ylim = c(0, 1), bty = "l"
   )
   if (j <= 8) title(paste("simulation ", j))
   if (j == 10) title("average over sims")

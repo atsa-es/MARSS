@@ -16,7 +16,7 @@ kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 
 # make figure
 graphics::matplot(years, t(dat),
-  xlab = "", ylab = "index of log abundance",
+  xlab = "", ylab = "Index of log abundance",
   pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L"
 )
 lines(years, kem1$states - 1.96 * kem1$states.se,
@@ -54,7 +54,7 @@ c(kem1$AIC, kem2$AIC) # AICs
 resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))
@@ -76,7 +76,7 @@ kem3 <- MARSS(dat, model = list(
 resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
 par(mfrow = c(2, 3))
 for (i in 1:n) {
-  plot(resids[i, ], ylab = "residuals")
+  plot(resids[i, ], ylab = "Residuals")
   title(legendnames[i])
 }
 par(mfrow = c(1, 1))

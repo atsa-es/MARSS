@@ -17,7 +17,7 @@ library(broom)
 # load the datasets package
 library(datasets)
 data(Nile) # load the data
-plot(Nile, ylab = "Flow volume", xlab = "Year")
+plot(Nile, ylab = "Flow volume", xlab = "")
 
 
 ###################################################
@@ -124,7 +124,7 @@ library(Hmisc)
 par(mfrow = c(3, 1), mar = c(3, 4, 1.5, 2))
 x <- seq(tsp(Nile)[1], tsp(Nile)[2], tsp(Nile)[3])
 plot(x, resids.0[1, ],
-  ylab = "std. residuals", xlab = "", type = "l",
+  ylab = "Std. residuals", xlab = "", type = "l",
   ylim = c(-4, 4), xaxp = c(1870, 1970, 10), bty = "L"
 )
 minor.tick(nx = 10, ny = 0, tick.ratio = .3)
@@ -132,7 +132,7 @@ abline(h = c(1.97, -1.97, 0), lty = 2)
 title("model 0--flat level")
 
 plot(x, resids.1[1, ],
-  ylab = "std. residuals", xlab = "", type = "l",
+  ylab = "Std. residuals", xlab = "", type = "l",
   ylim = c(-4, 4), xaxp = c(1870, 1970, 10), bty = "L"
 )
 minor.tick(nx = 10, ny = 0, tick.ratio = .3)
@@ -140,7 +140,7 @@ abline(h = c(1.97, -1.97, 0), lty = 2)
 title("model 1--linearly declining level")
 
 plot(x, resids.2[1, ],
-  ylab = "std. residuals", xlab = "", type = "l",
+  ylab = "Std. residuals", xlab = "", type = "l",
   ylim = c(-4, 4), xaxp = c(1870, 1970, 10), bty = "L"
 )
 minor.tick(nx = 10, ny = 0, tick.ratio = .3)
@@ -162,6 +162,6 @@ plot(x, resids.2[2, ], ylab = "", xlab = "", type = "l", ylim = c(-4, 4), xaxp =
 minor.tick(nx = 10, ny = 0, tick.ratio = .3)
 abline(h = c(1.97, -1.97), lty = 2)
 title("test for level changes")
-mtext("standardized residuals", side = 2, outer = TRUE, line = -1)
+mtext("Standardized residuals", side = 2, outer = TRUE, line = -1)
 
 
