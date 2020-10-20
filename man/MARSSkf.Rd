@@ -80,7 +80,6 @@ The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) An
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ 
 \code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}}, \code{\link[KFAS]{KFAS}}

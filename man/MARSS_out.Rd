@@ -54,6 +54,4 @@ The function you want to use depends on what you are trying to do.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }

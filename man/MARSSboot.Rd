@@ -51,8 +51,6 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
  }
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{ 
   \code{\link{marssMLE}},  \code{\link{marssMODEL}},  \code{\link{MARSSaic}}, \code{\link{MARSShessian}}, \code{\link{MARSSFisherI}}

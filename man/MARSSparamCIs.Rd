@@ -31,8 +31,6 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
  }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ \code{\link{MARSSboot}}, \code{\link{MARSSinnovationsboot}}, \code{\link{MARSShessian}}
  }

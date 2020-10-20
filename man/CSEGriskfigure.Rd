@@ -42,9 +42,7 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 (TMU figure) Ellner, S. P. and E. E. Holmes. (2008) Resolving the debate on when extinction risk is predictable. Ecology Letters 11:E1-E5.
  }
 \author{ 
-  Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
+  Eli Holmes, NOAA, Seattle, USA, and Steve Ellner, Cornell Univ. 
 }
 \seealso{ \code{\link{MARSSboot}}, \code{\link{marssMLE}}, \code{\link{CSEGtmufigure}} }
 \examples{

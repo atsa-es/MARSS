@@ -20,8 +20,6 @@ The X.names and Y.names are attributes of \code{\link{marssMODEL}} objects (whic
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ \code{\link{marssMLE}}, \code{\link{marssMODEL}} }
 

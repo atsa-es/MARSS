@@ -85,8 +85,6 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]\code{RS
 }
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{ 
   \code{\link{MARSSkf}}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}}, \code{\link{MARSSinfo}}

@@ -27,8 +27,6 @@
   }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{ 
 dat <- t(harborSeal)

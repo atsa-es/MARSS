@@ -27,8 +27,6 @@ As the name of the functions imply, these convert \code{\link{marssMODEL}} objec
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 
 \seealso{ \code{\link{marssMODEL}} } 

@@ -28,8 +28,6 @@ Ellner, S. P. and E. E. Holmes. (2008) Resolving the debate on when extinction r
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA, and Steve Ellner, Cornell Univ.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ \code{\link{CSEGriskfigure}} }
 \examples{

@@ -32,7 +32,5 @@
 }
 \author{ 
   Eli Holmes and Kellie Wills, NOAA, Seattle, USA
-  
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \keyword{classes}

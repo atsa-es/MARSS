@@ -16,8 +16,6 @@ MARSSinfo(number)
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{
 # Show all the info options

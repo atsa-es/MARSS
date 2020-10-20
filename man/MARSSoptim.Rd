@@ -53,8 +53,6 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
 }
 \author{
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{  \code{\link{MARSS}}, \code{\link{MARSSkem}},  \code{\link{marssMLE}},  \code{\link{optim}}
 }

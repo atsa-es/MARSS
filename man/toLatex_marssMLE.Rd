@@ -30,8 +30,6 @@ math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE)
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{ 
 # Example with linear constraints

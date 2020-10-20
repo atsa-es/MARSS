@@ -96,8 +96,6 @@ For \code{type="ytT"}, the predictions are conceptually the same as predictions 
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{
 dat <- t(harborSealWA)

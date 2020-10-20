@@ -30,8 +30,6 @@ MARSSsimulate(object, tSteps = NULL, nsim = 1, silent = TRUE,
 }
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{ 
   \code{\link{marssMODEL}}, \code{\link{marssMLE}}, \code{\link{MARSSboot}} 

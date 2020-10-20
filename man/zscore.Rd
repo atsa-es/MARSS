@@ -24,8 +24,6 @@ zscore(x, mean.only = FALSE)
 
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \examples{
 zscore(1:10)

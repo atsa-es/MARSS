@@ -58,8 +58,6 @@ A vector of error messages or NULL is no errors.
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 
 \seealso{ \code{\link{MARSS}}, \code{\link{MARSS.marxss}}, \code{\link{marssMODEL}} } 

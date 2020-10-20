@@ -61,7 +61,5 @@ Each form, should have a file called MARSS_form.R, with the following functions.
 
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \keyword{classes}

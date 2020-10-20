@@ -22,6 +22,4 @@
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-  
-  eli(dot)holmes(at)noaa(dot)gov
 }

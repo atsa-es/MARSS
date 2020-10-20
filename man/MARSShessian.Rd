@@ -27,8 +27,6 @@ See \code{\link{MARSSFisherI}} for a discussion of the observed Fisher Informati
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 } 
 \seealso{ \code{\link{MARSSFisherI}}, \code{\link{MARSSharveyobsFI}}, \code{\link{MARSShessian.numerical}}, \code{\link{MARSSparamCIs}}, \code{\link{marssMLE}} }
 \examples{

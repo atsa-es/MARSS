@@ -120,7 +120,5 @@ See above.
 
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 

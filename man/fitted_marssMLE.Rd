@@ -89,8 +89,6 @@ The intervals returned by \code{MARSSpredict()} are for the state predictions ba
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{
 dat <- t(harborSeal)

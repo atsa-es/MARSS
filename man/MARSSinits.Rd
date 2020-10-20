@@ -33,8 +33,6 @@ MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0,
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}} }
 

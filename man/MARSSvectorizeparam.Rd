@@ -22,8 +22,6 @@ MARSSvectorizeparam(MLEobj, parvec = NA, what="par")
 }
 \author{ 
   Eli Holmes and Kellie Wills, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
 }
 \seealso{ \code{\link{marssMLE}} }
 \examples{

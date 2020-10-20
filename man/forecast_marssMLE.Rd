@@ -56,8 +56,6 @@ Note: \code{y} in \code{newdata}. Data along with covariates can be passed into 
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \examples{
 # More examples are in ?predict.marssMLE

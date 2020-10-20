@@ -36,8 +36,6 @@ Holmes, E. E. (2012) Derivation of the EM algorithm for constrained and unconstr
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 }
 \seealso{ 
 \code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}}

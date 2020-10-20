@@ -81,9 +81,6 @@ Use \code{help.search("internal", package="MARSS")} to see the documentation of 
 }
 \author{
   Eli Holmes, Eric Ward and Kellie Wills, NOAA, Seattle, USA.
-
-  eli(dot)holmes(at)noaa(dot)gov and eric(dot)ward(at)noaa(dot)gov, 
-
 }
 \references{
 The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science

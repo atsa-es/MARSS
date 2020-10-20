@@ -18,8 +18,6 @@ Harvey (1989) discusses missing observations in section 3.4.7.  However, the \co
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 } 
 \seealso{ \code{\link{MARSShessian}}, \code{\link{MARSSparamCIs}} }
 \examples{

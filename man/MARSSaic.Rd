@@ -39,9 +39,7 @@ Bengtsson, T., and J. E. Cavanaugh. 2006. An improved Akaike information criteri
 Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-space model selection. Statistica Sinica 7:473-496.
 }
 \author{ 
-  Eli Holmes and Eric Ward, NOAA, Seattle, USA.
-
-  eli(dot)holmes(at)noaa(dot)gov, eric(dot)ward(at)noaa(dot)gov
+  Eli Holmes, NOAA, Seattle, USA.
 }
 \seealso{ \code{\link{MARSSboot}} }
 \examples{

@@ -20,8 +20,6 @@
 \code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}}, \code{\link{forecast.marssMLE}}
 }
 \author{ 
-  Eli Holmes
-  
-  eli(dot)holmes(at)noaa(dot)gov
+  Eli Holmes, NOAA, Seattle, WA.
 }
 \keyword{classes}

@@ -20,8 +20,6 @@ MARSShessian.numerical(MLEobj, fun=c("fdHess", "optim"))
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 } 
 \seealso{ \code{\link{MARSSharveyobsFI}}, \code{\link{MARSShessian}}, \code{\link{MARSSparamCIs}} }
 \examples{

@@ -71,8 +71,6 @@ See the discussion of residuals for missing and left-out data in \code{\link{MAR
 
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
-
-  eli(dot)holmes(at)noaa(dot)gov
 } 
 \seealso{ \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
 \examples{
