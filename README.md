@@ -23,8 +23,6 @@
 }
 </style>
 
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico?">
-
 <ul class="nav">
   <li><a href="#install">Install</a></li>
   <li><a href="#documentation">Documentation</a></li>
