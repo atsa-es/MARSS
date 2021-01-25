@@ -14,6 +14,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
   if (object[["fun.kf"]] != fun.kf) message(paste0(fun.kf, "is being used for prediction. This is different than fun.kf in the marssMLE object."))
   MODELobj <- object[["model"]]
   model.dims <- attr(MODELobj, "model.dims")
+  model.tsp <- attr(MODELobj, "model.tsp")
   TT <- model.dims[["y"]][2]
   nx <- switch(type,
     ytT = model.dims[["y"]][1],
@@ -63,6 +64,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
+    if( "h" %in% names(extras) ) stop(paste0("predict.marssMLE: pass in n.ahead for forecast not h."), call. = FALSE)
   }
 
   if (!missing(n.ahead) && n.ahead > 0) {
@@ -78,40 +80,48 @@ predict.marssMLE <- function(object, n.ahead = 0,
     return(outlist)
   }
 
-  # h not passed and/or h=0
+  # h not passed in and/or h=0
 
   # check newdata for errors
+  nonewdata <- all(unlist(lapply(newdata[c("y", "c", "d")], is.null)))
+  isnullnewdata <- all(unlist(lapply(newdata[c("t", "y", "c", "d")], is.null)))
+  istimevarying <- any(unlist(MARSS:::is.timevarying(object)))
+  if (nonewdata && !is.null(newdata[["t"]])) {
+    stop("predict.marssMLE: newdata cannot include only t (without either y, c or d).", call. = FALSE)
+  }
   if (!is.null(newdata[["t"]])) {
     if (!is.numeric(newdata[["t"]]) || !is.vector(newdata[["t"]])) {
       stop("predict.marssMLE: t in newdata must be a numeric vector.", call. = FALSE)
     }
-    if (!all(diff(newdata[["t"]]) == 1) || newdata[["t"]][1] < 1) {
+    if (!all(diff(newdata[["t"]]) == 1)) {
       stop("predict.marssMLE: t in newdata must be a positive ordered sequence of integers, one time step apart (like 1,2,3...).", call. = FALSE)
     }
-  }
-  nonewdata <- all(unlist(lapply(newdata[c("y", "c", "d")], is.null)))
-  isnullnewdata <- all(unlist(lapply(newdata[c("t", "y", "c", "d")], is.null)))
-  if (nonewdata && !is.null(newdata[["t"]])) {
-    if (length(newdata[["t"]]) > TT || newdata[["t"]][length(newdata[["t"]])] > TT) {
-      stop("predict.marssMLE: if no y, c or d in newdata, t must be within the original time steps.", call. = FALSE)
-    } else {
-      newdata[["y"]] <- object[["model"]][["data"]][, newdata[["t"]], drop = FALSE]
-      message(paste0("predict.marssMLE(): prediction is conditioned on the model data t = ", newdata[["t"]][1], " to ", max(newdata[["t"]]), "."))
+    if (istimevarying && is.null(newdata[["t"]])) {
+      newdata[["t"]] <- model.tsp[1]:model.tsp[2]
     }
+    if (istimevarying && newdata[["t"]][1] < model.tsp[1]) {
+      stop(paste0("predict.marssMLE: if the model is time-varying, t[1] in newdata cannot be less than the first time-step value (", model.tsp[1], ")."), call. = FALSE)      
+    }
+    if (istimevarying && newdata[["t"]][1] > model.tsp[2]) {
+      message(paste0("predict.marssMLE: if the model is time-varying and t[1] in newdata is greater than the last time-step value (", model.tsp[2], "). The prediction will use the parameter values at the last time step.\n"))      
+      }
+    if (istimevarying && max(newdata[["t"]]) > model.tsp[2]) {
+        message(paste0("predict.marssMLE: if the model is time-varying and t in newdata extends beyond the the last time-step value (", model.tsp[2], "). The prediction will use the parameter values at the last time step for any newdata$t beyond the last time step.\n"))      
+      }
   }
-  if (isnullnewdata) newdata[["t"]] <- 1:TT
 
   # h=0 if here
   if (isnullnewdata) { # Use original data if no new data
     if (is.matrixx0) { # Need to reestimate model
       new.MODELlist <- coef(object, type = "matrix", form = "marxss")
-      new.MODELlist$c <- object$call$model$c
-      new.MODELlist$d <- object$call$model$d
+      new.MODELlist$c <- object[["call"]][["model"]][["c"]]
+      new.MODELlist$d <- object[["call"]][["model"]][["d"]]
       new.MODELlist$x0 <- x0
-      newMLEobj <- MARSS(object$call$data,
+      # If call$data is a ts object, this will pull in the tsp information
+      newMLEobj <- MARSS(object[["call"]][["data"]],
         model = new.MODELlist, silent = TRUE,
         method = object[["method"]],
-        fun.kf = object$call$fun.kf, form = "marxss"
+        fun.kf = object[["call"]][["fun.kf"]], form = "marxss"
       )
     } else {
       newMLEobj <- object
@@ -136,23 +146,11 @@ predict.marssMLE <- function(object, n.ahead = 0,
       }
     }
 
-    # if y is null, then c or d was passed in
-    if (identical(newdata[["y"]], "model")) {
-      newdata[["y"]] <- object[["model"]][["data"]]
-      tmp <- unlist(lapply(newdata[c("c", "d")], ncol))
-      ncol.cd <- unname(tmp[1])
-      if (is.null(newdata[["t"]]) && ncol.cd <= TT) newdata[["t"]] <- 1:ncol.cd
-      if (!is.null(newdata[["t"]])) {
-        if (max(newdata[["t"]]) > TT) stop("predict.marssMLE: newdata t must be within the original data if using model data for y.", call. = FALSE)
-        newdata[["y"]] <- newdata[["y"]][, newdata[["t"]], drop = FALSE]
-        message(paste("predict.marssMLE(): prediction is conditioned on the model data t =", newdata[["t"]][1], "to", max(newdata[["t"]]), "."))
-      }
-    }
-    if (identical(newdata[["y"]], "none") || is.null(newdata[["y"]])) {
+    if (is.null(newdata[["y"]])) {
       tmp <- unlist(lapply(newdata[c("c", "d")], ncol))
       ncol.cd <- unname(tmp[1])
       newdata[["y"]] <- matrix(as.numeric(NA), model.dims[["y"]][1], ncol.cd)
-      message("predict.marssMLE(): prediction is not conditioned on any data, only c or d covariates.")
+      message("predict.marssMLE(): prediction is not conditioned on any data, only c or d covariates.\n")
     }
     for (elem in c("y", "c", "d")) {
       if (!isxreg[[elem]]) {
@@ -167,7 +165,17 @@ predict.marssMLE <- function(object, n.ahead = 0,
           stop("predict.marssMLE: y, c, and d in newdata must be numeric (use class() and is.numeric() to test what you are passing in).", call. = FALSE)
         }
         if (is.vector(newdata[[elem]])) newdata[[elem]] <- matrix(newdata[[elem]], nrow = 1)
-        if (inherits(newdata[[elem]], "ts")) newdata[[elem]] <- t(newdata[[elem]])
+        if (inherits(newdata[[elem]], "ts")){
+          model.tsp.newdata <- stats::tsp(newdata[[elem]])
+          if (is.null(newdata[["t"]])){
+            newdata[["t"]] <- model.tsp.newdata[1]:model.tsp.newdata[2]
+          } else {
+            if (newdata[["t"]][1] != model.tsp.newdata[1] || max(newdata[["t"]]) != model.tsp.newdata[2])
+              stop("predict.marssMLE: The time dimension in the newdata y ts object does not match newdata t.", call. = FALSE)
+          }
+          newdata[[elem]] <- t(newdata[[elem]])
+          attr(newdata[[elem]], "model.tsp")
+        }
         if (!is.matrix(newdata[[elem]])) stop(paste0("predict.marssMLE(): newdata ", elem, " must be a matrix with ", model.dims[[elem]][1], " rows."), call. = FALSE)
         if (dim(newdata[[elem]])[1] != model.dims[[elem]][1]) stop(paste0("predict.marssMLE(): model ", elem, " has ", model.dims[[elem]][1], " rows.", elem, " in newdata does not."), call. = FALSE)
 
@@ -183,9 +191,10 @@ predict.marssMLE <- function(object, n.ahead = 0,
     if (!is.null(newdata[["t"]]) && length(newdata[["t"]]) != ncol.newdata) {
       stop("predict.marssMLE(): t in newdata must be the same length as the number of columns in y, c and d.", call. = FALSE)
     }
+    if (is.null(newdata[["t"]])) newdata[["t"]] <- 1:ncol.newdata
 
     # use x0 in model if no data and user didn't specify not to use x0
-    nodata <- (all(is.na(newdata[["y"]])) || identical(newdata[["y"]], "none"))
+    nodata <- all(is.na(newdata[["y"]]))
     if (missingx0 && nodata) {
       x0list <- list(x0 = coef(object, type = "matrix")[["x0"]], tinitx = object[["model"]][["tinitx"]])
       message("predict.marssMLE(): x0 and tinitx from model are being used for prediction.")
@@ -195,12 +204,11 @@ predict.marssMLE <- function(object, n.ahead = 0,
     }
 
     # check if parameters are time-varying. If so, t used to specify which parameters to use
+    nend <- newdata[["t"]][ncol.newdata] - model.tsp[1] + 1
+    nstart <- newdata[["t"]][1] - model.tsp[1] + 1
     for (elem in names(new.MODELlist)) {
       if (elem %in% c("c", "d", "x0", "V0")) next
       if (model.dims[[elem]][3] == TT) {
-        if (is.null(newdata[["t"]])) stop("predict.marssMLE(): the model has time-varying parameters. t in newdata needed in order to specify which parameters to use.", call. = FALSE)
-        nend <- newdata[["t"]][length(newdata[["t"]])]
-        nstart <- newdata[["t"]][1]
         tmp <- array(NA, dim = c(model.dims[[elem]][1:2], ncol.newdata))
         if (nstart <= TT && nend > TT) {
           tmp[, , 1:(TT - nstart + 1)] <- new.MODELlist[[elem]][, , nstart:TT, drop = FALSE]
@@ -212,7 +220,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
           message(paste0(elem, " is time-varying. The value at ", TT, " is used since newdata t past the original data."))
         }
         if (nend <= TT) {
-          tmp[, , 1:ncol.newdata] <- new.MODELlist[[elem]][, , newdata[["t"]], drop = FALSE]
+          tmp[, , 1:ncol.newdata] <- new.MODELlist[[elem]][, , nstart:nend, drop = FALSE]
         }
         new.MODELlist[[elem]] <- tmp
       }
@@ -268,7 +276,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
 
 
   # set t in ret with t in newdata
-  ret$t <- rep(newdata[["t"]], nx)
+  if (!isnullnewdata) ret$t <- rep(newdata[["t"]], nx)
 
   # Set up output
   outlist <- list(
@@ -277,7 +285,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
     level = 100 * level,
     type = type,
     pred = ret,
-    t = newdata[["t"]],
+    t = ret$t[1:(TT+n.ahead)],
     ft = NULL,
     h = n.ahead,
     n.ahead = n.ahead,

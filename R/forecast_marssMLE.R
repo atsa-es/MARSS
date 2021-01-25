@@ -14,6 +14,7 @@ forecast.marssMLE <- function(object, h = 10,
   if (object[["fun.kf"]] != fun.kf) message(paste0(fun.kf, "is being used for forecast. This is different than fun.kf in the marssMLE object.\n"))
   MODELobj <- object[["model"]]
   model.dims <- attr(MODELobj, "model.dims")
+  model.tsp <- attr(object[["model"]], "model.tsp")
   TT <- model.dims[["data"]][2]
   n <- model.dims[["data"]][1]
 
@@ -88,7 +89,8 @@ forecast.marssMLE <- function(object, h = 10,
   }
 
   new.MODELlist[["tinitx"]] <- object[["model"]][["tinitx"]]
-
+  attr(new.data, "model.tsp") <- c(model.tsp[1], model.tsp[2] + h / model.tsp[3], model.tsp[3])
+  
   newMLEobj <- MARSS.marxss(list(
     data = new.data,
     model = new.MODELlist,
@@ -149,7 +151,6 @@ forecast.marssMLE <- function(object, h = 10,
   }
 
   # Set up output
-  model.tsp <- attr(object[["model"]], "model.tsp")
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,

@@ -66,6 +66,7 @@ plot.marssPredict <- function(x, include, pi.int = TRUE, main = NULL,
     if (h != 0) { # plot forecast
       pvals <- 1:h
       pt <- xxx <- x$t[nx] + pvals # pt is the locs of PIs to plot; xxx is x-axis
+      pt <- nx + pvals
       if (!showgap) xxx <- xxx - 1
     } else { # h=0; nx is length x$t;
       pt <- 1:nx
