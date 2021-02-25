@@ -5,32 +5,32 @@ vers <- paste("R package version", meta$Version)
 
 citEntry(entry="Manual",
          title = "MARSS: Multivariate Autoregressive State-Space Modeling",
-         author = personList(as.person("Elizabeth Holmes"),
-                             as.person("Eric Ward"),
-                             as.person("Mark Scheuerell"),
+         author = personList(as.person("Elizabeth Eli Holmes"),
+                             as.person("Eric J. Ward"),
+                             as.person("Mark D. Scheuerell"),
                              as.person("Kellie Wills")),
          year = year,
          note = vers,
          url = "https://CRAN.R-project.org/package=MARSS",
          textVersion =
-         paste("Elizabeth Holmes, Eric Ward, Mark Scheuerell and Kellie Wills (", year,
+         paste("Elizabeth E. Holmes, Eric J. Ward, Mark D. Scheuerell and Kellie Wills (", year,
                "). MARSS: Multivariate Autoregressive State-Space Modeling. ",
                vers, ".", sep="") )
 
 citEntry(entry="Manual",
          title = paste0("Analysis of multivariate time-series using the MARSS package version", meta$Version),
-         author = personList(as.person("Elizabeth Holmes"),
-                             as.person("Eric Ward"),
-                             as.person("Mark Scheuerell")),
+         author = personList(as.person("Elizabeth Eli Holmes"),
+                             as.person("Mark D. Scheuerell"),
+                             as.person("Eric J. Ward")),
          year = year,
          note = vers,
          url = "https://CRAN.R-project.org/package=MARSS/vignettes/UserGuide.pdf",
          textVersion =
-         paste0("Holmes, E. E., E. J. Ward, and M. D. Scheuerell (", year, ") Analysis of multivariate time-series using the MARSS package version", meta$Version, ". NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112" ) )
+         paste0("Holmes, E. E., M. D. Scheuerell, and E. J. Ward (", year, ") Analysis of multivariate time-series using the MARSS package version", meta$Version, ". NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112" ) )
 
 citEntry(entry="Article",
          title = "MARSS: Multivariate autoregressive state-space models for analyzing time-series data",
-         author = personList(as.person("Elizabeth E. Holmes"),
+         author = personList(as.person("Elizabeth Eli Holmes"),
                              as.person("Eric J. Ward"),
                              as.person("Kellie Wills")),
          year     = {2012},
@@ -41,6 +41,5 @@ citEntry(entry="Article",
 
          textVersion =
          paste("Holmes, E. E., Ward, E. J. & Wills, K. (2012)",
-          "MARSS: Multivariate Autoregressive State-space Models for Analyzing Time-series Data.",
-               "The R Journal. 4(1):11-19")
+          "MARSS: Multivariate Autoregressive State-space Models for Analyzing Time-series Data.", "The R Journal. 4(1):11-19")
 )
