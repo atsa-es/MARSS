@@ -40,7 +40,7 @@ checkMARSSInputs <- function(MARSS.inputs, silent = FALSE) {
   # the user might reset these in their MARSS.form function
   req.args <- c("inits", "control") # needed but not necessarily speced by user
 
-  # the alldefaults is set in MARSSsettings but user might override later in MARSS.form()
+  # the alldefaults is set in .onLoad but user might override later in MARSS.form()
   defaults <- alldefaults[[MARSS.inputs$method]] # just use the generic values in .onLoad
 
   ## Now set defaults if needed, first deal with case where arg not passed in all
