@@ -73,7 +73,7 @@ If R asks you to update packages, and then proceeds to fail at installation beca
 ```
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS=TRUE)
 ```
-To install an R package from GitHub, you need to be able to build an R package on your machine. If you are on Windows, that means you will need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). On a Mac, installation should work fine; you don't need to install anything.
+To install an R package from GitHub, you need to be able to build an R package on your machine. If you are on Windows, that means you may need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). In more recent versions of R, it seems like the Rtools dependency for Windows users has been removed, so try installing. If you get an error about no gcc installation, it means you need Rtools. On a Mac, installation should work fine; you do not need to install anything.
 
 ### DOCUMENTATION and TUTORIALS  {#documentation}
 
