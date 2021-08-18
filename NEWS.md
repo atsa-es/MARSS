@@ -14,11 +14,11 @@ BUGS
 
 * `plot.predictMARSS()` was not showing the forecasts.
 * `autoplot.marssPredict()` was not using the time info from ts object, so x-axis was showing 1, 2, 3 etc instead of the years, for example.
-* `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
+* `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"`). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
 
 DOCUMENTATION
 
-* Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment.
+* Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment via `.onLoad()`.
 
 
 MARSS 3.11.3  (released 2020-10-20 on CRAN)
