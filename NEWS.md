@@ -7,7 +7,21 @@ MARSS Development site
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
 
-MARSS 3.11.3
+MARSS 3.11.4 (GitHub master branch)
+------------------------------------
+
+BUGS
+
+* `plot.predictMARSS()` was not showing the forecasts.
+* `autoplot.marssPredict()` was not using the time info from ts object, so x-axis was showing 1, 2, 3 etc instead of the years, for example.
+* `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
+
+DOCUMENTATION
+
+* Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment.
+
+
+MARSS 3.11.3  (released 2020-10-20 on CRAN)
 ------------------------------------
 This is an update based on version 3.11.2 (GitHub release). It is mainly focused on providing graceful exiting for models that report errors due to ill-conditioned variance matrices and for models with fixed parameters. The testing and output (`plot`, `residuals`, `tsSmooth`, `fitted`) was made less reliant on `MARSSkfss()`, which involves an inversion of `Vtt1` and which can become ill-conditioned and report an error. The update also fixes a bug in the log-likelihood calculation due to not specifying the `tol=0` in `SSModel()` call. This bug would come up only for variance matrices with extremely high condition numbers fit with `method=BFGS`. Data and covariates can now be a ts object and the time information will be used for plotting.
 
@@ -127,7 +141,7 @@ BUGS
 * `fitted.marssMLE()` Fixed bug in fitted.marssMLE for states when one.step.ahead=TRUE. It was using xtt1[,t-1] instead of xtt[,t-1]. The former meant it only used data up to t-2.
 * `degen.test()` in MARSSkem() was not catching when R or Q was time-varying (and thus degeneracy should not be allowed). Changed to test the 3D of model.dims == 1 or not.
 * `residuals.marssMLE(..., Harvey=TRUE)` would fail if Q, B, or G was time-varying because parmat() called with t+1. Changed to only call parmat() when t<TT. Q, B, and G do not appear in the recursion when t=TT so parmat() with t=t+1 is never needed.
-* `MARSS_dfa()` used form="dfa" in MARSS.call list. Just info. Never used.
+* `MARSS_dfa()` used `form="dfa"` in MARSS.call list. Just info. Never used.
 * Default A matrix ("scaling") was throwing an error for manually set up DLM models. Problem was call to check that Z was a design matrix in MARSS_marxss.R. It was not catching that Z was time-varying before running `is.design()`.
 * `toLatex.marssMODEL()` Fixed some old bugs in toLatex_marssMODEL.R. Added S3 class declaration in NAMESPACE for toLatex. fixed equation attribute in MARSS_marxss. G{t} was used instead of G_{t}. Only affected toLatex_marssMODEL(). Had extra line in build.mat.tex() that removed last line of matrices. This function was not exported so users would never have run into these bugs.
 * `MARSSkfss()` To limit propagation of numerical errors when R=0, the row/col of Vtt for the fully determined x (determined from data) need to be set to 0. My algorithm for finding these x was not robust and zero-d out Vtt row/cols when it should not have if Z was under-determined. MARSSkfss() is not used for fitting and only affected underdetermined models (such as models with a stochastic trend and AR-1 errors). To fix I added a function `fully.det.x()` to the utility functions. This returns the x that are fully determined by the data. Note, MARSkfss() is the classic Kalman filter/smoother. The MARSS algorithm does not use this normally. Normally MARSSkfas(), build off the Koopman et al algorithm which avoids unneeded matrix inverses, is used. MARSSkfas() uses the Kalman filter/smoother in the KFAS package. 
@@ -206,12 +220,12 @@ BUGS
 inits functions
 
 * In `MARSSinits_marxss()` function would give error if U, A, C, or D fixed and user passed in inits.  inits ignored in this case so should not throw error.
-* `alldefaults` could be updated by form.  A few functions were neglecting to (re)load alldefaults or to reassign `alldefaults` when updated: is_marssMLE(), MARSSinits.marxss(), MARSSinits().  The variables in the pkg_globals environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
+* `alldefaults` could be updated by form.  A few functions were neglecting to (re)load alldefaults or to reassign `alldefaults` when updated: `is_marssMLE()`, `MARSSinits.marxss()`, `MARSSinits()`.  The variables in the `pkg_globals` environment should be (and only be) loaded when needed by a function and only loaded into the function environment.
 
 Kalman filter functions
 
 * `MARSSkf()` was not passing optional function args to `MARSSkfas()`.
-* `MARSSkfss()` miscounting the number of data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), MARSSkfss() was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
+* `MARSSkfss()` miscounting the number of data points when R=0, V0=0, and tinitx=1.  When Ft[,,1]=0 (e.g. when R=0, V0=0, and tinitx=1), `MARSSkfss()` was including the y[1] associated with Ft[,,1]=0 in the # number of data points.  These should be excluded since they don't affect x10.
 
 Confidence intervals and std error for R and Q
 
@@ -388,7 +402,7 @@ ENHANCEMENTS
 * Changed `MARSShessian()` to use a Cholesky transformation on any variances so that the variance covariance matrices stay positive definite
 * Change above required update to `MARSSparamCIs()`
 * miss.value is now deprecated.  The user is instructed to replace missing values with NAs before passing data to `MARSS()`.
-* Created an global environment (pkg_globals) specific to the package environment, so that all functions have access to these package-specific globals.  This is assigned in a new onLoad() function.
+* Created an global environment (pkg_globals) specific to the package environment, so that all functions have access to these package-specific globals.  This is assigned in a new `.onLoad()` function.
 * Added check in `MARSSkfas()` for version of KFAS.  API changes in KFAS 1.0.0, and a line of code was added to use the correct API if KFAS 0.9.11 versus 1.0.0 is installed.  MARSS will work with both versions of KFAS.
 * Condensed the errors print-out to 10 errors; added more error info to `MARSSinfo()`
 * Restructured the NAMESPACE and DESCRIPTION files to better control imports and dependencies so that user cannot break the package by detaching needed libraries or redefining needed base and stats functions.
