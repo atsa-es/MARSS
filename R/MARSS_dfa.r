@@ -84,6 +84,11 @@ MARSS.dfa <- function(MARSS.call) {
       }
     }
   }
+  if (!is.null(MARSS.call[["model"]][["Z"]])) {
+      problem <- TRUE
+      msg <- c(msg, "If using form='dfa', specify the Z matrix using m (number of trends). If you need a custom Z, then use the default MARSS model and specify all your matrices. See ?MARSS.dfa for defaults for the matrices.\n")
+  }
+  
 
   if (problem) {
     cat("\n", "Errors were caught in MARSS.dfa \n", msg, sep = "")
@@ -104,12 +109,15 @@ MARSS.dfa <- function(MARSS.call) {
     diffuse = c(TRUE, FALSE),
     m = 1:n,
     # This line says what is allowed to be a matrix
-    matrices = c("Z", "A", "R", "D", "x0", "V0", "Q", "B")
+    matrices = c("A", "R", "D", "x0", "V0", "Q", "B")
   )
-
-  if (is.null(MARSS.call[["model"]][["m"]])) m <- 1 else m <- MARSS.call[["model"]][["m"]]
+ 
+  ## Set-up model defaults
   if (!is.null(MARSS.call[["covariates"]])) D <- "unconstrained" else D <- "zero"
-  if (is.null(MARSS.call[["model"]][["Z"]])) { # Set up default Z
+  # Set up m and Z
+  if (is.null(MARSS.call[["model"]][["m"]])) m <- 1 else m <- MARSS.call[["model"]][["m"]]
+
+  # Set up default Z
     Z <- matrix(list(), nrow = n, ncol = m)
     # insert row (i) & col (j) indices
     for (i in seq(n)) {
@@ -121,7 +129,7 @@ MARSS.dfa <- function(MARSS.call) {
         Z[i, (i + 1):m] <- 0
       }
     }
-  }
+  
   # defaults for any missing model list elements
   model.defaults <- list(
     A = "zero",
