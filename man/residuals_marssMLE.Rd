@@ -16,11 +16,11 @@
 
   \item{standardization}{"Cholesky" means it is standardized by the lower triangle of the Cholesky transformation of the full variance-covariance matrix of the model and state residuals. 
 "marginal" means that the residual is standardized by its standard deviation, i.e. the square root of the value on the diagonal of the variance-covariance matrix of the model and state residuals. 
-"Block.Cholesky" means the model or state residuals are standardized by the lower triangle of the Cholesky transformation only their variance-covariance matrix. }
-
+"Block.Cholesky" means the model or state residuals are standardized by the lower triangle of the Cholesky transformation of only their variance-covariance matrix (not the joint model and state variance-covariance matrix). }
+ 
   \item{form}{ For developers. Can be ignored. If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
 
-  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{.type=="state"}. }
+  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{name=="state"}. }
   
   \item{...}{Not used.}
 
@@ -31,13 +31,14 @@
 \value{
 A data frame with the following columns:
 
-\item{.rownames}{Fitted values of observations or states. See details.}
-\item{type}{model or state}
+\item{type}{tT, tt1 or tt}
+\item{.rownames}{The names of the observation rows or the state rows.}
+\item{name}{model or state}
 \item{t}{time step}
-\item{value}{The data value if type="model" or the x estimate if type="state". }
+\item{value}{The data value if type="model" or the x estimate if type="state". See details.}
 \item{.fitted}{Model predicted values of observations or states. See details.}
 \item{.resids}{Model or states residuals. See details.}
-\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using qnorm(alpha/2)*.sigma + .fitted.}
+\item{.sigma}{The standard error of the model or state residuals. Intervals for the residuals can be constructed from \code{.sigma} using \code{qnorm(alpha/2)*.sigma + .fitted.}}
 \item{.std.resids}{Standardized residuals. See \code{\link{MARSSresiduals}} for a discussion of residual standardization.}
 
 }
@@ -45,19 +46,23 @@ A data frame with the following columns:
 
 See \code{\link{MARSSresiduals}} for a discussion of the residuals calculations for MARSS models.
 
+\strong{value} and \strong{.fitted}
+
+See the discussion below on the meaning of these for \eqn{\mathbf{y}}{y} associated residuals (model residuals) or \eqn{\mathbf{x}}{x} associated residuals (state residuals).
+
 \strong{model residuals}
 
-The model residuals are in the data frame with \code{.type="model"}.
+The model residuals are in the data frame with \code{name="model"}.
 
-The model residuals are the familiar type of residuals, they are the difference between the data at time \eqn{t} and the predicted value at time \eqn{t}. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="tT"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{\mathbf{x}}{x} at time \eqn{t} (\code{xtT}).  If \code{type="tt1"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on the data up to time \eqn{t-1}, i.e. is computed using the estimate of \eqn{\mathbf{x}}{x} at time \eqn{t} conditioned on the data up to time \eqn{t-1} (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
+The model residuals are the familiar type of residuals, they are the difference between the data at time \eqn{t} and the predicted value at time \eqn{t}, labelled \code{.fitted} in the data frame. For the model residuals, the "value"" is the data (or NA if data are missing). If \code{type="tT"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on all the data, i.e. is computed using the smoothed estimated of \eqn{\mathbf{x}}{x} at time \eqn{t} (\code{xtT}).  If \code{type="tt1"}, the predicted value is the expected value of \eqn{\mathbf{y}}{y} conditioned on the data up to time \eqn{t-1}, i.e. is computed using the estimate of \eqn{\mathbf{x}}{x} at time \eqn{t} conditioned on the data up to time \eqn{t-1} (\code{xtt1}). These are known as the one-step-ahead predictions and the residuals are known as the innovations. 
 
 The standard errors help visualize how well the model fits to the data.  See \code{\link[=fitted.marssMLE]{fitted}} for a discussion of the calculation of the model predictions for the observations.  The standardized smoothation residuals can be used for outlier detection.  See the references in \code{\link{MARSSresiduals}} and the chapter on shock detection in the MARSS User Guide.
 
 \strong{state residuals}
 
-The state residuals are in the data frame with \code{.type="state"}.
+The state residuals are in the data frame with \code{name="state"}.
 
-If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a MARSS() call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
+If you want the expected value of the states and an estimate of their standard errors (for confidence intervals), then \code{residuals()} is not what you want to use.  You want to use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtT")} to return the smoothed estimate of the state or you can find the states in the \code{states} element of the \code{\link{marssMLE}} object returned by a \code{MARSS()} call. For the one-step-ahead state estimates, use \code{\link[=tsSmooth.marssMLE]{tsSmooth}(..., type="xtt1")}.
 
 The state residuals are only for state-space models. At time \eqn{t}, the state residuals are the difference between the state estimate at time \eqn{t+1} and the predicted value of the state at time \eqn{t+1} given the estimate of the state at time \eqn{t}. For smoothation state residuals, this is 
 \deqn{ \hat{\mathbf{w}}_{t+1} = \mathbf{x}_{t+1}^T - \mathbf{B}\mathbf{x}_{t}^T - \mathbf{u} - \mathbf{C}\mathbf{c}_{t+1}}{ hatw(t+1) = xtT(t+1) - B xtT(t) - u - C c(t+1)}
