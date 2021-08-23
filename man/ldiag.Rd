@@ -12,7 +12,8 @@ ldiag(x, nrow=NA)
   \item{nrow}{ Rows in square matrix }
 }
 \details{
-  A diagonal list matrix is returned. The off-diagonals will be 0 and the diagonal will be x. x can be a combination of numbers and characters.  If x is numeric, the diagonal will still be list type so that later the diagonal can be replace with characters. See examples. 
+  A diagonal list matrix is returned. The off-diagonals will be 0 and the diagonal will be \code{x
+  }. \code{x} can be a combination of numbers and characters.  If \code{x} is numeric, the diagonal will still be list type so that later the diagonal can be replace with characters. See examples. 
 }
 \value{
   a square list matrix

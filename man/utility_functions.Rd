@@ -69,7 +69,7 @@ vec(x)
 }
 \arguments{
   \item{x, A, y}{ A matrix (or vector for '\code{makediag}' or string for '\code{mystrsplit}'.). }
-  \item{ Z, R }{ Z matrix and R matrix }
+  \item{ Z, R }{ \code{Z} matrix and \code{R} matrix }
   \item{na.rm}{ How to treat NAs in the block diag test. }
   \item{dim, dims}{ Matrix dimensions. Some functions will take the vec of a matrix.  In this case, the optional dim arg specifies the matrix dimensions. }
   \item{fixed}{ A fixed matrix per the MARSS specification for fixed matrix syntax. }
@@ -110,7 +110,7 @@ vec(x)
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
   \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{\link[=coef.marssMLE]{coef}}.
-  \item \code{ fully.spec.x } returns a list with 0 and 1 showing which x are fully specified by data when R has zeros. Used by \code{\link{MARSSkfss}()}.
+  \item \code{ fully.spec.x } returns a list with 0 and 1 showing which x are fully specified by data when \code{R} has zeros on the diagonal. Used by \code{\link{MARSSkfss}()}.
 
 } 
 }

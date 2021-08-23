@@ -20,7 +20,7 @@ MARSSboot(MLEobj, nboot = 1000,
     \describe{
       \item{\code{max.iter}}{ Maximum number of EM iterations. } 
       \item{\code{tol}}{ Optional tolerance for log-likelihood change.  If log-likelihood decreases less than this amount relative to the previous iteration, the EM algorithm exits. } 
-      \item{\code{allow.degen}}{ Whether to try setting Q or R elements to zero if they appear to be going to zero. }  
+      \item{\code{allow.degen}}{ Whether to try setting \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} elements to zero if they appear to be going to zero. }  
     } 
   }
   \item{silent}{ Suppresses printing of progress bar. }

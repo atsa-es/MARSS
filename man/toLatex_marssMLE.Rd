@@ -22,7 +22,7 @@ math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE)
   \item{math.sty}{ LaTeX math styling to use. }
   \item{output}{ pdf or tex. If blank, both are output. }
   \item{replace}{ Replace existing file if present. }
-  \item{simplify}{ If TRUE, then if B or Z are identity, they do not appear. Any zero-ed out elements also do not appear. }
+  \item{simplify}{ If TRUE, then if \eqn{\mathbf{B}}{B} or \eqn{\mathbf{Z}}{Z} are identity, they do not appear. Any zero-ed out elements also do not appear. }
  }
 
 \value{

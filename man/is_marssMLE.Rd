@@ -18,12 +18,12 @@ is.marssMLE(MLEobj)
   \item{\code{marss}}{ An object of class \code{\link{marssMODEL}} in "marss" forms, needed for all the base MARSS functions. }
   \item{\code{start}}{ List with matrices specifying initial values for parameters to be used (if needed) by the maximization algorithm. 
     \describe{
-    \item{\code{B}}{ Initial value(s) for B matrix (m x m). }
-    \item{\code{U}}{ Initial value(s) for U matrix (m x 1). }
-    \item{\code{Q}}{ Initial value(s) for Q variance-covariance matrix (m x m). }
-    \item{\code{Z}}{ Initial value(s) for Z matrix (n x m). }
-    \item{\code{A}}{ Initial value(s) for A matrix (n x 1). }
-    \item{\code{R}}{ Initial value(s) for R variance-covariance matrix (n x n). }
+    \item{\code{B}}{ Initial value(s) for \eqn{\mathbf{B}}{B} matrix (m x m). }
+    \item{\code{U}}{ Initial value(s) for \eqn{\mathbf{u}}{U} matrix (m x 1). }
+    \item{\code{Q}}{ Initial value(s) for \eqn{\mathbf{Q}}{Q} variance-covariance matrix (m x m). }
+    \item{\code{Z}}{ Initial value(s) for \eqn{\mathbf{Z}}{Z} matrix (n x m). }
+    \item{\code{A}}{ Initial value(s) for \eqn{\mathbf{a}}{A} matrix (n x 1). }
+    \item{\code{R}}{ Initial value(s) for \eqn{\mathbf{R}}{R} variance-covariance matrix (n x n). }
     \item{\code{x0}}{ Initial value(s) for initial state vector (m x 1). }
     \item{\code{V0}}{ Initial variance(s) for initial state variance (m x m). }
     }
@@ -39,9 +39,9 @@ is.marssMLE(MLEobj)
       \item{\code{abstol}}{ The logLik.(iter-1)-logLik.(iter) convergence tolerance for the maximization routine. Both the abstol and the slope of the log of the parameters versus the log iteration tests must be met for convergence.} 
       \item{\code{trace}}{ A positive integer.  If not 0, a record will be created during maximization iterations (what's recorded depends on method of maximization). -1 turns off most internal error checking.}
       \item{\code{safe}}{ Logical.  If TRUE, then the Kalman filter is run after each update equation in the EM algorithm.  This slows down the algorithm.  The default is FALSE. }
-      \item{\code{allow.degen}}{ If TRUE, replace Q or R diagonal elements by 0 when they become very small.} 
-      \item{\code{min.degen.iter}}{ Number of iterations before trying to set a diagonal element of Q or R to zero). } 
-      \item{\code{degen.lim}}{ How small the Q or R diagonal element should be before attempting to replace it with zero. }
+      \item{\code{allow.degen}}{ If TRUE, replace \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} diagonal elements by 0 when they become very small.} 
+      \item{\code{min.degen.iter}}{ Number of iterations before trying to set a diagonal element of \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} to zero). } 
+      \item{\code{degen.lim}}{ How small the \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} diagonal element should be before attempting to replace it with zero. }
   \item{\code{silent}}{ Suppresses printing of progress bar, error messages and convergence information. } 
     }
   }

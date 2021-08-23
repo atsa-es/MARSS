@@ -31,7 +31,7 @@ Note, if there are no missing values, the expected value of \eqn{\mathbf{y}_t}{y
  
   \item{fun.kf}{ By default, \code{tsSmooth()} will use the Kalman filter/smoother function in \code{object$fun.kf} (either \code{\link{MARSSkfas}()} or \code{\link{MARSSkfss}()}). You can pass in \code{fun.kf} to force a particular Kalman filter/smoother function to be used. }
   
-  \item{...}{Optional arguments.  If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not the Z matrix).}
+  \item{...}{Optional arguments.  If form="dfa", \code{rotate=TRUE} can be passed in to rotate the trends (only trends not the \eqn{\mathbf{Z}}{Z} matrix).}
 
 }
 
