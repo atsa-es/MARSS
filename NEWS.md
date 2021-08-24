@@ -7,8 +7,13 @@ MARSS Development site
 New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
 
 
-MARSS 3.11.4 (GitHub master branch)
+MARSS 3.11.4 (GitHub master development branch)
 ------------------------------------
+
+ENHANCEMENTS
+
+* Created `autoplot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
+* Revamped residuals plots made by `autoplot.marssMLE()` and `plot.marssMLE()` to allow a full range of residuals plots but to only show a subset for a specific set of residuals diagnostics plots by default.
 
 BUGS
 
@@ -19,6 +24,8 @@ BUGS
 DOCUMENTATION
 
 * Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment via `.onLoad()`.
+* More clean-up of the equations. Just being more consitent about using `\eqn{}` when R, Q etc refer to the matrices in the MARSS equation versus code.
+* `residuals_marssMLE.Rd` had a few typos. Main one was that `name` column was called `.type` column.
 
 
 MARSS 3.11.3  (released 2020-10-20 on CRAN)
