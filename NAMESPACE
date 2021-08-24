@@ -69,6 +69,7 @@ if(getRversion() >= "3.6.0") {
   S3method(broom::tidy, marssMLE)
   S3method(ggplot2::autoplot, marssMLE)
   S3method(ggplot2::autoplot, marssPredict)
+  S3method(ggplot2::autoplot, marssResiduals)
   S3method(forecast::accuracy, marssMLE)
   S3method(forecast::accuracy, marssPredict)
   S3method(forecast::forecast, marssMLE)
