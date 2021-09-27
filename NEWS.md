@@ -16,6 +16,7 @@ ENHANCEMENTS
 
 * Created `autoplot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
 * Revamped residuals plots made by `autoplot.marssMLE()` and `plot.marssMLE()` to allow a full range of residuals plots but to only show a subset for a specific set of residuals diagnostics plots by default.
+* Added utility function `match.arg.exact()` which does exact argument matching. The base R `match.arg()` uses `pmatch()` and does partial matching. This is a problem for many functions where `"xtt1"` is different than `"xtt"`. This function implements exact matching.
 
 BUGS
 
