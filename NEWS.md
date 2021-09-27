@@ -10,6 +10,8 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 MARSS 3.11.4 (GitHub master development branch)
 ------------------------------------
 
+This update is focused on improving a few plotting functions and updating the website links to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
+
 ENHANCEMENTS
 
 * Created `autoplot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.

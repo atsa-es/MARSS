@@ -18,7 +18,7 @@ citEntry(entry="Manual",
                vers, ".", sep="") )
 
 citEntry(entry="Manual",
-         title = paste0("Analysis of multivariate time-series using the MARSS package version", meta$Version),
+         title = paste0("Analysis of multivariate time-series using the MARSS package version ", meta$Version),
          author = personList(as.person("Elizabeth Eli Holmes"),
                              as.person("Mark D. Scheuerell"),
                              as.person("Eric J. Ward")),

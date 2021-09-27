@@ -30,7 +30,7 @@
   <li><a href="#cite">Citation</a></li>
   <li><a href="#pubs">Publications</a></li>
   <li><a href="#license">License</a></li>
-  <li><a href="https://nwfsc-timeseries.github.io/MARSS/NEWS.html">NEWS</a></li>
+  <li><a href="https://atsa-es.github.io/MARSS/NEWS.html">NEWS</a></li>
 </ul>
 
 <img src="logot.png" align="right" style="margin:5px 0px"/>
@@ -79,8 +79,8 @@ To install an R package from GitHub, you need to be able to build an R package o
 
 - [Quick Start Guide](https://cran.r-project.org/web/packages/MARSS/vignettes/Quick_Start.pdf).
 - [User Manual](https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf) - The extensive user manual included in the package has many examples of how to fit MARSS models to a variety of data sets.
-- [ATSA lab book](https://nwfsc-timeseries.github.io/atsa-labs/) - Many applications are also covered in our Applied Time Series Analysis book developed from the labs in our course.
-- [ATSA course website](https://nwfsc-timeseries.github.io/atsa/) - We have lectures and all material from our course on our course website. Select the Lectures tab to find the lecture material and videos of lectures.
+- [ATSA lab book](https://atsa-es.github.io/atsa-labs/) - Many applications are also covered in our Applied Time Series Analysis book developed from the labs in our course.
+- [ATSA course website](https://atsa-es.github.io/atsa/) - We have lectures and all material from our course on our course website. Select the Lectures tab to find the lecture material and videos of lectures.
 - [Wiki](https://nwfsc-timeseries.github.io/MARSS-wiki/) - The MARSS wiki has misc and random projects and code.
 
 
@@ -96,9 +96,10 @@ Holmes, E. E., Ward, E. J. and Wills, K. (2012) MARSS: Multivariate Autoregressi
 
 You can also cite the package as you would other R packages:
 
-Elizabeth Holmes, Eric Ward, Mark Scheuerell, and Kellie Wills (2019). MARSS: Multivariate Autoregressive State-Space Modeling. R package version 3.10.13.
-
-Update the version number and year if you use a more recent version on GitHub.
+Elizabeth E. Holmes, Eric J. Ward, Mark D. Scheuerell and Kellie Wills (2020). MARSS:
+  Multivariate Autoregressive State-Space Modeling. R package version 3.11.4.
+  
+Type `citation("MARSS")` at the command line to get the most up to data citations.
 
 ### PUBLICATIONS {#pubs}
 
