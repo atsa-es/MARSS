@@ -17,10 +17,10 @@ tsSmooth.marssMLE <- function(object,
     stop("tsSmooth.marssMLE: prediction intervals are only available for ytT.")
   }
   if (interval != "none" && type == "ytt") {
-    stop("tsSmooth.marssMLE: MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
+    stop("tsSmooth.marssMLE: not available in this version of MARSS. MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
   }
   if (interval != "none" && type == "ytt1") {
-    stop("tsSmooth.marssMLE: MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs for ytt1.")
+    stop("tsSmooth.marssMLE: not available in this version of MARSS. MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs for ytt1.")
   }
   if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0)) {
     stop("tsSmooth.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
