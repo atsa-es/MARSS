@@ -86,7 +86,7 @@ To install an R package from GitHub, you need to be able to build an R package o
 
 ### ISSUES and BUG REPORTS {#bugs}
 
-Issues? [https://github.com/nwfsc-timeseries/MARSS/issues]()
+Issues? [https://github.com/nwfsc-timeseries/MARSS/issues](https://github.com/nwfsc-timeseries/MARSS/issues)
 
 ### CITATION  {#cite}
 
