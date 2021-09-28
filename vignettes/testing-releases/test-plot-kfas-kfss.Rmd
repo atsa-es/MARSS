@@ -1,0 +1,130 @@
+---
+title: "Testing Plots MARSSkfss vs MARSSkfas"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This is a vignette to run the plotting functions and check that outputs look ok.
+
+Here is how to compare images.
+```{r}
+# install vdiffr if needed
+disp_hist_base <- function() hist(mtcars$disp)
+disp_hist_ggplot <- ggplot2::ggplot(mtcars, ggplot2::aes(disp)) + ggplot2::geom_histogram()
+
+aa <- testthat::test_that("plots have known output", {
+  vdiffr::expect_doppelganger("Base graphics histogram", disp_hist_base)
+  vdiffr::expect_doppelganger("ggplot2 histogram", disp_hist_ggplot)
+})
+aa
+```
+
+Load MARSS and check that I am checking the right version.
+```{r message=FALSE}
+library(MARSS)
+library(ggplot2)
+packageVersion("MARSS")
+```
+
+## marssMLE objects
+
+```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+# Little harder model
+
+dat <- t(harborSealWA)
+dat <- dat[2:4, ] # remove the year row
+Qvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[1]]
+Bvals <- c("identity", "diagonal and unequal")[1]
+Rvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[2]]
+plottypes <- eval(formals(MARSS:::autoplot.marssMLE)$plot.type)
+plottypes <- plottypes[!(plottypes %in% c("all", "residuals"))]
+
+for (Q in Qvals) {
+  for (B in Bvals) {
+    for (R in Rvals) {
+      if (B == "diagonal and unequal" && (is.list(Q) || is.list(R))) next
+      mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = dat[, 1, drop = FALSE] * 1.1)
+      if (B != "identity" && R != "zero") mod$tinitx <- 1
+      if (Q == "zero" && R == "zero") next
+      if (Q == "zero" && B != "identity") next
+      kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent = TRUE)
+      kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent = TRUE)
+      for(plt in plottypes){
+      cat(paste0("\n", plt, " Q:", Q, " R:", R, " B:", B))
+      conf.int <- TRUE
+      if(plt %in% c("ytt", "ytt1")) conf.int <- FALSE
+      a1 <- autoplot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)[[1]]
+      plot(a1)
+      a2 <- autoplot(kemfit2, plot.type=plt, silent=TRUE, conf.int = conf.int)[[1]]
+      plot(a2)
+      aa <- testthat::test_that("plots have known output", {
+             vdiffr::expect_doppelganger("kfss", a1)
+             vdiffr::expect_doppelganger("kfas", a2)
+      })
+      }
+    }
+  }
+}
+```
+
+# test B unconstrained
+
+```{r eval=FALSE, fig.hold=TRUE, out.width="50%"}
+Q <- "diagonal and unequal"
+B <- "unconstrained"
+R <- "diagonal and unequal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = "unequal", tinitx = 1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent = TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent = TRUE)
+
+for(plt in plottypes){
+cat(paste0("\n", plt, " Q:", Q, " R:", R, " B:", B))
+if (plt=="residuals") cat("MARSSkfss")
+plot(kemfit1, plot.type=plt, silent=TRUE)
+if (plt=="residuals") cat("MARSSkfas")
+plot(kemfit2, plot.type=plt, silent=TRUE)
+}
+```
+
+# test Q with some zeros
+
+
+```{r eval=FALSE, fig.hold=TRUE, out.width="50%"}
+
+Q <- ldiag(list("q1", 0, "q2"))
+B <- "identity"
+R <- "diagonal and equal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = "unequal", tinitx = 1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent = TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent = TRUE)
+
+for(plt in plottypes){
+cat(paste0("\n", plt, " Q:", Q, " R:", R, " B:", B))
+if (plt=="residuals") cat("MARSSkfss")
+plot(kemfit1, plot.type=plt, silent=TRUE)
+if (plt=="residuals") cat("MARSSkfas")
+plot(kemfit2, plot.type=plt, silent=TRUE)
+}
+```
+
+# test R with some zeros
+
+```{r eval=FALSE, fig.hold=TRUE, out.width="50%"}
+R <- ldiag(list("r1", 0, "r2"))
+B <- "identity"
+Q <- "diagonal and equal"
+mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = "unequal", tinitx = 1)
+kemfit1 <- MARSS(dat, model = mod, fun.kf = "MARSSkfss", silent = TRUE)
+kemfit2 <- MARSS(dat, model = mod, fun.kf = "MARSSkfas", silent = TRUE)
+
+for(plt in plottypes){
+cat(paste0("\n", plt, " Q:", Q, " R:", R, " B:", B))
+if (plt=="residuals") cat("MARSSkfss")
+plot(kemfit1, plot.type=plt, silent=TRUE)
+if (plt=="residuals") cat("MARSSkfas")
+plot(kemfit2, plot.type=plt, silent=TRUE)
+}
+```
