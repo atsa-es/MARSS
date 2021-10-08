@@ -371,7 +371,7 @@ head(df)
 ###################################################
 ### code chunk number 50: Cs502_plotting
 ###################################################
-plot(fit_marss, plot.type = "model.ytT", pi.int = TRUE)
+plot(fit_marss, plot.type = "fitted.ytT", pi.int = TRUE)
 
 
 ###################################################
