@@ -2019,7 +2019,7 @@ To present the algorithm for the Kalman smoother and filter, the expectations co
 \end{subequations}
 The $\hatPt$ and $\hatPttm$ equations arise from the computational formula for variance (equation \ref{eq:comp.formula.variance}). When comparing the Kalman filter and smoother algorithms here to Shumway and Stoffer, keep in mind the difference in notation: $P_t^n$ in Shumway and Stoffer is $\VV_t^T$ here not $\PP_t^T$.
 
-In the presentation of the EM algorithm, $\YY(1)_1^T=\yy(1)_1^T,\Theta$ was dropped from the expectations to remove clutter; thus $E[\dots]$ always denoted the conditional expectation $\E[\dots|\YY(1)_1^T=\yy(1)_1^T,\Theta]$. To present the smoother algorithm, we the other conditional expectations.
+In the presentation of the EM algorithm, $\YY(1)_1^T=\yy(1)_1^T,\Theta$ was dropped from the expectations to remove clutter; thus $E[\dots]$ always denoted the conditional expectation $\E[\dots|\YY(1)_1^T=\yy(1)_1^T,\Theta]$. To present the smoother algorithm, I present the other conditional expectations.
 \begin{subequations}\label{eq:kffilteroutput}
 \begin{align}
 &\xx_t^{t-1} = \E[\XX_t|\YY(1)_1^{t-1}=\yy(1)_1^{t-1},\Theta]\\
@@ -2279,7 +2279,7 @@ The variance can be decomposed into two parts via the law of total variance:
 \var_{XY}[\YY_t|\YY_t(1)=\yy_t(1)] = \E_X[\var_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]] + 
 \var_X[\E_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]]
 \end{equation}
-Hsing equations \ref{eq:law.total.var.Y}, \ref{eq:var.Y.cond.x}, and \ref{eq:cond.var.Y}, we can solve for the variance (over $\xx_t$) of the expected value of $\YY_t|\YY_t(1)=\yy_t(1)$ conditioned on $\XX_t=\xx_t$:
+Using equations \ref{eq:law.total.var.Y}, \ref{eq:var.Y.cond.x}, and \ref{eq:cond.var.Y}, we can solve for the variance (over $\xx_t$) of the expected value of $\YY_t|\YY_t(1)=\yy_t(1)$ conditioned on $\XX_t=\xx_t$:
 \begin{equation}
 \begin{split}
 \var_X[\E_{Y|x}[\YY_t|\YY_t(1)=\yy_t(1),\XX_t]] & \\
