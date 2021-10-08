@@ -76,7 +76,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
     hatytt1 <- hatytt <- matrix(0, n, TT)
     hatOtt1 <- hatOtt <- array(0, dim = c(n, n, TT))
     hatyxtt1T <- hatyxtt1 <- hatyxtt <- array(0, dim = c(n, m, TT))
-    hatvarEytT <- hatvarytT <- array(0, dim = c(n, n, TT))
+    hatvarEytT <- hatvarytT <- hatvarEytt1 <- hatvarytt1 <- array(0, dim = c(n, n, TT))
   }
 
   for (t in 1:TT) {
@@ -93,7 +93,9 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
       # For conditioning on data up to t-1, the data at time t do not factor in so Delta.r and I.2 not needed
       hatytt1[, t] <- pari$Z %*% hatxtt1[, t, drop = FALSE] + pari$A
       t.Z <- matrix(pari$Z, m, n, byrow = TRUE)
-      hatOtt1[, , t] <- pari$R + pari$Z %*% hatVtt1[, , t] %*% t.Z + tcrossprod(hatytt1[, t, drop = FALSE])
+      hatvarEytt1[, , t] <- pari$Z %*% hatVtt1[, , t] %*% t.Z
+      hatvarytt1[, , t] <- pari$R + hatvarEytt1[, , t]
+      hatOtt1[, , t] <- hatvarytt1[, , t] + tcrossprod(hatytt1[, t, drop = FALSE])
       hatyxtt1[, , t] <- tcrossprod(hatytt1[, t, drop = FALSE], hatxtt1[, t, drop = FALSE]) + pari$Z %*% hatVtt1[, , t]
     }
 
@@ -146,8 +148,10 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
     rtn.list <- list(ytT = hatyt, OtT = hatOt, yxtT = hatyxt, yxttpT = hatyxttp)
   } else {
     rtn.list <- list(
-      ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, yxtT = hatyxt, yxtt1T = hatyxtt1T, yxttpT = hatyxttp,
-      ytt1 = hatytt1, Ott1 = hatOtt1, yxtt1 = hatyxtt1,
+      ytT = hatyt, OtT = hatOt, var.ytT = hatvarytT, var.EytT = hatvarEytT, 
+      yxtT = hatyxt, yxtt1T = hatyxtt1T, yxttpT = hatyxttp,
+      ytt1 = hatytt1, Ott1 = hatOtt1, var.ytt1 = hatvarytt1, var.Eytt1 = hatvarEytt1, 
+      yxtt1 = hatyxtt1,
       ytt = hatytt, Ott = hatOtt, yxtt = hatyxtt
     )
   }
