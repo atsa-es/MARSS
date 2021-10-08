@@ -611,7 +611,7 @@ With MARSS, there is a plot method (and ggplot2::autoplot method) for marssMLE o
 \begin{figure}[htp]
 \begin{center}
 <<Cs502_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
-plot(fit_marss, plot.type = "model.ytT", pi.int = TRUE)
+plot(fit_marss, plot.type = "fitted.ytT", pi.int = TRUE)
 @
 \end{center}
 \caption{MARSS smooth model fit (expected value of $\ZZ \XX_t + \aa$) confidence intervals and predictions.}

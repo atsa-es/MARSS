@@ -5,4 +5,5 @@ MARSS.Rproj
 .Rhistory
 .DS_Store
 vignettes/.DS_Store
+tests/testthat/_snaps
 
