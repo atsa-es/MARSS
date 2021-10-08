@@ -19,9 +19,6 @@ tsSmooth.marssMLE <- function(object,
   if (interval != "none" && type == "ytt") {
     stop("tsSmooth.marssMLE: not available in this version of MARSS. MARSShatyt is missing needed var.ytt and var.Eytt to compute CIs for ytt.")
   }
-  if (interval != "none" && type == "ytt1") {
-    stop("tsSmooth.marssMLE: not available in this version of MARSS. MARSShatyt is missing needed var.ytt1 and var.Eytt1 to compute CIs for ytt1.")
-  }
   if (interval != "none" && (!is.numeric(level) || length(level) != 1 || level > 1 || level < 0)) {
     stop("tsSmooth.marssMLE: level must be a single number between 0 and 1.", call. = FALSE)
   }
@@ -117,7 +114,7 @@ tsSmooth.marssMLE <- function(object,
       .estimate = vec(t(Ey)),
       stringsAsFactors = FALSE
     )
-    if (type %in% c("ytT")) {
+    if (type %in% c("ytT", "ytt1")) {
       vtype <- paste0("var.Ey", substr(ytype, 2, nchar(type)))
       Ey.var <- hatyt[[vtype]]
       Ey.se <- apply(Ey.var, 3, function(x) {
