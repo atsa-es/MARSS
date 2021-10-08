@@ -7,7 +7,7 @@ fitted.marssMLE <- function(object, ...,
                             level = 0.95,
                             output = c("data.frame", "matrix"),
                             fun.kf = c("MARSSkfas", "MARSSkfss")) {
-  type <- match.arg(type)
+  type <- match.arg.exact(type)
   output <- match.arg(output)
   interval <- match.arg(interval)
   conditioning <- substring(type, 3)

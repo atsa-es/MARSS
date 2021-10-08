@@ -8,7 +8,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
                              fun.kf = c("MARSSkfas", "MARSSkfss"),
                              x0 = "reestimate",
                              ...) {
-  type <- match.arg(type)
+  type <- match.arg.exact(type)
   interval <- match.arg(interval)
   fun.kf <- match.arg(fun.kf)
   if (object[["fun.kf"]] != fun.kf) message(paste0(fun.kf, "is being used for prediction. This is different than fun.kf in the marssMLE object."))
