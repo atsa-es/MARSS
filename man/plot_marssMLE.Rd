@@ -42,7 +42,7 @@
     form=c("marxss", "marss", "dfa"),
     standardization = c("Cholesky", "marginal", "Block.Cholesky"),
     conf.int=TRUE, conf.level=0.95, decorate=TRUE, pi.int = FALSE,
-    plot.par = list(), ..., silent = FALSE)
+    fig.notes = TRUE, plot.par = list(), ..., silent = FALSE)
   }
 \arguments{
   \item{x}{ A \code{\link{marssMLE}} object.  }
@@ -57,6 +57,7 @@
                     line.col = "black", line.size = 1, line.linetype = "solid",
                     ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
                     ci.linesize = 0, ci.alpha = 0.6). }
+  \item{fig.notes}{ Add notes to the bottom of the plots (only for \code{autoplot()}. }
   \item{silent}{ No console interaction or output. }
   \item{...}{ Other arguments, not used. }
   }
