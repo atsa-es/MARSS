@@ -282,7 +282,8 @@ autoplot.marssMLE <-
                ytT = "smoothation "
         ),
         "residuals"
-      )      
+      )    
+      stringr::str_sub(title.val, 1, 1) <- stringr::str_to_upper(stringr::str_sub(title.val, 1, 1))
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$value)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(
           shape = plotpar$point.pch, fill = plotpar$point.fill,
@@ -347,7 +348,8 @@ autoplot.marssMLE <-
                ytT = "smoothation "
         ),
         "residuals"
-      )      
+      )
+      stringr::str_sub(title.val, 1, 1) <- stringr::str_to_upper(stringr::str_sub(title.val, 1, 1))
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(
           shape = plotpar$point.pch, fill = plotpar$point.fill,
