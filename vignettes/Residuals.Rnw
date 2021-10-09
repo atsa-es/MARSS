@@ -129,7 +129,7 @@
 \def\dotVtp{\dot{\VV}_{t+1}}
 \def\dotVt{\dot{\VV}_t}
 \def\hatVtT{\widetilde{\VV}_t^T}
-\def\hatVtt1{\widetilde{\VV}_t^{t-1}}
+\def\hatVttm{\widetilde{\VV}_t^{t-1}}
 \def\hatVtt{\widetilde{\VV}_t^{t}}
 \def\hatVtmT{\widetilde{\VV}_{t-1}^T}
 \def\hatVtmt1{\widetilde{\VV}_{t-1}^{t-1}}
@@ -144,7 +144,7 @@
 \def\hatUtT{\widetilde{\UU}_t^T}
 \def\hatUtt1{\widetilde{\UU}_t^{t-1}}
 \def\hatStT{\widetilde{\Ss}_t^T}
-\def\hatStt1{\widetilde{\Ss}_t^{t-1}}
+\def\hatSttm{\widetilde{\Ss}_t^{t-1}}
 \def\hatStt{\widetilde{\Ss}_t^{t}}
 \def\hatSttmT{\widetilde{\Ss}_{t,t-1}^T}
 \def\hatSttmt1{\widetilde{\Ss}_{t,t-1}^{t-1}}
@@ -575,7 +575,7 @@ The $\HH_t$ and $\GG_t$ matrices specify the variance and covariance of $\WW_t$ 
 The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\GG_t\epsilon_t\\ \HH_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVtt1=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVttm=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
 
 \subsection{Algorithm for the non-normalized residuals}
 
@@ -594,8 +594,8 @@ Start from $t=T$ and work backwards to $t=1$. At time $T$, $r_T=0_{1 \times m}$ 
 \begin{equation}\label{eq:Harveyalgo}
 \begin{gathered}
 \QQ^\prime_{t+1}=\begin{bmatrix}0_{m \times n}&\QQ_{t+1}\end{bmatrix}, \mbox{    } \RR^\prime_t=\begin{bmatrix}\RR_t^* & 0_{n \times m}\end{bmatrix}\\
-\FF_t = \ZZ_t^*\hatVtt1{\ZZ_t^*}^\top+\RR_t^* , \,\, n \times n \\
-K_t = \BB_{t+1}\KK_t = \BB_{t+1} \hatVtt1{\ZZ_t^*}^\top \FF_t^{-1}  , \,\, m \times n  \\
+\FF_t = \ZZ_t^*\hatVttm{\ZZ_t^*}^\top+\RR_t^* , \,\, n \times n \\
+K_t = \BB_{t+1}\KK_t = \BB_{t+1} \hatVttm{\ZZ_t^*}^\top \FF_t^{-1}  , \,\, m \times n  \\
 L_t = \BB_{t+1} - K_t\ZZ_t^*  , \,\, m \times m \\
 J_t= \QQ^\prime_{t+1} - K_t \RR^\prime_t  , \,\, m \times (n+m) \\
 v_t = \yy_t^* - \ZZ_t\hatxttm - \aa_t , \,\, n \times 1 \\
@@ -666,13 +666,13 @@ This is conceptually different than the observed `innovations'. First, this is t
 
 The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus using Equation \ref{eq:first.and.secons.vvtgeneral}, we can write the variance directly as:
 \begin{equation}\label{eq:innov.model}
-\var[\checkVt] = \RR_t - \ZZ_t \hatVtt1 \ZZ_t^\top + \hatStt1\ZZ_t^\top + \ZZ_t(\hatStt1)^\top
+\var[\checkVt] = \RR_t - \ZZ_t \hatVttm \ZZ_t^\top + \hatSttm\ZZ_t^\top + \ZZ_t(\hatSttm)^\top
 \end{equation}
-where the $\hatVtt1$ and $\hatStt1$ are now conditioned on only the data from 1 to $t-1$.
-$\hatStt1 = \cov[\YY_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t + \aa_t+\VV_t,\XX_t|\yy^{(1), t-1}]$. 
-$\yy_t$ is not in the conditional since it only includes data up to $t-1$. Without $\yy_t$ in the conditional, $\VV_t$ and $\WW_t$ and by extension $\VV_t$ and $\XX_t$ are independent\footnote{This is only true given the way the MARSS equation is written in this report where $V_t$ and $W_t$ are independent. This is not the case for the more general Harvey et al. MARSS model which allows covariance between $V_t$ and $W_t$.} and $\cov[\ZZ_t \XX_t + \aa_t + \VV_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t,\XX_t|\yy^{(1), t-1}] = \ZZ_t \hatVtt1$. Therefore, $\ZZ_t(\hatStt1)^\top =  \ZZ_t \hatVtt1 \ZZ_t^\top = \hatStt1(\ZZ_t)^\top$. Thus Equation \ref{eq:innov.model} reduces to
+where the $\hatVttm$ and $\hatSttm$ are now conditioned on only the data from 1 to $t-1$.
+$\hatSttm = \cov[\YY_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t + \aa_t+\VV_t,\XX_t|\yy^{(1), t-1}]$. 
+$\yy_t$ is not in the conditional since it only includes data up to $t-1$. Without $\yy_t$ in the conditional, $\VV_t$ and $\WW_t$ and by extension $\VV_t$ and $\XX_t$ are independent\footnote{This is only true given the way the MARSS equation is written in this report where $V_t$ and $W_t$ are independent. This is not the case for the more general Harvey et al. MARSS model which allows covariance between $V_t$ and $W_t$.} and $\cov[\ZZ_t \XX_t + \aa_t + \VV_t,\XX_t|\yy^{(1), t-1}] = \cov[\ZZ_t \XX_t,\XX_t|\yy^{(1), t-1}] = \ZZ_t \hatVttm$. Therefore, $\ZZ_t(\hatSttm)^\top =  \ZZ_t \hatVttm \ZZ_t^\top = \hatSttm(\ZZ_t)^\top$. Thus Equation \ref{eq:innov.model} reduces to
 \begin{equation}\label{eq:innov.model2}
-\var[\checkVt] = \RR_t + \ZZ_t \hatVtt1 \ZZ_t^\top.
+\var[\checkVt] = \RR_t + \ZZ_t \hatVttm \ZZ_t^\top.
 \end{equation}
 
 Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the MARSS R package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
@@ -693,7 +693,7 @@ Thus, $\checkwt$ is a transformed $\checkvt$:
 \begin{equation}\label{eq:wtt1.3}
 \checkwt = \KK_t \checkvt,
 \end{equation}
-where $\KK_t$ is the Kalman gain. $\KK_t = \hatVtt1 \ZZ_t^\top[\ZZ_t \hatVtt1 \ZZ_t^\top + \RR_t]^{-1}$ and $\ZZ_t$ is the missing values modified $\ZZ_t$ where if the $i$-th $\yy_t$ is missing, the $i$-th row of $\ZZ_t$ is set to all 0s (Shumway and Stoffer 2006, equation 6.78).
+where $\KK_t$ is the Kalman gain. $\KK_t = \hatVttm \ZZ_t^\top[\ZZ_t \hatVttm \ZZ_t^\top + \RR_t]^{-1}$ and $\ZZ_t$ is the missing values modified $\ZZ_t$ where if the $i$-th $\yy_t$ is missing, the $i$-th row of $\ZZ_t$ is set to all 0s (Shumway and Stoffer 2006, equation 6.78).
 Thus the variance of $\checkWt$ is 
 \begin{equation}\label{eq:var.Wt}
 \var[\checkWt] = \KK_t \var[\checkVt] \KK_t^\top
