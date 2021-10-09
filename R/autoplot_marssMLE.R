@@ -18,15 +18,21 @@ autoplot.marssMLE <-
            form = c("marxss", "marss", "dfa"),
            standardization = c("Cholesky", "marginal", "Block.Cholesky"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
-           fig.notes = TRUE,
-           plot.par = list(),
-           ..., silent = FALSE) {
+           fig.notes = TRUE, plot.par = list(), ..., silent = FALSE) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
     
     # Argument checks
     standardization <- match.arg(standardization)
+
+    if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("autoplot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+
+    # Test logical arguments
+    largs <- list(conf.int=conf.int, pi.int=pi.int, decorate=decorate, fig.notes=fig.notes, silent=silent)
+    for(i in names(largs)){ 
+      if(!(identical(largs[[i]], TRUE) || identical(largs[[i]], FALSE))) stop(paste("autoplot.marssMLE:", i, "must be TRUE/FALSE"), call. = FALSE)
+        }
     
     # Argument checks: plot.type
     if (missing(plot.type)) {
@@ -71,9 +77,6 @@ autoplot.marssMLE <-
         stop("autoplot.marssMLE: x must be class marssMLE or marssResiduals.", call. = FALSE)
       }
     }
-    
-    if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("autoplot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
-    if (!(conf.int %in% c(TRUE, FALSE))) stop("autoplot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
     
     if (missing(form)) {
       model_form <- attr(x[["model"]], "form")[1]
@@ -160,7 +163,7 @@ autoplot.marssMLE <-
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(paste("States", i))
-      note <- paste("This is the estimate of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), ifelse(ctype!="xtT", "If you want the smoothed state estimates conditioned on all the data, use xtT instead.", ""))
+      note <- paste("This is the estimate of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), ifelse(ctype!="xtT", "If you want the smoothed state estimates conditioned on all the data, use xtT instead.", ""), ifelse(conf.int, paste("Confidence intervals are for the expected value of X (conditioned on the data up to", switch(ctype, xtT="T).", xtt="t).", xtt1="t-1).")), ""))
       if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -206,14 +209,16 @@ autoplot.marssMLE <-
           col = plotpar$point.col, size = plotpar$point.size, na.rm = TRUE
         )
       }
-      if (cname == "model") note <- paste("This is the model fitted value of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype!="ytt1", "Use fitted.ytt1 if you want the one-step-ahead predictions instead.", "These are known as the one-step-ahead predictions."))
-      if (cname == "state") note <- paste("This is the model fitted value of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), "This is not the model estimate of X (i.e. the states). It is the expected value of X(t) given the E[X(t-1)|y] where y is the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), "Use xtT if you want the traditional states estimates for a state-space model.")
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(tit)
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        if (cname == "model") note <- paste("This is the model fitted value of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype!="ytt1", "Use fitted.ytt1 if you want the one-step-ahead predictions instead.", "These are known as the one-step-ahead predictions."))
+        if (cname == "state") note <- paste("This is the model fitted value of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), "This is not the model estimate of X (i.e. the states). It is the expected value of X(t) given the E[X(t-1)|y] where y is the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), "Use plot.type='xtT' if you want the traditional states estimates for a state-space model.")
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
@@ -225,18 +230,17 @@ autoplot.marssMLE <-
       ctype <- i
       # make plot of expected value of Y condtioned on y(1)
       if ( ctype %in% c("ytT", "ytt1") | !conf.int){
-        df <- tsSmooth.marssMLE(x, type = i, ifelse(conf.int, "confidence", "none"), level = conf.level)
+        df <- tsSmooth.marssMLE(x, type = i, interval=ifelse(conf.int, "confidence", "none"), level = conf.level)
       }else{
         if( plot.all ) next # If plot.type="all" then just skip the problematic plots
-        if( conf.int ) stop(paste("Confidence intervals for", i, "are not yet implemented in MARSS.\nPass in conf.int=FALSE to autoplot()."))
-      }
-      if (conf.int) {
-        df$ymin <- df$.conf.low
-        df$ymax <- df$.conf.up
+        if( conf.int ) message(paste("Confidence intervals for", i, "are not implemented in MARSS.\nNo confidence intervals shown for the", i, "plot.\n"))
+        df <- tsSmooth.marssMLE(x, type = i, interval="none")
       }
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate)) +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size)
-      if (conf.int) {
+      if (conf.int & ctype!="ytt") {
+        df$ymin <- df$.conf.low
+        df$ymax <- df$.conf.up
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
@@ -250,9 +254,11 @@ autoplot.marssMLE <-
           col = plotpar$point.col, size = plotpar$point.size
         ) +
         ggplot2::ggtitle("Expected value of Y conditioned on data")
-      note <- "This is the expected value of Y conditioned on the data. Use this if you need an estimate of missing data. For non-missing data, it will simply return the observed y. E(Y|y) = y. If you want the model estimate of Y, use fitted.ytT."
-      note <- paste("This is the estimate of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype=="ytT", "Use this if you need an estimate of missing data points. For non-missing data, it will simply return the observed y. E(Y|y) = y. If you want the model estimate of Y, use fitted.ytT.", "If you need an estimate of missing data, use ytT."))
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        note <- paste("This is the estimate of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype=="ytT", "Use this if you need an estimate of missing data points. For non-missing data, it will simply return the observed y. E(Y|y) = y. If you want the model estimate of Y, use fitted.ytT.", "If you need an estimate of missing data, use ytT."))
+        if(conf.int) note <- paste(note, "Confidence intervals are for the expected value of Y and will be 0 if data are not missing.")
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
@@ -266,6 +272,17 @@ autoplot.marssMLE <-
       df <- subset(resids, resids$type == ctype)
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       df$.rownames <- factor(df$.rownames) # drop levels
+      title.val <- paste0(
+        ifelse(stringr::str_detect(i, "std"), paste(cstan, "standardized "), ""),
+        cname, " ",
+        switch(ctype,
+               xtT = "smoothation ",
+               ytt1 = "innovation ",
+               ytt = "ytt ",
+               ytT = "smoothation "
+        ),
+        "residuals"
+      )      
       p1 <- ggplot2::ggplot(df[(!is.na(df$.resids) & !is.na(df$value)), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(
           shape = plotpar$point.pch, fill = plotpar$point.fill,
@@ -275,28 +292,35 @@ autoplot.marssMLE <-
         ggplot2::ylab(ifelse(stringr::str_detect(i, "std"), "Standardized observation residuals, y - E[y]", "Observation residuals, y - E[y]")) +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
-        ggplot2::ggtitle(ifelse(stringr::str_detect(i, "std"), "Standardized model residuals", "Model residuals"))
+        ggplot2::ggtitle(title.val)
       if (decorate) {
         p1 <- p1 + ggplot2::stat_smooth(formula = y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
+      }
+      if (conf.int){
         if (stringr::str_detect(i, "std")) {
           df$sigma <- 1
-          if (i == "std.model.resids.ytt1") note <- paste(cstan, "standardized innovations residuals. Use standardized model smoothation model residuals ('std.model.resids.ytT') for outlier detection.")
-          if (i == "std.model.resids.ytt") note <- paste(cstan, "standardized ytt residuals. Use standardized model smoothation model residuals ('std.model.resids.ytT') for outlier detection.")
-          if (i == "std.model.resids.ytT" & cstan=="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Residuals outside the +/- 2 limits are potential outliers.")
-          if (i == "std.model.resids.ytT" & cstan!="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Use Cholesky standardized residuals for outlier detection.")
         } else {
           df$sigma <- df$.sigma
           df$sigma[is.na(df$value)] <- 0
-          if (i == "model.resids.ytt1") note <- "Innovations (one-step ahead) residuals. (1-alpha) fraction of residuals should fall within the CIs."
-          if (i == "model.resids.ytt") note <- "Model residuals conditioned on data up to t. (1-alpha) fraction of residuals should fall within the CIs."
-          if (i == "model.resids.ytT") note <- "Model smoothation residuals (y - E[y|all data]). Note, standardized smoothation model residuals are the more typical outlier diagnostic."
         }
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        if (stringr::str_detect(i, "std")) {
+          if (i == "std.model.resids.ytt1") note <- paste(cstan, "standardized innovations residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
+          if (i == "std.model.resids.ytt") note <- paste(cstan, "standardized ytt residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
+          if (i == "std.model.resids.ytT" & cstan=="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Residuals outside the +/- 2 limits are potential outliers.")
+          if (i == "std.model.resids.ytT" & cstan!="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Use Cholesky standardized residuals for outlier detection.")
+        } else {
+          if (i == "model.resids.ytt1") note <- paste("Innovations (one-step ahead) residuals.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates problems with the normality assumption.", ""))
+          if (i == "model.resids.ytt") note <- "Model residuals conditioned on data up to t. These are not typically used. See model.resids.ytt1 and std.model.resids.ytT for more standard residuals diagnostics."
+          if (i == "model.resids.ytT") note <- paste("Model smoothation residuals (y - E[y|all data]). Note, Cholesky standardized smoothation model residuals are the more typical outlier diagnostic.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates potential outliers.", ""))
+        }
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
@@ -312,6 +336,17 @@ autoplot.marssMLE <-
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       df$.rownames <- factor(df$.rownames) # drop levels
       df$.rownames <- paste0("State ", df$.rownames)
+      title.val <- paste0(
+        ifelse(stringr::str_detect(i, "std"), paste(cstan, "standardized "), ""),
+        cname, " ",
+        switch(ctype,
+               xtT = "smoothation ",
+               ytt1 = "innovation ",
+               ytt = "ytt ",
+               ytT = "smoothation "
+        ),
+        "residuals"
+      )      
       p1 <- ggplot2::ggplot(df[!is.na(df$.resids), ], ggplot2::aes_(~t, ~.resids)) +
         ggplot2::geom_point(
           shape = plotpar$point.pch, fill = plotpar$point.fill,
@@ -321,24 +356,33 @@ autoplot.marssMLE <-
         ggplot2::ylab(ifelse(stringr::str_detect(i, "std"), "Standardized state residuals, xtT - E[x]", "State residuals, xtT - E[x]")) +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
-        ggplot2::ggtitle(ifelse(stringr::str_detect(i, "std"), "Standardized state residuals", "State residuals"))
+        ggplot2::ggtitle(title.val)
       if (decorate) {
         p1 <- p1 + ggplot2::stat_smooth(formula = y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
+      }
+      if (conf.int){
         if (stringr::str_detect(i, "std")) {
           df$sigma <- 1
-          note <- paste(cstan, "standardized state smoothation residuals.")
-          if(cstan=="Cholesky") note <- paste(note, "Residuals outside the +/- 2 limits are potential outliers of x(t) to x(t+1).")
         } else {
           df$sigma <- df$.sigma
           df$sigma[is.na(df$value)] <- 0
-          note <- "State smoothation residuals. Note, Cholesky standardized state smoothation residuals are the more typical outlier diagnostic."
         }
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
         p1 <- p1 +
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        if(stringr::str_detect(i, "std")){
+          note <- paste(cstan, "standardized state smoothation residuals.")
+          if(cstan=="Cholesky" & conf.int) note <- paste(note, "Residuals outside the +/- 2 limits are potential outliers of x(t) to x(t+1).")
+          if(cstan!="Cholesky" & conf.int) note <- paste(note, "Confidence intervals are for the x(t) to x(t+1) step.")
+        }else{
+          note <- "State smoothation residuals. Note, Cholesky standardized state smoothation residuals are the more typical outlier diagnostic."
+          if(conf.int) note <- paste(note, "Confidence intervals are for the x(t) to x(t+1) step.")
+        }
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
@@ -375,18 +419,6 @@ autoplot.marssMLE <-
         intercept = intercept,
         stringsAsFactors = FALSE
       )
-      note <- paste0(
-        ifelse(stringr::str_detect(i, "std"), paste(cstan,"standardized "), ""),
-        cname, " ",
-        switch(ctype,
-               xtT = "smoothation ",
-               ytt1 = "innovation ",
-               ytt = "ytt ",
-               ytT = "smoothation "
-        ),
-        "residuals. The residuals should be Gaussian."
-      )
-      note <- stringr::str_to_sentence(note)      
       ylab.val <- paste0(
         ifelse(stringr::str_detect(i, "std"), "standardized ", ""),
         cname, " ",
@@ -406,7 +438,21 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle("Residuals normality test") + 
         ggplot2::geom_abline(data = abline.dat, ggplot2::aes_(slope = ~slope, intercept = ~intercept), color = "blue")
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        note <- paste0(
+          ifelse(stringr::str_detect(i, "std"), paste(cstan,"standardized "), ""),
+          cname, " ",
+          switch(ctype,
+                 xtT = "smoothation ",
+                 ytt1 = "innovation ",
+                 ytt = "ytt ",
+                 ytT = "smoothation "
+          ),
+          "residuals. The residuals should be Gaussian."
+        )
+        note <- stringr::str_to_sentence(note)
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
@@ -463,20 +509,6 @@ autoplot.marssMLE <-
       )
       title.val <- stringr::str_to_sentence(title.val)
       
-      note <- paste0(
-        ifelse(stringr::str_detect(i, "std"), paste(cstan,"standardized "), ""),
-        cname, " ",
-        switch(ctype,
-               xtT = "smoothation ",
-               ytt1 = "innovation ",
-               ytt = "ytt ",
-               ytT = "smoothation "
-        ),
-        "residuals.",
-        ifelse(stringr::str_detect(i, "ytt1"), " These residuals should be temporally uncorrelated.", " These residuals are not expected to be temporally uncorrelated. Use innovation residuals to check for temporal correlation in the residuals.") 
-      )
-      note <- stringr::str_to_sentence(note)      
-      
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
         ggplot2::geom_segment(mapping = ggplot2::aes(xend = lag, yend = 0), na.rm = TRUE) +
@@ -487,7 +519,22 @@ autoplot.marssMLE <-
       p1 <- p1 +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ci), color = "blue", linetype = 2) +
         ggplot2::geom_hline(data = ci.dat, ggplot2::aes_(yintercept = ~ -ci), color = "blue", linetype = 2)
-      if (fig.notes) p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      if (fig.notes){
+        note <- paste0(
+          ifelse(stringr::str_detect(i, "std"), paste(cstan,"standardized "), ""),
+          cname, " ",
+          switch(ctype,
+                 xtT = "smoothation ",
+                 ytt1 = "innovation ",
+                 ytt = "ytt ",
+                 ytT = "smoothation "
+          ),
+          "residuals.",
+          ifelse(stringr::str_detect(i, "ytt1"), " These residuals should be temporally uncorrelated.", " These residuals are not expected to be temporally uncorrelated. Use innovation residuals to check for temporal correlation in the residuals.") 
+        )
+        note <- stringr::str_to_sentence(note)
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+      }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
         invisible(plts)
