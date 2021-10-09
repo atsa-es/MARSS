@@ -1,51 +1,53 @@
 plot.marssMLE <-
   function(x,
            plot.type = c(
-             "model.ytT", "xtT",
+             "fitted.ytT", "fitted.ytt", "fitted.ytt1", 
+             "ytT", "ytt", "ytt1",
+             "fitted.xtT", "fitted.xtt1", 
+             "xtT", "xtt", "xtt1",
              "model.resids.ytt1", "qqplot.model.resids.ytt1", "acf.model.resids.ytt1",
              "std.model.resids.ytt1", "qqplot.std.model.resids.ytt1", "acf.std.model.resids.ytt1",
-             "model.resids.ytT", "qqplot.model.resids.ytT",
-             "std.model.resids.ytT", "qqplot.std.model.resids.ytT",
-             "model.resids.ytt", "qqplot.model.resids.ytt",
-             "std.model.resids.ytt", "qqplot.std.model.resids.ytt",
-             "state.resids.xtT", "qqplot.state.resids.xtT",
-             "std.state.resids.xtT", "qqplot.std.state.resids.xtT",
-             "ytT", "residuals", "all"
+             "model.resids.ytT", "qqplot.model.resids.ytT", "acf.model.resids.ytT",
+             "std.model.resids.ytT", "qqplot.std.model.resids.ytT", "acf.std.model.resids.ytT",
+             "model.resids.ytt", "qqplot.model.resids.ytt", "acf.model.resids.ytt",
+             "std.model.resids.ytt", "qqplot.std.model.resids.ytt", "acf.std.model.resids.ytt",
+             "state.resids.xtT", "qqplot.state.resids.xtT", "acf.state.resids.xtT",
+             "std.state.resids.xtT", "qqplot.std.state.resids.xtT", "acf.std.state.resids.xtT",
+             "residuals", "all"
            ),
            form = c("marxss", "marss", "dfa"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
            ..., silent = FALSE) {
-    if (!requireNamespace("ggplot2", quietly = TRUE)) {
-      stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
-    }
     if (!inherits(x, "marssMLE")) {
-      stop("autoplot.marssMLE: x must be class marssMLE.", call. = FALSE)
+      stop("plot.marssMLE: x must be class marssMLE.", call. = FALSE)
     }
 
     # Argument checks: plot.type
     if (missing(plot.type)) {
       plot.type <- c(
-        "model.ytT", "xtT",
+        "fitted.ytT", "xtT",
         "model.resids.ytt1", "qqplot.std.model.resids.ytt1", "acf.std.model.resids.ytt1",
         "std.model.resids.ytT",
         "std.state.resids.xtT", "qqplot.std.state.resids.xtT"
       )
     }
-    plot.type <- match.arg(plot.type, several.ok = TRUE)
+    plot.type <- match.arg.exact(plot.type, several.ok = TRUE)
     if (identical(plot.type, "residuals")) {
       plot.type <- c(
         "model.resids.ytt1", "qqplot.std.model.resids.ytt1", "acf.std.model.resids.ytt1",
         "std.model.resids.ytT", "std.state.resids.xtT", "qqplot.std.state.resids.xtT"
       )
     }
-    if (identical(plot.type, "all")) {
+    plot.all <- FALSE
+    if (identical(plot.type,"all")){
+      plot.all <- TRUE
       plot.type <- eval(formals()$plot.type)
       plot.type <- plot.type[!(plot.type %in% c("residuals", "all"))]
     }
-
-    if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("autoplot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
-    if (!(conf.int %in% c(TRUE, FALSE))) stop("autoplot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
+    
+    if (!is.numeric(conf.level) || length(conf.level) > 1 || conf.level > 1 || conf.level < 0) stop("plot.marssMLE: conf.level must be a single number between 0 and 1.", call. = FALSE)
+    if (!(conf.int %in% c(TRUE, FALSE))) stop("plot.marssMLE: conf.int must be TRUE/FALSE", call. = FALSE)
 
     if (missing(form)) {
       model_form <- attr(x[["model"]], "form")[1]
@@ -70,15 +72,36 @@ plot.marssMLE <-
         }
       }
     }
-
+    
+    # Check class and alter plot.type as needed
+    if (!inherits(x, "marssMLE")) {
+      if(inherits(x, "marssResiduals")){
+        plot.type <- plot.type[stringr::str_detect(plot.type, "resids")]
+        # Make sure that plot types are possible for the object that the user passed in
+        ctype <- unique(x$type)
+        plot.type <- plot.type[sapply(plot.type, function(x){any(stringr::str_detect(x, ctype))})]
+        cname <- unique(x$name)
+        plot.type <- plot.type[sapply(plot.type, function(x){any(stringr::str_detect(x, cname))})]
+        if (length(plot.type) == 0) {
+          message("Nothing to plot. Either your MARSSresiduals object does not include model or state residuals or you have passed in the wrong plot.type, i.e. model residual plots when your MARRSSresiduals object only includes state residuals.")
+          return()
+        }
+        # Set up the residuals object
+        resids <- x
+        cstan <- attr(resids, "standardization")
+      }else{
+        stop("plot.marssMLE: x must be class marssMLE or marssResiduals.", call. = FALSE)
+      }
+    }
+    
     extras <- list()
     if (!missing(...)) {
       extras <- list(...)
       allowednames <- c("rotate", "method", "hessian.fun", "nboot")
       bad.names <- names(extras)[!(names(extras) %in% allowednames)]
-      if (!all(names(extras) %in% allowednames)) stop(paste("autoplot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?autoplot.marssMLE for allowed arguments.\n"), call. = FALSE)
+      if (!all(names(extras) %in% allowednames)) stop(paste("plot.marssMLE:", paste(bad.names, collapse = " "), "is/are unknown argument(s). See ?plot.marssMLE for allowed arguments.\n"), call. = FALSE)
       if (model_form != "dfa" & "rotate" %in% names(extras)) {
-        cat("autoplot.marssMLE: 'rotate' argument is ignored if form!='dfa'\n Pass in form='dfa' if your model is a DFA model, but the form \n attribute is not set (because you set up your DFA model manually).\n\n")
+        cat("plot.marssMLE: 'rotate' argument is ignored if form!='dfa'\n Pass in form='dfa' if your model is a DFA model, but the form \n attribute is not set (because you set up your DFA model manually).\n\n")
         rotate <- FALSE
       }
     }
@@ -86,25 +109,32 @@ plot.marssMLE <-
 
     alpha <- 1 - conf.level
 
-    # If user requests any residuals plots, set up the residuals data frames
-    resids <- c()
-    if (any(stringr::str_detect(plot.type, "tt1"))) {
-      resids <- residuals.marssMLE(x, type = "tt1", standardization = "Cholesky")
+    # If user requests any residuals plots, set up the residuals data frames unless x is marssResiduals object
+    if(!inherits(x, "marssResiduals")){
+      resids <- c()
+      cstan <- "Cholesky"
+      if (any(stringr::str_detect(plot.type, "tt1"))) {
+        resids <- residuals.marssMLE(x, type = "tt1", standardization = cstan)
+      }
+      if (any(stringr::str_detect(plot.type, "tt") & !stringr::str_detect(plot.type, "tt1"))) {
+        resids <- rbind(resids, residuals.marssMLE(x, type = "tt", standardization = cstan))
+      }
+      if (any(stringr::str_detect(plot.type, "tT"))) {
+        resids <- rbind(resids, residuals.marssMLE(x, type = "tT", standardization = cstan))
+      }
     }
-    if (any(stringr::str_detect(plot.type, "tt") & !stringr::str_detect(plot.type, "tt1"))) {
-      resids <- rbind(resids, residuals.marssMLE(x, type = "tt", standardization = "Cholesky"))
-    }
-    if (any(stringr::str_detect(plot.type, "tT"))) {
-      resids <- rbind(resids, residuals.marssMLE(x, type = "tT", standardization = "Cholesky"))
-    }
+    
+    fitted.plots <- paste0("fitted.", c("ytt1", "ytt", "ytT", "xtT", "xtt1"))
+    for (i in fitted.plots[fitted.plots %in% plot.type]) {
+      ctype <- rev(stringr::str_split(i, "[.]")[[1]])[1]
+      cname <- ifelse(stringr::str_detect(i, "y"), "model", "state")
 
-    if ("model.ytT" %in% plot.type) {
-      # make plot of observations
-      df <- fitted.marssMLE(x, type = "ytT", interval = "confidence", level = conf.level)
+      df <- fitted.marssMLE(x, type = ctype, interval = "confidence", level = conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
+      if(stringr::str_detect(i, "x")) df$y <- df$.x
       if (pi.int) {
-        df2 <- fitted.marssMLE(x, type = "ytT", interval = "prediction", level = conf.level)
+        df2 <- fitted.marssMLE(x, type = ctype, interval = "prediction", level = conf.level)
         df$ymin.pi <- df2$.lwr
         df$ymax.pi <- df2$.upr
       }
@@ -130,8 +160,9 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "model.ytT"]
-      if (!silent) cat(paste("plot type = \"model.ytT\" Observations with fitted values\n"))
+      plot.type <- plot.type[plot.type != i]
+      if (!silent & stringr::str_detect(i, "y")) cat(paste("plot type = ", i, " Observations with fitted values\n"))
+      if (!silent & stringr::str_detect(i, "x")) cat(paste("plot type = ", i, " Expected states with fitted states based on states at t-1\n"))
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -140,8 +171,9 @@ plot.marssMLE <-
       }
     }
 
-    if ("xtT" %in% plot.type) {
-      # make plot of states and CIs
+    state.plots <- c("xtT", "xtt", "xtt1")
+    for (i in state.plots[state.plots %in% plot.type]) {
+      ctype <- i
 
       if ("rotate" %in% names(extras)) {
         rotate <- extras[["rotate"]]
@@ -150,7 +182,7 @@ plot.marssMLE <-
         rotate <- FALSE
       }
 
-      states <- tsSmooth.marssMLE(x, type = "xtT", interval = ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
+      states <- tsSmooth.marssMLE(x, type = ctype, interval = ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
       if (model_form == "dfa") {
         if (rotate) {
           rottext <- "rotated"
@@ -176,8 +208,8 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "xtT"]
-      if (!silent) cat(paste("plot type = \"xtT\" Estimated states\n"))
+      plot.type <- plot.type[plot.type != i]
+      if (!silent) cat(paste0("plot type = ", i, " Estimated states\n"))
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -329,12 +361,21 @@ plot.marssMLE <-
       }
     }
 
-    if ("ytT" %in% plot.type) {
-      # make plot of expected value of y
-      df <- tsSmooth.marssMLE(x, type = "ytT", interval = ifelse(conf.int, "confidence", "none"))
+    y.plots <- c("ytT", "ytt", "ytt1")
+    for (i in y.plots[y.plots %in% plot.type]) {
+      ctype <- i
+      if ( ctype %in% c("ytT", "ytt1") | !conf.int){
+        df <- tsSmooth.marssMLE(x, type = i, ifelse(conf.int, "confidence", "none"), level = conf.level)
+      }else{
+        if( plot.all ) next # If plot.type="all" then just skip the problematic plots
+        if( conf.int ) stop(paste("Confidence intervals for", i, "are not yet implemented in MARSS.\nPass in conf.int=FALSE to autoplot()."))
+      }
       if (conf.int) {
         df$ymin <- df$.conf.low
         df$ymax <- df$.conf.up
+      }else{
+        df$ymin <- df$y
+        df$ymax <- df$y
       }
       nY <- min(9, attr(x$model, "model.dims")$y[1])
       plot.ncol <- round(sqrt(nY))
@@ -353,8 +394,8 @@ plot.marssMLE <-
           box()
         })
       }
-      plot.type <- plot.type[plot.type != "ytT"]
-      if (!silent) cat(paste("plot type = \"ytT\" Expected value of Y conditioned on data\n"))
+      plot.type <- plot.type[plot.type != i]
+      if (!silent) cat(paste0("plot type = ", i, " Expected value of Y conditioned on data\n"))
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
