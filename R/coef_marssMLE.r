@@ -28,6 +28,7 @@ coef.marssMLE <- function(object, ..., type = "list", form = NULL, what = "par")
   if (missing(form)) form <- attr(object[["model"]], "form")
 
   # This will return the object with the $par element changed to a form compatible with $model
+  # $par is in marss form but $model is the form that the user specified (usually marxss with D and C separate)
   coef.fun <- paste("coef_", form[1], sep = "")
   tmp <- try(exists(coef.fun, mode = "function"), silent = TRUE)
   if (isTRUE(tmp)) {
@@ -72,17 +73,21 @@ coef.marssMLE <- function(object, ..., type = "list", form = NULL, what = "par")
       return.obj[[the.type]] <- paramvector
     }
 
-    par.dims <- attr(object[["model"]], "model.dims")
+    par.dims <- attr(modified.object[["model"]], "model.dims")
     if (the.type == "matrices" || the.type == "matrix") {
       par.mat <- list()
       if (what != "par") {
-        orig.par <- modified.object[["par"]]
-        modified.object[["par"]] <- pars
+        orig.par <- modified.object[["par"]] # in marss form
+        modified.object[["par"]] <- pars # in the user form; probably marxss
       }
       for (elem in par.names) {
         # need to tell parmat to use the model in $model; default is $marss
         # passing in par.dims[elem] keeps it as a list so that parmat doesn't have to change vector to list
         the.par <- parmat(modified.object, elem = elem, t = 1:par.dims[[elem]][3], dims = par.dims[elem], model.loc = "model")[[elem]]
+        if(elem %in% c("R", "A", "D", "Z")) rownames(the.par) <- attr(modified.object[["model"]], "Y.names")
+        if(elem %in% c("R")) colnames(the.par) <- attr(modified.object[["model"]], "Y.names")
+        if(elem %in% c("Q", "U", "C", "V0", "x0", "B")) rownames(the.par) <- attr(modified.object[["model"]], "X.names")
+        if(elem %in% c("Q", "V0", "Z", "B")) colnames(the.par) <- attr(modified.object[["model"]], "X.names")
         par.mat[[elem]] <- the.par
       }
       if (what != "par") modified.object[["par"]] <- orig.par
