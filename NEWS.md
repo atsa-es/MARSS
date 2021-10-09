@@ -10,24 +10,26 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 MARSS 3.11.4 (GitHub master development branch)
 ------------------------------------
 
-This update is focused on improving a few plotting functions and updating the website links to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
+This update is focused on improving the plotting functions and updating the website links to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
 
 ENHANCEMENTS
 
-* Created `autoplot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
+* Created `autoplot.marssResiduals()` and `plot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
 * Revamped residuals plots made by `autoplot.marssMLE()` and `plot.marssMLE()` to allow a full range of residuals plots but to only show a subset for a specific set of residuals diagnostics plots by default.
 * Added utility function `match.arg.exact()` which does exact argument matching. The base R `match.arg()` uses `pmatch()` and does partial matching. This is a problem for many functions where `"xtt1"` is different than `"xtt"`. This function implements exact matching.
+* Added row and column names to the output from `coef.marssMLE()` when `type="matrix"`.
 
 BUGS
 
 * `plot.predictMARSS()` was not showing the forecasts.
 * `autoplot.marssPredict()` was not using the time info from ts object, so x-axis was showing 1, 2, 3 etc instead of the years, for example.
 * `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"`). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
+* `coef.marssMLE()` was not properly showing a time-varying A or U when `type="matrix"`, `form="marss"` and D or C estimated.
 
 DOCUMENTATION
 
 * Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment via `.onLoad()`.
-* More clean-up of the equations. Just being more consitent about using `\eqn{}` when R, Q etc refer to the matrices in the MARSS equation versus code.
+* More clean-up of the equations. Just being more consistent about using `\eqn{}` when R, Q etc refer to the matrices in the MARSS equation versus code.
 * `residuals_marssMLE.Rd` had a few typos. Main one was that `name` column was called `.type` column.
 
 
