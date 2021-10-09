@@ -189,7 +189,7 @@ autoplot.marssMLE <-
         p1 <- p1 + ggplot2::geom_line(data = df, ggplot2::aes_(~t, ~ymax.pi), linetype = "dashed")
       }
       # Add data points
-      if (decorate & stringr::str_sub(i, 1, 1)=="y") {
+      if (decorate & stringr::str_detect(i, "y")) {
         p1 <- p1 + ggplot2::geom_point(
           data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y),
           shape = plotpar$point.pch, fill = plotpar$point.fill,
@@ -203,8 +203,8 @@ autoplot.marssMLE <-
           col = plotpar$point.col, size = plotpar$point.size, na.rm = TRUE
         )
       }
-      if (cname == "model") note <- paste("This is the model fitted value of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype!="ytt1", "Use fitted.ytt1 if you want the one-step-ahead predictions instead.", ""))
-      if (cname == "state") note <- paste("This is the model fitted value of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), "This is not the model estimate of X (i.e. the states). It is the expected value of X(t) given the E[x(t-1)|y] where y is the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."))
+      if (cname == "model") note <- paste("This is the model fitted value of Y conditioned on the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), ifelse(ctype!="ytt1", "Use fitted.ytt1 if you want the one-step-ahead predictions instead.", "These are known as the one-step-ahead predictions."))
+      if (cname == "state") note <- paste("This is the model fitted value of X conditioned on the data from t=1 to", switch(ctype, xtT="T.", xtt="t.", xtt1="t-1."), "This is not the model estimate of X (i.e. the states). It is the expected value of X(t) given the E[X(t-1)|y] where y is the data from t=1 to", switch(ctype, ytT="T.", ytt="t.", ytt1="t-1."), "Use xtT if you want the traditional states estimates for a state-space model.")
       p1 <- p1 +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
