@@ -310,10 +310,11 @@ autoplot.marssMLE <-
       }
       if (fig.notes){
         if (stringr::str_detect(i, "std")) {
-          if (i == "std.model.resids.ytt1") note <- paste(cstan, "standardized innovations residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
-          if (i == "std.model.resids.ytt") note <- paste(cstan, "standardized ytt residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
-          if (i == "std.model.resids.ytT" & cstan=="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Residuals outside the +/- 2 limits are potential outliers.")
-          if (i == "std.model.resids.ytT" & cstan!="Cholesky") note <- paste(cstan, "standardized model smoothation residuals. Use Cholesky standardized residuals for outlier detection.")
+          cstan2 <- ifelse(cstan=="marginal", "Marginal", cstan)
+          if (i == "std.model.resids.ytt1") note <- paste(cstan2, "standardized innovations residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
+          if (i == "std.model.resids.ytt") note <- paste(cstan2, "standardized ytt residuals. Use standardized model smoothation model residuals (std.model.resids.ytT) for outlier detection.")
+          if (i == "std.model.resids.ytT" & cstan=="Cholesky") note <- paste(cstan2, "standardized model smoothation residuals. Residuals outside the +/- 2 limits are potential outliers.")
+          if (i == "std.model.resids.ytT" & cstan!="Cholesky") note <- paste(cstan2, "standardized model smoothation residuals. Use Cholesky standardized residuals for outlier detection.")
         } else {
           if (i == "model.resids.ytt1") note <- paste("Innovations (one-step ahead) residuals.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates problems with the normality assumption.", ""))
           if (i == "model.resids.ytt") note <- "Model residuals conditioned on data up to t. These are not typically used. See model.resids.ytt1 and std.model.resids.ytT for more standard residuals diagnostics."
@@ -374,7 +375,8 @@ autoplot.marssMLE <-
       }
       if (fig.notes){
         if(stringr::str_detect(i, "std")){
-          note <- paste(cstan, "standardized state smoothation residuals.")
+          cstan2 <- ifelse(cstan=="marginal", "Marginal", cstan)
+          note <- paste(cstan2, "standardized state smoothation residuals.")
           if(cstan=="Cholesky" & conf.int) note <- paste(note, "Residuals outside the +/- 2 limits are potential outliers of x(t) to x(t+1).")
           if(cstan!="Cholesky" & conf.int) note <- paste(note, "Confidence intervals are for the x(t) to x(t+1) step.")
         }else{
@@ -451,6 +453,7 @@ autoplot.marssMLE <-
           "residuals. The residuals should be Gaussian."
         )
         note <- stringr::str_to_sentence(note)
+        note <- stringr::str_replace(note, "cholesky", "Cholesky")
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
@@ -508,6 +511,7 @@ autoplot.marssMLE <-
         "residuals ACF"
       )
       title.val <- stringr::str_to_sentence(title.val)
+      title.val <- stringr::str_replace(title.val, "cholesky", "Cholesky")
       
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
@@ -533,6 +537,7 @@ autoplot.marssMLE <-
           ifelse(stringr::str_detect(i, "ytt1"), " These residuals should be temporally uncorrelated.", " These residuals are not expected to be temporally uncorrelated. Use innovation residuals to check for temporal correlation in the residuals.") 
         )
         note <- stringr::str_to_sentence(note)
+        note <- stringr::str_replace(note, "cholesky", "Cholesky")
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse="\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
