@@ -23,7 +23,10 @@ plot.marssMLE <-
       stop("plot.marssMLE: x must be class marssMLE.", call. = FALSE)
     }
 
-    # Argument checks: plot.type
+    # Argument checks
+    standardization <- match.arg(standardization)
+
+        # Argument checks: plot.type
     if (missing(plot.type)) {
       plot.type <- c(
         "fitted.ytT", "xtT",
@@ -112,7 +115,7 @@ plot.marssMLE <-
     # If user requests any residuals plots, set up the residuals data frames unless x is marssResiduals object
     if(!inherits(x, "marssResiduals")){
       resids <- c()
-      cstan <- "Cholesky"
+      cstan <- standardization
       if (any(stringr::str_detect(plot.type, "tt1"))) {
         resids <- residuals.marssMLE(x, type = "tt1", standardization = cstan)
       }

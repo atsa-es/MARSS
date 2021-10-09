@@ -25,6 +25,9 @@ autoplot.marssMLE <-
       stop("Package \"ggplot2\" needed for autoplot.marssMLE. Please install it.", call. = FALSE)
     }
     
+    # Argument checks
+    standardization <- match.arg(standardization)
+    
     # Argument checks: plot.type
     if (missing(plot.type)) {
       plot.type <- c(
@@ -115,7 +118,7 @@ autoplot.marssMLE <-
     # If user requests any residuals plots, set up the residuals data frames unless x is marssResiduals object
     if(!inherits(x, "marssResiduals")){
       resids <- c()
-      cstan <- "Cholesky"
+      cstan <- standardization
       if (any(stringr::str_detect(plot.type, "tt1"))) {
         resids <- residuals.marssMLE(x, type = "tt1", standardization = cstan)
       }
