@@ -14,10 +14,13 @@ This update is focused on improving the plotting functions and updating the webs
 
 ENHANCEMENTS
 
-* Created `autoplot.marssResiduals()` and `plot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
+* Added a variety of new plots to `autoplot.marssMLE` and `plot.marssMLE`: all types of residuals with all possible standardizations versus time, plus ACF and QQPlots for the same, and all possible fitted y and x plots. Cleaned-up the plots in various ways (e.g. missing CIs). Added notes (that can be turned off) to the bottom of the `autoplot` plots to explain what the plot is and guide the user to the more standard plots.
 * Revamped residuals plots made by `autoplot.marssMLE()` and `plot.marssMLE()` to allow a full range of residuals plots but to only show a subset for a specific set of residuals diagnostics plots by default.
+* Created `autoplot.marssResiduals()` and `plot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
 * Added utility function `match.arg.exact()` which does exact argument matching. The base R `match.arg()` uses `pmatch()` and does partial matching. This is a problem for many functions where `"xtt1"` is different than `"xtt"`. This function implements exact matching.
 * Added row and column names to the output from `coef.marssMLE()` when `type="matrix"`.
+* Added more text to help file for `MARSSresiduals()` to explain variance and correlation for standardized residuals.
+* Added `var.ytt1` and `var.Eytt1` to the output from `MARSShatyt()` when `only.kem=FALSE`. This is for convenience for the plot functions.
 
 BUGS
 
@@ -31,6 +34,7 @@ DOCUMENTATION
 * Fixed some references to `MARSSsettings()`. This was replaced with `pkg_globals` in the package environment via `.onLoad()`.
 * More clean-up of the equations. Just being more consistent about using `\eqn{}` when R, Q etc refer to the matrices in the MARSS equation versus code.
 * `residuals_marssMLE.Rd` had a few typos. Main one was that `name` column was called `.type` column.
+* Fixed a typo in `Residuals.Rnw`. LaTeX definition for `Vtt1` was not working. Also fixed a couple misspellings in `EMDerivation.Rnw`.
 
 
 MARSS 3.11.3  (released 2020-10-20 on CRAN)
