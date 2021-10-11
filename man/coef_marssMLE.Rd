@@ -11,7 +11,7 @@
 \arguments{
   \item{object}{ A \code{\link{marssMLE}} object.  }
   \item{...}{ Other arguments. Not used. }
-  \item{type}{ What to print.  Default is "list".  If you input type as a vector, \code{coef()} returns a list of output. See examples.
+  \item{type}{ What to output.  Default is "list". Options are
   \itemize{
     \item{ "list" }{ A list of only the estimated values in each matrix. Each model matrix has it's own list element.}
     \item{ "vector" }{ A vector of all the estimated values in each matrix. }
