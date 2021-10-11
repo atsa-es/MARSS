@@ -53,10 +53,7 @@
   \item{pi.int}{ TRUE/FALSE. Whether to include a prediction interval on the observations plot }
   \item{conf.level}{ Confidence level for CIs. }
   \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots and add data points plus residuals confidence intervals to states and observations plots. }
-  \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  The default is list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
-                    line.col = "black", line.size = 1, line.linetype = "solid",
-                    ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
-                    ci.linesize = 0, ci.alpha = 0.6). }
+  \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  See details. }
   \item{fig.notes}{ Add notes to the bottom of the plots (only for \code{autoplot()}. }
   \item{silent}{ No console interaction or output. }
   \item{...}{ Other arguments, not used. }
@@ -78,8 +75,9 @@ The plot types are as follows:
 \item{\code{"acf"}}{ ACF of the residuals. The only residuals that should be temporally independent are the innovation residuals: \code{acf.model.residuals.ytt1} and \code{acf.std.model.residuals.ytt1}. This ACF is a standard residuals diagnostic for state-space models. The other ACF plots will show temporal dependence and are not used for diagnostics. }
 \item{\code{"ytT"}}{ The expected value of \eqn{Y} conditioned on all the data. Use this for estimates of the missing data points. Note for non-missing \eqn{y} values, the expected value of \eqn{Y} is \eqn{y}. } 
 \item{\code{"ytt"}, \code{ytt1}}{ The expected value of \eqn{Y} conditioned on the data from 1 to \eqn{t} or \eqn{t-1}. } 
-
 }
+
+The plot parameters can be passed in as a list to change the look of the plots. For \code{plot.marssMLE()}, the default is \code{plot.par = list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1, line.col = "black", line.size = 1, line.linetype = "solid", ci.col = "grey70", ci.border = NA, ci.lwd = 1, ci.lty = 1)}. For \code{autoplot.marssMLE}, the default is \code{plot.par = list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1, line.col = "black", line.size = 1, line.linetype = "solid", ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", ci.linesize = 0, ci.alpha = 0.6)}.
 }
 \author{ 
   Eric Ward and Eli Holmes
