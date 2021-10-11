@@ -101,6 +101,10 @@ coef.marssMLE <- function(object, ..., type = "list", form = NULL, what = "par")
         modified.object[["par"]] <- pars
       }
       the.par <- parmat(modified.object, elem = the.type, t = 1:par.dims[[the.type]][3], dims = par.dims[the.type], model.loc = "model")[[the.type]]
+      if(the.type %in% c("R", "A", "D", "Z")) rownames(the.par) <- attr(modified.object[["model"]], "Y.names")
+      if(the.type %in% c("R")) colnames(the.par) <- attr(modified.object[["model"]], "Y.names")
+      if(the.type %in% c("Q", "U", "C", "V0", "x0", "B")) rownames(the.par) <- attr(modified.object[["model"]], "X.names")
+      if(the.type %in% c("Q", "V0", "Z", "B")) colnames(the.par) <- attr(modified.object[["model"]], "X.names")
       if (what != "par") modified.object[["par"]] <- orig.par
       return.obj[[the.type]] <- the.par
     }
