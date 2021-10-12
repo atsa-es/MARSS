@@ -28,6 +28,7 @@ BUGS
 * `autoplot.marssPredict()` was not using the time info from ts object, so x-axis was showing 1, 2, 3 etc instead of the years, for example.
 * `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"`). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
 * `coef.marssMLE()` was not properly showing a time-varying A or U when `type="matrix"`, `form="marss"` and D or C estimated.
+* `plot.marssMLE()` was not resetting `par()` when done thus affecting users plot environment.
 
 DOCUMENTATION
 
