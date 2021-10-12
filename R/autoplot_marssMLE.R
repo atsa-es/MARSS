@@ -147,7 +147,7 @@ autoplot.marssMLE <-
         rotate <- FALSE
       }
       df <- tsSmooth.marssMLE(x, type = i, ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
-      df$.rownames <- factor(df$.rownames, level = attr(x$model, "X.names"))
+      df$.rownames <- factor(df$.rownames, level = unique(df$.rownames))
       rottext <- ifelse(rotate, "the rotated ", "")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate))
       if (conf.int) {
@@ -187,12 +187,7 @@ autoplot.marssMLE <-
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
       # Drop levels and make sure ggplot doesn't rearrange levels
-      df$.rownames <- factor(df$.rownames,
-        levels = attr(x$model, switch(cname,
-          model = "Y.names",
-          state = "X.names"
-        ))
-      )
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
 
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
       if (conf.int) {
@@ -267,7 +262,7 @@ autoplot.marssMLE <-
         df <- tsSmooth.marssMLE(x, type = i, interval = "none")
       }
       # make sure that ggplot doesn't re-order the levels
-      df$.rownames <- factor(df$.rownames, levels = attr(x$model, "Y.names"))
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate)) +
         ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size)
       if (conf.int & ctype != "ytt") {
@@ -308,7 +303,7 @@ autoplot.marssMLE <-
       df <- subset(resids, resids$type == ctype)
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       # drop x levels and make sure ggplot doesn't rearrange the levels
-      df$.rownames <- factor(df$.rownames, levels = attr(x$model, "Y.names"))
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       title.val <- paste0(
         ifelse(stringr::str_detect(i, "std"), paste(cstan, "standardized "), ""),
         cname, " ",
@@ -374,7 +369,7 @@ autoplot.marssMLE <-
       df <- subset(resids, resids$type == ctype)
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       # Drop y levels and make sure ggplot doesn't rearrange levels
-      df$.rownames <- factor(df$.rownames, levels = attr(x$model, "X.names"))
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       title.val <- paste0(
         ifelse(stringr::str_detect(i, "std"), paste(cstan, "standardized "), ""),
         cname, " ",
@@ -452,12 +447,7 @@ autoplot.marssMLE <-
       df <- subset(resids, resids$type == ctype)
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       # Drop levels and make sure ggplot doesn't rearrange levels
-      df$.rownames <- factor(df$.rownames,
-        levels = attr(x$model, switch(cname,
-          model = "Y.names",
-          state = "X.names"
-        ))
-      )
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       slope <- tapply(df$.resids, df$.rownames, slp)
       intercept <- tapply(df$.resids, df$.rownames, int)
       abline.dat <- data.frame(
@@ -467,12 +457,7 @@ autoplot.marssMLE <-
         stringsAsFactors = FALSE
       )
       # Drop levels and make sure ggplot doesn't rearrange levels
-      abline.dat$.rownames <- factor(abline.dat$.rownames,
-        levels = attr(x$model, switch(cname,
-          model = "Y.names",
-          state = "X.names"
-        ))
-      )
+      abline.dat$.rownames <- factor(abline.dat$.rownames, levels = unique(abline.dat$.rownames))
       ylab.val <- paste0(
         ifelse(stringr::str_detect(i, "std"), "standardized ", ""),
         cname, " ",
@@ -506,6 +491,7 @@ autoplot.marssMLE <-
         )
         note <- stringr::str_to_sentence(note)
         note <- stringr::str_replace(note, "cholesky", "Cholesky")
+        note <- stringr::str_replace(note, "gaussian", "Gaussian")
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
@@ -547,9 +533,12 @@ autoplot.marssMLE <-
         })),
         stringsAsFactors = FALSE
       )
-
+      acf.dat$.rownames <- factor(acf.dat$.rownames, levels = unique(df$.rownames))
+      
       cidf <- tapply(df$.resids, df$.rownames, acfci)
       ci.dat <- data.frame(.rownames = names(cidf), ci = cidf, stringsAsFactors = FALSE)
+      ci.dat$.rownames <- factor(ci.dat$.rownames, levels = unique(df$.rownames))
+      
 
       title.val <- paste0(
         ifelse(stringr::str_detect(i, "std"), paste(cstan, "standardized "), ""),
@@ -564,19 +553,6 @@ autoplot.marssMLE <-
       )
       title.val <- stringr::str_to_sentence(title.val)
       title.val <- stringr::str_replace(title.val, "cholesky", "Cholesky")
-      # Drop levels and make sure ggplot doesn't rearrange levels
-      acf.dat$.rownames <- factor(acf.dat$.rownames,
-        levels = attr(x$model, switch(cname,
-          model = "Y.names",
-          state = "X.names"
-        ))
-      )
-      ci.dat$.rownames <- factor(ci.dat$.rownames,
-        levels = attr(x$model, switch(cname,
-          model = "Y.names",
-          state = "X.names"
-        ))
-      )
 
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
