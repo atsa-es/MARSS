@@ -20,7 +20,7 @@ packageVersion("MARSS")
 
 ## marssMLE objects
 
-```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+```{r echo=FALSE}
 # Little harder model
 
 dat <- t(harborSealWA)
@@ -40,14 +40,19 @@ for (Q in Qvals) {
       if (Q == "zero" && R == "zero") next
       if (Q == "zero" && B != "identity") next
       kemfit1 <- MARSS(dat, model = mod, silent = TRUE)
-      for(plt in plottypes){
-       conf.int <- TRUE
-      if(plt %in% c("ytt")) conf.int <- FALSE
-      plot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
-      autoplot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
-       }
-    }
-  }
-}
+    }}}
 ```
+
+```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+      for(cstan in c("Cholesky", "marginal", "Block.Cholesky")){
+        for(type in c("tt1", "tT", "tt")){
+          resids <- residuals(kemfit1, type=type, standardization=cstan)
+        for(plt in c("all")){
+      plot(resids, plot.type=plt, silent=TRUE)
+      autoplot(resids, plot.type=plt, silent=TRUE)
+        }
+        }
+      }
+```
+
 
