@@ -20,9 +20,6 @@ plot.marssMLE <-
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE, pi.int = FALSE,
            plot.par = list(),
            ..., silent = FALSE) {
-    if (!inherits(x, "marssMLE")) {
-      stop("plot.marssMLE: x must be class marssMLE.", call. = FALSE)
-    }
 
     # Argument checks
     standardization <- match.arg(standardization)
@@ -115,6 +112,9 @@ plot.marssMLE <-
     # End Argument checks
 
     alpha <- 1 - conf.level
+    
+    # Save par setting so can reset
+    op <- par()[c("mfrow", "mar")]
 
     # If user requests any residuals plots, set up the residuals data frames unless x is marssResiduals object
     if (!inherits(x, "marssResiduals")) {
@@ -145,7 +145,7 @@ plot.marssMLE <-
         df$ymin.pi <- df2$.lwr
         df$ymax.pi <- df2$.upr
       }
-      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
@@ -212,6 +212,7 @@ plot.marssMLE <-
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
+          par(op)
           return()
         }
       }
@@ -230,7 +231,7 @@ plot.marssMLE <-
       } else {
         df$.sigma[is.na(df$value)] <- 0
       }
-      nY <- min(9, attr(x$model, "model.dims")[[stringr::str_sub(ctype, 1, 1)]][1])
+      nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
@@ -270,6 +271,7 @@ plot.marssMLE <-
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
+          par(op)
           return()
         }
       }
@@ -298,7 +300,7 @@ plot.marssMLE <-
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
       slope <- tapply(df$.resids, df$.rownames, slp)
       intercept <- tapply(df$.resids, df$.rownames, int)
-      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
@@ -313,6 +315,7 @@ plot.marssMLE <-
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
+          par(op)
           return()
         }
       }
@@ -334,7 +337,7 @@ plot.marssMLE <-
         df$ymin <- df$y
         df$ymax <- df$y
       }
-      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
@@ -356,6 +359,7 @@ plot.marssMLE <-
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
+          par(op)
           return()
         }
       }
@@ -367,7 +371,7 @@ plot.marssMLE <-
       cname <- ifelse(stringr::str_detect(i, "model"), "model", "state")
       df <- subset(resids, resids$type == ctype)
       if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
-      nY <- min(9, attr(x$model, "model.dims")$y[1])
+      nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
       par(mfrow = c(plot.nrow, plot.ncol), mar = c(2, 4, 2, 1) + 0.1)
@@ -384,8 +388,10 @@ plot.marssMLE <-
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
+          par(op)
           return()
         }
       }
     }
+    par(op)
   }
