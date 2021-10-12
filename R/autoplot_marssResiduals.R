@@ -9,7 +9,7 @@ autoplot.marssResiduals <-
     plot.type <- plot.type[stringr::str_detect(plot.type, "resids")]
     ctype <- unique(x$type)
     plot.type <- plot.type[sapply(plot.type, function(x) {
-      any(stringr::str_detect(x, ctype))})]
+      rev(stringr::str_split(x, "[.]")[[1]])[1] %in% ctype})]
     cname <- unique(x$name)
     plot.type <- plot.type[sapply(plot.type, function(x) {
       any(stringr::str_detect(x, cname))})]
