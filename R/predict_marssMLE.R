@@ -282,6 +282,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
+    interval.type = interval,
     level = 100 * level,
     type = type,
     pred = ret,
