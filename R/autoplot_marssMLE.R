@@ -147,7 +147,7 @@ autoplot.marssMLE <-
         rotate <- FALSE
       }
       df <- tsSmooth.marssMLE(x, type = i, ifelse(conf.int, "confidence", "none"), level = conf.level, ...)
-      df$.rownames <- factor(df$.rownames, level = unique(df$.rownames))
+      df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       rottext <- ifelse(rotate, "the rotated ", "")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate))
       if (conf.int) {
@@ -168,7 +168,7 @@ autoplot.marssMLE <-
           xtt = "t).",
           xtt1 = "t-1)."
         )), ""))
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -242,7 +242,7 @@ autoplot.marssMLE <-
             xtt1 = "t-1."
           ), "Use plot.type='xtT' if you want the traditional states estimates for a state-space model. These estimates are used in state residuals calculations.")
         }
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -288,7 +288,7 @@ autoplot.marssMLE <-
           ytt1 = "t-1."
         ), ifelse(ctype == "ytT", "Use this if you need an estimate of missing data points. For non-missing data, it will simply return the observed y. E(Y|y) = y. If you want the model estimate of Y, use fitted.ytT.", "If you need an estimate of missing data, use ytT."))
         if (conf.int) note <- paste(note, "Confidence intervals are for the expected value of Y and will be 0 if data are not missing.")
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -353,7 +353,7 @@ autoplot.marssMLE <-
           if (i == "model.resids.ytt") note <- "Model residuals conditioned on data up to t. These are not typically used. See model.resids.ytt1 and std.model.resids.ytT for more standard residuals diagnostics."
           if (i == "model.resids.ytT") note <- paste("Model smoothation (ytT) residuals (y - E[y|all data]). Note, Cholesky standardized model smoothation residuals are the more typical outlier diagnostic.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates potential outliers.", ""))
         }
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -417,7 +417,7 @@ autoplot.marssMLE <-
           note <- "State smoothation (xtT) residuals. Note, Cholesky standardized state smoothation residuals are the more typical outlier diagnostic."
           if (conf.int) note <- paste(note, "Confidence intervals are for the x(t) to x(t+1) step.")
         }
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -490,7 +490,7 @@ autoplot.marssMLE <-
           "residuals. The residuals should be Gaussian."
         )
         note <- str_to_sentence(note, ignore = c("Cholesky", "Gaussian", "Block.Cholesky"))
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
@@ -575,7 +575,7 @@ autoplot.marssMLE <-
           ifelse(grepl("ytt1", i), " These residuals should be temporally uncorrelated.", " These residuals are not expected to be temporally uncorrelated. Use innovation (ytt1) residuals to check for temporal correlation in the residuals.")
         )
         note <- str_to_sentence(note, ignore = c("Cholesky", "Block.Cholesky"))
-        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = element_text(size = 7.5, hjust = 0))
+        p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
