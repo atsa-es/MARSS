@@ -154,6 +154,7 @@ forecast.marssMLE <- function(object, h = 10,
   outlist <- list(
     method = c("MARSS", object[["method"]]),
     model = object,
+    interval.type = interval,
     level = 100 * level,
     type = type,
     pred = ret,
