@@ -21,6 +21,7 @@ ENHANCEMENTS
 * Added row and column names to the output from `coef.marssMLE()` when `type="matrix"`.
 * Added more text to help file for `MARSSresiduals()` to explain variance and correlation for standardized residuals.
 * Added `var.ytt1` and `var.Eytt1` to the output from `MARSShatyt()` when `only.kem=FALSE`. This is for convenience for the plot functions.
+* Added `str_to_sentence` utility function for the notes in `autoplot.marssMLE()` plots.
 
 BUGS
 
