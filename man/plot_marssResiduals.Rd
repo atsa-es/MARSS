@@ -7,12 +7,12 @@
   Plots residuals using the output from a \code{\link{residuals.marssResiduals}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
 }
 \usage{
-\method{plot}{marssMLE}(x, plot.type = c("model.resids",
+\method{plot}{marssResiduals}(x, plot.type = c("model.resids",
                  "state.resids", "qqplot.model.resids",
                  "qqplot.state.resids", "acf.model.resids"), 
                  conf.int = TRUE, conf.level = 0.95, decorate = TRUE, 
-                 pi.int = FALSE, plot.par = list(), silent = FALSE)
-\method{autoplot}{marssMLE}(x, plot.type = c("model.resids", 
+                 pi.int = FALSE, plot.par = list(), silent = FALSE, ...)
+\method{autoplot}{marssResiduals}(x, plot.type = c("model.resids", 
     "state.resids", "qqplot.model.resids", "qqplot.state.resids", 
     "acf.model.resids"),
     conf.int=TRUE, conf.level=0.95, decorate=TRUE, pi.int = FALSE,
@@ -30,6 +30,7 @@
                     ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", 
                     ci.linesize = 0, ci.alpha = 0.6). }
   \item{silent}{ No console interaction or output. }
+  \item{...}{ Not used. }
   }
 \value{
   If an individual plot is selected using \code{plot.type} and \code{autoplot()} is called, then the ggplot object is returned invisibly.
