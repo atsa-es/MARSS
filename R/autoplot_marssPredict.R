@@ -11,7 +11,7 @@ autoplot.marssPredict <-
     }
     plotpar <- list(
       point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
-      line.col = "black", line.size = 1, line.linetype = "solid",
+      line.col = "black", line.size = 1, line.type = "solid",
       ci.fill = NULL, ci.col = NULL,
       ci.linetype = "blank",
       ci.linesize = 0, ci.alpha = 0.6,
@@ -62,12 +62,10 @@ autoplot.marssPredict <-
 
     if (h == 0) {
       df <- subset(x$pred, x$t > nx - include + 1)
+      df$.rownames <- factor(df$.rownames, levels=unique(df$.rownames))
+      # Set up the plot
+      plottitle <- paste(ifelse(substr(x$type, 1, 1)=="x", "State", "Data"), x$type, "Predictions")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
-      p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
-        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
-        ggplot2::facet_wrap(~ df$.rownames, scale = "free_y") +
-        ggplot2::ggtitle(paste(ifelse(x$type == "xtT", "State", "Data"), "Predictions"))
       if (pi.int) {
         for (i in length(lev):1) {
           tmp <- df
@@ -79,25 +77,28 @@ autoplot.marssPredict <-
             linetype = plotpar$ci.linetype, size = plotpar$ci.linesize
           )
         }
+        plottitle <- paste(plottitle, switch(x$interval.type, none="", confidence="+ CI", prediction = "+ PI"))
       }
-      if (x$type == "ytT" && decorate) {
-        p1 <- p1 + ggplot2::geom_point(
-          data = df[!is.na(df$y), ], ggplot2::aes_(~t, ~y),
+      p1 <- p1 +
+        ggplot2::geom_line(linetype = plotpar$line.type, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
+        ggplot2::facet_wrap(~ df$.rownames, scale = "free_y") +
+        ggplot2::ggtitle(plottitle)
+      if (substr(x$type, 1, 1)=="y" && decorate) {
+        p1 <- p1 + ggplot2::geom_point(ggplot2::aes_(~t, ~y),
           shape = plotpar$point.pch, fill = plotpar$point.fill,
-          col = plotpar$point.col, size = plotpar$point.size
+          col = plotpar$point.col, size = plotpar$point.size,
+          na.rm = TRUE
         )
       }
       return(p1)
     }
     if (h != 0) {
       df <- subset(x$pred, x$t >= nx - include + 1)
+      df$.rownames <- factor(df$.rownames, levels=unique(df$.rownames))
       # set up the plot
+      plottitle <- paste(ifelse(substr(x$type, 1, 1)== "x", "State", "Data"), x$type, "Predictions")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
-      tmp <- df
-      tmp$estimate[tmp$t > nx] <- NA # subset makes facet_wrap fail
-      # make the estimate line
-      p1 <- p1 + ggplot2::geom_line(data = tmp, linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$f.linesize, na.rm = TRUE)
-
       if (pi.int) {
         for (i in length(lev):1) {
           tmp <- df
@@ -111,24 +112,33 @@ autoplot.marssPredict <-
               alpha = plotpar$ci.alpha, fill = plotpar$ci.fill[i], na.rm = TRUE
             )
         }
+        plottitle <- paste(plottitle, switch(x$interval.type, none="", confidence="+ CI", prediction = "+ PI"))
       }
+      # make the estimate line
+      tmp <- df
+      tmp$estimate[tmp$t > nx] <- NA # subset makes facet_wrap fail
+      p1 <- p1 + ggplot2::geom_line(data = tmp, 
+                                    linetype = plotpar$line.type, 
+                                    color = plotpar$line.col, 
+                                    size = plotpar$line.size, na.rm = TRUE)
       # Add the forecast line
       tmp <- df
       tmp$estimate[tmp$t <= nx] <- NA
-      p1 <- p1 + ggplot2::geom_line(data = tmp, linetype = plotpar$f.linetype, color = plotpar$f.col, size = plotpar$line.size, na.rm = TRUE)
+      p1 <- p1 + ggplot2::geom_line(data = tmp, linetype = plotpar$f.linetype, color = plotpar$f.col, size = plotpar$f.linesize, na.rm = TRUE)
       # Add labels and titles
       p1 <- p1 +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~ df$.rownames, scale = "free_y") +
-        ggplot2::ggtitle(paste(ifelse(x$type == "xtT", "State", "Data"), "Predictions"))
+        ggplot2::ggtitle(plottitle)
       # Add the data points
-      if (x$type == "ytT" && decorate) {
+      if (substr(x$type, 1, 1) == "y" && decorate) {
         p1 <- p1 + ggplot2::geom_point(
           data = df, ggplot2::aes_(~t, ~y),
           shape = plotpar$point.pch, fill = plotpar$point.fill,
           col = plotpar$point.col, size = plotpar$point.size, na.rm = TRUE
         )
       }
+      
       return(p1)
     }
   }

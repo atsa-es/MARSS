@@ -37,7 +37,7 @@
 \item{decorate}{ TRUE/FALSE. Add data points to the ytT plots. }
 \item{plot.par}{ A list of plot parameters to adjust the look of the plot.  The default is 
                list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
-                    line.col = "black", line.size = 1, line.linetype = "solid",
+                    line.col = "black", line.size = 1, line.type = "solid",
                     ci.fill = NULL, ci.col = NULL, 
                     ci.linetype = "blank", 
                     ci.linesize = 0, ci.alpha = 0.6, 
