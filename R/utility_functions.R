@@ -968,6 +968,23 @@ str_replace <- function(string, pattern, replacement) {
   }
 }
 
+str_to_title <- function(x) {
+  s <- strsplit(x, " ")[[1]]
+  paste(toupper(substring(s, 1, 1)), substring(s, 2),
+        sep = "", collapse = " ")
+}
+
+# ignore these words
+str_to_sentence <- function(x, ignore=c()) {
+  cap <- function(s) paste(ifelse(str_trim(s) %in% ignore | str_trim(s) %in% paste0(ignore, "."), str_trim(s), tolower(str_trim(s))), sep = "", collapse = " " )
+  ss <- c()
+  for(val in strsplit(x, "[.] ")[[1]]){
+  tit <- sapply(strsplit(str_trim(val), split = " "), cap, USE.NAMES = !is.null(names(val)))
+  substr(tit, 1, 1) <- toupper(substr(tit, 1, 1))
+  ss <- c(ss, tit)
+  }
+  paste(ss, collapse=". ")
+}
 ################################################################
 
 zscore <- function(x, mean.only = FALSE) {
@@ -1042,3 +1059,4 @@ match.arg.exact <- function (arg, choices, several.ok = FALSE, exact = TRUE)
     stop("there is more than one match in 'match.arg'")
   choices[i]
 }
+
