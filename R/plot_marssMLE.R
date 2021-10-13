@@ -76,15 +76,15 @@ plot.marssMLE <-
     # Check class and alter plot.type as needed
     if (!inherits(x, "marssMLE")) {
       if (inherits(x, "marssResiduals")) {
-        plot.type <- plot.type[stringr::str_detect(plot.type, "resids")]
+        plot.type <- plot.type[grepl("resids", plot.type)]
         # Make sure that plot types are possible for the object that the user passed in
         ctype <- unique(x$type)
         plot.type <- plot.type[sapply(plot.type, function(x) {
-          any(stringr::str_detect(x, ctype))
+          any(sapply(ctype, function(s) grepl(s, x)))
         })]
         cname <- unique(x$name)
         plot.type <- plot.type[sapply(plot.type, function(x) {
-          any(stringr::str_detect(x, cname))
+          any(sapply(cname, function(s) grepl(s, x)))
         })]
         if (length(plot.type) == 0) {
           message("Nothing to plot. Either your MARSSresiduals object does not include model or state residuals or you have passed in the wrong plot.type, i.e. model residual plots when your MARRSSresiduals object only includes state residuals.")
@@ -120,26 +120,26 @@ plot.marssMLE <-
     if (!inherits(x, "marssResiduals")) {
       resids <- c()
       cstan <- standardization
-      if (any(stringr::str_detect(plot.type, "tt1"))) {
+      if (any(grepl("tt1", plot.type, fixed=TRUE))) {
         resids <- residuals.marssMLE(x, type = "tt1", standardization = cstan)
       }
-      if (any(stringr::str_detect(plot.type, "tt") & !stringr::str_detect(plot.type, "tt1"))) {
+      if (any(grepl("tt", plot.type, fixed=TRUE) & !grepl("tt1", plot.type, fixed=TRUE))) {
         resids <- rbind(resids, residuals.marssMLE(x, type = "tt", standardization = cstan))
       }
-      if (any(stringr::str_detect(plot.type, "tT"))) {
+      if (any(grepl("tT", plot.type, fixed=TRUE))) {
         resids <- rbind(resids, residuals.marssMLE(x, type = "tT", standardization = cstan))
       }
     }
 
     fitted.plots <- paste0("fitted.", c("ytt1", "ytt", "ytT", "xtT", "xtt1"))
     for (i in fitted.plots[fitted.plots %in% plot.type]) {
-      ctype <- rev(stringr::str_split(i, "[.]")[[1]])[1]
-      cname <- ifelse(stringr::str_detect(i, "y"), "model", "state")
+      ctype <- rev(strsplit(i, "[.]")[[1]])[1]
+      cname <- ifelse(grepl("y", i), "model", "state")
 
       df <- fitted.marssMLE(x, type = ctype, interval = "confidence", level = conf.level)
       df$ymin <- df$.conf.low
       df$ymax <- df$.conf.up
-      if (stringr::str_detect(i, "x")) df$y <- df$.x
+      if (grepl("x", i)) df$y <- df$.x
       if (pi.int) {
         df2 <- fitted.marssMLE(x, type = ctype, interval = "prediction", level = conf.level)
         df$ymin.pi <- df2$.lwr
@@ -168,8 +168,8 @@ plot.marssMLE <-
         })
       }
       plot.type <- plot.type[plot.type != i]
-      if (!silent & stringr::str_detect(i, "y")) cat(paste("plot type = ", i, " Observations with fitted values\n"))
-      if (!silent & stringr::str_detect(i, "x")) cat(paste("plot type = ", i, " Expected states with fitted states based on states at t-1\n"))
+      if (!silent & grepl("y", i)) cat(paste("plot type = ", i, " Observations with fitted values\n"))
+      if (!silent & grepl("x", i)) cat(paste("plot type = ", i, " Expected states with fitted states based on states at t-1\n"))
       if (length(plot.type) != 0 && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
@@ -220,13 +220,13 @@ plot.marssMLE <-
 
     resids.vs.time.plots <- c(paste0(rep(c("model.resids", "std.model.resids"), each = 3), c(".ytT", ".ytt", ".ytt1")), "state.resids.xtT", "std.state.resids.xtT")
     for (i in resids.vs.time.plots[resids.vs.time.plots %in% plot.type]) {
-      ctype <- rev(stringr::str_split(i, "[.]")[[1]])[1] # ytT, ytt or ytt1
-      cname <- ifelse(stringr::str_detect(i, "model"), "model", "state")
+      ctype <- rev(strsplit(i, "[.]")[[1]])[1] # ytT, ytt or ytt1
+      cname <- ifelse(grepl("model", i), "model", "state")
       df <- subset(resids, resids$type == ctype)
-      if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
+      if (grepl("std", i)) df$.resids <- df$.std.resids
       df$.resids[is.na(df$value)] <- NA
       # need to adjust sigma for making a polygon
-      if (stringr::str_detect(i, "std")) {
+      if (grepl("std", i)) {
         df$.sigma <- 1
       } else {
         df$.sigma[is.na(df$value)] <- 0
@@ -263,8 +263,8 @@ plot.marssMLE <-
           box()
           abline(h = 0, lty = 3)
         })
-        if (cname == "model") mtext(ifelse(stringr::str_detect(i, "std"), "Standardized observation residuals, y - E[y]", "Observation residuals, y - E[y]"), side = 2, outer = TRUE, line = -1)
-        if (cname == "state") mtext(ifelse(stringr::str_detect(i, "std"), "Standardized state residuals, xtT - E[x]", "State residuals, xtT - E[x]"), side = 2, outer = TRUE, line = -1)
+        if (cname == "model") mtext(ifelse(grepl("std", i), "Standardized observation residuals, y - E[y]", "Observation residuals, y - E[y]"), side = 2, outer = TRUE, line = -1)
+        if (cname == "state") mtext(ifelse(grepl("std", i), "Standardized state residuals, xtT - E[x]", "State residuals, xtT - E[x]"), side = 2, outer = TRUE, line = -1)
       }
       plot.type <- plot.type[plot.type != i]
       if (!silent) cat(paste0("plot type = ", i, "\n"))
@@ -292,12 +292,12 @@ plot.marssMLE <-
       return(int)
     }
 
-    qqplot.plots <- plot.type[stringr::str_detect(plot.type, "qqplot")]
+    qqplot.plots <- plot.type[grepl("qqplot", plot.type)]
     for (i in qqplot.plots[qqplot.plots %in% plot.type]) {
-      ctype <- rev(stringr::str_split(i, "[.]")[[1]])[1] # xtT, ytT, ytt or ytt1
-      cname <- ifelse(stringr::str_detect(i, "model"), "model", "state")
+      ctype <- rev(strsplit(i, "[.]")[[1]])[1] # xtT, ytT, ytt or ytt1
+      cname <- ifelse(grepl("model", i), "model", "state")
       df <- subset(resids, resids$type == ctype)
-      if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
+      if (grepl("std", i)) df$.resids <- df$.std.resids
       slope <- tapply(df$.resids, df$.rownames, slp)
       intercept <- tapply(df$.resids, df$.rownames, int)
       nY <- min(9, length(unique(df$.rownames)))
@@ -365,12 +365,12 @@ plot.marssMLE <-
       }
     }
 
-    acf.plots <- plot.type[stringr::str_detect(plot.type, "acf")]
+    acf.plots <- plot.type[grepl("acf", plot.type)]
     for (i in acf.plots[acf.plots %in% plot.type]) {
-      ctype <- rev(stringr::str_split(i, "[.]")[[1]])[1] # xtT, ytT, ytt or ytt1
-      cname <- ifelse(stringr::str_detect(i, "model"), "model", "state")
+      ctype <- rev(strsplit(i, "[.]")[[1]])[1] # xtT, ytT, ytt or ytt1
+      cname <- ifelse(grepl("model", i), "model", "state")
       df <- subset(resids, resids$type == ctype)
-      if (stringr::str_detect(i, "std")) df$.resids <- df$.std.resids
+      if (grepl("std", i)) df$.resids <- df$.std.resids
       nY <- min(9, length(unique(df$.rownames)))
       plot.ncol <- round(sqrt(nY))
       plot.nrow <- ceiling(nY / plot.ncol)
