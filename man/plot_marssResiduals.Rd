@@ -4,25 +4,22 @@
 
 \title{ Plot MARSS marssResiduals objects }
 \description{
-  Plots residuals using the output from a \code{\link{residuals.marssResiduals}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
+  Plots residuals using the output from a \code{\link{residuals.marssMLE}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
 }
 \usage{
-\method{plot}{marssResiduals}(x, plot.type = c("model.resids",
-                 "state.resids", "qqplot.model.resids",
-                 "qqplot.state.resids", "acf.model.resids"), 
-                 conf.int = TRUE, conf.level = 0.95, decorate = TRUE, 
-                 pi.int = FALSE, plot.par = list(), silent = FALSE, ...)
-\method{autoplot}{marssResiduals}(x, plot.type = c("model.resids", 
-    "state.resids", "qqplot.model.resids", "qqplot.state.resids", 
-    "acf.model.resids"),
-    conf.int=TRUE, conf.level=0.95, decorate=TRUE, pi.int = FALSE,
-    plot.par = list(), silent = FALSE)
+\method{plot}{marssResiduals}(x, plot.type = c("all", "residuals", "qqplot", "acf"),
+                   conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
+                   plot.par = list(), silent = FALSE, ...)
+\method{autoplot}{marssResiduals}(x,
+           plot.type = c("all", "residuals", "qqplot", "acf"),
+           conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
+           plot.par = list(),
+           silent = FALSE)
   }
 \arguments{
   \item{x}{ A \code{\link{marssResiduals}} object.  }
   \item{plot.type}{ Type of plot.  If not passed in, all plots are drawn. See details for plot types.  }
   \item{conf.int}{ TRUE/FALSE. Whether to include a confidence interval. }
-  \item{pi.int}{ TRUE/FALSE. Whether to include a prediction interval on the observations plot }
   \item{conf.level}{ Confidence level for CIs. }
   \item{decorate}{ TRUE/FALSE. Add smoothing lines to residuals plots or qqline to qqplots and add data points plus residuals confidence intervals to states and observations plots. }
   \item{plot.par}{ A list of plot parameters to adjust the look of the plots.  The default is list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
@@ -40,11 +37,10 @@ If \code{resids <- residuals(x)} is used (default) where \code{x} is a \code{mar
 
 The plot types are as follows:
 \describe{
-\item{\code{"model.resids"}}{ Model residuals (data minus fitted values) are plotted versus time. The intervals are the CIs for the smoothation model residuals if \code{x$type is "ytT"} and the data are not expected to fall inside these CIS. If \code{x$type is "ytt1"}, these are one-step-ahead (aka innovations) residuals and the data would be expected to fall in the CIs. }
-\item{\code{"state.resids"}}{ State smoothation residuals (E(x(t) | xtT(t-1)) minus xtT(t)). The intervals are the CIs for the smoothation residuals not one-step-ahead residuals. }
-\item{\code{"qqplot.model.resids"}}{ Visual normality test for the model residuals.} 
-\item{\code{"qqplot.state.resids"}}{ Visual normality test for the state residuals.} 
-\item{\code{"acf.model.resids"}}{ ACF of the model residuals. If \code{x$type is "ytT"}, then these are smoothation model residuals and they are not temporally independent. If \code{x$type is "ytt1"}, these are the one-step-ahead (aka innovations) residuals and they should be temporally independent. }
+\item{\code{"all"}}{ All the residuals in the residuals object plus QQ plots and ACF plots. }
+\item{\code{"residuals"}}{ Only residuals versus time. }
+\item{\code{"qqplot"}}{ Only QQplots. Visual normality test for the residuals.} 
+\item{\code{"acf"}}{ ACF of the residuals. If \code{x$type is "ytt1"}, these are the one-step-ahead (aka innovations) residuals and they should be temporally independent. }
 }
 }
 \author{ 
