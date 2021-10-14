@@ -83,7 +83,6 @@ For \code{type="ytT"}, the predictions are conceptually the same as predictions 
 \item{\code{t} in \code{newdata}:}{ If the model has time-varying parameters, \code{t} in \code{newdata} removes any ambiguity as to which parameter values (time steps) will be used for prediction. In this case, \code{t} specifies which time values of the parameters you want to use. If you leave off \code{t}, then it is assumed that \code{t} starts at the first time step in the data used to fit the original model. If the model is time-constant, \code{t} is used to set the time step values (used for plotting, etc.). }
 \item{The model has \eqn{\mathbf{c}}{c} and/or \eqn{\mathbf{d}}{d}:}{ \code{c} and/or \code{d} must be included in \code{newdata}. If \code{y} (new data) is not in \code{newdata}, it is assumed to be absent (all NA). That is, the default behavior if \code{y} is absent but \code{c} and/or \code{d} is present is \code{y="none"}. If you want to use the original data used to fit the model, then pass in \code{y="model"} in \code{newdata}. Pass in \code{t} in \code{newdata} if it is ambiguous which time steps of the model data to use.}
 \item{The model has time-varying parameters:}{ You have to pass in \code{t} in \code{newdata} to specify what parameter values to use. If any \eqn{t > T} (\eqn{T} equals the last time step in the model data), then it is assumed that you want to use the parameter values at the last time step of the original time series for values beyond the last time step. See examples. }
-\item{Only \code{t} is in \code{newdata}:}{ You can specify a subset of the original model data (and \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d}), by passing in \code{t} alone with the desired time steps denoted. For example \code{t=1:10}.}
 \item{\code{y}, \code{c} and \code{d} in \code{newdata} have more time steps than the original data: }{If the model has time-varying parameters, you will need to pass in \code{t}. If the model is time-constant, then \code{t} is assumed to start at the first time step in the original data but you can pass in \code{t} to change that. It will not change the prediction, but will change the t column in the output.}
 }
 
@@ -108,7 +107,8 @@ plot(fr)
 
 # use model data with the estimated initial values (at t=0) for 
 # initial values at t=9
-fr <- predict(fit,  newdata=list(t=10:20), x0 = "use.model")
+# This would be a somewhat strange thing to do and the value at t=10 will look wrong.
+fr <- predict(fit,  newdata=list(t=10:20, y=dat[,10:20]), x0 = "use.model")
 plot(fr)
 
 # pass in new data and give it new t; initial conditions will be estimated
@@ -133,19 +133,25 @@ C <- "unconstrained"
 model.list <- list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=covariates)
 fit <- MARSS(dat, model=model.list)
 
-# Use a new c (covariate) and the first 10 time steps of model data
+# Use a new c (covariate) but no data.
 fr <- predict(fit,  newdata=list(c=matrix(5,2,10)), x0="use.model")
 plot(fr)
 
 # Use first 10 time steps of model data
-plot(predict(fit, newdata=list(t=1:10, y="model", c=matrix(5,2,10))))
+plot(predict(fit, newdata=list(y=dat[,1:10], c=matrix(5,2,10))))
 
-# Use all model data
-plot(predict(fit,  newdata=list(t=1:22, y="model", c=matrix(5,2,22))))
+# Use all model data but new covariates
+# Why does it look so awful? Because this is a one-step ahead
+# prediction and there is no info on what the c will be at t
+plot(predict(fit,  newdata=list(y=dat, c=matrix(5,2,120))))
+
+# Use all model data but new covariates with ytT type
+# this looks better because is uses all the c data to estimate (so knows what c is at t and beyond)
+plot(predict(fit,  newdata=list(y=dat, c=matrix(5,2,120)), type="ytT"))
 
 # Use no data; cannot estimate initial conditions without data
 # so x0 must be "use.model"
-fr <- predict(fit,  newdata=list(y="none", c=matrix(5,2,22)), x0="use.model")
+fr <- predict(fit,  newdata=list(c=matrix(5,2,22)), x0="use.model")
 plot(fr)
 
 # forecast with covariates
