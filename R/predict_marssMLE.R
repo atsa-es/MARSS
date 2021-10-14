@@ -64,7 +64,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
   extras <- list()
   if (!missing(...)) {
     extras <- list(...)
-    if( "h" %in% names(extras) ) stop(paste0("predict.marssMLE: pass in n.ahead for forecast not h."), call. = FALSE)
+    if( "h" %in% names(extras) ) stop(paste0("predict.marssMLE: predict() uses n.ahead for forecast not h."), call. = FALSE)
   }
 
   if (!missing(n.ahead) && n.ahead > 0) {
@@ -85,7 +85,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
   # check newdata for errors
   nonewdata <- all(unlist(lapply(newdata[c("y", "c", "d")], is.null)))
   isnullnewdata <- all(unlist(lapply(newdata[c("t", "y", "c", "d")], is.null)))
-  istimevarying <- any(unlist(MARSS:::is.timevarying(object)))
+  istimevarying <- any(unlist(is.timevarying(object)))
   if (nonewdata && !is.null(newdata[["t"]])) {
     stop("predict.marssMLE: newdata cannot include only t (without either y, c or d).", call. = FALSE)
   }
