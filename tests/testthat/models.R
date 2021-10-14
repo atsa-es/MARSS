@@ -174,6 +174,7 @@ months <- lapply(X = GDP$date, FUN = seq.Date, by = "month", length.out = 3)
 months <- data.frame(date = do.call(what = c, months))
 
 m_GDP <- left_join(x = months, y = GDP, by = "date")
+m_GDP <- m_GDP %>% filter(date >= as.Date("1947-01-01") & date <= as.Date("2020-06-01"))
 
 df <- cbind(m_GDP, Emp$norm_rate)
 
@@ -281,6 +282,8 @@ months <- lapply(X = GDP$date, FUN = seq.Date, by = "month", length.out = 3)
 months <- data.frame(date = do.call(what = c, months))
 
 m_GDP <- left_join(x = months, y = GDP, by = "date")
+m_GDP <- m_GDP %>% filter(date >= as.Date("1947-01-01") & date <= as.Date("2020-06-01"))
+
 df <- cbind(m_GDP, Emp$rate)
 names(df) <- c("date", "S01_GDP", "S02_Emp")
 df_marss <- df %>% gather(key = "serie", value = "value", -date)
@@ -341,6 +344,7 @@ months <- lapply(X = GDP$date, FUN = seq.Date, by = "month", length.out = 3)
 months <- data.frame(date = do.call(what = c, months))
 
 m_GDP <- left_join(x = months, y = GDP, by = "date")
+m_GDP <- m_GDP %>% filter(date >= as.Date("1947-01-01") & date <= as.Date("2020-06-01"))
 
 # Data frame for estimation
 
