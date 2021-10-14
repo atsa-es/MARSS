@@ -53,10 +53,10 @@ fit <- MARSS(t(harborSealWA[, -1]), model = model.list)
 resids <- residuals(fit)
 
 require(ggplot2)
-# plot versus time, QQ-norm plot, and ACF
+# plots of residuals versus time, QQ-norm plot, and ACF
 autoplot(resids)
 
-# only the ACF plot
-autoplot(resids, plot.type = "acf.model.resids")
+# only the ACF plots
+autoplot(resids, plot.type = "acf")
 
 }
