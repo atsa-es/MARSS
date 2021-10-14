@@ -3,7 +3,7 @@ plot.marssResiduals <-
            plot.type = c("all", "residuals", "qqplot", "acf"),
            conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
            plot.par = list(),
-           silent = FALSE) {
+           silent = FALSE, ...) {
     tmp <- match.arg(plot.type)
     plot.type <- eval(formals(plot.marssMLE)$plot.type)
     plot.type <- plot.type[grepl("resids", plot.type, fixed=TRUE)]
