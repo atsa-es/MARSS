@@ -56,11 +56,11 @@
 data(harborSealWA)
 dat <- t(harborSealWA[, -1])
 fit <- MARSS(dat[1:2,])
-fr <- predict(fit, h=10)
+fr <- predict(fit, n.ahead=10)
 plot(fr, include=10)
 
 # forecast.marssMLE does the same thing as predict with h
-fr <- forecast.marssMLE(fit, h=10)
+fr <- forecast.marssMLE(fit, n.ahead=10)
 plot(fr)
 
 # without h, predict will show the prediction intervals
@@ -75,7 +75,7 @@ plot(fr)
 fr <- predict(fit, newdata=list(y=dat[3:4,]), x0="reestimate")
 plot(fr)
 
-# forecast
+# forecast; note h not n.ahead is used for forecast()
 fr <- forecast.marssMLE(fit, h=10)
 # If you load the forecast package, this will work
 library(forecast)

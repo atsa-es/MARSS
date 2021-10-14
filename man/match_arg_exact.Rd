@@ -16,7 +16,7 @@ match.arg.exact(arg, choices, several.ok = FALSE, exact = TRUE)
 \keyword{internal}
 \examples{
 # this fails
-match.arg.exact(c("a"), c("aa", "bb"))
+# MARSS:::match.arg.exact(c("a"), c("aa", "bb"))
 # this does not
 match.arg(c("a"), c("aa", "bb"))
 }
