@@ -334,7 +334,7 @@ autoplot.marssMLE <-
           df$sigma <- 1
         } else {
           df$sigma <- df$.sigma
-          df$sigma[is.na(df$value)] <- 0
+          df$sigma[is.na(df$value)] <- 0 # will only apply for y; x value is never NA
         }
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
@@ -400,7 +400,7 @@ autoplot.marssMLE <-
           df$sigma <- 1
         } else {
           df$sigma <- df$.sigma
-          df$sigma[is.na(df$value)] <- 0
+          df$sigma[is.na(df$value)] <- 0 # will never be the case for x so not really needed here
         }
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
@@ -489,7 +489,7 @@ autoplot.marssMLE <-
           ),
           "residuals. The residuals should be Gaussian."
         )
-        note <- str_to_sentence(note, ignore = c("Cholesky", "Gaussian", "Block.Cholesky"))
+        note <- str_to_sentence(note, ignore = c("Cholesky", "Gaussian", "Block.Cholesky", "(ytT)", "(xtT)"))
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
@@ -549,7 +549,7 @@ autoplot.marssMLE <-
         ),
         "residuals ACF"
       )
-      title.val <- str_to_sentence(title.val, ignore = c("Cholesky", "Block.Cholesky"))
+      title.val <- str_to_sentence(title.val, ignore = c("Cholesky", "Block.Cholesky", "(ytT)", "(xtT)"))
 
       p1 <- ggplot2::ggplot(acf.dat, mapping = ggplot2::aes(x = lag, y = acf)) +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
@@ -574,7 +574,7 @@ autoplot.marssMLE <-
           "residuals.",
           ifelse(grepl("ytt1", i), " These residuals should be temporally uncorrelated.", " These residuals are not expected to be temporally uncorrelated. Use innovation (ytt1) residuals to check for temporal correlation in the residuals.")
         )
-        note <- str_to_sentence(note, ignore = c("Cholesky", "Block.Cholesky"))
+        note <- str_to_sentence(note, ignore = c("Cholesky", "Block.Cholesky", "(ytT)", "(xtT)"))
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
