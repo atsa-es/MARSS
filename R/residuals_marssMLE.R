@@ -42,6 +42,7 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
   model <- x[["model"]]
   model.dims <- attr(model, "model.dims")
   data.dims <- model.dims[["y"]]
+  mm <- model.dims[["x"]][1]
   nn <- data.dims[1]
   TT <- data.dims[2]
   resids <- MARSSresiduals(x, type = type, ...)
@@ -98,14 +99,17 @@ residuals_marxss <- function(x, type, standardization, clean, ...) {
   }
   if (type != "tt" && (type == "tT" || !clean)) {
     fit.list <- fitted.marssMLE(x, type = type1, interval = "none")
-    fit.list$value <- c(fit.list$.x[2:TT], NA)
+    # Note .resids(t) = .x(t+1) - .fitted(t+1); State residual time indexing is OFFSET
+    # Although I could also offset the value and fitted, I decided not to because it would be confusing.
+    # Instead added notes to help file.
+    # loc <- rep(c(2:TT,NA), mm)+TT*rep(0:(mm-1), each=TT)
     ret2 <- data.frame(
       type = paste0("x", type),
       .rownames = fit.list$.rownames,
       name = "state",
       t = fit.list$t,
-      value = fit.list$value,
-      .fitted = fit.list$.fitted,
+      value = fit.list$.x, # t indexing is offset relative to the state resids
+      .fitted = fit.list$.fitted, # t indexing is offset relative to the state resids
       .resids = vec(t(state.resids)),
       .sigma = vec(t(state.se.resids)),
       .std.resids = vec(t(state.std.resids)),
