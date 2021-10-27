@@ -30,6 +30,7 @@ This update is focused on improving the plotting functions for marssMLE, marssRe
 * `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"`). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
 * `coef.marssMLE()` was not properly showing a time-varying A or U when `type="matrix"`, `form="marss"` and D or C estimated.
 * `plot.marssMLE()` was not resetting `par()` when done thus affecting users plot environment.
+* `residuals.marssMLE()` value column for states was wrong when there were more than one state because `c($.x[2:TT], NA)` was used. Changed to not offsetting either `.x` or `.fitted` columns and instead added clarification to the documentation for `residuals.marssMLE()`. The `value` column was used for examples in help file for `residuals.marssMLE()` and for the coefficient of determination reported by `glance.marssMLE()`.
 
 ## DOCUMENTATION
 
