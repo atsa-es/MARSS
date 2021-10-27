@@ -19,15 +19,15 @@ Values such as \eqn{a b} or \eqn{a^2} or \eqn{log(a)} are not linear constraints
 }
 \usage{
 MARSS(y, 
-    model=NULL,
-    inits=NULL,
-    miss.value=as.numeric(NA),
-    method = "kem",
-    form = "marxss",
-    fit=TRUE, 
-    silent = FALSE,
-    control = NULL,
-    fun.kf = c("MARSSkfas", "MARSSkfss"),
+    model = NULL, 
+    inits = NULL, 
+    miss.value = as.numeric(NA), 
+    method = "kem", 
+    form = "marxss", 
+    fit = TRUE, 
+    silent = FALSE, 
+    control = NULL, 
+    fun.kf = c("MARSSkfas", "MARSSkfss"), 
     ...) 
 }
 
@@ -41,7 +41,7 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
   \item{form}{ The equation form used in the \code{MARSS()} call.  The default is "marxss". See \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}. }
   \item{fit}{ TRUE/FALSE Whether to fit the model to the data. If FALSE, a \code{\link{marssMLE}} object with only the model is returned. }
   \item{silent}{ Setting to TRUE(1) suppresses printing of full error messages, warnings, progress bars and convergence information. Setting to FALSE(0) produces error output. Setting silent=2 will produce more verbose error messages and progress information. }
-    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \link[KFAS]{KFAS} package based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implementation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
+    \item{fun.kf}{   What Kalman filter function to use.  MARSS has two: \code{\link{MARSSkfas}()} which is based on the Kalman filter in the \href{https://cran.r-project.org/package=KFAS}{KFAS} package based on Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native R implementation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()} modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
   \item{control}{ Estimation options for the maximization algorithm. The typically used control options for method="kem" are below but see  \code{\link{marssMLE}} for the full list of control options.  Note many of these are not allowed if method="BFGS"; see  \code{\link{MARSSoptim}} for the allowed control options for this method.
     \itemize{
       \item{\code{minit}}{   The minimum number of iterations to do in the maximization routine (if needed by method). If \code{method="kem"}, this is an easy way to up the iterations and see how your estimates are converging. (positive integer)} 

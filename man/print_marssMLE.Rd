@@ -6,7 +6,8 @@
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{print(MLEobj)}, where \code{MLEobj} is a \code{\link{marssMLE}} object, will print out information on the fit.  However, \code{print} can be used to print a variety of information (residuals, smoothed states, imputed missing values, etc) from a \code{\link{marssMLE}} object using the \code{what} argument in the print call.
 }
 \usage{
-\method{print}{marssMLE}(x, digits = max(3, getOption("digits")-4), ..., what="fit", form=NULL, silent=FALSE)
+\method{print}{marssMLE}(x, digits = max(3, getOption("digits")-4), ..., 
+    what = "fit", form = NULL, silent = FALSE)
 }
 \arguments{
   \item{x}{ A \code{\link{marssMLE}} object.  }

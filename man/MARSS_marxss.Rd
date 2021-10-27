@@ -14,21 +14,21 @@ Note, "marxss" is a model form.  A model form is defined by a collection of form
 }
 \section{Usage}{
 \code{MARSS(y, 
-    inits=NULL,
-    model=NULL,
-    miss.value=as.numeric(NA),
-    method = "kem",
-    form = "marxss",
-    fit=TRUE, 
-    silent = FALSE,
-    control = NULL,
-    fun.kf = "MARSSkfas",
+    inits = NULL, 
+    model = NULL, 
+    miss.value = as.numeric(NA), 
+    method = "kem", 
+    form = "marxss", 
+    fit = TRUE, 
+    silent = FALSE, 
+    control = NULL, 
+    fun.kf = "MARSSkfas", 
     ...)}
 }
 
 \details{
 The allowed arguments when \code{form="marxss"} are 1) the arguments common to all forms: "y" (data), "inits", "control", "method", "form", "fit", "silent", "fun.kf" (see \code{\link{MARSS}} for information on these arguments) and 2) the argument "model" which is a list describing the MARXSS model (the model list is described below).
-See the Quick Start guide (\code{RShowDoc("Quick_Start",package="MARSS")}) or the User Guide (\code{RShowDoc("UserGuide",package="MARSS")}) for examples.
+See the \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} guide or the \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} for examples.
 
 The argument \code{model} must be a list.  The elements in the list specify the structure for the \eqn{\mathbf{B}}{B}, \eqn{\mathbf{u}}{u}, \eqn{\mathbf{C}}{C}, \eqn{\mathbf{c}}{c}, \eqn{\mathbf{Q}}{Q}, \eqn{\mathbf{Z}}{Z}, \eqn{\mathbf{a}}{a}, \eqn{\mathbf{D}}{D}, \eqn{\mathbf{d}}{d}, \eqn{\mathbf{R}}{R}, \eqn{\mathbf{x}_0}{x0}, and \eqn{\mathbf{V}_0}{V0} in the MARXSS model (above).  The list elements can have the following values:
 \itemize{

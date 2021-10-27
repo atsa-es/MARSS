@@ -7,7 +7,7 @@
   This is a helper function to check the inputs to a \code{\link{MARSS}()} call for any errors. Not exported.
 }
 \usage{
-checkMARSSInputs( MARSS.inputs, silent=FALSE )
+checkMARSSInputs( MARSS.inputs, silent = FALSE )
 }
 \arguments{
   \item{MARSS.inputs}{ A list comprised of the needed inputs to a MARSS call: 
@@ -22,7 +22,7 @@ checkMARSSInputs( MARSS.inputs, silent=FALSE )
 \details{
 This is a helper function to check that all the inputs to a \code{\link{MARSS}()} function call are properly specified.  
 
-If arguments \code{inits} or \code{control} are not provided by the user, they will be set by the \code{alldefaults[[method]]} object specified in \code{MARSSsettings}.  Argument \code{model} specifies the model structure using a list of matrices; see \code{\link{MARSS}} or the User Guide for instructions on how to specify model structure. If \code{model} is left off, then the function \code{MARSS.form()} is used to determine the default model structure.
+If arguments \code{inits} or \code{control} are not provided by the user, they will be set by the \code{alldefaults[[method]]} object specified in \code{MARSSsettings}.  Argument \code{model} specifies the model structure using a list of matrices; see \code{\link{MARSS}} or the \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} for instructions on how to specify model structure. If \code{model} is left off, then the function \code{MARSS.form()} is used to determine the default model structure.
 }
 \value{
   If the function does not stop due to errors, it returns an updated list with elements

@@ -11,11 +11,11 @@ The data go from \eqn{t=1} to \eqn{t=T}. For brevity, the parameter matrices are
 Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up to time \eqn{t} is not provided since that would require the expected value of \eqn{\mathbf{X}_{t}}{X(t)} conditioned on data from \eqn{t = 1} to \eqn{t+1}, which is not output from the Kalman filter or smoother.
 }
 \usage{
-\method{fitted}{marssMLE}(object, ...,
+\method{fitted}{marssMLE}(object, ..., 
     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),   
     interval = c("none", "confidence", "prediction"), 
-    level = 0.95,
-    output = c("data.frame", "matrix"),
+    level = 0.95, 
+    output = c("data.frame", "matrix"), 
     fun.kf = c("MARSSkfas", "MARSSkfss"))
   }
   \arguments{
@@ -28,7 +28,7 @@ Note that the prediction of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data up 
   \item{...}{ Not used. }
   }
 \value{
-If \code{output="data.frame"} (the default), a data frame with the following columns is returned. If If \code{output="matrix"}, the columns are returned as matrices in a list. Information computed from the model has a leading "." in the column name.
+If \code{output="data.frame"} (the default), a data frame with the following columns is returned. If \code{output="matrix"}, the columns are returned as matrices in a list. Information computed from the model has a leading "." in the column name.
 
 If \code{interval="none"}, the following are returned (colnames with \code{.} in front are computed values):
   
@@ -81,11 +81,11 @@ The model predicted \eqn{\mathbf{x}_t}{x(t)} given \eqn{\mathbf{x}_{t-1}}{x(t-1)
 
 If \code{interval="confidence"}, the standard error of the predicted values (meaning the standard error of the expected value of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)}) is returned.  The standard error of the predicted value is \eqn{\mathbf{B} \mathbf{V}_{t-1}^\tau\mathbf{B}^\top}{B Vttau(t-1) t(B)}. If \code{interval="prediction"}, the standard deviation of \eqn{\mathbf{X}_t}{X(t)} given \eqn{\mathbf{X}_{t-1}}{X(t-1)} is output. The latter is \eqn{\mathbf{B} \mathbf{V}_{t-1}^\tau \mathbf{B}^\top + \mathbf{Q}}{B Vttau(t-1) t(B) + Q} . \eqn{\mathbf{V}_{t-1}^\tau}{Vttau(t-1)} is either conditioned on data 1 to \eqn{\tau=T} or \eqn{\tau=t-1} depending on \code{type}. 
 
-The intervals returned by \code{MARSSpredict()} are for the state predictions based on the state estimate at \eqn{t-1}. These are not typically what one uses or needs--however might be useful for simulation work. If you want confidence intervals for the state estimates, those are provided in \code{\link[=fitted.marssMLE]{fitted}()}. If you want to do residuals analysis (for outliers or model inadequacy), you want the residuals intervals provided in \code{\link[=residuals.marssMLE]{residuals}()}.
+The intervals returned by \code{fitted.marssMLE()} are for the state predictions based on the state estimate at \eqn{t-1}. These are not typically what one uses or needs--however might be useful for simulation work. If you want confidence intervals for the state estimates, those are provided in \code{\link[=tsSmooth.marssMLE]{tsSmooth}}. If you want to do residuals analysis (for outliers or model inadequacy), you want the residuals intervals provided in \code{\link[=residuals.marssMLE]{residuals}()}.
 
 }
 \seealso{
-\code{\link{MARSSkf}}, \code{\link{MARSSresiduals}}, \code{\link{residuals.marssMLE}}, \code{\link{predict.marssMLE}}, \code{\link{fitted.marssMLE}}
+\code{\link{MARSSkf}}, \code{\link{MARSSresiduals}}, \code{\link{residuals.marssMLE}}, \code{\link{predict.marssMLE}}, \code{\link{tsSmooth.marssMLE}}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
@@ -106,6 +106,14 @@ mod.list <- list(
   x0 = matrix("pi")
 )
 fit <- MARSS(nile, model = mod.list, silent = TRUE)
+
+# Plotting
+# There are plot methods for marssMLE objects
+library(ggplot2)
+autoplot(fit)
+
+# Below shows how to make plots manually but all of these can be made
+# with autoplot(fit) or plot(fit)
 plot(nile, type = "p", pch = 16, col = "blue")
 lines(fitted(fit, type="ytT")$.fitted, col = "red", lwd = 2)
 lines(fitted(fit, type="ytt1")$.fitted, col = "grey", lwd = 2)

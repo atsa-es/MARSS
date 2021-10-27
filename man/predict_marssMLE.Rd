@@ -10,12 +10,12 @@ If you want the estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data
 If \code{h} is passed in, \code{predict(object)} will return a forecast \eqn{h} steps past the end of the model data. \code{predict(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{plot()} or \code{ggplot2::autoplot()}for automatic plotting of predictions and forecasts with intervals.
 }
 \usage{
-\method{predict}{marssMLE}(object, n.ahead=0,
-     level = c(0.80, 0.95),
-     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"),
-     newdata = list(t=NULL, y=NULL, c=NULL, d=NULL),
-     interval = c("none", "confidence", "prediction"),
-     fun.kf = c("MARSSkfas", "MARSSkfss"),
+\method{predict}{marssMLE}(object, n.ahead = 0, 
+     level = c(0.80, 0.95), 
+     type = c("ytt1", "ytT", "xtT", "ytt", "xtt1"), 
+     newdata = list(t=NULL, y=NULL, c=NULL, d=NULL), 
+     interval = c("none", "confidence", "prediction"), 
+     fun.kf = c("MARSSkfas", "MARSSkfss"), 
      x0 = "reestimate", ...)
    }
 \arguments{

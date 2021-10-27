@@ -6,9 +6,9 @@
   The normal residuals function is \code{\link[=residuals.marssMLE]{residuals}()}. \code{MARSSresiduals()} returns residuals as a list of matrices while \code{\link[=residuals.marssMLE]{residuals}()} returns the same information in a data frame.  This function calculates the residuals, residuals variance, and standardized residuals for the one-step-ahead (conditioned on data up to \eqn{t-1}), the smoothed (conditioned on all the data), and contemporaneous (conditioned on data up to \eqn{t}) residuals.
 }
 \usage{
-MARSSresiduals(object, ..., type=c("tT", "tt1", "tt"), 
-    normalize=FALSE, silent=FALSE, 
-    fun.kf=c("MARSSkfas", "MARSSkfss"))
+MARSSresiduals(object, ..., type = c("tT", "tt1", "tt"), 
+    normalize = FALSE, silent = FALSE, 
+    fun.kf = c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{marssMLE}.}

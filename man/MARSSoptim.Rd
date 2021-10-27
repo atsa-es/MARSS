@@ -39,7 +39,7 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
   }
   \item{logLik}{Log-likelihood.}
   \item{states}{State estimates from the Kalman filter.}
-  \item{states.se}{Confidence intervals based on state standard errors, see caption of Fig 6.3 (p. 337) Shumway & Stoffer.}
+  \item{states.se}{Confidence intervals based on state standard errors, see caption of Fig 6.3 (p. 337) in Shumway & Stoffer (2006).}
   \item{errors}{Any error messages.}
 }
 \section{Discussion}{

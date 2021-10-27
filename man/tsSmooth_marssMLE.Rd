@@ -81,7 +81,7 @@ H.inv <- varimax(coef(dfa, type="matrix")$Z)$rotmat
 Z.rot <- Z.est \%*\% H.inv
 }
 
-For \code{type="xtt"} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data $t=1$ to \eqn{t} or $t=1$ to \eqn{t-1}. 
+For \code{type="xtt"} and \code{type=="xtt1"}, the calculations and interpretations of the intervals are the same but the conditioning is for data \eqn{t=1} to \eqn{t} or \eqn{t=1} to \eqn{t-1}. 
 
 
 \strong{observation estimates (y)}
@@ -92,7 +92,7 @@ The intervals reported by \code{tsSmooth.marssMLE} for the missing values take i
 
 The standard error and confidence interval for the expected value of the missing data along with the standard deviation and prediction interval for the missing data are reported. The former uses the variance of \eqn{E[\mathbf{Y}_t]}{E[Y(t)]} conditioned on the data while the latter uses variance of \eqn{\mathbf{Y}_t}{Y(t)} conditioned on the data. \code{\link{MARSShatyt}()} returns these variances and expected values. See Holmes (2012) for a discussion of the derivation of expectation and variance of \eqn{\mathbf{Y}_t}{Y(t)} conditioned on the observed data (in the section 'Computing the expectations in the update equations').
 
-For \code{type="ytt"} and \code{type="ytt1"}, only the estimates are provided. \code{\link{MARSShatyt}()} does not return the necessary variances matrices for the standard errors for these cases.
+For \code{type="ytt"}, only the estimates are provided. \code{\link{MARSShatyt}()} does not return the necessary variances matrices for the standard errors for this cases.
 
 }
 \references{ 
@@ -112,7 +112,7 @@ ggplot(data = d) +
   geom_line(aes(t, .estimate)) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), linetype = 2, alpha = 0.3) +
   facet_grid(~.rownames) +
-  xlab("Time Step") + ylab("Count")
+  xlab("Time Step") + ylab("State estimate")
 
 # Make a plot of the estimates for the missing values
 library(ggplot2)

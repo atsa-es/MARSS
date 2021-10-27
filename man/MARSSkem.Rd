@@ -14,12 +14,12 @@ MARSSkem(MLEobj)
 \details{
 Objects of class \code{\link{marssMLE}} may be built from scratch but are easier to construct using \code{\link{MARSS}()} with \code{MARSS(..., fit=FALSE)}.
 
-  Options for \code{MARSSkem()} may be set using \code{MLEobj$control}.  The commonly used elements of \code{control} are follows (see \code{\link{marssMLE}}:
+  Options for \code{MARSSkem()} may be set using \code{MLEobj$control}.  The commonly used elements of \code{control} are as follows (see \code{\link{marssMLE}}):
   \describe{
       \item{\code{minit}}{ Minimum number of EM iterations. You can use this to force the algorithm to do a certain number of iterations.  This is helpful if your solution is not converging.} 
       \item{\code{maxit}}{ Maximum number of EM iterations. } 
       \item{\code{min.iter.conv.test}}{ The minimum number of iterations before the log-log convergence test will be computed.  If \code{maxit} is set less than this, then convergence will not be computed (and the algorithm will just run for maxit iterations). } 
-      \item{\code{kf.x0}}{ Whether to set the prior at t=0 ("x00") or at t=1 ("x10"). The default is "x00". } 
+      \item{\code{kf.x0}}{ Whether to set the prior at \eqn{t=0} (\code{"x00"}) or at \eqn{t=1} (\code{"x10"}). The default is \code{"x00"}. } 
       \item{\code{conv.test.deltaT}}{ The number of iterations to use in the log-log convergence test.  This defaults to 9. } 
       \item{\code{abstol}}{ Tolerance for log-likelihood change for the delta logLik convergence test.  If log-likelihood changes less than this amount relative to the previous iteration, the EM algorithm exits. This is normally (default) set to NULL and the log-log convergence test is used instead.} 
       \item{\code{allow.degen}}{ Whether to try setting \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} elements to zero if they appear to be going to zero. }
@@ -55,7 +55,7 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
   }
   \item{logLik}{Log-likelihood.}
   \item{states}{State estimates from the Kalman filter.}
-  \item{states.se}{Confidence intervals based on state standard errors, see caption of Fig 6.3 (p. 337) Shumway & Stoffer.}
+  \item{states.se}{Confidence intervals based on state standard errors, see caption of Fig 6.3 (p. 337) in Shumway & Stoffer (2006).}
   \item{errors}{Any error messages.}
 }
 
@@ -78,10 +78,10 @@ Harvey, A. C. (1989) Chapter 5 in Forecasting, structural time series models and
 Kalman filter. Cambridge University Press, Cambridge, UK.
   
 The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science
-Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuide",package="MARSS")} to open a copy.      
+Center, 2725 Montlake Blvd E., Seattle, WA 98112   Go to \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} to open the most recent version.
 
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive
-state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME]\code{RShowDoc("EMDerivation",package="MARSS")} to open a copy.
+state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \href{https://cran.r-project.org/package=MARSS/vignettes/EMDerivation.pdf}{EMDerivation} has the most recent version.
 }
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  

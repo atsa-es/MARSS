@@ -20,7 +20,7 @@
  
   \item{form}{ For developers. Can be ignored. If you want the function to use a different function than \code{residuals_form}.  This might be useful if you manually specified a DFA model and want to use \code{residuals_dfa} for rotating.}
 
-  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{name=="state"} when `clean=TRUE`. }
+  \item{clean}{ Can be ignored. For \code{type="tt1"}, state residuals are not used for residuals analysis and for \code{type="tt"}, they don't exist (all NA). They are used only for smoothation residuals, \code{type="tT"}.  For \code{type="tt1"} and \code{type="tt"}, the data frame is cleaned by removing \code{name=="state"} when \code{clean=TRUE}. }
   
   \item{...}{Not used.}
 

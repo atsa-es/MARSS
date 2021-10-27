@@ -9,7 +9,7 @@ These are utility functions for model objects in the package \code{\link{MARSS-p
 Users would not normally work directly with these functions.
 }
 \usage{
-marss_to_marxss(x, C.and.D.are.zero=FALSE)
+marss_to_marxss(x, C.and.D.are.zero = FALSE)
 marxss_to_marss(x, only.par = FALSE)
 }
 

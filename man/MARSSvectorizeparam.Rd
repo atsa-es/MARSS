@@ -7,7 +7,7 @@
   Converts \code{MLEobj[["what"]]} to a vector or assigns a vector to \code{MLEobj[["what"]]}.  This is a utility function in the \code{\link{MARSS-package}} for \code{\link{marssMODEL}} objects of form="marss" and is not exported.  Users achieve this functionality with \code{\link[=coef.marssMLE]{coef}}.
 }
 \usage{
-MARSSvectorizeparam(MLEobj, parvec = NA, what="par")
+MARSSvectorizeparam(MLEobj, parvec = NA, what = "par")
 }
 \arguments{
   \item{MLEobj}{ An object of class \code{\link{marssMLE}}. }

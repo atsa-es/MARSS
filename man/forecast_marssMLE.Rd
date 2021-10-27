@@ -1,9 +1,11 @@
 \name{forecast.marssMLE}
 \alias{forecast.marssMLE}
 
-\title{ forecast function for MARSS MLE objects }
+\title{ forecast function for marssMLE objects }
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{forecast(object)}, where object is \code{\link{marssMLE}} object, will return the forecasts of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} for \code{h} steps past the end of the model data. \code{forecast(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{\link{plot.marssPredict}} for automatic plotting of the forecast. \code{forecast.marssMLE()} is used by \code{\link{predict.marssMLE}()} to generate forecasts.
+  
+This is a method for the generic \code{forecast} function in the forecast package. The forecast package is not part of the MARSS package and you will need to load it separately. Alternatively you can use \code{forecast.marssMLE()} instead of \code{forecast()}.
 }
 \usage{
 \method{forecast}{marssMLE}(object, h = 10, level = c(0.8, 0.95), 
@@ -49,7 +51,10 @@ where \eqn{\mathbf{B}}{B} and \eqn{\mathbf{u}}{u} and \eqn{\mathbf{C}}{C} are es
 If the model has time-varying parameters, the parameter estimates at time \eqn{T} will be used for the whole forecast. If new data \code{c} or \code{d} are passed in, it must have \code{h} time steps. 
 
 Note: \code{y} in \code{newdata}. Data along with covariates can be passed into \code{newdata}. In this case, the data in \code{newdata} (\eqn{T+1} to \eqn{T+h}) are conditioned on for the expected value of \eqn{\mathbf{X}_t}{X(t)}
- but parameters used are only estimated using the data in the marssMLE object (\eqn{t=1} to \eqn{T}). If you include data in \code{newdata}, you need to decide how to condition on that new data for the forecast. \code{type="ytT"} would mean that the \eqn{t=T+i} forecast is conditioned on all the data, \eqn{t=1} to \eqn{T+h}, \code{type="ytt"} would mean that the \eqn{t=T+i} forecast is conditioned on the data, \eqn{t=1} to \eqn{T+i}, and \code{type="ytt1"} would mean that the \eqn{t=T+i} forecast is conditioned on the data, \eqn{t=1} to \eqn{T+i-1}. Because MARSS models can be used all sorts of systems, the \eqn{\mathbf{y}}{y} part of the MARSS model might not be "data" in the traditional sense. In some cases, one of the \eqn{\mathbf{y}}{y} (in a multivariate model) might be a known deterministic process or it might be a simulated future \eqn{\mathbf{y}}{y} that you want to include. In this case the \eqn{\mathbf{y}}{y} rows that are being forecasted are NAs and the \eqn{\mathbf{y}}{y} rows that are known are passed in with \code{newdata}.
+ but parameters used are only estimated using the data in the marssMLE object (\eqn{t=1} to \eqn{T}). If you include data in \code{newdata}, you need to decide how to condition on that
+ new data for the forecast. \code{type="ytT"} would mean that the \eqn{t=T+i} forecast is conditioned on all the data, \eqn{t=1} to \eqn{T+h}, \code{type="ytt"} would mean that the
+ \eqn{t=T+i} forecast is conditioned on the data, \eqn{t=1} to \eqn{T+i}, and \code{type="ytt1"} would mean that the \eqn{t=T+i} forecast is conditioned on the data, \eqn{t=1} to \eqn{T+i-1}. Because MARSS models can be used in all sorts of systems, the \eqn{\mathbf{y}}{y} part of the MARSS model might not be "data" in the traditional sense. In some cases, one of the \eqn{\mathbf{y}}{y} (in a multivariate model) might be a known deterministic process or it might be a simulated future \eqn{\mathbf{y}}{y} that you want to include. In this case the
+ \eqn{\mathbf{y}}{y} rows that are being forecasted are NAs and the \eqn{\mathbf{y}}{y} rows that are known are passed in with \code{newdata}.
 }
 \seealso{
 \code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}}

@@ -5,7 +5,7 @@
 \docType{data}
 \title{ Salmon Survival Indices }
 \description{
-  Example data set for use in MARSS vignettes for the DLM chapter in the \code{\link{MARSS-package}} User Guide. This is a 42-year time-series of the logit of juvenile salmon survival along with an index of April coastal upwelling.  See the source for details.
+  Example data set for use in MARSS vignettes for the DLM chapter in the \code{\link{MARSS-package}} \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide}. This is a 42-year time-series of the logit of juvenile salmon survival along with an index of April coastal upwelling.  See the source for details.
 }
 \usage{
 data(SalmonSurvCUI)

@@ -5,7 +5,7 @@
   Creates a list diagonal matrix where the diagonal can be a combination of numbers and characters. Characters are names of parameters to be estimated.
 }
 \usage{
-ldiag(x, nrow=NA)
+ldiag(x, nrow = NA)
 }
 \arguments{
   \item{x}{ A vector or list of single values }

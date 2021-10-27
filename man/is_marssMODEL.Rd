@@ -12,7 +12,7 @@ These are model objects and utility functions for model objects in the package \
   \code{MARSS_formname()} translates a model list as passed in call to \code{\link{MARSS}()} into a marssMODEL model object.
 }
 \usage{
-is.marssMODEL(MODELobj, method="kem")
+is.marssMODEL(MODELobj, method = "kem")
 }
 
 \arguments{

@@ -7,13 +7,13 @@
   Plots residuals using the output from a \code{\link{residuals.marssMLE}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
 }
 \usage{
-\method{plot}{marssResiduals}(x, plot.type = c("all", "residuals", "qqplot", "acf"),
+\method{plot}{marssResiduals}(x, plot.type = c("all", "residuals", "qqplot", "acf"), 
                    conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
                    plot.par = list(), silent = FALSE, ...)
-\method{autoplot}{marssResiduals}(x,
-           plot.type = c("all", "residuals", "qqplot", "acf"),
-           conf.int = TRUE, conf.level = 0.95, decorate = TRUE,
-           plot.par = list(),
+\method{autoplot}{marssResiduals}(x, 
+           plot.type = c("all", "residuals", "qqplot", "acf"), 
+           conf.int = TRUE, conf.level = 0.95, decorate = TRUE, 
+           plot.par = list(), 
            silent = FALSE)
   }
 \arguments{

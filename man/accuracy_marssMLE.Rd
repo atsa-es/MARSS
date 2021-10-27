@@ -4,8 +4,8 @@
 
 \title{Return accuracy metrics}
 \usage{
-accuracy.marssPredict(f, x, test=NULL, type="ytt1", verbose=FALSE, ...)
-accuracy.marssMLE(f, x, test=NULL, type="ytt1", verbose=FALSE, ...)
+accuracy.marssPredict(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
+accuracy.marssMLE(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
 }
 \arguments{
   \item{f}{A \code{\link{marssMLE}} or \code{\link{marssPredict}} object}
@@ -48,5 +48,7 @@ test.dat <- dat[,13:22]
 accuracy(fr, x=test.dat)
 }
 \references{
-Hyndman, R.J. and Koehler, A.B. (2006) "Another look at measures of forecast accuracy". International Journal of Forecasting, 22(4), 679-688. Hyndman, R.J. and Athanasopoulos, G. (2018) "Forecasting: principles and practice", 2nd ed., OTexts, Melbourne, Australia. Section 3.4 "Evaluating forecast accuracy". https://otexts.org/fpp2/accuracy.html.
+Hyndman, R.J. and Koehler, A.B. (2006) "Another look at measures of forecast accuracy". International Journal of Forecasting, 22(4), 679-688. 
+
+Hyndman, R.J. and Athanasopoulos, G. (2018) "Forecasting: principles and practice", 2nd ed., OTexts, Melbourne, Australia. Section 3.4 "Evaluating forecast accuracy". https://otexts.org/fpp2/accuracy.html.
 }

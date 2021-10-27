@@ -6,8 +6,8 @@
   Calculates the standardized (or auxiliary) contemporaneous residuals, aka the residuals and their variance conditioned on the data up to time \eqn{t}.  Contemporaneous residuals are only for the observations. Not exported. Access this function with \code{MARSSresiduals(object, type="tt")}.
 }
 \usage{
-MARSSresiduals.tt(object, method=c("SS"), normalize=FALSE, 
-    silent=FALSE, fun.kf=c("MARSSkfas", "MARSSkfss"))
+MARSSresiduals.tt(object, method = c("SS"), normalize = FALSE, 
+    silent = FALSE, fun.kf = c("MARSSkfas", "MARSSkfss"))
 }
 \arguments{
   \item{object}{ An object of class \code{\link{marssMLE}}.}

@@ -16,7 +16,7 @@ CSEGtmufigure(N = 20, u = -0.1, s2p = 0.01, make.legend = TRUE)
 \details{
   This figure shows the region of high uncertainty in dark grey. In this region, the minimum 95 percent confidence intervals on the probability of quasi-extinction span 80 percent of the 0 to 1 probability. Green hashing indicates where the 95 percent upper bound does not exceed 5\% probability of quasi-extinction.  The red hashing indicates, where the 95 percent lower bound is above 95\% probability of quasi-extinction. The light grey lies between these two certain/uncertain extremes.   The extinction calculation is based on Dennis et al. (1991). The minimum theoretical confidence interval is based on Fieberg and Ellner (2000).  This figure was developed in Ellner and Holmes (2008).
   
- Examples using this figure are shown in the User Guide (\code{RShowDoc("UserGuide",package="MARSS")}) in the PVA chapter.
+ Examples using this figure are shown in the \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} in the PVA chapter.
 }
 
 \references{ 

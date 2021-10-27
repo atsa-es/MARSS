@@ -17,15 +17,15 @@ Note, "marss" is a model form.  A model form is defined by a collection of form 
 }
 \section{Usage}{
 \code{MARSS(y, 
-    inits=NULL,
-    model=NULL,
-    miss.value=as.numeric(NA),
-    method = "kem",
-    form = "marxss",
-    fit=TRUE, 
-    silent = FALSE,
-    control = NULL,
-    fun.kf = "MARSSkfas",
+    inits = NULL, 
+    model = NULL, 
+    miss.value = as.numeric(NA), 
+    method = "kem", 
+    form = "marxss", 
+    fit = TRUE, 
+    silent = FALSE, 
+    control = NULL, 
+    fun.kf = "MARSSkfas", 
     ...)}
 }
 
