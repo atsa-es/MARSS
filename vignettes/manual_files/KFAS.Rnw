@@ -610,8 +610,9 @@ With MARSS, there is a plot method (and ggplot2::autoplot method) for marssMLE o
 \index{confidence intervals}\index{plotting!confidence intervals}
 \begin{figure}[htp]
 \begin{center}
-<<Cs502_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
-plot(fit_marss, plot.type = "fitted.ytT", pi.int = TRUE)
+<<Cs502_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=TRUE>>=
+plot.type <- ifelse(packageVersion("MARSS") < '3.11.4', "model.ytT", "fitted.ytT")
+plot(fit_marss, plot.type = plot.type, pi.int = TRUE)
 @
 \end{center}
 \caption{MARSS smooth model fit (expected value of $\ZZ \XX_t + \aa$) confidence intervals and predictions.}
@@ -620,7 +621,7 @@ plot(fit_marss, plot.type = "fitted.ytT", pi.int = TRUE)
 Alternatively you could used the fitted output (Figure \ref{fig:plotting.3}).
 \begin{figure}[htp]
 \begin{center}
-<<Cs503_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
+<<Cs503_plotting, keep.source=TRUE, results=hide, fig=TRUE, echo=TRUE>>=
 require(ggplot2)
 df <- cbind(conf_marss1, pred_marss1[, c(".lwr", ".upr")])
 ggplot(df, aes(x = t, y = .fitted)) +
