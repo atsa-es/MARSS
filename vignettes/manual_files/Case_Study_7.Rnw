@@ -406,12 +406,12 @@ plank.model.4$C <- matrix(list("C11", "C21", 0, 0), 4, 1)
 plank.model.4$c <- d.phos
 @
 Then we fit the model as usual:
-<<Cs27_plank-model-4, results=hide>>=
+<<Cs27_plank-model-4, results=hide, keep.source=TRUE>>=
 kem.plank.4 <- MARSS(d.plank.dat, model = plank.model.4)
 @
 Here is the $\CC$ matrix. The $\CC$ terms for the zooplankton are shown as \verb@--@ since they are not applicable (have been set to 0). Temperature and phosphorous have an estimated positive effect on phytoplankton:
-<<Cs27.5_print-C, keep.source=TRUE, echo=false>>=
-# Cleaning up the B matrix for printing
+<<Cs28_print-C, keep.source=TRUE, echo=false>>=
+# Cleaning up the C matrix for printing
 Cmat <- coef(kem.plank.4, type = "matrix")$C[1:4, 1, drop = FALSE]
 rownames(Cmat) <- c("LP", "SP", "D", "ND")
 Cmat[Cmat == 0] <- NA
@@ -517,7 +517,7 @@ Ives et al. set the observation variance for the logged fish biomass data to 0.3
 \subsection{Setting the model structure for the model with fish covariate data}
  
 First we need to add the logged fish biomass to our data matrix.
-<<Cs28_add-fish-to-data, keep.source=TRUE>>=
+<<Cs29_add-fish-to-data, keep.source=TRUE>>=
 # transpose to make time go across columns
 # drop=FALSE so that R doesn't change our matrix to a vector
 fish <- t(log(ivesDataByWeek[, "Fish biomass", drop = FALSE]))
@@ -527,7 +527,7 @@ d.plank.dat.w.fish <- rbind(d.plank.dat, d.fish)
 @
 
 Next make the $\BB$ matrix.  Some elements are estimated and others are fixed at 0.
-<<Cs29_B-covar>>=
+<<Cs30_B-covar>>=
 B <- matrix(list(0), 5, 5)
 diag(B) <- list("B11", "B22", "B33", "B44", "Bfish")
 B[1, 2] <- "B12"
@@ -540,17 +540,17 @@ print(B)
 Now we have a $\BB$ matrix that looks like that in Equation \ref{eqn:marsscovarB}.    
 
 We need to add an extra row to $\CC$ for the fish biomass row in $\xx$:
-<<Cs30_C-covar>>=
+<<Cs31_C-covar>>=
 C <- matrix(list("C11", "C21", 0, 0, 0), 5, 1)
 @
 Then we set up the $\RR$ matrix.     
-<<Cs31_R.covar>>=
+<<Cs32_R.covar>>=
 R <- matrix(list(0), 5, 5)
 diag(R) <- list(0.04, 0.04, 0.16, 0.16, 0.36)
 @
  
 Last, we need to set up the $\QQ$ matrix:
-<<Cs32_Q-covar>>=
+<<Cs33_Q-covar>>=
 Q <- matrix(list(0), 5, 5)
 Q[1:4, 1:4] <- paste(rep(1:4, times = 4), rep(1:4, each = 4), sep = "")
 Q[5, 5] <- "fish"
@@ -560,7 +560,7 @@ print(Q)
 
 \subsection{Fit the model with covariates}
 The model is the same as the previous model with updated process parameters and updated $\RR$.  We will pass in the updated data matrix with the fish biomass added:
-<<Cs33_fit-covar-model, results=hide, keep.source=TRUE>>=
+<<Cs34_fit-covar-model, results=hide, keep.source=TRUE>>=
 plank.model.5 <- plank.model.4
 plank.model.5$B <- B
 plank.model.5$C <- C
@@ -571,7 +571,7 @@ kem.plank.5 <- MARSS(d.plank.dat.w.fish, model = plank.model.5)
 
 
 This is the new $\BB$ matrix using covariates.
-<<Cs34_print-B, keep.source=TRUE, echo=FALSE>>=
+<<Cs35_print-B, keep.source=TRUE, echo=FALSE>>=
 # Cleaning up the B matrix for printing
 B.5 <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
 rownames(B.5) <- colnames(B.5) <- c("LP", "SP", "D", "ND")
@@ -608,7 +608,7 @@ print(thetable, type = "latex", file = paste(tabledir, "tableplank.tex", sep = "
 \input{tables/tableplank}
 
 NOTE! When you include your covariates in your state model (the $\xx$ part), the reported log-likelihood is for the variate plus the covariate data.  If you want just the log-likelihood for the variates, then your replace the covariate data with NAs and run the Kalman filter with your estimated model:
-<<Cs35_logLik-variates>>=
+<<Cs36_logLik-variates>>=
 tmp <- kem.plank.5
 tmp$marss$data[5, ] <- NA
 LL.variates <- MARSSkf(tmp)$logLik
@@ -656,7 +656,7 @@ You can also try using the actual fish data instead of the interpolated data.  F
 The previous sections focused on estimation of the $\BB$ and $\CC$ matrices.  The estimated $\BB$ matrix gives a picture of the species interactions, but it also can be used to compute metrics of the intrinsic community stability \citep{Ivesetal2003}.  Here we illustrate how to compute these metric; the reader should see  \citet{Ivesetal2003} for details on the meaning of each.
 
 For the examples here, we will use the estimated $\BB$ and $\QQ$ matrices from our model 5:
-<<Cs36_BQ.5>>=
+<<Cs37_BQ.5>>=
 B <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
 Q <- coef(kem.plank.5, type = "matrix")$Q[1:4, 1:4]
 @
@@ -667,11 +667,11 @@ Rate of return to the stochastic equilibrium is the rate at which the distributi
 The more rapid the convergence, the more stable the system.
 
 The rate of return of the mean of the stationary distribution is governed by the dominant eigenvalue of $\BB$.  In R, we can compute this as:
-<<Cs37_max.eigen>>=
+<<Cs38_max.eigen>>=
 max(eigen(B)$values)
 @
 The rate of return of the variance of the stationary distribution is governed by the dominant eigenvalue of $\BB \otimes \BB$:
-<<Cs38_max.eig.kron.b>>=
+<<Cs39_max.eig.kron.b>>=
 max(eigen(kronecker(B, B))$values)
 @
 
@@ -679,17 +679,17 @@ max(eigen(kronecker(B, B))$values)
 These metrics measure the variance of the stationary distribution of species abundances (with variance due to environmental drivers removed) relative to the process error variance.  The system is considered more stable when the stationary distribution variance is low relative to the process error variance.
 
 To compute variance metrics, we need to first compute the variance-covariance matrix for the stationary distribution, $\VV_\infty$:
-<<Cs39_Vinfty>>=
+<<Cs40_Vinfty>>=
 m <- nrow(B)
 vecV <- solve(diag(m * m) - kronecker(B, B)) %*% as.vector(Q)
 V_inf <- matrix(vecV, nrow = m, ncol = m)
 @
 A measure of the proportion of the ``volume'' of the stationary distribution due to species interactions is given by the square of the determinant of the $\BB$ matrix (Eqn. 24  in \citet{Ivesetal2003}):
-<<Cs40_det.b.squared>>=
+<<Cs41_det.b.squared>>=
 abs(det(B))^2
 @
 To compare stability across systems of different sizes, you scale by the number of species:
-<<Cs41_det.b.scaled>>=
+<<Cs42_det.b.scaled>>=
 abs(det(B))^(2 / nrow(B))
 @
 
@@ -698,11 +698,11 @@ Reactivity measure how the system responds to a perturbation.  A highly reactive
 with high variances in the abundance of individual species.
 
 Both metrics of reactivity of estimates of the average expected change in distance from the mean of the stationary distribution.  The first uses estimates of $\QQ$ and $\VV_\infty$.
-<<Cs42_covar.sigma.Vinf>>=
+<<Cs43_covar.sigma.Vinf>>=
 -sum(diag(Q)) / sum(diag(V_inf))
 @
 Estimation of $\QQ$ is prone to high uncertainty.  Another metric that uses only $\BB$ is the worst-case reactivity.  This is given by
-<<Cs43_worse.case.reactivity>>=
+<<Cs44_worse.case.reactivity>>=
 max(eigen(t(B) %*% B)$values) - 1
 @
 
