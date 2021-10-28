@@ -86,6 +86,7 @@ for(unittestfile in unittestfiles){
   #clean the workspace but keep objects needed for the unit test
   rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun"))])
   #set up name for log files
+  op <- par()
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
@@ -103,6 +104,7 @@ for(unittestfile in unittestfiles){
   test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testNew = mget(test.these)
   save(testNew,file=paste(tag,unittestvrs,".Rdata",sep=""))
+  par(op)
 }
 #detach the version
 detach("package:MARSS", unload=TRUE)
@@ -114,6 +116,7 @@ library(MARSS, lib.loc = lib.old)
 cat("\n\nRunning code with MARSS version", as.character(unittestvrs), "\n")
 for(unittestfile in unittestfiles){
   rm(list = ls()[!(ls()%in%c("unittestfile","unittestfiles","unittestvrs","zscore.fun","lib.new","lib.old", "MARSSresiduals.fun", "MARSSresiduals_tT.fun", "MARSSresiduals_tt1.fun"))])
+  op <- par()
   tag=strsplit(unittestfile,"/")[[1]]
   tag=tag[length(tag)]
   tag=strsplit(tag,"[.]")[[1]][1]
@@ -183,6 +186,7 @@ for(unittestfile in unittestfiles){
   test.these = ls.not.funs[!(ls.not.funs%in%c("unittestfile","unittestfiles","unittestvrs")) & !funs]
   testOld = mget(test.these)
   save(testOld,file=paste(tag,unittestvrs,".Rdata",sep=""))
+  par(op)
 }
 detach("package:MARSS", unload=TRUE)
 
@@ -300,7 +304,7 @@ for(unittestfile in unittestfiles){
             }
         }
       }
-      if(inherits(testNew[[ii]], "matrix") || inherits(testNew[[ii]], "array")){
+      if(inherits(testNew[[ii]], "matrix") || inherits(testNew[[ii]], "array") || inherits(testNew[[ii]], "data.frame")){
         if(!idfun(dim(testNew[[ii]]), dim(testOld[[ii]]))){
           cat("Warning: dims of", names(testNew)[ii], "not identical\n")
           next
@@ -310,13 +314,17 @@ for(unittestfile in unittestfiles){
         if(!idfun(rownames(testNew[[ii]]), rownames(testOld[[ii]])))
           cat("Warning: rownames of", names(testNew)[ii], "not identical\n")
       }
-      if(inherits(testNew[[ii]], "list")){
-        for(kk in 1:length(testNew[[ii]])){
+      if(inherits(testNew[[ii]], "list") || inherits(testNew[[ii]], "marssPredict")){
+        for(kk in names(testNew[[ii]])){
+          if(!(kk %in% names(testOld[[ii]]))){
+            cat("Warning: ", kk, "not in", "testOld$", names(testNew)[ii], "\n")
+            next
+            }
           if(inherits(testNew[[ii]][[kk]], "marssMLE")){
             for(iii in names(testNew[[ii]][[kk]][["par"]])){
               if(iii %in% c("G","H","L")) next
               if(!idfun(testNew[[ii]][[kk]][["par"]][iii], testOld[[ii]][[kk]][["par"]][iii])){
-                cat("Warning:", names(testNew)[[ii]][kk],"par",iii,"not identical\n")
+                cat("Warning:", kk, "par",iii,"not identical\n")
               }else{
                 #cat(names(testNew)[ii],"par",iii,"idfun\n")
               }
@@ -330,21 +338,21 @@ for(unittestfile in unittestfiles){
             }
             for(iii in names(testNew[[ii]][[kk]])){
               if(!idfun(testNew[[ii]][[kk]][iii], testOld[[ii]][[kk]][iii])){
-                cat("Warning:", names(testNew)[[ii]][kk],iii,"not identical\n")
+                cat("Warning:", kk, iii,"not identical\n")
               }else{
                 #cat(names(testNew)[ii],iii,"idfun\n")
               }
             }
           }
-          if(inherits(testNew[[ii]][[kk]], "matrix") || inherits(testNew[[ii]][[kk]], "array")){
+          if(inherits(testNew[[ii]][[kk]], "matrix") || inherits(testNew[[ii]][[kk]], "array") || inherits(testNew[[ii]][[kk]], "data.frame")){
             if(!idfun(dim(testNew[[ii]][[kk]]), dim(testOld[[ii]][[kk]]))){
-              cat("Warning: dims of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: dims of", names(testNew)[ii], "$", kk, "not identical\n")
               next
             }
             if(!idfun(testNew[[ii]][[kk]], testOld[[ii]][[kk]]))
-              cat("Warning: values in", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: values in", names(testNew)[ii], "$", kk, "not identical\n")
             if(!idfun(rownames(testNew[[ii]][[kk]]), rownames(testOld[[ii]][[kk]])))
-              cat("Warning: rownames of", names(testNew)[ii], "$", names(testNew[[ii]])[kk], "not identical\n")
+              cat("Warning: rownames of", names(testNew)[ii], "$", kk, "not identical\n")
             
           }
         }
