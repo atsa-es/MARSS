@@ -1,8 +1,16 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/MLR-, eps=FALSE, split=TRUE}
-<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+\chapter{Multivariate linear regression}
+\label{chap:mlr}
+\chaptermark{Multivariate linear regression}
+
+<<RUNFIRST, echo=FALSE>>=
 tabledir <- "figures/"
 options(prompt = " ", continue = " ", width = 60)
 @
+\index{multivariate linear regression}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_MLR.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
 
 <<Cs_000_required_libraries, echo=FALSE>>=
 library(MARSS)
@@ -13,12 +21,6 @@ library(stringr)
 library(lme4)
 @
 
-\chapter{Multivariate linear regression}
-\label{chap:mlr}
-\chaptermark{Multivariate linear regression}
-\index{multivariate linear regression}
-%Add footnote with instructions for getting code
-\blfootnote{Type \texttt{RShowDoc("Chapter\_MLR.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the \verb@MARSS()@ function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
 
