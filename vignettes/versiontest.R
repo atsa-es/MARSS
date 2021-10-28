@@ -13,9 +13,24 @@
 # Source the code.
 # IMPORTANT: Using 'build and reload' from RStudio builds the package into the local
 # library but does not install the doc folder (which is needed for this test)
-# Use Install from zip and install from a .tar.gz file instead
-# cd to folder with the source code (e.g. GitHub)
-# R CMD build MARSS (build the tar.gz file)
+# Use Install from zip and install from a .tar.gz file instead.
+# Do not use devtools::build(); it trashes the inst/doc folder
+# Note if on Mac may need to update latex packages
+# tlmgr install collection-fontsrecommended
+
+# To build the tar.gz file. Open a terminal window.
+# cd ~/Documents/GitHub
+# rm MARSS_3.11.4.tar.gz
+# R CMD build MARSS # takes a long time since the vignettes are built
+# rm -r ~/Dropbox/MARSS
+# rm ~/Dropbox/MARSS_3.11.4.tar.gz
+# cp MARSS_3.11.4.tar.gz ~/Dropbox/MARSS_3.11.4.tar.gz
+# cd ~/Dropbox
+# tar -xvzf MARSS_3.11.4.tar.gz
+# rm ~/Dropbox/MARSS/vignettes/Makefile
+# R CMD build --no-build-vignettes MARSS
+# rm -r ~/Dropbox/MARSS.Rcheck
+# R CMD check --timings --as-cran MARSS_3.11.4.tar.gz
 
 # ###########################################
 
@@ -32,7 +47,7 @@ lib.old <- Sys.getenv("R_LIBS_USER")
 # to install MARSS to correct locations if needed
 # install.packages("MARSS", lib.old) #install from CRAN
 # Mac: install.packages("~/Dropbox/MARSS_3.11.1.tar.gz", lib=lib.old, repos=NULL)
-# Mac: install.packages("~/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
+# Mac: install.packages("~/Dropbox/MARSS_3.11.4.tar.gz", lib=lib.new, repos=NULL)
 # Win: install.packages("C:/Users/Eli.Holmes/Dropbox/MARSS_3.11.2.tar.gz", lib=lib.new, repos=NULL)
 
 #make sure MARSS isn't loaded
