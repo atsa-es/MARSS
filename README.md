@@ -26,7 +26,7 @@
 <ul class="nav">
   <li><a href="#install">Install</a></li>
   <li><a href="#documentation">Documentation</a></li>
-  <li><a href="#bugs">Issues</a></li>
+  <li><a href="https://github.com/nwfsc-timeseries/MARSS/issues">Issues</a></li>
   <li><a href="#cite">Citation</a></li>
   <li><a href="#pubs">Publications</a></li>
   <li><a href="#license">License</a></li>
