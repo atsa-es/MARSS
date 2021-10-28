@@ -109,7 +109,9 @@ MARSS.dfa <- function(MARSS.call) {
     diffuse = c(TRUE, FALSE),
     m = 1:n,
     # This line says what is allowed to be a matrix
-    matrices = c("A", "R", "D", "x0", "V0", "Q", "B")
+    # Z matrix needs to be allowed here because a Z matrix is computed from
+    # the m passed in by user
+    matrices = c("Z", "A", "R", "D", "x0", "V0", "Q", "B")
   )
  
   ## Set-up model defaults
