@@ -13,7 +13,7 @@ library(quantmod)
 
 # getSymbols('GDPC1',src='FRED')
 # getSymbols('PAYEMS',from = "1947-01-01",src='FRED')
-load("GDP.Rdata")
+load("GDP.RData")
 
 GDP <- data.frame(date = index(GDPC1), coredata(GDPC1))
 Emp <- data.frame(date = index(PAYEMS), coredata(PAYEMS))
@@ -127,11 +127,11 @@ test_that("GDF example for numerical stabilty", {
 })
 
 test_that("GDF example for numerical stabilty", {
-  expect_true(kf_ss$convergence == 54)
+  expect_true(kf_ss$convergence == 0)
 })
 
 test_that("GDF example for numerical stabilty", {
-  expect_true(all.equal(kf_ss$logLik, -86.3201321))
+  expect_true(all.equal(kf_ss$logLik, -1614.4923772))
 })
 
 model.gen <- list(Z = Z, A = A, R = R, B = B, U = U, Q = Q, x0 = x0, V0 = V0, tinitx = 1)
@@ -142,11 +142,11 @@ test_that("GDF example for numerical stabilty", {
 })
 
 test_that("GDF example for numerical stabilty", {
-  expect_true(kf_ss$convergence == 54)
+  expect_true(kf_ss$convergence == 0)
 })
 
 test_that("GDF example for numerical stabilty", {
-  expect_true(all.equal(kf_ss$logLik, -991.2024293))
+  expect_true(all.equal(kf_ss$logLik, -1553.064905))
 })
 
 # THIS One should work; scaling is different
