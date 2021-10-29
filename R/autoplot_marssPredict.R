@@ -106,7 +106,7 @@ autoplot.marssPredict <-
       }
       if(!is.null(note)){
         p1 <- p1 + 
-          ggplot2::labs(caption = paste0(strwrap(note, width=dev.size(units = "px")[1]/6), collapse = "\n")) + 
+          ggplot2::labs(caption = paste0(strwrap(note, width=grDevices::dev.size(units = "px")[1]/6), collapse = "\n")) + 
   ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       
@@ -166,7 +166,7 @@ autoplot.marssPredict <-
         tmp <- tmp[tmp != "t"]
         note <- paste("Forecast used newdata in the forecast period:", paste0(tmp, collapse=", "))
       p1 <- p1 + 
-        ggplot2::labs(caption = paste0(strwrap(note, width=dev.size(units = "px")[1]/6), collapse = "\n")) + 
+        ggplot2::labs(caption = paste0(strwrap(note, width=grDevices::dev.size(units = "px")[1]/6), collapse = "\n")) + 
         ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       
