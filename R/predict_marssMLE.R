@@ -30,6 +30,8 @@ predict.marssMLE <- function(object, n.ahead = 0,
   if (identical(object[["convergence"]], 54)) {
     stop("predict.marssMLE: MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", call. = FALSE)
   }
+  if (interval == "none" && !missing(level))
+    message("interval = none thus level argument was ignored.")
   if (interval == "none") level <- c()
   if (length(level) > 0 && (!is.numeric(level) || any(level > 1) || any(level < 0))) {
     stop("predict.marssMLE: level must be between 0 and 1.", call. = FALSE)
@@ -52,7 +54,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
     inherits(x0, "matrix"))) {
     stop("predict.marssMLE: x0 must be 'reestimate', 'use.model' or a new x0 matrix to use as the x0 value.", call. = FALSE)
   }
-  dimx0 <- attr(object$model, "model.dims")$x0[1:2]
+  dimx0 <- as.integer(attr(object$model, "model.dims")$x0[1:2])
   if (inherits(x0, "matrix") && !identical(dim(x0), dimx0)) {
     stop(paste0("predict.marssMLE: if x0 is a matrix, it must be the same dimensions as the model x0 (", dimx0[1], " x ", dimx0[2], ")."), call. = FALSE)
   }
@@ -276,7 +278,12 @@ predict.marssMLE <- function(object, n.ahead = 0,
 
 
   # set t in ret with t in newdata
-  if (!isnullnewdata) ret$t <- rep(newdata[["t"]], nx)
+  if (!isnullnewdata){
+    out.t <- newdata[["t"]]
+    ret$t <- rep(newdata[["t"]], nx)
+  }else{
+    out.t <- ret$t[1:(TT+n.ahead)]
+  }
 
   # Set up output
   outlist <- list(
@@ -286,7 +293,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
     level = 100 * level,
     type = type,
     pred = ret,
-    t = ret$t[1:(TT+n.ahead)],
+    t = out.t,
     ft = NULL,
     h = n.ahead,
     n.ahead = n.ahead,
