@@ -1,5 +1,5 @@
 autoplot.marssPredict <-
-  function(x, include, pi.int = TRUE, decorate = TRUE,
+  function(x, include, decorate = TRUE,
            plot.par = list(), ...) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       stop("ggplot2 is needed for this function to work. Install it via install.packages(\"ggplot2\")",
@@ -9,6 +9,10 @@ autoplot.marssPredict <-
     if (!inherits(x, "marssPredict")) {
       stop("autoplot.marssPredict requires a marssPredict object.", call. = FALSE)
     }
+    if(!is.logical(decorate)){
+      stop("autoplot.marssPredict: decorate must be TRUE/FALSE.", call. = FALSE)
+    }
+    pi.int <- ifelse(decorate, TRUE, FALSE)
     plotpar <- list(
       point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1,
       line.col = "black", line.size = 1, line.type = "solid",
@@ -61,7 +65,7 @@ autoplot.marssPredict <-
     }
 
     if (h == 0) {
-      df <- subset(x$pred, x$t > nx - include + 1)
+      df <- subset(x$pred, x$pred$t >= nx - include + 1)
       df$.rownames <- factor(df$.rownames, levels=unique(df$.rownames))
       # Set up the plot
       plottitle <- paste(ifelse(substr(x$type, 1, 1)=="x", "State", "Data"), x$type, "Predictions")
@@ -91,13 +95,28 @@ autoplot.marssPredict <-
           na.rm = TRUE
         )
       }
+      note <- NULL
+      if(!all(unlist(lapply(x$newdata, is.null)))){
+        tmp <- names(x$newdata)[!unlist(lapply(x$newdata, function(x){ all(is.na(x))}))]
+        tmp <- tmp[tmp != "t"]
+        note <- paste0("Prediction used newdata: ", paste0(tmp, collapse=", "), ". ")
+      }
+      if(substr(x$type, 1, 1)=="x"){
+        note <- paste(note, "State (x) prediction is the expected value of x(t) conditioned on x(t-1) where x(t-1) is computed conditioned on all the data (xtT) or data up to t-1 (xtt1). This type of state prediction is not commonly used. If you are looking for the estimated states (with CIs), then use autoplot(fit, plot.type='xtT').")
+      }
+      if(!is.null(note)){
+        p1 <- p1 + 
+          ggplot2::labs(caption = paste0(strwrap(note, width=dev.size(units = "px")[1]/6), collapse = "\n")) + 
+  ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
+      }
+      
       return(p1)
     }
     if (h != 0) {
       df <- subset(x$pred, x$t >= nx - include + 1)
       df$.rownames <- factor(df$.rownames, levels=unique(df$.rownames))
       # set up the plot
-      plottitle <- paste(ifelse(substr(x$type, 1, 1)== "x", "State", "Data"), x$type, "Predictions")
+      plottitle <- paste(ifelse(substr(x$type, 1, 1)== "x", "State", "Data"), x$type, "Forecasts")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~estimate)) + plotpar[["theme"]]
       if (pi.int) {
         for (i in length(lev):1) {
@@ -112,7 +131,9 @@ autoplot.marssPredict <-
               alpha = plotpar$ci.alpha, fill = plotpar$ci.fill[i], na.rm = TRUE
             )
         }
-        plottitle <- paste(plottitle, switch(x$interval.type, none="", confidence="+ CI", prediction = "+ PI"))
+        plottitle <- paste(plottitle, switch(x$interval.type, none="", 
+                                             confidence = paste0("+ ", paste0(lev, collapse=", "), "% CI"), 
+                                             prediction = paste0("+ ", paste0(lev, collapse=", "), "% PI")))
       }
       # make the estimate line
       tmp <- df
@@ -130,6 +151,7 @@ autoplot.marssPredict <-
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~ df$.rownames, scale = "free_y") +
         ggplot2::ggtitle(plottitle)
+      
       # Add the data points
       if (substr(x$type, 1, 1) == "y" && decorate) {
         p1 <- p1 + ggplot2::geom_point(
@@ -138,6 +160,16 @@ autoplot.marssPredict <-
           col = plotpar$point.col, size = plotpar$point.size, na.rm = TRUE
         )
       }
+      
+      if(!all(unlist(lapply(x$newdata, is.null)))){
+        tmp <- names(x$newdata)[!unlist(lapply(x$newdata, function(x){ all(is.na(x))}))]
+        tmp <- tmp[tmp != "t"]
+        note <- paste("Forecast used newdata in the forecast period:", paste0(tmp, collapse=", "))
+      p1 <- p1 + 
+        ggplot2::labs(caption = paste0(strwrap(note, width=dev.size(units = "px")[1]/6), collapse = "\n")) + 
+        ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
+      }
+      
       
       return(p1)
     }
