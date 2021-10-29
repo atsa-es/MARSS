@@ -169,13 +169,13 @@ MARSS <- function(y,
       kftest <- try(MARSSkf(MLEobj.test), silent = TRUE)
       if (inherits(kftest, "try-error")) {
         cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter/smoother (KF) from running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output. You could try trace=-1 to bypass the initial KF check if you are using method='BFGS' and know the logLik function will run.\n")
-        MLEobj$convergence <- 2
+        MLEobj.test$convergence <- 2
         return(MLEobj.test)
       }
       if (!kftest$ok) {
         cat(kftest$msg)
         cat(paste("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter or smoother running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output.\n", kftest$errors, "\n", sep = ""))
-        MLEobj$convergence <- 2
+        MLEobj.test$convergence <- 2
         return(MLEobj.test)
       }
       MLEobj.test$kf <- kftest
