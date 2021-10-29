@@ -5,7 +5,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   # load needed package globals
   kem.methods <- get("kem.methods", envir = pkg_globals)
   optim.methods <- get("optim.methods", envir = pkg_globals)
-  
+
   # Check that x has a marssMODEL object
   if (!inherits(x$model, "marssMODEL")) {
     cat("\nThe model element of your marssMLE object is not class marssMODEL.\n")
@@ -20,13 +20,15 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
     cat("Type MARSSinfo(\"modelclass\") for help.\n")
     return()
   }
-  
-  #### Error-checking that 'what' can be printed  
-  
+
+  #### Error-checking that 'what' can be printed
+
   # No output for these if model was not fit
   what.vals <- c("fit", "start", "inits", "par", "logLik", "paramvector", "par.se", "par.bias", "par.upCI", "par.lowCI", "xtT", "states", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis", names(x$model$fixed))
-  if( is.null(x$par) && any(what %in% what.vals)){
-    if( silent ) return()
+  if (is.null(x$par) && any(what %in% what.vals)) {
+    if (silent) {
+      return()
+    }
     cat("marssMLE object $par element is NULL.  Parameters have not been estimated.\n")
     if (x$convergence == 2) {
       cat("ERROR: marssMLE object is inconsistent or incomplete.\n No model was fit.\n marssMLE object $convergence arg = 2\n")
@@ -45,19 +47,19 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
     }
     return()
   }
-  
+
   # No params estimated
   what.vals <- c("paramvector", "start", "inits", "par.se", "par.bias", "par.upCI", "par.lowCI")
-  if ( any(what %in% what.vals) && all(unlist(lapply(x$model$free, is.fixed)))) {
-    if( !silent ) cat("No estimated parameters so no paramvector, parameters CIs or standard errors.\n")
+  if (any(what %in% what.vals) && all(unlist(lapply(x$model$free, is.fixed)))) {
+    if (!silent) cat("No estimated parameters so no paramvector, parameters CIs or standard errors.\n")
     return()
   }
-  
+
   # Set up error message
   conv54msg <- "No parameter CIs with Hessian, Kalman filter/smoother output or residuals calculations possible because MARSSkf (the Kalman filter/smoother) returns an error with the fitted model. Try MARSSinfo('optimerror54') for insight.\n"
   what.vals <- c("par.se", "par.bias", "par.upCI", "par.lowCI", "xtT", "states", "ytT", "states.se", "model.residuals", "state.residuals", "kfs", "Ey", "states.cis")
-  if ( any(what %in% what.vals) && identical(x$convergence, 54)) {
-    if ( !silent ) cat(conv54msg)
+  if (any(what %in% what.vals) && identical(x$convergence, 54)) {
+    if (!silent) cat(conv54msg)
     return()
   }
   ##### End error-checking on 'what'
@@ -66,7 +68,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   return.obj <- list()
   what.to.print <- what
   orig.x <- x
-  
+
   ## Run the print_form function to put x$par in the correct form
   if (is.null(form)) { # allow user to print using a different form than x$model form
     form <- attr(x[["model"]], "form")
@@ -80,10 +82,14 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
   } else {
     x <- print_null(x)
   } # if print_form is missing use print_marss
-  
+
   if (identical(what.to.print, "fit")) {
-    if (silent) return(orig.x) else invisible(orig.x)
-    
+    if (silent) {
+      return(orig.x)
+    } else {
+      invisible(orig.x)
+    }
+
     ## all parameters were fixed; don't use convergence since this won't catch fixed and conv=54
     if (all(unlist(lapply(x$model$free, is.fixed)))) {
       cat("\nAll parameters were fixed so none estimated.\n")
@@ -93,9 +99,10 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
       if (!is.null(x[["AICbb"]])) cat("AICbb(innov):", x$AICbb, "  ")
       if (!is.null(x[["AICbp"]])) cat("AICbp(param):", x$AICbp, "  ")
       cat("\n \n")
-      if( identical(x$convergence, 54) )
+      if (identical(x$convergence, 54)) {
         cat("WARNING: MARSSkf (the Kalman filter/smoother) returned an error with the model. No states estimates.\n")
-      
+      }
+
       invisible(orig.x)
     } else {
       cat("\nMARSS fit is\n")
@@ -173,17 +180,17 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
       if (!is.null(x[["AICbb"]])) cat("AICbb(innov):", x$AICbb, "  ")
       if (!is.null(x[["AICbp"]])) cat("AICbp(param):", x$AICbp, "  ")
       cat("\n \n")
-      
+
       # set up the paramvector
       paramvector <- coef(orig.x, type = "vector")
-      
+
       cmat <- as.matrix(paramvector)
       colnames(cmat) <- "Estimate"
       if (!is.null(x[["par.se"]])) {
         cmat <- cbind(cmat, coef(orig.x, type = "vector", what = "par.se"))
         colnames(cmat) <- c("ML.Est", "Std.Err")
       }
-      
+
       if (!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])) {
         cmat <- cbind(cmat, coef(orig.x, type = "vector", what = "par.lowCI"))
         colnames(cmat)[dim(cmat)[2]] <- "low.CI"
@@ -204,7 +211,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
       } else {
         cat("Initial states (x0) defined at t=0\n")
       }
-      
+
       cat("\n")
       if (is.null(x[["par.se"]])) cat("Standard errors have not been calculated. \n")
       if (!is.null(x[["par.lowCI"]]) & !is.null(x[["par.upCI"]])) {
@@ -218,7 +225,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
       if (!is.null(x[["par.bias"]])) {
         cat(paste("Bias calculated via", x$par.CI.method, "bootstrapping with", x$par.CI.nboot, "bootstraps. \n"))
       }
-      
+
       if (!is.null(x[["errors"]])) {
         if (length(x$errors) > 10) {
           cat(x$errors[1])
@@ -232,13 +239,13 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
     cat("\n")
     invisible(orig.x)
   } else { # what!=fit
-    
+
     for (what in what.to.print) {
       if (what == "fit") return.obj[[what]] <- orig.x
       if (what == "model") {
         # note at beginning of this function x$model was replaced with the model
         # in call$form form
-        if (! silent ) print.marssMODEL(x$model)
+        if (!silent) print.marssMODEL(x$model)
         return.obj[[what]] <- x$model
       }
       if (what == "par") {
@@ -291,10 +298,10 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         return.obj[[what]] <- orig.x$states
       }
       if (what == "data") {
-        if (!silent){
+        if (!silent) {
           model.tsp <- attr(orig.x$model$data, "model.tsp")
           attr(orig.x$model$data, "model.tsp") <- NULL
-          print(ts(t(orig.x$model$data), start=model.tsp[1], frequency = model.tsp[3]))
+          print(ts(t(orig.x$model$data), start = model.tsp[1], frequency = model.tsp[3]))
         }
         return.obj[[what]] <- orig.x$model$data
       }
@@ -340,10 +347,12 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
       if (what == "kfs") {
         kf <- MARSSkf(orig.x)
         if (x$fun.kf == "MARSSkfas") {
-          tmp <- MARSSkfss(orig.x) # MARSSkfas doesn't return Innov or Sigma
-          # will be NULL if kfss failed
-          kf$Innov <- tmp$Innov
-          kf$Sigma <- tmp$Sigma
+          tmp <- try(MARSSkfss(orig.x), silent = TRUE) # MARSSkfas doesn't return Innov or Sigma
+          if (!inherits(tmp, "try-error")) {
+            # will be NULL if kfss failed
+            kf$Innov <- tmp$Innov
+            kf$Sigma <- tmp$Sigma
+          }
         }
         if (!silent) {
           cat("Kalman filter and smoother output is verbose.  Assign print output and look at assigned object.\n")
@@ -352,7 +361,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         return.obj[[what]] <- kf
       }
       if (what == "Ey") {
-        Ey <- MARSShatyt(orig.x) 
+        Ey <- MARSShatyt(orig.x)
         if (!silent) {
           cat("Expectations involving y conditioned on all the data.  See ?MARSShatyt. \n Output is verbose.  Assign print output and look at assigned object.\n")
           cat("\n")
@@ -390,7 +399,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         }
         return.obj[[what]] <- the.par
       }
-      if (what %in% names(x$model) && !(what=="data")) {
+      if (what %in% names(x$model) && !(what == "data")) {
         if (!silent) {
           cat(paste("Model list element ", what, "\n", sep = ""))
           print(x$model[[what]])
