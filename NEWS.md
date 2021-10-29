@@ -16,6 +16,7 @@ This update is focused on improving the plotting functions for marssMLE, marssRe
 * Added a variety of new plots to `autoplot.marssMLE` and `plot.marssMLE`: all types of residuals with all possible standardizations versus time, plus ACF and QQPlots for the same, and all possible fitted y and x plots. Cleaned-up the plots in various ways (e.g. missing CIs). Added notes (that can be turned off) to the bottom of the `autoplot` plots to explain what the plot is and guide the user to the more standard plots.
 * Revamped residuals plots made by `autoplot.marssMLE()` and `plot.marssMLE()` to allow a full range of residuals plots but to only show a subset for a specific set of residuals diagnostics plots by default.
 * Created `autoplot.marssResiduals()` and `plot.marssResiduals()` for `marssResiduals` objects. Simplifies standard residuals plots. This needs to be separate from `plot.marssMLE()` (i.e. cannot be called from `plot.marssMLE`) since it is designed to plot whatever happens to be in the `marssResiduals` object passed to `plot.marssResiduals()`. `plot.marssMLE()` runs `residuals()` to create a specific set of residuals diagnostics plots.
+* Improved `autoplot.marssPredict()` with better titles and notes below the plots. Removed `pi.int` as an argument for `autoplot.marssPredict()` and `plot.marssPredict()` as this was extraneous. The PI/CI info is pulled in from the `marssPredict` object.
 * Added utility function `match.arg.exact()` which does exact argument matching. The base R `match.arg()` uses `pmatch()` and does partial matching. This is a problem for many functions where `"xtt1"` is different than `"xtt"`. This function implements exact matching.
 * Added row and column names to the output from `coef.marssMLE()` when `type="matrix"`.
 * Added more text to help file for `MARSSresiduals()` to explain variance and correlation for standardized residuals.
@@ -25,12 +26,13 @@ This update is focused on improving the plotting functions for marssMLE, marssRe
 
 ## BUGS
 
-* `plot.predictMARSS()` was not showing the forecasts.
+* `plot.predictMARSS()` was not showing the forecasts and the state predictions when `h=0` was garbling the CIs and PIs when a short `newdata` was passed in (short = shorter than original data).
 * `autoplot.marssPredict()` was not using the time info from ts object, so x-axis was showing 1, 2, 3 etc instead of the years, for example.
 * `MARSS.dfa()` used if `form="dfa"` allowed Z to be passed in. This form is a helper function that forms a default DFA model with a user specified number of trends (m). If the user needs a custom Z, they should not use `form="dfa"` but use the default `MARSS()` (`form="marxss"`). `MARSS.dfa()` was changed to not allow Z to be passed into the model argument.
 * `coef.marssMLE()` was not properly showing a time-varying A or U when `type="matrix"`, `form="marss"` and D or C estimated.
 * `plot.marssMLE()` was not resetting `par()` when done thus affecting users plot environment.
 * `residuals.marssMLE()` value column for states was wrong when there were more than one state because `c($.x[2:TT], NA)` was used. Changed to not offsetting either `.x` or `.fitted` columns and instead added clarification to the documentation for `residuals.marssMLE()`. The `value` column was used for examples in help file for `residuals.marssMLE()` and for the coefficient of determination reported by `glance.marssMLE()`.
+* `MARSS()` was not setting convergence to an error code when Kalman filter function throws and error before model is fit.
 
 ## DOCUMENTATION
 
