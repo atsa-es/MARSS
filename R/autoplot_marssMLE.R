@@ -584,8 +584,12 @@ autoplot.marssMLE <-
     }
 
     for (i in names(plts)) {
-      print(plts[[i]])
-      if (!silent) cat(paste("plot.type =", i, "\n"))
+      if(inherits(try(print(plts[[i]]), silent=TRUE), "try-error")){
+        if (!silent) cat(paste("plot.type =", i, "returned an error.\n"))
+      }else{
+        if (!silent) cat(paste("plot.type =", i, "\n"))
+        print(plts[[i]])
+      }
       if (i != plot.type[length(plot.type)] && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
