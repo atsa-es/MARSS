@@ -326,9 +326,6 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle(title.val)
-      if (decorate) {
-        p1 <- p1 + ggplot2::stat_smooth(formula = y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
-      }
       if (conf.int) {
         if (grepl("std", i)) {
           df$sigma <- 1
@@ -342,16 +339,17 @@ autoplot.marssMLE <-
           ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
       }
       if (fig.notes) {
+        conf.note <- paste0(" and ", round(conf.level*100, digits=0),"% of residuals should fall within the CIs.")
         if (grepl("std", i)) {
           cstan2 <- ifelse(cstan == "marginal", "Marginal", cstan)
           if (i == "std.model.resids.ytt1") note <- paste(cstan2, "standardized innovations residuals. Use standardized model smoothation (ytT) residuals (std.model.resids.ytT) for outlier detection.")
           if (i == "std.model.resids.ytt") note <- paste(cstan2, "standardized ytt residuals. Use standardized model smoothation (ytT) residuals (std.model.resids.ytT) for outlier detection.")
-          if (i == "std.model.resids.ytT" & cstan == "Cholesky") note <- paste(cstan2, "standardized model smoothation (ytT) residuals. Residuals outside the +/- 2 limits are potential outliers.")
-          if (i == "std.model.resids.ytT" & cstan != "Cholesky") note <- paste(cstan2, "standardized model smoothation (ytT) residuals. Use Cholesky standardized residuals for outlier detection.")
+          if (i == "std.model.resids.ytT" & cstan == "Cholesky") note <- paste(cstan2, "standardized model smoothation (ytT) residuals. These residuals should not have a temporal trend. Residuals outside the +/- 2 limits are potential outliers.")
+          if (i == "std.model.resids.ytT" & cstan != "Cholesky") note <- paste(cstan2, "standardized model smoothation (ytT) residuals. These residuals should not have a temporal trend. Use Cholesky standardized residuals for outlier detection.")
         } else {
-          if (i == "model.resids.ytt1") note <- paste("Innovations (one-step ahead) residuals.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates problems with the normality assumption.", ""))
+          if (i == "model.resids.ytt1") note <- paste0("Innovations (one-step ahead) residuals.", "These residuals should not have a temporal trend", ifelse(conf.int, conf.note,"."), " A violation of this indicates that the model cannot fit the data.")
           if (i == "model.resids.ytt") note <- "Model residuals conditioned on data up to t. These are not typically used. See model.resids.ytt1 and std.model.resids.ytT for more standard residuals diagnostics."
-          if (i == "model.resids.ytT") note <- paste("Model smoothation (ytT) residuals (y - E[y|all data]). Note, Cholesky standardized model smoothation residuals are the more typical outlier diagnostic.", ifelse(conf.int, "(1-alpha) fraction of residuals should fall within the CIs. A violation of this indicates potential outliers.", ""))
+          if (i == "model.resids.ytT") note <- paste0("Model smoothation (ytT) residuals (y - E[y|all data]). These residuals should not have a temporal trend", ifelse(conf.int, conf.note, "."), " A violation of this indicates that the model cannot fit the data. Note, Cholesky standardized model smoothation residuals are the more typical outlier diagnostic.")
         }
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
@@ -392,9 +390,6 @@ autoplot.marssMLE <-
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_hline(ggplot2::aes(yintercept = 0), linetype = 3) +
         ggplot2::ggtitle(title.val)
-      if (decorate) {
-        p1 <- p1 + ggplot2::stat_smooth(formula = y ~ x, method = "loess", se = FALSE, na.rm = TRUE)
-      }
       if (conf.int) {
         if (grepl("std", i)) {
           df$sigma <- 1
@@ -487,7 +482,8 @@ autoplot.marssMLE <-
             ytt = "ytt ",
             ytT = "smoothation (ytT) "
           ),
-          "residuals. The residuals should be Gaussian."
+          "residuals. The residuals should be Gaussian. ",
+        ifelse(ctype=="xtT", "Note if the data have many missing values, the state residuals will not be Gaussian. In that case, manually remove the states residuals associated with missing data and redo the QQ plot.", "")  
         )
         note <- str_to_sentence(note, ignore = c("Cholesky", "Gaussian", "Block.Cholesky", "(ytT)", "(xtT)"))
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))

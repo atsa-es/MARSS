@@ -254,11 +254,6 @@ plot.marssMLE <-
             polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border, lwd = plotpar$ci.lwd, lty = plotpar$ci.lty)
             points(t, .resids, col = plotpar$point.col, pch = plotpar$point.pch, cex = plotpar$point.size)
           }
-          if (decorate) {
-            lo <- predict(loess(.resids ~ t), newdata = data.frame(t = t), se = TRUE)
-            lo.t <- names(lo$fit)
-            lines(t, lo$fit, col = plotpar$line.col, lwd = plotpar$line.lwd)
-          }
           title(plt)
           box()
           abline(h = 0, lty = 3)
