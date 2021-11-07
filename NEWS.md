@@ -23,6 +23,7 @@ This update is focused on improving the plotting functions for marssMLE, marssRe
 * Added `var.ytt1` and `var.Eytt1` to the output from `MARSShatyt()` when `only.kem=FALSE`. This is for convenience for the plot functions.
 * Added `str_to_sentence` utility function for the notes in `autoplot.marssMLE()` plots.
 * Added `interval.type` to the marssPredict objects otherwise the type of interval in the object (prediction or confidence) cannot be known.
+* Removed the loess lines from the residuals plots.
 
 ## BUGS
 
