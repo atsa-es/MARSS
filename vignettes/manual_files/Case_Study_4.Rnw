@@ -914,7 +914,7 @@ for (i in 1:length(spp)) {
 
 \section{Discussion}
 We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the R code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code.  Copy and paste the code into a new file, and then you can edit that code.
-DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
+DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see Chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
 
 %---------
 % THE END

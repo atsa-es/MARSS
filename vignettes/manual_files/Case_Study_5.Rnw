@@ -303,7 +303,7 @@ If you have real tag data to analyze, you should use a state-space modeling pack
 \item[KFTRACK] https://github.com/positioning/kalmanfilter/wiki/Articlekftrack
 \end{description}
 
-\texttt{kftrack}\index{animal tracking!kftrack} is a full-featured toolbox for analyzing tag data with extended Kalman filtering.  It incorporates a number of extensions that are important for analyzing track data: barriers to movement such as coastlines and non-Gaussian movement distributions.  With \texttt{kftrack}, you can use the real tag data which has big gaps, i.e. days with no location.  \texttt{MARSS()} will struggle with these data because it will estimate states for all the unseen days; \texttt{kftrack} only fits to the seen days.  
+\texttt{kftrack}\index{animal tracking!kftrack} is a full-featured toolbox for analyzing tag data with extended Kalman filtering.  It incorporates a number of extensions that are important for analyzing track data: barriers to movement such as coastlines and non-Gaussian movement distributions.  With \texttt{kftrack}, you can use the real tag data which has big gaps, i.e., days with no location.  \texttt{MARSS()} will struggle with these data because it will estimate states for all the unseen days; \texttt{kftrack} only fits to the seen days.  
 
 To use \texttt{kftrack} to fit the turtle data, type
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

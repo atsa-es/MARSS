@@ -89,7 +89,7 @@ x_t = x_{t-1} + u + w_t, \textrm{ where } w_t \sim \N(0,q)
 $x_t=\log{n_t}$. When there is one effective population, there is one $x$, therefore $\xx_t$ is a $1 \times 1$ matrix.  There is one population growth rate ($u$) and there is one process variance ($q$).  Thus $\uu$ and $\QQ$ are $1 \times 1$ matrices.   
 
 \subsection{The observation process}
-We assume that all five regional time series are observations of this one population trajectory but they are scaled up or down relative to that trajectory.   In effect, we think that animals are moving around a lot and our regional samples are some fraction of the population.  There is year-to-year variation in the fraction in each region, just by chance.  Notice that under this analysis, we do not think the regions represent independent subpopulations but rather independent observations of one population.
+We assume that all five regional time series are observations of this one population trajectory but they are scaled up or down relative to that trajectory.   In effect, we think that animals are moving around and our regional samples are some fraction of the population.  There is year-to-year variation in the fraction in each region, just by chance.  Notice that under this analysis, we do not think the regions represent independent subpopulations but rather independent observations of one population.
 Our model for the data, $\yy_t = \ZZ \xx_t + \aa + \vv_t$, is written as:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
@@ -147,7 +147,7 @@ We have specified the mathematical form of our state-space model. The next step 
 <<funccallwithconstraints, eval=FALSE>>=
 kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
 @
-The \verb@model@ list argument tells the \texttt{MARSS()} function the model structure, i.e. the form of  $\ZZ$, $\uu$, $\QQ$, etc.  For our first analysis, we only need to set the model structure for $\ZZ$ and $\RR$.  Since there is only one population, there is only one $\uu$ and $\QQ$ (they are scalars), so they have no 'structure'.
+The \verb@model@ list argument tells the \texttt{MARSS()} function the model structure, i.e., the form of  $\ZZ$, $\uu$, $\QQ$, etc.  For our first analysis, we only need to set the model structure for $\ZZ$ and $\RR$.  Since there is only one population, there is only one $\uu$ and $\QQ$ (they are scalars), so they have no 'structure'.
 
 First we specify the $\ZZ$ matrix.  We need to tell the \texttt{MARSS} function that $\ZZ$ is a $5 \times 1$ matrix of 1s (as in Equation \ref{eq:meas}).  We can do this two ways. We can pass in \verb@Z.model@ as a matrix of ones, \verb@matrix(1,5,1)@, just like in  Equation \eqref{eq:meas} or we can pass in a vector of five factors,  \verb@factor(c(1,1,1,1,1))@. The $i$-th factor specifies which population trajectory the $i$-th observation time series belongs to.  Since there is only one population trajectory in this first analysis, we will have a vector of five $1$'s: every observation time series is measuring the first, and only, population trajectory. 
 <<setwhichPop, eval=TRUE>>=
@@ -234,7 +234,7 @@ names(kem1)
 @
 The maximum-likelihood estimates of 
 ``total harbor seal population'' scaled to the first observation data series (Figure \ref{fig:CS2.fig2}) are in \verb@kem1$states@, and \verb@kem1$states.se@ are the standard errors on those estimates.  To get 95\% confidence intervals, use \verb@kem1$states +/- 1.96*kem1$states.se@.
-Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the biases, the $/aa$, cannot be estimated and arbitrarily our algorithm chooses $a_1=0$, so the population estimate is scaled to the first observation time series.   
+Figure \ref{fig:CS2.fig2} shows a plot of \verb@kem1$states@ with its 95\% confidence intervals over the data.  Because \verb@kem1$states@ has been scaled relative to the first time series, it is on top of that time series.     One of the $\aa$ cannot be estimated and arbitrarily our algorithm chooses $a_1=0$, so the population estimate is scaled to the first observation time series.   
 
 The estimated parameters are output with the function \verb@coef()@: \verb@coef(kem1)@.  To get the estimate just for \texttt{U}, which is the estimated long-term population growth rate, use \verb@coef(kem1)$U@.  Multiply by 100 to get the percent increase per year.  The estimated process variance is given by \verb@coef(kem2)$Q@.
 
@@ -274,22 +274,16 @@ c(kem1$AIC, kem2$AIC)
 @
 A smaller AIC means a better model\index{model selection!AIC}.  The difference between the one observation variance versus the unique observation variances is >10, suggesting that the unique observation variances model is better.
 
-\index{diagnostics}One of the key diagnostics when you are comparing fits from multiple models is whether the model is flexible enough to fit the data.  This can be checked by looking for temporal trends in the residuals between the estimated population states (e.g. \verb@kem2$states@) and the data.\index{diagnostics!residual trends} In Figure \ref{fig:CS2.resids2}, the residuals for the second analysis are shown.  Ideally, these residuals should not have a temporal trend. They should look cloud-like.  The fact that the residuals have a strong temporal trend is an indication that our one population model is too restrictive for the data\footnote{When comparing models via AIC, it is important that you only compare models that are flexible enough to fit the data.  Fortunately if you neglect to do this, the inadequate models will usually have very high AICs and fall out of the mix anyhow.}.  Code \ref{CS2.ex2} shows you how to fit the second model and make the diagnostics plot.
+\index{diagnostics}One of the key diagnostics when you are comparing fits from multiple models is whether the model is flexible enough to fit the data.  This can be checked by looking for temporal trends in the residuals between the fitted data (e.g., the predicted value of the data given the states estimates) and the actual data.\index{diagnostics!residual trends} These are the smoothations model residuals (as opposed to the innovations model residuals). In Figure \ref{fig:CS2.resids2}, the residuals for the second analysis are shown.  Ideally, these residuals should not have a temporal trend.  The fact that the residuals have a strong temporal trend is an indication that our one population model is too restrictive for the data\footnote{When comparing models via AIC, it is important that you only compare models that are flexible enough to fit the data.  Fortunately if you neglect to do this, the inadequate models will usually have very high AICs and fall out of the mix anyhow.}.  Code \ref{CS2.ex2} shows you how to fit the second model and make the diagnostics plot.
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 \begin{figure}[htp]
 \begin{center}
 <<Cs2-fig5,fig=TRUE,echo=FALSE,width=5,height=5>>=
-resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+plot(kem2, plot.type="model.resids.ytT")
 @
 \end{center}
-\caption{Residuals for the model with a single population. The plots of the residuals should not have trends with time, but they do.  This is an indication that the single population model is inconsistent with the data.  The code to make this plot is given in the script file for this chapter.}
+\caption{Residuals for the model with a single population. The plots of the residuals should not have trends with time, but they do.  This is an indication that the single population model is inconsistent with the data.}
 \label{fig:CS2.resids2}
 \end{figure}
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -305,13 +299,7 @@ coef(kem2) # the estimated parameter elements
 kem2$logLik # log likelihood
 c(kem1$AIC, kem2$AIC) # AICs
 
-resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+plot(kem2, plot.type="model.resids.ytT")
 @
 \exend
 
@@ -399,7 +387,7 @@ Q.model <- "diagonal and equal"
 
 \noindent This says that there is one $u$ and one $q$ parameter and both subpopulations share it (if we wanted the $u$'s to be different, we would use \verb@U.model="unequal"@ or leave off the $\uu$ model since the default behavior is \verb@U.model="unequal"@).  
 
-Code \ref{CS2.ex3} puts all the pieces together and shows you how to fit the north and south population model and create the residuals plot (Figure \ref{fig:CS2.resids3}).  The residuals look better (more cloud-like) but the Hood Canal residuals are still temporally correlated. 
+Code \ref{CS2.ex3} puts all the pieces together and shows you how to fit the north and south population model and create the residuals plot (Figure \ref{fig:CS2.resids3}).  The residuals look better (less temporal trend) but the Hood Canal residuals are still have a trend. 
 
 \exbegin{Code \ref{CS2.ex3}}
 <<label=Cs2_Code3,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
@@ -412,14 +400,8 @@ kem3 <- MARSS(dat, model = list(
   Z = Z.model,
   R = R.model, U = U.model, Q = Q.model
 ))
-# plot residuals
-resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+# plot smoothation residuals
+plot(kem3, plot.type="model.resids.ytT")
 @
 \exend
 
@@ -427,13 +409,7 @@ par(mfrow = c(1, 1))
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs2-residuals-analysis3-fig6,fig=TRUE,echo=FALSE,width=5,height=5>>=
-resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+plot(kem3, plot.type="model.resids.ytT", silent=TRUE)
 @
 \end{center}
 \caption{The residuals for the analysis with a north and south subpopulation.  The plots of the residuals should not have trends with time.  Compare with the residuals for the analysis with one subpopulation.}
@@ -448,7 +424,7 @@ Now work through a number of different structures and examine how your estimatio
 \subsection{Five subpopulations}
 \label{CS2.ex4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Analyze the data using a model with five subpopulations, where each of the five census regions is sampling one of the subpopulations.  Assume that the subpopulation are independent (diagonal $\QQ$), however let each subpopulation share the same population parameters, $u$ and $q$.  Code \ref{CS2.ex4} shows how to set the \texttt{MARSS()} arguments for this case.  You can use \verb@R.model="diagonal and equal"@ to make all the observation variances equal.
+Analyze the data using a model with five subpopulations, where each of the five census regions is sampling one of the subpopulations.  Assume that the subpopulations are independent (diagonal $\QQ$), however let each subpopulation share the same population parameters, $u$ and $q$.  Code \ref{CS2.ex4} shows how to set the \texttt{MARSS()} arguments for this case.  You can use \verb@R.model="diagonal and equal"@ to make all the observation variances equal.
 
 \exbegin{Code \ref{CS2.ex4}}
 <<label=Cs2_Code4,fig=FALSE,echo=TRUE,keep.source=TRUE, results=hide>>=
@@ -467,7 +443,7 @@ kem <- MARSS(dat, model = list(
 \subsection{Two subpopulations with different population parameters}
 \label{CS2.ex5}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Analyze the data using a model that assumes that the Strait of Juan de Fuca and San Juan Islands census regions represent a northern Puget Sound subpopulation, while the other three regions represent a southern Puget Sound subpopulation. This time assume that each population trajectory (north and south) has different $u$ and $q$ parameters: $u_n$, $u_s$ and $q_n$, $q_s$. Also assume that each of the five census regions has a different observation variance.  Try to write your own code.  If you get stuck (or want to check your work, you can open a script file with sample R code by typing \verb@RShowDoc("Chapter_SealTrend.R",package="MARSS")@ at the R command line.
+Analyze the data using a model that assumes that the Strait of Juan de Fuca and San Juan Islands census regions represent a northern Puget Sound subpopulation, while the other three regions represent a southern Puget Sound subpopulation. This time assume that each population trajectory (north and south) has different $u$ and $q$ parameters: $u_n$, $u_s$ and $q_n$, $q_s$. Also assume that each of the five census regions has a different observation variance.  Try to write your own code.  If you get stuck, you can find R code for this model by typing \verb@RShowDoc("Chapter_SealTrend.R",package="MARSS")@ at the R command line.
 
 In math form, this model is:
 \begin{equation}
@@ -593,10 +569,14 @@ print(Q.model)
 @
 Notice that $\QQ$ is a diagonal matrix (independent year-to-year environmental variability) but the variance of two of the populations is the same.  Notice too that the off-diagonal terms are numeric; they do not have quotes.  We specified $\QQ$ using a matrix of class list, so that we could have numeric values (fixed) and character values (estimated parameters).
 
-In a similar way, we specify that the observation errors are independent but that estimates from a plane do not have the same variance as those from a boat:
+In a similar way, we specify that the observation errors are independent but that estimates from an airplane do not have the same variance as those from a boat:
 <<eval=FALSE,keep.source=TRUE>>=
 R.model <- matrix(list(0), 5, 5)
 diag(R.model) <- c("boat", "boat", "plane", "plane", "plane")
+@
+MARSS also has a helper function \verb@ldiag()@ to make this matrix: 
+<<eval=FALSE,keep.source=TRUE>>=
+R.model <- ldiag(c("boat", "boat", "plane", "plane", "plane"))
 @
 
 For the long-term trends, we specify that $x_1$ and $x_2$ share a long-term trend (``puget sound'') while $x_3$ is allowed to have a separate trend (``hood canal'').   
@@ -613,7 +593,7 @@ There are a number of corners that we cut in order to show you code that runs qu
 \item{We used the large-sample approximation for AIC\index{model selection!AIC} instead of a bootstrap AIC\index{model selection!bootstrap AIC} that is designed to correct for small sample size in state-space models.  The bootstrap metric, AICb, takes a long time to run. Use the call \verb@MARSSaic(kem, output=c("AICbp"))@ to compute AICb\index{model selection!bootstrap AIC, AICbp}.  We could have shown AICc\index{model selection!AICc}, which is the small-sample size corrector for non-state-space models.  Type \verb@kem$AICc@ to get that.}
 \end{itemize}
 
-Finally, in a real (maximum-likelihood) analysis, one needs to be careful not to dredge the data.  The temptation is to look at the data and pick a population structure that will fit that data.  This can lead to including models in your analysis that have no biological basis.  In practice, we spend a lot of time discussing the population structure with biologists working on the species and review all the biological data that might tell us what are reasonable structures.  From that, a set of model structures to use are selected.   Other times, a particular model structure needs to be used because the population structure is not in question rather it is a matter of using that pre-specified structure and using all the data to get parameter estimates for forecasting.  
+Finally, in a real (maximum-likelihood) analysis, one needs to be careful not to dredge the data.  The temptation is to look at the data and pick a population structure that will fit that data.  This can lead to including models in your analysis that have no biological basis.  In practice, we spend a great deal of time discussing the population structure with biologists working on the species and review all the biological data that might tell us what are reasonable structures.  From that, a set of model structures to use are selected.   Other times, a particular model structure needs to be used because the population structure is not in question rather it is a matter of using that pre-specified structure and using all the data to get parameter estimates for forecasting.  
 
  
 \section*{Some more questions you might ponder}
@@ -621,7 +601,7 @@ Do different assumptions about whether the observation error variances are all i
 
 Do assumptions about the underlying structure of the population affect your estimates of $u$?   Structure here means number of subpopulations and which areas are in which subpopulation.  
 
-The confidence intervals for the first two analyses are very tight because the estimated process variance, $\QQ$, was very small.  Why do you think process variance ($q$) was forced to be so small?  [Hint: We are forcing there to be one and only one true population trajectory and all the observation time series have to fit that one time series. Look at the AICs too.]
+The confidence intervals for the first two analyses are very tight because the estimated process variance, $\QQ$, was very small.  Why do you think process variance ($q$) was forced to be so small?  Hint: We are forcing there to be one and only one true population trajectory and all the observation time series have to fit that one time series. Look at the AICs too.
 
 <<Reset, echo=FALSE>>=
 options(prompt = "> ", continue = "+ ")

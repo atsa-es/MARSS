@@ -4,7 +4,7 @@
 Objects of class `marssMODEL'\index{objects!marssMODEL} specify Multivariate Autoregressive State Space (MARSS) models. The \verb@model@ component of an ML estimation object (class marssMLE; see below) is a marssMODEL object. These objects have the following components:
 
   \begin{description}
-    \item[\textbf{data}]{ An optional matrix (not dataframe), in which each row is a time series (time across columns). }
+    \item[\textbf{data}]{ An optional matrix (not data frame), in which each row is a time series (time across columns). }
     \item[\textbf{fixed}]{ A list with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying which elements of each parameter are fixed. }
     \item[\textbf{free}]{ A list with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying which elements of each parameter are to be estimated. }
     \item[\textbf{M}]{ An array of dim $n \times n \times T$ (an $n \times n$ missing values matrix for each time point).  Each matrix is diagonal with 0 at the $i,i$ value if the $i$-th value of $\yy$ is missing, and 1 otherwise.} 
@@ -25,11 +25,11 @@ Objects of class `marssMODEL'\index{objects!marssMODEL} specify Multivariate Aut
 
 \section*{MARSSinputs}\index{objects!inputs}
 
-All the user inputs to a \verb@MARSS()@ call are put into a list and then passed to a function called \verb@MARSS.form()@ (where form is the text specified by the form argument, e.g. \verb@MARSS.marss()@).  This function is used to create the marssMODEL object and then \verb@MARSScheckinputs()@ is called to error check the other arguments.
+All the user inputs to a \verb@MARSS()@ call are put into a list and then passed to a function called \verb@MARSS.form()@ where \verb@form@ is the text specified by the form argument, e.g., \verb@MARSS.marss()@.  This function is used to create the marssMODEL object and then \verb@MARSScheckinputs()@ is called to error check the other arguments.
 
   \begin{description}
   
-  \item[\textbf{data}]{ A matrix (not dataframe) of observations (rows) $\times$ time (columns).  }
+  \item[\textbf{data}]{ A matrix (not data frame) of observations (rows) $\times$ time (columns).  }
   \item[\textbf{model}]{ The specification is form dependent.  For the default marxss form, the inputs are a list with up to 14  elements Z, A, R, B, U, Q, x0, V0, C, c, D, d, tinitx, diffuse }
   \item[\textbf{inits}]{ A list with up to 10 matrices Z, A, R, B, U, Q, x0, V0, C, D specifying initial values for parameters. Dimensions are given in the class `marssMODEL' section. }
   \item[\textbf{miss.value}]{ Deprecated. Specifies missing value representation (default is NA). }

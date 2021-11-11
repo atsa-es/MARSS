@@ -46,14 +46,14 @@ For residuals analysis (outlier detection), you want to use the "residual" inter
 dat <- t(harborSealWA)
 dat <- dat[2, ] # remove the year row
 Q <- array(c(rep(.02, 11), rep(.01, 11)), dim = c(1, 1, 22))
-kemfit <- MARSS(dat, model = list(Q = Q))
+kem <- MARSS(dat, model = list(Q = Q))
 # returns a data.frame
-harvey.resids <- residuals(kemfit, type = "tT", Harvey = TRUE)
-holmes.resids <- residuals(kemfit, type = "tT", Harvey = FALSE)
+harvey.resids <- residuals(kem, type = "tT", Harvey = TRUE)
+holmes.resids <- residuals(kem, type = "tT", Harvey = FALSE)
 identical(harvey.resids, holmes.resids)
 # returns a matrix with various variances
-harvey.resids <- MARSSresiduals(kemfit, type = "tT", Harvey = TRUE)
-holmes.resids <- MARSSresiduals(kemfit, type = "tT", Harvey = FALSE)
+harvey.resids <- MARSSresiduals(kem, type = "tT", Harvey = TRUE)
+holmes.resids <- MARSSresiduals(kem, type = "tT", Harvey = FALSE)
 for (i in names(holmes.resids)) cat(i, all(na.omit(as.vector(harvey.resids[[i]] - holmes.resids[[i]])) < sqrt(.Machine$double.eps)), "\n")
 @
 

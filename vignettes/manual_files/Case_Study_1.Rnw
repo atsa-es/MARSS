@@ -17,11 +17,11 @@ library(MARSS)
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_PVA.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-Estimates of extinction\index{extinction} and quasi-extinction risk are an important risk metric used in the management and conservation of endangered and threatened species. By necessity, these estimates are based on data that contain both variability due to real year-to-year changes in the population growth rate (process errors\index{error!process}) and variability in the relationship between the true population size and the actual count (observation errors). Classic approaches to extinction risk assume the data have only process error, i.e. no observation error.  In reality, observation error is ubiquitous both because of the sampling variability and also because of year-to-year (and day-to-day) variability in sightability. 
+Estimates of extinction\index{extinction} and quasi-extinction risk are an important risk metric used in the management and conservation of endangered and threatened species. By necessity, these estimates are based on data that contain both variability due to real year-to-year changes in the population growth rate (process errors\index{error!process}) and variability in the relationship between the true population size and the actual count (observation errors). Classic approaches to extinction risk assume the data have only process error, i.e., no observation error.  In reality, observation error is ubiquitous both because of the sampling variability and also because of year-to-year (and day-to-day) variability in sightability. 
 
-In this application, we will fit a univariate (meaning one time series) state-space model to population count data with observation error. We will compute the extinction risk metrics given in \citet{Dennisetal1991}, however instead of using a process-error only model (as is done in the original paper), we use a model with both process and observation error.  The risk metrics and their interpretations are the same as in \citet{Dennisetal1991}.  The only real difference is how we compute $\sigma^2$, the process error variance.  However this difference has a large effect on our risk estimates, as you will see.
+In this application, we will fit a univariate state-space model to population count data with observation error. We will compute the extinction risk metrics given in \citet{Dennisetal1991}, however instead of using a process-error only model (as is done in the original paper), we use a model with both process and observation error.  The risk metrics and their interpretations are the same as in \citet{Dennisetal1991}.  The only real difference is how we compute $\sigma^2$, the process error variance.  However this difference has a large effect on our risk estimates, as you will see.
 
-We use here a density-independent\index{density-independent} model, a stochastic exponential growth model in log space.  This equivalent to a MARSS model with $\BB=1$.  Density-independence is often a reasonable assumption when doing a population viability analysis because we do such calculations for at-risk populations that are either declining or that are well below historical levels (and presumably carrying capacity).  In an actual population viability analysis, it is necessary to justify this assumption and if there is reason to doubt the assumption,  one tests for density-dependence \citep{TaperDennis1994} and does sensitivity analyses using state-space models with density-dependence \citep{Dennisetal2006}.
+We use here a density-independent\index{density-independent} model, a stochastic exponential growth model in log space.  This is equivalent to a MARSS model with $\BB=1$.  Density-independence is often a reasonable assumption when doing a population viability analysis because we do such calculations for at-risk populations that are either declining or that are well below historical levels (and presumably carrying capacity).  In an actual population viability analysis, it is necessary to justify this assumption and if there is reason to doubt the assumption,  one tests for density-dependence \citep{TaperDennis1994} and does sensitivity analyses using state-space models with density-dependence \citep{Dennisetal2006}.
 
 The univariate\index{MARSS model!univariate example} model is written:
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,10 +108,10 @@ for (i in 1:9) {
 \begin{example}{The effect of parameter values on parameter estimates}%
 \label{CS1.ex1}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-A good way to get a feel for reasonable $\sigma^2$ values is to generate simulated data and look at the time series.  A biologist would have a pretty good idea of what kind of year-to-year population changes are reasonable for their study species.  For example for many large mammalian species, the maximum population yearly increase would be around 50\% (the population could go from 1000 to 1500 in one year), but some of fish species could easily double or even triple in a really good year.   Observed data may bounce around a lot for many different reasons having to do with sightability, sampling error, age-structure, etc., but the underlying population trajectory is constrained by the kinds of year-to-year changes in population size that are biologically possible.  $\sigma^2$ describes those true population changes.
+A good way to get a feel for reasonable $\sigma^2$ values is to generate simulated data and look at the time series.  A biologist would have a pretty good idea of what kind of year-to-year population changes are reasonable for their study species.  For example for many large mammalian species, the maximum population yearly increase would be around 50\% (the population could go from 1000 to 1500 in one year), but some fish species could easily double or even triple in a really good year.   Observed data may bounce around for many different reasons having to do with sightability, sampling error, age-structure, etc., but the underlying population trajectory is constrained by the kinds of year-to-year changes in population size that are biologically possible.  $\sigma^2$ describes those true population changes.
 
 You should run the example code several times using different parameter values to get a feel for how different the time series can look based on identical parameter values.  You can cut and paste from the pdf into the R command line.
-Typical vertebrate $\sigma^2$ values are 0.002 to 0.02, and typical $\eta^2$ values are 0.005 to 0.1.  A $u$ of -0.01 translates to an average 1\% per year decline and a $u$ of -0.1 translates to an average 10\% per year decline (approximately).
+Typical vertebrate $\sigma^2$ values are 0.002 to 0.02, and typical $\eta^2$ values are 0.005 to 0.1 \citep{Holmesetal2007}.  A $u$ of -0.01 translates to an average 1\% per year decline and a $u$ of -0.1 translates to a roughly 10\% per year decline.
  
 \exbegin{Example \ref{CS1.ex1} code}
 \newline
@@ -156,7 +156,7 @@ legend("topright", c("Observed", "True"),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \index{estimation}
 \subsection{Model with process and observation error}
-\index{estimation!EM}\index{estimation!maximum-likelihood}Using the simulated  data, we estimate the parameters, $u$, $\sigma^2$, and $\eta^2$, and the hidden population sizes.   These are the estimates using a model with process and observation variability.  The function call is \verb@kem = MARSS(data)@, where \verb@data@ is a vector of logged (base e) counts with missing values denoted by NA.  After this call, the maximum-likelihood parameter estimates are shown with \verb@coef(kem)@.  There are numerous other outputs from the \texttt{MARSS()} function.  To get a list of the standard model output available type in \verb@?print.MARSS@.  Note that \verb@kem@ is just a name; the output could have been called \verb@foo@.  Here's code to fit to the simulated time series:
+\index{estimation!EM}\index{estimation!maximum-likelihood}Using the simulated  data, we estimate the parameters, $u$, $\sigma^2$, and $\eta^2$, and the hidden population sizes.   These are the estimates using a model with process and observation variability.  The function call is \verb@kem = MARSS(data)@, where \verb@data@ is a vector of logged (base e) counts with missing values denoted by NA.  After this call, the maximum-likelihood parameter estimates are shown with \verb@coef(kem)@.  There are numerous other outputs from the \texttt{MARSS()} function.  To get a list of the standard model output available type in \verb@?print.MARSS@.  Here's code to fit to the simulated time series:
 <<fitKalmanEM1, eval=FALSE,include.source=FALSE>>=
 kem <- MARSS(y)
 @
@@ -221,8 +221,6 @@ den91 <- lm(delta.pop ~ -1 + tau)
 # note: the "-1" specifies no intercept
 den91.u <- den91$coefficients
 den91.Q <- var(resid(den91))
-# type ?lm to learn about the linear regression function in R
-# form is lm(dependent.var ~ response.var1 + response.var2 + ...)
 # type summary(den91) to see other info about our regression fit
 @
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -262,15 +260,15 @@ den91.params[11, ] <- c(sim.u, sim.Q)
 <<den91params, echo=FALSE>>=
 den91.params
 @
-Notice that the $u$ estimates are similar to those from MARSS model, but the $\sigma^2$ estimate (\verb@Q@) is much larger.  That is because this approach treats all the variance as process variance, so any observation variance in the data is lumped into process variance (in fact it appears as an additional variance of twice the observation variance).
+Notice that the $u$ estimates are similar to those from MARSS model, but the $\sigma^2$ estimate (\verb@Q@) is much larger.  That is because this approach treats all the variance as process variance, so any observation variance in the data is lumped into process variance. The additional variance added is two times the observation variance.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{example}{The variability in parameter estimates}
 \label{CS1.ex2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this example, you will look at how variable the parameter estimates are by generating multiple simulated data sets and then estimating parameter values for each.  You'll  compare the MARSS estimates to the estimates using a process error only model (i.e. ignoring the observation error).  
+In this example, we will look at how variable the parameter estimates are by generating multiple simulated data sets and then estimating parameter values for each.  This example  compares the MARSS estimates to the estimates using a process error only model, i.e., ignoring the observation error.  
 
-Run the example code a few times to compare the estimates using a state-space model (\verb@kem@) versus the model with no observation error (\verb@den91@).  You can copy and paste the code from the pdf file into \R.  Next, change the observation variance in the code, \texttt{sim.R}, in the data generation step in order to get a feel for the estimation performance as observations are further corrupted. What happens as observation error is increased?  Next, decrease the number of years of data, \texttt{nYr}, and re-run the parameter estimation. What is the effect of fewer years of data?  If you find that the example code takes too long to run, reduce the number of simulations (by reducing \verb@nsim@ in the code).
+Run the example code a few times to compare the estimates using a state-space model (\verb@kem@) versus the model with no observation error (\verb@den91@).  Next, change the observation variance in the code, \texttt{sim.R}, in the data generation step in order to get a feel for the estimation performance as observations are further corrupted. What happens as observation error is increased?  Next, decrease the number of years of data, \texttt{nYr}, and re-run the parameter estimation. What is the effect of fewer years of data?  If you find that the example code takes too long to run, reduce the number of simulations by reducing \verb@nsim@ in the code.
 
 \exbegin{Example \ref{CS1.ex2} code}
 \newline
@@ -362,7 +360,7 @@ for (i in 1:100) {
 
 Figure \ref{fig:CS1.9probext} shows the estimated probabilities of hitting the 90\% decline for the nine  30-year times series simulated with $u=-0.05$, $\sigma^2=0.01$ and $\eta^2=0.05$.  The dashed line shows the estimates using the MARSS parameter estimates and the solid line shows the estimates using a process-error only model (the \verb@den91@ estimates).  The circles are the true probabilities.  The difference between the estimates and the true probabilities is due to errors in $\hat{u}$.  Those errors are due largely to process error---not observation error.  As we saw earlier, by chance population trajectories with a $u<0$ will increase, even over a 50-year period.  In this case, $\hat{u}$ will be positive when in fact $u<0$.
 
-Looking at the figure, it is obvious that the probability estimates are highly variable.  However, look at the first panel.  This is the average estimate (over nine simulations). Note that on average (over nine simulations), the estimates are good.  If we had averaged over 1000 simulations instead of nine, you would see that the MARSS line falls on the true line.  It is an unbiased predictor.  While that may seem a small consolation if estimates for individual simulations are all over the map, it is important for correctly specifying our uncertainty about our estimates.  Second, rather than focusing on how the estimates and true lines match up, see if there are any types of forecasts that seem better than others.  For example, are 20-year predictions better than 50-year and are 100-year forecasts better or worse.  In Example \ref{chap:CSpva}.3, you will remake this figure with different $u$.  You'll discover from that forecasts are more certain for populations that are declining faster.  
+Looking at the figure, it is obvious that the probability estimates are highly variable.  However, look at the first panel.  This is the average estimate (over nine simulations). Note that on average (over nine simulations), the estimates are good.  If we had averaged over 1000 simulations instead of nine, the MARSS line would have fallen on the true line.  It is an unbiased predictor.  While that may seem a small consolation if estimates for individual simulations are all over the map, it is important for correctly specifying our uncertainty about our estimates.  Second, rather than focusing on how the estimates and true lines match up, see if there are any types of forecasts that seem better than others.  For example, are 20-year predictions better than 50-year and are 100-year forecasts better or worse.  In Example \ref{chap:CSpva}.3, we will remake this figure with different $u$.  This demonstrates how forecasts are more certain for populations that are declining faster.  
 
 
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -429,14 +427,14 @@ legend("bottomright", c("True", "Dennis", "KalmanEM"), pch = c(1, -1, -1),
 \begin{example}{The effect of parameter values on risk estimates}
 \label{CS1.ex3}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this example, you will recreate Figure \ref{fig:CS1.9probext} using different
-parameter values.  This will give you a feel for how variability in the data and population process affect the risk estimates.  You'll need to run the Example \ref{CS1.ex2} code before running the Example \ref{CS1.ex3} code.
+In this example, we will recreate Figure \ref{fig:CS1.9probext} using different
+parameter values.  This will illustrate how variability in the data and population process affect the risk estimates.  The Example \ref{CS1.ex2} code needs to be run before the Example \ref{CS1.ex3} code.
 
 Begin by changing \verb@sim.R@ and rerunning the Example \ref{CS1.ex2} code.  Now run the Example \ref{CS1.ex3} code and generate parameter estimates.  When are the estimates using the process-error only model (\verb@den91@) worse and in what way are they worse? You might imagine that you should always use a model that includes observation error, since in practice observations are never perfect.  However, there is a cost to estimating that extra variance parameter and the cost is a more variable $\sigma^2$ (\verb@Q@) estimate.  Play with shortening the time series and decreasing the \verb@sim.R@ values.  Are there situations when the `cost' of the extra parameter is greater than the `cost' of ignoring observation error?
 
 Next change the rate of decline in the simulated data.  To do this, rerun the Example \ref{CS1.ex2} code using a lower \texttt{sim.u}; then run the Example \ref{CS1.ex3} code. Do the estimates seem better or worse for rapidly declining populations?  Rerun the Example \ref{CS1.ex2} code using fewer number of years (\texttt{nYr} smaller) and increase \texttt{fracmiss}.  Run the Example \ref{CS1.ex3} code again.  The graphs will start to look peculiar.  Why do you think it is doing that? Hint: look at the estimated parameters.
 
-Last change the extinction threshold (\texttt{pd} in the Example \ref{CS1.ex3} code). How does changing the extinction threshold change the extinction probability curves? Do not remake the data, i.e. don't rerun the Example \ref{CS1.ex2} code.
+Last change the extinction threshold (\texttt{pd} in the Example \ref{CS1.ex3} code). How does changing the extinction threshold change the extinction probability curves? Do not remake the data, i.e., don't rerun the Example \ref{CS1.ex2} code.
 
 
 \exbegin{Example \ref{CS1.ex3} code}
@@ -505,9 +503,9 @@ legend("bottomright", c("True", "Dennis", "KalmanEM"),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Certain and uncertain regions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\index{extinction!uncertainty}From Example \ref{CS1.ex3}, you have observed one of the problems with estimates of the probability of hitting thresholds.  Looking over the nine simulations, your risk estimates will be on the true line sometimes and other times they are way off.  So your estimates are variable and one should not present only the point estimates of the probability of 90\% decline.  At the minimum, confidence intervals need to be added (next section), but even with confidence intervals, the probability of hitting declines often does not capture our certainty and uncertainty about extinction risk estimates.
+\index{extinction!uncertainty}Example \ref{CS1.ex3} illustrates one of the problems with estimates of the probability of hitting thresholds.  Looking over the nine simulations, the risk estimates will be on the true line sometimes and other times they are way off.  The estimates are highly variable and one should not present only the point estimates of the probability of 90\% decline.  At the minimum, confidence intervals need to be added (next section), but even with confidence intervals, the probability of hitting declines often does not capture our certainty and uncertainty about extinction risk estimates.
 
-From Example \ref{CS1.ex3}, you might have also noticed that there are some time horizons (10, 20 years) for which the estimate are highly certain (the threshold is never hit), while for other time horizons (30, 50 years) the estimates are all over the map.  Put another way, you may be able to say with high confidence that a 90\% decline will not occur between years 1 to 20 and that by year 100 it most surely will have occurred.  However, between the years 20 and 100, you are very uncertain about the risk.  The point is that you can be certain about some forecasts while at the same time being uncertain about other forecasts.
+By running Example \ref{CS1.ex3}, you might have also noticed that there are some time horizons (10, 20 years) for which the estimate are highly certain (the threshold is never hit), while for other time horizons (30, 50 years) the estimates are all over the map.  Put another way, you may be able to say with high confidence that a 90\% decline will not occur between years 1 to 20 and that by year 100 it most surely will have occurred.  However, between the years 20 and 100, you are very uncertain about the risk.  The point is that you can be certain about some forecasts while at the same time being uncertain about other forecasts.
 
 One way to show this is to plot the uncertainty as a function of the forecast, where the forecast is defined in terms of the forecast length (number of years) and forecasted decline (percentage). Uncertainty is defined as how much of the 0-1 range your 95\% confidence interval covers.  \citet{EllnerHolmes2008} show such a figure (their Figure 1).  Figure \ref{fig:CS1.TMU} shows a version of this figure that you can produce with the function \texttt{CSEGtmufigure(u= val, N= val, s2p= val)}.  For the figure, the values $u=-0.05$ which is a 5\% per year decline, $N=25$ so 25 years between the first and last census, and $s^2_p=0.01$ are used.  The process variability for big mammals is typically in the range of 0.002 to 0.02.  
 
@@ -521,7 +519,7 @@ par(mfrow = c(1, 1))
 CSEGtmufigure(N = nYr, u = sim.u, s2p = sim.Q)
 @
 \end{center}
-\caption{This figure shows your region of high uncertainty (dark gray).  In this region, the minimum 95\% confidence intervals (meaning if you had no observation error) span 80\% of the 0 to 1 probability.  That is, you are uncertain if the probability of a specified decline is close to 0 or close to 1.  The white area shows where your upper 95\% CIs does not exceed P=0.05.  So you are quite sure the probability of a specified decline is less than 0.05.  The black area shows where your lower 95\% confidence interval is above P=.95.  So you are quite sure the probability is greater than P=0.95.  The light gray is between these two certain/uncertain extremes.}
+\caption{This figure shows the region of high uncertainty (dark gray).  In this region, the minimum 95\% confidence intervals (meaning no observation error) span 80\% of the 0 to 1 probability.  That is, we are uncertain if the probability of a specified decline is close to 0 or close to 1.  The white area shows where the upper 95\% CIs does not exceed P=0.05.  In this region, we are quite sure the probability of a specified decline is less than 0.05.  The black area shows where the lower 95\% confidence interval is above P=0.95.  Here we are quite sure the probability is greater than P=0.95.  The light gray is between these two certain/uncertain extremes.}
 \label{fig:CS1.TMU}
 \end{figure}
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -546,7 +544,7 @@ CSEGtmufigure(N = 50, u = -0.05, s2p = 0.02)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{More risk metrics and some real data}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The previous sections have focused on the probability of hitting thresholds because this is an important and common risk metric used in population viability analysis and it appears in IUCN Red List criteria.  However, as you have seen, there is high uncertainty associated with such estimates.  Part of the problem is that probability is constrained to be 0 to 1, and it is easy to get estimates with confidence intervals that span 0 to 1.  Other metrics of risk, $\hat{u}$ and the distribution of the time to hit a threshold \citep{Dennisetal1991}, do not have this problem and may be more informative.  Figure \ref{fig:CS1.riskfigure} shows different risk metrics from \citet{Dennisetal1991} on a single plot.  This figure is generated by a call to the function \texttt{CSEGriskfigure()}:
+The previous sections have focused on the probability of hitting thresholds because this is an important and common risk metric used in population viability analysis and it appears in IUCN Red List criteria.  However, there is high uncertainty associated with such estimates.  Part of the problem is that probability is constrained to be 0 to 1, and it is easy to get estimates with confidence intervals that span 0 to 1.  Other metrics of risk, $\hat{u}$ and the distribution of the time to hit a threshold \citep{Dennisetal1991}, do not have this problem and may be more informative.  Figure \ref{fig:CS1.riskfigure} shows different risk metrics from \citet{Dennisetal1991} on a single plot.  This figure is generated by a call to the function \texttt{CSEGriskfigure()}:
 <<noevalriskfigure, eval=FALSE>>=
 dat <- read.table(datafile, skip = 1)
 dat <- as.matrix(dat)
@@ -573,7 +571,7 @@ CSEGriskfigure(wilddogs, silent = TRUE)
 \begin{example}{Risk figures for different species}
 \label{CS1.ex5}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Use the Example \ref{CS1.ex5} code to re-create Figure \ref{fig:CS1.riskfigure}.  The package includes other data for you to run: \verb@prairiechicken@ from the endangered Attwater Prairie Chicken, \verb@graywhales@ from \citet{Gerberetal1999}, and  \verb@grouse@ from the Sharptailed Grouse (a species of U.S. federal concern) in Washington State.  Note for some of these other datasets, the Hessian matrix cannot be inverted and you will need to use \verb@CI.method="parametric"@. If you have other text files of data, you can run those too.  The commented lines show how to read in data from a tab-delimited text file with a header line.
+Use the Example \ref{CS1.ex5} code to re-create Figure \ref{fig:CS1.riskfigure}.  The MARSS package includes other data that you can also run: \verb@prairiechicken@ from the endangered Attwater Prairie Chicken, \verb@graywhales@ from \citet{Gerberetal1999}, and  \verb@grouse@ from the Sharptailed Grouse (a species of U.S. federal concern) in Washington State.  Note for some of these other datasets, the Hessian matrix cannot be inverted and you will need to use \verb@CI.method="parametric"@. The commented lines show how to read in your own data from a tab-delimited text file with a header line.
 <<label=Testing_Exercise5,echo=FALSE,results=hide>>=
 # make sure the other examples work
 dat <- prairiechicken
@@ -604,21 +602,21 @@ CSEGriskfigure(dat, CI.method = "hessian", silent = TRUE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \index{confidence intervals}\index{confidence intervals!parametric bootstrap}The figures produced by \verb@CSEGriskfigure()@ have confidence intervals (95\% and 75\%) on the probabilities in the top right panel.  A standard way to produce these intervals is via parametric bootstrapping.  Here are the steps in a parametric bootstrap:  
 \begin{itemize}
-\item You estimate $u$, $\sigma^2$ and $\eta^2$
-\item Then you simulate time series using those estimates and Equations \ref{eqn:1a} and \ref{eqn:1b}
-\item Then you re-estimate your parameters from the simulated data (using say \texttt{MARSS(simdata)}
-\item Repeat for 1000s of time series simulated using your estimated parameters.  This gives you a large set of bootstrapped parameter estimates 
-\item For each bootstrapped parameter set, compute a set of extinction estimates (you use Equation \ref{eqn:probext} and code from Example \ref{CS1.ex3})
-\item The $\alpha$\% ranges on those bootstrapped extinction estimates gives you your $\alpha$ confidence intervals on your probabilities of hitting thresholds
+\item Estimate $u$, $\sigma^2$ and $\eta^2$
+\item Simulate time series using those estimates and Equations \ref{eqn:1a} and \ref{eqn:1b}
+\item Re-estimate the model parameters from the simulated data (using say \texttt{MARSS(simdata)})
+\item Repeat for 1000s of time series simulated using your estimated parameters.  This gives a large set of bootstrapped parameter estimates 
+\item For each bootstrapped parameter set, compute a set of extinction estimates ( Equation \ref{eqn:probext} and code from Example \ref{CS1.ex3})
+\item The $\alpha$\% ranges on those bootstrapped extinction estimates gives the $\alpha$ confidence intervals on the probabilities of hitting thresholds
 \end{itemize}
 The MARSS package provides the function \verb@MARSSparamCIs()@ to add bootstrapped confidence intervals to fitted models (type \verb@?MARSSparamCIs@ to learn about the function).
 
-In the function \verb@CSEGriskfigure()@,  you can set \verb@CI.method = c("hessian",@ \verb@"parametric", "innovations", "none")@ to tell it how to compute the confidence intervals.  The methods `parametric' and `innovations' specify parametric and non-parametric bootstrapping respectively.  Producing parameter estimates by bootstrapping is quite slow.  Approximate confidence intervals on the parameters can be generated rapidly using the inverse of a numerically estimated Hessian matrix\index{confidence intervals!Hessian approximation} (method `hessian').  This uses an estimate of the variance-covariance matrix of the parameters (the inverse of the Hessian matrix).  Using an estimated Hessian matrix to compute confidence intervals is a handy trick that can be used for all sorts of maximum-likelihood parameter estimates.
+In the function \verb@CSEGriskfigure()@,  you can set \verb@CI.method = c("hessian",@ \verb@"parametric", "innovations", "none")@ to tell it how to compute the confidence intervals.  The methods `parametric' and `innovations' specify parametric and non-parametric bootstrapping respectively.  Producing parameter estimates by bootstrapping is quite slow.  Approximate confidence intervals on the parameters can be generated rapidly using the inverse of the estimate of the Hessian matrix\index{confidence intervals!Hessian approximation} (method `hessian').  This uses an estimate of the variance-covariance matrix of the parameters (the inverse of the Hessian matrix).  Using an estimated Hessian matrix to compute confidence intervals is a handy trick that can be used for all sorts of maximum-likelihood parameter estimates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Data with cycles, from age-structure or predator-prey interactions, are difficult to analyze and the EM algorithm used in the MARSS package will give poor estimates for this type of data.  The slope method \citep{Holmes2001} is more robust to those problems.  \citet{Holmesetal2007} used the slope method in a large study of data from endangered and threatened species, and  \citet{EllnerHolmes2008}  showed that the slope estimates are close to the theoretical minimum uncertainty.  Especially, when doing a population viability analysis using a time series with fewer than 25 years of data, the slope method is often less biased and (much) less variable because that method is less data-hungry \citep{Holmes2004}.  However the slope method is not a true maximum-likelihood method and thus constrains the types of further analyses you can do (such as model selection).
+Data with cycles, from age-structure or predator-prey interactions, are difficult to analyze and the EM algorithm used in the MARSS package will give poor estimates for this type of data.  The slope method \citep{Holmes2001} is more robust to those problems.  \citet{Holmesetal2007} used the slope method in a large study of data from endangered and threatened species, and  \citet{EllnerHolmes2008}  showed that the slope estimates are close to the theoretical minimum uncertainty.  Especially, when doing a population viability analysis using a time series with fewer than 25 years of data, the slope method is often less biased and (much) less variable because that method is less data-hungry \citep{Holmes2004}.  However the slope method is not a true maximum-likelihood method and this constrains the types of further analyses you can do (such as model selection).
 
 <<Reset, echo=FALSE>>=
 options(prompt = "> ", continue = "+ ")

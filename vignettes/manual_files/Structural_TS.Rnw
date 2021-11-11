@@ -12,7 +12,7 @@ options(prompt = " ", continue = " ", width = 60)
 
 Structural time series models are linear Gaussian state-space models which decompose the series into additive random walks for the level, trend and season. These models can be written as a multivariate state-space model. R provides the \verb@StructTS()@ function in the stats package to fit the level, level plus trend, and level plus trend plus season versions of structural time series models to univariate data.
 
-Here it is shown how to fit structural time series models with \verb@MARSS()@ using the same initial conditions assumptions as used in the \verb@StructTS()@ function. With \verb@MARSS()@, you are not restricted to univariate time series and you have control over any parameter constraints (i.e. linear constraints) that you wish to impose. You will see how to do this after the univariate cases are shown.
+Here it is shown how to fit structural time series models with \verb@MARSS()@ using the same initial conditions assumptions as used in the \verb@StructTS()@ function. With \verb@MARSS()@, you are not restricted to univariate time series and you have control over any parameter constraints that you wish to impose. You will see how to do this after the univariate cases are shown.
 
 Required libraries for this chapter:
 <<label=Cs00_required-libraries>>=
@@ -522,7 +522,7 @@ ggplot(df) +
 \subsection{Residuals}
 \index{structural ts models!residuals}\index{residuals!StructTS}\index{functions!residuals}
 
-\verb@residuals(x)@ applied to a StructTS object will return the difference between $y_t$ and the expected value of $Y_t$  conditioned on the data up to time $t$. This is $m_t+s_t$ for the BSM model. It is returned as a ts  object. The residuals are standardized, i.e. divided by the square root of the conditional variance of residuals (conditioned on the data). Note the conditional variance of the residuals is not \verb@var(resids)@; see \verb@?MARSSresiduals@ for a discussion of how the conditional variance of state-space residuals is computed.
+\verb@residuals(x)@ applied to a StructTS object will return the difference between $y_t$ and the expected value of $Y_t$  conditioned on the data up to time $t$. This is $m_t+s_t$ for the BSM model. It is returned as a ts  object. The residuals are standardized, i.e., divided by the square root of the conditional variance of residuals (conditioned on the data). Note the conditional variance of the residuals is not \verb@var(resids)@; see \verb@?MARSSresiduals@ for a discussion of how the conditional variance of state-space residuals is computed.
 <<label=Cs601_residuals>>=
 resids1 <- residuals(fit1)
 @
@@ -631,7 +631,7 @@ mod.list.x <- list(
   U = "zero"
 )
 @
-Next we set up the $\yy$ part of the equation. This is the part that changes. We will assume that the observations are independent with the same bias (i.e. expected value of each $y$ is the same). We will relax this assumption later.
+Next we set up the $\yy$ part of the equation. This is the part that changes. We will assume that the observations are independent with the same bias (i.e., expected value of each $y$ is the same). We will relax this assumption later.
 <<label=Cs704_multivariate, keep.source=TRUE, results=hide>>=
 mod.list.y <- list(
   A = "zero",
@@ -858,7 +858,7 @@ plot(t, ym[2, ], ylim = ylims, type = "p")
 lines(t, level2, col = "black")
 @
 \end{center}
-\caption{Observations (points) and truth (line). The levels (line) have the same variance but are independent. The level processes share a trend, i.e. $m_{1,t} = m_{1,t-1}+n_{t-1}$ and $m_{2,t} = m_{2,t-1}+n_{t-1}$.}
+\caption{Observations (points) and truth (line). The levels (line) have the same variance but are independent. The level processes share a trend, i.e., $m_{1,t} = m_{1,t-1}+n_{t-1}$ and $m_{2,t} = m_{2,t-1}+n_{t-1}$.}
 \label{fig:STS.fig.multi.two}
 \end{figure}
 

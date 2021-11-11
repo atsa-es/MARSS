@@ -151,7 +151,7 @@ mod.nile.2 <- list(
 @
 We could also use the text shortcuts to specify the model.  Because $\RR$ and $\QQ$ are $1 \times 1$ matrices, ``unconstrained'', ``diagonal and unequal``, ``diagonal and equal'' and ``equalvarcov'' will all lead to a $1 \times 1$ matrix with one estimated element.
 
-To fit the model, we use the ``BFGS" algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
+To fit the model, we use the BFGS algorithm to polish off the estimates, since it will get the maximum faster than the default EM algorithm as long as we start it close to the maximum.
 <<Cs07_fit-data-2, eval=TRUE>>=
 kem.2em <- MARSS(dat, model = mod.nile.2, silent = TRUE)
 kem.2 <- MARSS(dat,
@@ -425,7 +425,7 @@ kem.3 <- MARSS(dat,
 summary(kem.3)
 @
 
-Figure \ref{fig:CS6.fig4} shows the standardized residuals for the $u$, which is the 2nd state in $\xx$. There appears to be unusually large changes in the trend around year 25. The other changes in the trend are consistent with a random walk, i.e. the trend changes but only the rapid change near year 25 is inconsistent with the estimated trend random walk.
+Figure \ref{fig:CS6.fig4} shows the standardized residuals for the $u$, which is the 2nd state in $\xx$. There appears to be unusually large changes in the trend around year 25. The other changes in the trend are consistent with a random walk; i.e., the trend changes but only the rapid change near year 25 is inconsistent with the estimated trend random walk.
 
 \begin{figure}[htp]
 \begin{center}

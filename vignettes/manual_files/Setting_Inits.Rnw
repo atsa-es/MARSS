@@ -109,19 +109,19 @@ You can pass in the initial conditions as a list using the \verb@coef()@ functio
 <<Cs_mci_010, results=hide>>=
 # create the par list from the output
 inits <- coef(kem, what = "par")
-kem.bfgs <- MARSS(dat, model = model.list, inits = inits, method = "BFGS")
+bfgs <- MARSS(dat, model = model.list, inits = inits, method = "BFGS")
 @
 Or you can pass in a marssMLE object output from a prior call to \verb@MARSS()@. This is a shortcut for the above call.
 <<Cs_mci_0101, results=hide>>=
 # create the par list from the output
-kem.bfgs <- MARSS(dat, model = model.list, inits = kem, method = "BFGS")
+bfgs <- MARSS(dat, model = model.list, inits = kem, method = "BFGS")
 @
 
 \section{Searching across initial values using a Monte Carlo routine}
 \index{initial conditions!Monte Carlo search}
-The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima and ridges.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carol search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  In our papers on the distributional properties of  MARSS parameter estimates, we rarely found that an initial conditions search changed the estimates---except in cases where $\ZZ$ and $\BB$ are estimated as unconstrained or as the fraction of missing data in the data set became large.  Regardless an initial conditions search should be done before reporting final estimates for an analysis\footnote{It is also a good idea to try method=BFGS to see if this changes the estimates.}.  
+The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms it can get stuck on local maxima and ridges.  There are a number approaches to doing a pre-search of the initial conditions space, but a brute force  random Monte Carlo search appears to work well \citep{Biernackietal2003}.  It is slow, but normally sufficient.  In our papers on the distributional properties of  MARSS parameter estimates, we rarely found that an initial conditions search changed the estimates---except in cases where $\ZZ$ and $\BB$ are estimated as unconstrained or when the fraction of missing data in the data set became large.  Regardless an initial conditions search should be done before reporting final estimates for an analysis\footnote{It is also a good idea to try method=BFGS to see if this changes the estimates.}.  
 
-The idea behind a Monte Carlo search of initial conditions is simple.  One simply randomly generates initial conditions, runs the EM algorithm a few iterations (10-20), and save the log-likelihood at the end of those iterations.  The starting initial conditions is selected from that giving the lowest log-likelihood. 
+The idea behind a Monte Carlo search of initial conditions is simple.  One simply randomly generates initial conditions, runs the EM algorithm a few iterations (10-20), and saves the log-likelihood at the end of those iterations.  The starting initial conditions is selected as the initial conditions that gives the lowest log-likelihood. 
 
 The R code included for this chapter includes a function that will do a simple Monte Carlo search using a marssMLE object (output from a \verb@MARSS()@ call) and drawing random initial conditions from a uniform distribution or a Wishart distribution for the variance-covariance matrices. The function will not work for all MARSS models but will give you a starting point for setting up your own Monte Carlo search.  The function uses a control list to set \texttt{numInits}, the number of random initial value draws, \texttt{numInitSteps}, the maximum number of EM iterations for each random initial value draw, and \texttt{boundsInits}, the bounds for the random distributions. It outputs a list with specifying the initial values that give the lowest log-likelihood.
 
@@ -218,7 +218,7 @@ MARSSmcinit <- function(MLEobj,
     MLEobj$start <- init.loop
     MLEobj$control$maxit <- control$numInitSteps
     MLEobj$control$minit <- 1
-    MLEobj$control$silent <- TRUE # don't print convergence information during kem call
+    MLEobj$control$silent <- TRUE # don't output
     MLEobj <- MARSSkem(MLEobj) # get new fit using this init
 
     if (drawProgressBar == TRUE) prev <- MARSS:::progressBar(loop / control$numInits, prev)

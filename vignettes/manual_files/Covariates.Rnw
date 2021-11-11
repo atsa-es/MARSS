@@ -207,7 +207,7 @@ TT <- ncol(dat)
 
 \subsection{Seasonal effects as fixed factors}
 
-One common approach for estimating seasonal effects is to treat each one as a fixed factor.  This adds an estimated parameter for each season (\emph{e.g.}, 24 hours per day, 4 quarters per year). The plankton data are collected monthly, so we will treat each month as a fixed factor.  To fit a model with fixed month effects, we create a 12 $\times$ \emph{T} covariate matrix $\cc$ with one row for each month (Jan, Feb, ...) and one column for each time point. We put a 1 in the January row for each column corresponding to a January time point, a 1 in the February row for each column corresponding to a February time point, and so on. All other values of $\cc$ equal 0. The following code will create such a $\cc$ matrix.
+One common approach for estimating seasonal effects is to treat each one as a fixed factor.  This adds an estimated parameter for each season (e.g., 24 hours per day, 4 quarters per year). The plankton data are collected monthly, so we will treat each month as a fixed factor.  To fit a model with fixed month effects, we create a $12 \times T$ covariate matrix $\cc$ with one row for each month (Jan, Feb, ...) and one column for each time point. We put a 1 in the January row for each column corresponding to a January time point, a 1 in the February row for each column corresponding to a February time point, and so on. All other values of $\cc$ equal 0. The following code will create such a $\cc$ matrix.
 <<Covar_sec6_02_set-up-month-factors>>=
 # number of "seasons" (e.g., 12 months per year)
 period <- 12
@@ -315,7 +315,7 @@ The middle panel in Figure \ref{fig:mon-effects} shows the estimated seasonal ef
 
 \subsection{Seasonal effects as a Fourier series}
 
-The factor approach required estimating 60 effects, and the 3rd order polynomial model was an improvement at only 20 parameters. A third option is to use a discrete Fourier series, which is combination of sine and cosine waves; it would require only 10 parameters. Specifically, the effect of month $m$ on taxon $i$ is $a_i \times \cos(2 \pi m/p) + b_i \times \sin(2 \pi m/p)$, where $p$ is the period (\emph{e.g.}, 12 months, 4 quarters), and $a_i$ and $b_i$ are contained in the $i$-th row of $\CC$.
+The factor approach required estimating 60 effects, and the 3rd order polynomial model was an improvement at only 20 parameters. A third option is to use a discrete Fourier series, which is combination of sine and cosine waves; it would require only 10 parameters. Specifically, the effect of month $m$ on taxon $i$ is $a_i \times \cos(2 \pi m/p) + b_i \times \sin(2 \pi m/p)$, where $p$ is the period (e.g., 12 months, 4 quarters), and $a_i$ and $b_i$ are contained in the $i$-th row of $\CC$.
 
 We begin by defining the 2 $\times$ \emph{T} seasonal covariate matrix $\cc$ as a combination of 1 cosine and 1 sine wave:
 <<Covar_sec6_09_seasonal-fourier>>=
