@@ -796,7 +796,7 @@ for (i in 1:N.ts) {
 \label{fig:CS4.bestfits}
 \end{figure}
 
-Alternatively, you can use the \verb@residuals()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot:\index{dynamic factor analysis!residuals}
+Alternatively, you can use the \verb@residuals()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot.\index{dynamic factor analysis!residuals}
 
 \begin{figure}[htp]
 \begin{center}
@@ -829,7 +829,7 @@ It is standard to add covariates to the analysis so that one removes known impor
  \xx_0 \sim \MVN(\pipi,\LAM) 
  \end{gathered}   
  \label{eq:dfa.cov}\end{equation}
-where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and the $n \times q$ matrix $\DD$ contains the effect(s) of the covariate(s) on the observations.  Using \verb@form="dfa"@ and \verb@covariates=@<\emph{covariate name(s)}>, we can easily add covariates to our DFA, but this means that the covariates are input, not data, and there can be no missing values (see Chapter \ref{chap:covariates} for how to include covariates with missing values).
+where the $q \times 1$ vector $\dd_t$ contains the covariate(s) at time $t$, and the $n \times q$ matrix $\DD$ contains the effect(s) of the covariate(s) on the observations.  Using \verb@form="dfa"@ and \verb@covariates=@<\emph{covariate name(s)}>, we can easily add covariates to our DFA, but this means that the covariates are input, not data, and there can be no missing values. See Chapter \ref{chap:covariates} for how to include covariates with missing values.
  
 The Lake Washington dataset has two environmental covariates that we might expect to have effects on phytoplankton growth, and hence, abundance: temperature (Temp) and total phosphorous (TP). 
 <<Cs26_set-up-covar>>=
@@ -891,7 +891,7 @@ print(cbind(
   ))
 ), quote = FALSE)
 @
-This suggests that adding temperature or phosphorus to the model, either alone or in combination with one another, improves overall model fit. If we were interested in assessing the ``best" model structure that includes covariates, however, we should examine all combinations of trends and structures for $\RR$. The model fits for the temperature-only model are shown in Fig \ref{fig:CS4.bestcovarfits} and they appear much better than the model without any covariates.
+This suggests that adding temperature or phosphorus to the model, either alone or in combination with one another, improves overall model fit. If we were interested in assessing the best model structure that includes covariates, however, we should examine all combinations of trends and structures for $\RR$. The model fits for the temperature-only model are shown in Fig \ref{fig:CS4.bestcovarfits} and they appear much better than the model without any covariates.
 
 \begin{figure}[htp]
 \begin{center}
@@ -913,8 +913,9 @@ for (i in 1:length(spp)) {
 \end{figure}
 
 \section{Discussion}
-We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the R code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code.  Copy and paste the code into a new file, and then you can edit that code.
-DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see Chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  
+We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the zooplankton names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the R code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code. 
+
+DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see Chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  You might also try using \verb@method="BFGS"@ in the \verb@MARSS()@ call.
 
 %---------
 % THE END
