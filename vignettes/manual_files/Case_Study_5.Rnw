@@ -54,10 +54,9 @@ The variance-covariance matrix for $\ww_t$ is a diagonal matrix with unequal var
 
 \section{Loggerhead sea turtle tracking data}
 Loggerhead sea turtles (\emph{Caretta caretta}) are listed as threatened under the United States Endangered Species Act of 1973.  Over the last ten years, a number of state and local agencies have been deploying ARGOS tags on loggerhead turtles on the east coast of the United States.  We have data on eight individuals over that period.  In this chapter, we use some turtle data from the WhaleNet Archive of
-STOP Data, however we have corrupted this data severely by adding random errors in order to create a ``bad tag'' problem.  We corrupted latitude and longitude data by errors (Figure \ref{fig:CS5.fig1}) and it would appear that our sea turtles are becoming land turtles (at least part of the time).   We will the MARSS model to estimate true positions and speeds from the corrupted data.  
+STOP Data, however we have corrupted this data severely by adding random errors in order to create a ``bad tag'' problem (Figure \ref{fig:CS5.fig1}), and it would appear that our sea turtles are becoming land turtles (at least part of the time).   We will use the MARSS model to estimate true positions and speeds from the corrupted data.  
 
-Our noisy data are in \texttt{loggerheadNoisy}.  They consist of daily readings of location (longitude/latitude).
-  If data are missing for a day, then the entries for latitude and longitude for that day should be NA.  However, to make the code in this chapter run quickly, we have interpolated all missing values in the original, uncorrupted, dataset (\texttt{loggerhead}).  The first six lines of the corrupted data look like so
+Our noisy data are in \texttt{loggerheadNoisy}.  They consist of daily readings of location (longitude and latitude). If data are missing for a day, then the entries for latitude and longitude for that day should be NA.  However, to make the code in this chapter run quickly, we have interpolated all missing values in the original, uncorrupted, dataset (\texttt{loggerhead}).  The first six lines of the corrupted data are
 <<Cs01_data2>>=
 loggerheadNoisy[1:6, ]
 @
@@ -119,7 +118,7 @@ points(pdat$lon[which(pdat$turtle == turtlename)], pdat$lat[which(pdat$turtle ==
 \end{figure}
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-\section{Estimate locations from bad tag data}
+\section{Estimate locations from the bad tag data}
 
 We will begin by specifying the structure of the MARSS model and then use \texttt{MARSS()} to fit that model to the data. There are two state processes (one for latitude and the other for longitude), and there is one observation time series for each state process.   As we saw in Equation \ref{eq:mssmlong.b}, $\ZZ$ is the an identity matrix (a diagonal matrix with 1s on the diagonal).  We could specify this structure as \texttt{Z.model="identity"} or \texttt{Z.model=factor(c(1,2))}. Although technically, this is unnecessary as this is the default form for $\ZZ$.
 
@@ -216,7 +215,7 @@ col = c("blue", "red", "black"), bty = FALSE
 %^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 \section{Estimate speeds for each turtle}
-Turtle biologists designated one of these loggerheads ``Big Mama,'' presumably for her size and speed.  For each of the eight turtles, estimate the average miles traveled per day.  To calculate the distance traveled by a turtle each day, you use the estimate (from \texttt{MARSS()}) of the lat/lon location of turtle at day $t$ and at day $t-1$.  To calculate distance traveled in miles from lat/lon start and finish locations, we will use the function \verb@GCDF@:
+For each of the eight turtles, estimate the average miles traveled per day.  To calculate the distance traveled by a turtle each day, you use the estimate (from \texttt{MARSS()}) of the latitude/longitude location of turtle at day $t$ and at day $t-1$.  To calculate distance traveled in miles from latitude/longitude start and finish locations, we will use the function \verb@GCDF@:
 <<Cs09b_GCDF>>=
 GCDF <- function(lon1, lon2, lat1, lat2, degrees = TRUE, units = "miles") {
   temp <- ifelse(degrees == FALSE,
@@ -304,19 +303,6 @@ If you have real tag data to analyze, you should use a state-space modeling pack
 \end{description}
 
 \texttt{kftrack}\index{animal tracking!kftrack} is a full-featured toolbox for analyzing tag data with extended Kalman filtering.  It incorporates a number of extensions that are important for analyzing track data: barriers to movement such as coastlines and non-Gaussian movement distributions.  With \texttt{kftrack}, you can use the real tag data which has big gaps, i.e., days with no location.  \texttt{MARSS()} will struggle with these data because it will estimate states for all the unseen days; \texttt{kftrack} only fits to the seen days.  
-
-To use \texttt{kftrack} to fit the turtle data, type
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<<Cs17_kftrack, keep.source=TRUE, eval=FALSE>>=
-library(kftrack) # must be installed from github
-loggerhead <- loggerhead
-turtlename <- "BigMama"
-dat <- loggerhead[which(loggerhead$turtle == turtlename), 2:6]
-model <- kftrack(dat,
-  fix.first = FALSE, fix.last = FALSE,
-  var.struct = "uniform"
-)
-@
 
 
 <<Reset, echo=FALSE>>=
