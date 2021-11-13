@@ -43,7 +43,7 @@ In our first application combining multiple time series, we will analyze a datas
 We will be using the logged counts.
 <<Cs001_readinredddata>>=
 head(okanaganRedds)
-logRedds = log(t(okanaganRedds)[2:3,])
+logRedds <- log(t(okanaganRedds)[2:3, ])
 @   
 Year is in the first column, and the counts (in normal space) are in columns 2:3.  Missing observations are represented by NAs.  
 
@@ -52,11 +52,14 @@ Year is in the first column, and the counts (in normal space) are in columns 2:3
 \begin{center}
 <<Cs002_fig1,fig=TRUE>>=
 # Code for plotting raw Okanagan redd counts
-plot(okanaganRedds[,1], okanaganRedds[,2],
-    xlab = "", ylab="Redd counts",main="", col="red", pch=1)
-points(okanaganRedds[,1], okanaganRedds[,3], col="blue", pch=2)
-legend('topleft', inset=0.1, legend=c("Aerial survey","Ground survey"),
- col=c("red","blue"), pch=c(1,2))
+plot(okanaganRedds[, 1], okanaganRedds[, 2],
+  xlab = "", ylab = "Redd counts", main = "", col = "red", pch = 1
+)
+points(okanaganRedds[, 1], okanaganRedds[, 3], col = "blue", pch = 2)
+legend("topleft",
+  inset = 0.1, legend = c("Aerial survey", "Ground survey"),
+  col = c("red", "blue"), pch = c(1, 2)
+)
 @
 \end{center}
 \caption{The two time series look to be pretty close to one another in the years where there is overlap.}
@@ -88,19 +91,19 @@ We specify this model as follows.  Since $\xx$ is univariate, $\QQ$ and $\uu$ ar
 Fit the single state model, where the time series are assumed 
 to be from the same population. 
 <<Cs003_reddmodel1, keep.source=TRUE, results=hide>>=
-model1=list()
-model1$R="diagonal and equal"
-model1$Z=matrix(1,2,1)
-model1$A="scaling" 
-kem1 = MARSS(logRedds, model=model1)
+model1 <- list()
+model1$R <- "diagonal and equal"
+model1$Z <- matrix(1, 2, 1)
+model1$A <- "scaling"
+kem1 <- MARSS(logRedds, model = model1)
 @
 The AIC and AICc values for this model are
 
 We can modify the above model to let the observation error variances to be unique:
 <<Cs004_reddmodel2, keep.source=TRUE, results=hide>>=
-model2=model1 #model2 is based on model1
-model2$R="diagonal and unequal"
-kem2 = MARSS(logRedds, model=model2)
+model2 <- model1 # model2 is based on model1
+model2$R <- "diagonal and unequal"
+kem2 <- MARSS(logRedds, model = model2)
 @
 
 It is possible that these surveys are measuring different population processes. For our third model, we will fit a model with two different population process with the same process parameters.  For simplicity, we will keep the trend and variance parameters the same.  Mathematically, the model we are fitting is:
@@ -120,18 +123,18 @@ It is possible that these surveys are measuring different population processes. 
 \end{equation}
 We specify this in MARSS as
 <<Cs005_reddmodel3, keep.source=TRUE, results=hide>>=
-model3=list()
-model3$Q="diagonal and equal"
-model3$R="diagonal and equal"
-model3$U="equal"
-model3$Z="identity"
-model3$A="zero"
-kem3 = MARSS(logRedds, model=model3)
+model3 <- list()
+model3$Q <- "diagonal and equal"
+model3$R <- "diagonal and equal"
+model3$U <- "equal"
+model3$Z <- "identity"
+model3$A <- "zero"
+kem3 <- MARSS(logRedds, model = model3)
 @
 
 Based on AICc, it appears that the best model is also the simplest one, with one state vector (model1).
 <<Cs005b_aic>>=
-c(mod1=kem1$AICc, mod2=kem2$AICc, mod3=kem3$AICc)
+c(mod1 = kem1$AICc, mod2 = kem2$AICc, mod3 = kem3$AICc)
 @
 This suggests that the two different surveys are not only measuring the same underlying process, but have the same observation error variance.  Finally, we will make a plot of the model-predicted states (with +/- 2 s.e.s) and the log-transformed data (Figure \ref{fig:fig2}).
 
@@ -140,12 +143,13 @@ This suggests that the two different surveys are not only measuring the same und
 \begin{center}
 <<Cs006_fig2,fig=TRUE, echo=FALSE>>=
 # Code for plotting the fit from the best model
-plot(okanaganRedds[,1], logRedds[1,],
-xlab = "", ylab="Redd counts",main="", col="red", ylim=c(0,8))
-points(okanaganRedds[,1], logRedds[2,], col="blue", pch=2)
-lines(okanaganRedds[,1], c(kem1$states), lty=1, lwd=2)
-lines(okanaganRedds[,1], c(kem1$states + 2*kem1$states.se), lty=1, lwd=1, col="grey40")
-lines(okanaganRedds[,1], c(kem1$states - 2*kem1$states.se), lty=1, lwd=1, col="grey40")
+plot(okanaganRedds[, 1], logRedds[1, ], xlab = "", ylab = "Redd counts", 
+     main = "", col = "red", ylim = c(0, 8)
+)
+points(okanaganRedds[, 1], logRedds[2, ], col = "blue", pch = 2)
+lines(okanaganRedds[, 1], c(kem1$states), lty = 1, lwd = 2)
+lines(okanaganRedds[, 1], c(kem1$states + 2 * kem1$states.se), lty = 1, lwd = 1, col = "grey40")
+lines(okanaganRedds[, 1], c(kem1$states - 2 * kem1$states.se), lty = 1, lwd = 1, col = "grey40")
 @
 \end{center}
 \caption{The data support the hypothesis that the two redd-count time series are observations of the same population. The points are the data and the thick black line is the estimated underlying state.}
@@ -160,15 +164,15 @@ For this example, we want to estimate the average long-term trend in total rockf
 We will assume that the underlying process is a univariate stochastic exponential growth process with rates of decline that are not changing through time.  The stochastic exponential is often a decent approximation for many different types of density-independent population processes, and total rockfish catches have been declining over the last 30 years.  Because we are only interested in the total trend, we use a model with one state vector only ($m=1$). Our uncertainty lies in how observation errors may be differing among different types of data. 
 
 <<set-up-rockfish-data>>=
-rec.names=paste("Rec..targeting.bottomfish.",1:4,sep="")
-rec.years=apply(!is.na(rockfish[,rec.names]),1,any)
-recdat = rockfish[rec.years,rec.names]
-flatrecdat=apply(recdat,1,sum,na.rm=TRUE)
+rec.names <- paste("Rec..targeting.bottomfish.", 1:4, sep = "")
+rec.years <- apply(!is.na(rockfish[, rec.names]), 1, any)
+recdat <- rockfish[rec.years, rec.names]
+flatrecdat <- apply(recdat, 1, sum, na.rm = TRUE)
 @
 \begin{figure}[htp]
 \begin{center}
 <<label=rockfish1,fig=TRUE>>=
-graphics::matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
+graphics::matplot(rockfish[rec.years, 1], recdat, ylab = "", xlab = "Rec CPUE")
 title("Puget Sound Total Rockfish Recreational CPUE data")
 @
 \end{center}
@@ -178,31 +182,31 @@ title("Puget Sound Total Rockfish Recreational CPUE data")
 
 Use a $\QQ$ that is reasonable for medium sized vertebrates.
 <<fit-rockfish1>>=
-kem.rock1=MARSS(flatrecdat,model=list(Q=matrix(0.01)))
+kem.rock1 <- MARSS(flatrecdat, model = list(Q = matrix(0.01)))
 @
 
 We think there is a management effect and we'd like to take this into account.
 <<set-up-rock-A>>=
-A.model=array(list(0),dim=c(1,1,dim(recdat)[1]))
-manage.A=!is.na(recdat[,"Rec..targeting.bottomfish.2"])
-A.model[1,1,manage.A]="manag.A"
-manage.B=!is.na(recdat[,"Rec..targeting.bottomfish.3"])
-A.model[1,1,manage.B]="manag.B"
-manage.C=!is.na(recdat[,"Rec..targeting.bottomfish.4"])
-A.model[1,1,manage.C]="manag.C"
+A.model <- array(list(0), dim = c(1, 1, dim(recdat)[1]))
+manage.A <- !is.na(recdat[, "Rec..targeting.bottomfish.2"])
+A.model[1, 1, manage.A] <- "manag.A"
+manage.B <- !is.na(recdat[, "Rec..targeting.bottomfish.3"])
+A.model[1, 1, manage.B] <- "manag.B"
+manage.C <- !is.na(recdat[, "Rec..targeting.bottomfish.4"])
+A.model[1, 1, manage.C] <- "manag.C"
 @
 
 <<fit-rockfish2>>=
-kem.rock2=MARSS(flatrecdat,model=list(A=A.model,Q=matrix(0.01)))
+kem.rock2 <- MARSS(flatrecdat, model = list(A = A.model, Q = matrix(0.01)))
 @
 Including the management effect has a big effect on our estimate of trend.
 
 \begin{figure}[htp]
 \begin{center}
 <<label=rockfish2,fig=TRUE>>=
-graphics::matplot(rockfish[rec.years,1],recdat,ylab="",xlab="Rec CPUE")
-lines(rockfish[rec.years,1],as.vector(kem.rock1$states),col="red",lty=2,lwd=2)
-lines(rockfish[rec.years,1],as.vector(kem.rock2$states),col="blue",lty=1,lwd=2)
+graphics::matplot(rockfish[rec.years, 1], recdat, ylab = "", xlab = "Rec CPUE")
+lines(rockfish[rec.years, 1], as.vector(kem.rock1$states), col = "red", lty = 2, lwd = 2)
+lines(rockfish[rec.years, 1], as.vector(kem.rock2$states), col = "blue", lty = 1, lwd = 2)
 title("Puget Sound Total Rockfish Recreational CPUE data")
 @
 \end{center}
@@ -211,8 +215,8 @@ title("Puget Sound Total Rockfish Recreational CPUE data")
 \end{figure}
 Why was $\QQ$ set to 0.01?  The data are not distinctive enough to allow us to estimate both $\RR$ and $\QQ$.  We can see the problem with the following code.  One has $\QQ$ going to zero and the other has $\RR$ going to zero.
 <<test-rock,results=hide,eval=FALSE>>=
- kem.rock3a=MARSS(flatrecdat,model=list(A=A.model,tinitx=0))
- kem.rock3b=MARSS(flatrecdat,model=list(A=A.model,tinitx=1))
+kem.rock3a <- MARSS(flatrecdat, model = list(A = A.model, tinitx = 0))
+kem.rock3b <- MARSS(flatrecdat, model = list(A = A.model, tinitx = 1))
 @
 
 
@@ -220,29 +224,29 @@ Why was $\QQ$ set to 0.01?  The data are not distinctive enough to allow us to e
 \subsection{Read in and plot the data}
 <<legend, echo=FALSE>>=
 d <- rockfish
-legendnames = (unlist(dimnames(d)[2]))[2:ncol(d)]
-for(i in 1:length(legendnames)) cat(paste(i,legendnames[i],"\n",sep=" "))
+legendnames <- (unlist(dimnames(d)[2]))[2:ncol(d)]
+for (i in 1:length(legendnames)) cat(paste(i, legendnames[i], "\n", sep = " "))
 @
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{figure}[htp]
 \begin{center}
 <<label=fig3,fig=TRUE,echo=FALSE>>=
 d <- rockfish
-dat = d[,2:ncol(d)] #first col is years
-x = d[,1] #first col is years
-n = nrow(dat) #num time series
+dat <- d[, 2:ncol(d)] # first col is years
+x <- d[, 1] # first col is years
+n <- nrow(dat) # num time series
 
-#set up the graphical parameters to give each data a unique line, color and width
-options(warn=-99)
-ltys=matrix(1,nrow=n)
-cols=matrix(1:4,nrow=n)
-lwds=matrix(1:2,nrow=n)
-pchs=matrix(as.character(c(1:n)),nrow=n)
-options(warn=0)
+# set up the graphical parameters to give each data a unique line, color and width
+options(warn = -99)
+ltys <- matrix(1, nrow = n)
+cols <- matrix(1:4, nrow = n)
+lwds <- matrix(1:2, nrow = n)
+pchs <- matrix(as.character(c(1:n)), nrow = n)
+options(warn = 0)
 
-meany = matrix(apply(dat,2,mean,na.rm=T),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #take off the mean; for better plotting and to mask pattern
-adj = matrix(c(1.5,0,-2,1,2,-2,-1,0,2),nrow=nrow(dat),ncol=ncol(dat),byrow=T) #just to mask pattern in data
-graphics::matplot(x,dat-meany+adj,xlab="",ylab="Index of log(cpue)",type="b",pch=pchs,lty=ltys,col=cols,lwd=lwds)
+meany <- matrix(apply(dat, 2, mean, na.rm = T), nrow = nrow(dat), ncol = ncol(dat), byrow = T) # take off the mean; for better plotting and to mask pattern
+adj <- matrix(c(1.5, 0, -2, 1, 2, -2, -1, 0, 2), nrow = nrow(dat), ncol = ncol(dat), byrow = T) # just to mask pattern in data
+graphics::matplot(x, dat - meany + adj, xlab = "", ylab = "Index of log(cpue)", type = "b", pch = pchs, lty = ltys, col = cols, lwd = lwds)
 title("Puget Sound Total Rockfish Indices")
 @
 \end{center}
@@ -254,29 +258,29 @@ title("Puget Sound Total Rockfish Indices")
 
 First, let's fit a model that allows unique observation variances for each time series.
 <<fishmodel1, keep.source=TRUE, results=hide>>=
-fishdat = t(rockfish[,2:dim(rockfish)[2]])
-Q.model="diagonal and equal"
-R.model="diagonal and unequal"
-U.model="equal"
-Z.model=factor(rep(1,dim(fishdat)[1]))
-model1 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
-kem1 = MARSS(fishdat, model=model1)
+fishdat <- t(rockfish[, 2:dim(rockfish)[2]])
+Q.model <- "diagonal and equal"
+R.model <- "diagonal and unequal"
+U.model <- "equal"
+Z.model <- factor(rep(1, dim(fishdat)[1]))
+model1 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem1 <- MARSS(fishdat, model = model1)
 @
 
 At the other end of the spectrum, we can build a model that assumes each of the time series has the same observation error.  
 <<fishmodel2, keep.source=TRUE, results=hide>>=
-R.model="diagonal and equal"
-model2 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
-kem2 = MARSS(fishdat, model=model2)
+R.model <- "diagonal and equal"
+model2 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem2 <- MARSS(fishdat, model = model2)
 @
 
 Neither of these models converge in 500 iterations.  The models are not that complex and if the models could decently describe the data, they would converge quickly.  Let's try some other observation error structures.  We can improve the partitioning of the variances by constraining some of the measurement variances.  We know that the recreational CPUE data from 1977 on represents a consistent measure of catch effort.  It is the average fish per angler trip over 8 standardized regions in the Puget Sound.  The error between this metric and ``total rockfish'' equals (sampling error variance + variance due to real year-to-year changes in catchability).  The sampling error variance is something we control by our sampling design and sample size.  The year-to-year changes in catchability have to do with things we cannot control -- weather, how hungry fish are, where the fish are, sizes of the fish, etc. etc.  For the recreational data, our sample size is very large: ca 100,000 to 300,000 angler trips.  So we can probably safely say that the measurement error variance is driven by year-to-year changes in catchability rather than changes in sample size.  Thus we will assume that that the measurement errors for time series 4,5,6, and 7 have an identical variance (so there are six observation variances, rather than nine).
 
 <<fishmodel3, keep.source=TRUE, results=hide>>=
-R.model=matrix(list(0),9,9)
-diag(R.model)=list("1","2","4","4","4","4","4","5","6")
-model3 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
-kem3 = MARSS(fishdat, model=model3)
+R.model <- matrix(list(0), 9, 9)
+diag(R.model) <- list("1", "2", "4", "4", "4", "4", "4", "5", "6")
+model3 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem3 <- MARSS(fishdat, model = model3)
 @
 This model doesn't converge either.  Examination of the model fit reveals that there is a conflict between and the model for pre-1980 and post-1980.  Thus the pre-1980 ``total rockfish'' estimates produced by this model (with $u$=constant) are unsupported by the data.  The reasons for this could be that the population was stable pre-1980 and then declined post-1980.  
 
@@ -284,39 +288,39 @@ This model doesn't converge either.  Examination of the model fit reveals that t
 In this case, our assumption that $u$ is constant over the whole time series is poor, and we should have fit a model using $u_{\textrm{pre-1980}}$ and $u_{\textrm{post-1980}}$.  As a last example, we will drop the data before 1980 (and the time series that do not have data after this year).  
 
 <<testing,echo=FALSE, results=hide>>=
-U.model=array(list(),dim=c(1,1,length(rockfish[,"Year"])))
-U.model[1,1,rockfish[,"Year"]<1980]="pre-1980"
-U.model[1,1,rockfish[,"Year"]>=1980]="post-1980"
-model4 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
-kem4 = MARSS(fishdat, model=model4)
+U.model <- array(list(), dim = c(1, 1, length(rockfish[, "Year"])))
+U.model[1, 1, rockfish[, "Year"] < 1980] <- "pre-1980"
+U.model[1, 1, rockfish[, "Year"] >= 1980] <- "post-1980"
+model4 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem4 <- MARSS(fishdat, model = model4)
 
-Z.model=factor(c("trawl","trawl","rec","rec","rec","rec","rec","scuba","wdfw.trawl"))
-Q.model="diagonal and unequal"
-U.model="equal"
-model5 = list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
-kem5 = MARSS(fishdat, model=model5)
+Z.model <- factor(c("trawl", "trawl", "rec", "rec", "rec", "rec", "rec", "scuba", "wdfw.trawl"))
+Q.model <- "diagonal and unequal"
+U.model <- "equal"
+model5 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem5 <- MARSS(fishdat, model = model5)
 @
 
 Pull out data years 1980 on and drop the columns (observation time series) with no data after 1980:
 <<getdat4>>=
-years = rockfish[,1]
-dat = rockfish[,-1]
-dat4 = dat[years>=1980,]
-years4=years[years>=1980]
-isdata = apply(is.na(dat4),2,sum)!=length(years4)
-dat4 = dat4[,isdata]
+years <- rockfish[, 1]
+dat <- rockfish[, -1]
+dat4 <- dat[years >= 1980, ]
+years4 <- years[years >= 1980]
+isdata <- apply(is.na(dat4), 2, sum) != length(years4)
+dat4 <- dat4[, isdata]
 @
 Redo the $\ZZ$ matrix since we now have fewer time series and change the \verb@R.model@ argument to reflect the missing time series:
 <<setargs4>>=
-n4 = ncol(dat4)
-Z4 = as.factor(rep(1,n4))
-R.model4=matrix(list(0),n4,n4)
-diag(R.model4)=list("1","2","2","2","2","3","4")
+n4 <- ncol(dat4)
+Z4 <- as.factor(rep(1, n4))
+R.model4 <- matrix(list(0), n4, n4)
+diag(R.model4) <- list("1", "2", "2", "2", "2", "3", "4")
 @
 Rerun the analysis:
 <<fitanalysis3, results=hide>>=
-model4 =  list(Z = Z4, Q = Q.model, R = R.model4, U = U.model)
-kem4 = MARSS(t(dat4), model=model4)
+model4 <- list(Z = Z4, Q = Q.model, R = R.model4, U = U.model)
+kem4 <- MARSS(t(dat4), model = model4)
 @
 
 \end{comment}
@@ -327,7 +331,7 @@ In this example, we evaluate uncertainty in the structure of process variability
 \subsection{Read in and look at the data}
 Figure \ref{fig:fig5} shows the data.  The data are already log transformed.
 <<Cs007_birddata>>=
-birddat = t(kestrel[,2:4]) 
+birddat <- t(kestrel[, 2:4])
 head(kestrel)
 @
 
@@ -335,10 +339,10 @@ head(kestrel)
 \begin{center}
 <<Cs008_plot-bird-data,fig=TRUE,echo=FALSE>>=
 # Make a plot of the three time series
-plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red",ylim=c(0,2), pch=21)
-points(kestrel[,1], kestrel[,3], col="blue", pch=22)
-points(kestrel[,1], kestrel[,4], col="purple", pch=25)
-legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
+plot(kestrel[, 1], kestrel[, 2], xlab = "", ylab = "Index of kestrel abundance", main = "", col = "red", ylim = c(0, 2), pch = 21)
+points(kestrel[, 1], kestrel[, 3], col = "blue", pch = 22)
+points(kestrel[, 1], kestrel[, 4], col = "purple", pch = 25)
+legend("topright", inset = 0.1, legend = c("British Columbia", "Alberta", "Saskatchewan"), col = c("red", "blue", "purple"), pch = c(21, 22, 25))
 @
 \end{center}
 \caption{The kestrel data.}
@@ -386,23 +390,23 @@ We will compare this to a model where we assume that there is a separate populat
 \end{equation}
 This is specified as:
 <<Cs011_fit-bird-model-2, results=hide>>=
-model.b2=list()
-model.b2$Q="diagonal and equal"
-model.b2$R="diagonal and equal"
-model.b2$Z="identity"
-model.b2$A="zero"
-model.b2$U="equal"
-kem.b2 = MARSS(birddat, model=model.b2)
+model.b2 <- list()
+model.b2$Q <- "diagonal and equal"
+model.b2$R <- "diagonal and equal"
+model.b2$Z <- "identity"
+model.b2$A <- "zero"
+model.b2$U <- "equal"
+kem.b2 <- MARSS(birddat, model = model.b2)
 @
 
 Because these populations are surveyed over a relatively large geographic area, it is reasonable to expect that environmental variation
 may differ between provinces.  For our third model, we will fit a model with separate processes that are allowed to have unequal process parameters.
 <<Cs013_fit-bird-model-3, echo=TRUE, results=hide, keep.source=TRUE>>=
-model.b3=model.b2 #is is based on model.b2
-#all we change is the structure of Q
-model.b3$Q="diagonal and unequal"
-model.b3$U="unequal"
-kem.b3 = MARSS(birddat, model=model.b3)
+model.b3 <- model.b2 # is is based on model.b2
+# all we change is the structure of Q
+model.b3$Q <- "diagonal and unequal"
+model.b3$U <- "unequal"
+kem.b3 <- MARSS(birddat, model = model.b3)
 @
 
 For our last model, we will consider lumping Alberta/Saskatchewan, because the time series suggest similar trends.   Mathematically, this model is:
@@ -422,18 +426,18 @@ For our last model, we will consider lumping Alberta/Saskatchewan, because the t
 \end{equation}
 This model is specified as
 <<Cs015_fit-bird-model-4, echo=TRUE, results=hide>>=
-model.b4=list()
-model.b4$Q="diagonal and unequal"
-model.b4$R="diagonal and equal"
-model.b4$Z=factor(c("BC","AB-SK","AB-SK"))
-model.b4$A="scaling"
-model.b4$U="unequal"
-kem.b4 = MARSS(birddat, model=model.b4)
+model.b4 <- list()
+model.b4$Q <- "diagonal and unequal"
+model.b4$R <- "diagonal and equal"
+model.b4$Z <- factor(c("BC", "AB-SK", "AB-SK"))
+model.b4$A <- "scaling"
+model.b4$U <- "unequal"
+kem.b4 <- MARSS(birddat, model = model.b4)
 @
 
 The AICc values for the four models are
 <<Cs016_aics>>=
-c(mod1=kem.b1$AICc, mod2=kem.b2$AICc, mod3=kem.b3$AICc, mod4=kem.b4$AICc)
+c(mod1 = kem.b1$AICc, mod2 = kem.b2$AICc, mod3 = kem.b3$AICc, mod4 = kem.b4$AICc)
 @
 The last model is superior to the others, and lowers the AICc value compared to model 1 by 8 units.  Figure \ref{fig:fig6} shows the fits for this model.
 
@@ -441,13 +445,16 @@ The last model is superior to the others, and lowers the AICc value compared to 
 \begin{center}
 <<Cs017_plot-bird-model-4-fits,fig=TRUE,echo=FALSE>>=
 # Make a plot of the predicted trajectory, confidence intervals, and the raw data in log-space
-plot(kestrel[,1], kestrel[,2], xlab = "", ylab="Index of kestrel abundance",main="", col="red", ylim=c(0,2), pch=21)
-points(kestrel[,1], kestrel[,3], col="blue", pch=22)
-points(kestrel[,1], kestrel[,4], col="purple", pch=25)
-lines(kestrel[,1], c(kem.b4$states[1,]), lty=3, lwd=2, col="red")
-lines(kestrel[,1], c(kem.b4$states[2,]), lty=3, lwd=2, col="blue")
-lines(kestrel[,1], c(kem.b4$states[2,]+coef(kem.b4,type="matrix")$A[3,1]), lty=3, lwd=2, col="purple")
-legend('topright',inset=0.1, legend=c("British Columbia","Alberta","Saskatchewan"), col=c("red","blue","purple"), pch=c(21,22,25))
+plot(kestrel[, 1], kestrel[, 2], xlab = "", ylab = "Index of kestrel abundance", 
+     main = "", col = "red", ylim = c(0, 2), pch = 21)
+points(kestrel[, 1], kestrel[, 3], col = "blue", pch = 22)
+points(kestrel[, 1], kestrel[, 4], col = "purple", pch = 25)
+lines(kestrel[, 1], c(kem.b4$states[1, ]), lty = 3, lwd = 2, col = "red")
+lines(kestrel[, 1], c(kem.b4$states[2, ]), lty = 3, lwd = 2, col = "blue")
+lines(kestrel[, 1], c(kem.b4$states[2, ] + coef(kem.b4, type = "matrix")$A[3, 1]), 
+      lty = 3, lwd = 2, col = "purple")
+legend("topright", inset = 0.1, legend = c("British Columbia", "Alberta", "Saskatchewan"), 
+       col = c("red", "blue", "purple"), pch = c(21, 22, 25))
 @
 \end{center}
 \caption{Plot model 4 fits to the kestrel data.}
