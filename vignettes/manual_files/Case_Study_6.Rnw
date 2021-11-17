@@ -73,7 +73,7 @@ x_0 = a
  \end{gathered}   
  \label{eq:marss.model.0}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-We will use this latter format since we will be building on this form.  The model is specified as a list as follows and we denote this model ``0'':
+We will use this latter format since we will be building on this form.  The model is specified as follows:
 <<Cs02_mod-nile-0, eval=TRUE>>=
 mod.nile.0 <- list(
   Z = matrix(1), A = matrix(0), R = matrix("r"),
@@ -103,7 +103,7 @@ x_0 = a
 \end{gathered}   
 \label{eq:marss.model.1}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-where $u$ is now the average per-year decline in river flow volume.  The model is specified as a list as follows and we denote this model ``1":
+where $u$ is now the average per-year decline in river flow volume.  The model is specified as  follows:
 <<Cs04_mod-nile-1, eval=TRUE>>=
 mod.nile.1 <- list(
   Z = matrix(1), A = matrix(0), R = matrix("r"),
@@ -121,7 +121,7 @@ Figure \ref{fig:CS6.fits} shows the fits for the two models with deterministic m
 
 \subsection{Stochastic level model}
 Looking at the flow levels, we might suspect that a model that allows the average flow to change would model the data better and we might suspect that there have been sudden, and anomalous, changes in the river flow level.
-We will now model the average river flow at year $t$ as a random walk, specifically an autoregressive process which means that average river flow is year $t$ is a function of average river flow in year $t-1$.  
+We will now model the average river flow at year $t$ as a random walk, specifically an autoregressive process which means that average river flow in year $t$ is a function of the average river flow in year $t-1$.  
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{gathered}
