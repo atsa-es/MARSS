@@ -226,7 +226,7 @@ The MARSS function will output the expected values of $x_t$ conditioned on the m
 \end{split}   
 \label{eq:hatxy}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \eqref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
+where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \ref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
 
 \subsection{Using observation residuals to detect outliers}
 \index{residuals!model}\index{residuals!smoothations}The standardized smoothed observation (or model) residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data and then standardized by the observation variance:
@@ -238,7 +238,7 @@ e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 \end{split}
  \label{eq:smoothations}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-These residuals should have (asymptotically) a $t$-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals(..., type="tT")@ will compute the smoothation (or auxilliary) residuals for a marssMLE object (output by a MARSS call).   \verb@MARSSresiduals()@ returns two types of standardized residuals (also called auxiliary residuals): Cholesky standardized residuals and marginal standardized residuals. We are using the latter here. The residuals are returned as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \verb@residuals(..., type="tT")@ will also return the smoothations but in a data frame. We use \verb@MARSSresiduals()@ which return them in a list of matrices. \index{functions!residuals}
+These residuals should have (asymptotically) a t-distribution \citep[sec. 3]{KohnAnsley1989} and by looking at the residuals, we can identify potential outlier data points--or more accurately, we can identify data points that do not fit the model (Equation \ref{eq:random.walk.w.noise}).  The call \verb@MARSSresiduals(..., type="tT")@ will compute the smoothation (or auxilliary) residuals for a marssMLE object (output by a MARSS call).   \verb@MARSSresiduals()@ returns two types of standardized residuals (also called auxiliary residuals): Cholesky standardized residuals and marginal standardized residuals. We are using the latter here. The residuals are returned as a $n+m \times T$ matrix.  The first $n$ rows are the estimated $\vv_t$ standardized observation residuals and the next $m$ rows are the estimated $\ww_t$  standardized state residuals (discussed below). \verb@residuals(..., type="tT")@ will also return the smoothations but in a data frame. Here we use \verb@MARSSresiduals()@ which return them in a list of matrices. \index{functions!residuals}
 
 <<Cs09_compute-resids, eval=TRUE, echo=TRUE>>=
 resids.0 <- MARSSresiduals(kem.0, type = "tT")$mar.residuals
@@ -449,7 +449,7 @@ title("test for slope changes")
 
 \section{Discussion}
 
-This chapter shows the basic strategy for doing shock detection sensu Harvey et al. using standardized residuals. This was illustrated with stochastic level and trend models. Stochastic level and trend models are also called Structural Time Series models. You can find more examples of these models in the chapter on that topic along with the seasonal version.
+This chapter shows the basic strategy for doing shock detection sensu Harvey et al. using standardized residuals. This was illustrated with stochastic level and trend models. Stochastic level and trend models are also called Structural Time Series models. You can find more examples of these models in Chapter \ref{chap:structts}.
 
 <<Reset, echo=FALSE>>=
 options(prompt = "> ", continue = "+ ")
