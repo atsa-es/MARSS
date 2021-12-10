@@ -44,7 +44,7 @@ The EM algorithm finds the maximum-likelihood estimates of the parameters in a M
 	\hat{\Theta}_2 &= \arg\underset{\Theta}{\max} \quad \E_{\XX|\hat{\Theta}_1}[\log L(\Theta |\YY=\yy_1^T,\XX)]\\
 \nonumber
 \end{align}
-Then using $\hat{\Theta}_2$, the distibution of $\XX$ conditioned on $\hat{\Theta}_2$ is computed.  Then that distibution along with $\hat{\Theta}_2$ in place of $\hat{\Theta}_1$ is used in Equation \eqref{eqn:EM} to produce an updated parameter set $\hat{\Theta}_3$.  This is repeated until the expected log-likelihood stops increasing (or increases less than some set tolerance level).
+Then using $\hat{\Theta}_2$, the distibution of $\XX$ conditioned on $\hat{\Theta}_2$ is computed.  Then that distibution along with $\hat{\Theta}_2$ in place of $\hat{\Theta}_1$ is used in Equation \ref{eqn:EM} to produce an updated parameter set $\hat{\Theta}_3$.  This is repeated until the expected log-likelihood stops increasing (or increases less than some set tolerance level).
 
 Implementing this algorithm is straight-forward, hence its popularity.
 \begin{enumerate}
