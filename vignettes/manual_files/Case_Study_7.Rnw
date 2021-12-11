@@ -653,7 +653,7 @@ You can also try using the actual fish data instead of the interpolated data.  F
 
 \section{Stability metrics from estimated interaction matrices}
 \index{B matrix!stability metrics}
-The previous sections focused on estimation of the $\BB$ and $\CC$ matrices.  The estimated $\BB$ matrix gives a picture of the species interactions, but it also can be used to compute metrics of the intrinsic community stability \citep{Ivesetal2003}.  Here we illustrate how to compute these metric; the reader should see  \citet{Ivesetal2003} for details on the meaning of each.
+The previous sections focused on estimation of the $\BB$ and $\CC$ matrices.  The estimated $\BB$ matrix gives a picture of the species interactions, but it also can be used to compute metrics of the intrinsic community stability \citep{Ivesetal2003}.  Here we illustrate how to compute these metrics; the reader should see  \citet{Ivesetal2003} for details on the meaning of each.
 
 For the examples here, we will use the estimated $\BB$ and $\QQ$ matrices from our model 5:
 <<Cs37_BQ.5>>=
@@ -666,7 +666,7 @@ Return rate metrics measure how rapidly the system returns to the stationary dis
 Rate of return to the stochastic equilibrium is the rate at which the distribution converges to the stationary distribution after a perturbation away from this stationary distribution.
 The more rapid the convergence, the more stable the system.
 
-The rate of return of the mean of the stationary distribution is governed by the dominant eigenvalue of $\BB$.  In R, we can compute this as:
+The rate of return of the mean of the stationary distribution is governed by the dominant eigenvalue of $\BB$.  We can compute this as:
 <<Cs38_max.eigen>>=
 max(eigen(B)$values)
 @
