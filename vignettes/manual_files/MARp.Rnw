@@ -84,7 +84,7 @@ model.list.2 <- list(
   R = R, x0 = mu, V0 = V, tinitx = 0
 )
 @
-Notice that we do not estimate $\mumu$. We will fit our model to the data ($y$) starting at $t=3$.  Because $\RR=0$, this means $\E[\xx_t|\yy_t]=\xx_t^t=\yy_t$ and $\xx_0^0 \equiv \begin{bmatrix}y_2\\ y_1\end{bmatrix}$.  Note $\E[\xx_t|\yy_{t-1}]=\xx_t^{t-1}\neq\yy_t$ so we do not use $\xx_1^0$ as our initial $\xx$.
+Notice that we do not estimate $\mumu$. We will fit our model to the data ($y$) starting at $t=3$.  Because $\RR=0$, this means $\E[\XX_t|\yy_t]=\xx_t^t=\yy_t$ and $\xx_0^0 \equiv \begin{bmatrix}y_2\\ y_1\end{bmatrix}$.  Note $\E[\XX_t|\yy_{t-1}]=\xx_t^{t-1}\neq\yy_t$ so we do not use $\xx_1^0$ as our initial $\xx$.
 
 Then we can then estimate the $b_1$ and $b_2$ parameters for the AR(2) process.
 <<Cs_103_ar2-fit>>=

@@ -50,7 +50,7 @@ Implementing this algorithm is straight-forward, hence its popularity.
 \begin{enumerate}
 	\item Set an initial set of parameters, $\hat{\Theta}_1$
 	\item E step: using the model for the hidden states ($\XX$) and $\hat{\Theta}_1$, calculate the expected values of $\XX$ conditioned on all the data $\yy_1^T$; this is \verb@xtT@ output by the Kalman smoother (function \verb@MARSSkf()@).  Also calculate expected values of any functions of $\XX$ (or $\YY$ if there are missing $\YY$ values) that appear in your expected log-likelihood function.
-	\item M step: put those $\E(\XX | \YY=\yy_1^T, \hat{\Theta}_1)$ and $\E(g(\XX) | \YY=\yy_1^T, \hat{\Theta}_1)$ into your expected log-likelihood function in place of $\XX$ (and $g(\XX)$) and maximize with respect to $\Theta$.  This gives you $\hat{\Theta}_2$.
+	\item M step: put those $\E[\XX | \YY=\yy_1^T, \hat{\Theta}_1]$ and $\E[g(\XX) | \YY=\yy_1^T, \hat{\Theta}_1]$ into your expected log-likelihood function in place of $\XX$ (and $g(\XX)$) and maximize with respect to $\Theta$.  This gives you $\hat{\Theta}_2$.
 	\item Repeat the E and M steps until the log likelihood stops increasing.
 \end{enumerate}
 
@@ -60,7 +60,7 @@ The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorit
 
 \section{Kalman filter and smoother}\index{estimation!Kalman filter}\index{estimation!Kalman smoother}\label{sec:kalmanfilter}
 
-The Kalman filter \citep{Kalman1960} is a recursive algorithm that solves for the expected value of the hidden states (the $\XX$) in a MARSS model (Equation \ref{eqn:marss}) at time $t$ conditioned on the data up to time $t$: $\E(\XX_t|\yy_1^t)$.  The Kalman filter gives the optimal (lowest mean square error) estimate of the unobserved $\xx_t$ based on the observed data up to time $t$ for this class of linear dynamical system.  The Kalman smoother \citep{Rauchetal1965} solves for the expected value of the hidden state(s) conditioned on all the data: $\E(\XX_t|\yy_1^T)$.  If the errors in the stochastic process are Gaussian, then the estimators from the Kalman filter and smoother are also the maximum-likelihood estimates.  
+The Kalman filter \citep{Kalman1960} is a recursive algorithm that solves for the expected value of the hidden states (the $\XX$) in a MARSS model (Equation \ref{eqn:marss}) at time $t$ conditioned on the data up to time $t$: $\E[\XX_t|\yy_1^t]$.  The Kalman filter gives the optimal (lowest mean square error) estimate of the unobserved $\xx_t$ based on the observed data up to time $t$ for this class of linear dynamical system.  The Kalman smoother \citep{Rauchetal1965} solves for the expected value of the hidden state(s) conditioned on all the data: $\E[\XX_t|\yy_1^T]$.  If the errors in the stochastic process are Gaussian, then the estimators from the Kalman filter and smoother are also the maximum-likelihood estimates.  
 
 However, even if the the errors are not Gaussian, the estimators are optimal in the sense that they are estimators with the least variability possible.  This robustness is one reason the Kalman filter is so powerful---it provides well-behaving estimates of the hidden states for all kinds of multivariate autoregressive processes, not just Gaussian processes.  The Kalman filter and smoother are widely used in time-series analysis, and there are many textbooks covering it and its applications.  In the interest of giving the reader a single point of reference, we use \citet{ShumwayStoffer2006} as our primary reference.  
 
@@ -69,14 +69,14 @@ The \verb@MARSSkf()@\index{functions!MARSSkf} function provides the Kalman filte
 \begin{description}
 \item[\texttt{xtt1 }] The expected value of $\XX_t$ conditioned on the data up to time $t-1$.
 \item[\texttt{xtt  }] The expected value of $\XX_t$ conditioned on the data up to time $t$.
-\item[\texttt{xtT  }] The expected value of $\XX_t$ conditioned on all the data from time $1$ to $T$.  This the smoothed state estimate.
+\item[\texttt{xtT  }] The expected value of $\XX_t$ conditioned on all the data from time $1$ to $T$.  These are called the smoothed state estimates.
 \item[\texttt{Vtt1 }] The variance of $\XX_t$ conditioned on the data up to time $t-1$.  Denoted $P_t^{t-1}$ in section 6.2 in \citet{ShumwayStoffer2006}.
 \item[\texttt{Vtt  }] The variance of $\XX_t$ conditioned on the data up to time $t$. Denoted $P_t^t$ in section 6.2 in \citet{ShumwayStoffer2006}.
 \item[\texttt{VtT  }] The variance of $\XX_t$ conditioned on all the data from time $1$ to $T$.
 \item[\texttt{Vtt1T}] The lag-one covariance of $\XX_t$ and $\XX_{t-1}$ conditioned on all the data, $1$ to $T$.
 \item[\texttt{Kt   }] The Kalman gain.  This is part of the update equations and relates to the amount \verb@xtt1@ is updated by the data at time $t$ to produce \verb@xtt@.    Not  output by \verb@MARSSkfas@.
 \item[\texttt{J    }] This is similar to the Kalman gain but is part of the Kalman smoother.  See Equation 6.49 in \citet{ShumwayStoffer2006}.     Not  output by \verb@MARSSkfas@.
-\item[\texttt{Innov}] This has the innovations at time $t$, defined as $\ep_t \equiv \yy_t$-$\E(\YY_t)$.  These are the residuals, the difference between the data and their predicted values.  See Equation 6.24 in \citet{ShumwayStoffer2006}. Not  output by \verb@MARSSkfas@.
+\item[\texttt{Innov}] This has the innovations at time $t$, defined as $\ep_t \equiv \yy_t$-$\E[\YY_t]$.  These are the residuals, the difference between the data and their predicted values.  See Equation 6.24 in \citet{ShumwayStoffer2006}. Not  output by \verb@MARSSkfas@.
 \item[\texttt{Sigma}] This has the $\Sigma_t$, the variance-covariance matrices for the innovations at time $t$.  This is used for the calculation of confidence intervals, the s.e. on the state estimates and the likelihood.  See Equation 6.25 in \citet{ShumwayStoffer2006} for the $\Sigma_t$ calculation.  Not  output by \verb@MARSSkfas@.
 \item[\texttt{logLik}] The log-likelihood of the data conditioned on the model parameters.  
 \end{description}

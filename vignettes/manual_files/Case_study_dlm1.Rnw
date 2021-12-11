@@ -198,7 +198,7 @@ y_{t}|y_{1:t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
 %----------------------------------------------
 \subsection{Forecasting a univariate DLM with MARSS}
 %----------------------------------------------
-Working from Equation \ref{eqn:dlmFore3}, we can now use MARSS to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in MARSS notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $\tilde{x}_t^{t-1}$ in MARSS notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkfss()@ function.
+Working from Equation \ref{eqn:dlmFore3}, we can now use MARSS to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in MARSS notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $x_t^{t-1}$ in MARSS notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkfss()@ function.
 <<Cs_08_univDLM-fore-mean, eval=TRUE>>=
 # get list of Kalman filter output
 kf.out <- MARSSkfss(dlm1)

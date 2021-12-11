@@ -42,7 +42,7 @@ The mathematical form of the process model for the wolf-moose population dynamic
 \begin{bmatrix}w_{w}\\w_{m}\end{bmatrix}_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}q_{w}&0\\0&q_{m}\end{bmatrix}\end{pmatrix}
 \end{gathered}
 \end{equation}
-where $w$ denotes wolf and $m$ denotes moose. $w \rightarrow w$ is effect of wolf on wolf (density-dependence) and $w \rightarrow m$ is effect of wolf on moose (predation effect on moose).
+where $w$ denotes wolf and $m$ denotes moose. $w \rightarrow w$ is the effect of wolf on wolf (density-dependence) and $w \rightarrow m$ is the effect of wolf on moose (predation effect on moose).
 
 \subsection{Load in and plot the data}
 We will use 1960 to 2011.  We will hold out 1959 as we will need that year when we look at the effect of covariates.
@@ -114,12 +114,12 @@ wolf.B <- coef(kem.2, type = "matrix")$B
 rownames(wolf.B) <- colnames(wolf.B) <- rownames(royale.dat)
 print(wolf.B, digits = 2)
 @
-The \verb@coef()@ function returns the estimated parameters of the fitted object, but in this case we want to see the estimates in matrix form.  Thus we use \verb@type="matrix"@.  Element row=$i$, col=$j$ in $\BB$ is the effect of species $j$ on species $i$, so $\BB_{2,1}$ is the effect of wolves on moose and $\BB_{1,2}$ is the effect of moose on wolves.    The $\BB$ matrix suggests that wolves have a negative effect on moose and that moose have a positive effect on wolves---as one would expect.  The diagonals are interpreted differently than the off-diagonals since the diagonals are ($b_{i,i}-1$) so subtract off 1 from the diagonals to get the effect of species $i$ on itself.   If the species are density-independent, then $\BB_{i,i}$ would equal 1.  Smaller $\BB_{i,i}$ means more density dependence.   
+The \verb@coef()@ function returns the estimated parameters, but in this case we want to see the estimates in matrix form.  Thus we use \verb@type="matrix"@.  Element row=$i$, col=$j$ in $\BB$ is the effect of species $j$ on species $i$, so $\BB_{2,1}$ is the effect of wolves on moose and $\BB_{1,2}$ is the effect of moose on wolves.    The $\BB$ matrix suggests that wolves have a negative effect on moose and that moose have a positive effect on wolves---as one would expect.  The diagonals are interpreted differently than the off-diagonals since the diagonals are ($b_{i,i}-1$) so subtract off 1 from the diagonals to get the effect of species $i$ on itself.   If the species are density-independent, then $\BB_{i,i}$ would equal 1.  Smaller $\BB_{i,i}$ means more density dependence.   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Adding covariates}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-It is well-known that moose numbers are strongly affected by winter and summer climate.  The Isle Royale data set provided with MARSS has climate data from climate stations in Northeastern Minnesota, near Isle Royale\footnote{From the Western Regional Climate Center.  See the help file for this dataset for references (\texttt{?isleRoyal}).}.  The covariate data include January-February, July-September and April-May average temperature and precipitation.  Also included are three-year running means of these data, where the number for year x is the average of years x-1, x and x+1.  We will include these covariates in the analysis to see how they change our interaction estimates.  We have to adjust our covariates because the census numbers are from winter in year x and we want the climate data from the previous year to affect this winter's moose count.  As usual, we will need to demean our covariate data so that we can set $\uu$ equal to zero.  We will standardize the variance also so that we can more easily compare the effects across different covariates.
+It is well-known that moose numbers are strongly affected by winter and summer climate.  The Isle Royale data set provided with MARSS has climate data from climate stations in Northeastern Minnesota, near Isle Royale\footnote{From the Western Regional Climate Center.  See the help file for this dataset for references (\texttt{?isleRoyal}).}.  The covariate data include January-February, July-September and April-May average temperature and precipitation.  Also included are three-year running means of these data, where the number for year $t$ is the average of years $t-1$, $t$ and $t+1$.  We will include these covariates in the analysis to see how they change our interaction estimates.  We have to adjust our covariates because the census numbers are from winter in year $t$ and we want the climate data from the previous year to affect this winter's moose count.  As usual, we will need to demean our covariate data so that we can set $\uu$ equal to zero.  We will standardize the variance also so that we can more easily compare the effects across different covariates.
 
 The mathematical form of our new process model for the wolf-moose population dynamics is
 \begin{equation}
@@ -191,7 +191,7 @@ You can change the model by changing the constraints on $\RR$ and $\QQ$.
 \section{Some settings to improve performance when estimating $\BB$}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \index{troubleshooting!B estimation}\index{B matrix!troubleshooting estimation}
-In the default MARSS model, the value of $\E[\xx_0|\yy_0]$ (what \verb@x0@ denotes when \verb@tinitx=0@ in the model list) is estimated.  If we are estimating the $\BB$ matrix, it is better to set \verb@tinitx=1@ so that we are estimating $\E[\xx_1|\yy_0]$ instead\footnote{If there are many missing values at $t=1$, we might still have problems and have to adjust accordingly.}.  The model will fit either way, but setting \verb@tinitx=1@ in the model list will speed up and stabilize the fitting. It doesn't make much of a difference for the wolf-moose dataset but can have a large effect for larger models.  The reason is that the likelihood surface for $\E[\xx_1|\yy_0]$ is better behaved when $\BB$ is small.  For example, if $\BB$ equal to 0, there is little information about $\E[\xx_0|\yy_0]$ so the algorithm goes in circles trying to estimate it while there is good information $\E[\xx_1|\yy_0]$ from $\yy_1$.  We could use a prior on the initial $\xx$ but this requires its variance-covariance structure, which depends on the unknown $\BB$ and specifying a variance-covariance structure that conflicts with $\BB$ will change your $\BB$ estimates.\index{troubleshooting!sensitivity to x0 prior}
+In the default MARSS model, the value of $\E[\XX_0|\yy_0]$ (what \verb@x0@ denotes when \verb@tinitx=0@ in the model list) is estimated.  If we are estimating the $\BB$ matrix, it is better to set \verb@tinitx=1@ so that we are estimating $\E[\XX_1|\yy_0]$ instead\footnote{If there are many missing values at $t=1$, we might still have problems and have to adjust accordingly.}.  The model will fit either way, but setting \verb@tinitx=1@ in the model list will speed up and stabilize the fitting. It does not make much of a difference for the wolf-moose dataset but can have a large effect for larger models.  The reason is that the likelihood surface for $\E[\XX_1|\yy_0]$ is better behaved when $\BB$ is small.  For example, if $\BB$ equal to 0, there is little information about $\E[\XX_0|\yy_0]$ so the algorithm goes in circles trying to estimate it while there is good information $\E[\XX_1|\yy_0]$ from $\yy_1$.  We could use a prior on the initial $\xx$ but this requires its variance-covariance structure, which depends on the unknown $\BB$ and specifying a variance-covariance structure that conflicts with $\BB$ will change your $\BB$ estimates.\index{troubleshooting!sensitivity to x0 prior}
 
 For the wolf-moose model, we set $\RR=0$.  The EM algorithm (default) cannot estimate \verb@x0@ when \verb@tinitx=1@ therefore to fit the model with \verb@tinitx=1@ we need to use \verb@method="BFGS"@.  This is only for the case when $\RR=0$\footnote{because the update for $(\xx_1^0)_{j+1}$ is $\xx_1^T$ but when $\RR=0$ and $\VV_1^0=0$, $\xx_1^T$ will equal $(\xx_1^0)_j$, i.e., whatever value you started with.  Thus the estimate of $\xx_1^0$ never changes.}
 <<Cs05_fit.model.tinitx1, eval=TRUE, echo=TRUE, keep.source=TRUE, results=hide>>=
@@ -290,7 +290,7 @@ B.Ives <- B.Ives.Obs
 rownames(B.Ives) <- colnames(B.Ives) <- c("LP", "SP", "D", "ND")
 print(B.Ives, digits = 2, na.print = "--")
 @
-First, thing you will notice is that the Ives et al. matrix is missing values.  The matrix they show is after a model selection step to determine which interactions had little data support and thus could be set to zero.  Also, they fixed the interactions between Daphnia and non-Daphnia at zero because they do not prey on each other.   The second thing you will notice is that the estimates are not particularly similar.  Next we will try some other ways of fitting the data that are closer to the way that Ives et al. fitted the data.
+First, you will notice is that the Ives et al. matrix is missing values.  The matrix they show is after a model selection step to determine which interactions had little data support and thus could be set to zero.  Also, they fixed the interactions between Daphnia and non-Daphnia at zero because they do not prey on each other.   The second thing you will notice is that the estimates are not particularly similar.  Next we will try some other ways of fitting the data that are closer to the way that Ives et al. fitted the data.
 
 By the way, if you are curious what would happen if we removed all those NAs, you can run the following code. 
 <<Cs18_test-rm-NAs,eval=FALSE, keep.source=FALSE>>=
@@ -331,7 +331,7 @@ B.2[4, 2] <- "B42"
 print(B.2)
 @ 
 
-As you can see, the $\BB$ matrix now has elements that will be estimated (the names in quotes) and fixed values (the numbers with no quotes).  When preparing your list matrix, make sure your fixed values do not have have quotes around them.  If they do, they are strings (class character) not numbers (class numeric), and MARSS will interpret a string as the name of something to be estimated.  If you use the same name for an element, then MARSS will force those elements to be shared (have the same value).  
+As you can see, the $\BB$ matrix now has elements that will be estimated (the names in quotes) and fixed values (the numbers with no quotes).  When preparing your list matrix, make sure your fixed values do not have quotes around them.  If they do, they are strings (class character) not numbers (class numeric), and \verb@MARSS()@ will interpret a string as the name of something to be estimated.  If you use the same name for an element, then \verb@MARSS()@ will force those elements to be shared (have the same value).  
 <<Cs22_fit-plank-model-2, results=hide>>=
 # model 2
 plank.model.2 <- plank.model.1
@@ -384,7 +384,7 @@ To fit this model, we first need to prepare the covariate data.  We will just us
 phos <- t(log(ivesDataByWeek[, "Phosph", drop = FALSE]))
 d.phos <- (phos - apply(phos, 1, mean, na.rm = TRUE))
 @
-Why log the covariate data?  It is what Ives et al. did, so we follow their method.  However, in general, you want to think about what relationship you want to assume between the covariates and their effects.  For example, log (or square-root) transformations mean that extremes have less impact relative to their untransformed value and that a small absolute change, say from 0.01 to 0.0001 in the untransformed value, can mean large difference in the effects since log(0.0001) $<$ log(0.01).
+Why log the covariate data?  It is what Ives et al. did, so we follow their method.  However, in general, you want to think about what relationship you want to assume between the covariates and their effects.  For example, log (or square-root) transformations mean that extremes have less impact relative to their untransformed value and that a small absolute change, say from 0.01 to 0.0001 in the untransformed value, can mean a large difference in the effect since log(0.0001) $<$ log(0.01).
 
 Phosphorous is assumed to only affect phytoplankton so the other terms in $\CC$, corresponding to the zooplankton, are set to 0.
 The $\CC$ matrix is defined as follows:
@@ -399,7 +399,7 @@ C_{SP,phos}\\
 \end{equation}
 
 
-To add $\CC$ and $\cc$ to our latest model, we add $\CC$ and $\cc$ to the model list used in the MARSS call:
+To add $\CC$ and $\cc$ to our latest model, we add $\CC$ and $\cc$ to the model list used in the \verb@MARSS()@ call:
 <<Cs26_add-covar-model-3>>=
 plank.model.4 <- plank.model.3
 plank.model.4$C <- matrix(list("C11", "C21", 0, 0), 4, 1)
@@ -420,7 +420,7 @@ print(Cmat, digits = 2, na.print = "--")
 
 \subsection{Including a covariate observation model}
 \index{covariates!observed with error}
-The difficulty with the standard approach to including covariates (Equation \ref{eqn:covar}) is that it limits what kind of covariate data you can use and how you model that covariate data.  You have to assume that your covariate data has no error, which is probably not true.  Assuming that your covariate has no error reduces the reported uncertainty in your covariate effect because you did not include uncertainty in those values.  The standard approach also does not allow missing values in your covariate data, which is why we did not include the fish covariate data in the last model. Also you cannot combine instrument time series; for example, if you have two temperature recorders with different error rates and biases.  Also, what if you have one noisy temperature recorder in the first part of your time series and then you switch to a much better recorder in the second half of your time series?  All these problems require pre-analysis massaging of the covariate data, leaving out noisy and gappy covariate data, and making what can feel like arbitrary choices about which covariate time series to include.  This is especially worrisome when the covariates are then incorporated into the model as if they are known without error.
+The difficulty with the standard approach to including covariates (Equation \ref{eqn:covar}) is that it limits what kind of covariate data you can use and how you model that covariate data.  You have to assume that your covariate data has no error, which is probably not true.  Assuming that your covariate has no error reduces the reported uncertainty in your covariate effect because you did not include uncertainty in those values.  The standard approach also does not allow missing values in your covariate data, which is why we did not include the fish covariate data in the last model. Also you cannot combine multiple instrument time series; for example, if you have two temperature recorders with different error rates and biases.  Perhaps you have one noisy temperature recorder in the first part of your time series and then you switch to a much better recorder in the second half of your time series.  All these problems require pre-analysis massaging of the covariate data, leaving out noisy and gappy covariate data, and making what can feel like arbitrary choices about which covariate time series to include.  This is especially worrisome when the covariates are then incorporated into the model as if they are known without error.
 
 Instead one can include an observation and process model for the covariates just like for the non-covariate data.  Now the covariates are included in $\yy_t$ and are modeled with their own state process(es) in $\xx_t$. A MARSS model with a covariate observation and process model is shown below.  The elements with superscript ${(v)}$ are for the variates and those with superscript ${(c)}$ are for the covariates.  The superscripts just help us keep straight which of the state processes and parameters correspond to abundances and which correspond to the environmental covariates.   
 \begin{equation}\label{eqn:marsscovar}
@@ -607,7 +607,7 @@ print(thetable, type = "latex", file = paste(tabledir, "tableplank.tex", sep = "
 @
 \input{tables/tableplank}
 
-NOTE! When you include your covariates in your state model (the $\xx$ part), the reported log-likelihood is for the variate plus the covariate data.  If you want just the log-likelihood for the variates, then your replace the covariate data with NAs and run the Kalman filter with your estimated model:
+NOTE! When you include your covariates in your state model (the $\xx$ part), the reported log-likelihood is for the variate plus the covariate data.  If you want just the log-likelihood for the variates, then you should replace the covariate data with NAs and re-run the Kalman filter with your estimated model:
 <<Cs36_logLik-variates>>=
 tmp <- kem.plank.5
 tmp$marss$data[5, ] <- NA
@@ -616,7 +616,7 @@ LL.variates <- MARSSkf(tmp)$logLik
 \verb@MARSSkf()@ is the Kalman filter function and it needs a fitted model as output by a \verb@MARSS()@ call.  We set up a temporary fitted model, \verb@tmp@, equal to our fitted model and then set the covariate data in that to NAs.  Note we need to do this for the marssMODEL object used by \verb@MARSSkf()@, which will be in \verb@MLEobj$marss@.  We then pass that temporary fitted model to \verb@MARSSkf()@ to get the log-likelihood of just the variates.  
 
 \subsection{Discussion}
-The estimates for our last model are fairly close to the Ives et al. estimates, but still a bit different.  There are two big difference between our last model and the Ives et al. analysis.  Ives et al. had data from three lakes and the estimate of $\QQ$ used the data from all lakes.   
+The estimates for our last model are fairly close to the Ives et al. estimates, but still a bit different.  There are two big differences between our last model and the Ives et al. analysis.  Ives et al. had data from three lakes and the estimate of $\QQ$ used the data from all lakes.   
 
 Combining data, whether it be from different areas or years, can be done in a MARSS model as follows.  Let $\yy_1$ be the first data set (say from site 1) and $\yy_2$ be the second data set (say from site 2).  Then a MARSS model with shared parameters values across datasets would be
 \begin{equation}
@@ -645,7 +645,7 @@ where the  $+$ matrices are stacked matrices from the different sites (1 and 2):
  \text{ } \vv_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\RR & 0 \\ 0 & \RR \end{bmatrix} \end{pmatrix}  
 \end{gathered}
 \end{equation}
-The $\qq$ in the process variance allows that the environmental variability might might be correlated between datasets, i.e., if they are replicate plots that are nearby, say.  If you did not want all the parameters shared, then you replace the $\BB$ in $\BB^+$ with $\BB_1$ and $\BB_2$, say.
+The $\qq$ in the process variance allows that the environmental variability  might be correlated between datasets, e.g., if they are replicate plots that are nearby.  If you did not want all the parameters shared, then you replace the $\BB$ in $\BB^+$ with $\BB_1$ and $\BB_2$, say.
 
 The second big difference is that Ives et al. did not demean their data, but estimated $\uu$.  We could have done that too, but with all the NAs in the data (during winter), estimating $\uu$ is not robust and takes a long time.   You can try the analysis on the data that has not been demeaned and set \verb@U="unequal"@.  The results are not particularly different, but it takes a long, long,...long time to converge.
 

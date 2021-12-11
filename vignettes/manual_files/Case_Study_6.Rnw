@@ -216,24 +216,24 @@ legend("topright", paste("model 2, AICc=", format(kem$AICc, digits = 1)), bty = 
 \index{residuals!auxiliary}\index{residuals!smoothations}
 Figure \ref{fig:CS6.fits} shows the MARSS fits to the data.  From these model fits, auxiliary residuals can be computed which contain information about whether the data and models fits at time $t$ differ more than you would expect given the model and the model fits at time $t-1$.  In this section, we follow the example shown on page 147-148 in \citet{Koopmanetal1998} and use these residuals to look for outliers and sudden flow level changes.  Using auxiliary residuals this way follows mainly from \citet{HarveyKoopman1992}, but see also \citet[sec. 3]{Koopman1993},  \citet{deJongPenzer1998} and \citet{Penzer2001} for discussions of using auxiliary residuals for detection of outliers and structural breaks. 
 
-The MARSS function will output the expected values of $x_t$ conditioned on the maximum-likelihood values of $q$, $r$, and $x_1$ and on the data ($y$ from $t=1$ to $T$).   In time-series literature, these are called the smoothed state estimates and they are output by the Kalman filter-smoother.  We will call these smoothed estimates $\tilde{x}_{t|T}$ (and are \verb@xtT@ in the MARSS output). The time value after the $|$ in the subscript indicates the data on which the estimate was conditioned (in this case, 1 to $T$). From these, we can compute the model predicted value of $y_t$, denoted or $\hat{y}_{t|T}$.  This is the predicted value of $y_t$ conditioned on $\tilde{x}_{t|T}$. 
+The \verb@MARSS()@ function will output the expected values of $x_t$ conditioned on the maximum-likelihood values of $q$, $r$, and $x_1$ and on the data ($y$ from $t=1$ to $T$).   In time-series literature, these are called the smoothed state estimates and they are output by the Kalman filter-smoother.  We will denote these smoothed estimates $x_t^T$ (and are \verb@xtT@ in the MARSS output). The time value in the superscript indicates the last data time point on which the estimate was conditioned (in this case, the state estimate is conditioned on data from $t=1$ to $t=T$). From these, we can compute the model predicted value of $y_t$, denoted or $\hat{y}_t^T$.  This is the predicted value of $y_t$ conditioned on $x_t^T$. 
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
-\tilde{x}_{t|T} &= \E(X_t|\hat{\theta},y_1^T)\\
-\hat{y}_{t|T} &= \E(Y_t|\hat{\theta},\tilde{x}_{t|T} ) \\
-&= \tilde{x}_{t|T} + \E(w_t|\hat{\theta},y_1^T) = \tilde{x}_{t|T}
+x_t^T &= \E[X_t|\hat{\theta}, y_1^T]\\
+\hat{y}_t^T &= \E[Y_t|\hat{\theta}, x_t^T] \\
+&= x_t^T + \E[w_t|\hat{\theta}, y_1^T] = x_t^T
 \end{split}   
 \label{eq:hatxy}\end{equation}
 %~~~~~~~~~~~~~~~~~~~~~~~~~
-where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_{t|T}$ equation comes directly from equation \ref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $\tilde{x}_{t|T}$, which is conditioned on $y_1^T$. 
+where $\hat{\theta}$ are the maximum-likelihood estimates of the parameters.  The $\hat{y}_t^T$ equation comes directly from equation \ref{eq:random.walk.w.noise}.  This expectation is not conditioned on the data $y_1^T$, directly.  It is conditioned on $x_t^T$, which is conditioned on $y_1^T$. 
 
 \subsection{Using observation residuals to detect outliers}
-\index{residuals!model}\index{residuals!smoothations}The standardized smoothed observation (or model) residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E(\YY_t|\tilde{x}_{t|t-1})$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data and then standardized by the observation variance:
+\index{residuals!model}\index{residuals!smoothations}The standardized smoothed observation (or model) residuals\footnote{also called smoothations in the literature to distinguish them from innovations, which are $\yy_t-\E[\YY_t|x_t^{t-1}]$. Notice that for innovations the expectation is conditioned on the data up to time $t-1$ while for smoothations, we condition on all the data.} are the difference between the data at time $t$ and the model fit at time $t$ conditioned on all the data and then standardized by the observation variance:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
-\hat{v}_t &= y_t - \hat{y}_{t|T}  \\
+\hat{v}_t &= y_t - \hat{y}_t^T  \\
 e_t &= \frac{1}{\sqrt{\var(\hat{v}_t)}} \hat{v}_t
 \end{split}
  \label{eq:smoothations}\end{equation}
@@ -289,7 +289,7 @@ The standardized smoothed state residuals ($f_t$ below) are the difference betwe
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{split}
-\hat{w}_t &= \tilde{x}_{t|T} - \tilde{x}_{t-1|T}   \\
+\hat{w}_t &= x_t^T - x_{t-1}^T   \\
 f_t &= \frac{1}{\sqrt{\var(\hat{w}_t)}}\hat{w}_t
 \end{split}
  \label{eq:stateresids}\end{equation}

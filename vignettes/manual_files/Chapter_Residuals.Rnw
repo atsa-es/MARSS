@@ -25,7 +25,7 @@ When looking at estimates and intervals for $\xx$ and $\yy$, keep in mind that t
 
 \item  If you want the estimate of y conditioned on all the data, then use \verb@tsSmooth.marssMLE@ with \verb@type="ytT"@. This gives $\E[\YY|\yy]$ and if you have no missing data, $\E[\YY|data] = \yy$ so you will just be returning your data. The confidence intervals will also be 0. For missing $\yy$ values, you will see prediction intervals since \verb@tsSmooth.marssMLE@ returns intervals based on $\var[\YY|\yy]$.
   
-\item  If you want the estimate of $\yy$ conditioned on the data up to $t-1$, then use \verb@fitted.marssMLE@ with \verb@type="ytt1"@. This is the one step ahead prediction, $\ZZ \xx_{t|t-1} + \aa$, and its variance. The prediction interval is based on the variance \verb@Z Vtt1[,,t] Z^T + R@. The confidence interval on the expected value of the prediction, that would use \verb@Z Vtt1[,,t] Z^T@.
+\item  If you want the estimate of $\yy$ conditioned on the data up to $t-1$, then use \verb@fitted.marssMLE@ with \verb@type="ytt1"@. This is the one step ahead prediction, $\ZZ \xx_t^{t-1} + \aa$, and its variance. The prediction interval is based on the variance \verb@Z Vtt1[,,t] Z^T + R@. The confidence interval on the expected value of the prediction, that would use \verb@Z Vtt1[,,t] Z^T@.
 }
 
 \section{One step ahead predictions} 
