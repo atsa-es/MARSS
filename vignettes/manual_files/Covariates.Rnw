@@ -34,13 +34,12 @@ the.mean <- apply(dat, 1, mean, na.rm = TRUE)
 the.sigma <- sqrt(apply(dat, 1, var, na.rm = TRUE))
 dat <- (dat - the.mean) * (1 / the.sigma)
 @
-Next we set up the covariate data, temperature and total phosphorous. We z-score the covariates to standardize and remove the mean.
+Next we set up the covariate data, temperature and total phosphorous. We z-score the covariates to standardize and remove the mean. MARSS has a function to z-score data, so we used that from here out.
 <<Covar_sec2_2_z-score-covar-data, eval=TRUE, keep.source=TRUE>>=
 covariates <- rbind(
   Temp = fulldat[years, "Temp"],
   TP = fulldat[years, "TP"]
 )
-
 # z.score the covariates
 covariates <- zscore(covariates)
 @
@@ -53,7 +52,7 @@ LWA <- ts(cbind(Year = fulldat[years, "Year"], t(dat), t(covariates)), start = c
 plot.ts(LWA[, c("Greens", "Bluegreens", "Temp", "TP")], main = "", yax.flip = TRUE)
 @
 \end{center}
-\caption{Time series of Green and Blue-green algae abundances in Lake Washington along with the temperature and total phosphorous covariates.}
+\caption{Time series of green andblue-green algae abundances in Lake Washington along with the temperature and total phosphorous covariates.}
 \label{fig:plank-plot}
 \end{figure}
 
@@ -91,7 +90,7 @@ The elements in $\aa$ are the intercepts and those in $\DD$ are the slopes (effe
 \end{split}   
 \label{eq:mlr.dfa1}\end{equation}
 
-Let's fit this model with MARSS.  The $\xx$ part of the model is irrelevant so we want to fix the parameters in that part of the model.  We won't set $\BB=0$ or $\ZZ=0$ since that might cause numerical issues for the Kalman filter. Instead we fix them as identity matrices and fix $\xx_0=0$ so that $\xx_t=0$ for all $t$.
+Let's fit this model with MARSS().  The $\xx$ part of the model is irrelevant so we want to fix the parameters in that part of the model.  We won't set $\BB=0$ or $\ZZ=0$ since that might cause numerical issues for the Kalman filter. Instead we fix them as identity matrices and fix $\xx_0=0$ so that $\xx_t=0$ for all $t$.
 <<Covar_sec3_1_covar-model-0, eval=TRUE, keep.source=TRUE>>=
 Q <- U <- x0 <- "zero"
 B <- Z <- "identity"
@@ -156,7 +155,7 @@ model.list <- list(
 )
 kem <- MARSS(x, model = model.list)
 @
-Now, it looks like temperature has a strong negative effect on algae?  Also our log-likelihood dropped a lot.  Well, the data do not look at all like a random walk model (\emph{i.e.}, where $\BB=1$), which we can see from the plot of the data (Figure \ref{fig:plank-plot}).  The data are fluctuating about some mean so let's switch to a better autoregressive model---a mean-reverting model.  To do this, we will allow the diagonal elements of $\BB$ to be something other than 1.
+Now, it looks like temperature has a strong negative effect on algae, which is odd.  Also our log-likelihood dropped a lot.  Well, the data do not look at all like a random walk model (\emph{i.e.}, where $\BB=1$), which we can see from the plot of the data (Figure \ref{fig:plank-plot}).  The data are fluctuating about some mean so let's switch to a better autoregressive model---a mean-reverting model.  To do this, we will allow the diagonal elements of $\BB$ to be something other than 1.
 <<Covar_sec4_2_covar-model-1c, eval=TRUE>>=
 model.list$B <- "diagonal and unequal"
 kem <- MARSS(dat, model = model.list)
@@ -274,7 +273,7 @@ rownames(seas.1) <- phytos
 colnames(seas.1) <- month.abb
 @
 
-The top panel in Figure \ref{fig:mon-effects} shows the estimated seasonal effects for this model.  Note that if we had set U="unequal", we would need to set one of the columns of $\CC$ to zero because the model would be under-determined (infinite number of solutions). If we subtracted the mean January abundance off each time series, we could set the January column in $\CC$ to 0 and get rid of 5 estimated effects.
+The top panel in Figure \ref{fig:mon-effects} shows the estimated seasonal effects for this model.  Note that if we had set \verb@U="unequal"@, we would need to set one of the columns of $\CC$ to zero because the model would be under-determined (infinite number of solutions). If we subtracted the mean January abundance off each time series, we could set the January column in $\CC$ to 0 and get rid of 5 estimated effects.
 
 \subsection{Seasonal effects as a polynomial}
 
@@ -317,7 +316,7 @@ The middle panel in Figure \ref{fig:mon-effects} shows the estimated seasonal ef
 
 The factor approach required estimating 60 effects, and the 3rd order polynomial model was an improvement at only 20 parameters. A third option is to use a discrete Fourier series, which is combination of sine and cosine waves; it would require only 10 parameters. Specifically, the effect of month $m$ on taxon $i$ is $a_i \times \cos(2 \pi m/p) + b_i \times \sin(2 \pi m/p)$, where $p$ is the period (e.g., 12 months, 4 quarters), and $a_i$ and $b_i$ are contained in the $i$-th row of $\CC$.
 
-We begin by defining the 2 $\times$ \emph{T} seasonal covariate matrix $\cc$ as a combination of 1 cosine and 1 sine wave:
+We begin by defining the $2 \times T$ seasonal covariate matrix $\cc$ as a combination of 1 cosine and 1 sine wave:
 <<Covar_sec6_09_seasonal-fourier>>=
 cos.t <- cos(2 * pi * seq(TT) / period)
 sin.t <- sin(2 * pi * seq(TT) / period)
@@ -366,7 +365,7 @@ legend("topright", lty = 1:5, legend = phytos, cex = 0.6, col = 1:5)
 \label{fig:mon-effects}
 \end{figure}
 
-Rather than rely on our eyes to judge model fits, we should formally assess which of the 3 approaches offers the most parsimonious fit to the data. Here is a table of AICc values for the 3 models:
+Rather than rely on our eyes to judge model fits, we should formally assess which of the three approaches offers the most parsimonious fit to the data. Here is a table of AICc values for the three models:
 <<Covar_sec6_13_show-aics>>=
 data.frame(
   Model = c("Fixed", "Cubic", "Fourier"),
@@ -378,7 +377,7 @@ data.frame(
   stringsAsFactors = FALSE
 )
 @
-The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the 3 models. Its AICc value is much lower than either the polynomial or fixed-effects models.
+The model selection results indicate that the model with monthly seasonal effects estimated via the discrete Fourier sequence is the most parsimonious of the three models. Its AICc value is much lower than either the polynomial or fixed-effects models.
 
 \section{Model diagnostics}\index{diagnostics}\index{functions!residuals}
 We will examine some basic model diagnostics for these three approaches by looking at plots of the model residuals (innovations) and their autocorrelation functions (ACFs) for all five taxa using the following code: \index{diagnostics!ACF plot}
@@ -397,7 +396,7 @@ for (i in 1:3) {
   }
 }
 @
-Figures \ref{fig:mon-diagnostics-1}--\ref{fig:mon-diagnostics-3} shows these diagnostics for the three models.  The model residuals for all taxa and models appear to show significant negative autocorrelation at lag=1, suggesting that a model with seasonal effects is inadequate to capture all of the systematic variation in phytoplankton abundance. \index{diagnostics!ACF plot}
+Figures \ref{fig:mon-diagnostics-1} to \ref{fig:mon-diagnostics-3} shows these diagnostics for the three models.  The model residuals for all taxa and models appear to show significant negative autocorrelation at lag=1, suggesting that a model with seasonal effects is inadequate to capture all of the systematic variation in phytoplankton abundance. \index{diagnostics!ACF plot}
 
 \setkeys{Gin}{}
 \begin{figure}[htp]
@@ -518,7 +517,7 @@ Next, we can write the observation equation in an analogous manner, such that
 \end{equation}
 The dimension of $\yy^{(c)}$ is $p \times 1$, where $p$ is the number of covariate observation time series in your dataset.  The dimension of $\yy^{(v)}$ is $l \times 1$, where $l$ is the number of variate observation time series in your dataset.  The total dimension of $\yy$ is $l+p$.  The matrix $\DD$ is dimension $l \times q$, $\ZZ^{(c)}$ is dimension $p \times q$, and  $\RR^{(c)}$ are dimension $p \times p$.  The dimension of  $\ZZ^{(v)}$ is dimension $l \times k$, and  $\RR^{(v)}$ are dimension $l \times l$.
 
-The $\DD$ matrix would presumably have a number of all zero rows in it, as would the $\CC$ matrix.   The covariates that affect the states would often be different than the covariates that affect the observations.  For example, mean annual temperature would affect population growth rates for many species while having little or no affect on observability, and turbidity might strongly affect observability in many types of aquatic, say, surveys but have little affect on population growth rate.
+The $\DD$ matrix would presumably have a number of all zero rows in it, as would the $\CC$ matrix.   The covariates that affect the states would often be different than the covariates that affect the observations.  For example, mean annual temperature would affect population growth rates for many species while having little or no effect on observability, and turbidity might strongly affect observability in many types of aquatic surveys but have little affect on population growth rate.
 
 Our MARSS model with covariates now looks on the surface like a regular MARSS model: 
 \begin{equation}\label{eqn:marss.covar}
@@ -536,7 +535,7 @@ with the $\xx_t$, $\yy_t$ and parameter matrices redefined as in Equations \ref{
 \end{equation}
 Note $\QQ$ and $\RR$ are written as block diagonal matrices, but you could allow covariances if that made sense.  $\uu$ and $\aa$ are column vectors here.  We can fit the model (Equation \ref{eqn:marss.covar}) as usual using the \verb@MARSS()@ function. 
 
-The log-likelihood that is returned by MARSS will include the log-likelihood of the covariates under the covariate state model.  If you want only the the log-likelihood of the non-covariate data, you will need to subtract off the log-likelihood of the covariate model:
+The log-likelihood that is returned by \verb@MARSS()@ will include the log-likelihood of the covariates under the covariate state model.  If you want only the the log-likelihood of the non-covariate data, you will need to subtract off the log-likelihood of the covariate model:
 \begin{equation}\label{eqn:covar.dummy}
 \begin{gathered}
 \xx^{(c)}_t = \BB^{(c)}\xx_{t-1}^{(c)} + \uu^{(c)} + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ^{(c)}) \\
@@ -551,7 +550,7 @@ non-covariate data.  The following code shows how to do this.
 y.aug <- rbind(data, covariates)
 fit.aug <- MARSS(y.aug, model = model.aug)
 @
-\texttt{fit.aug} is the MLE object that can be passed to \verb@MARSSkf()@.  You need to make a version of this MLE object with the non-covariate data filled with NAs so that you can compute the logLik without the covariates.  This needs to be done in the \texttt{marss} element since that is what is used by MARSSkf().  Below is code to do this.
+\texttt{fit.aug} is the MLE object that can be passed to \verb@MARSSkf()@.  You need to make a version of this MLE object with the non-covariate data filled with NAs so that you can compute the log-likelihood without the covariates.  This needs to be done in the \texttt{marss} element since that is what is used by \verb@MARSSkf()@.  Below is code to do this.
 <<get-LL-aug-2, eval=FALSE>>=
 fit.cov <- fit.aug
 fit.cov$marss$data[1:dim(data)[1], ] <- NA
