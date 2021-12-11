@@ -49,7 +49,7 @@ title("Puget Sound Harbor Seal Surveys")
 
 We will assume that the underlying population process is a stochastic exponential growth process with rates of increase that were not changing through 1978-1999.  However, we are not sure if all five regions sample a single ``total Puget Sound'' population or if there are  independent subpopulations.  We will estimate the long-term population growth rate using different assumptions about the population structures (one big population versus multiple smaller ones) and observation error structures to see how different assumptions change the trend estimates.  
 
-The harbor seal data are included in the MARSS package.   The data have time running down the rows and years in the first column. We need time across the columns for the \verb@MARSS()@ function, so we will transpose the data:
+The harbor seal data are included in the \{MARSS\} package.   The data have time running down the rows and years in the first column. We need time across the columns for the \verb@MARSS()@ function, so we will transpose the data:
 <<Cs2-readindata, echo=TRUE, keep.source=TRUE>>=
 dat <- t(harborSealWA) # Transpose
 years <- dat[1, ] # [1,] means row 1

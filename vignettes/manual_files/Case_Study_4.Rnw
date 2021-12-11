@@ -31,7 +31,7 @@ DFA is conceptually different than what we have been doing in the previous appli
  \label{eq:dfa}\end{equation}
 The general idea is that the observations ($\yy$) are modeled as a linear combination of hidden trends ($\xx$) and factor loadings ($\ZZ$) plus some offsets ($\aa$).  The DFA model in Equation \ref{eq:dfa} and the standard MARSS model in Equation 1.1 are equivalent---we have simply set the matrix $\BB$ equal to an $m \times m$ identity matrix\footnote{a diagonal matrix with 1's on the diagonal} and the vector $\uu$ = {\bf 0}. 
 
-\subsection{Writing out a DFA model in MARSS form}
+\subsection{Writing out a DFA model as a MARSS model}
 Imagine a case where we had a data set with six observed time series ($n=6$) and we want to fit a model with three hidden trends ($m=3$).  If we write out our DFA model in MARSS matrix form (ignoring the error structures and initial conditions for now), it would look like this:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
@@ -263,7 +263,7 @@ To complete our model, we still need the final form for the initial conditions o
  \end{equation}  
 
 \section{The data}
-We will analyze some of the Lake Washington plankton data included in the MARSS package.  This dataset includes 33 years of monthly counts for 13 plankton species along with data on water temperature, total phosphorous (TP), and pH.  First, we load the data and then extract a subset of columns corresponding to the phytoplankton species only. For the purpose of speeding up model fitting times and to limit our analysis to years with no missing covariate data, we will only examine 10 years of data (1980-1989).
+We will analyze some of the Lake Washington plankton data included in the \{MARSS\} package.  This dataset includes 33 years of monthly counts for 13 plankton species along with data on water temperature, total phosphorous (TP), and pH.  First, we load the data and then extract a subset of columns corresponding to the phytoplankton species only. For the purpose of speeding up model fitting times and to limit our analysis to years with no missing covariate data, we will only examine 10 years of data (1980-1989).
 <<Cs01_read_in_data>>=
 data(lakeWAplankton)
 # we want lakeWAplanktonTrans, which has been log-transformed

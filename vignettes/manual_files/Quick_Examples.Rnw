@@ -14,7 +14,7 @@ options(prompt = " ", continue = " ", width = 60)
 library(MARSS)
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In this chapter, we work through a series of short examples to illustrate the MARSS package functions.  This chapter is oriented towards those who are already somewhat familiar with multivariate (or vector) autoregressive state-space (MARSS or VARSS) models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS (or VARSS) models might prefer to start with the application chapters. 
+In this chapter, we work through a series of short examples to illustrate the \{MARSS\} package functions.  This chapter is oriented towards those who are already somewhat familiar with multivariate (or vector) autoregressive state-space (MARSS or VARSS) models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS (or VARSS) models might prefer to start with the application chapters. 
 
 In these examples, we will use the default \verb@form="marxss"@ argument for a \verb@MARSS()@ call.  This specifies a MARSS model of the form:
 \begin{subequations}\label{eqn:marss.qe}
@@ -75,12 +75,12 @@ V0 <- diag(1, 2)
 model.gen <- list(Z = Z, A = A, R = R, B = B, U = U, 
                   Q = Q, x0 = x0, V0 = V0, tinitx = 0)
 @
-Notice that there is a one-to-one correspondence between the model list in \R and the model on paper.  Fitting the model is then just a matter of passing the data and model list to the MARSS function:
+Notice that there is a one-to-one correspondence between the model list in \R and the model on paper.  Fitting the model is then just a matter of passing the data and model list to the \verb@MARSS@ function:
 <<Cs02_model-general, eval=FALSE, keep.source=TRUE>>=
 kem <- MARSS(dat, model = model.gen)
 @
 
-\index{troubleshooting!sensitivity to x0 prior}If you work often with MARSS models then you will probably know whether prior sensitivity is a problem for your types of MARSS applications.  If so, note that the MARSS package is unusual in that it allows you to set $\LAM=0$ and treat $\pipi$ (initial $\xx$) as an unknown estimated parameter\index{prior}.  This eliminates the prior and thus the prior sensitivity problems---at the cost of adding $m$ parameters.  Depending on your application, you may need to set the initial conditions at $t=1$ instead of the default of $t=0$.  If you are unsure, look in the index and read all the sections that talk about troubleshooting priors.
+\index{troubleshooting!sensitivity to x0 prior}If you work often with MARSS models then you will probably know whether prior sensitivity is a problem for your types of MARSS applications.  If so, note that the \{MARSS\} package is unusual in that it allows you to set $\LAM=0$ and treat $\pipi$ (initial $\xx$) as an unknown estimated parameter\index{prior}.  This eliminates the prior and thus the prior sensitivity problems---at the cost of adding $m$ parameters.  Depending on your application, you may need to set the initial conditions at $t=1$ instead of the default of $t=0$.  If you are unsure, look in the index and read all the sections that talk about troubleshooting priors.
 
 \section{Different numbers of state processes}
 Here we show a series of short examples using a dataset on Washington harbor seals (\verb@?harborSealWA@), which has five observation time series.   The dataset is a little unusual in that it has four missing years from years 2 to 5.  This causes some interesting issues with prior specification.  Before starting the harbor seal examples, we set up the data, making time go across the columns and removing the year column:
@@ -488,7 +488,7 @@ Then you might want to estimate parameters from the simulated data.  Above we cr
 <<Cs37_sim-fit, include.source=F, keep.source=T, results=hide>>=
 kem.sim.1 <- MARSS(sim.data[, , 1])
 @
-Then we might like to see the likelihood\index{likelihood} of the second set of simulated data under the model fit to the first set of data.  We do that with the Kalman filter function.  This function takes a marssMLE object (as output by say the MARSS function), and we have to replace the data in kem.sim.1 with the second set of simulated data.\index{likelihood!MARSSkf function}
+Then we might like to see the likelihood\index{likelihood} of the second set of simulated data under the model fit to the first set of data.  We do that with the Kalman filter function.  This function takes a marssMLE object (as output by say the \verb@MARSS()@ function), and we have to replace the data in kem.sim.1 with the second set of simulated data.\index{likelihood!MARSSkf function}
 <<Cs38_sim-like, include.source=F, keep.source=T>>=
 kem.sim.2 <- kem.sim.1
 kem.sim.2$model$data <- sim.data[, , 2]
@@ -496,7 +496,7 @@ MARSSkf(kem.sim.2)$logLik
 @ 
 
 \section{Bootstrap AIC} 
-The function \verb@MARSSaic()@\index{model selection!MARSSaic function}\index{functions!MARSSaic} computes a bootstrap AIC for model selection purposes.  \verb@output="AICbp"@ will produce a parameter bootstrap\index{model selection!bootstrap AIC, AICbp}.  Use \verb@output="AICbb"@ to produce a non-parametric bootstrap\index{model selection!bootstrap AIC, AICbb} AIC. You will need a large number of bootstraps (\verb@nboot@). We use only 10 bootstraps to show you how to compute AICb with the MARSS package, but the AICbp estimate will be terrible with this few bootstraps. \verb@nboot@ should be more like 1000.
+The function \verb@MARSSaic()@\index{model selection!MARSSaic function}\index{functions!MARSSaic} computes a bootstrap AIC for model selection purposes.  \verb@output="AICbp"@ will produce a parameter bootstrap\index{model selection!bootstrap AIC, AICbp}.  Use \verb@output="AICbb"@ to produce a non-parametric bootstrap\index{model selection!bootstrap AIC, AICbb} AIC. You will need a large number of bootstraps (\verb@nboot@). We use only 10 bootstraps to show you how to compute AICb with the \{MARSS\} package, but the AICbp estimate will be terrible with this few bootstraps. \verb@nboot@ should be more like 1000.
 <<Cs39_AICb, keep.source=TRUE>>= 
 kem.with.AICb <- MARSSaic(kem,
   output = "AICbp",

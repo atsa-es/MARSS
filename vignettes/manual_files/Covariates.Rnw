@@ -167,7 +167,7 @@ With this model,  we are estimating $\xx_0^0$ (the starting value for the Kalman
 
 \section{Both process- \& observation-error model}
 
-The MARSS package is really designed for state-space models where you have errors ($\vv$ and $\ww$) in both the process and observation models.  For example,
+The \{MARSS\} package is really designed for state-space models where you have errors ($\vv$ and $\ww$) in both the process and observation models.  For example,
 \begin{equation}
 \begin{gathered}
 \xx_t = \BB\xx_{t-1} +  \CC_t\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ)\\ 

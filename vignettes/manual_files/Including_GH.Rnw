@@ -105,7 +105,7 @@ By the way, there are much easier and faster functions in \R for fitting univari
 <<Cs_05_arima>>=
 arima(gappy.data, order = c(2, 0, 0), include.mean = FALSE)
 @
-The advantage of using the MARSS package really only comes in when you are fitting to multivariate data or data with observation error.
+The advantage of using the \{MARSS\} package really only comes in when you are fitting to multivariate data or data with observation error.
 
 \subsection{Example of MAR(2): multivariate data}
 Here we show an example of fitting a MAR(2) model.  Let's make some simulated data of two realizations of the same AR(2) process:

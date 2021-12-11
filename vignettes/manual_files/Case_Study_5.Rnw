@@ -296,7 +296,7 @@ levels(loggerheadNoisy$turtle)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \SweaveOpts{eval=FALSE}
 \section{Using specialized packages to analyze tag data}
-If you have real tag data to analyze, you should use a state-space modeling package that is customized for fitting MARSS models to tracking data. The MARSS package does not have all the bells and whistles that you would want for analyzing tracking data, particularly tracking data in the marine environment. Examples are the Ukfsst and kftrack R packages:
+If you have real tag data to analyze, you should use a state-space modeling package that is customized for fitting MARSS models to tracking data. The \{MARSS\} package does not have all the bells and whistles that you would want for analyzing tracking data, particularly tracking data in the marine environment. Examples are the Ukfsst and kftrack R packages:
 \begin{description}
 \item[UKFSST] https://github.com/positioning/kalmanfilter/wiki/ArticleUkfsst
 \item[KFTRACK] https://github.com/positioning/kalmanfilter/wiki/Articlekftrack

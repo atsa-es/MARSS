@@ -63,7 +63,7 @@ x_0 = 0
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 MARSS includes the state process $x_t$ but we are setting $\ZZ$ to zero so that does not appear in our observation model.  We need to fix all the state parameters to zero so that the algorithm doesn't ``chase its tail'' trying to fit $x_t$ to the data.
 
-An equivalent way to write this model is to use $x_t$ as the average flow level and make it be a constant level by setting $q=0$.  The average flow appears as the $x_0$ parameter.  In MARSS form, the model is:
+An equivalent way to write this model is to use $x_t$ as the average flow level and make it be a constant level by setting $q=0$.  The average flow appears as the $x_0$ parameter.  Written as a MARSS model, the model is:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
 \begin{equation}
 \begin{gathered}
@@ -214,7 +214,7 @@ legend("topright", paste("model 2, AICc=", format(kem$AICc, digits = 1)), bty = 
 
 \section{Observation and state residuals}
 \index{residuals!auxiliary}\index{residuals!smoothations}
-Figure \ref{fig:CS6.fits} shows the MARSS fits to the data.  From these model fits, auxiliary residuals can be computed which contain information about whether the data and models fits at time $t$ differ more than you would expect given the model and the model fits at time $t-1$.  In this section, we follow the example shown on page 147-148 in \citet{Koopmanetal1998} and use these residuals to look for outliers and sudden flow level changes.  Using auxiliary residuals this way follows mainly from \citet{HarveyKoopman1992}, but see also \citet[sec. 3]{Koopman1993},  \citet{deJongPenzer1998} and \citet{Penzer2001} for discussions of using auxiliary residuals for detection of outliers and structural breaks. 
+Figure \ref{fig:CS6.fits} shows the fits to the data.  From these model fits, auxiliary residuals can be computed which contain information about whether the data and models fits at time $t$ differ more than you would expect given the model and the model fits at time $t-1$.  In this section, we follow the example shown on page 147-148 in \citet{Koopmanetal1998} and use these residuals to look for outliers and sudden flow level changes.  Using auxiliary residuals this way follows mainly from \citet{HarveyKoopman1992}, but see also \citet[sec. 3]{Koopman1993},  \citet{deJongPenzer1998} and \citet{Penzer2001} for discussions of using auxiliary residuals for detection of outliers and structural breaks. 
 
 The \verb@MARSS()@ function will output the expected values of $x_t$ conditioned on the maximum-likelihood values of $q$, $r$, and $x_1$ and on the data ($y$ from $t=1$ to $T$).   In time-series literature, these are called the smoothed state estimates and they are output by the Kalman filter-smoother.  We will denote these smoothed estimates $x_t^T$ (and are \verb@xtT@ in the MARSS output). The time value in the superscript indicates the last data time point on which the estimate was conditioned (in this case, the state estimate is conditioned on data from $t=1$ to $t=T$). From these, we can compute the model predicted value of $y_t$, denoted or $\hat{y}_t^T$.  This is the predicted value of $y_t$ conditioned on $x_t^T$. 
 %~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -75,7 +75,7 @@ fit4 <- MARSS(as.vector(y),
 )
 @
 
-A difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate)\index{Kalman filter and smoother!StructTS} is the estimate of the state conditioned on the data up to $t$ not $T$. In the MARSS package, the state estimate (in the \verb@states@ element of the fitted object) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$).\index{functions!MARSSkfss}\index{Kalman filter and smoother}
+A difference with \verb@StructTS()@ is that the reported fitted level (the $x$ state estimate)\index{Kalman filter and smoother!StructTS} is the estimate of the state conditioned on the data up to $t$ not $T$. In the \{MARSS\} package, the state estimate (in the \verb@states@ element of the fitted object) is reported conditioned on all the data (up to $T$). To compare the outputs, we need to use \verb@MARSSkfss()@ to get \verb@xtt@ (the estimate of $x$ conditioned on data up to $t$).\index{functions!MARSSkfss}\index{Kalman filter and smoother}
 
 <<label=Cs103_structTS-level, keep.source=TRUE>>=
 fit2$kf <- MARSSkfss(fit2)
@@ -438,7 +438,7 @@ rbind(
 @
 
 If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get a forecast object that can be printed since the forecast package has a plot method for StructTS objects.
-The MARSS package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
+The \{MARSS\} package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
 
 The plots from the StructTS and marssMLE objects are similar though they have slightly different formats.
 \begin{figure}[htp]
@@ -469,7 +469,7 @@ plot(fitted1)
 \caption{Output from a plot of a fitted StructTS object.}
 \label{fig:STS.fig.bsm.fitted}
 \end{figure}
-In the MARSS package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.  The function \verb@fitted()@ in the MARSS package has the more typical meaning of \emph{fitted} for a statistical model (model prediction of $\yy$ or $\xx$).\index{functions!tsSmooth}\index{fitted values}\index{functions!fitted}
+In the \{MARSS\} package, the estimated states conditioned on the data up to time $t$ is returned with \verb@tsSmooth(x, type="xtt")@.  The function \verb@fitted()@ in the \{MARSS\} package has the more typical meaning of \emph{fitted} for a statistical model (model prediction of $\yy$ or $\xx$).\index{functions!tsSmooth}\index{fitted values}\index{functions!fitted}
 <<label=Cs502_fitted>>=
 fitted2 <- tsSmooth(fit2, type = "xtt")
 fitted2 <- subset(fitted2, .rownames %in% c("X1", "X2", "X3"))
@@ -526,7 +526,7 @@ ggplot(df) +
 <<label=Cs601_residuals>>=
 resids1 <- residuals(fit1)
 @
-In the MARSS package, the residuals function will return the model residuals conditioned on all the data, data up to time $t-1$ or up to time $t$.\index{residuals!model} To replicate the behavior for StructTS objects, we need to use conditioning up to time $t$ which is \verb@type="tt"@.
+In the \{MARSS\} package, the residuals function will return the model residuals conditioned on all the data, data up to time $t-1$ or up to time $t$.\index{residuals!model} To replicate the behavior for StructTS objects, we need to use conditioning up to time $t$ which is \verb@type="tt"@.
 <<label=Cs602_residuals>>=
 resids2 <- residuals(fit2, type = "tt", standardization = "marginal")
 @
@@ -552,7 +552,7 @@ ggplot(df, aes(x = t, y = resids)) +
 \section{Multivariate models}
 \index{structural ts models!multivariate}
 
-The MARSS package allows one to fit multivariate versions of structural equation models. In this section, we will use the level plus trend model as the example, however the approaches work for all the structural models. The focus for this example will be estimating a changing trend using multiple time series.
+The \{MARSS\} package allows one to fit multivariate versions of structural equation models. In this section, we will use the level plus trend model as the example, however the approaches work for all the structural models. The focus for this example will be estimating a changing trend using multiple time series.
 
 \subsection{Multiple observations of same process}
 
@@ -932,9 +932,9 @@ ggplot(df, aes(x = t, y = .estimate, col = name)) +
 
 \section{Summary}
 
-This chapter illustrates how to fit the structural equation models fit by the \verb@StructTS()@ function in base R. The initial conditions used in that function were used here, however that should not be assumed to be the best choice. The default behavior for in the MARSS package is to treat $\xx_0$ as an estimated parameter with initial conditions variance matrix set to all 0. These models can be a challenge for the EM algorithm and for most examples the BFGS algorithm was used. If using EM, the algorithm will need to be run longer to achieve the maximum likelihood. 
+This chapter illustrates how to fit the structural equation models fit by the \verb@StructTS()@ function in base R. The initial conditions used in that function were used here, however that should not be assumed to be the best choice. The default behavior for in the \{MARSS\} package is to treat $\xx_0$ as an estimated parameter with initial conditions variance matrix set to all 0. These models can be a challenge for the EM algorithm and for most examples the BFGS algorithm was used. If using EM, the algorithm will need to be run longer to achieve the maximum likelihood. 
 
-The MARSS package allows you to fit multivariate versions of these models with a flexible data structure and flexible relationships between the data. It allows you to include covariates and model intervention effects. You can model multiple observations of the same process or different observations of independent processes that share some or all parameter values. You can also model cases where the trend (or seasonality) is shared across processes but not the levels. The ability to use multiple data sets can improve estimation and allow you to estimate an underlying process which might remain hidden if one one data set is used for estimation.
+The \{MARSS\} package allows you to fit multivariate versions of these models with a flexible data structure and flexible relationships between the data. It allows you to include covariates and model intervention effects. You can model multiple observations of the same process or different observations of independent processes that share some or all parameter values. You can also model cases where the trend (or seasonality) is shared across processes but not the levels. The ability to use multiple data sets can improve estimation and allow you to estimate an underlying process which might remain hidden if one one data set is used for estimation.
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
