@@ -24,7 +24,7 @@ library(lme4)
 
 This chapter shows how to write regression models with multivariate responses and multivariate explanatory variables in MARSS form.  R has many excellent packages for multiple linear regression.  We will be showing how to use the \verb@MARSS()@ function to fit these models, but note that R's standard linear regression functions would be much better choices in most cases.  The purpose of this chapter is to show the relationship between multivariate linear regression and the MARSS equation.
 
-In a classic linear regression, the response variable ($y$) is univariate and there may one to multiple explanatory variables ($d_1$, $d_2$, $\dots$) plus an optional intercept ($\alpha$):
+In a classic linear regression, the response variable ($y$) is univariate and there may be one to multiple explanatory variables ($d_1$, $d_2$, $\dots$) plus an optional intercept ($\alpha$):
 \begin{equation}\label{eqn:lm}
 y_t = \alpha + \sum_k\beta_k d_k + e_t, \text{ where } e_t \sim \N(0,\sigma^2) 
 \end{equation}
@@ -34,11 +34,11 @@ This chapter will start with classical linear regression where the explanatory v
 
 \section{Univariate linear regression}
 
-A vanilla linear regression where our data are time ordered but we treat them as independent can be written 
+A vanilla linear regression where our data are time ordered but we treat them as independent can be written as 
 \begin{equation}\label{eqn:lm2}
 y_t=\alpha + \beta_1 d_{1,t} + \beta_2 d_{2,t} + e_t,
 \end{equation}
-where the $d$ are our explanatory variables.  This model can be written in many different ways in as a MARSS equation. Here we use a specific form where the i.i.d. component of the errors is $v_t$ in the $y$ part of the MARSS equation and the autocorrelated errors appear as $x_t$ in the $y$ equation.  Specifying the MARSS model this way allows us to use the EM-algorithm to fit the model which will prove to be important.
+where the $d$ are our explanatory variables.  This model can be written in many different ways in as a MARSS equation. Here we use a specific form where the i.i.d. component of the errors is $v_t$ in the $y$ part of the MARSS equation and autocorrelated errors will appear as $x_t$ in the $y$ equation.  Specifying the MARSS model this way allows us to use the EM-algorithm to fit the model which will prove to be important.
 
 \begin{equation}\label{eqn:lm.marss1}
 \begin{gathered}
@@ -80,7 +80,7 @@ A full multivariate MARSS model looks like
 \end{gathered}
 \end{equation}
 We need to specify the parameters in Equation \ref{eqn:mlm.marss} such that we get Equation 
-\ref{eqn:longley1} 
+\ref{eqn:longley1}. 
 
 First, we load the data and set up $y$, the response variable number of people employed, as a matrix with time going across the columns.
 <<Cs_002_example1-data>>=
@@ -108,7 +108,7 @@ The $\DD$ matrix has the two $\beta$ (slope) parameters for GNP and Population a
 longley.model$A <- matrix("intercept")
 longley.model$D <- matrix(c("GNP", "Pop"), nrow = 1)
 @
-Last we set up our explanatory variables.  This is the $\dd$ matrix and we need each explanatory variable in a row and time across the columns.
+Last we set up our explanatory variables.  This is the $\dd$ matrix and we need each explanatory variable in a row with time across the columns.
 <<Cs_007_example1-eVar>>=
 longley.model$d <- rbind(longley$GNP, longley$Population)
 @
@@ -218,7 +218,7 @@ longley.model$x0 <- "zero"
 longley.model$tinitx <- 0
 @
 
-And then we fit as usual.  We will fit with the EM-algorithm (the default) and compare to BFGS.
+Then we fit as usual.  We will fit with the EM-algorithm (the default) and compare to BFGS.
 <<Cs_017_full-model-fit, results=hide>>=
 mod3.em <- MARSS(Employed, model = longley.model)
 mod3.bfgs <- MARSS(Employed, model = longley.model, method = "BFGS")
@@ -232,7 +232,7 @@ Compared to the BFGS estimates:
 <<Cs_019_full-bfgs-ests>>=
 c(coef(mod3.bfgs, type = "vector")[par.names], logLik = mod3.bfgs$logLik)
 @
-And compared to the estimates from the lm() function:
+And compared to the estimates from the \verb@lm()@ function:
 <<Cs_020_full-lm-ests>>=
 mod3.lm <- lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed
   + Armed.Forces + Population + Year, data = longley)
@@ -264,7 +264,7 @@ Compared to the BFGS estimates:
 <<Cs_024_full-correrr-bfgs-ests>>=
 c(coef(mod4.bfgs, type = "vector")["B.b"], logLik = mod4.bfgs$logLik)
 @
-And compared to the estimates from the gls() function:
+And compared to the estimates from the \verb@gls()@ function:
 <<Cs_025_full-gls-ests>>=
 mod4.gls <- gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
   + Armed.Forces + Population + Year,
@@ -277,9 +277,9 @@ Again we see that the BFGS algorithm struggles with the ridge-like likelihood ca
 
 
 \section{Multivariate response example using longitudinal data}
-We will illustrate linear regression with a multivariate response using longitudinal data from a sleep study on 18 subjects from the \verb@lme4@ R package. These are data on reaction time of subjects after 0 to 9 days of being restricted to 3 hours of sleep.
+We will illustrate linear regression with a multivariate response using longitudinal data from a sleep study on 18 subjects from the \{lme4\} R package. These are data on reaction time of subjects after 0 to 9 days of being restricted to 3 hours of sleep.
 
-We load the data from the \verb@lme4@ package:
+We load the data from the \{lme4\} package:
 <<Cs_026_loadsleep>>=
 data(sleepstudy, package = "lme4")
 @
@@ -301,15 +301,13 @@ xyplot(Reaction ~ Days | Subject, sleepstudy,
 \end{figure}
 
 
-We set up the data into the form required for the \verb@MARSS()@ function.
+We set up the data into a matrix for the \verb@MARSS()@ function with each subject as a row with day across the columns. The explanatory variable is the the day number 0 to 9 and we make this into a matrix with one row and day across the columns.
 <<Cs_028_setupdata, keep.source=TRUE>>=
 # number of subjects
 nsub <- length(unique(sleepstudy$Subject))
 ndays <- length(sleepstudy$Days) / nsub
-# each subject is a row with day across the columns
 dat <- matrix(sleepstudy$Reaction, nsub, ndays, byrow = TRUE)
 rownames(dat) <- paste("sub", unique(sleepstudy$Subject), sep = ".")
-# the day number 0 to 9 is the explanatory variable
 exp.var <- matrix(sleepstudy$Days, 1, ndays, byrow = TRUE)
 @
 
@@ -320,7 +318,7 @@ Let's start with a simple regression where each subject has a separate intercept
 \begin{bmatrix}v_1\\v_2\\ \dots \\v_{18}\end{bmatrix}_t \sim \N \left(0, \begin{bmatrix}r&0&\dots&0\\ 0&r&\dots&0\\ \dots&\dots&\dots&\dots \\ 0&0&0&r\end{bmatrix} \right)
 \end{gathered}
 \end{equation}
-The response time of subject $i$ is a subject specific intercept ($\alpha_i$) plus an effect of day at time $t$ (so 0, 1, 2, etc) that doesn't vary by subject and error that is i.i.d. across subject and day.
+The response time of subject $i$ is a subject specific intercept ($\alpha_i$) plus an effect of day at time $t$ that doesn't vary by subject and error that is i.i.d. across subject and day.
 
 We specify and fit this model as follows
 <<Cs_029_sleepmod1, results=hide>>=
@@ -392,7 +390,7 @@ sleep.model <- list(
 )
 sleep.mod4 <- MARSS(dat, model = sleep.model, inits = inits, silent = TRUE)
 @
-It is not obvious how to specify these last two models using gls() or if it is possible.
+It is not obvious how to specify these last two models using \verb@gls()@ or if it is possible.
 
 We can also allow each subject to have his/her own error process but specify that the parameters of these ($b$, $q$ and $r$) are the same across subjects.  We do this by using \verb@"diagonal and equal"@.  Mathematically this model is
 \begin{equation}\label{eqn:sleep.mod5}
@@ -414,14 +412,14 @@ sleep.model <- list(
 )
 sleep.mod5 <- MARSS(dat, model = sleep.model, inits = inits, silent = TRUE)
 @
-This is fairly close to this model fit with gls().\index{functions!gls}
+This is fairly close to this model fit with \verb@gls()@.\index{functions!gls}
 <<Cs_036_mod5-gls>>=
 sleep.mod5.gls <- gls(Reaction ~ 0 + Subject + Days:Subject,
   data = sleepstudy,
   correlation = corAR1(form = ~ 1 | Subject), method = "ML"
 )
 @
-The way the variance-covariance structure is modeled is a little different but it's the same idea.
+The way the variance-covariance structure is modeled is a little different but it is the same idea.
 
 <<Cs_037_makemodeltable, echo=FALSE, keep.source=FALSE>>=
 if (!exists("tabledir")) tabledir <- ""
@@ -448,7 +446,7 @@ print(thetable, type = "latex", file = paste(tabledir, "tablesleepstudy.tex", se
 \input{figures/tablesleepstudy}
 
 \section{Discussion}
-The purpose of the is chapter is to illustrate how linear regression models with multivariate explanatory variable or response variables can be written in MARSS form and fit with the \verb@MARSS()@ function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many excellent packages for linear regression and generalized linear regression (non-Gaussian errors).  While the \{MARSS\} package can fit a variety of linear regression models with Gaussian errors, that is not what the package is designed to do.  The \{MARSS\} package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables) and linear constraints.
+The purpose of this chapter is to illustrate how linear regression models with multivariate explanatory variables can be written in MARSS form and fit with the \verb@MARSS()@ function\footnote{with caveat that one must always be careful when the likelihood surface has prominent ridges which will occur with collinear explanatory variables.}.  This is to help one understand the relationship between the MARSS model form and the more familiar multivariate linear model forms. Obviously R has many, many excellent packages for linear regression and generalized linear regression (non-Gaussian errors).  While the \{MARSS\} package can fit a variety of linear regression models with Gaussian errors, that is not what the package is designed to do.  The \{MARSS\} package is designed for fitting models that cannot be fit with typical linear regression: multivariate autoregressive state-space models with inputs (explanatory variables) and linear constraints.
 
 <<reset, echo=FALSE, include.source=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
