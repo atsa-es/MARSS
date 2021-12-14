@@ -6,11 +6,11 @@ options(prompt = " ", continue = " ", width = 60)
 library(MARSS)
 @
 
-\chapter{Lag-p models with MARSS}
+\chapter{Lag-p MARSS models}
 \label{chap:ARMA}
 \chaptermark{Models with lag-p}\index{MAR(p)}
 %Add footnote with instructions for getting code
-\blfootnote{Type \texttt{RShowDoc("Chapter\_MARp.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+\blfootnote{Type \texttt{RShowDoc("Chapter\_MARp.R",package="MARSS")} at the \R command line to open a file with all the code for the examples in this chapter.}
 
 \section{Background}
 Most of the chapters in the User Guide are `lag-1' in the autoregressive part of the model.  This means that $\xx_t$ in the process model only depends on $\xx_{t-1}$ and not $\xx_{t-2}$ (lag-2) or more generally $\xx_{t-p}$ (lag-p).  A lag-p model can be written in state-space form as a MARSS lag-1 model, aka a MARSS(1) model (see section 11.3.2 in \citet{Tsay2010}).  Writing lag-p models in this form allows one to take advantage of the fitting algorithms for MARSS(1) models. There are a number of ways to do the conversion to a MARSS(1) form.  We use Hamilton's form (section 1 in \citet{Hamilton1994}) because it can be fit with an EM algorithm while the other forms (Harvey's and Akaike's) cannot.
@@ -19,12 +19,12 @@ This chapter shows how to convert and fit the following using the MARSS(1) form:
 \begin{description}
 \item[AR(p)] A univariate autoregressive model where $x_t$ is a function of $x_{t-p}$ (and the prior lags usually too).  No observation error.
 \item[MAR(p)] The same as AR(p) but the $\xx$ term is multivariate not univariate.
-\item[ARSS(p)] The same as AR(p) but with a observation model and observation error.  The observations may be multivariate ($\yy$ can be multivariate) but the $\xx$ term is univariate.
+\item[ARSS(p)] The same as AR(p) but with a observation model and observation error.  The observations ($\yy$) may be multivariate but the $\xx$ term is univariate.
 \item[MARSS(p)] The same as ARSS(p) but the $\xx$ term is multivariate not univariate.
 \end{description}
 Note that only ARSS(p) and MARSS(p) assume observation error in the data.  AR(p) and MAR(p) will be rewritten in the state-space form with a $\yy$ component to facilitate statistical analysis but the data themselves are considered error free.  
 
-Note there are many \R packages for fitting AR(p) (and ARMA(p,q) for that matter) models.  If you are only interested in univariate data with no observation error in the data then you probably want to look into the \verb@arima()@ function included in base \R and into \R packages that specialize in fitting ARMA models to univariate data.  The forecast package in \R is a good place to start but others can be found on the \href{http://cran.r-project.org/web/views/TimeSeries.html}{CRAN task view: Time Series Analysis}.  
+Note there are many \R packages for fitting AR(p) (and ARMA(p,q) for that matter) models.  If you are only interested in univariate data with no observation error in the data then you probably want to look into the \verb@arima()@ function included in base \R and into \R packages that specialize in fitting ARMA models to univariate data.  The \{forecast\} package in \R is a good place to start but others can be found on the \href{http://cran.r-project.org/web/views/TimeSeries.html}{CRAN task view: Time Series Analysis}.  
 
 \section{MAR(2) models}
 \index{MAR(p)}
@@ -109,13 +109,13 @@ print(cbind(
 ))
 @
 
-By the way, there are much better and faster functions in \R for fitting univariate AR models (no observation error).  The \{MARSS\} package is really for fitting to multivariate data with observation error not AR(p) models.  For example, here is how you would fit the AR(2) model using the base \verb@arima()@ function:
+By the way, there are much better and faster functions in \R for fitting univariate AR models (no observation error).  The \{MARSS\} package is really for fitting to multivariate data with observation error not AR(p) models.  For example, here is how you would fit the AR(2) model using the \verb@arima()@ function:
 <<Cs_107_arima>>=
 arima(gappy.data, order = c(2, 0, 0), include.mean = FALSE)
 @
-The estimates will be different because \verb@arima@ sets $\xx_1^0$ as coming from the stationary distribution.  That is a non-linear constraint that MARSS cannot handle.
+The estimates will be different because \verb@arima()@ sets $\xx_1^0$ as coming from the stationary distribution.  That is a non-linear constraint that \verb@MARSS()@ cannot handle.
 
-The assumption that $\xx_1^0$ comes from the stationary distribution is fine if the initial $\xx$ indeed comes from the stationary distribution, but if the initial $\xx$ is well outside the stationary distribution the the estimates will be incorrect.
+The assumption that $\xx_1^0$ comes from the stationary distribution is fine if the initial $\xx$ indeed comes from the stationary distribution, but if the initial $\xx$ is well outside the stationary distribution the estimates will be incorrect.
 <<Cs_108_non-stationary>>=
 TT <- 50
 true.2 <- c(r = 0, b1 = -1.5, b2 = -0.75, q = 1)
@@ -313,7 +313,7 @@ Fit as usual:
 ar2ss <- MARSS(noisy.data, model = model.list.2ss)
 @
 
-We can compare the results to modeling the data as if there is no observation error, and we see that that assumption leads to poor $\BB$ estimates:\index{B matrix!estimation}
+We can compare the results to modeling the data as if there is no observation error, and we see that the assumption of no observation error leads to poor $\BB$ estimates:\index{B matrix!estimation}
 <<Cs_405_fit-arss2-model, keep.source=TRUE>>=
 model.list.2ss.bad <- model.list.2ss
 # set R to zero in this model
@@ -333,7 +333,7 @@ print(cbind(
 @ 
 The middle column are the estimates assuming that the data have no observation error and the right column are our estimates with the observation error estimated.  Clearly, assuming no observation error when it is present has negative consequences for the $\BB$ and $\QQ$ estimates.
 
-By the way, there is a straight-forward way to deal with the measurement error if you are working with univariate ARMA models and you are only interested in the AR parameters (the $b$'s).   Inclusion of measurement error leads to additional MA components up to lag $p$ \citep{StaudenmayerBuonaccorsi2005}.  This means that if you are fitting a AR(p) model with measurement error, you can fit a ARMA(p,p) and the measurement error will be absorbed in the $p$ MA components.  For the example above, we could estimate the AR parameters for our AR(2) data with measurement error by fitting a ARMA(p,p) model.  Here's how we could do that using \R's \verb@arima()@ function:
+By the way, there is a straight-forward way to deal with the measurement error if you are working with univariate ARMA models and you are only interested in the AR parameters (the $b$'s).   Inclusion of measurement error leads to additional MA components up to lag $p$ \citep{StaudenmayerBuonaccorsi2005}.  This means that if you are fitting an AR(p) model with measurement error, you can fit a ARMA(p,p) and the measurement error will be absorbed in the $p$ MA components.  For the example above, we could estimate the AR parameters for our AR(2) data with measurement error by fitting a ARMA(p,p) model.  Here's how we could do that using \R's \verb@arima()@ function:
 <<Cs_408_fit-arss2-with-arima>>=
 arima(noisy.data, order = c(2, 0, 2), include.mean = FALSE)
 @
@@ -430,7 +430,7 @@ if (sims.exist) { # flag to check that the code to creat the plot has been run
 }
 @
 \end{center}
-\caption{Comparison of the AR parameter estimates using different approaches to model ARSS(2) data (univariate AR(2) data observed with error).  Results are from \Sexpr{nsim} simulations of AR(2) data with \Sexpr{TT} time steps.  Results are shown for the $b_1$ and $b_2$ parameters of the AR process fit with a 1) AR(2) model with no correction for measurement error, 2) MARSS(1) model fit via the EM optimization, 3) MARSS(1) model fit via BFGS optimization (initial conditions not optimized), 4) ARMA(2,2) model fit with the R \texttt{arima} function, and 5) AR(2) model fit 2nd differencing with the R \texttt{arima} function.  The "x" shows the mean of the simulations and the bar in the boxplot is the median.  The true values are shown with the dashed horizontal line. The $\sigma^2$ for the AR process was \Sexpr{true.2ss[4]} and the $\sigma^2$ for the measurement error was \Sexpr{true.2ss[1]}.  The $b_1$ parameters was \Sexpr{true.2ss[2]},and $b_2$ was \Sexpr{true.2ss[3]}.}
+\caption{Comparison of the AR parameter estimates using different approaches to model ARSS(2) data (univariate AR(2) data observed with error).  Results are from \Sexpr{nsim} simulations of AR(2) data with \Sexpr{TT} time steps.  Results are shown for the $b_1$ and $b_2$ parameters of the AR process fit with a 1) AR(2) model with no correction for measurement error, 2) MARSS(1) model fit via the EM optimization, 3) MARSS(1) model fit via BFGS optimization (initial conditions not optimized), 4) ARMA(2,2) model fit with the\verb@arima()@ function, and 5) AR(2) model fit 2nd differencing with the  \verb@arima()@ function.  The "x" shows the mean of the simulations and the bar in the boxplot is the median.  The true values are shown with the dashed horizontal line. The $\sigma^2$ for the AR process was \Sexpr{true.2ss[4]} and the $\sigma^2$ for the measurement error was \Sexpr{true.2ss[1]}.  The $b_1$ parameters was \Sexpr{true.2ss[2]},and $b_2$ was \Sexpr{true.2ss[3]}.}
 \label{fig:CS4.arperf}
 \end{figure}
 
