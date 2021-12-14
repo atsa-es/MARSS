@@ -16,9 +16,9 @@ The marssMLE object returned by a \verb@MARSS()@ call includes the estimated par
   \item[Kalman filter and smoother output] \verb@tsSmooth(MLEobj)@. The smoothed states are in \verb@MLEobj$states@. \verb@tsSmooth(MLEobj)@ provides filter and smoother output as a data frame, but the full Kalman filter and smoother output is available in matrix form from \verb@MARSSkf(MLEobj)@.  See \verb@?MARSSkf@ for a discussion of the Kalman filter and smoother outputs.  If you just want the estimated states conditioned on all the data, use \verb@tsSmooth(MLEobj)@; you can pass in \verb@interval="confidence"@.\index{functions!MARSSkf}\index{functions!tsSmooth}\index{Observation filtering and smoothing}
     \item[expected value of missing y] \verb@tsSmooth(MLEobj, type="ytT")@ returns these as a data frame. \verb@MARSShatyt(MLEobj)@ returns the same (and much more) as matrices. See \verb@?MARSShatyt@ for a discussion of the expectations involving y.\index{functions!MARSShatyt}\index{functions!tsSmooth}\index{Observation filtering and smoothing}
     \item[log-likelihood] \verb@logLik(MLEobj)@ returns the log-likelihood.
-    \item[AIC] \verb@AIC(MLEobj)@  (\verb@stats@ package) returns the uncorrected AIC. Use \verb@MLEobj$AICc@ to return the small sample size corrected AIC.\index{functions!AIC}
+    \item[AIC] \verb@AIC(MLEobj)@  (\{stats\} package) returns the uncorrected AIC. Use \verb@MLEobj$AICc@ to return the small sample size corrected AIC.\index{functions!AIC}
 \end{description}
-Note the \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the R command line to see the print help file which will also point you to the more standard functions (like \verb@coef()@).\index{functions!print}
+Note the \verb@print@ method for marssMLE objects will print or compute all the frequently needed output using the \verb@what=@ argument in the print call.  Type \verb@?print.MARSS@ at the \R command line to see the print help file which will also point you to the more standard functions (like \verb@coef()@).\index{functions!print}
 
 
 \section{Core functions for fitting a MARSS model}
@@ -33,7 +33,7 @@ The following core functions are designed to work with `unfitted' marssMLE objec
 \section{Functions for a fitted marssMLE object}
 The following functions use a marssMLE object that has a populated \verb@par@ element, i.e., a marssMLE object returned from one of the fitting functions (\verb@MARSS()@, \verb@MARSSkem()@, \verb@MARSSoptim()@).  Below \verb@MODELobj@ means the argument is a marssMODEL object and \verb@MLEobj@ means the argument is a marssMLE object.  Type \verb@?function.name@ to see information on function usage and examples.
 \begin{description}
-  \item[standard functions] The standard R functions for fitted objects are provided: \verb@residuals()@, \verb@fitted()@, \verb@logLik()@, \verb@AIC()@, \verb@coef()@, \verb@predict()@ and \verb@tsSmooth()@.
+  \item[standard functions] The standard \R functions for fitted objects are provided: \verb@residuals()@, \verb@fitted()@, \verb@logLik()@, \verb@AIC()@, \verb@coef()@, \verb@predict()@ and \verb@tsSmooth()@.
   \item[summary functions] Standard functions for printing output are also available: \verb@summary()@ and \verb@print()@ along with `tidyverse' output: \verb@tidy()@ and \verb@glance()@.
 \end{description}
 

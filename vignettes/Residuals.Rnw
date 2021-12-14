@@ -320,7 +320,7 @@ Equation \ref{eq:varvtcondy} can be written as\footnote{$\var(A+B)=\var(A)+\var(
 &=\ZZ_t \hatVtT \ZZ_t^\top + \hatUtT - \hatStT\ZZ_t^\top - \ZZ_t(\hatStT)^\top .
 \end{split}
 \end{equation}
-$\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e., if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
+$\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e., if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
 From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate Normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
 \Sigma_1 & \Sigma_{12} \\
@@ -474,7 +474,7 @@ $\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus\footnote{$\cov[\BB
 & = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top ,
 \end{split}
 \end{equation}
-where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package.
+where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package.
 
 Both $\VV_t$ and $\WW_t$ are multivariate Normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
 \begin{equation}
@@ -575,7 +575,7 @@ The $\HH_t$ and $\GG_t$ matrices specify the variance and covariance of $\WW_t$ 
 The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\GG_t\epsilon_t\\ \HH_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVttm=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVttm=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the \{MARSS\} package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
 
 \subsection{Algorithm for the non-normalized residuals}
 
@@ -621,9 +621,9 @@ These $\widehat{\varepsilon}_t$ and $\widehat{\Sigma]}_t$ are for both the non-m
 
 In Equation 20 in \citet{Harveyetal1998}, their $T_t$ is my $\BB_{t+1}$ and their $H_t H_t^\top$ is my $\QQ_{t+1}$.  Notice the difference in the time indexing. My time indexing on $\BB$ and $\QQ$ matches the left $\xx$ while in theirs, $T$ and $H$ indexing matches the right $\xx$. Thus in my implementation of their algorithm \citep[eqns. 21-24]{Harveyetal1998}, $\BB_{t+1}$ appears in place of $T_t$ and $\QQ_{t+1}$ appears in place of $H_t$. See comments below on normalization and the difference between $\QQ$ and $H$. 
 
-\citet[eqns. 19, 20]{Harveyetal1998} use $G_t$ to refer to the $\chol(\RR_t)^\top$ (non-zero part of the $n \times n+m$ matrix) and $H_t$ to refer to $\chol(\QQ_t)^\top$.  I have replaced these with $\RR_t^\prime$ and $\QQ_t^\prime$ (Equation \ref{eq:Harveyalgo}) which causes my variant of their algorithm (Equation \ref{eq:Harveyalgo}) to give the `non-normalized' variance of the residuals. The residuals function in the MARSS R package has an option to give either normalized or non-normalized residuals.
+\citet[eqns. 19, 20]{Harveyetal1998} use $G_t$ to refer to the $\chol(\RR_t)^\top$ (non-zero part of the $n \times n+m$ matrix) and $H_t$ to refer to $\chol(\QQ_t)^\top$.  I have replaced these with $\RR_t^\prime$ and $\QQ_t^\prime$ (Equation \ref{eq:Harveyalgo}) which causes my variant of their algorithm (Equation \ref{eq:Harveyalgo}) to give the `non-normalized' variance of the residuals. The residuals function in the \{MARSS\} package has an option to give either normalized or non-normalized residuals.
 
-$\KK_t$ is the Kalman gain output by the MARSS R package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the MARSS R package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
+$\KK_t$ is the Kalman gain output by the \{MARSS\} package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the \{MARSS\} package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
 
 \subsection{Computing the normalized residuals}
 
@@ -675,7 +675,7 @@ $\yy_t$ is not in the conditional since it only includes data up to $t-1$. Witho
 \var[\checkVt] = \RR_t + \ZZ_t \hatVttm \ZZ_t^\top.
 \end{equation}
 
-Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the MARSS R package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
+Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the \{MARSS\} package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
 
 
 \subsection{One-step ahead state residuals}

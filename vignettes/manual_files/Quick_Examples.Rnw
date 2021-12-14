@@ -383,7 +383,7 @@ The package also includes the common functions for working with the output from 
 
 \section{Tidy output}
 
-The \verb@tidy@ and \verb@glance@ functions from the broom package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
+The \verb@tidy@ and \verb@glance@ functions from the \{broom\} package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
 
 <<Cs24_model-tidy-R>>=
 broom::tidy(kem)

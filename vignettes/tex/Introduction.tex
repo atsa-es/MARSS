@@ -81,7 +81,7 @@ MARSS models are used in many different ways and different users will want diffe
 The best way to find out how to get output is to type \verb@?print.MARSS@ at the command line after installing MARSS.  The print help page discusses how to get parameter estimates in different forms, the smoothed and filtered states, all the Kalman filter and smoother output, all the expectations of y (missing data), confidence intervals and bias estimates for the parameters, 
 and standard errors of the states.  If you are looking only for Kalman filter and smoother output, see the relevant section in Chapter \ref{chap:algorithms} and see the help page for the \verb@MARSSkf()@ function (type \verb@?MARSSkf@at the \R command line).
 
-You might also want to look at the \verb@tidy@ and \verb@glance@ functions which will summarize commonly needed output from a MARSS model fit.  These functions work as they do in the \verb@broom@ R package.
+You might also want to look at the \verb@tidy@ and \verb@glance@ functions which will summarize commonly needed output from a \verb@MARSS()@ model fit.  These functions work as they do in the \{broom\} \R package.
 
 \section{How to get started (quickly)}
 
@@ -91,7 +91,7 @@ If you already work with models in the form of Equation \ref{eqn:marss}, you can
 Your data need to be a matrix, not data frame, with time across the columns ($n \times T$ matrix). Note a univariate or multivariate ts (time-series) object can also be used and this will be converted to a $n \times T$ matrix. The \{MARSS\} functions assume discrete time steps and you will need a column for each time step.  Replace any missing time steps with NA.  Write your model down on paper and identify which parameters correspond to which parameter matrices in Equation \ref{eqn:marss}.  Call the \texttt{MARSS()} function (Chapter \ref{chap:MARSS}) using your data and using the \texttt{model} argument to specify the structure of each parameter. 
 
 \subsection{Getting a ts object into the right form}
-A R ts object (time series object) stores information about the time steps of the data and often seasonal information (the quarter or month).  You can pass in your data as a ts object and MARSS will convert this to matrix form.  However if you have your data in ts form, then you may be using year and season (quarter, month) as covariates to estimate trend and seasonality.  Here is how to get your ts into the form that MARSS wants with a matrix of covariates for season.
+A \R ts object (time series object) stores information about the time steps of the data and often seasonal information (the quarter or month).  You can pass in your data as a ts object and MARSS will convert this to matrix form.  However if you have your data in ts form, then you may be using year and season (quarter, month) as covariates to estimate trend and seasonality.  Here is how to get your ts into the form that MARSS wants with a matrix of covariates for season.
 
 \emph{Univariate example}.  This converts a univariate ts object with year and quarter into a matrix with a row for the response (here called Temp), year, and quarter.  
 \begin{Schunk}
@@ -177,7 +177,7 @@ Packages that will do Kalman filtering and smoothing are many, but packages that
 	
 	\item[eViews] eViews is a commercial economics software that will estimate at least some types of MARSS models.
 	
-	\item[KFAS] The \href{https://cran.r-project.org/package=KFAS}{KFAS} \R package provides a fast Kalman filter and smoother.  Examples in the package show how to estimate MARSS models using the KFAS functions and \R's \verb@optim()@ function.   The \{MARSS\} package uses the filter and smoother functions from the KFAS package.
+	\item[KFAS] The \href{https://cran.r-project.org/package=KFAS}{KFAS} \R package provides a fast Kalman filter and smoother.  Examples in the package show how to estimate MARSS models using the \{KFAS\} functions and \R's \verb@optim()@ function.   The \{MARSS\} package uses the filter and smoother functions from the \{KFAS\} package.
 	
 		\item[S+FinMetrics] \href{http://faculty.washington.edu/ezivot/MFTS2ndEditionFinMetrics.htm}{S+FinMetrics} is a S-plus module for fitting MAR models, which are called vector autoregressive (VAR) models in the economics and finance literature.  It has some support for state-space VAR models.  It was developed by Andrew Bruce, Doug Martin, Jiahui Wang, and Eric Zivot, and it has a book associated with it: Modeling Financial Time Series with S-plus by Eric Zivot and Jiahui Wang.
 		

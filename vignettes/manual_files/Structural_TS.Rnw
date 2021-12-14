@@ -10,7 +10,7 @@ options(prompt = " ", continue = " ", width = 60)
 \blfootnote{Type \texttt{RShowDoc("Chapter\_Structural\_TS.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 
-Structural time series models are linear Gaussian state-space models which decompose the series into additive random walks for the level, trend and season. These models can be written as a multivariate state-space model. R provides the \verb@StructTS()@ function in the stats package to fit the level, level plus trend, and level plus trend plus season versions of structural time series models to univariate data.
+Structural time series models are linear Gaussian state-space models which decompose the series into additive random walks for the level, trend and season. These models can be written as a multivariate state-space model. R provides the \verb@StructTS()@ function in the \{stats\} package to fit the level, level plus trend, and level plus trend plus season versions of structural time series models to univariate data.
 
 Here it is shown how to fit structural time series models with \verb@MARSS()@ using the same initial conditions assumptions as used in the \verb@StructTS()@ function. With \verb@MARSS()@, you are not restricted to univariate time series and you have control over any parameter constraints that you wish to impose. You will see how to do this after the univariate cases are shown.
 
@@ -158,7 +158,7 @@ y_1\\
 
 Because \verb@MARSS()@ does an inversion of the initial variance matrix as part of code to force positive definite matrices and deal with degenerate models with 0s on diagonals of $\QQ$ or $\RR$, the initial conditions variance  used in \verb@StructTS()@ needs to be made positive definite for \verb@MARSS()@. This is done by adding a small value (1e-10) to the diagonal as shown in the \verb@mod.list@ used for \verb@fit3@ and \verb@fit4@. 
 
-This model will be illustrated with the \verb@UKgas@ data set. For the tree ring data, the trend variance estimate is 0 and that will not illustrate a stochastic trend. The \verb@subset.ts()@ function in the forecast package is used to subset just the 2nd quarter data.
+This model will be illustrated with the \verb@UKgas@ data set. For the tree ring data, the trend variance estimate is 0 and that will not illustrate a stochastic trend. The \verb@subset.ts()@ function in the \{forecast\} package is used to subset just the 2nd quarter data.
 
 Fit with \verb@StructTS()@.
 <<label=Cs201_structTS-leveltrend, keep.source=TRUE, results=hide>>=
@@ -397,7 +397,7 @@ ggplot(df, aes(x = t, y = value, color = model, linetype = model, shape = model)
 \subsection{Forecasting}
 \index{structural ts models!forecasting}\index{forecasting!structural ts models}\index{functions!predict}\index{functions!forecast}
 
-Forecasts can be made with the \verb@predict()@ function or the \verb@forecast()@ function in the forecast package. Here we will use the BSM model fits to illustrate forecasting.
+Forecasts can be made with the \verb@predict()@ function or the \verb@forecast()@ function in the \{forecast\} package. Here we will use the BSM model fits to illustrate forecasting.
 
 
 <<label=Cs401_forecast, results=hide>>=
@@ -437,8 +437,8 @@ rbind(
 )
 @
 
-If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get a forecast object that can be printed since the forecast package has a plot method for StructTS objects.
-The \{MARSS\} package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The forecast function can be called with \verb@forecast::forecast()@ if you have the forecast package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
+If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get an object that can be plotted since the \{forecast\} package has a plot method for StructTS objects.
+The \{MARSS\} package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The \verb@forecast()@ function can be called with \verb@forecast::forecast()@ if you have the \{forecast\} package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
 
 The plots from the StructTS and marssMLE objects are similar though they have slightly different formats.
 \begin{figure}[htp]

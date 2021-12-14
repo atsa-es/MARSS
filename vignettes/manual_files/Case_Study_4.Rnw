@@ -332,7 +332,7 @@ Z.vals <- list(
 )
 Z <- matrix(Z.vals, nrow = N.ts, ncol = 3, byrow = TRUE)
 @
-When specifying the list values, spacing and carriage returns were added to help show the correspondence with the $\ZZ$ matrix in Equation \ref{eq:dfa2}. If you print $\ZZ$ (at the R command line), you will see that it is a matrix with character values (the estimated elements) and numeric values (the fixed 0's).
+When specifying the list values, spacing and carriage returns were added to help show the correspondence with the $\ZZ$ matrix in Equation \ref{eq:dfa2}. If you print $\ZZ$ (at the \R command line), you will see that it is a matrix with character values (the estimated elements) and numeric values (the fixed 0's).
 <<Cs06_printZ>>=
 print(Z)
 @
@@ -366,7 +366,7 @@ R.vals <- list(
 R <- matrix(R.vals, nrow = N.ts, ncol = N.ts, byrow = TRUE)
 @
 \pagebreak
-You can print $\RR$ at the R command line to see what it looks like:
+You can print $\RR$ at the \R command line to see what it looks like:
 <<Cs09_printR>>=
 print(R)
 @
@@ -374,7 +374,7 @@ This form of variance-covariance matrix is commonly used, and therefore MARSS ha
 <<Cs10_setupR_short>>=
 R <- "diagonal and unequal"
 @
-Type ?MARSS at the R command line to see a list of the shorthand options for each parameter vector/matrix.
+Type \verb@?MARSS@ at the \R command line to see a list of the shorthand options for each parameter vector/matrix.
 
 The parameter vectors $\pipi$ (termed \verb@x0@ in MARSS), $\aa$ and $\uu$ are each set to be a column vector of zeros.  Any of the following can be used:
 <<Cs11_setupU>>=
@@ -609,7 +609,7 @@ $\xx^\dagger$ are the rotated trends.
 There are many ways of doing factor rotations, but a common approach is the varimax rotation which seeks a rotation matrix $\HH$ that creates the largest difference between loadings.  For example, let's say there are three trends in our model.  In our estimated $\ZZ$ matrix, let's say row 3 is $(0.2, 0.2, 0.2)$.  That would mean that data series 3 is equally described by trends 1, 2, and 3.  If instead row 3 was 
  $(0.8, 0.1, 0.1)$, this would make interpretation easier because we could say that data time series 3 was mostly described by trend 1.  The varimax rotation finds the $\HH$ matrix that makes the $\ZZ$ rows more like $(0.8, 0.1, 0.1)$ and less like $(0.2, 0.2, 0.2)$.\index{dynamic factor analysis!rotation}
  
-The varimax rotation is easy to compute because R has a built in function that returns $\HH^{-1}$. We will illustrate the use of the varimax rotation with the 2-state model with $\RR$ unconstrained.  We will fit this with a large maxit.
+The varimax rotation is easy to compute because \R has the \verb@varimax()@ function\footnote{in the \{stats\} package} that returns $\HH^{-1}$. We will illustrate the use of the varimax rotation with the 2-state model with $\RR$ unconstrained.  We will fit this with a large maxit.
 
 <<Cs20_kem3_R_unconstrained, results=hide>>=
 big.maxit.cntl.list <- list(minit = 200, maxit = 5000, allow.degen = FALSE)
