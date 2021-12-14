@@ -10,9 +10,9 @@ options(prompt = " ", continue = " ", width = 60)
 \blfootnote{Type \texttt{RShowDoc("Chapter\_Structural\_TS.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
 
-Structural time series models are linear Gaussian state-space models which decompose the series into additive random walks for the level, trend and season. These models can be written as a multivariate state-space model. R provides the \verb@StructTS()@ function in the \{stats\} package to fit the level, level plus trend, and level plus trend plus season versions of structural time series models to univariate data.
+Structural time series models are linear Gaussian state-space models which decompose the time series into additive random walks for the level, trend and season. These models can be written as a MARSS model. \R provides the \verb@StructTS()@ function in the \{stats\} package to fit the level, level plus trend, and level plus trend plus season versions of structural time series models to univariate data.
 
-Here it is shown how to fit structural time series models with \verb@MARSS()@ using the same initial conditions assumptions as used in the \verb@StructTS()@ function. With \verb@MARSS()@, you are not restricted to univariate time series and you have control over any parameter constraints that you wish to impose. You will see how to do this after the univariate cases are shown.
+Here it is shown how to fit structural time series models with \verb@MARSS()@ using the same initial conditions assumptions as used in the \verb@StructTS()@ function. With \verb@MARSS()@, you are not restricted to univariate time series and you have control over any parameter constraints that you wish to impose. You will see how to fit multivariate structural time series models after the univariate cases are shown.
 
 Required libraries for this chapter:
 <<label=Cs00_required-libraries>>=
@@ -28,7 +28,7 @@ library(forecast)
 \subsection{Level model}
 \index{structural ts models!level}
 
-The basic stochastic level model fit by \verb@stats::StructTS()@ is
+The basic stochastic level model fit by \verb@stats::StructTS()@ and using the notation of that function is
 \begin{equation}\label{eqn:struct.ts.y}
 y_t = m_t+v_t \text{ where } v_t \sim \N(0,\sigma^2_\epsilon)  \\
 \end{equation}
@@ -122,9 +122,9 @@ ggplot(df, aes(x = t, y = value)) +
 
 The basic stochastic level plus trend model fit by \verb@stats::StructTS()@ is
 \begin{equation}\label{eqn:struct.ts.trend.y}
-y_t = m_t+v_t \text{ where } v_t \sim \N(0,\sigma^2_\epsilon)  
+y_t = m_t + v_t \text{ where } v_t \sim \N(0,\sigma^2_\epsilon)  
 \end{equation}
-where $m$ and $n$ are the stochastic level and trend. $m_t=m_{t-1}+n_{t-1}+w_t$ and in matrix form this is
+where $m$ and $n$ are the stochastic level and trend. $m_t = m_{t-1}+n_{t-1}+w_t$ and in matrix form this is
 \begin{equation}\label{eqn:struct.ts.trend.x}
 \begin{bmatrix}
 m\\
@@ -140,7 +140,7 @@ n
 0&\sigma^2_\zeta
 \end{bmatrix}\right) 
 \end{equation}
-The initial conditions assumption used in the \verb@StructTS()@ for this model is the following where $s^2$ is the variance in the data ($\var(y)$):
+The initial conditions assumption used in \verb@StructTS()@ for this model is the following where $s^2$ is the variance in the data ($\var(y)$):
 
 \begin{equation}\label{eqn:struct.ts.trend.x0}
 \begin{bmatrix}
@@ -158,7 +158,7 @@ y_1\\
 
 Because \verb@MARSS()@ does an inversion of the initial variance matrix as part of code to force positive definite matrices and deal with degenerate models with 0s on diagonals of $\QQ$ or $\RR$, the initial conditions variance  used in \verb@StructTS()@ needs to be made positive definite for \verb@MARSS()@. This is done by adding a small value (1e-10) to the diagonal as shown in the \verb@mod.list@ used for \verb@fit3@ and \verb@fit4@. 
 
-This model will be illustrated with the \verb@UKgas@ data set. For the tree ring data, the trend variance estimate is 0 and that will not illustrate a stochastic trend. The \verb@subset.ts()@ function in the \{forecast\} package is used to subset just the 2nd quarter data.
+This model will be illustrated with the UKgas data set. For the tree ring data, the trend variance estimate is 0 and that will not illustrate a stochastic trend. The \verb@subset.ts()@ function in the \{forecast\} package is used to subset just the 2nd quarter data.
 
 Fit with \verb@StructTS()@.
 <<label=Cs201_structTS-leveltrend, keep.source=TRUE, results=hide>>=
@@ -256,7 +256,7 @@ $f$ is the frequency of the seasonality. For quarterly data, $f=4$ and the $s_t$
 s_t = -s_{t-1}-s_{t-2}-s_{t-3}+v_t
 \end{equation}
 
-Written in matrix form, the model for a quarterly seasonality is the following. $s$ is the seasonality term while $s_1$ and $s_2$ are just keeping track of $s_{t-1}$ and $s_{t-2}$.
+Written in MARSS form, the model for a quarterly seasonality is the following. $s$ is the seasonality term while $s_1$ and $s_2$ are just keeping track of $s_{t-1}$ and $s_{t-2}$.
 \begin{equation}\label{eqn:struct.bsm.y.matrix}
 y_t = \begin{bmatrix}1&0&1&0&0\end{bmatrix}\begin{bmatrix}
 m\\
@@ -423,7 +423,7 @@ fr1 <- predict(fit1, n.ahead = 5)
 fr1
 @
 
-The \verb@MARSS::predict.marssMLE()@ does both predicting within the data (similar to other \verb@predict@ methods) and will forecast if \verb@n.ahead@ is passed in. It returns a list with the predictions and forecasts in \verb@pred@ as a data frame in long form (suitable for \verb@ggplot@ calls). The standard errors and intervals (confidence or prediction) are included in \verb@pred@. The standard error is not printed but is in the \verb@pred@ data frame.\index{functions!predict}
+The \verb@MARSS::predict.marssMLE()@ does both predicting within the data (similar to other \verb@predict@ methods) and will forecast if \verb@n.ahead@ is passed in. It returns a list with the predictions and forecasts in \verb@pred@ as a data frame in long form (suitable for \verb@ggplot()@ calls). The standard errors and intervals (confidence or prediction) are included in \verb@pred@. The standard error is not printed but is in the \verb@pred@ data frame.\index{functions!predict}
 <<label=Cs403_forecast>>=
 fr2 <- predict(fit2, n.ahead = 5, interval = "prediction")
 fr2
@@ -458,7 +458,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 \subsection{Fitted values}
 \index{structural ts models!fitted}
 
-\verb@fitted(x)@ applied to a StructTS object will return the expected value of $\XX_t$  (but only the first 3 states) conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed times series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
+\verb@fitted(x)@ applied to a StructTS object will return the expected value of $\XX_t$  (but only the first 3 states) conditioned on the data up to time $t$. It is returned as a ts or mts object depending if there is one state ("level") or multiple ("trend" or "BSM"). For the BSM model, plotting this will show the decomposed time series with the estimated level $m_t$, slope or trend $n_t$ and season $s_t$ terms.
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs501_fitted, fig=TRUE>>=
@@ -474,7 +474,7 @@ In the \{MARSS\} package, the estimated states conditioned on the data up to tim
 fitted2 <- tsSmooth(fit2, type = "xtt")
 fitted2 <- subset(fitted2, .rownames %in% c("X1", "X2", "X3"))
 @
-This is a data frame in long-form which we can plot with ggplot.
+This is a data frame in long-form which we can plot with \verb@ggplot()@.
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs503_fitted, fig=TRUE>>=
@@ -486,7 +486,7 @@ ggplot(fitted2, aes(x = t, y = .estimate)) +
 \caption{Output from a plot of the states from the marssMLE object using tsSmooth() output.}
 \label{fig:STS.fig.bsm.tsSmooth.marss}
 \end{figure}
-Alternatively we can use \verb@MARSSkfss(x)$xtt@ to return the state estimates as a matrix. Converting the matrix to a ts object makes it easier to plot.
+Alternatively instead of \verb@tsSmooth(x, type="xtt")@, we can use \verb@MARSSkfss(x)$xtt@ to return the state estimates as a matrix. Converting the matrix to a ts object makes it easier to plot.
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs504_fitted, fig=TRUE>>=
@@ -495,11 +495,11 @@ fitted3 <- ts(t(fitted3[1:3, ]))
 plot(fitted3)
 @
 \end{center}
-\caption{Output from a plot of states from a marssMLE object using MARSSkfss().}
+\caption{Output from a plot of states from a marssMLE object.}
 \label{fig:STS.fig.bsm.kfss.marss}
 \end{figure}
 
-To output the model fitted value for $y$, we add the level and season states together if using \verb@StructTS()@ because for the BSM model, the model for $y_t$ is $m_t+s_t$. With MARSS, this would be output with \verb@fitted(x, type="ytt")@. Alternative we could add the $m_t$ and $s_t$ states from the MARSS output, but \verb@fitted(x, type="ytt")@ allows you to easily compute this for cases that are more complex with a non-identity $\ZZ$, non-zero $\aa$ and covariates $\dd$.\index{functions!fitted}
+To output the model fitted value for $y$, we add the level and season states together if using \verb@StructTS()@ because for the BSM model, the model for $y_t$ is $m_t+s_t$. With \{MARSS\}, this would be output with \verb@fitted(x, type="ytt")@. Alternative we could add the $m_t$ and $s_t$ states from the \{MARSS\} output, but \verb@fitted(x, type="ytt")@ allows you to easily compute this for cases that are more complex with a non-identity $\ZZ$, non-zero $\aa$ and covariates $\dd$.\index{functions!fitted}
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs505_fitted, fig=TRUE, echo=FALSE>>=
@@ -522,15 +522,15 @@ ggplot(df) +
 \subsection{Residuals}
 \index{structural ts models!residuals}\index{residuals!StructTS}\index{functions!residuals}
 
-\verb@residuals(x)@ applied to a StructTS object will return the difference between $y_t$ and the expected value of $Y_t$  conditioned on the data up to time $t$. This is $m_t+s_t$ for the BSM model. It is returned as a ts  object. The residuals are standardized, i.e., divided by the square root of the conditional variance of residuals (conditioned on the data). Note the conditional variance of the residuals is not \verb@var(resids)@; see \verb@?MARSSresiduals@ for a discussion of how the conditional variance of state-space residuals is computed.
+\verb@residuals(x)@ applied to a StructTS object will return the difference between $y_t$ and the expected value of $Y_t$  conditioned on the data up to time $t$. The residuals are returned as a ts  object. The residuals are standardized, i.e., divided by the square root of the conditional variance of residuals (conditioned on the data). Note the conditional variance of the residuals is not \verb@var(resids)@; see \verb@?MARSSresiduals@ for a discussion of how the conditional variance of state-space residuals is computed.
 <<label=Cs601_residuals>>=
 resids1 <- residuals(fit1)
 @
-In the \{MARSS\} package, the residuals function will return the model residuals conditioned on all the data, data up to time $t-1$ or up to time $t$.\index{residuals!model} To replicate the behavior for StructTS objects, we need to use conditioning up to time $t$ which is \verb@type="tt"@.
+In the \{MARSS\} package, the \verb@residuals()@ function will return the model residuals conditioned on all the data, data up to time $t-1$ or up to time $t$.\index{residuals!model} To replicate the behavior for StructTS objects, we need to use conditioning up to time $t$ which is \verb@type="tt"@ and we need to specify marginal standardization.
 <<label=Cs602_residuals>>=
 resids2 <- residuals(fit2, type = "tt", standardization = "marginal")
 @
-This is a data frame in long-form which we can plot with \verb@ggplot()@.
+The output is a data frame in long-form which we can plot with \verb@ggplot()@.
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs603_residuals, fig=TRUE, echo=FALSE>>=
@@ -545,14 +545,14 @@ ggplot(df, aes(x = t, y = resids)) +
   ggtitle("Marginal standardized model residuals")
 @
 \end{center}
-\caption{The initial difference in the residuals is due to the small value added to the diagonal of the initial condition variance-covariance matrix to allow MARSS to fit this model.}
+\caption{The initial difference in the residuals is due to the small value added to the diagonal of the initial condition variance-covariance matrix to allow \texttt{MARSS()} to fit this model.}
 \label{fig:STS.fig.bsm.residuals}
 \end{figure}
 
 \section{Multivariate models}
 \index{structural ts models!multivariate}
 
-The \{MARSS\} package allows one to fit multivariate versions of structural equation models. In this section, we will use the level plus trend model as the example, however the approaches work for all the structural models. The focus for this example will be estimating a changing trend using multiple time series.
+The \{MARSS\} package allows one to fit multivariate structural equation models. In this section, we will use the level plus trend model as the example, however the approaches work for all the structural models. The focus for this example will be estimating a changing trend using multiple observation time series.
 
 \subsection{Multiple observations of same process}
 
@@ -585,7 +585,7 @@ The initial conditions assumption used in the \verb@StructTS()@ for this model i
 
 \subsubsection{Simulated data}
 
-We will model a simulated random walk with level and an abrupt trend change. We will generate observations that are the level + substantial error. We will also insert 50\% missing values into the $y$ to illustrate how the method will deal with missing values. Figure \ref{fig:STS.fig.UK.multi} shows the simulated data. We will fit to the points. The line is the true level.
+We will model a simulated random walk with level and an abrupt trend change. We will generate observations that are the level + substantial error. We will also insert 50\% missing values into the $\yy$ to illustrate how the method will deal with missing values. Figure \ref{fig:STS.fig.UK.multi} shows the simulated data. We will fit to the points. The line is the true level.
 <<label=Cs701_multivariate, keep.source=TRUE, results=hide>>=
 set.seed(100)
 TT <- 60
@@ -700,7 +700,7 @@ plot(t, covariate[1, ], col = "blue", lty = 2, type = "l", main = "covariate")
 \label{fig:STS.fig.UK.multi.2}
 \end{figure}
 
-We fit by passing in the covariate into \verb@d@ (because it affects the observations not the process). The estimated versus true effects are shown in Figure \ref{fig:STS.fig.UK.multi.D.est} and the estimated trend is in Figure \ref{fig:STS.fig.UK.multi.fit.2}.
+We fit by passing the covariate into \verb@d@ (because it affects the observations not the process). The estimated versus true effects are shown in Figure \ref{fig:STS.fig.UK.multi.D.est} and the estimated trend is in Figure \ref{fig:STS.fig.UK.multi.fit.2}.
 <<label=Cs709_multivariate, keep.source=TRUE, results=hide>>=
 Z <- matrix(c(1, 0), n, 2, byrow = TRUE)
 mod.list <- c(mod.list.x, mod.list.y, list(Z = Z, d = covariate))
@@ -787,7 +787,7 @@ ggplot(rvals, aes(x = x, y = val, col = name)) +
 \label{fig:STS.fig.UK.multi.R.est}
 \end{figure}
 
-The level will be scaled up or down to fit the first observation time series. It has to set one of the $\aa$ to 0 and by default sets the first one to zero. The estimates are in Figure \ref{fig:STS.fig.UK.multi.fit.4}. 
+The level will be scaled up or down to fit the first observation time series. We have to set one of the $\aa$ to 0 and by default, \verb@MARSS()@ sets the first one to zero. The estimates are in Figure \ref{fig:STS.fig.UK.multi.fit.4}. 
 \begin{figure}[htp]
 \begin{center}
 <<label=Cs715_multivariate, keep.source=TRUE, results=hide, fig=TRUE, echo=FALSE>>=
@@ -932,9 +932,9 @@ ggplot(df, aes(x = t, y = .estimate, col = name)) +
 
 \section{Summary}
 
-This chapter illustrates how to fit the structural equation models fit by the \verb@StructTS()@ function in base R. The initial conditions used in that function were used here, however that should not be assumed to be the best choice. The default behavior for in the \{MARSS\} package is to treat $\xx_0$ as an estimated parameter with initial conditions variance matrix set to all 0. These models can be a challenge for the EM algorithm and for most examples the BFGS algorithm was used. If using EM, the algorithm will need to be run longer to achieve the maximum likelihood. 
+This chapter illustrates how to fit the structural equation models fit by the \verb@StructTS()@ function in \R. The initial conditions used in that function were used here, however those initial conditions should not be assumed to be the best choice. The default behavior in the \{MARSS\} package is to treat $\xx_0$ as an estimated parameter with initial conditions variance matrix set to all 0. Structural time series models can be a challenge for the EM algorithm and for most examples the BFGS algorithm was used. If using EM, the algorithm will need to be run longer to achieve the maximum likelihood. 
 
-The \{MARSS\} package allows you to fit multivariate versions of these models with a flexible data structure and flexible relationships between the data. It allows you to include covariates and model intervention effects. You can model multiple observations of the same process or different observations of independent processes that share some or all parameter values. You can also model cases where the trend (or seasonality) is shared across processes but not the levels. The ability to use multiple data sets can improve estimation and allow you to estimate an underlying process which might remain hidden if one one data set is used for estimation.
+The \{MARSS\} package allows you to fit multivariate structural time series models with a flexible data structure and flexible relationships between the data. It allows you to include covariates and model intervention effects. You can model multiple observations of the same process or different observations of independent processes that share some or all parameter values. You can also model cases where the trend (or seasonality) is shared across processes but not the levels. The ability to use multiple data sets can improve estimation and allow you to estimate an underlying process which might remain hidden if only one data set were used for estimation.
 
 <<reset, echo=FALSE>>=
 options(prompt = "> ", continue = " +", width = 120)
