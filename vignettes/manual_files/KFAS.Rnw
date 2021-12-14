@@ -286,7 +286,7 @@ conf_marss2 <- predict(fit_marss,
 head(conf_marss2$pred)
 @
 
-Prediction intervals are the intervals for new data. They are  the expected value and standard error of $\ZZ \XX_t + \aa + \vv_t$ conditioned on all the data (before and after $t$). \verb@predict.SSModel()@ returns the upper and lower prediction intervals, but the standard error returned is the standard error for the confidence interval ($\ZZ \XX_t + \aa$_ not the prediction interval.
+Prediction intervals are the intervals for new data. They are  the expected value and standard error of $\ZZ \XX_t + \aa + \vv_t$ conditioned on all the data (before and after $t$). \verb@predict.SSModel()@ returns the upper and lower prediction intervals, but the standard error returned is the standard error for the confidence interval (i.e., for $\ZZ \XX_t + \aa$) not the prediction interval.
 <<Cs404_conf-int>>= 
 pred_kfas <- predict(fit_kfas$model,
   interval = "prediction", se.fit = TRUE
