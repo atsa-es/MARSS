@@ -28,7 +28,7 @@ The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave 
 
 \subsection{Output from model fits}
 
-MARSS provides the following functions for output from fitted model objects. These functions output data frames in long form. There are companion functions which return the same information as lists in matrix form.
+\{MARSS\} provides the following functions for output from fitted model objects. These functions output data frames in long form. There are companion functions which return the same information as lists in matrix form.
 
 \begin{itemize}
 \item \verb@fitted(fit)@ Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
@@ -38,7 +38,7 @@ MARSS provides the following functions for output from fitted model objects. The
 \item \verb@predict(fit)@, \verb@forecast::forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@, where \verb@fr <- forecast(fit)@, plots the forecasts.\index{plotting!predictions}\index{forecasting}
 \item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.\index{plotting}
 \item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"xtT"@, \verb@"xtt"@ or \verb@"xtt1@.  Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.\index{Kalman filter and smoother}
-\item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"ytT"@, \verb@"ytt"@ or \verb@"ytt1@. These are the expected values of the y (left side of the y equation with the error terms). \verb@MARSShatyt(fit)@ returns the same in matrix form. Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation. Most users will likely want \verb@fitted()@ which is the model fitted values (expected value of the right side of the y equation without the error term).
+\item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"ytT"@, \verb@"ytt"@ or \verb@"ytt1@. These are the expected values of the y (left side of the y equation with the error terms). \verb@MARSShatyt(fit)@ returns the same in matrix form. Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation. Most users will likely want \verb@fitted()@ which is the model fitted values (expected value of the right side of the $\yy$ equation without the error term).
 \end{itemize}
 
 \section{Fixed and estimated elements in parameter matrices}
@@ -61,7 +61,7 @@ Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following s
 \end{gather*}
 Notice how this model mixes fixed values, estimated values and shared values.
 
-In MARSS, model structure is specified using a list with the names, \verb@Z@, \verb@A@, \verb@R@, \verb@B@, \verb@U@, \verb@Q@, \verb@x0@ and \verb@V0@.  Each element is matrix (class matrix) with the same dimensions as the matrix of the same name in the MARSS model.  MARSS distinguishes between the estimated and fixed values in a matrix by using a list matrix in which you can have numeric and character elements.  Numeric elements are fixed; character elements are names of things to be estimated.  The model above would be specified as:
+In MARSS, model structure is specified using a list with the names, \verb@Z@, \verb@A@, \verb@R@, \verb@B@, \verb@U@, \verb@Q@, \verb@x0@ and \verb@V0@.  Each element is matrix (class matrix) with the same dimensions as the matrix of the same name in the MARSS model.  \{MARSS\} distinguishes between the estimated and fixed values in a matrix by using a list matrix in which you can have numeric and character elements.  Numeric elements are fixed; character elements are names of things to be estimated.  The model above would be specified as:
 <<Cs01_model-gen-spec, eval=TRUE>>=
 Z <- matrix(list("z1", "z2", 0, 0, "z2", 3), 3, 2)
 A <- matrix(0, 3, 1)
@@ -383,7 +383,7 @@ The package also includes the common functions for working with the output from 
 
 \section{Tidy output}
 
-The \verb@tidy@ and \verb@glance@ functions from the \{broom\} package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.  See \index{tidy}\index{functions!tidy}
+The \verb@tidy()@ and \verb@glance()@ functions from the \{broom\} package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.\index{tidy}\index{functions!tidy}
 
 <<Cs24_model-tidy-R>>=
 broom::tidy(kem)
@@ -395,7 +395,7 @@ broom::glance(kem)
 The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default $\alpha$ level of 0.05.  The default is to compute approximate confidence intervals using the Hessian matrix (\verb@method="hessian"@).  Confidence intervals can also be computed  via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.  Note, if you want confidence intervals on variances, then it is unwise to use the Hessian approximation as it is symmetric and variances are constrained to be positive.
 
 \subsection{Approximate confidence intervals from the Hessian matrix}
-The default method for \verb@MARSSparamCIs()@ computes approximate confidence intervals using an analytically computed Hessian matrix \citep[sec 3.4.5]{Harvey1989}.  The call is:
+The default method for \verb@MARSSparamCIs()@ computes approximate confidence intervals using an analytically computed Hessian matrix \citep[section 3.4.5]{Harvey1989}.  The call is:
 <<Cs25_CIs-hessian, include.source=F, keep.source=T>>=
 kem.with.hess.CIs <- MARSSparamCIs(kem)
 @

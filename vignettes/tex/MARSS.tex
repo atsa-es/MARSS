@@ -1,4 +1,4 @@
-\chapter{Fitting models: the MARSS() function}\label{chap:MARSS}
+\chapter{The \texttt{MARSS()} function}\label{chap:MARSS}
 
 From the user perspective, the main package function is \verb@MARSS()@.  This fits a MARSS model (Equation \ref{eqn:marss}) to a matrix of data. The function call takes the form:
 \begin{Schunk}
@@ -44,7 +44,7 @@ U=matrix(list(0.05,"u1","u2"),3,1)
 \end{Schunk}
 If you print out \verb@Q@ and \verb@U@, you will see they look exactly like $\QQ$ and $\uu$ written above.  MARSS will keep the fixed values fixed and estimate $q$, $u1$, and $u2$.
 
-List matrices allow the most flexible model structures, but MARSS also has text shortcuts for a number of common model structures.  Below, the possible ways to specify each model parameter are shown, using $m=3$ (the number of hidden state processes) and $n=3$ (number of observation time series).
+List matrices allow the most flexible model structures, but \verb@MARSS()@ also has text shortcuts for a number of common model structures.  Below, the possible ways to specify each model parameter are shown, using $m=3$ (the number of hidden state processes) and $n=3$ (number of observation time series).
 
 
 \section{$\uu$, $\aa$ and $\pipi$ model structures}

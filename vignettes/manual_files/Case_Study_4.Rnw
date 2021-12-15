@@ -14,11 +14,11 @@ library(xtable)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{Overview}
+\section{Overview of DFA}
 %Add footnote with instructions for getting code
 \blfootnote{Type \texttt{RShowDoc("Chapter\_DFA.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
 
-\index{MARSS model!DFA example}\index{dynamic factor analysis}In this chapter, we use MARSS to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[sec. 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in Section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
+\index{MARSS model!DFA example}\index{dynamic factor analysis}In this chapter, we use \{MARSS\} to do dynamic factor analysis (DFA), which allows us to look for a set of common underlying trends among a relatively large set of time series \citep[section 8.5]{Harvey1989}. See also \citet{Zuuretal2003a} which shows a number of examples of DFA applied to fisheries catch data and densities of zoobenthos.   We will walk through some examples to show you the math behind DFA, and then in Section \ref{sec:dfa.usingmodelselection}, we will show a short-cut for doing a DFA with MARSS using \verb@form="dfa"@.  
 
 DFA is conceptually different than what we have been doing in the previous applications.  Here we are trying to explain temporal variation in a set of $n$ observed time series using linear combinations of a set of $m$ hidden random walks, where $m << n$.  A DFA model is a type of MARSS model with the following structure:
 %~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,7 +138,7 @@ The process errors of the hidden trends would be
 \label{eq:dfa3}\end{align}
 
 \subsection{Constraints to ensure identifiability}
-If $\ZZ$, $\aa$, and $\QQ$ in Equation \ref{eq:dfa} are not constrained, then the DFA model above is unidentifiable \citep[sec 4.4]{Harvey1989}.  \citet[sec. 8.5.1]{Harvey1989} suggests the following parameter constraints to make the model identifiable: 
+If $\ZZ$, $\aa$, and $\QQ$ in Equation \ref{eq:dfa} are not constrained, then the DFA model above is unidentifiable \citep[sec 4.4]{Harvey1989}.  \citet[section 8.5.1]{Harvey1989} suggests the following parameter constraints to make the model identifiable: 
 \begin{itemize}
 \item in the first $m-1$ rows of $\ZZ$, the $z$-value in the $j$-th column and $i$-th row is set to zero if $j > i$;
 \item $\aa$ is constrained so that the first $m$ values are set to zero; and
@@ -318,7 +318,7 @@ for (i in spp) {
 \label{fig:CS4.fig1}
 \end{figure}
 
-\section{Setting up the model in MARSS}
+\section{Setting up the model for \texttt{MARSS()} }
 As we have seen in other cases, setting up the model structure for MARSS requires that the parameter matrices have a one-to-one correspondence to the model as you would write it on paper (i.e., Equations \ref{eq:dfa4} through \ref{eq:dfa7}).  If a parameter matrix has a combination of fixed and estimated values, then you specify that using \verb@matrix(list(), nrow, ncol)@.  This is a matrix of class list and allows you to combine numeric and character values in a single matrix.  MARSS recognizes the numeric values as fixed values and the character values as estimated values. 
 
 This is how we set up $\ZZ$ for MARSS, assuming a model with 5 observed time series and 3 hidden trends:
@@ -345,14 +345,14 @@ Q <- B <- diag(1, 3)
 
 For our first analysis, we will assume that each time series of phytoplankton has a different
 observation variance, but that there is no covariance among time series.  Thus, $\RR$ should be a diagonal matrix that looks like:
-\begin{flalign*}
- &\begin{bmatrix}
+\begin{equation*}
+ \begin{bmatrix}
     r_{11}&0&0&0&0\\
     0&r_{22}&0&0&0\\
     0&0&r_{33}&0&0\\
     0&0&0&r_{44}&0\\
-    0&0&0&0&r_{55}\\ \end{bmatrix} \text{,}&
- \label{eq:dfa.r}\end{flalign*}
+    0&0&0&0&r_{55}\\ \end{bmatrix}
+ \label{eq:dfa.r}\end{equation*}
 and each of the $r_{i,i}$ elements is a different parameter to be estimated.  We can also specify this $\RR$ structure using a list matrix as follows:
 <<Cs08_setupR, eval=TRUE>>=
 R.vals <- list(
@@ -365,12 +365,11 @@ R.vals <- list(
 
 R <- matrix(R.vals, nrow = N.ts, ncol = N.ts, byrow = TRUE)
 @
-\pagebreak
 You can print $\RR$ at the \R command line to see what it looks like:
 <<Cs09_printR>>=
 print(R)
 @
-This form of variance-covariance matrix is commonly used, and therefore MARSS has a built-in shorthand for this structure. Alternatively, we could simply type:
+This form of variance-covariance matrix is commonly used, and therefore \{MARSS\} has a built-in shorthand for this structure.
 <<Cs10_setupR_short>>=
 R <- "diagonal and unequal"
 @
@@ -913,7 +912,7 @@ for (i in 1:length(spp)) {
 \end{figure}
 
 \section{Discussion}
-We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the zooplankton names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  To see all the R code behind the figures, type \verb@RShowDoc("Chapter_DFA.R",package="MARSS")@. This opens a file with all the code. 
+We analyzed the phytoplankton data alone.  You can try analyzing the zooplankton data (type \verb@head(plankdat)@ to see the zooplankton names).  You can also try analyzing the phytoplankton and zooplankton together.  You can also try different assumptions concerning the structure of $\RR$; we just tried unconstrained, diagonal and unequal, and diagonal and equal.  Lastly, notice that there is a seasonal cycle in the data. We did not explicitly include a seasonal cycle and it would be wise to include that as a covariate. A random walk can fit a seasonal cycle, but a random walk is not fundamentally cyclic and thus is not a good way to model a cycle.
 
 DFA models often take an unusually long time to converge.  In a real DFA, you will want to make sure to try different initial starting values (see Chapter \ref{chap:inits}), and force the algorithm to run a long time by using \verb@minit=x@ and \verb@maxit=(x+c)@, where \verb@x@ and \verb@c@ are something like 200 and 5000, respectively.  You might also try using \verb@method="BFGS"@ in the \verb@MARSS()@ call.
 

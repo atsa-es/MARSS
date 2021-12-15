@@ -204,7 +204,7 @@ Thus,
 \end{equation}
 Here $\xx_{t1}^{t2}$ denotes the set of $\xx_t$ from $t=t1$ to $t=t2$ (and thus $\xx$ is shorthand for $\xx_1^T$).  The third line follows because conditioned on $\xx$, the $\yy_t$'s are independent of each other (because the $\vv_t$ are independent of each other).  In the last line, $\xx_1^{t-1}$ becomes $\xx_{t-1}$ from the Markov property of the equation for $\xx_t$ (equation \ref{eq:MARSSx}), and $\xx$ becomes $\xx_t$ because $\yy_t$ depends only on $\xx_t$ (equation \ref{eq:MARSSy}).
 
-Since $(\XX_t|\XX_{t-1}=\xx_{t-1})$ is multivariate normal and $(\YY_t|\XX_t=\xx_t)$ is multivariate normal (equation \ref{eq:MARSS}), we can write down the joint log-likelihood function using the likelihood function for a multivariate normal distribution \citep[sec. 4.3]{JohnsonWichern2007}.  
+Since $(\XX_t|\XX_{t-1}=\xx_{t-1})$ is multivariate normal and $(\YY_t|\XX_t=\xx_t)$ is multivariate normal (equation \ref{eq:MARSS}), we can write down the joint log-likelihood function using the likelihood function for a multivariate normal distribution \citep[section 4.3]{JohnsonWichern2007}.  
 \begin{equation}\label{eq:logL}
 \begin{split}
 &\log\LL(\yy,\xx ; \Theta) = -\sum_1^T \frac{1}{2}(\yy_t - \ZZ \xx_t - \aa)^\top \RR^{-1} (\yy_t - \ZZ \xx_t - \aa) -\sum_1^T\frac{1}{2} \log |\RR|\\
@@ -2029,7 +2029,7 @@ In the presentation of the EM algorithm, $\YY(1)_1^T=\yy(1)_1^T,\Theta$ was drop
 \end{align}
 \end{subequations}
 
-The first part of the Kalman smoother algorithm is the Kalman filter which gives the expectation at time $t$ conditioned on the data up to time $t$.  The following the filter as shown in \citep[sec. 6.2, p. 331]{ShumwayStoffer2006}, although the notation is a little different. The recursion starts at time $t=1$ and repeats until $t=T$.
+The first part of the Kalman smoother algorithm is the Kalman filter which gives the expectation at time $t$ conditioned on the data up to time $t$.  The following the filter as shown in \citep[section 6.2, p. 331]{ShumwayStoffer2006}, although the notation is a little different. The recursion starts at time $t=1$ and repeats until $t=T$.
 \begin{subequations}\label{eq:kffilter}
 \begin{align}
 &\xx_t^{t-1}=\BB_t\xx_{t-1}^{t-1}+\uu_t\label{eq:xtt1}\\
@@ -2054,7 +2054,7 @@ The Kalman smoother and lag-1 covariance smoother compute the expectations condi
 \end{align}
 \end{subequations}
 
-The classic Kalman smoother is an algorithm to compute these expectations conditioned on no missing values in $\yy$. However, the algorithm  can be easily modified to give the expected values of $\XX$ conditioned on the incomplete data, $\YY(1)=\yy(1)$ \citep[sec. 6.4, eqn 6.78, p. 348]{ShumwayStoffer2006}.  
+The classic Kalman smoother is an algorithm to compute these expectations conditioned on no missing values in $\yy$. However, the algorithm  can be easily modified to give the expected values of $\XX$ conditioned on the incomplete data, $\YY(1)=\yy(1)$ \citep[section 6.4, eqn 6.78, p. 348]{ShumwayStoffer2006}.  
 In this case, the usual filter and smoother equations are used with the following modifications to the parameters and data used in the equations.  If the $i$-th element of $\yy_t$ is missing, zero out the $i$-th rows in $\yy_t$, $\aa$ and $\ZZ$.  Thus if the 2nd and 5th elements of $\yy_t$ are missing,
 \begin{equation}\label{eq:yaZ.miss}
 \yy_t^*=\begin{bmatrix}

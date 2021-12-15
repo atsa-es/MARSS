@@ -1,10 +1,14 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+.DS_Store
 .Rhistory
 .RData
 .gitignore
+.github
 logo.jpg
 logot.png
+hexlogo.png
+mars.png
 favicon.ico
 _config.yml
 _layouts

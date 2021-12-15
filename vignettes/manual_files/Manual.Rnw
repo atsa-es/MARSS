@@ -33,7 +33,7 @@ options(width = 60)
 \begin{document}
 
 \author{E. E. Holmes, E. J. Ward, and M. D. Scheuerell}
-\title{Analysis of multivariate time-series using the MARSS package}
+\title{Analysis of multivariate time series using the MARSS package}
 \subtitle{version \Sexpr{packageDescription("MARSS", fields = "Version")}}
 \maketitle
 \include{./tex/dedic}
@@ -50,7 +50,7 @@ options(width = 60)
 \include{./tex/Introduction}
 \include{./tex/Functions}
 \include{./tex/Algorithms}
-\part{Fitting models with MARSS}
+\part{Fitting models with \{MARSS\} }
 \include{./tex/MARSS}
 \include{./Quick_Examples}
 \include{./Setting_Inits}

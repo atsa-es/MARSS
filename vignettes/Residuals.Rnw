@@ -189,7 +189,7 @@ Keywords: Time-series analysis, Kalman filter, residuals, maximum-likelihood, ve
 {\noindent \small citation: Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045 }
  \newpage
  
-\section{Overview}
+\section{Overview of MARSS residuals}
 
 This report discusses the computation of the variance of the conditional model and state residuals for MARSS models of the  form:
 \begin{equation}\label{eq:residsMARSS}
@@ -322,7 +322,7 @@ Equation \ref{eq:varvtcondy} can be written as\footnote{$\var(A+B)=\var(A)+\var(
 \end{equation}
 $\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e., if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
-From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate Normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
+From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
 \Sigma_1 & \Sigma_{12} \\
 \Sigma_21 & \Sigma_{2}
 \end{bmatrix}$.  The variance-covariance matrix of $\AA$ conditioned on $\AA_1=\aa$ is $\Sigma = \begin{bmatrix}
@@ -411,7 +411,7 @@ $\uu_t$  is not a random variable and can be dropped. Thus\footnote{$\var[A-B]=\
 & = \hatVtT + \BB_t \hatVtmT \BB_t^\top - \hatVttmT\BB_t^\top - \BB_t\hatVtmtT .
 \end{split}
 \end{equation}
-Again this is conditional multivariate Normal variance, and its value does not depend on the value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$. Thus
+Again this is conditional multivariate normal variance, and its value does not depend on the value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$. Thus
 \begin{equation}\label{eq:E.var.Wt.yt}
 \E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] =  \hatVtT + \BB_t\hatVtmT\BB_t^\top - \hatVttmT\BB_t^\top - \BB_t\hatVtmtT .
 \end{equation}
@@ -476,7 +476,7 @@ $\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus\footnote{$\cov[\BB
 \end{equation}
 where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package.
 
-Both $\VV_t$ and $\WW_t$ are multivariate Normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
+Both $\VV_t$ and $\WW_t$ are multivariate normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
 \begin{equation}
 \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top .
 \end{equation}
@@ -642,7 +642,7 @@ The Cholesky standardized residuals are computed by multiplying $\widehat{\varep
 \begin{equation}\label{eq:std.resid}
 \widehat{\varepsilon}_{t, std} = (\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t .
 \end{equation}
-These residuals are uncorrelated (across the residuals at time $t$ in $\widehat{\varepsilon}_t$).  See \citet{HarveyKoopman1992} and \citet[Section V]{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
+These residuals are uncorrelated (across the residuals at time $t$ in $\widehat{\varepsilon}_t$).  See \citet{HarveyKoopman1992} and \citet[section V]{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
 
 It is also common to use the marginal standardized residuals, which would be $\widehat{\varepsilon}_t$ multiplied by the inverse of the square-root of $\dg(\widehat{\Sigma}_t)$, where $\dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
 \begin{equation}

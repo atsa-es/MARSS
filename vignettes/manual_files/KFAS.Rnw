@@ -3,7 +3,7 @@
 options(prompt = " ", continue = " ", width = 60)
 @
 
-\chapter{Comparison to \{KFAS\} Package}
+\chapter{Comparison to the \{KFAS\} Package}
 \label{chap:KFAS}
 \chaptermark{KFAS}
 %Add footnote with instructions for getting code

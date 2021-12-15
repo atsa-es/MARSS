@@ -1,5 +1,5 @@
 \SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS7-, eps=FALSE, split=TRUE}
-\chapter{Estimation of species interaction strengths with and without covariates}
+\chapter{Estimation of species interaction strengths}
 \label{chap:CSB}
 \chaptermark{B estimation}
 

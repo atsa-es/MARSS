@@ -9,6 +9,8 @@ _layouts export-ignore
 favicon.ico export-ignore
 logo.jpg export-ignore
 logo.png export-ignore
+mars.png export-ignore
+hexlogo.png export-ignore
 logot.png export-ignore
 vignettes/*.sty export-ignore
 vignettes/*.cls export-ignore

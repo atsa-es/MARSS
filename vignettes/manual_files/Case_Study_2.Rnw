@@ -241,7 +241,7 @@ The estimated parameters are output with the function \verb@coef()@: \verb@coef(
 The log-likelihood of the fitted model is in \verb@kem1$logLik@.  We estimated  one initial $x$ ($t=1$), one process variance, one $u$, four $a$'s, and five observation variances. So $K=12$ parameters.  The AIC\index{model selection!AIC} of this model is $-2 \times \text{log-like} + 2K$, which we can show by typing \verb@kem1$AIC@.
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\section{Single population model with independent and non-identical errors}
+\section{Single population with independent and non-identical errors}
 \label{CS2.ex2}
 Here is the estimated $\RR$ matrix for our first model:
 <<Cs2-analysis2obsvariance>>=
