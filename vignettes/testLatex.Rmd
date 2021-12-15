@@ -1,0 +1,34 @@
+---
+title: "test"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+B <- r"(
+\begin{bmatrix}
+1 & \alpha &  0\\
+2 &  \alpha & 3 \\
+3 & 2\alpha & 4\end{bmatrix}
+)"
+```
+
+```{r}
+catLatex <- function(x, ...){
+  cat(stringr::str_squish(paste("$$", x, ..., "$$")))
+}
+bf <- function(x){paste0("\\mathbf{",x,"}")}
+```
+
+```{r results='asis'}
+cat(stringr::str_squish(paste("$$", bf("x"), "=", B, B, "+", B, "$$")))
+```
+
+```{r results='asis'}
+catLatex("\\mathbf{x}=",B,B,"+",2,B,"+", bf("w"), "_t")
+```
