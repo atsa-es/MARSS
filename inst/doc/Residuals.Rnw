@@ -189,7 +189,7 @@ Keywords: Time-series analysis, Kalman filter, residuals, maximum-likelihood, ve
 {\noindent \small citation: Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. arXiv:1411.0045 }
  \newpage
  
-\section{Overview}
+\section{Overview of MARSS residuals}
 
 This report discusses the computation of the variance of the conditional model and state residuals for MARSS models of the  form:
 \begin{equation}\label{eq:residsMARSS}
@@ -225,7 +225,7 @@ This section discusses computation of the variance of the model and state residu
 
 Throughout, I follow the convention that capital letters are random variables and small letters are a realization from the random variable.  This only applies to random variables; parameters are not random variables\footnote{in a frequentist framework}. Parameters are shown in Roman font while while random variables are bold slanted font. Parameters written as capital letters are matrices, while parameters written in small letters are strictly column matrices. 
 
-In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript, e.g. $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable over all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B]$ or $\var_{A|B}[f(A)|B]$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$.
+In this report, the distribution over which the integration is done in an expectation or variance  is given by the subscript; e.g., $\E_A[f(A)]$ indicates an unconditional expectation over the distribution of $A$ without conditioning on another random variable while $\E_{A|b}[f(A)|b]$ would indicate an expectation over the distribution of $A$ conditioned on $B=b$; presumably $A$ and $B$ are not independent otherwise $B=b$ would have no effect on $A$. $\E_{A|b}[f(A)|b]$ is a fixed value, not random. It is the expected value when $B=b$. In contrast, $\E_{A|B}[f(A)|B]$ denotes the random variable over all the possible $\E_{A|b}[f(A)|b]$ given all the possible $b$ values that $B$ might take. The variance of $\E_{A|B}[f(A)|B]$ is the variance of this random variable. The variance of $\E_{A|b}[f(A)|b]$ in contrast is 0 since it is a fixed value.  We will often be working with the random variables, $\E_{A|B}[f(A)|B]$ or $\var_{A|B}[f(A)|B]$, inside an expectation or variance: such as $\var_B[\E_{A|B}[f(A)|B]]$.
 
 \subsubsection{Law of total variance}
 
@@ -320,9 +320,9 @@ Equation \ref{eq:varvtcondy} can be written as\footnote{$\var(A+B)=\var(A)+\var(
 &=\ZZ_t \hatVtT \ZZ_t^\top + \hatUtT - \hatStT\ZZ_t^\top - \ZZ_t(\hatStT)^\top .
 \end{split}
 \end{equation}
-$\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e. if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
+$\hatVtT = \var[ \XX_t | \yy^{(1)} ]$ and is output by the Kalman smoother. $\hatUtT=\var[\YY_t|\yy^{(1)}]$ and $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$. The equations for these are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package\footnote{$\hatUtT$ is  \texttt{OtT - tcrossprod(ytT)} in the \texttt{MARSShatyt()} output.}.  If there were no missing data, i.e., if $\yy^{(1)}=\yy$, then $\hatUtT$ and $\hatStT$ would be zero because $\YY_t$ would be fixed at $\yy_t$. This would reduce Equation \ref{eq:var.Vt.yy} to $\ZZ_t \hatVtT \ZZ_t^\top$. But we are concerned with the case where there are missing values. Those missing values need not be for all $t$. That is, there may be some observed $y$ at time t and some missing $y$. $\yy_t$ is multivariate.
 
-From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate Normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
+From Equation \ref{eq:var.Vt.yy}, we know $\var[\VV_t|\yy^{(1)}]$ for a specific $\yy^{(1)}$. We want $\E_{Y^{(1)}}[\var[\VV_t|\YY^{(1)}]]$ which is its expected value over all possible values of $\yy^{(1)}$.  $\VV_t$ is a multivariate normal random variable with two random variables $\YY^{(1)}$ and $\YY^{(2)}$. The conditional variance of a multivariate Normal does not depend on the value that you are conditioning on. Let the $\AA$ be a N-dimensional multivariate Normal random variable partitioned into $\AA_1$ and $\AA_2$ with variance-covariance matrix $\Sigma = \begin{bmatrix}
 \Sigma_1 & \Sigma_{12} \\
 \Sigma_21 & \Sigma_{2}
 \end{bmatrix}$.  The variance-covariance matrix of $\AA$ conditioned on $\AA_1=\aa$ is $\Sigma = \begin{bmatrix}
@@ -367,7 +367,7 @@ Equation \ref{eq:first.and.secons.vvtgeneral} will reduce to $\RR_t - \ZZ_t \hat
 \begin{equation}\label{eq:cov.Yt.Xt.no.missing.vals}
 \cov[\YY_t, \XX_t|\yy^{(1)}] = \cov[\ZZ_t \XX_t + \aa_t + \VV_t, \XX_t|\yy^{(1)}] = \cov[\ZZ_t \XX_t, \XX_t|\yy^{(1)}] = \ZZ_t \cov[\XX_t, \XX_t|\yy^{(1)}] = \ZZ_t \hatVtT .
 \end{equation}
-The reduction in Equation \ref{eq:cov.Yt.Xt.no.missing.vals} occurs because $\VV_t$ and $\WW_t$ and by extension $\VV_t$ and $\XX_t$ are independent in the form of MARSS model used in this report (Equation \ref{eq:residsMARSS})\footnote{This is not the case for the \citet{Harveyetal1998} form of the MARSS model where $\VV_t$ and $\WW_t$ are allowed to be correlated.}. Thus when $\yy_t$ is all missing values, Equation \ref{eq:first.and.secons.vvtgeneral} will reduce to $\RR_t + \ZZ_t \hatVtT \ZZ_t^\top$ . The behavior if $\yy_t$ has some missing and some not missing values depends on whether $\RR_t$ is a diagonal matrix or not (i.e. if the $\yy_t^{(1)}$ and $\yy_t^{(2)}$ are correlated).
+The reduction in Equation \ref{eq:cov.Yt.Xt.no.missing.vals} occurs because $\VV_t$ and $\WW_t$ and by extension $\VV_t$ and $\XX_t$ are independent in the form of MARSS model used in this report (Equation \ref{eq:residsMARSS})\footnote{This is not the case for the \citet{Harveyetal1998} form of the MARSS model where $\VV_t$ and $\WW_t$ are allowed to be correlated.}. Thus when $\yy_t$ is all missing values, Equation \ref{eq:first.and.secons.vvtgeneral} will reduce to $\RR_t + \ZZ_t \hatVtT \ZZ_t^\top$ . The behavior if $\yy_t$ has some missing and some not missing values depends on whether $\RR_t$ is a diagonal matrix or not, i.e., if the $\yy_t^{(1)}$ and $\yy_t^{(2)}$ are correlated.
 
 \subsection{State residuals conditioned on the data}
 
@@ -411,7 +411,7 @@ $\uu_t$  is not a random variable and can be dropped. Thus\footnote{$\var[A-B]=\
 & = \hatVtT + \BB_t \hatVtmT \BB_t^\top - \hatVttmT\BB_t^\top - \BB_t\hatVtmtT .
 \end{split}
 \end{equation}
-Again this is conditional multivariate Normal variance, and its value does not depend on the value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$. Thus
+Again this is conditional multivariate normal variance, and its value does not depend on the value, $\yy^{(1)}$ that we are conditioning on.  It depends only on the parameters values, $\QQ$, $\BB$, $\RR$, etc., and is the same for all values of $\yy^{(1)}$. So $\E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] = \var[\WW_t|\yy^{(1)}]$, using any value of $\yy^{(1)}$. Thus
 \begin{equation}\label{eq:E.var.Wt.yt}
 \E_{Y^{(1)}}[\var[\WW_t|\YY^{(1)}]] =  \hatVtT + \BB_t\hatVtmT\BB_t^\top - \hatVttmT\BB_t^\top - \BB_t\hatVtmtT .
 \end{equation}
@@ -474,9 +474,9 @@ $\aa_t$ and $\uu_t$ are fixed values and can be dropped. Thus\footnote{$\cov[\BB
 & = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top ,
 \end{split}
 \end{equation}
-where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the MARSS R package.
+where $\hatStT=\cov[\YY_t,\XX_t|\yy^{(1)}]$ and $\hatSttmT=\cov[\YY_t,\XX_{t-1}|\yy^{(1)}]$; the equations for $\hatStT$ and $\hatSttmT$ are given in \citet{Holmes2010} and are output by the \verb@MARSShatyt()@ function in the \{MARSS\} package.
 
-Both $\VV_t$ and $\WW_t$ are multivariate Normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
+Both $\VV_t$ and $\WW_t$ are multivariate normal random variables that depend on $\YY^{(1)}$ and $\YY^{(2)}$ and the conditional covariance is not a function of the variable that we condition on (in this case $\yy^{(1)}$). The conditional covariance is only a function of the MARSS parameters\footnote{By extension, this is also the case for $\hatVtT$, $\hatVttmT$, $\hatStT$ and $\hatSttmT$ which may seem counter-intuitive, but you can show it is true by working through the Kalman filter and smoother equations starting at t=1. Or run a Kalman filter/smoother algorithm with different data and the same parameters and you will see that the variances do not change with different data.}. Thus 
 \begin{equation}
 \E_{Y^{(1)}}[ \cov[\VV_t, \WW_t|\YY^{(1)}] ]= \cov[\VV_t, \WW_t|\yy^{(1)}] = \hatStT - \hatSttmT\BB_t^\top - \ZZ_t \hatVtT + \ZZ_t\hatVttmT\BB_t^\top .
 \end{equation}
@@ -575,7 +575,7 @@ The $\HH_t$ and $\GG_t$ matrices specify the variance and covariance of $\WW_t$ 
 The algorithm in \citet{Harveyetal1998} gives the variance of the `normalized' residuals, the $\epsilon_t$.  I have modified their algorithm so it  returns the `non-normalized' residuals:
 $$\varepsilon_t=\begin{bmatrix}\GG_t\epsilon_t\\ \HH_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\vv_t\\ \ww_{t+1} \end{bmatrix}.$$
 
-The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVttm=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the MARSS R package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
+The Harvey et al. algorithm is a backwards recursion using the following output from the Kalman filter: the one-step ahead prediction covariance $\FF_t$, the Kalman gain $\KK_t$, $\hatxttm=\E[\XX_t|\yy^{(1),1:{t-1}}]$ and $\hatVttm=\var[\XX_t|\yy^{(1),1:{t-1}}]$. In the \{MARSS\} package, these are output from \texttt{MARSSkfss()} in \texttt{Sigma}, \texttt{Kt}, \texttt{xtt1} and \texttt{Vtt1}.
 
 \subsection{Algorithm for the non-normalized residuals}
 
@@ -621,9 +621,9 @@ These $\widehat{\varepsilon}_t$ and $\widehat{\Sigma]}_t$ are for both the non-m
 
 In Equation 20 in \citet{Harveyetal1998}, their $T_t$ is my $\BB_{t+1}$ and their $H_t H_t^\top$ is my $\QQ_{t+1}$.  Notice the difference in the time indexing. My time indexing on $\BB$ and $\QQ$ matches the left $\xx$ while in theirs, $T$ and $H$ indexing matches the right $\xx$. Thus in my implementation of their algorithm \citep[eqns. 21-24]{Harveyetal1998}, $\BB_{t+1}$ appears in place of $T_t$ and $\QQ_{t+1}$ appears in place of $H_t$. See comments below on normalization and the difference between $\QQ$ and $H$. 
 
-\citet[eqns. 19, 20]{Harveyetal1998} use $G_t$ to refer to the $\chol(\RR_t)^\top$ (non-zero part of the $n \times n+m$ matrix) and $H_t$ to refer to $\chol(\QQ_t)^\top$.  I have replaced these with $\RR_t^\prime$ and $\QQ_t^\prime$ (Equation \ref{eq:Harveyalgo}) which causes my variant of their algorithm (Equation \ref{eq:Harveyalgo}) to give the `non-normalized' variance of the residuals. The residuals function in the MARSS R package has an option to give either normalized or non-normalized residuals.
+\citet[eqns. 19, 20]{Harveyetal1998} use $G_t$ to refer to the $\chol(\RR_t)^\top$ (non-zero part of the $n \times n+m$ matrix) and $H_t$ to refer to $\chol(\QQ_t)^\top$.  I have replaced these with $\RR_t^\prime$ and $\QQ_t^\prime$ (Equation \ref{eq:Harveyalgo}) which causes my variant of their algorithm (Equation \ref{eq:Harveyalgo}) to give the `non-normalized' variance of the residuals. The residuals function in the \{MARSS\} package has an option to give either normalized or non-normalized residuals.
 
-$\KK_t$ is the Kalman gain output by the MARSS R package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the MARSS R package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
+$\KK_t$ is the Kalman gain output by the \{MARSS\} package \verb@MARSSkf()@ function.  The Kalman gain as used in the \citet{Harveyetal1998} algorithm is $K_t=\BB_{t+1}\KK_t$. Notice that Equation 21 in \citet{Harveyetal1998} has $H_t G_t^\top$ in the equation for $K_t$. This is the covariance of the state and observation errors, which is allowed to be non-zero given the way Harvey et al. write the errors in their Equations 19 and 20. The way the \{MARSS\} package model is written, the state and observation errors are independent of each other. Thus $H_t G_t^\top = 0$ and this term drops out of the $K_t$ equation in Equation \ref{eq:Harveyalgo}.
 
 \subsection{Computing the normalized residuals}
 
@@ -642,7 +642,7 @@ The Cholesky standardized residuals are computed by multiplying $\widehat{\varep
 \begin{equation}\label{eq:std.resid}
 \widehat{\varepsilon}_{t, std} = (\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t .
 \end{equation}
-These residuals are uncorrelated (across the residuals at time $t$ in $\widehat{\varepsilon}_t$).  See \citet{HarveyKoopman1992} and \citet[Section V]{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
+These residuals are uncorrelated (across the residuals at time $t$ in $\widehat{\varepsilon}_t$).  See \citet{HarveyKoopman1992} and \citet[section V]{Harveyetal1998} for a discussion on how to use these residuals for outlier detection and structural break detection.
 
 It is also common to use the marginal standardized residuals, which would be $\widehat{\varepsilon}_t$ multiplied by the inverse of the square-root of $\dg(\widehat{\Sigma}_t)$, where $\dg(\AA)$ is a diagonal matrix formed from the diagonal of the square matrix $\AA$.
 \begin{equation}
@@ -662,7 +662,7 @@ Define the innovations $\checkvt$ as:
 \end{equation}
 where $\hatxttm$ is $\E[\XX_t|\yy^{(1),t-1}]$ (expected value of $\XX_t$ conditioned on the data up to time $t-1$). The random variable, innovations over all possible $\yy_t$, is $\checkVt$. Its mean is 0 and we want to find its variance. 
 
-This is conceptually different than the observed `innovations'. First, this is the random variable `innovation'.  $\yy^{(1)}_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$ and $\checkvt$ is a sample from the innovations you could observe. Second, $\checkvt$ includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$ (observed and unobserved $\yy$). Normally, the innovations for missing data would appear as 0s (e.g. from a call to \verb@MARSSfss()@). For missing data, $\checkvt$ is not necessarily 0. For example if $\yy$ is multivariate and correlated with each other through $\RR$ or a shared $\xx$ dependency.
+This is conceptually different than the observed `innovations'. First, this is the random variable `innovation'.  $\yy^{(1)}_t$ here is not the actual data that you observe (the one data set that you have). It's the data that you could observe. $\yy_t$ is a sample from the random variable $\YY_t$ and $\checkvt$ is a sample from the innovations you could observe. Second, $\checkvt$ includes both $\yy_t^{(1)}$ and $\yy_t^{(2)}$ (observed and unobserved $\yy$). Normally, the innovations for missing data would appear as 0s, e.g., from a call to \verb@MARSSfss()@. For missing data, $\checkvt$ is not necessarily 0. For example if $\yy$ is multivariate and correlated with each other through $\RR$ or a shared $\xx$ dependency.
 
 The derivation of the variance of $\checkVt$ follows the exact same steps as the smoothations $\hatVt$, except that we condition on the data up to $t-1$ not up to $T$. Thus using Equation \ref{eq:first.and.secons.vvtgeneral}, we can write the variance directly as:
 \begin{equation}\label{eq:innov.model}
@@ -675,7 +675,7 @@ $\yy_t$ is not in the conditional since it only includes data up to $t-1$. Witho
 \var[\checkVt] = \RR_t + \ZZ_t \hatVttm \ZZ_t^\top.
 \end{equation}
 
-Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the MARSS R package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
+Note $\var[\checkVt]$ is a standard output from Kalman filter functions and is used to compute the likelihood of the data (conditioned on a set of parameters). In the Kalman filter in the \{MARSS\} package, it is output as \texttt{Sigma} from \texttt{MARSSkfss()}.
 
 
 \subsection{One-step ahead state residuals}
@@ -794,7 +794,7 @@ where the $\hatVtt$ and $\hatStt$ are now conditioned on only the data from 1 to
 $\hatStt = \cov[\YY_t,\XX_t|\yy^{(1), t}] = \cov[\ZZ_t \XX_t + \aa_t+\VV_t,\XX_t|\yy^{(1), t}]$. 
 If $\yy_t$ has no missing values, this reduces to $\RR_t - \ZZ_t \hatVtt \ZZ_t^\top$ while if $\yy_t$ is all missing values, this reduces to $\RR_t + \ZZ_t \hatVtt \ZZ_t^\top$. See discussion of this after Equation \ref{eq:first.and.secons.vvtgeneral}.
 
-Equation \ref{eq:contemp.model} gives the equation for the case where $\yy_t$ is partially observed. $\hatStt$ is output by the \verb@MARSShatyt()@ function in the MARSS package and $\hatVtt$ is output by the \verb@MARSSkfss()@ function.
+Equation \ref{eq:contemp.model} gives the equation for the case where $\yy_t$ is partially observed. $\hatStt$ is output by the \verb@MARSShatyt()@ function in the \{MARSS\} package and $\hatVtt$ is output by the \verb@MARSSkfss()@ function.
 
 \bibliography{./EMDerivation}
 \bibliographystyle{apalike}

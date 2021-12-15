@@ -229,20 +229,7 @@ levels(loggerheadNoisy$turtle)
 
 
 ###################################################
-### code chunk number 19: Cs17_kftrack (eval = FALSE)
-###################################################
-## library(kftrack) # must be installed from github
-## loggerhead <- loggerhead
-## turtlename <- "BigMama"
-## dat <- loggerhead[which(loggerhead$turtle == turtlename), 2:6]
-## model <- kftrack(dat,
-##   fix.first = FALSE, fix.last = FALSE,
-##   var.struct = "uniform"
-## )
-
-
-###################################################
-### code chunk number 21: Cs18_code
+### code chunk number 20: Cs18_code
 ###################################################
 ###############################################################
 #    GCDF FUNCTION

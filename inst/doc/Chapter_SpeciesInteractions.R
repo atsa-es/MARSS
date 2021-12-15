@@ -263,9 +263,15 @@ plank.model.4$c <- d.phos
 
 
 ###################################################
-### code chunk number 31: Cs27.5_print-C
+### code chunk number 30: Cs27_plank-model-4
 ###################################################
-# Cleaning up the B matrix for printing
+kem.plank.4 <- MARSS(d.plank.dat, model = plank.model.4)
+
+
+###################################################
+### code chunk number 31: Cs28_print-C
+###################################################
+# Cleaning up the C matrix for printing
 Cmat <- coef(kem.plank.4, type = "matrix")$C[1:4, 1, drop = FALSE]
 rownames(Cmat) <- c("LP", "SP", "D", "ND")
 Cmat[Cmat == 0] <- NA
@@ -273,13 +279,7 @@ print(Cmat, digits = 2, na.print = "--")
 
 
 ###################################################
-### code chunk number 30: Cs27_plank-model-4
-###################################################
-kem.plank.4 <- MARSS(d.plank.dat, model = plank.model.4)
-
-
-###################################################
-### code chunk number 32: Cs28_add-fish-to-data
+### code chunk number 32: Cs29_add-fish-to-data
 ###################################################
 # transpose to make time go across columns
 # drop=FALSE so that R doesn't change our matrix to a vector
@@ -290,7 +290,7 @@ d.plank.dat.w.fish <- rbind(d.plank.dat, d.fish)
 
 
 ###################################################
-### code chunk number 33: Cs29_B-covar
+### code chunk number 33: Cs30_B-covar
 ###################################################
 B <- matrix(list(0), 5, 5)
 diag(B) <- list("B11", "B22", "B33", "B44", "Bfish")
@@ -303,20 +303,20 @@ print(B)
 
 
 ###################################################
-### code chunk number 34: Cs30_C-covar
+### code chunk number 34: Cs31_C-covar
 ###################################################
 C <- matrix(list("C11", "C21", 0, 0, 0), 5, 1)
 
 
 ###################################################
-### code chunk number 35: Cs31_R.covar
+### code chunk number 35: Cs32_R.covar
 ###################################################
 R <- matrix(list(0), 5, 5)
 diag(R) <- list(0.04, 0.04, 0.16, 0.16, 0.36)
 
 
 ###################################################
-### code chunk number 36: Cs32_Q-covar
+### code chunk number 36: Cs33_Q-covar
 ###################################################
 Q <- matrix(list(0), 5, 5)
 Q[1:4, 1:4] <- paste(rep(1:4, times = 4), rep(1:4, each = 4), sep = "")
@@ -326,7 +326,7 @@ print(Q)
 
 
 ###################################################
-### code chunk number 37: Cs33_fit-covar-model
+### code chunk number 37: Cs34_fit-covar-model
 ###################################################
 plank.model.5 <- plank.model.4
 plank.model.5$B <- B
@@ -337,7 +337,7 @@ kem.plank.5 <- MARSS(d.plank.dat.w.fish, model = plank.model.5)
 
 
 ###################################################
-### code chunk number 38: Cs34_print-B
+### code chunk number 38: Cs35_print-B
 ###################################################
 # Cleaning up the B matrix for printing
 B.5 <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
@@ -347,7 +347,7 @@ print(B.5, digits = 2, na.print = "--")
 
 
 ###################################################
-### code chunk number 40: Cs35_logLik-variates
+### code chunk number 40: Cs36_logLik-variates
 ###################################################
 tmp <- kem.plank.5
 tmp$marss$data[5, ] <- NA
@@ -355,26 +355,26 @@ LL.variates <- MARSSkf(tmp)$logLik
 
 
 ###################################################
-### code chunk number 41: Cs36_BQ.5
+### code chunk number 41: Cs37_BQ.5
 ###################################################
 B <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
 Q <- coef(kem.plank.5, type = "matrix")$Q[1:4, 1:4]
 
 
 ###################################################
-### code chunk number 42: Cs37_max.eigen
+### code chunk number 42: Cs38_max.eigen
 ###################################################
 max(eigen(B)$values)
 
 
 ###################################################
-### code chunk number 43: Cs38_max.eig.kron.b
+### code chunk number 43: Cs39_max.eig.kron.b
 ###################################################
 max(eigen(kronecker(B, B))$values)
 
 
 ###################################################
-### code chunk number 44: Cs39_Vinfty
+### code chunk number 44: Cs40_Vinfty
 ###################################################
 m <- nrow(B)
 vecV <- solve(diag(m * m) - kronecker(B, B)) %*% as.vector(Q)
@@ -382,25 +382,25 @@ V_inf <- matrix(vecV, nrow = m, ncol = m)
 
 
 ###################################################
-### code chunk number 45: Cs40_det.b.squared
+### code chunk number 45: Cs41_det.b.squared
 ###################################################
 abs(det(B))^2
 
 
 ###################################################
-### code chunk number 46: Cs41_det.b.scaled
+### code chunk number 46: Cs42_det.b.scaled
 ###################################################
 abs(det(B))^(2 / nrow(B))
 
 
 ###################################################
-### code chunk number 47: Cs42_covar.sigma.Vinf
+### code chunk number 47: Cs43_covar.sigma.Vinf
 ###################################################
 -sum(diag(Q)) / sum(diag(V_inf))
 
 
 ###################################################
-### code chunk number 48: Cs43_worse.case.reactivity
+### code chunk number 48: Cs44_worse.case.reactivity
 ###################################################
 max(eigen(t(B) %*% B)$values) - 1
 

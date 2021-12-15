@@ -51,13 +51,7 @@ coef(kem2) # the estimated parameter elements
 kem2$logLik # log likelihood
 c(kem1$AIC, kem2$AIC) # AICs
 
-resids <- MARSSresiduals(kem2, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+plot(kem2, plot.type="model.resids.ytT")
 
 
 ###################################################
@@ -72,14 +66,8 @@ kem3 <- MARSS(dat, model = list(
   Z = Z.model,
   R = R.model, U = U.model, Q = Q.model
 ))
-# plot residuals
-resids <- MARSSresiduals(kem3, type = "tt1")$model.residuals
-par(mfrow = c(2, 3))
-for (i in 1:n) {
-  plot(resids[i, ], ylab = "Residuals")
-  title(legendnames[i])
-}
-par(mfrow = c(1, 1))
+# plot smoothation residuals
+plot(kem3, plot.type="model.resids.ytT")
 
 
 ###################################################
@@ -96,7 +84,7 @@ kem <- MARSS(dat, model = list(
 
 
 ###################################################
-### code chunk number 28: Cs2_Code5_7
+### code chunk number 29: Cs2_Code5_7
 ###################################################
 # Two subpopulations with different population parameters
 Z.model <- factor(c(1, 1, 2, 2, 2))

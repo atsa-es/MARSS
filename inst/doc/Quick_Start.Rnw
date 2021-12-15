@@ -70,7 +70,7 @@
 \def\E{\,\textup{\textrm{E}}}
 \def\Lik{\,\textup{\textrm{L}}}
 \def\N{\,\textup{\textrm{N}}}
-\def\R{R}
+\def\R{R }
 
 \title{Quick Start Guide}
 \begin{document}
@@ -79,7 +79,7 @@
 options(prompt=" ", continue=" ")
 @
 \section*{MARSS Quick Start Guide}
-The default MARSS model (\verb@form="marxss"@) is written as follows:
+The \{MARSS\} package fits multivariate autoregressive state-space (MARSS) models of the form:
 \begin{equation}\label{eqn:marss}
 \begin{gathered}
 \xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \GG_t\ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ_t)\\
@@ -89,7 +89,7 @@ The default MARSS model (\verb@form="marxss"@) is written as follows:
 \end{equation}
 $\cc$ and $\dd$ are inputs (aka, exogenous variables or covariates or indicator variables) and must have no missing values.  They are not treated as `data' in the likelihood but as inputs.  In most cases, $\GG$ and $\HH$ are fixed (not estimated) and must have no missing values, but see the User Guide on situations when they can be estimated.
 
-The MARSS package is designed to handle linear constraints within the parameter matrices: $\BB$, $\uu$, $\CC$, $\QQ$, $\ZZ$, $\aa$, $\DD$, $\RR$, $\pipi$, and $\LAM$ (and in limited situations $\GG$ and $\HH$).  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements.
+The \{MARSS\} package is designed to handle linear constraints within the parameter matrices: $\BB$, $\uu$, $\CC$, $\QQ$, $\ZZ$, $\aa$, $\DD$, $\RR$, $\pipi$, and $\LAM$ (and in limited situations $\GG$ and $\HH$).  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements.
 
 Example: a mean-reverting random walk model with three observation time series:
 \begin{gather*}
@@ -108,7 +108,7 @@ Example: a mean-reverting random walk model with three observation time series:
  \begin{bmatrix}r_{11}&0&0\\ 0&r&0\\ 0&0&r\end{bmatrix} \end{pmatrix} 
 \end{gather*}
 
-To fit with MARSS, we translate this model into equivalent matrices (or arrays if time-varying) in R. Matrices that combine fixed and estimated values are specified using a list matrix with numerical values for fixed values and  character names for the estimated values. 
+To fit a MARSS model with the \{MARSS\} package, we translate the mathematical model written in matrix form into equivalent matrices (or arrays if time-varying) in \R  code. Matrices that combine fixed and estimated values are specified using a list matrix with numerical values for fixed values and  character names for the estimated values. 
 <<model.spec, eval=FALSE>>=
 B1 <- matrix(list("b",0,0,"b"),2,2)
 U1 <- matrix(0,2,1)
@@ -119,17 +119,18 @@ R1 <- matrix(list("r11",0,0,0,"r",0,0,0,"r"),3,3)
 pi1 <- matrix(0,2,1); V1=diag(1,2)
 model.list <- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 @
-Try printing these out and you will see the one-to-one correspondence between the model in R and the math version of the model.  For \verb@form="marxss"@ (the default), matrix names in the model list must be B, U, C, c, Q, Z, A, D, d, R, x0, and V0, just like in equation \eqref{eqn:marss}.  The \verb@tinitx@ element tells MARSS whether the initial state for $x$ is at $t=1$ (\verb@tinitx=1@) or $t=0$ (\verb@tinitx=0@).   The data must be entered as a $n \times T$ matrix, or a ts object or vector (which will be converted to a $n \times T$ matrix).  MARSS has a number of text shortcuts for common parameter forms, such as ``diagonal and unequal''; see the User Guide for the possible shortcuts. You can leave off matrix names and the defaults will be used. Type ?MARSS.marxss to see the defaults for \verb@form="marxss"@.
+Try printing these out and you will see the one-to-one correspondence between the model in \R and the math version of the model.  For \verb@form="marxss"@ (the default), matrix names in the model list must be \verb@B@, \verb@U@, \verb@C@, \verb@c@, \verb@Q@, 
+\verb@Z@, \verb@A@, \verb@D@, \verb@d@, \verb@R@, \verb@x0@ ($\pipi$), and \verb@V0@ ($\LAM$), just like in Equation \ref{eqn:marss}.  The \verb@tinitx@ element tells MARSS whether the initial state for $x$ is at $t=1$ (\verb@tinitx=1@) or $t=0$ (\verb@tinitx=0@).   The data must be entered as a $n \times T$ matrix, or a ts object or vector (which will be converted to a $n \times T$ matrix).  MARSS has a number of text shortcuts for common parameter forms, such as ``diagonal and unequal''; see the User Guide for the possible shortcuts. You can leave off matrix names and the defaults will be used. Type \verb@?MARSS.marxss@ to see the defaults for \verb@form="marxss"@.
 
-The call to MARSS is 
+The call to fit the model is 
 <<marss.call, eval=FALSE>>=
 fit <- MARSS(data, model=model.list)
 @
-The \verb@R@, \verb@Q@ and \verb@V0@ variances can be set to zero to specify partially deterministic systems.  This allows you to write MAR(p) models in MARSS form for example. See the User Guide for examples. 
+The $\RR$, $\QQ$ and $\LAM$ variances can be set to zero to specify partially deterministic systems.  This allows you to write MAR(p) models in MARSS form for example. See the User Guide for examples. 
 
 \section*{Linear constraints}
 
-Your model can have simple linear constraints within all the parameters except Q, R and V0.  For example $1+2a-3b$ is a linear constraint. When entering this value for you matrix, you specify this as \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so $+-3*b$ to specify $-3b$. Anything after `*` is a parameter. So `1*1` has a parameter called `"1"`. Example, let's change the $\BB$ and $\QQ$ matrices in the previous model to:
+Your model can have simple linear constraints within all the parameters except $\QQ$, $\RR$ and $\LAM$.  For example $1+2a-3b$ is a linear constraint. When entering this value for you matrix, you specify this as \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so \verb@+-3*b@ to specify $-3b$. Anything after \verb@*@ is a parameter. So \verb@1*1@ has a parameter called \verb@"1"@. Example, let's change the $\BB$ and $\QQ$ matrices in the previous model to:
 \begin{equation*}
 \BB = \begin{bmatrix}b-0.1&0\\ 0&b+0.1\end{bmatrix}\quad
 \QQ = \begin{bmatrix}q_{11}&0\\ 1&0\end{bmatrix}\quad
@@ -151,17 +152,17 @@ toLatex(fit$model)
 @
 
 \section*{Important}
-\begin{itemize}
-  \item Specification of a properly constrained model with a unique solution is the responsibility of the user because MARSS has no way to tell if you have specified an insufficiently constrained model.
-  \item The code in the MARSS package is not particularly fast and EM algorithms are famously slow.  You can try method="BFGS" and see if that is faster.  For some models, it will be much faster and for others, much slower. "BFGS" can be notoriously sensitive to initial conditions. You can run EM a few iterations and then pass to "BFGS", and it will do better.
-  <<marss.call3, eval=FALSE>>=
+
+Specification of a properly constrained model with a unique solution is the responsibility of the user because the \{MARSS\} package has no way to tell if you have specified an insufficiently constrained model.
+
+The code in the \{MARSS\} package is not particularly fast and EM algorithms are famously slow.  You can try \verb@method="BFGS"@ and see if that is faster.  For some models, it will be much faster and for others, much slower. BFGS can be notoriously sensitive to initial conditions. You can run EM a few iterations and run with BFGS, and it will do better.
+<<marss.call3, eval=FALSE>>=
 fit1 <- MARSS(data, model=model.list, control=list(minit=10, maxit=10))
 fit2 <- MARSS(data, model=model.list, method="BFGS", inits=fit1)
 @
-\end{itemize}
 
 \section*{Time-varying parameters and inputs}
-The default model form (\verb@form="marxss"@) allows you to pass in an array of $T$ matrices for a time-varying parameter ($T$ is the number of time-steps in your data and is the 3rd dimension in the array):  
+The default model form allows you to pass in a 3-D array for a time-varying parameter ($T$ is the number of time-steps in your data and is the 3rd dimension in the array):  
 %\begin{equation}\label{qeq:MARSS.ex.vec}
 \begin{equation}\label{qeq:MARSS.tv}
 \begin{gathered}
@@ -172,7 +173,7 @@ The default model form (\verb@form="marxss"@) allows you to pass in an array of 
 \xx_{t_0} \sim \MVN(\pipi,\LAM)
 \end{gathered}
 \end{equation}
-Zeros are allowed on the diagonals of $\QQ$, $\RR$ and $\LAM$.  NOTE(!!), the time indexing.  Make sure you enter your arrays such that the right parameter (or input) at time $t$ lines up with $\xx_t$, e.g. it is common for state equations to have $\BB_{t-1}$ lined up with $\xx_t$ so you might need to enter the $\BB$ array such that your $\BB_{t-1}$ is entered at \verb@Bt[,,t]@ in the R code.
+Zeros are allowed on the diagonals of $\QQ$, $\RR$ and $\LAM$.  NOTE(!!), the time indexing.  Make sure you enter your arrays such that the correct parameter (or input) at time $t$ lines up with $\xx_t$; e.g., it is common for state equations to have $\BB_{t-1}$ lined up with $\xx_t$ so you might need to enter the $\BB$ array such that your $\BB_{t-1}$ is entered at \verb@Bt[,,t]@ in your \R code.
 
 The length of the 3rd dimension must be the same as your data.  For example, say in your  mean-reverting random walk model (the example on the first page) you wanted $\BB(2,2)$ to be one value before $t=20$ and another value after but $\BB(1,1)$ to be time constant. You can pass in the following:
 <<model.spec2, eval=FALSE>>=
@@ -188,16 +189,17 @@ Inputs are specified in exactly the same manner.  $\CC$ and $\DD$ are the estima
 C1 <- matrix(c("temp1","temp2"),2,1)
 model.list <- list(B=B1,U=U1,C=C1,c=temp,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 @
-If you want a factor effect, then you'll need to recode your factor as a matrix with $T$ columns and a row for each factor.  Then you have 0 or 1 if that factor applies in time period $t$.  $\CC$ then has a column for each estimated factor effect.  See the Covariate chapter in the user guide.
+If you want a factor effect, then you'll need to recode your factor as a matrix with $T$ columns and a row for each factor.  Then you have 0 or 1 if that factor applies in time period $t$.  $\CC$ then has a column for each estimated factor effect.  See the Covariate chapter in the User Guide.
 
 \section*{Showing the model fits and getting the parameters}
-There are \verb@plot@, \verb@autoplot@, \verb@print@, \verb@summary@, \verb@coef@, \verb@fitted@, \verb@residuals@ and \verb@predict@ functions for marssMLE objects.  \verb@?print.MARSS@ will show you how to get standard output from your fitted model objects and where that output is stored in the marssMLE object.  Type \verb@?coef.MARSS@ to see the different formats for displaying the estimated parameters.  To see plots of your states and fits plus diagnostic plots, use \verb@plot(fit)@ or \verb@ggplot2::autoplot(fit)@. For summaries of the residuals (model and state), use the \verb@residuals@ function. See \verb@?residuals.marssMLE@. To produce predictions and forecasts from a MARSS model, see \verb@?predict.marssMLE@.
+There are \verb@plot@, \verb@autoplot@, \verb@print@, \verb@summary@, \verb@coef@, \verb@fitted@, \verb@residuals@ and \verb@predict@ functions for marssMLE objects.  \verb@?print.MARSS@ will show you how to get standard output from your fitted model objects and where that output is stored in the marssMLE object.  Type \verb@?coef.MARSS@ to see the different formats for displaying the estimated parameters.  To see plots of your states and fits plus diagnostic plots, use \verb@plot(fit)@ or, better, \verb@ggplot2::autoplot(fit)@. For summaries of the residuals (model and state), use the \verb@residuals@ function. See \verb@?residuals.marssMLE@. To produce predictions and forecasts from a MARSS model, see \verb@?predict.marssMLE@.
 
 \section*{Tips and Tricks}
-Use \verb@plot(fit)@ (or \verb@autoplot(fit)@) to see a series of plots and diagnostics for your model. Try \verb@MARSSinfo()@ if you get errors you don't understand or fitting is taking a long time to converge.  When fitting a model with \verb@MARSS()@, pass in \verb@silent=2@ to see what \verb@MARSS()@ is doing.  This puts it in verbose mode.   Use \verb@fit=FALSE@ to set up a model without fitting. Let's say you do \verb@fit <- MARSS(..., fit=FALSE)@.  Now you can do \verb@summary(fit$model)@ to see what \verb@MARSS()@ thinks you are trying to fit.  You can also try \verb@toLatex(fit$model)@ to make a LaTeX file and pdf version of your model (saved in the working directory).  This loads the Hmisc package (and all its dependencies) and requires that you are able to process LaTeX files.  Let's say you specified your model with some text short-cuts, like \verb@Q="unconstrained"@, but you want the list matrix form for a next step. \verb@a <- summary(fit$model)@ returns that list (invisibly).  Because the model argument of \verb@MARSS()@ will understand a list of list matrices, you can pass in \verb@model=a@ to specify the model.  \verb@MARSSkfas(fit, return.kfas.model=TRUE)@  will return your model in KFAS form (class SSModel), thus you can use all the functions available in the KFAS package on your model.
+Use \verb@ggplot2::autoplot(fit)@ (or \verb@plot(fit)@) to see a series of standard plots and diagnostics for your model. Try \verb@MARSSinfo()@ if you get errors you don't understand or fitting is taking a long time to converge.  When fitting a model with \verb@MARSS()@, pass in \verb@silent=2@ to see what \verb@MARSS()@ is doing.  This puts it in verbose mode.   Use \verb@fit=FALSE@ to set up a model without fitting. Let's say you do \verb@fit <- MARSS(..., fit=FALSE)@.  Now you can do \verb@summary(fit$model)@ to see what \verb@MARSS()@ thinks you are trying to fit.  You can also try \verb@toLatex(fit$model)@ to make a LaTeX file and pdf version of your model (saved in the working directory).  
+This loads the \{Hmisc\} package (and all its dependencies) and requires that you are able to process LaTeX files.  Let's say you specified your model with some text short-cuts, like \verb@Q="unconstrained"@, but you want the list matrix form for a next step. \verb@a <- summary(fit$model)@ returns that list (invisibly).  Because the model argument of \verb@MARSS()@ will understand a list of list matrices, you can pass in \verb@model=a@ to specify the model.  \verb@MARSSkfas(fit, return.kfas.model=TRUE)@  will return your model in \{KFAS\} format (class SSModel), thus you can use all the functions available in the \{KFAS\} package on your model.
 
 \section*{Need more information?}
-The MARSS User Guide starts with some tutorials on MARSS models and walks through many examples showing how to write multivariate time-series models in MARSS form.  The user guide also has a series of vignettes: how to write AR(p) models in state-space form, dynamic linear models (regression models where the regression parameters are AR(p)), multivariate regression models with regression parameters that are time-varying and enter the non-AR part of your model or the AR part, detecting breakpoints using state-space models, and dynamic factor analysis.  All of these can be written in MARSS form.  It also has a series of vignettes on analysis of multivariate biological data.  Background on the algorithms used in MARSS is included in the user guide.  Lectures and more examples on fitting multivariate models can be found at our course website \url{https://atsa-es.github.io/atsa} and course eBook \url{https://atsa-es.github.io/atsa-labs}.
+The MARSS User Guide starts with some tutorials on MARSS models and walks through many examples showing how to write multivariate time-series models in MARSS form.  The User Guide also has vignettes: how to write AR(p) models in state-space form, dynamic linear models (regression models where the regression parameters are AR(p)), multivariate regression models with regression parameters that are time-varying and enter the non-AR part of your model or the AR part, detecting breakpoints using state-space models, and dynamic factor analysis.  All of these can be written in MARSS form.  It also has a series of vignettes on analysis of multivariate biological data.  Background on the algorithms used in the \{MARSS\} package is included in the User Guide.  Lectures and more examples on fitting multivariate models can be found at our course website \url{https://atsa-es.github.io/atsa} and course eBook \url{https://atsa-es.github.io/atsa-labs}.
 
 <<Reset, echo=FALSE>>=
 options(prompt="> ", continue="+ ")

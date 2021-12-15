@@ -87,14 +87,14 @@ kem <- MARSS(dat, model = model.list, inits = inits)
 ###################################################
 # create the par list from the output
 inits <- coef(kem, what = "par")
-kem.bfgs <- MARSS(dat, model = model.list, inits = inits, method = "BFGS")
+bfgs <- MARSS(dat, model = model.list, inits = inits, method = "BFGS")
 
 
 ###################################################
 ### code chunk number 12: Cs_mci_0101
 ###################################################
 # create the par list from the output
-kem.bfgs <- MARSS(dat, model = model.list, inits = kem, method = "BFGS")
+bfgs <- MARSS(dat, model = model.list, inits = kem, method = "BFGS")
 
 
 ###################################################
@@ -192,7 +192,7 @@ MARSSmcinit <- function(MLEobj,
     MLEobj$start <- init.loop
     MLEobj$control$maxit <- control$numInitSteps
     MLEobj$control$minit <- 1
-    MLEobj$control$silent <- TRUE # don't print convergence information during kem call
+    MLEobj$control$silent <- TRUE # don't output
     MLEobj <- MARSSkem(MLEobj) # get new fit using this init
 
     if (drawProgressBar == TRUE) prev <- MARSS:::progressBar(loop / control$numInits, prev)

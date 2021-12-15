@@ -174,7 +174,7 @@ cbind(
 ###################################################
 ### code chunk number 19: Cs301_obs-filtering
 ###################################################
-f_kfas <- KFS(fit_kfas$model,
+kf_kfas <- KFS(fit_kfas$model,
   filtering = "signal",
   smoothing = "signal", simplify = FALSE
 )
@@ -183,7 +183,7 @@ f_kfas <- KFS(fit_kfas$model,
 ###################################################
 ### code chunk number 20: Cs302_obs-filtering
 ###################################################
-f_marss <- MARSSkf(fit_marss)
+kf_marss <- MARSSkf(fit_marss)
 
 
 ###################################################
@@ -197,7 +197,7 @@ n <- 10
 ###################################################
 ytt1_fit <- fitted(fit_marss, type = "ytt1")$.fitted
 ytt1_hatyt <- MARSShatyt(fit_marss, only.kem = FALSE)$ytt1
-cbind(m = f_kfas$m[1:n], fitted = ytt1_fit[1:n], MARSShatyt = ytt1_hatyt[1:n])
+cbind(m = kf_kfas$m[1:n], fitted = ytt1_fit[1:n], MARSShatyt = ytt1_hatyt[1:n])
 
 
 ###################################################
@@ -208,7 +208,7 @@ var.Eytt1_fit <-
 var.Eytt1_hatyt <-
   MARSShatyt(fit_marss, only.kem = FALSE)$var.Eytt1
 cbind(
-  P_mu = f_kfas$P_mu[1:n], fitted = var.Eytt1_fit[1:n],
+  P_mu = kf_kfas$P_mu[1:n], fitted = var.Eytt1_fit[1:n],
   MARSShatyt = var.Eytt1_hatyt[1:n]
 )
 
@@ -219,7 +219,7 @@ cbind(
 ytT_fit <- fitted(fit_marss, type = "ytT")$.fitted
 ytT_hatyt <- MARSShatyt(fit_marss)$ytT
 cbind(
-  a = f_kfas$muhat[1:n], fitted = ytT_fit[1:n],
+  a = kf_kfas$muhat[1:n], fitted = ytT_fit[1:n],
   MARSShatyt = ytT_hatyt[1:n], Nile = Nile[1:n]
 )
 
@@ -232,7 +232,7 @@ var.EytT_fit <-
 var.EytT_hatyt <-
   MARSShatyt(fit_marss, only.kem = FALSE)$var.EytT
 cbind(
-  V_mu = f_kfas$V_mu[1:n], fitted = var.EytT_fit[1:n],
+  V_mu = kf_kfas$V_mu[1:n], fitted = var.EytT_fit[1:n],
   MARSShatyt = var.EytT_hatyt[1:n]
 )
 
@@ -371,7 +371,8 @@ head(df)
 ###################################################
 ### code chunk number 50: Cs502_plotting
 ###################################################
-plot(fit_marss, plot.type = "fitted.ytT", pi.int = TRUE)
+plot.type <- ifelse(packageVersion("MARSS") < '3.11.4', "model.ytT", "fitted.ytT")
+plot(fit_marss, plot.type = plot.type, pi.int = TRUE)
 
 
 ###################################################

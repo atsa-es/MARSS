@@ -22,7 +22,6 @@ covariates <- rbind(
   Temp = fulldat[years, "Temp"],
   TP = fulldat[years, "TP"]
 )
-
 # z.score the covariates
 covariates <- zscore(covariates)
 

@@ -244,10 +244,8 @@ xyplot(Reaction ~ Days | Subject, sleepstudy,
 # number of subjects
 nsub <- length(unique(sleepstudy$Subject))
 ndays <- length(sleepstudy$Days) / nsub
-# each subject is a row with day across the columns
 dat <- matrix(sleepstudy$Reaction, nsub, ndays, byrow = TRUE)
 rownames(dat) <- paste("sub", unique(sleepstudy$Subject), sep = ".")
-# the day number 0 to 9 is the explanatory variable
 exp.var <- matrix(sleepstudy$Days, 1, ndays, byrow = TRUE)
 
 

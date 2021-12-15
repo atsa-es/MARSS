@@ -93,59 +93,50 @@ params[nsim + 2, ] <- c(sim.u, sim.u, sim.Q, sim.R, sim.Q)
 ###################################################
 # Needs Example 2 to be run first
 par(mfrow = c(3, 3))
-pd <- 0.1
-xd <- -log(pd) # decline threshold
-te <- 100
-tyrs <- 1:te # extinction time horizon
+pd <- 0.1; xd <- -log(pd) # decline threshold
+te <- 100; tyrs <- 1:te # extinction time horizon
 for (j in c(10, 1:8)) {
   real.ex <- denn.ex <- kal.ex <- matrix(nrow = te)
 
   # MARSS parameter estimates
-  u <- params[j, 1]
-  Q <- params[j, 3]
+  u <- params[j, 1]; Q <- params[j, 3]
   if (Q == 0) Q <- 1e-4 # just so the extinction calc doesn't choke
   p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
   for (i in 1:100) {
     if (is.finite(exp(2 * xd * abs(u) / Q))) {
-      sec.part <- exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
-    } else {
-      sec.part <- 0
-    }
+      sec.part <- exp(2 * xd * abs(u) / Q) * 
+        pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+    } else { sec.part <- 0 }
     kal.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) + sec.part
   } # end i loop
 
   # Dennis et al 1991 parameter estimates
-  u <- params[j, 2]
-  Q <- params[j, 5]
+  u <- params[j, 2]; Q <- params[j, 5]
   p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
   for (i in 1:100) {
     denn.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) +
-      exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+      exp(2 * xd * abs(u) / Q) * 
+      pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
   } # end i loop
 
   # True parameter values
-  u <- sim.u
-  Q <- sim.Q
+  u <- sim.u; Q <- sim.Q
   p.ever <- ifelse(u <= 0, 1, exp(-2 * u * xd / Q))
   for (i in 1:100) {
     real.ex[i] <- p.ever * pnorm((-xd + abs(u) * tyrs[i]) / sqrt(Q * tyrs[i])) +
-      exp(2 * xd * abs(u) / Q) * pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
+      exp(2 * xd * abs(u) / Q) * 
+      pnorm((-xd - abs(u) * tyrs[i]) / sqrt(Q * tyrs[i]))
   } # end i loop
 
-  # plot it
-  plot(tyrs, real.ex,
-    xlab = "Time steps into future",
-    ylab = "Probability of extinction", ylim = c(0, 1), bty = "l"
-  )
+  plot(tyrs, real.ex, xlab = "Time steps into future",
+    ylab = "Probability of extinction", ylim = c(0, 1), bty = "l")
   if (j <= 8) title(paste("simulation ", j))
   if (j == 10) title("average over sims")
   lines(tyrs, denn.ex, type = "l", col = "red", lwd = 2, lty = 1)
   lines(tyrs, kal.ex, type = "l", col = "green", lwd = 2, lty = 2)
 }
-legend("bottomright", c("True", "Dennis", "KalmanEM"),
-  pch = c(1, -1, -1),
-  col = c(1, 2, 3), lty = c(-1, 1, 2), lwd = c(-1, 2, 2), bty = "n"
-)
+legend("bottomright", c("True", "Dennis", "KalmanEM"), pch = c(1, -1, -1),
+  col = c(1, 2, 3), lty = c(-1, 1, 2), lwd = c(-1, 2, 2), bty = "n")
 
 
 ###################################################
