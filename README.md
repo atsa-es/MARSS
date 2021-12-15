@@ -33,8 +33,6 @@
   <li><a href="https://atsa-es.github.io/MARSS/NEWS.html">NEWS</a></li>
 </ul>
 
-#<img src="hexlogo.png" align="right" style="margin:15px 10px"/>
-
 <img src='man/figures/logo.png' align="right" height="139" style="margin:15px 10px"/>
 
 MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
