@@ -2,12 +2,7 @@
 output: html_document
 ---
 
-# MARSS Development site
-
-New work on MARSS before posting to CRAN is at the GitHub repo.  See issues posted there.
-
-
-# MARSS 3.11.4 (GitHub master development branch)
+# MARSS 3.11.4 (released 2021-12-15 on CRAN)
 
 This release is focused on improving the plotting functions for marssMLE, marssResiduals and marssPredict objects. The website links also needed to be updated to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
 
