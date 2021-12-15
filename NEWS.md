@@ -9,7 +9,7 @@ New work on MARSS before posting to CRAN is at the GitHub repo.  See issues post
 
 # MARSS 3.11.4 (GitHub master development branch)
 
-This update is focused on improving the plotting functions for marssMLE, marssResiduals and marssPredict objects. The website links also needed to be updated to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
+This release is focused on improving the plotting functions for marssMLE, marssResiduals and marssPredict objects. The website links also needed to be updated to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
 
 ## ENHANCEMENTS
 
@@ -41,6 +41,7 @@ This update is focused on improving the plotting functions for marssMLE, marssRe
 * More clean-up of the equations. Just being more consistent about using `\eqn{}` when R, Q etc refer to the matrices in the MARSS equation versus code.
 * `residuals_marssMLE.Rd` had a few typos. Main one was that `name` column was called `.type` column.
 * Fixed a typo in `Residuals.Rnw`. LaTeX definition for `Vtt1` was not working. Also fixed a couple misspellings in `EMDerivation.Rnw`.
+* Did a thorough re-read of the user guide and cleaned it up quite a bit.
 
 
 # MARSS 3.11.3  (released 2020-10-20 on CRAN)

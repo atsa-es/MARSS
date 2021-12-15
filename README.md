@@ -94,10 +94,12 @@ If you use MARSS results in publications, please cite the primary citation:
 
 Holmes, E. E., Ward, E. J. and Wills, K. (2012) MARSS: Multivariate Autoregressive State-space Models for Analyzing Time-series Data. The R Journal. 4(1):11-19
 
-You can also cite the package as you would other R packages:
+You can also cite the package and user guide:
 
 Elizabeth E. Holmes, Eric J. Ward, Mark D. Scheuerell and Kellie Wills (2020). MARSS:
   Multivariate Autoregressive State-Space Modeling. R package version 3.11.4.
+  
+Holmes, E. E., M. D. Scheuerell, and E. J. Ward (", year, ") Analysis of multivariate time-series using the MARSS package. Version ", meta$Version, ". NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112, DOI: 10.5281/zenodo.5781847
   
 Type `citation("MARSS")` at the command line to get the most up to data citations.
 

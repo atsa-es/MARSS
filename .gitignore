@@ -7,4 +7,5 @@ MARSS.Rproj
 vignettes/.DS_Store
 tests/testthat/dontruntests/_snaps
 tests/testthat/dontruntests/*.*
+inst/.DS_Store
 

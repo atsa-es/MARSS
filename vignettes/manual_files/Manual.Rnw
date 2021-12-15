@@ -32,7 +32,7 @@ options(width = 60)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
-\author{E. E. Holmes, E. J. Ward, and M. D. Scheuerell}
+\author{E. E. Holmes, M. D. Scheuerell, and E. J. Ward}
 \title{Analysis of multivariate time series using the MARSS package}
 \subtitle{version \Sexpr{packageDescription("MARSS", fields = "Version")}}
 \maketitle
