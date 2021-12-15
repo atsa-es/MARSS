@@ -23,6 +23,8 @@ catLatex <- function(x, ...){
   cat(stringr::str_squish(paste("$$", x, ..., "$$")))
 }
 bf <- function(x){paste0("\\mathbf{",x,"}")}
+fromLatex <- function(x){
+}
 ```
 
 ```{r results='asis'}
