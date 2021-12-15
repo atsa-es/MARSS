@@ -75,7 +75,7 @@ Check the documentation pdfs
   - [ ] EMDerivation
   - [ ] Quick Start
   - [ ] Residuals
-  - [ ] User Guide - See separate issue for this
+  - [ ] User Guide
 
 Compress documentation pdfs
   - [ ] Manually compress the pdfs in the doc folder Dropbox/MARSS/inst/doc
@@ -88,9 +88,6 @@ R CMD check --timings --as-cran MARSS_3.11.4.tar.gz
 
 Update the doc folder for GitHub. This has to be done manually by copying from
   - [ ] Dropbox/MARSS/inst/doc into GitHub/MARSS/inst/doc
-
-Transition MARSS to atsa-es
-  - [ ] Clone v3.11.4 over to atsa-es so that url links pass. Leave MARSS on nwfsc-timeseries for the time being.
 
 Prepare for release:
 * [ ] Check [current CRAN check results](https://cran.rstudio.org/web/checks/check_results_MARSS.html)
@@ -107,7 +104,6 @@ Check that package builds on Windows
 
 Upload package to CRAN
 - [ ] https://cran.r-project.org/submit.html
-
 
 
 The items below are for cases where you are submitting the package files without any extra processing. I process my vignette PDFs separately, so the below won't work. But when submitting there is a link to check the tar.gz file on Windows.
