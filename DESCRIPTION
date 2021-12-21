@@ -31,3 +31,4 @@ BuildVignettes: yes
 ByteCompile: TRUE
 URL: https://atsa-es.github.io/MARSS/
 BugReports: https://github.com/atsa-es/MARSS/issues
+RoxygenNote: 7.1.2
