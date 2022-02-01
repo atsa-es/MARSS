@@ -731,12 +731,9 @@ MARSSkem <- function(MLEobj) {
         fstar.tm <- 0 * fU
         Dstar <- dU
         Dstar.tm <- 0 * dU
-        Mt <- AdjM
-        IId.tm <- IIm # t=0; no w's
-        IId <- makediag(1 - diag.Q) # only can be w free if Q==0
-        if (any(diag.Q == 0) & any(diag.Q != 0)) { # which did not pick up a zero from B
-          IId[diag.Q == 0, diag.Q == 0][1 + 0:(nQ0 - 1) * (nQ0 + 1)] <- apply(Mt[diag.Q == 0, diag.Q != 0, drop = FALSE] == 0, 1, all)
-        }
+        Mt <- IIm
+        IId.tm <- IIm # IId(t=0)
+        IId <- makediag(1 - diag.Q) # IId(t=1)
         # x_1-B(I-Id)xtm-B Id (B* E.x0 + f*)-fU; f*=0, B*=I; xtm=E.x0 so reduces to the following
         Delta3 <- kf$xtT[, 1, drop = FALSE] - B %*% E.x0 - fU
         Delta4 <- dU # since IId.tm and Bstar.tm are IIm
@@ -746,11 +743,12 @@ MARSSkem <- function(MLEobj) {
         Bstar <- IIm
         fstar <- 0 * fU
         Dstar <- 0 * dU
-        IId.tm <- 0 * IIm
+        IId.tm <- 0 * IIm 
         IId <- IIm
         Mt <- IIm
       }
-      if (any(IId == 1)) { # again t=1
+      if (any(IId == 1)) { 
+        # this is t==1; any deterministic x?
         Delta1 <- Ey$ytT[, 1, drop = FALSE] - Z %*% ((IIm - IId) %*% kf$xtT[, 1, drop = FALSE]) - Z %*% (IId %*% (Bstar %*% E.x0 + fstar)) - A
         Delta2 <- Z %*% IId %*% Dstar
         numer <- numer + crossprod(Delta2, Rinv %*% Delta1)
@@ -772,11 +770,13 @@ MARSSkem <- function(MLEobj) {
         Dstar <- B %*% Dstar + dU
         Bstar.tm <- Bstar
         Bstar <- B %*% Bstar
-        if (t <= (m + 1)) {
+        if (t <= (m + 2)) { 
+          # the location of the deterministic rows will stabilize after M^m but M doesn't start being multiplied until t0 + 2
+          # so if kf.x0="x00", m multiplications happens at t=m+1. if kf.x0="x10", it happens at t=m+2
           IId.tm <- IId
-          IId <- makediag(1 - diag.Q) # only can be w free if Q==0
-          if (any(diag.Q == 0) & any(diag.Q != 0)) {
-            Mt <- AdjM %*% Mt
+          IId <- makediag(1 - diag.Q) # only can be fully deterministic if Q==0
+          if (any(diag.Q == 0) & any(diag.Q != 0)) { # only need to do this if there are both stochastic and deterministic rows
+            if(!(kf.x0 == "x10" & t==2)) Mt <- AdjM %*% Mt
             IId[diag.Q == 0, diag.Q == 0][1 + 0:(nQ0 - 1) * (nQ0 + 1)] <- apply(Mt[diag.Q == 0, diag.Q != 0, drop = FALSE] == 0, 1, all)
           }
         }
