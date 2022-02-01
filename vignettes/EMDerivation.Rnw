@@ -2431,7 +2431,7 @@ Similarly, we can rewrite the observation process part of the MARSS model by sep
 In order for this to be solvable using an EM algorithm with the Kalman filter, we require that no estimated $\BB$ or $\uu$ elements appear in the equation for $\yy_t^{(0)}$ (via $x_t$ in that equation).  Since the $\yy_t^{(0)}$ do not appear in the likelihood function (since $\HH_t^{(0)}=0$), $\yy_t^{(0)}$ would not affect the estimate for the parameters appearing in the $\yy_t^{(0)}$ equation.  This translates to the following constraints, $(1_{1 \times m} \otimes \OMG_{t,r}^{(0)}\ZZ_t\II_{t,q}^{(0)})\DD_{t,b}$ is all zeros and $\OMG_{t,r}^{(0)}\ZZ_t\II_{t,q}^{(0)}\DD_u$ is all zeros.
 Also notice that $\OMG_{t,r}^{(0)}\ZZ_t$ and $\OMG_{t,r}^{(0)}\aa_t$ appear in the $\yy^{(0)}$ equation and not in the $\yy^+$ equation.  This means that $\OMG_{t,r}^{(0)}\ZZ_t$ and $\OMG_{t,r}^{(0)}\aa_t$ must be only fixed terms.
 
-In summary, the degenerate model can be reduced to the following (with $\xx_0$ not specified yet).
+In summary, the degenerate model can be reduced to the following (with $\xx_{t_0}$ not specified yet).
 \begin{equation}\label{eq:degen.model2}
 \begin{split}
 \xx_t^{(0)}&=\BB_t^{(0)}\xx_{t-1} + \uu_t^{(0)}\\
@@ -2446,28 +2446,34 @@ In summary, the degenerate model can be reduced to the following (with $\xx_0$ n
 \end{equation}
 where $\BB_t^{(0)}=\OMG_{t,q}^{(0)}\BB_t$ and $\BB_t^+=\OMG_{t,q}^+\BB_t$ so that $\BB_t^{(0)}$ are the rows of $\BB_t$ corresponding to the zero rows of $\GG_t$ and $\BB_t^+$ are the rows of $\BB_t$ corresponding to non-zero rows of  $\GG_t$.  The other parameters are similarly defined: $\uu_t^{(0)}=\OMG_{t,q}^{(0)}\uu_t$  and $\uu_t^+=\OMG_{t,q}^+\uu_t$, $\ZZ_t^{(0)}=\OMG_{t,r}^{(0)}\ZZ_t$  and $\ZZ_t^+=\OMG_{t,r}^+\ZZ_t$, and $\aa_t^{(0)}=\OMG_{t,r}^{(0)}\aa_t$  and $\aa_t^+=\OMG_{t,r}^+\aa_t$.
 
-\subsection{Identifying the fully deterministic $\xx$  rows}\label{sec:ident.xds}
-To derive EM update equations, we need to take the derivative of the expected log-likelihood holding everything but the parameter of interest constant.  If there are deterministic $\xx_t$ rows, then we cannot hold these constant and do this partial differentiation with respect to the state parameters.  We need to identify these $\xx_t$ rows and remove them from the likelihood function by rewriting them in terms of only the state parameters\footnote{Then we can do the partial differentiation with respect to the parameters.}. For this derivation, I am going to make the simplifying assumption that the locations of the all-zero rows in $\GG_t$ and $\HH_t$ are time-invariant.  This is not strictly necessary, but simplifies the algebra greatly.
- 
-For the  deterministic $\xx_t$ rows, denoted $\xx_t^d$, the process equation is $\xx_t = \BB_t\xx_{t-1}+\uu_t$, with no $\ww_t$ term. When we do the partial differentiation step in deriving the EM update equation for $\uu$, $\BB$ or $\xixi$, we will need to take a partial derivative  while holding $\xx_t$ and $\xx_{t-1}$ constant.   We cannot hold the deterministic rows of $\xx_t$ and $\xx_{t-1}$ constant while changing the corresponding rows of $\uu_t$ and $\BB_t$ (or $\xixi$ if $t=0$ or $t=1$).  If a row of $\xx_t$ is fully deterministic, then that $x_{i,t}$ must change when row $i$ of $\uu_t$ or $\BB_t$ is changed.  Thus we  cannot do the partial differentiation step required in the EM update equation derivation.  
+\subsection{Identifying the fully deterministic $\xx$ rows}\label{sec:ident.xds}
+For the  deterministic $\xx_t^d$, the process equation is $\xx_t = \BB_t\xx_{t-1}+\uu_t$, with no $\ww_t$ term. When we do the partial differentiation step in deriving the EM update equation for $\uu$, $\BB$ or $\xixi$, we will need to take a partial derivative  while holding $\xx_t$ and $\xx_{t-1}$ constant.   We cannot hold the deterministic rows of $\xx_t$ and $\xx_{t-1}$ constant while changing the corresponding rows of $\uu_t$ and $\BB_t$ (or $\xixi$ if $t=0$ or $t=1$).  If a row of $\xx_t$ is fully deterministic, then that $x_{i,t}$ must change when row $i$ of $\uu_t$ or $\BB_t$ is changed.  Thus we  cannot do the partial differentiation step required in the EM update equation derivation.  
 
-So we need to identify the fully deterministic $\xx_t$ and treat them differently in our likelihood so we can derive the update equation.  First I will define some terminology regarding the $\xx_t$.
+So we need to identify the fully deterministic $\xx_t$ and remove them from the likelihood by rewriting them in terms of only the state parameters. That will allow us can do the partial differentiation with respect to the parameters. The difficulty is that the $\xx_t^{(0)}$ are not the fully deterministic $\xx_t$ because $\xx_t^{(0)}$ can be indirectly stochastic through $\BB$. We cannot rewrite the indirectly stochastic $\xx_t^{(0)}$ as a function of the state parameters. We can only rewrite the fully deterministic $\xx_t^{(0)}$ as a function of the parameters. The strategy is
+\begin{itemize}
+  \item Identify the fully deterministic $\xx_t^{d}$ and rewrite as a function of the state parameters.
+  \item Identify the indirectly stochastic $\xx_t^{is}$ and ensure that $u_t^{is}$ is not estimated.
+\end{itemize}
+
+The following describes how to find the fully deterministic and indirectly stochastic $\xx_t^{(0)}$. For this derivation, I am going to make the simplifying assumption that the locations of the all-zero rows in $\GG_t$ and $\HH_t$ are time-invariant.  This is not strictly necessary, but simplifies the algebra greatly. I am also going to treat $\xx_{t_0}$ as fixed, not stochastic\footnote{I am not actually assuming this. This section is in the context of partial differentiation where $\xx_{t-1}$ is held fixed at its expected value. Thus whether $\xx_{t_0}$ is fixed or stochastic is irrelevant for this discussion because within the partial differentiation it is always fixed.}.
+ 
+First I will define some terminology regarding the $\xx_t$.
 \begin{itemize}
   \item $(0)$ rows of any $\xx$, $\BB$, $\uu$ or $\II$ matrix that are associated with all-zero rows of $\GG_t$, e.g. $\xx_t^{(0)}$.
   \item $(+)$ rows of any $\xx$, $\BB$, $\uu$ or $\II$ matrix that are associated with non-zero rows of $\GG_t$, e.g. $\xx_t^{(+)}$.
-  \item 'directly stochastic' $\xx_t$ are denoted $\xx_t^{ds}$. These are the same as $\xx_t^{+}$. These $\xx_t$ have a $w_t$ from their row of $\GG_t$.
-  \item 'deterministic' $\xx_t$ are denoted $\xx_t^d$. These are those $\xx_t^{(0)}$ which have no $w_t$ terms either from their own row or picked up through $\BB$ from a non-zero row of $\GG_t$.
-  \item 'indirectly stochastic' $\xx_t$ are denoted $\xx_t^{is}$. Indirectly stochastic $\xx_t^{is}$ have a corresponding row of $\GG_t$ that is all zero, but pick up a $w_t$ from a non-zero row of $\GG_t$ through $\BB$ in one of the prior $\BB_t\xx_t$ steps. 
+  \item 'directly stochastic' $\xx_t$ are denoted $\xx_t^{ds}$. These are the same as $\xx_t^{(+)}$. These $\xx_t$ have a $w_t$ from their row of $\GG_t$.
+  \item 'fully deterministic' $\xx_t$ are denoted $\xx_t^d$. These are those $\xx_t^{(0)}$ which have no $w_t$ terms either from their own row or picked up through $\BB$ from a non-zero row of $\GG_t$. These can be rewritten in terms of state parameters only, with no $\xx_{t-1}$ terms.
+  \item 'indirectly stochastic' $\xx_t$ are denoted $\xx_t^{is}$. Indirectly stochastic $\xx_t^{is}$ have a corresponding row of $\GG_t$ that is all zero, but pick up a $w_t$ from a non-zero row of $\GG_t$ through $\BB$ in one of the prior $\BB_t\xx_t$ steps. These cannot be rewritten in terms of state parameters only; you have to condition on $\xx_{t-1}$.
 \end{itemize}
 The stochastic $\xx_t$ are denoted $\xx_t^s$ whether they are indirectly or directly stochastic.
 
-How do you determine the $d$, or deterministic, set of $\xx_t$ rows?  These are the rows of $\xx_t$ with no $w$ terms, from time $t$ or from prior $t$.  Note that the location of the $d$ rows is time-dependent, a row may be deterministic at time $t$ but pick up a $w$ at time $t+1$ and thus be indirectly stochastic thereafter.  I am requiring that once a row becomes indirectly stochastic, it remains stochastic; rows are not allowed to flip back and forth between deterministic (no $w$ terms in them) and stochastic (containing a $w$ term).
+How do you determine the fully deterministic $\xx_t$ rows?  These are the rows of $\xx_t$ with no $w$ terms, from time $t$ or from prior $t$.  Note that the location of the fully deterministic rows is time-dependent, a row may be fully deterministic at time $t$ but pick up a $w$ at time $t+1$ and thus be indirectly stochastic thereafter.  I am requiring that once a row becomes indirectly stochastic, it remains stochastic; rows are not allowed to flip back and forth between deterministic (no $w$ terms in them) and stochastic (containing a $w$ term).
 
 I will work through an example and then show a general algorithm to keep track of the deterministic rows at time $t$.
 
 \subsubsection*{Example}
 
-Let $\xx_0=\xixi$ (so $\FF$ is all zero and $\xx_0$ is not stochastic).  Define $\II_t^{ds}$, $\II_t^{is}$, and $\II_t^d$ as diagonal indicator matrices with a 1 at $\II(i,i)$ if row $i$ is directly stochastic, indirectly stochastic, or deterministic respectively.  $\II_t^{ds}+\II_t^{is}+\II_t^d=\II_m$.  Let our state equation be $\xx_t=\BB\xx_{t-1}+\GG w_t$.
+Let $\xx_0=\xixi$ (so $\xx_0$ is not stochastic).  Define $\II_t^{ds}$, $\II_t^{is}$, and $\II_t^d$ as diagonal indicator matrices with a 1 at $\II(i,i)$ if row $i$ is directly stochastic, indirectly stochastic, or deterministic respectively.  $\II_t^{ds}+\II_t^{is}+\II_t^d=\II_m$.  Let our state equation be $\xx_t=\BB\xx_{t-1}+\GG w_t$.
 Let
 \begin{equation}
 \BB=\begin{bmatrix}
@@ -2493,14 +2499,14 @@ At $t=0$, $\xx_0$ is fixed, aka deterministic.
 \end{bmatrix}
 \end{equation}
 \begin{equation}
-\II_0^d=\begin{bmatrix}
+\II_{0,q}^d=\begin{bmatrix}
 1&0&0&0\\
 0&1&0&0\\
 0&0&1&0\\
 0&0&0&1
 \end{bmatrix}
 \quad
-\II_0^s=\II_0^{is}=\begin{bmatrix}
+\II_{0,q}^{ds}=\II_{0,q}^{is}=\begin{bmatrix}
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
@@ -2517,21 +2523,21 @@ At $t=1$, the $\xx_t$ begin picking up $w_t$ starting with $x_{1,t}$.
 \end{bmatrix}
 \end{equation}
 \begin{equation}
-\II_1^d=\begin{bmatrix}
+\II_{1,q}^d=\begin{bmatrix}
 0&0&0&0\\
 0&1&0&0\\
 0&0&1&0\\
 0&0&0&1
 \end{bmatrix}
 \quad
-\II_1^{ds}=\begin{bmatrix}
+\II_{1,q}^{ds}=\begin{bmatrix}
 1&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0
 \end{bmatrix}
 \quad
-\II_1^{is}=\begin{bmatrix}
+\II_{1,q}^{is}=\begin{bmatrix}
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
@@ -2548,21 +2554,21 @@ At $t=2$, $x_{2,2}$ picks up $w_1$ through $\BB$.
 \end{bmatrix}
 \end{equation}
 \begin{equation}
-\II_2^d=\begin{bmatrix}
+\II_{2,q}^d=\begin{bmatrix}
 0&0&0&0\\
 0&0&0&0\\
 0&0&1&0\\
 0&0&0&1
 \end{bmatrix}
 \quad
-\II_2^{ds}=\begin{bmatrix}
+\II_{2,q}^{ds}=\begin{bmatrix}
 1&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0
 \end{bmatrix}
 \quad
-\II_0^{is}=\begin{bmatrix}
+\II_{2,q}^{is}=\begin{bmatrix}
 0&0&0&0\\
 0&1&0&0\\
 0&0&0&0\\
@@ -2579,39 +2585,40 @@ By $t=3$, the $\II^{d}$ and $\II^{is}$ stabilize.
 \end{bmatrix}
 \end{equation}
 \begin{equation}
-\II_3^d=\begin{bmatrix}
+\II_{3,q}^d=\begin{bmatrix}
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&1
 \end{bmatrix}
 \quad
-\II_3^{ds}=\begin{bmatrix}
+\II_{3,q}^{ds}=\begin{bmatrix}
 1&0&0&0\\
 0&0&0&0\\
 0&0&0&0\\
 0&0&0&0
 \end{bmatrix}
 \quad
-\II_3^{is}=\begin{bmatrix}
+\II_{3,q}^{is}=\begin{bmatrix}
 0&0&0&0\\
 0&1&0&0\\
 0&0&1&0\\
 0&0&0&0
 \end{bmatrix}
 \end{equation}
-After time $t=3$ the location of the deterministic and indirectly stochastic rows is stabilized and no longer changes.  
+After $t=3$ the location of the deterministic and indirectly stochastic rows is stabilized and no longer changes.  
 
-\subsubsection*{Finding the indirectly stochastic rows}
+\subsubsection*{Specifying a connectivity or adjacency matrix}
 
-In general, it can take up to $m$ time steps for the location of the deterministic rows to stabilize.  This is because $\BB_t$ is like an adjacency matrix, and I require that the location of the 0 elements in $\BB_1\BB_2\dots\BB_t$ is time invariant. If we replace all non-zero elements in $\BB_t$ with 1, then we have an adjacency matrix, let's call it $\MM$.  If there is a path in $\MM$ from $x_{j,t}$, where $j$ is a $(0)$ row of $\xx$, to an $x_{i,t}$, where $i$ is a $(+)$ row, then row $j$ of $\xx$ will eventually be indirectly stochastic. Graph theory tells us that it takes at most $m$ steps for a $m \times m$ adjacency matrix to show full connectivity. This means that if element $(j,i)$ is 0 in $M^m$ then row $j$ is not connected to row $i$ by any path and thus will remain unconnected for $M^{t>m}$; note element $i,j$ can be 0 while $j,i$ is not.
+In general, it can take up to $m$ time steps for the location of the deterministic rows to stabilize.  This is because $\BB_t$ is like an adjacency matrix, and I require that the location of the 0 elements in $\BB_1\BB_2\dots\BB_t$ is time invariant. If we replace all non-zero elements in $\BB_t$ with 1, then we have an adjacency matrix, let's call it $\MM$.  If there is a path in $\MM$ from $x_{j,t}$, where $j$ is a $(0)$ row of $\xx$, to an $x_{i,t}$, where $i$ is a $(+)$ row, then row $j$ of $\xx$ will eventually be indirectly stochastic. Graph theory tells us that it takes at most $m$ steps for a $m \times m$ adjacency matrix to show full connectivity. This means that if element $(j,i)$ is 0 in $M^m$ then row $j$ is not connected to row $i$ by any path and thus will remain unconnected for $\MM^{t>m}$; note element $i,j$ can be 0 while $j,i$ is not.
 
-This means that to determine if $x_{j,t}$, in the $(0)$ rows, is indirectly stochastic, we raise $\MM$, to the $t$ power and look if there is a non-zero value in the $j$-th row and any $(+)$ columns of $\MM^t$.  In words, we looking for a path from $x_{j,t}$ to any $x_{+}$ in the past. We do not need to do this past $t=m$ since the location of the indirectly stochastic and deterministic rows stabilize by then.
+This means that to determine if $x_{j,t}$, in the $(0)$ rows, is indirectly stochastic at time $t$, we raise $\MM$, to the $t$ power and look if there is a non-zero value in the $j$-th row and any $(+)$ columns of $\MM^t$.  In words, we looking for a path from $x_{j,t}$ to any $x_{+}$ in the past. We do not need to do this past $t=m$ since the location of the indirectly stochastic and deterministic rows stabilize by then.
 
 Since my $\BB_t$ matrices are small, I use an  inefficient strategy in the MARSS code to construct the indicator matrices $\II_d^t$.  I define $\MM$ as $\BB_t$ with the non-zero $\BB$ replaced with 1; I require that the location of the non-zero elements in $\BB_t$ are time-invariant so there is only one $\MM$.  Within the product $\MM^t$, those rows where only 0s appear in the 'stochastic' columns (non-zero $\GG_t$ rows) are the fully deterministic $\xx_{t+1}$ rows. Note, $t+1$ so one time step ahead.  There are much faster algorithms for finding paths, but my $\MM$ tend to be small.  Also, unfortunately, using $\BB^t$ in place of $\MM^t$ is not robust. Let's say $\BB=\bigl[ \begin{smallmatrix}-1&-2\\ 1&1\end{smallmatrix} \bigr]$, $\GG=\bigl[ \begin{smallmatrix}1\\ 0\end{smallmatrix} \bigr]$ and $\xx_0$ is fixed (not stochastic).
 $\BB^2$ is a diagonal matrix suggesting that no connection between $x_2$ and $x_1$ at time $t=2$. That is incorrect. $x_{2,t}$ is indirectly stochastic.
 
 \subsubsection{Redefining the $\xx_t^d$ elements in the likelihood}
+
 Because the deterministic rows of $\xx_t$ do not appear in the $\xx$ part of the likelihood (no error term = no likelihood), we have to move them into the $\yy$ part of the likelihood. To do that we need to re-write them in terms of only model parameters and remove all $\xx_{t-1}$ terms. This section walks through how to do that.
 
 By definition, all the $\BB_t$ elements in the $ds$ and $is$ columns of the $d$ rows of $\BB_t$ are 0. If they weren't, then $\xx_t^d$ wouldn't be a deterministic row because it would pick up a $w$ from a directly or indirectly stochastic $x$ from a prior $t-1$.  This is due to the constraint that I have imposed that locations of 0s in $\BB_t$ are time-invariant and the location of the zero rows in $\GG_t$ also time-invariant: $\II_q^{+}$ and $\II_q^{(0)}$ are time-constant. 
@@ -2715,22 +2722,23 @@ The messy part is keeping track of which rows are deterministic because this wil
 We can rewrite the function for $\xx_t^d$, where $t_0$ is the $t$ at which the initial state is defined.  It is either $t=0$ or $t=1$.
 \begin{equation} \label{eq:xt.det.sum2}
 \begin{split}
-\xx_t^d &= \II_t^d(\BB^*_t\xx_{t_0} + \ff^*_t +\DD^*_t\uupsilon) \\
+\xx_t^d &= \II_{t,q}^d(\BB^*_t\pipi + \ff^*_t +\DD^*_t\uupsilon) \\
 \text{where}&\\
 \BB^*_{t_0} &= \II_m \\
-\BB^*_{t} &=\BB_t\BB^*_{t-1}\quad t > t_0 \\ 
+\BB^*_{t} &=\BB_t\BB^*_{t-1}\quad\quad t > t_0 \\ 
 \\
 \ff^*_{t_0} &= 0 \\
-\ff^*_t &=\BB_t\ff^*_{t-1} + \ff_{t,u}\quad t > t_0\\ 
+\ff^*_t &=\BB_t\ff^*_{t-1} + \ff_{t,u}\quad\quad t > t_0\\ 
 \\
 \DD^*_{t_0} &= 0 \\
-\DD^*_t &= \BB_t\DD^*_{t-1}  + \DD_{t,u}\quad t > t_0\\ 
+\DD^*_t &= \BB_t\DD^*_{t-1}  + \DD_{t,u}\quad\quad t > t_0\\ 
 \\
-\II_{q,t_0}^d&=\II_\lambda^d\\
-\text{diag}(\II_{t_0+\tau}^d)&=\text{apply}(\OMG_q^{(0)}\MM^\tau\OMG_q^+ == 0, 1, \text{all}) 
+\II_{t_0,q}^d&=\II_m \\
+\II_{t_0+1,q}^d&=\II_q^+ \\
+\text{diag}(\II_{t,q}^d)&= \II_{q}^{(0)} diag(\MM^{(t-t_0-1)}(\OMG_q^+)^\top 1_{p \times 1} == 0) \quad\quad t > t_0 + 1
 \end{split}
 \end{equation}
-The bottom line is written in R: $\II_{t_0+\tau}^d$ is a diagonal matrix with a 1 at $(i,i)$ where row $i$ of $\GG$ is all 0 and all $ds$ and $is$ columns in row $i$ of $\MM^t$ are equal to zero.
+The bottom line means $\II_{t,q}^d$ ($t > t_0 + 1$) is a diagonal matrix with a 0 at all the $(+)$ rows and for the $(0)$ rows, has a 1 at $(i,i)$ if the $i$-th row of $\MM^{(t-t_0)}(\OMG_q^+)^\top$ is all zero. That means there has been no connection ($w$ picked up) between the $i$-th row and any $(+)$ row.
 
 In the expected log-likelihood, the term $\E[\XX_t^d]=\E[\XX_t^d|\YY=\yy]$, meaning the expected value of $\XX_t^d$ conditioned on the data, appears. Thus in the expected log-likelihood the function will be written:
 \begin{equation}
