@@ -2,7 +2,7 @@
 name: Questions or other issues
 about: Issues for questions or other issues
 title: ''
-labels: ''
+labels: 'question'
 assignees: ''
 
 ---
