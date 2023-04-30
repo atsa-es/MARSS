@@ -123,14 +123,15 @@ MARSSoptim <- function(MLEobj) {
   }
 
   kf.function <- MLEobj$fun.kf # used for printing
-  optim.output <- try(optim(pars, neglogLik, MLEobj = tmp.MLEobj, method = optim.method, lower = lower, upper = upper, control = optim.control, hessian = FALSE), silent = TRUE)
+  opt1 <- nlminb(pars, neglogLik, MLEobj = tmp.MLEobj, lower = lower, upper = upper, control = list(iter.max = 2000, eval.max = 2000))
+  optim.output <- try(optim(opt1$par, neglogLik, MLEobj = tmp.MLEobj, method = optim.method, lower = lower, upper = upper, control = optim.control, hessian = FALSE), silent = TRUE)
 
   if (inherits(optim.output, "try-error")) { # try MARSSkfss if the user did not use it
     if (MLEobj$fun.kf != "MARSSkfss") { # if user did not request MARSSkf
       cat("MARSSkfas returned error.  Trying MARSSkfss.\n")
       tmp.MLEobj$fun.kf <- "MARSSkfss"
       kf.function <- "MARSSkfss" # used for printing
-      optim.output <- try(optim(pars, neglogLik, MLEobj = tmp.MLEobj, method = optim.method, lower = lower, upper = upper, control = optim.control, hessian = FALSE), silent = TRUE)
+      optim.output <- try(optim(opt1$pars, neglogLik, MLEobj = tmp.MLEobj, method = optim.method, lower = lower, upper = upper, control = optim.control, hessian = FALSE), silent = TRUE)
     }
   }
 
