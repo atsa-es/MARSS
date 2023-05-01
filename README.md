@@ -2,11 +2,11 @@
 <ul>
   <li><a href="#about-marss">About MARSS</a></li>
   <li><a href="#install">Install</a></li>
-  <li><a href="#documentation">Documentation</a></li>
+  <li><a href="#documentation-and-tutorials">Documentation and Tutorials</a></li>
   <li><a href="https://github.com/atsa-es/MARSS/issues">Issues</a></li>
   <li><a href="#citation">Citation</a></li>
   <li><a href="#publications">Publications</a></li>
-  <li><a href="#noaa-disclaimer">License</a></li>
+  <li><a href="https://github.com/atsa-es/MARSS/blob/master/License.md">License</a></li>
   <li><a href="https://atsa-es.github.io/MARSS/NEWS.html">NEWS</a></li>
 </ul>
 
