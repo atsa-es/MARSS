@@ -1,18 +1,39 @@
-### Navigation
-<ul>
-  <li><a href="#about-marss">About MARSS</a></li>
+<style>
+.nav{
+    border:1px solid #ccc;
+    border-width:1px 0;
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:center;
+}
+.nav ul{
+    margin-before: 1em;
+    margin-after: 1em;
+    margin-start: 0;
+    margin-end: 0;
+    padding:0;
+}
+.nav li{
+    display:inline-block;
+}
+.nav a{
+    display:inline-block;
+    padding:5px;
+}
+</style>
+
+<ul class="nav">
   <li><a href="#install">Install</a></li>
-  <li><a href="#documentation-and-tutorials">Documentation and Tutorials</a></li>
+  <li><a href="#documentation">Documentation</a></li>
   <li><a href="https://github.com/atsa-es/MARSS/issues">Issues</a></li>
-  <li><a href="#citation">Citation</a></li>
-  <li><a href="#publications">Publications</a></li>
-  <li><a href="https://github.com/atsa-es/MARSS/blob/master/License.md">License</a></li>
+  <li><a href="#cite">Citation</a></li>
+  <li><a href="#pubs">Publications</a></li>
+  <li><a href="#license">License</a></li>
   <li><a href="https://atsa-es.github.io/MARSS/NEWS.html">NEWS</a></li>
 </ul>
 
 <img src='man/figures/logo.png' align="right" height="139" style="margin:15px 10px"/>
-
-### About MARSS
 
 MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package is an R package for estimating the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates to multivariate time-series data via maximum-likelihood using primarily an EM algorithm.
 
@@ -23,7 +44,7 @@ MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS package 
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
 
 
-### INSTALL
+### INSTALL {#install}
 
 To install MARSS from CRAN:
 
@@ -53,7 +74,7 @@ Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS=TRUE)
 ```
 To install an R package from GitHub, you need to be able to build an R package on your machine. If you are on Windows, that means you may need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). In more recent versions of R, it seems like the Rtools dependency for Windows users has been removed, so try installing. If you get an error about no gcc installation, it means you need Rtools. On a Mac, installation should work fine; you do not need to install anything.
 
-### DOCUMENTATION and TUTORIALS
+### DOCUMENTATION and TUTORIALS  {#documentation}
 
 - [Quick Start Guide](https://CRAN.R-project.org/package=MARSS/vignettes/Quick_Start.pdf).
 - [User Manual](https://CRAN.R-project.org/package=MARSS/vignettes/UserGuide.pdf) - The extensive user manual included in the package has many examples of how to fit MARSS models to a variety of data sets.
@@ -62,11 +83,11 @@ To install an R package from GitHub, you need to be able to build an R package o
 - [Wiki](https://atsa-es.github.io/MARSS-wiki/) - The MARSS wiki has misc and random projects and code.
 
 
-### ISSUES and BUG REPORTS
+### ISSUES and BUG REPORTS {#bugs}
 
 Issues? [https://github.com/atsa-es/MARSS/issues](https://github.com/atsa-es/MARSS/issues)
 
-### CITATION
+### CITATION  {#cite}
 
 If you use MARSS results in publications, please cite the primary citation:
 
@@ -81,7 +102,7 @@ Holmes, E. E., M. D. Scheuerell, and E. J. Ward (", year, ") Analysis of multiva
   
 Type `citation("MARSS")` at the command line to get the most up to data citations.
 
-### PUBLICATIONS
+### PUBLICATIONS {#pubs}
 
 To see our publications using MARSS models, see the [Applied Time Series Analysis website](https://atsa-es.github.io/).
 
