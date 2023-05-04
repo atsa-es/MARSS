@@ -2,6 +2,14 @@
 output: html_document
 ---
 
+# MARSS 3.11.4 (GitHub)
+
+This release is focused on adding new method `method="TMB"` which uses the package {marssTMB}.
+
+## OTHER
+
+* Allow `toLatex()` to output the raw tex so that it can directly go into RMarkdown or Quarto.
+
 # MARSS 3.11.4 (released 2021-12-15 on CRAN)
 
 This release is focused on improving the plotting functions for marssMLE, marssResiduals and marssPredict objects. The website links also needed to be updated to the new GitHub organization home for MARSS (and the other ATSA material): [atsa-es](https://atsa-es.github.io).
