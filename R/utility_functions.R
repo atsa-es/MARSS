@@ -119,6 +119,11 @@ is.identity <- function(x, dim = NULL) {
 }
 
 is.validvarcov <- function(x, method = "kem") {
+  kem.methods <- get("kem.methods", envir = pkg_globals)
+  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
+  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
+  varcov_is_constrained <- method %in% c(MARSSoptim.methods, MARSStmb.methods)
+  
   # works on numeric and list matrices
   # x must be 2D matrix; is.matrix returns false for 3D array
   if (!is.matrix(x)) {
@@ -185,10 +190,10 @@ is.validvarcov <- function(x, method = "kem") {
       if (!(all(unlist(lapply(vals, is.numeric))) | all(unlist(lapply(vals, is.character))))) {
         return(list(ok = FALSE, error = "numeric (fixed) and estimated values cannot mixed within blocks in a varcov matrix "))
       }
-      # if method="BFGS", then blocks must be diagonal or block unconstrained, if estimated
-      if (method == "BFGS" & is.character(vals[[1]])) { # only test first since all the same class
+      # if optim() or nlminb() are used, then blocks must be diagonal or block unconstrained, if estimated
+      if (varcov_is_constrained & is.character(vals[[1]])) { # only test first since all the same class
         if (any(duplicated(unlist(vals)))) {
-          return(list(ok = FALSE, error = "when method=BFGS, blocks in var-cov matrices much either be diagonal (shared values allowed) or unconstrained (no shared values) "))
+          return(list(ok = FALSE, error = "when optim() or nlminb() are used, blocks in var-cov matrices must either be fixed, diagonal (shared values allowed) or unconstrained (no shared values) "))
         }
       }
       # if the block is numeric, it must be positive definite

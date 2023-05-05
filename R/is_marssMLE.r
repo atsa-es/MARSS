@@ -120,8 +120,8 @@ is.marssMLE <- function(MLEobj) {
     control <- MLEobj[["control"]]
     en <- names(alldefaults[[MLEobj[["method"]]]][["control"]])
     ok.null <- c(
-      "REPORT", "reltol", "fnscale", "parscale", "ndeps", "alpha", "beta", "gamma", "type", "lmm", "factr",
-      "pgtol", "tmax", "temp", "lower", "upper"
+      "REPORT", "reltol", "fnscale", "parscale", "ndeps", "alpha", "beta", "gamma", "type", "lmm", "factr", "pgtol", "tmax", "temp", "lower", "upper",
+      "abs.tol", "rel.tol", "x.tol", "xf.tol", "step.min", "step.max", "sing.tol", "scale.init", "diff.g"
     )
     for (el in en) {
       null.flag <- (is.null(control[[el]]) && !(el %in% ok.null)) # those in ok.null can be NULL
@@ -129,12 +129,12 @@ is.marssMLE <- function(MLEobj) {
 
       if (!is.null(control[[el]])) {
         # everything must be numeric except these
-        if (el %in% en[!(en %in% c("safe", "allow.degen", "demean.states", "sparse"))]) {
+        if (el %in% en[!(en %in% c("safe", "allow.degen", "demean.states", "sparse", "tmb.silent"))]) {
           null.flag <- (!is.numeric(control[[el]]))
           if (null.flag) msg <- c(msg, paste("control list element", el, "is non-numeric\n"))
         }
         # everything must be positive or 0 except these
-        if ((el %in% en[!(en %in% c("safe", "trace", "allow.degen", "demean.states", "sparse"))]) && is.numeric(control[[el]])) {
+        if ((el %in% en[!(en %in% c("safe", "trace", "allow.degen", "demean.states", "sparse", "tmb.silent"))]) && is.numeric(control[[el]])) {
           null.flag <- (control[[el]] <= 0)
           if (null.flag) msg <- c(msg, paste("control list element", el, "less than or equal to zero\n"))
         }
@@ -158,7 +158,7 @@ is.marssMLE <- function(MLEobj) {
           null.flag <- (control[[el]] < 2)
           if (null.flag) msg <- c(msg, "control list element conv.test.deltaT must be greater than 2\n")
         }
-        if (el %in% c("safe", "allow.degen", "demean.states", "sparse")) {
+        if (el %in% c("safe", "allow.degen", "demean.states", "sparse", "tmb.silent")) {
           null.flag <- !(control[[el]] %in% c(TRUE, FALSE))
           if (null.flag) msg <- c(msg, paste("control list element", el, "is not TRUE or FALSE\n"))
         }
