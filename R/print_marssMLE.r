@@ -4,8 +4,8 @@
 print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., what = "fit", form = NULL, silent = FALSE) {
   # load needed package globals
   kem.methods <- get("kem.methods", envir = pkg_globals)
-  optim.methods <- get("optim.methods", envir = pkg_globals)
-
+  optim.methods <- c(get("optim.methods", envir = pkg_globals), get("nlminb.methods", envir = pkg_globals))
+  
   # Check that x has a marssMODEL object
   if (!inherits(x$model, "marssMODEL")) {
     cat("\nThe model element of your marssMLE object is not class marssMODEL.\n")
@@ -125,7 +125,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         if (x$method %in% kem.methods) tmp.msg <- paste("Neither abstol nor log-log convergence test were passed.\n", sep = "") else tmp.msg <- ""
         cat(
           "WARNING: maxit reached at ", x$control$maxit, " iter before convergence.\n", tmp.msg,
-          "The likelihood and params are not at the ML values.\n",
+          "The likelihood and params are not at the MLE values.\n",
           "Try setting control$maxit higher.\n"
         )
       }

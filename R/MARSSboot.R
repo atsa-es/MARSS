@@ -28,8 +28,9 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
 
   # load needed package globals
   kem.methods <- get("kem.methods", envir = pkg_globals)
-  optim.methods <- get("optim.methods", envir = pkg_globals)
-
+  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
+  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
+  
   ###### Error-checking on the arguments
   msg <- NULL
   if (!is.numeric(nboot)) {
@@ -50,8 +51,8 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
   if (FALSE %in% (silent %in% c(TRUE, FALSE))) {
     msg <- c(msg, " Incorrect function arg. silent must be TRUE or FALSE")
   }
-  if (!(MLEobj$method %in% c(kem.methods, optim.methods))) {
-    msg <- c(msg, " MLE object method must be a kem or optim method.")
+  if (!(MLEobj$method %in% allowed.methods)) {
+    msg <- c(msg, paste0(" MLE object method must be in ", paste0(allowed.methods, collapse = ", "), "."))
   }
   if (!is.null(msg)) {
     cat("\n", "Errors were caught in MARSSboot \n", msg, sep = "")
@@ -180,7 +181,8 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
         newmod[["data"]] <- array(boot.data[, , i], dim = dim(boot.data)[1:2], dimnames = dimnames(marss.model$data))
         mle.object[["marss"]] <- newmod # we are resetting the marss object
         if (mle.object[["method"]] %in% kem.methods) boot.model <- MARSSkem(mle.object)
-        if (mle.object[["method"]] %in% optim.methods) boot.model <- MARSSoptim(mle.object)
+        if (mle.object[["method"]] %in% MARSSoptim.methods) boot.model <- MARSSoptim(mle.object)
+        if (mle.object[["method"]] %in% MARSStmb.methods) boot.model <- marssTMB::MARSStmb(mle.object)
         boot.params[, i] <- MARSSvectorizeparam(boot.model)
       } # if MLE
 

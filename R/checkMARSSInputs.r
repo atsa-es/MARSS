@@ -71,7 +71,7 @@ checkMARSSInputs <- function(MARSS.inputs, silent = FALSE) {
       } else {
         extra.msg <- ""
       }
-      stop(paste("\nStopped in checkMARSSInputs(): elements ", bad.name, " is not allowed in arg ", el, " (misspelled?).\n", extra.msg, sep = ""), call. = FALSE)
+      stop(paste("\nStopped in checkMARSSInputs(): elements ", bad.name, " is not allowed in arg ", el, " for method ", MARSS.inputs$method, ". Misspelled?.\n", extra.msg, sep = ""), call. = FALSE)
     }
     # set defaults for any req elements that were not passed in
     passed.in <- (names(defaults[[el]]) %in% names(tmp))

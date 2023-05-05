@@ -3,7 +3,7 @@
 # S3method(toLatex, marssMODEL)
 # S3method(toLatex, marssMLE)
 #############################################
-toLatex.marssMLE <- function(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE) {
+toLatex.marssMLE <- function(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", math.sty = "amsmath", output = c("pdf", "tex", "rawtex"), replace = TRUE, simplify = TRUE) {
   toLatex.marssMODEL(object$model, ..., file = file, digits = digits, greek = greek, orientation = orientation, math.sty = math.sty, output = output, replace = replace, simplify = simplify)
 }
 toLatex.marssMODEL <- function(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE) {
@@ -197,6 +197,7 @@ toLatex.marssMODEL <- function(object, ..., file = NULL, digits = 2, greek = TRU
     all.t.eqn.tex <- c(all.t.eqn.tex, eqn.head, eqn.tex, eqn.foot)
   } # over all t for which we should print
 
+  if(output=="rawtex") return(all.t.eqn.tex)
 
   ##############################################################
   # Create the latex file

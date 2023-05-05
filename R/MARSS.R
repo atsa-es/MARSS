@@ -10,12 +10,19 @@ MARSS <- function(y,
                   fun.kf = c("MARSSkfas", "MARSSkfss"),
                   ...) {
   # If user did not pass in fun.kf, then MARSSkfas will be used by default. MARSSkfss will be tried if that fails
+  pkg <- "MARSS"
   if (missing(fun.kf)) missing.fun.kf <- FALSE else missing.fun.kf <- TRUE
   fun.kf <- match.arg(fun.kf)
+  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
+  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
   allowed.methods <- get("allowed.methods", envir = pkg_globals)
   # Some error checks depend on an allowable method
   if (!method %in% allowed.methods) {
     stop(paste("method must be one of:", allowed.methods))
+  }
+  if (method %in% MARSStmb.methods) {
+    if(length(find.package("marssTMB", quiet = TRUE)) == 0)
+      stop(paste0(pkg, ": If you want to use TMB, please install marssTMB from https://atsa-es.github.io/marssTMB/\nWe will including TMB in MARSS() in the next CRAN release."))
   }
   ## Start by checking the data, since if the data have major problems then the rest of the code
   ## will have problems
@@ -38,8 +45,8 @@ MARSS <- function(y,
   if (any(is.nan(y))) cat("MARSS: NaNs in data are being replaced with NAs.  There might be a problem if NaNs shouldn't be in the data.\nNA is the normal missing value designation.\n")
   y[is.na(y)] <- as.numeric(NA)
 
-  if (inherits(model, "marssMLE")) model <- c(coef(model, type = "matrix"), tinitx=model$model$tinitx, diffuse=model$model$diffuse)
-  if (inherits(model, "marssMODEL")) model <- c(marssMODEL.to.list(model), tinitx=model$tinitx, diffuse=model$diffuse)
+  if (inherits(model, "marssMLE")) model <- c(coef(model, type = "matrix"), tinitx = model$model$tinitx, diffuse = model$model$diffuse)
+  if (inherits(model, "marssMODEL")) model <- c(marssMODEL.to.list(model), tinitx = model$tinitx, diffuse = model$diffuse)
 
   MARSS.call <- list(data = y, inits = inits, model = model, control = control, method = method, form = form, silent = silent, fit = fit, fun.kf = fun.kf, ...)
 
@@ -97,8 +104,7 @@ MARSS <- function(y,
   ## MLE estimation
   kem.methods <- get("kem.methods", envir = pkg_globals)
   optim.methods <- get("optim.methods", envir = pkg_globals)
-  if (method %in% c(kem.methods, optim.methods)) {
-
+  if (method %in% allowed.methods) {
     ## Create the marssMLE object
 
     MLEobj <- list(marss = marss.object, model = MARSS.inputs$model, control = c(MARSS.inputs$control, silent = silent), method = method, fun.kf = fun.kf)
@@ -132,10 +138,9 @@ MARSS <- function(y,
       MLEobj$convergence <- 2
       return(MLEobj)
     }
-    
+
     # MLEobj is ok.
-    
-    if (!fit){
+    if (!fit) {
       # will be set to 3 if all fixed
       MLEobj$convergence <- -1
     }
@@ -148,15 +153,15 @@ MARSS <- function(y,
       MLEobj$convergence <- 3
       MLEobj$par <- list()
       for (el in attr(MLEobj[["marss"]], "par.names")) MLEobj[["par"]][[el]] <- matrix(0, 0, 1)
-      kf.out <- try(MARSSkf(MLEobj, only.logLik=TRUE), silent = TRUE)
-      if (inherits(kf.out, "try-error")){
+      kf.out <- try(MARSSkf(MLEobj, only.logLik = TRUE), silent = TRUE)
+      if (inherits(kf.out, "try-error")) {
         MLEobj$convergence <- 53
         MLEobj$logLik <- NA
-      }else{
+      } else {
         # rest of the output will be added below
         MLEobj$logLik <- kf.out$logLik
         kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
-        if (inherits(kf.out, "try-error")){
+        if (inherits(kf.out, "try-error")) {
           MLEobj$convergence <- 54
         }
       }
@@ -197,104 +202,105 @@ MARSS <- function(y,
         return(MLEobj.test)
       }
     }
-    
+
     # fit and not all parameters estimated
     if (fit && !model.is.fixed) {
-        if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
-        ## Fit and add param estimates to the object
-        if (method %in% kem.methods) {
-          MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
-          if (inherits(MLEobj, "try-error")) {
-            cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
-            MLEobj.test$convergence <- 2
-            return(MLEobj.test)
-          }
+      if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
+      ## Fit and add param estimates to the object
+      if (method %in% kem.methods) {
+        MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
+        if (inherits(MLEobj, "try-error")) {
+          cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
+          MLEobj.test$convergence <- 2
+          return(MLEobj.test)
         }
-        if (method %in% optim.methods) MLEobj <- MARSSoptim(MLEobj)
       }
+      if (method %in% MARSSoptim.methods) MLEobj <- MARSSoptim(MLEobj)
+      if (method %in% MARSStmb.methods) MLEobj <- marssTMB::MARSStmb(MLEobj)
+    }
 
-      ## Add AIC and AICc and coef to the object
-      ## Return as long as $par element and there are no errors, but might not be converged
-      if ((MLEobj$convergence %in% c(0, 1, 3, 54)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
-        if (silent == 2) cat("Adding AIC and coefficients.\n")
-        MLEobj <- MARSSaic(MLEobj)
-        MLEobj$coef <- coef(MLEobj, type = "vector")
+    ## Add AIC and AICc and coef to the object
+    ## Return as long as $par element and there are no errors, but might not be converged
+    if ((MLEobj$convergence %in% c(0, 1, 3, 54)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
+      if (silent == 2) cat("Adding AIC and coefficients.\n")
+      MLEobj <- MARSSaic(MLEobj)
+      MLEobj$coef <- coef(MLEobj, type = "vector")
+    }
+
+    ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
+    if (MLEobj$convergence %in% c(0, 1, 3) || (MLEobj$convergence %in% c(10, 11) && MLEobj$method %in% kem.methods)) {
+      if (silent == 2) cat("Adding states and states.se.\n")
+      kf <- MARSSkf(MLEobj) # use function requested by user; default smoother=TRUE
+      MLEobj$states <- kf$xtT
+      MLEobj$logLik <- kf$logLik
+      if (!is.null(kf[["VtT"]])) {
+        m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
+        TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
+        states.se <- apply(kf[["VtT"]], 3, function(x) takediag(x))
+        # KFS
+        if (any(states.se < 0 & states.se > -1 * sqrt(.Machine$double.eps))) {
+          states.se[states.se < 0 & states.se > -1 * sqrt(.Machine$double.eps)] <- 0
+          MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values close to machine tolerance on diagonal of VtT and the states.se values for these are set to 0. You may want to use", ifelse(MLEobj$fun.kf == "MARSSkfas", "MARSSkfss()", "MARSSkfas()"), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
+        }
+        if (any(states.se < 0)) {
+          states.se[states.se < 0] <- NA
+          MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values on diagonal of VtT and the states.se values for these are set to NA. You may want to use", ifelse(MLEobj$fun.kf == "MARSSkfas", "MARSSkfss()", "MARSSkfas()"), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
+        }
+        states.se <- sqrt(states.se)
+        if (m == 1) states.se <- matrix(states.se, 1, TT)
+        rownames(states.se) <- attr(MLEobj$marss, "X.names")
+      } else {
+        states.se <- NULL
       }
+      MLEobj[["states.se"]] <- states.se
+      Ey <- MARSShatyt(MLEobj)
+      MLEobj$ytT <- Ey[["ytT"]]
+      if (!is.null(Ey[["OtT"]])) {
+        n <- attr(MLEobj$marss, "model.dims")[["y"]][1]
+        TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
+        if (n == 1) yy <- matrix(Ey[["OtT"]][, , 1:TT], nrow = 1)
+        if (n > 1) {
+          yy <- apply(Ey[["OtT"]], 3, function(x) {
+            takediag(x)
+          })
+        }
+        ytT.se <- sqrt(yy - MLEobj$ytT^2)
+        rownames(ytT.se) <- attr(MLEobj$marss, "Y.names")
+      } else {
+        ytT.se <- NULL
+      }
+      MLEobj$ytT.se <- ytT.se
 
-      ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
-      if (MLEobj$convergence %in% c(0, 1, 3) || (MLEobj$convergence %in% c(10, 11) && MLEobj$method %in% kem.methods)) {
-        if (silent == 2) cat("Adding states and states.se.\n")
-        kf <- MARSSkf(MLEobj) # use function requested by user; default smoother=TRUE
-        MLEobj$states <- kf$xtT
-        MLEobj$logLik <- kf$logLik
-        if (!is.null(kf[["VtT"]])) {
-          m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
-          TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
-          states.se <- apply(kf[["VtT"]], 3, function(x) takediag(x))
-          # KFS 
-          if( any(states.se < 0 & states.se > -1*sqrt(.Machine$double.eps)) ){
-            states.se[states.se < 0 & states.se > -1*sqrt(.Machine$double.eps)] <- 0
-            MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values close to machine tolerance on diagonal of VtT and the states.se values for these are set to 0. You may want to use", ifelse(MLEobj$fun.kf=='MARSSkfas', 'MARSSkfss()', 'MARSSkfas()'), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
-          } 
-          if( any(states.se < 0) ){
-            states.se[states.se < 0] <- NA
-            MLEobj$errors <- c(MLEobj$errors, paste("\nAlert:", MLEobj$fun.kf, "returned negative values on diagonal of VtT and the states.se values for these are set to NA. You may want to use", ifelse(MLEobj$fun.kf=='MARSSkfas', 'MARSSkfss()', 'MARSSkfas()'), "to compute the states standard errors (states.se). See MARSSinfo('negVt') for insight.\n"))
-          } 
-          states.se <- sqrt(states.se)
-          if (m == 1) states.se <- matrix(states.se, 1, TT)
-          rownames(states.se) <- attr(MLEobj$marss, "X.names")
+      # Return kf and Ey, if trace = 1
+      if (MLEobj$control$trace > 0) {
+        if (fun.kf == "MARSSkfas") {
+          kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
+          if (inherits(kfss, "try-error") || !kfss$ok) {
+            msg <- "Not available. MARSSkfss() returned error."
+            kfss <- list(Innov = msg, Sigma = msg, J = msg, Kt = msg)
+          }
         } else {
-          states.se <- NULL
+          kfss <- kf
         }
-        MLEobj[["states.se"]] <- states.se
-        Ey <- MARSShatyt(MLEobj)
-        MLEobj$ytT <- Ey[["ytT"]]
-        if (!is.null(Ey[["OtT"]])) {
-          n <- attr(MLEobj$marss, "model.dims")[["y"]][1]
-          TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
-          if (n == 1) yy <- matrix(Ey[["OtT"]][, , 1:TT], nrow = 1)
-          if (n > 1) {
-            yy <- apply(Ey[["OtT"]], 3, function(x) {
-              takediag(x)
-            })
-          }
-          ytT.se <- sqrt(yy - MLEobj$ytT^2)
-          rownames(ytT.se) <- attr(MLEobj$marss, "Y.names")
+        MLEobj$kf <- kf # from above will use function requested by user
+        MLEobj$Ey <- Ey # from above
+        # these are only returned by MARSSkfss
+        MLEobj$Innov <- kfss$Innov
+        MLEobj$Sigma <- kfss$Sigma
+        MLEobj$J <- kfss$J
+        MLEobj$Kt <- kfss$Kt
+        if (fun.kf == "MARSSkfss") {
+          MLEobj$J0 <- kfss$J0
         } else {
-          ytT.se <- NULL
+          # From kfss smoother so won't be available if fun.kf=MARSSkfas
+          # Line above used smoother = FALSE; here smoother = TRUE
+          J0 <- try(MARSSkfss(MLEobj), silent = TRUE)
+          if (!inherits(J0, "try-error") && J0$ok) MLEobj$J0 <- J0$J0 else MLEobj$J0 <- "Not available. MARSSkfss() smoother returned error."
         }
-        MLEobj$ytT.se <- ytT.se
-
-        # Return kf and Ey, if trace = 1
-        if (MLEobj$control$trace > 0) {
-          if (fun.kf == "MARSSkfas") {
-            kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
-            if (inherits(kfss, "try-error") || !kfss$ok) {
-              msg <- "Not available. MARSSkfss() returned error."
-              kfss <- list(Innov = msg, Sigma = msg, J = msg, Kt = msg)
-            }
-          } else {
-            kfss <- kf
-          }
-          MLEobj$kf <- kf # from above will use function requested by user
-          MLEobj$Ey <- Ey # from above
-          # these are only returned by MARSSkfss
-          MLEobj$Innov <- kfss$Innov
-          MLEobj$Sigma <- kfss$Sigma
-          MLEobj$J <- kfss$J
-          MLEobj$Kt <- kfss$Kt
-          if (fun.kf == "MARSSkfss") {
-            MLEobj$J0 <- kfss$J0
-          } else {
-            # From kfss smoother so won't be available if fun.kf=MARSSkfas
-            # Line above used smoother = FALSE; here smoother = TRUE
-            J0 <- try(MARSSkfss(MLEobj), silent = TRUE)
-            if (!inherits(J0, "try-error") && J0$ok) MLEobj$J0 <- J0$J0 else MLEobj$J0 <- "Not available. MARSSkfss() smoother returned error."
-          }
-        }
-        # apply X and Y names various X and Y related elements
-        MLEobj <- MARSSapplynames(MLEobj)
       }
+      # apply X and Y names various X and Y related elements
+      MLEobj <- MARSSapplynames(MLEobj)
+    }
     # END Adding info to output #################
 
     if ((!silent || silent == 2) && MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54)) {
@@ -303,11 +309,12 @@ MARSS <- function(y,
     if ((!silent || silent == 2) && !(MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
     } # 3 added since don't print if fit=FALSE
-    if ((!silent || silent == 2) && !fit) 
+    if ((!silent || silent == 2) && !fit) {
       print(MLEobj$model)
+    }
 
     return(MLEobj)
   } # end MLE methods
 
-  return("method allowed but it's not in kem.methods or optim.methods so marssMLE object was not created")
+  return("method allowed but it's not in kem.methods, optim.methods or nlminb.methods so marssMLE object was not created")
 }
