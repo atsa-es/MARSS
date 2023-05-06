@@ -216,7 +216,7 @@ MARSS <- function(y,
         }
       }
       if (method %in% MARSSoptim.methods) MLEobj <- MARSSoptim(MLEobj)
-      if (method %in% MARSStmb.methods) MLEobj <- marssTMB::MARSStmb(MLEobj)
+      if (method %in% MARSStmb.methods) MLEobj <- MARSStmb(MLEobj)
     }
 
     ## Add AIC and AICc and coef to the object
