@@ -1,6 +1,6 @@
 MARSStmb <- function(MLEobj) {
   
-out <- marssTMB::estimate_marss_parameters(MLEobj)
+out <- marssTMB::estimate_marss(MLEobj)
 obj1 <- out$obj
 opt1 <- out$opt
   
