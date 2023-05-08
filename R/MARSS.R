@@ -117,7 +117,7 @@ MARSS <- function(y,
     if (silent == 2) cat("Running MARSSinits() to set start conditions.\n")
     MLEobj$start <- MARSSinits(MLEobj, MARSS.inputs$inits)
 
-    class(MLEobj) <- "marssMLE"
+    class(MLEobj) <- c("marssMLE", method)
 
     ## Check the marssMLE object
     ## is.marssMLE() calls is.marssMODEL() to check the model,
@@ -208,15 +208,14 @@ MARSS <- function(y,
       if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
       ## Fit and add param estimates to the object
       if (method %in% kem.methods) {
-        MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
+        MLEobj <- try(MARSSfit(MLEobj), silent = TRUE)
         if (inherits(MLEobj, "try-error")) {
           cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
           MLEobj.test$convergence <- 2
           return(MLEobj.test)
         }
       }
-      if (method %in% MARSSoptim.methods) MLEobj <- MARSSoptim(MLEobj)
-      if (method %in% MARSStmb.methods) MLEobj <- MARSStmb(MLEobj)
+      MLEobj <- MARSSfit(MLEobj)
     }
 
     ## Add AIC and AICc and coef to the object

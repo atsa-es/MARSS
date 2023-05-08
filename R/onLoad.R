@@ -2,11 +2,11 @@
 .onLoad <- function(libname, pkgname) {
   assign("pkg_globals", new.env(), envir = parent.env(environment()))
 
-  kem.methods <- c("kem", "EM.KFAS", "EM.KFSS")
-  optim.methods <- c("BFGS", "BFGS.KFAS", "BFGS.KFSS", "BFGS.TMB")
-  nlminb.methods <- c("TMB", "nlminb.TMB")
-  MARSSoptim.methods <- c("BFGS", "BFGS.KFAS", "BFGS.KFSS")
-  MARSStmb.methods <- c("TMB", "nlminb.TMB", "BFGS.TMB")
+  kem.methods <- c("kem", "EM_KFAS", "EM_KFSS")
+  optim.methods <- c("BFGS", "BFGS_KFAS", "BFGS_KFSS", "BFGS_TMB")
+  nlminb.methods <- c("TMB", "nlminb_TMB")
+  MARSSoptim.methods <- c("BFGS", "BFGS_KFAS", "BFGS_KFSS")
+  MARSStmb.methods <- c("TMB", "nlminb_TMB", "BFGS_TMB")
   # specify what function is used for what method
   allowed.methods <- c(kem.methods, optim.methods, nlminb.methods)
   # These are arguments that are required/allowed for all forms
@@ -44,19 +44,19 @@
       lower = NULL, upper = NULL
     )
   )
-  alldefaults[["BFGS.KFAS"]] <- alldefaults[["BFGS.KFSS"]] <- alldefaults[["BFGS"]]
+  alldefaults[["BFGS_KFAS"]] <- alldefaults[["BFGS_KFSS"]] <- alldefaults[["BFGS"]]
     
   alldefaults[["TMB"]] <- 
-    alldefaults[["BFGS.TMB"]] <- 
-    alldefaults[["nlminb.TMB"]] <- alldefaults[["BFGS"]]
-  alldefaults[["BFGS.TMB"]][["control"]][["tmb.silent"]] <- TRUE
+    alldefaults[["BFGS_TMB"]] <- 
+    alldefaults[["nlminb_TMB"]] <- alldefaults[["BFGS"]]
+  alldefaults[["BFGS_TMB"]][["control"]][["tmb.silent"]] <- TRUE
   alldefaults[["TMB"]]$control <- # nlminb() control
     list(
     maxit = 5000, tmb.silent = TRUE, eval.max = 5000, iter.max = 5000, trace = 0, 
     abs.tol = NULL, rel.tol = NULL, x.tol = NULL, 
     xf.tol = NULL, step.min = NULL, step.max = NULL, 
     sing.tol = NULL)
-  alldefaults[["nlminb.TMB"]] <- alldefaults[["TMB"]]
+  alldefaults[["nlminb_TMB"]] <- alldefaults[["TMB"]]
   
   assign("alldefaults", alldefaults, pkg_globals)
 }

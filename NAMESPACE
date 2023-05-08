@@ -44,6 +44,14 @@ importFrom(KFAS, SSModel, SSMcustom, KFS)
 importFrom("grDevices", "contourLines")
 
 ## register S3 methods
+export(MARSSfit) # method
+S3method(MARSSfit, kem)
+S3method(MARSSfit, EM_KFAS)
+S3method(MARSSfit, EM_KFSS)
+S3method(MARSSfit, BFGS)
+S3method(MARSSfit, BFGS_KFAS)
+S3method(MARSSfit, BFGS_KFSS)
+
 S3method(print, marssMODEL)
 S3method(print, marssMLE)
 S3method(print, marssPredict)
