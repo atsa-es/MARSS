@@ -10,6 +10,7 @@ This release is focused on adding new method `method="TMB"` which uses the packa
 * Added more descriptive methods for kem and optim: "EM_KFAS", "EM_KFSS", "BFGS_KFAS", "BFGS_KFSS"
 * Added the defaults to `R/onLoad.R` and made it easier to specify new methods and constraints on methods
 * Made changes to `checkMARSSinputs.R`, `is_marssMLE.R` and `is.validvarcov()` so they are not so specific to `method="BFGS"` but work for any methods with similar constraints.
+* Export MARSSvectorizeparam. Need when writing methods for MARSSfit() generic.
 
 ## OTHER
 
