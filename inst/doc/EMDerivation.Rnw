@@ -1098,7 +1098,7 @@ $\aa=(\aa^\top \otimes \II_1)$ & \\
 \refstepcounter{equation}\label{eq:vec.Aa}
 $\vec(\AA\aa) = (\aa^\top \otimes \II_n)\vec(\AA) = \AA\aa$
 &\multirow{2}{*}{(\theequation)} \\
-$\vec(\AA\aa) = \AA\aa$ since $\AA\aa$ is itself an $m \times 1$ column vector. & \\
+$\vec(\AA\aa) = \AA\aa$ since $\AA\aa$ is itself an $n \times 1$ column vector. & \\
 \\
 \refstepcounter{equation}\label{eq:vec.AB}
 $\vec(\AA\BB) = (\II_p \otimes \AA)\vec(\BB) = (\BB^\top \otimes \II_n)\vec(\AA)$
