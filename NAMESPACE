@@ -21,6 +21,7 @@ export(
   MARSSresiduals,
   MARSSsimulate,
   MARSSFisherI,
+  MARSSvectorizeparam,
   zscore,
   ldiag,
   autoplot.marssMLE,
