@@ -160,6 +160,8 @@ MARSS <- function(y,
       } else {
         # rest of the output will be added below
         MLEobj$logLik <- kf.out$logLik
+        MLEobj <- MARSSaic(MLEobj)
+        MLEobj$coef <- coef(MLEobj, type = "vector")
         kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
         if (inherits(kf.out, "try-error")) {
           MLEobj$convergence <- 54
@@ -219,19 +221,15 @@ MARSS <- function(y,
     }
 
     ## Add AIC and AICc and coef to the object
-    ## Return as long as $par element and there are no errors, but might not be converged
-    if ((MLEobj$convergence %in% c(0, 1, 3, 54)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
-      if (silent == 2) cat("Adding AIC and coefficients.\n")
-      MLEobj <- MARSSaic(MLEobj)
-      MLEobj$coef <- coef(MLEobj, type = "vector")
-    }
-
     ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
     if (MLEobj$convergence %in% c(0, 1, 3) || (MLEobj$convergence %in% c(10, 11) && MLEobj$method %in% kem.methods)) {
-      if (silent == 2) cat("Adding states and states.se.\n")
-      kf <- MARSSkf(MLEobj) # use function requested by user; default smoother=TRUE
-      MLEobj$states <- kf$xtT
+      kf <- MARSSkf(MLEobj) # use kf function requested by user; default smoother=TRUE
+      if (silent == 2) cat("Adding logLik, AIC and coefficients.\n")
       MLEobj$logLik <- kf$logLik
+      MLEobj <- MARSSaic(MLEobj)
+      MLEobj$coef <- coef(MLEobj, type = "vector")
+      if (silent == 2) cat("Adding states and states.se.\n")
+      MLEobj$states <- kf$xtT
       if (!is.null(kf[["VtT"]])) {
         m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
         TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
@@ -307,7 +305,8 @@ MARSS <- function(y,
     }
     if ((!silent || silent == 2) && !(MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
-    } # 3 added since don't print if fit=FALSE
+      if(!is.null(MLEobj$iter.record$message)) cat("Optimizer message: ", MLEobj$iter.record$message)
+    } # 3 added since doesn't print if fit=FALSE
     if ((!silent || silent == 2) && !fit) {
       print(MLEobj$model)
     }
