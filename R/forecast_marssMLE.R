@@ -97,14 +97,14 @@ forecast.marssMLE <- function(object, h = 10,
     form = "marxss",
     control = object[["control"]],
     silent = TRUE,
-    method = "kem",
+    method = object[["method"]],
     fun.kf = fun.kf
   ))
   newMLEobj[["par"]] <- object[["par"]]
   newMLEobj[["convergence"]] <- object[["convergence"]]
   newMLEobj[["logLik"]] <- object[["logLik"]]
   for (elem in names(newMLEobj[["par"]])) newMLEobj[["par"]][[elem]] <- matrix(0, 0, 1)
-  class(newMLEobj) <- c("marssMLE", method)
+  class(newMLEobj) <- c("marssMLE", object[["method"]])
 
   if (substr(type, 1, 1) == "y") {
     cols <- switch(interval,
