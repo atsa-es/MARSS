@@ -13,16 +13,16 @@ MARSS <- function(y,
   pkg <- "MARSS"
   if (missing(fun.kf)) missing.fun.kf <- FALSE else missing.fun.kf <- TRUE
   fun.kf <- match.arg(fun.kf)
-  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
-  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
   allowed.methods <- get("allowed.methods", envir = pkg_globals)
   # Some error checks depend on an allowable method
   if (!method %in% allowed.methods) {
     stop(paste("method must be one of:", allowed.methods))
   }
-  if (method %in% MARSStmb.methods) {
-    if(length(find.package("marssTMB", quiet = TRUE)) == 0)
-      stop(paste0(pkg, ": If you want to use TMB, please install marssTMB from https://atsa-es.github.io/marssTMB/\nWe will including TMB in MARSS() in the next CRAN release."))
+  if (length(grep("TMB", method)) > 0) {
+    if(!requireNamespace("marssTMB")){
+      message("Fitting with TMB requires the  'TMB' package. Please install marssTMB from https://atsa-es.github.io/marssTMB/")
+      return(invisible())
+    }
   }
   ## Start by checking the data, since if the data have major problems then the rest of the code
   ## will have problems
@@ -117,7 +117,7 @@ MARSS <- function(y,
     if (silent == 2) cat("Running MARSSinits() to set start conditions.\n")
     MLEobj$start <- MARSSinits(MLEobj, MARSS.inputs$inits)
 
-    class(MLEobj) <- "marssMLE"
+    class(MLEobj) <- c("marssMLE", method)
 
     ## Check the marssMLE object
     ## is.marssMLE() calls is.marssMODEL() to check the model,
@@ -144,7 +144,7 @@ MARSS <- function(y,
       # will be set to 3 if all fixed
       MLEobj$convergence <- -1
     }
-    
+
     # If all parameters fixed. Set convergence=3 whether or not fit=TRUE
     model.is.fixed <- FALSE
     if (all(unlist(lapply(MLEobj[["marss"]][["free"]], is.fixed)))) {
@@ -160,6 +160,8 @@ MARSS <- function(y,
       } else {
         # rest of the output will be added below
         MLEobj$logLik <- kf.out$logLik
+        MLEobj <- MARSSaic(MLEobj)
+        MLEobj$coef <- coef(MLEobj, type = "vector")
         kf.out <- try(MARSSkf(MLEobj), silent = TRUE)
         if (inherits(kf.out, "try-error")) {
           MLEobj$convergence <- 54
@@ -207,32 +209,24 @@ MARSS <- function(y,
     if (fit && !model.is.fixed) {
       if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
       ## Fit and add param estimates to the object
-      if (method %in% kem.methods) {
-        MLEobj <- try(MARSSkem(MLEobj), silent = TRUE)
-        if (inherits(MLEobj, "try-error")) {
-          cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
-          MLEobj.test$convergence <- 2
-          return(MLEobj.test)
-        }
+      MLEobj <- try(MARSSfit(MLEobj), silent = TRUE)
+      if (inherits(MLEobj, "try-error")) {
+        cat(paste("Error: Stopped in MARSS() when trying to fit.  Try control$trace=1 for more information. You can also try another fitting method by passing in the method argument. This is especially helpful if you are seeing a chol error.\n"))
+        MLEobj.test$convergence <- 2
+        return(MLEobj.test)
       }
-      if (method %in% MARSSoptim.methods) MLEobj <- MARSSoptim(MLEobj)
-      if (method %in% MARSStmb.methods) MLEobj <- marssTMB::MARSStmb(MLEobj)
     }
 
     ## Add AIC and AICc and coef to the object
-    ## Return as long as $par element and there are no errors, but might not be converged
-    if ((MLEobj$convergence %in% c(0, 1, 3, 54)) || (MLEobj$convergence %in% c(10, 11) && method %in% kem.methods)) {
-      if (silent == 2) cat("Adding AIC and coefficients.\n")
-      MLEobj <- MARSSaic(MLEobj)
-      MLEobj$coef <- coef(MLEobj, type = "vector")
-    }
-
     ## Add states.se and ytT.se if no errors.  Return kf and Ey if trace>0
     if (MLEobj$convergence %in% c(0, 1, 3) || (MLEobj$convergence %in% c(10, 11) && MLEobj$method %in% kem.methods)) {
-      if (silent == 2) cat("Adding states and states.se.\n")
-      kf <- MARSSkf(MLEobj) # use function requested by user; default smoother=TRUE
-      MLEobj$states <- kf$xtT
+      kf <- MARSSkf(MLEobj) # use kf function requested by user; default smoother=TRUE
+      if (silent == 2) cat("Adding logLik, AIC and coefficients.\n")
       MLEobj$logLik <- kf$logLik
+      MLEobj <- MARSSaic(MLEobj)
+      MLEobj$coef <- coef(MLEobj, type = "vector")
+      if (silent == 2) cat("Adding states and states.se.\n")
+      MLEobj$states <- kf$xtT
       if (!is.null(kf[["VtT"]])) {
         m <- attr(MLEobj$marss, "model.dims")[["x"]][1]
         TT <- attr(MLEobj$marss, "model.dims")[["data"]][2]
@@ -308,7 +302,8 @@ MARSS <- function(y,
     }
     if ((!silent || silent == 2) && !(MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
-    } # 3 added since don't print if fit=FALSE
+      if (!is.null(MLEobj$iter.record$message)) cat("Optimizer message: ", MLEobj$iter.record$message)
+    } # 3 added since doesn't print if fit=FALSE
     if ((!silent || silent == 2) && !fit) {
       print(MLEobj$model)
     }

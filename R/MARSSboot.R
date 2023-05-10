@@ -26,11 +26,6 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
   # control is a list which holds options for the estimation function (see help file)
   # silent controls whether a progress bar is shown
 
-  # load needed package globals
-  kem.methods <- get("kem.methods", envir = pkg_globals)
-  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
-  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
-  
   ###### Error-checking on the arguments
   msg <- NULL
   if (!is.numeric(nboot)) {
@@ -180,9 +175,8 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
         newmod <- marss.model # marss form
         newmod[["data"]] <- array(boot.data[, , i], dim = dim(boot.data)[1:2], dimnames = dimnames(marss.model$data))
         mle.object[["marss"]] <- newmod # we are resetting the marss object
-        if (mle.object[["method"]] %in% kem.methods) boot.model <- MARSSkem(mle.object)
-        if (mle.object[["method"]] %in% MARSSoptim.methods) boot.model <- MARSSoptim(mle.object)
-        if (mle.object[["method"]] %in% MARSStmb.methods) boot.model <- marssTMB::MARSStmb(mle.object)
+        # fitting function determined by the MLEobj$method
+        boot.model <- MARSSfit(mle.object)
         boot.params[, i] <- MARSSvectorizeparam(boot.model)
       } # if MLE
 

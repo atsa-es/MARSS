@@ -120,9 +120,9 @@ is.identity <- function(x, dim = NULL) {
 
 is.validvarcov <- function(x, method = "kem") {
   kem.methods <- get("kem.methods", envir = pkg_globals)
-  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
-  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
-  varcov_is_constrained <- method %in% c(MARSSoptim.methods, MARSStmb.methods)
+  optim.methods <- get("optim.methods", envir = pkg_globals)
+  nlminb.methods <- get("nlminb.methods", envir = pkg_globals)
+  varcov_is_constrained <- method %in% c(optim.methods, nlminb.methods)
   
   # works on numeric and list matrices
   # x must be 2D matrix; is.matrix returns false for 3D array

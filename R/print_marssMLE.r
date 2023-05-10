@@ -4,7 +4,8 @@
 print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., what = "fit", form = NULL, silent = FALSE) {
   # load needed package globals
   kem.methods <- get("kem.methods", envir = pkg_globals)
-  optim.methods <- c(get("optim.methods", envir = pkg_globals), get("nlminb.methods", envir = pkg_globals))
+  optim.methods <- get("optim.methods", envir = pkg_globals)
+  nlminb.methods <- get("nlminb.methods", envir = pkg_globals)
   
   # Check that x has a marssMODEL object
   if (!inherits(x$model, "marssMODEL")) {
@@ -31,7 +32,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
     }
     cat("marssMLE object $par element is NULL.  Parameters have not been estimated.\n")
     if (x$convergence == 2) {
-      cat("ERROR: marssMLE object is inconsistent or incomplete.\n No model was fit.\n marssMLE object $convergence arg = 2\n")
+      cat("ERROR: The fitting function returned a try-error (crashed).\n marssMLE object $convergence arg = 2\n")
     }
     if (x$convergence == 52 || x$convergence == 62) {
       cat(
@@ -111,7 +112,7 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         cat(paste("Convergence test: conv.test.slope.tol = ", x$control$conv.test.slope.tol, ", abstol = ", x$control$abstol, "\n", sep = ""))
       }
       if (x$convergence == 0) {
-        if (x$method %in% optim.methods) {
+        if (x$method %in% c(optim.methods, nlminb.methods)) {
           cat("Estimation converged in", x$numIter, "iterations. \n")
         } else {
           if (x$numIter > x$control$minit) {
@@ -122,14 +123,15 @@ print.marssMLE <- function(x, digits = max(3, getOption("digits") - 4), ..., wha
         }
       }
       if (x$convergence == 1) {
-        if (x$method %in% kem.methods) tmp.msg <- paste("Neither abstol nor log-log convergence test were passed.\n", sep = "") else tmp.msg <- ""
-        cat(
-          "WARNING: maxit reached at ", x$control$maxit, " iter before convergence.\n", tmp.msg,
+        if (x$method %in% kem.methods) tmp.msg <- paste("Neither abstol nor log-log convergence test were passed.\n", sep = "") else tmp.msg <- x$iter.record$message
+        if(x$method %in% c(kem.methods, optim.methods) || (x$method %in% nlminb.methods & x$numIter >= x$control$maxit)) cat("WARNING: maxit reached at ", x$control$maxit, " iter before convergence.\n", tmp.msg,
           "The likelihood and params are not at the MLE values.\n",
           "Try setting control$maxit higher.\n"
         )
+        if(x$method %in% nlminb.methods && x$numIter < x$control$maxit)
+          cat("WARNING: nlminb() ran for", x$numIter, "iterations and stopped before maxit with a convergence warning.\nTreat the parameter values and logLik with caution. Message:", tmp.msg, ".\n")
       }
-      if (x$convergence == 2) cat("Invalid MLE object. \n")
+      if (x$convergence == 2) cat("Invalid MLE object. Try-error returned by fitting function. \n")
       if (x$convergence == 3) cat("All parameters fixed. No convergence information. \n")
       if (x$method %in% kem.methods && x$convergence == 10) {
         tmp.msg <- paste("maxit (=", x$control$maxit, ") reached before log-log convergence.\n", sep = "")
