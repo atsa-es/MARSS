@@ -147,7 +147,7 @@ MARSSoptim <- function(MLEobj) {
   MLEobj.return$start <- tmp.inits # set to what was used here
   MLEobj.return$convergence <- optim.output$convergence
   if (optim.output$convergence %in% c(1, 0)) {
-    if ((!control$silent || control$silent == 2) && optim.output$convergence == 0) cat(paste("Success! Converged in ", optim.output$counts[1], " iterations.\n", "Function ", kf.function, " used for likelihood calculation.\n", sep = ""))
+    if ((!control$silent || control$silent == 2) && optim.output$convergence == 0) cat(paste("Success! Converged in ", optim.output$counts[2], " iterations.\n", "Function ", kf.function, " used for likelihood calculation.\n", sep = ""))
     if ((!control$silent || control$silent == 2) && optim.output$convergence == 1) cat(paste("Warning! Max iterations of ", control$maxit, " reached before convergence.\n", "Function ", kf.function, " used for likelihood calculation.\n", sep = ""))
 
     tmp.MLEobj <- MARSSvectorizeparam(tmp.MLEobj, optim.output$par)
@@ -171,7 +171,7 @@ MARSSoptim <- function(MLEobj) {
     kf.out <- try(MARSSkf(MLEobj.return), silent = TRUE)
 
     if (inherits(kf.out, "try-error")) {
-      MLEobj.return$numIter <- optim.output$counts[1]
+      MLEobj.return$numIter <- optim.output$counts[2]
       MLEobj.return$logLik <- -1 * optim.output$value
       MLEobj.return$errors <- c(paste0("\nWARNING: optim() successfully fit the model but ", kf.function, " returned an error with the fitted model. Try MARSSinfo('optimerror54') for insight.", sep = ""), "\nError: ", kf.out[1])
       MLEobj.return$convergence <- 54
@@ -192,7 +192,7 @@ MARSSoptim <- function(MLEobj) {
   if (!is.null(kf.out)) {
     if (control$trace > 0) MLEobj.return$kf <- kf.out
     MLEobj.return$states <- kf.out$xtT
-    MLEobj.return$numIter <- optim.output$counts[1]
+    MLEobj.return$numIter <- optim.output$counts[2]
     MLEobj.return$logLik <- kf.out$logLik
   }
   MLEobj.return$method <- MLEobj$method

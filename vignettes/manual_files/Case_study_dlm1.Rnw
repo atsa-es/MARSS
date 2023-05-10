@@ -180,17 +180,17 @@ mtext("Year of ocean entry", 1, line = 3)
 
 Beginning with our definition for the distribution of the parameters at time $t=0$, $\ttheta_0 \sim \MVN(\pipi_0,\LAM_0)$ in Equation \ref{eqn:dlmSW3}, we write
 \begin{equation}\label{eqn:dlmFore1}
-\ttheta_{t-1}|y_{1:t-1} \sim \MVN(\pipi_{t-1},\LAM_{t-1})
+\ttheta_{t-1}|y_1^{t-1} \sim \MVN(\pipi_{t-1},\LAM_{t-1})
 \end{equation}
-to indicate the distribution of $\ttheta$ at time $t-1$ conditioned on the observed data through time $t-1$ (i.e., $y_{1:t-1}$). Then, we can write the one-step ahead predictive distribution for $\ttheta_t$ given $y_{1:t-1}$ as
+to indicate the distribution of $\ttheta$ at time $t-1$ conditioned on the observed data through time $t-1$ (i.e., $y_1^{t-1}$). Then, we can write the one-step ahead predictive distribution for $\ttheta_t$ given $y_1^{t-1}$ as
 \begin{align}\label{eqn:dlmFore2}
-\ttheta_{t}|y_{1:t-1} &\sim \MVN(\et_{t},\PH_{t}), \text{ where} \nonumber\\
+\ttheta_{t}|y_1^{t-1} &\sim \MVN(\et_{t},\PH_{t}), \text{ where} \nonumber\\
 \et_{t} &= \GG_t\pipi_{t-1}, \text{ and}\\
 \PH_{t} &= \GG_t\LAM_{t-1}\GG_t^{\top} + \QQ \nonumber.
 \end{align}
-Consequently, the one-step ahead predictive distribution for the observation at time $t$ given $y_{1:t-1}$ is
+Consequently, the one-step ahead predictive distribution for the observation at time $t$ given $y_1^{t-1}$ is
 \begin{align}\label{eqn:dlmFore3}
-y_{t}|y_{1:t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
+y_{t}|y_1^{t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
 \zeta_{t} &= \FF_t\et_{t}, \text{ and}\\
 \Psi_{t} &= \FF_t\Phi_{t}\FF_t^{\top} + \RR \nonumber.
 \end{align}
@@ -198,7 +198,7 @@ y_{t}|y_{1:t-1} &\sim \N(\zeta_{t},\Psi_{t}), \text{ where} \nonumber\\
 %----------------------------------------------
 \subsection{Forecasting a univariate DLM with the \{MARSS\} package}
 %----------------------------------------------
-Working from Equation \ref{eqn:dlmFore3}, we can now use the \{MARSS\} package to compute the expected value of the forecast at time $t$ $(\E [y_t|y_{1:t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_{1:t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in \{MARSS\} notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $x_t^{t-1}$ in \{MARSS\} notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkf()@ function.
+Working from Equation \ref{eqn:dlmFore3}, we can now use the \{MARSS\} package to compute the expected value of the forecast at time $t$ $(\E [y_t|y_1^{t-1}] = \zeta_t)$, and its variance $(\var [y_t|y_1^{t-1}] = \Psi_t)$. For the expectation, we need $\FF_t\et_t$. Recall that $\FF_t$ is our $1 \times m$ matrix of explanatory variables at time $t$ ($\FF_t$ is called $\ZZ_t$ in \{MARSS\} notation). The one-step ahead forecasts of the parameters at time $t$ $(\et_t)$ are calculated as part of the Kalman filter algorithm---they are termed $x_t^{t-1}$ in \{MARSS\} notation and stored as \verb@xtt1@ in the list produced by the \verb@MARSSkf()@ function.
 <<Cs_08_univDLM-fore-mean, eval=TRUE>>=
 # get list of Kalman filter output
 kf.out <- MARSSkfss(dlm1)

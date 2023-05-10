@@ -2,8 +2,8 @@ MARSS <- function(y,
                   model = NULL,
                   inits = NULL,
                   miss.value = as.numeric(NA),
-                  method = "kem",
-                  form = "marxss",
+                  method = c("kem", "BFGS", "TMB", "BFGS_TMB", "nlminb_TMB"),
+                  form = c("marxss", "dfa", "marss"),
                   fit = TRUE,
                   silent = FALSE,
                   control = NULL,
@@ -13,11 +13,10 @@ MARSS <- function(y,
   pkg <- "MARSS"
   if (missing(fun.kf)) missing.fun.kf <- FALSE else missing.fun.kf <- TRUE
   fun.kf <- match.arg(fun.kf)
+  method <- match.arg(method)
+  form <- match.arg(form)
   allowed.methods <- get("allowed.methods", envir = pkg_globals)
   # Some error checks depend on an allowable method
-  if (!method %in% allowed.methods) {
-    stop(paste("method must be one of:", allowed.methods))
-  }
   if (length(grep("TMB", method)) > 0) {
     if(!requireNamespace("marssTMB")){
       message("Fitting with TMB requires the  'TMB' package. Please install marssTMB from https://atsa-es.github.io/marssTMB/")

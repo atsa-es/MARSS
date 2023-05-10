@@ -87,7 +87,7 @@ CSEGriskfigure <- function(data, te = 100, absolutethresh = FALSE, threshold = 0
       plotCI <- FALSE
       kem <- MARSShessian(kem)
       # The R and Q are chol transformed so = sqrt(R) and sqrt(Q) respectively
-      boot.params <- try(rmvnorm(n = nsim, mean = kem$parMean, sigma = kem$parSigma, method = "chol"), silent = TRUE)
+      boot.params <- try(mvtnorm::rmvnorm(n = nsim, mean = kem$parMean, sigma = kem$parSigma, method = "chol"), silent = TRUE)
       if (!inherits(boot.params, "try-error")) {
         plotCI <- TRUE
         boot.params <- boot.params[boot.params[, which(substr(colnames(boot.params), 1, 1) == "Q")] > 0, ]

@@ -138,7 +138,7 @@ MARSSkem <- function(MLEobj) {
       if (control$trace > 0) {
         msg.kem <- c(msg.kem, paste("iter=", iter, " LogLike DROPPED.  old=", loglike.old, " new=", MLEobj.iter$logLik, "\n", sep = ""))
       } else {
-        msg.kem <- "MARSSkem: The solution became unstable and logLik DROPPED.\n"
+        msg.kem <- "MARSSkem: The solution became unstable and logLik DROPPED. Try MARSSinfo('LLdropped') for insight.\n"
       }
     }
 
@@ -1174,7 +1174,7 @@ rerun.kf <- function(elem, MLEobj, iter) { # Start~~~~~~~~Error checking
     if (MLEobj$control$trace > 0) {
       msg.kem <- paste("iter=", iter, " LogLike DROPPED in ", elem, " update. logLik old=", loglike.old, " new=", loglike.new, "\n", sep = "")
     } else {
-      msg.kem <- paste("MARSSkem: The solution became unstable and logLik DROPPED in the", elem, "updates.\n")
+      msg.kem <- paste("MARSSkem: The solution became unstable and logLik DROPPED in the", elem, "updates.  Try MARSSinfo('LLdropped') for insight.\n")
     }
   }
   return(list(kf = kf, msg.kem = msg.kem, msg.kf = msg.kf, ok = TRUE))

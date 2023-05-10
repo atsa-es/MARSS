@@ -182,7 +182,7 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
 
       if (param.gen == "hessian") {
         if (any(is.na(MLEobj.hessian$parSigma))) stop("Stopped in MARSSboot(): The variance-covariance matrix (parSigma) returned by MARSShessian() has NAs.  See MARSSinfo(\"HessianNA\").\n", call. = FALSE)
-        hess.params <- rmvnorm(1, mean = MLEobj.hessian$parMean, sigma = MLEobj.hessian$parSigma, method = "chol")
+        hess.params <- mvtnorm::rmvnorm(1, mean = MLEobj.hessian$parMean, sigma = MLEobj.hessian$parSigma, method = "chol")
         boot.params[, i] <- hess.params
       } # if hessian
 

@@ -2,19 +2,29 @@
 output: html_document
 ---
 
-# MARSS 3.11.5 (GitHub)
+# MARSS 3.11.6 (GitHub)
 
 This release is focused on adding new method `method="TMB"` which uses the package {marssTMB}.
 
 * Added methods "TMB", "BFGS_TMB" and "nlminb_TMB" and changed `MARSS()` to recognize these.
-* Added more descriptive methods for kem and optim: "EM_KFAS", "EM_KFSS", "BFGS_KFAS", "BFGS_KFSS"
+* Added the generic function `MARSSfit()` and methods for "kem" and "BFGS".
 * Added the defaults to `R/onLoad.R` and made it easier to specify new methods and constraints on methods
 * Made changes to `checkMARSSinputs.R`, `is_marssMLE.R` and `is.validvarcov()` so they are not so specific to `method="BFGS"` but work for any methods with similar constraints.
 * Export MARSSvectorizeparam. Need when writing methods for MARSSfit() generic.
 
+## BUGS
+
+* The iterations count for `optim()` was using number of function calls not number of gradient calls.
+
 ## OTHER
 
 * Allow `toLatex()` to output the raw tex so that it can directly go into RMarkdown or Quarto.
+* Use `match.arg()` for form and method.
+* Fix typo in DLM chapter re y_1^{t-1}
+
+# MARSS 3.11.5 (GitHub)
+
+Ignore. Pre-emptive.
 
 # MARSS 3.11.4 (released 2021-12-15 on CRAN)
 

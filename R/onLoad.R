@@ -2,8 +2,8 @@
 .onLoad <- function(libname, pkgname) {
   assign("pkg_globals", new.env(), envir = parent.env(environment()))
 
-  kem.methods <- c("kem", "EM_KFAS", "EM_KFSS")
-  optim.methods <- c("BFGS", "BFGS_KFAS", "BFGS_KFSS", "BFGS_TMB")
+  kem.methods <- c("kem")
+  optim.methods <- c("BFGS", "BFGS_TMB")
   nlminb.methods <- c("TMB", "nlminb_TMB")
   # specify what function is used for what method
   allowed.methods <- c(kem.methods, optim.methods, nlminb.methods)
@@ -40,8 +40,7 @@
       lower = NULL, upper = NULL
     )
   )
-  alldefaults[["BFGS_KFAS"]] <- alldefaults[["BFGS_KFSS"]] <- alldefaults[["BFGS"]]
-    
+
   alldefaults[["TMB"]] <- 
     alldefaults[["BFGS_TMB"]] <- 
     alldefaults[["nlminb_TMB"]] <- alldefaults[["BFGS"]]

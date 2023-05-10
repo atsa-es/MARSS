@@ -136,7 +136,7 @@ MARSSsimulate <- function(object, tSteps = NULL, nsim = 1, silent = TRUE, miss.l
     if (n.not0$V0 != 0) { # by def length 1
       V0.mat <- Omg1$V0 %*% par1$V0 %*% t.Omg1$V0
       # rmvnorm returns a 1 x m matrix even if mean is m x 1
-      x0.new <- array(rmvnorm(1, mean = Omg1$V0 %*% x0.mat, sigma = V0.mat, method = "chol"), dim = dim(x0.mat))
+      x0.new <- array(mvtnorm::rmvnorm(1, mean = Omg1$V0 %*% x0.mat, sigma = V0.mat, method = "chol"), dim = dim(x0.mat))
       newStates[, 1] <- t.Omg1$V0 %*% x0.new + t.Omg0$V0 %*% Omg0$V0 %*% x0.mat
     } else {
       newStates[, 1] <- x0.mat
@@ -147,7 +147,7 @@ MARSSsimulate <- function(object, tSteps = NULL, nsim = 1, silent = TRUE, miss.l
       if (n.not0$R[min(j - 1, length(n.not0$R))] != 0) { # some nonzeros; minus 1 since j=2 is t=1
         R.mat <- Omg1$R %*% pari$R %*% t.Omg1$R
         # rmvnorm returns a T x p matrix and we need p x T
-        obs.error <- t(rmvnorm(1, mean = rep(0, n.not0$R), sigma = R.mat, method = "chol"))
+        obs.error <- t(mvtnorm::rmvnorm(1, mean = rep(0, n.not0$R), sigma = R.mat, method = "chol"))
         obs.error <- t.Omg1$R %*% obs.error
       } else {
         obs.error <- matrix(0, n, 1)
@@ -157,7 +157,7 @@ MARSSsimulate <- function(object, tSteps = NULL, nsim = 1, silent = TRUE, miss.l
         if (time.varying$Q) pari$Q <- parmat(MLEobj, "Q", t = (j - 1))$Q
         Q.mat <- Omg1$Q %*% pari$Q %*% t.Omg1$Q
         # rmvnorm returns a 1 x p matrix and we need p x 1
-        pro.error <- t(rmvnorm(1, mean = rep(0, n.not0$Q), sigma = Q.mat, method = "chol"))
+        pro.error <- t(mvtnorm::rmvnorm(1, mean = rep(0, n.not0$Q), sigma = Q.mat, method = "chol"))
         pro.error <- t.Omg1$Q %*% pro.error
       } else {
         pro.error <- matrix(0, m, 1)
