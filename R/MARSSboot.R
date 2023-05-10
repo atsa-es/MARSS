@@ -25,7 +25,8 @@ MARSSboot <- function(MLEobj, nboot = 1000, output = "parameters", sim = "parame
   #      hessian  -- get params from estimated hessian matrix
   # control is a list which holds options for the estimation function (see help file)
   # silent controls whether a progress bar is shown
-
+  allowed.methods <- get("allowed.methods", envir = pkg_globals)
+  
   ###### Error-checking on the arguments
   msg <- NULL
   if (!is.numeric(nboot)) {
