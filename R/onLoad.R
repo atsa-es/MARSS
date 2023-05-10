@@ -5,8 +5,6 @@
   kem.methods <- c("kem", "EM_KFAS", "EM_KFSS")
   optim.methods <- c("BFGS", "BFGS_KFAS", "BFGS_KFSS", "BFGS_TMB")
   nlminb.methods <- c("TMB", "nlminb_TMB")
-  MARSSoptim.methods <- c("BFGS", "BFGS_KFAS", "BFGS_KFSS")
-  MARSStmb.methods <- c("TMB", "nlminb_TMB", "BFGS_TMB")
   # specify what function is used for what method
   allowed.methods <- c(kem.methods, optim.methods, nlminb.methods)
   # These are arguments that are required/allowed for all forms
@@ -14,8 +12,6 @@
   assign("kem.methods", kem.methods, pkg_globals)
   assign("optim.methods", optim.methods, pkg_globals)
   assign("nlminb.methods", nlminb.methods, pkg_globals)
-  assign("MARSSoptim.methods", MARSSoptim.methods, pkg_globals)
-  assign("MARSStmb.methods", MARSStmb.methods, pkg_globals)
   assign("allowed.methods", allowed.methods, pkg_globals)
   assign("common.allowed.in.MARSS.call", common.allowed.in.MARSS.call, pkg_globals)
 

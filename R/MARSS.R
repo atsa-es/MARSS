@@ -13,16 +13,16 @@ MARSS <- function(y,
   pkg <- "MARSS"
   if (missing(fun.kf)) missing.fun.kf <- FALSE else missing.fun.kf <- TRUE
   fun.kf <- match.arg(fun.kf)
-  MARSSoptim.methods <- get("MARSSoptim.methods", envir = pkg_globals)
-  MARSStmb.methods <- get("MARSStmb.methods", envir = pkg_globals)
   allowed.methods <- get("allowed.methods", envir = pkg_globals)
   # Some error checks depend on an allowable method
   if (!method %in% allowed.methods) {
     stop(paste("method must be one of:", allowed.methods))
   }
-  if (method %in% MARSStmb.methods) {
-    if(length(find.package("marssTMB", quiet = TRUE)) == 0)
-      stop(paste0(pkg, ": If you want to use TMB, please install marssTMB from https://atsa-es.github.io/marssTMB/\nWe will including TMB in MARSS() in the next CRAN release."))
+  if (length(grep("TMB", method)) > 0) {
+    if(!requireNamespace("marssTMB")){
+      message("Fitting with TMB requires the  'TMB' package. Please install marssTMB from https://atsa-es.github.io/marssTMB/")
+      return(invisible())
+    }
   }
   ## Start by checking the data, since if the data have major problems then the rest of the code
   ## will have problems
@@ -144,7 +144,7 @@ MARSS <- function(y,
       # will be set to 3 if all fixed
       MLEobj$convergence <- -1
     }
-    
+
     # If all parameters fixed. Set convergence=3 whether or not fit=TRUE
     model.is.fixed <- FALSE
     if (all(unlist(lapply(MLEobj[["marss"]][["free"]], is.fixed)))) {
@@ -209,15 +209,12 @@ MARSS <- function(y,
     if (fit && !model.is.fixed) {
       if (silent == 2) cat(paste("Fitting model with ", method, ".\n", sep = ""))
       ## Fit and add param estimates to the object
-      if (method %in% kem.methods) {
-        MLEobj <- try(MARSSfit(MLEobj), silent = TRUE)
-        if (inherits(MLEobj, "try-error")) {
-          cat(paste("Error: Stopped in MARSS() before fitting because MARSSkem returned errors.  Try control$trace=1 for more information as the reported error may not be helpful. You can also try method='BFGS' if you are seeing a 'chol' error.\n", MLEobj[1], "\n"))
-          MLEobj.test$convergence <- 2
-          return(MLEobj.test)
-        }
+      MLEobj <- try(MARSSfit(MLEobj), silent = TRUE)
+      if (inherits(MLEobj, "try-error")) {
+        cat(paste("Error: Stopped in MARSS() when trying to fit.  Try control$trace=1 for more information. You can also try another fitting method by passing in the method argument. This is especially helpful if you are seeing a chol error.\n"))
+        MLEobj.test$convergence <- 2
+        return(MLEobj.test)
       }
-      MLEobj <- MARSSfit(MLEobj)
     }
 
     ## Add AIC and AICc and coef to the object
@@ -305,7 +302,7 @@ MARSS <- function(y,
     }
     if ((!silent || silent == 2) && !(MLEobj[["convergence"]] %in% c(0, 1, 3, 10, 11, 12, 54))) {
       cat(MLEobj$errors)
-      if(!is.null(MLEobj$iter.record$message)) cat("Optimizer message: ", MLEobj$iter.record$message)
+      if (!is.null(MLEobj$iter.record$message)) cat("Optimizer message: ", MLEobj$iter.record$message)
     } # 3 added since doesn't print if fit=FALSE
     if ((!silent || silent == 2) && !fit) {
       print(MLEobj$model)
