@@ -186,8 +186,8 @@ x <- print(kem, what = "states", silent = TRUE)
 ###################################################
 ### code chunk number 27: Cs24_model-tidy-R
 ###################################################
-broom::tidy(kem)
-broom::glance(kem)
+tidy(kem)
+glance(kem)
 
 
 ###################################################

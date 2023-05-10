@@ -32,10 +32,10 @@ The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave 
 
 \begin{itemize}
 \item \verb@fitted(fit)@ Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
-\item \verb@broom::tidy(fit)@ or \verb@tidy.marssMLE(fit)@ Parameter estimates and confidence intervals.\index{fitted values}
+\item \verb@tidy(fit)@ Parameter estimates and confidence intervals.\index{fitted values}
 \item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.\index{likelihood}\index{AIC}
 \item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.\index{residuals}
-\item \verb@predict(fit)@, \verb@forecast::forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@, where \verb@fr <- forecast(fit)@, plots the forecasts.\index{plotting!predictions}\index{forecasting}
+\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@, where \verb@fr <- forecast(fit)@, plots the forecasts.\index{plotting!predictions}\index{forecasting}
 \item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.\index{plotting}
 \item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"xtT"@, \verb@"xtt"@ or \verb@"xtt1@.  Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.\index{Kalman filter and smoother}
 \item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"ytT"@, \verb@"ytt"@ or \verb@"ytt1@. These are the expected values of the y (left side of the y equation with the error terms). \verb@MARSShatyt(fit)@ returns the same in matrix form. Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation. Most users will likely want \verb@fitted()@ which is the model fitted values (expected value of the right side of the $\yy$ equation without the error term).
@@ -383,11 +383,11 @@ The package also includes the common functions for working with the output from 
 
 \section{Tidy output}
 
-The \verb@tidy()@ and \verb@glance()@ functions from the \{broom\} package will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.\index{tidy}\index{functions!tidy}
+The \verb@tidy()@ and \verb@glance()@ functions will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.\index{tidy}\index{functions!tidy}
 
 <<Cs24_model-tidy-R>>=
-broom::tidy(kem)
-broom::glance(kem)
+tidy(kem)
+glance(kem)
 @
 
 \section{Confidence intervals on a fitted model}

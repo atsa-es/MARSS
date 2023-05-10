@@ -437,7 +437,7 @@ rbind(
 )
 @
 
-If we use the \verb@forecast::forecast.StructTS()@ function instead of \verb@predict()@, we get an object that can be plotted since the \{forecast\} package has a plot method for StructTS objects.
+If we use the \verb@forecast:::forecast.StructTS()@ function instead of \verb@predict()@, we get an object that can be plotted since the \{forecast\} package has a plot method for StructTS objects.
 The \{MARSS\} package has a plot method for marssPredict objects returned by \verb@predict()@ and \verb@forecast()@ functions used with marssMLE objects. The \verb@forecast()@ function can be called with \verb@forecast::forecast()@ if you have the \{forecast\} package installed or \verb@forecast.marssMLE()@ if not.\index{forecasting!plotting}\index{plotting!predictions}
 
 The plots from the StructTS and marssMLE objects are similar though they have slightly different formats.
@@ -445,7 +445,7 @@ The plots from the StructTS and marssMLE objects are similar though they have sl
 \begin{center}
 <<label=Cs405_forecast, keep.source=TRUE, fig=TRUE, fig.width=6, echo=FALSE>>=
 fr1 <- forecast:::forecast.StructTS(fit1, h = 10)
-fr2 <- forecast.marssMLE(fit2, h = 10)
+fr2 <- forecast(fit2, h = 10)
 p1 <- ggplot2::autoplot(fr1, include = 8)
 p2 <- ggplot2::autoplot(fr2, include = 8)
 gridExtra::grid.arrange(p1, p2, nrow = 1)

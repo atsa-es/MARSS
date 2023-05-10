@@ -19,7 +19,7 @@ fits[[7]] <- MARSS(i$data, model = i$model, control = i$control, silent = TRUE, 
 
 for(i in c(3,6)){
   fit <- fits[[i]]
-  p1 <- try(forecast.marssMLE(fit, h=10), silent=TRUE)
+  p1 <- try(forecast(fit, h=10), silent=TRUE)
   test_that(paste("forecast class", i), {
     expect_true(inherits(p1, "try-error"))
   })
@@ -31,7 +31,7 @@ for(i in c(3,6)){
 
 for(i in c(1:2,4,5,7)){
   fit <- fits[[i]]
-  p1 <- try(forecast.marssMLE(fit, h=10), silent=TRUE)
+  p1 <- try(forecast(fit, h=10), silent=TRUE)
   test_that(paste("forecast class", i), {
     expect_true(inherits(p1, "marssPredict"))
   })
@@ -55,7 +55,7 @@ for (Q in list("unconstrained", "diagonal and equal", "equalvarcov", "zero")) {
       if (Q == "zero" && R == "zero") next
       if (Q == "zero" && B != "identity") next
       fit <- MARSS(dat, model = mod, silent = TRUE)
-      p1 <- try(forecast.marssMLE(fit, h=10), silent=TRUE)
+      p1 <- try(forecast(fit, h=10), silent=TRUE)
       test_that(paste("forecast class", Q, R, B), {
         expect_true(inherits(p1, "marssPredict"))
       })

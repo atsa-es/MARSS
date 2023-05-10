@@ -8,7 +8,6 @@ library(Formula)
 library(ggplot2)
 library(Hmisc)
 library(datasets)
-library(broom)
 
 
 ###################################################

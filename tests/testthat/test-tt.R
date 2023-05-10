@@ -78,7 +78,6 @@ for (i in model.list) {
       }
     }
   }
-  library(forecast)
   for (type in c("ytT", "xtT", "ytt", "ytt1", "xtt", "xtt1")) {
     for (interval in c("none", "confidence", "prediction")) {
       for (x0 in c("reestimate", "use.model")) {

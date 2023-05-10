@@ -5,7 +5,7 @@
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{forecast(object)}, where object is \code{\link{marssMLE}} object, will return the forecasts of \eqn{\mathbf{y}_t}{y(t)} or \eqn{\mathbf{x}_t}{x(t)} for \code{h} steps past the end of the model data. \code{forecast(object)} returns a \code{\link{marssPredict}} object which can be passed to \code{\link{plot.marssPredict}} for automatic plotting of the forecast. \code{forecast.marssMLE()} is used by \code{\link{predict.marssMLE}()} to generate forecasts.
   
-This is a method for the generic \code{forecast} function in the forecast package. The forecast package is not part of the MARSS package and you will need to load it separately. Alternatively you can use \code{forecast.marssMLE()} instead of \code{forecast()}.
+This is a method for the generic \code{forecast} function in the generics package. It is written to mimic the behavior and look of the forecast package.
 }
 \usage{
 \method{forecast}{marssMLE}(object, h = 10, level = c(0.8, 0.95), 
@@ -70,15 +70,11 @@ dat <- dat[2:4,] #remove the year row
 fit <- MARSS(dat, model=list(R="diagonal and equal"))
 
 # 2 steps ahead forecast
-fr <- forecast.marssMLE(fit, type="ytT", h=2)
+fr <- forecast(fit, type="ytT", h=2)
 plot(fr)
 
 # forecast and only show last 10 steps of original data
-fr <- forecast.marssMLE(fit, h=10)
+fr <- forecast(fit, h=10)
 plot(fr, include=10)
-
-# if you load the forecast package, you can use
-library(forecast)
-fr <- forecast(fit)
 
 }

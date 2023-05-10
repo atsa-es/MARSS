@@ -1,20 +1,20 @@
-accuracy.marssPredict <- function(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...) {
-  out <- accuracy.marssMLE(f$model, test = test, type = type, verbose = verbose)
+accuracy.marssPredict <- function(object, x, test = NULL, type = "ytt1", verbose = FALSE, ...) {
+  out <- accuracy.marssMLE(object$model, test = test, type = type, verbose = verbose)
 
   if (!missing(x)) {
     dotest <- TRUE
-    if (f$h == 0) {
+    if (object$h == 0) {
       message("Test data (x) passed in but object is not a forecast (h=0). Test data ignored.")
       dotest <- FALSE
     }
-    if (dotest) { # f is a marssPredict object
+    if (dotest) { # object is a marssPredict object
       # set up the predictions
-      n <- attr(f$model$model, "model.dims")[["y"]][1]
-      h <- f$h
+      n <- attr(object$model$model, "model.dims")[["y"]][1]
+      h <- object$h
 
-      TT <- attr(f$model$model, "model.dims")[["x"]][2]
-      loc <- which(colnames(f$pred) == "se")
-      testset <- subset(f$pred, f$t > TT)[, c(".rownames", "y", "estimate")]
+      TT <- attr(object$model$model, "model.dims")[["x"]][2]
+      loc <- which(colnames(object$pred) == "se")
+      testset <- subset(object$pred, object$t > TT)[, c(".rownames", "y", "estimate")]
       colnames(testset) <- c(".rownames", "y", ".fitted")
       testset$t <- rep(1:h, n)
 
@@ -23,13 +23,13 @@ accuracy.marssPredict <- function(f, x, test = NULL, type = "ytt1", verbose = FA
       if (!is.matrix(x) && !is.data.frame(x)) {
         stop("accuracy.marssMLE: Test data must be a matrix or data frame.\n", call. = FALSE)
       }
-      Y.names <- attr(f$model$model, "Y.names")
+      Y.names <- attr(object$model$model, "Y.names")
       if (is.matrix(x)) {
         if (nrow(x) != n) stop(paste0("accuracy.marssPredict: Test data must have the same number of rows (n=", n, ") as training data.\n"), call. = FALSE)
         if (ncol(x) != h) stop(paste0("accuracy.marssPredict: Test data must have the same columns as time steps (h=", h, ") as in the forecast.\n"), call. = FALSE)
         if (is.null(rownames(x))) {
           message("Training data rownames being used as rownames for test data.")
-          rownames(x) <- attr(f$model$model, "Y.names")
+          rownames(x) <- attr(object$model$model, "Y.names")
         }
         val <- Y.names %in% rownames(x)
         if (!all(val)) stop(paste0("accuracy.marssPredict: Test data is missing ", paste(Y.names[!val], collapse = " ,"), ".\n"), call. = FALSE)
@@ -66,15 +66,15 @@ accuracy.marssPredict <- function(f, x, test = NULL, type = "ytt1", verbose = FA
   return(out)
 }
 
-accuracy.marssMLE <- function(f, x = NULL, test = NULL, type = "ytt1", verbose = FALSE, ...) {
+accuracy.marssMLE <- function(object, x = NULL, test = NULL, type = "ytt1", verbose = FALSE, ...) {
   if (!missing(x)) {
     message("Test data (x) passed in but object is not a forecast. x ignored.")
   }
   rout <- c("Training set")
-  fx <- fitted(f, type = type)
+  fx <- fitted(object, type = type)
   out <- aout(fx, test)
   rownames(out) <- rout
-  n <- attr(f$model, "model.dims")[["y"]][1]
+  n <- attr(object$model, "model.dims")[["y"]][1]
   if (!verbose && n != 1) {
     return(out)
   }

@@ -1,9 +1,10 @@
-\name{glance.marssMLE}
+\name{glance}
+\alias{glance}
 \alias{glance.marssMLE}
 
 \title{Return brief summary information on a MARSS fit}
 \usage{
-glance.marssMLE(x, ...)
+\method{glance}{marssMLE}(x, ...)
 }
 \arguments{
   \item{x}{A \code{\link{marssMLE}} object}
@@ -30,6 +31,5 @@ dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]
 fit <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
-library(broom)
 glance(fit)
 }

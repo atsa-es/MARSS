@@ -5,11 +5,10 @@ Version: 3.11.6
 Date: 2023-05-10
 Depends: R (>= 3.5.0)
 Imports: 
-    graphics, grDevices, KFAS (>= 1.0.1), mvtnorm, nlme, stats, utils
+    generics (>= 0.1.2), graphics, grDevices, KFAS (>= 1.0.1), mvtnorm, nlme, stats, utils
 Suggests: 
-    broom,
-    forecast,
     Formula,
+    forecast,
     ggplot2,
     gridExtra,
     Hmisc,

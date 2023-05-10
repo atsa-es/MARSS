@@ -10,7 +10,8 @@ This release is focused on adding new method `method="TMB"` which uses the packa
 * Added the generic function `MARSSfit()` and methods for "kem" and "BFGS".
 * Added the defaults to `R/onLoad.R` and made it easier to specify new methods and constraints on methods
 * Made changes to `checkMARSSinputs.R`, `is_marssMLE.R` and `is.validvarcov()` so they are not so specific to `method="BFGS"` but work for any methods with similar constraints.
-* Export MARSSvectorizeparam. Need when writing methods for MARSSfit() generic.
+* Export MARSSvectorizeparam(). Need when writing methods for MARSSfit() generic.
+* Added {generics} as a dependency and removed {forecast} and {broom} from Suggests. Cleaned up examples and text throughout to remove references to these packages.
 
 ## BUGS
 

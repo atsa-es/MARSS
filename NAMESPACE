@@ -1,8 +1,13 @@
 
 ## export functions
 export(
+  accuracy,
+  autoplot.marssMLE,
+  autoplot.marssPredict,
   CSEGriskfigure,
   CSEGtmufigure,
+  forecast,
+  glance,
   MARSS,
   MARSSaic,
   MARSSboot,
@@ -23,15 +28,9 @@ export(
   MARSSsimulate,
   MARSSFisherI,
   MARSSvectorizeparam,
+  tidy,
   zscore,
-  ldiag,
-  autoplot.marssMLE,
-  autoplot.marssPredict,
-  accuracy.marssMLE,
-  accuracy.marssPredict,
-  forecast.marssMLE,
-  glance.marssMLE,
-  tidy.marssMLE
+  ldiag
 )
 
 #these are part of base, but user could unattach them and then MARSS wouldn't work
@@ -44,12 +43,24 @@ importFrom(mvtnorm, rmvnorm)
 importFrom(nlme, fdHess)
 importFrom(KFAS, SSModel, SSMcustom, KFS)
 importFrom("grDevices", "contourLines")
+importFrom(generics,forecast)
+importFrom(generics,accuracy)
+importFrom(generics,glance)
+importFrom(generics,tidy)
 
 ## register S3 methods
 export(MARSSfit) # method
 S3method(MARSSfit, kem)
 S3method(MARSSfit, BFGS)
 
+S3method(accuracy, marssMLE)
+S3method(accuracy, marssPredict)
+S3method(coef, marssMLE)
+S3method(fitted, marssMLE)
+S3method(forecast, marssMLE)
+S3method(glance, marssMLE)
+S3method(model.frame, marssMODEL)
+S3method(model.frame, marssMLE)
 S3method(print, marssMODEL)
 S3method(print, marssMLE)
 S3method(print, marssPredict)
@@ -58,37 +69,19 @@ S3method(plot, marssPredict)
 S3method(plot, marssResiduals)
 S3method(stats::predict, marssMLE)
 S3method(logLik, marssMLE)
-S3method(fitted, marssMLE)
+S3method(residuals, marssMLE)
+S3method(simulate, marssMLE)
 S3method(summary, marssMODEL)
 S3method(summary, marssMLE)
-S3method(coef, marssMLE)
-S3method(residuals, marssMLE)
-S3method(model.frame, marssMODEL)
-S3method(model.frame, marssMLE)
-S3method(simulate, marssMLE)
+S3method(tidy, marssMLE)
 S3method(toLatex, marssMODEL)
 S3method(toLatex, marssMLE)
 S3method(stats::tsSmooth, marssMLE)
 
 # Declare these methods if the user has the package
 if(getRversion() >= "3.6.0") {
-  S3method(broom::glance, marssMLE)
-  S3method(broom::tidy, marssMLE)
   S3method(ggplot2::autoplot, marssMLE)
   S3method(ggplot2::autoplot, marssPredict)
   S3method(ggplot2::autoplot, marssResiduals)
-  S3method(forecast::accuracy, marssMLE)
-  S3method(forecast::accuracy, marssPredict)
-  S3method(forecast::forecast, marssMLE)
 }
-
-
-# Another approach for the broom and ggplot2 S3 methods is 
-# to put broom and ggplot2 in imports
-# importFrom(broom, glance, tidy)
-# importFrom(ggplot2, autoplot)
-# S3method(augment, marssMLE)
-# S3method(glance, marssMLE)
-# S3method(tidy, marssMLE)
-# S3method(autoplot, marssMLE)
 

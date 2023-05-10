@@ -1,14 +1,15 @@
-\name{accuracy.marssMLE}
-\alias{accuracy.marssMLE}
+\name{accuracy}
+\alias{accuracy}
 \alias{accuracy.marssPredict}
+\alias{accuracy.marssMLE}
 
 \title{Return accuracy metrics}
 \usage{
-accuracy.marssPredict(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
-accuracy.marssMLE(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
+\method{accuracy}{marssPredict}(object, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
+\method{accuracy}{marssMLE}(object, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
 }
 \arguments{
-  \item{f}{A \code{\link{marssMLE}} or \code{\link{marssPredict}} object}
+  \item{object}{A \code{\link{marssMLE}} or \code{\link{marssPredict}} object}
   \item{x}{A matrix or data frame with data to test against the h steps of a forecast.}
   \item{test}{Which time steps in training data (data model fit to) to compute accuracy for.}
   \item{type}{type="ytt1" is the one-step-ahead predictions. type="ytT" is the fitted ytT predictions. The former are standardly used for training data prediction metrics.}  
@@ -16,7 +17,7 @@ accuracy.marssMLE(f, x, test = NULL, type = "ytt1", verbose = FALSE, ...)
   \item{...}{Not used.}
 }
 \description{
- This is a method for the generic \code{accuracy} function in the forecast package. The forecast package is not part of the MARSS package and you will need to load it separately (See examples). Alternatively you can use \code{accuracy.marssMLE()} or \code{accuracy.marssPredict()}.
+ This is a method for the generic \code{accuracy} function in the generics package. It is written to mimic the output from the accuracy function in the forecast package. See that package for details.
  
 The measures calculated are:
 \itemize{
@@ -39,7 +40,6 @@ dat <- dat[c(2, 11, 12),]
 train.dat <- dat[,1:12]
 fit <- MARSS(train.dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 
-library(forecast)
 accuracy(fit)
 
 # Compare to test data set
