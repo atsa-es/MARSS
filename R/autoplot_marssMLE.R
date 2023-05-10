@@ -151,10 +151,10 @@ autoplot.marssMLE <-
       rottext <- ifelse(rotate, "the rotated ", "")
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate))
       if (conf.int) {
-        p1 <- p1 + ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~.conf.low, ymax = ~.conf.up), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+        p1 <- p1 + ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~.conf.low, ymax = ~.conf.up), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, linewidth = plotpar$ci.linesize)
       }
       p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, linewidth = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(paste(str_to_sentence(paste0(rottext, "States")), i))
@@ -192,7 +192,7 @@ autoplot.marssMLE <-
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.fitted))
       if (conf.int) {
         p1 <- p1 +
-          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, linewidth = plotpar$ci.linesize)
       }
       if (pi.int) {
         df2 <- fitted.marssMLE(x, type = ctype, interval = "prediction", level = conf.level)
@@ -217,7 +217,7 @@ autoplot.marssMLE <-
         )
       }
       p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, linewidth = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::ggtitle(tit)
@@ -264,15 +264,15 @@ autoplot.marssMLE <-
       # make sure that ggplot doesn't re-order the levels
       df$.rownames <- factor(df$.rownames, levels = unique(df$.rownames))
       p1 <- ggplot2::ggplot(data = df, ggplot2::aes_(~t, ~.estimate)) +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size)
+        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, linewidth = plotpar$line.size)
       if (conf.int & ctype != "ytt") {
         df$ymin <- df$.conf.low
         df$ymax <- df$.conf.up
         p1 <- p1 +
-          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin, ymax = ~ymax), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, linewidth = plotpar$ci.linesize)
       }
       p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::geom_line(linetype = plotpar$line.linetype, color = plotpar$line.col, linewidth = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~.rownames, scale = "free_y") +
         ggplot2::geom_point(
@@ -336,7 +336,7 @@ autoplot.marssMLE <-
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
         p1 <- p1 +
-          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, linewidth = plotpar$ci.linesize)
       }
       if (fig.notes) {
         conf.note <- paste0(" and ", round(conf.level*100, digits=0),"% of residuals should fall within the CIs.")
@@ -400,7 +400,7 @@ autoplot.marssMLE <-
         df$ymin.resid <- stats::qnorm(alpha / 2) * df$sigma
         df$ymax.resid <- -stats::qnorm(alpha / 2) * df$sigma
         p1 <- p1 +
-          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, size = plotpar$ci.linesize)
+          ggplot2::geom_ribbon(data = df, ggplot2::aes_(ymin = ~ymin.resid, ymax = ~ymax.resid), alpha = plotpar$ci.alpha, fill = plotpar$ci.fill, color = plotpar$ci.col, linetype = plotpar$ci.linetype, linewidth = plotpar$ci.linesize)
       }
       if (fig.notes) {
         if (grepl("std", i)) {
@@ -586,7 +586,7 @@ autoplot.marssMLE <-
         if (!silent) cat(paste("plot.type =", i, "\n"))
         print(plts[[i]])
       }
-      if (i != plot.type[length(plot.type)] && !silent) {
+      if (i != names(plts)[length(names(plts))] && !silent) {
         ans <- readline(prompt = "Hit <Return> to see next plot (q to exit): ")
         if (tolower(ans) == "q") {
           return()

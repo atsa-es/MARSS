@@ -127,7 +127,7 @@ d2 <- fitted(fit, type = "ytT", interval="prediction", level=0.95)
 d$.lwr <- d2$.lwr
 d$.upr <- d2$.upr
 ggplot(data = d) +
-  geom_line(aes(t, .fitted), size=1) +
+  geom_line(aes(t, .fitted), linewidth=1) +
   geom_point(aes(t, y), color = "blue", na.rm=TRUE) +
   geom_ribbon(aes(x = t, ymin = .conf.low, ymax = .conf.up), alpha = 0.3) +
   geom_line(aes(t, .lwr), linetype = 2) +

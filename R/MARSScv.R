@@ -1,4 +1,4 @@
-#' MARSS_cv is a wrapper for MARSS that re-fits the model with cross validated data.
+#' MARSScv is a wrapper for MARSS that re-fits the model with cross validated data.
 #'
 #' @param y A n x T matrix of n time series over T time steps. Only y
 #' is required for the function. A ts object (univariate or multivariate)
@@ -39,6 +39,7 @@
 #' to floor(n_future_cv/3). Predictions are made for the last n_future_cv time steps
 #' @param interval uncertainty interval for prediction. Can be one of "confidence" or "prediction",
 #' and defaults to "confidence"
+#' @param ... not used
 #' @return A list object, containing `cv_pred` (a matrix of predictions), `cv_se` (a matrix of SEs),
 #' `fold_ids` (a matrix of fold ids used as data), and `df` (a dataframe containing
 #' the original data, predictions, SEs, and folds)
@@ -48,94 +49,98 @@
 #' \donttest{
 #' dat <- t(harborSealWA)
 #' dat <- dat[2:4, ] # remove the year row
-#' #fit a model with 1 hidden state and 3 observation time series
+#' # fit a model with 1 hidden state and 3 observation time series
 #' # cross validation here is random, 10 folds
-#' fit <- MARSS_cv(dat, model = list(
-#'  Z = matrix(1, 3, 1),
-#'  R = "diagonal and equal"
+#' fit <- MARSScv(dat, model = list(
+#'   Z = matrix(1, 3, 1),
+#'   R = "diagonal and equal"
 #' ))
 #'
 #' # second, demonstrate passing in pre-specified folds
-#' fold_ids = matrix(sample(1:5,size=nrow(dat)*ncol(dat),replace=T),
-#' nrow(dat),ncol(dat))
-#' fit <- MARSS_cv(dat, model = list(
-#'  Z = matrix(1, 3, 1),
-#'  R = "diagonal and equal"
+#' fold_ids <- matrix(
+#'   sample(1:5, size = nrow(dat) * ncol(dat), replace = TRUE),
+#'   nrow(dat), ncol(dat)
+#' )
+#' fit <- MARSScv(dat, model = list(
+#'   Z = matrix(1, 3, 1),
+#'   R = "diagonal and equal"
 #' ), fold_ids = fold_ids)
 #'
 #' # third, illustrate future cross validation
-#' fit <- MARSS_cv(dat, model = list(
-#'  Z = matrix(1, 3, 1),
-#'  R = "diagonal and equal"
-#' ), future_cv=TRUE, n_future_cv = 5)
+#' fit <- MARSScv(dat, model = list(
+#'   Z = matrix(1, 3, 1),
+#'   R = "diagonal and equal"
+#' ), future_cv = TRUE, n_future_cv = 5)
 #' }
-MARSS_cv <- function(y,
-                     model = NULL,
-                     inits = NULL,
-                     method = "kem",
-                     form = "marxss",
-                     silent = FALSE,
-                     control = NULL,
-                     fun.kf = c("MARSSkfas", "MARSSkfss"),
-                     fold_ids = NULL,
-                     future_cv = FALSE,
-                     n_future_cv = floor(ncol(y)/3),
-                     interval = "confidence",
-                     ...) {
-
-  if(is.null(fold_ids)) {
+MARSScv <- function(y,
+                    model = NULL,
+                    inits = NULL,
+                    method = "kem",
+                    form = "marxss",
+                    silent = FALSE,
+                    control = NULL,
+                    fun.kf = c("MARSSkfas", "MARSSkfss"),
+                    fold_ids = NULL,
+                    future_cv = FALSE,
+                    n_future_cv = floor(ncol(y) / 3),
+                    interval = "confidence",
+                    ...) {
+  if (is.null(fold_ids)) {
     # if fold_ids isn't entered, ids randomly
     n_folds <- 10
     fold_ids <- matrix(0, nrow(y), ncol(y))
-    for(i in 1:nrow(fold_ids)) {
-      for(j in 1:ncol(fold_ids)) fold_ids[i,j] <- sample(1:10,size=1)
+    for (i in 1:nrow(fold_ids)) {
+      for (j in 1:ncol(fold_ids)) fold_ids[i, j] <- sample(1:10, size = 1)
     }
   } else {
-    n_folds <- max(fold_ids, na.rm=T)
-    if(nrow(fold_ids) != nrow(y)) stop("Error: the number of rows of fold_ids must be the same as y")
-    if(ncol(fold_ids) != ncol(y)) stop("Error: the number of rows of fold_ids must be the same as y")
+    n_folds <- max(fold_ids, na.rm = T)
+    if (nrow(fold_ids) != nrow(y)) stop("Error: the number of rows of fold_ids must be the same as y")
+    if (ncol(fold_ids) != ncol(y)) stop("Error: the number of rows of fold_ids must be the same as y")
   }
 
   pred <- matrix(NA, nrow(y), ncol(y))
   pred_se <- matrix(NA, nrow(y), ncol(y))
-  row_indx <- matrix(rep(1:nrow(y),ncol(y)),nrow(y),ncol(y))
-  col_indx <- matrix(sort(rep(1:ncol(y),nrow(y))),nrow(y),ncol(y))
+  row_indx <- matrix(rep(1:nrow(y), ncol(y)), nrow(y), ncol(y))
+  col_indx <- matrix(sort(rep(1:ncol(y), nrow(y))), nrow(y), ncol(y))
 
-  if(future_cv==TRUE) {
+  if (future_cv == TRUE) {
     # bookkeeping for the future cv
-    n_folds = n_future_cv
-    fold_ids = ncol(y) - col_indx + 1
+    n_folds <- n_future_cv
+    fold_ids <- ncol(y) - col_indx + 1
   }
 
-  for(k in 1:n_folds) {
+  for (k in 1:n_folds) {
     # drop data from this fold by making it NA
-    if(future_cv==FALSE) {
+    if (future_cv == FALSE) {
       yfit <- y
-      yfit[which(fold_ids==k)] <- NA
+      yfit[which(fold_ids == k)] <- NA
     } else {
       # drop out all data points
-      yfit[,(ncol(y) - k + 1):ncol(y)] <- NA
+      yfit <- y
+      yfit[, (ncol(y) - k + 1):ncol(y)] <- NA
     }
     # fit the model
-    fit <- MARSS(y=yfit,
-                 model=model,
-                 inits=inits,
-                 method=method,
-                 form=form,
-                 silent=silent,
-                 control=control,
-                 fun.kf=fun.kf,
-                 ...)
+    fit <- MARSS(
+      y = yfit,
+      model = model,
+      inits = inits,
+      method = method,
+      form = form,
+      silent = silent,
+      control = control,
+      fun.kf = fun.kf,
+      ...
+    )
     # save predictions and SEs
-    pred_df <- predict(kemfit,interval=interval)$pred
-    pred_mat <- matrix(pred_df$estimate, nrow=nrow(y), byrow=TRUE)
-    pred_se_mat <- matrix(pred_df$se, nrow=nrow(y), byrow=TRUE)
-    pred[which(fold_ids==k)] <- pred_mat[which(fold_ids==k)]
-    pred_se[which(fold_ids==k)] <- pred_se_mat[which(fold_ids==k)]
+    pred_df <- predict(fit, interval = interval)$pred
+    pred_mat <- matrix(pred_df$estimate, nrow = nrow(y), byrow = TRUE)
+    pred_se_mat <- matrix(pred_df$se, nrow = nrow(y), byrow = TRUE)
+    pred[which(fold_ids == k)] <- pred_mat[which(fold_ids == k)]
+    pred_se[which(fold_ids == k)] <- pred_se_mat[which(fold_ids == k)]
   }
 
   # also return these as a df for plotting, etc.
-  df <- pred_df[,c(".rownames","t","y")]
+  df <- pred_df[, c(".rownames", "t", "y")]
   df$cv_pred <- c(t(pred))
   df$cv_se <- c(t(pred_se))
   df$fold_id <- c(t(fold_ids))

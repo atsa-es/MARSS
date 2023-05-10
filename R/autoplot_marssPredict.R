@@ -84,7 +84,7 @@ autoplot.marssPredict <-
         plottitle <- paste(plottitle, switch(x$interval.type, none="", confidence="+ CI", prediction = "+ PI"))
       }
       p1 <- p1 +
-        ggplot2::geom_line(linetype = plotpar$line.type, color = plotpar$line.col, size = plotpar$line.size) +
+        ggplot2::geom_line(linetype = plotpar$line.type, color = plotpar$line.col, linewidth = plotpar$line.size) +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +
         ggplot2::facet_wrap(~ df$.rownames, scale = "free_y") +
         ggplot2::ggtitle(plottitle)
@@ -141,11 +141,11 @@ autoplot.marssPredict <-
       p1 <- p1 + ggplot2::geom_line(data = tmp, 
                                     linetype = plotpar$line.type, 
                                     color = plotpar$line.col, 
-                                    size = plotpar$line.size, na.rm = TRUE)
+                                    linewidth = plotpar$line.size, na.rm = TRUE)
       # Add the forecast line
       tmp <- df
       tmp$estimate[tmp$t <= nx] <- NA
-      p1 <- p1 + ggplot2::geom_line(data = tmp, linetype = plotpar$f.linetype, color = plotpar$f.col, size = plotpar$f.linesize, na.rm = TRUE)
+      p1 <- p1 + ggplot2::geom_line(data = tmp, linetype = plotpar$f.linetype, color = plotpar$f.col, linewidth = plotpar$f.linesize, na.rm = TRUE)
       # Add labels and titles
       p1 <- p1 +
         ggplot2::xlab("Time") + ggplot2::ylab("Estimate") +

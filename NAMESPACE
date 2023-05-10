@@ -6,6 +6,7 @@ export(
   MARSS,
   MARSSaic,
   MARSSboot,
+  MARSScv,
   MARSShessian,
   MARSSinfo,
   MARSSinits,

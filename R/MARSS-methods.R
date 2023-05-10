@@ -1,3 +1,8 @@
+#' Generic for fitting MARSS models
+#' 
+#' Uses the method of a marssMLE class object. Will call a function such as [MARSSkem()], [MARSSoptim()] or `MARSStmb()` in the {marssTMB} package.
+#' @param x a [marssMLE] object.
+#' @param ... additional arguments for the fitting function
 MARSSfit <- function(x, ...) {
   UseMethod("MARSSfit")
 }

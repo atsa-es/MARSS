@@ -8,9 +8,9 @@
 }
 \usage{
 \method{toLatex}{marssMODEL}(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", 
-math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE)
+math.sty = "amsmath", output = c("pdf", "tex", "rawtex"), replace = TRUE, simplify = TRUE)
 \method{toLatex}{marssMLE}(object, ..., file = NULL, digits = 2, greek = TRUE, orientation = "landscape", 
-math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE)
+math.sty = "amsmath", output = c("pdf", "tex", "rawtex"), replace = TRUE, simplify = TRUE)
 }
 \arguments{
   \item{object}{ A \code{\link{marssMODEL}} or \code{\link{marssMLE}} object.  }
@@ -20,7 +20,7 @@ math.sty = "amsmath", output = c("pdf", "tex"), replace = TRUE, simplify = TRUE)
   \item{greek}{ Use greek symbols. }
   \item{orientation}{ Orientation to use. landscape or portrait. }
   \item{math.sty}{ LaTeX math styling to use. }
-  \item{output}{ pdf or tex. If blank, both are output. }
+  \item{output}{ pdf, tex or rawtex. If blank, both are output. }
   \item{replace}{ Replace existing file if present. }
   \item{simplify}{ If TRUE, then if \eqn{\mathbf{B}}{B} or \eqn{\mathbf{Z}}{Z} are identity, they do not appear. Any zero-ed out elements also do not appear. }
  }
