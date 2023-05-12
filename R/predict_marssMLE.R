@@ -176,7 +176,7 @@ predict.marssMLE <- function(object, n.ahead = 0,
               stop("predict.marssMLE: The time dimension in the newdata y ts object does not match newdata t.", call. = FALSE)
           }
           newdata[[elem]] <- t(newdata[[elem]])
-          attr(newdata[[elem]], "model.tsp")
+          attr(newdata[[elem]], "model.tsp") <- model.tsp.newdata
         }
         if (!is.matrix(newdata[[elem]])) stop(paste0("predict.marssMLE(): newdata ", elem, " must be a matrix with ", model.dims[[elem]][1], " rows."), call. = FALSE)
         if (dim(newdata[[elem]])[1] != model.dims[[elem]][1]) stop(paste0("predict.marssMLE(): model ", elem, " has ", model.dims[[elem]][1], " rows.", elem, " in newdata does not."), call. = FALSE)
