@@ -22,9 +22,28 @@ Suggests:
     tidyr,
     xtable,
     testthat
-Author: Elizabeth Eli Holmes, Eric J. Ward, Mark D. Scheuerell, and Kellie Wills
+Authors@R: 
+    c(person("Elizabeth Eli", "Holmes", , "eli.holmes@noaa.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9128-8393")),
+      person("Eric J.", "Ward", , "eric.ward@noaa.gov", role = c("aut"),
+           comment = c(ORCID = "0000-0002-4359-0296")),
+      person("Mark D.", "Scheuerell", , "scheuerl@uw.edu", role = c("aut"),
+           comment = c(ORCID = "0000-0002-8284-1254")),
+      person("Kellie", "Wills", , "wills.kellie@gmail.com", role = c("aut"))
+      )
 Maintainer: Elizabeth Holmes - NOAA Federal <eli.holmes@noaa.gov>
-Description: The MARSS package provides maximum-likelihood parameter estimation for constrained and unconstrained linear multivariate autoregressive state-space (MARSS) models fit to multivariate time-series data.  Fitting is primarily via an Expectation-Maximization (EM) algorithm, although fitting via the BFGS algorithm (using the optim function) is also provided.  MARSS models are a class of dynamic linear model (DLM) and vector autoregressive model (VAR) model.  Functions are provided for parametric and innovations bootstrapping, Kalman filtering and smoothing, bootstrap model selection criteria (AICb), confidences intervals via the Hessian approximation and via bootstrapping and calculation of auxiliary residuals for detecting outliers and shocks.  The user guide shows examples of using MARSS for parameter estimation for a variety of applications, model selection, dynamic factor analysis, outlier and shock detection, and addition of covariates.  Online workshops (lectures, eBook, and computer labs) at <https://atsa-es.github.io/>. Fast fitting with TMB available by installing the companion package <https://atsa-es.github.io/marssTMB/>.  See the NEWS file for update information.
+Description: The MARSS package provides maximum-likelihood parameter
+    estimation for constrained and unconstrained linear multivariate autoregressive
+    state-space (MARSS) models, including partially deterministic models. MARSS models are a class 
+    of dynamic linear model (DLM) and vector autoregressive model (VAR)
+    model. Fitting available via Expectation-Maximization (EM), BFGS (using optim), and TMB
+    (using the marssTMB companion package). Functions are provided for parametric and 
+    innovations bootstrapping, Kalman filtering and smoothing, model selection criteria including
+    bootstrap AICb, confidences intervals via the Hessian approximation or bootstrapping, and all
+    conditional residual types. See the user guide for examples of dynamic factor analysis, 
+    dynamic linear models, outlier and shock detection, and multivariate AR-p models.  
+    Online workshops (lectures, eBook, and computer labs) 
+    at <https://atsa-es.github.io/>.
 License: GPL-2
 LazyData: yes
 BuildVignettes: yes
