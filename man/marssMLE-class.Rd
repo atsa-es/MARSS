@@ -21,14 +21,18 @@
     \item{print}{\code{signature(x = "marssMLE")}: ... }
     \item{summary}{\code{signature(object = "marssMLE")}: ... }
     \item{coef}{\code{signature(object = "marssMLE")}: ... }
+    \item{residuals}{\code{signature(object = "marssMLE")}: ... }
     \item{predict}{\code{signature(object = "marssMLE")}: ... }
     \item{fitted}{\code{signature(object = "marssMLE")}: ... }
     \item{logLik}{\code{signature(object = "marssMLE")}: ... }
     \item{simulate}{\code{signature(object = "marssMLE")}: ... }
+    \item{forecast}{\code{signature(object = "marssMLE")}: ... }
+    \item{accuracy}{\code{signature(object = "marssMLE")}: ... }
+    \item{toLatex}{\code{signature(object = "marssMLE")}: ... }
 	 }
 }
 \seealso{
-\code{\link{is.marssMLE}}
+\code{\link{is.marssMLE}()}, \code{\link{print.marssMLE}()}, \code{\link{summary.marssMLE}()}, \code{\link{coef.marssMLE}()}, \code{\link{residuals.marssMLE}()}, \code{\link{fitted.marssMLE}()}, \code{\link{tsSmooth.marssMLE}()}, \code{\link{logLik.marssMLE}()}, \code{\link{simulate.marssMLE}()}, \code{\link{predict.marssMLE}()}, \code{\link{forecast.marssMLE}()}, \code{\link{accuracy.marssMLE}()}, \code{\link{toLatex.marssMLE}()}
 }
 \author{ 
   Eli Holmes and Kellie Wills, NOAA, Seattle, USA

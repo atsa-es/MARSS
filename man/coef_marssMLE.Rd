@@ -1,6 +1,6 @@
 \name{coef.marssMLE}
 \alias{coef.marssMLE}
-
+\keyword{coremethods}
 \title{ Coefficient function for MARSS MLE objects }
 \description{
   \code{\link{MARSS}()} outputs \code{\link{marssMLE}} objects.  \code{coef(object)}, where \code{object} is the output from a \code{\link{MARSS}()} call, will print out the estimated parameters.  The default output is a list with values for each parameter, however the output can be altered using the \code{type} argument to output a vector of all the estimated values (\code{type="vector"}) or a list with the full parameter matrix with the estimated and fixed elements (\code{type="matrix"}). For a summary of the parameter estimates with CIs from the estimated Hessian, use try \code{tidy(object)}.

@@ -6,9 +6,11 @@
 
 \description{
 The Dynamic Factor Analysis model in MARSS is
-\deqn{x(t) = x(t-1) + w(t), where w(t) ~ MVN(0,I)}
-\deqn{y(t) = Z(t) x(t) + D(t) d(t) + v(t), where v(t) ~ MVN(0,R(t))}
-\deqn{x(1) ~ MVN(0, 5*I)}
+The argument \code{form="marxss"} in a \code{\link{MARSS}()} function call specifies a MAR-1 model with eXogenous variables model.  This is a MARSS(1) model of the form:
+\deqn{\mathbf{x}_{t} = \mathbf{x}_{t-1} + \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{I})}{x(t) = x(t-1) + w(t), where w(t) ~ MVN(0,I)}
+\deqn{\mathbf{y}_t = \mathbf{Z}_t \mathbf{x}_t + \mathbf{D}_t \mathbf{d}_t + \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R}_t)}{y(t) = Z(t) x(t) + D(t) d(t) + v(t), where v(t) ~ MVN(0,R(t))}
+\deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, 5\mathbf{I})}{X(1) ~ MVN(x0, 5I) }
+Note, by default \eqn{\mathbf{x}_1}{x(1)} is treated as a diffuse prior.
 
 Passing in \code{form="dfa"} to \code{\link{MARSS}()} invokes a helper function to create that model and creates the \eqn{\mathbf{Z}}{Z} matrix for the user.  \eqn{\mathbf{Q}}{Q} is by definition identity, \eqn{\mathbf{x_0}}{x0} is zero and \eqn{\mathbf{V_0}}{V0} is diagonal with large variance (5). \eqn{\mathbf{u}}{U} is zero, \eqn{\mathbf{a}}{A} is zero, and covariates only enter the \eqn{\mathbf{y}}{Y} equation.  Because \eqn{\mathbf{u}}{U} and \eqn{\mathbf{a}}{A} are 0, the data should have mean 0 (demeaned) otherwise one is likely to be creating a structurally inadequate model (i.e. the model implies that the data have mean = 0, yet data do not have mean = 0 ).
 }

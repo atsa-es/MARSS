@@ -1,33 +1,33 @@
 #' MARSScv is a wrapper for MARSS that re-fits the model with cross validated data.
-#'
+#' @keywords experimental
 #' @param y A n x T matrix of n time series over T time steps. Only y
 #' is required for the function. A ts object (univariate or multivariate)
 #' can be used and this will be converted to a matrix with time in the
 #' columns.
 #' @param model Model specification using a list of parameter matrix text shortcuts or matrices.
-#' See Details and \code{\link{MARSS.marxss}} for the default form.
+#' See Details and [MARSS.marxss()] for the default form.
 #' Or better yet open the Quick Start Guide \code{RShowDoc("Quick_Start",package="MARSS")}
-#' @param inits A list with the same form as the list outputted by \code{coef(fit)}
-#' that specifies initial values for the parameters. See also \code{\link{MARSS.marxss}}.
-#' @param method Estimation method. MARSS provides an EM algorithm (\code{method="kem"})
-#' (see \code{\link{MARSSkem}}) and the BFGS algorithm (\code{method="BFGS"})
-#' (see \code{\link{MARSSoptim}})
+#' @param inits A list with the same form as the list output by \code{coef(fit)}
+#' that specifies initial values for the parameters. See also [MARSS.marxss()].
+#' @param method Estimation method. MARSS provides an EM algorithm (`method="kem"`)
+#' (see [MARSSkem()]) and the BFGS algorithm (`method="BFGS"`)
+#' (see [MARSSoptim()]). Fast TMB fitting provided by the companion package {marssTMB}.
 #' @param form The equation form used in the \code{MARSS()} call.  The default is "marxss".
-#' See \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}
+#' See [MARSS.marxss()] or [MARSS.dfa()]
 #' @param silent Setting to TRUE(1) suppresses printing of full error messages, warnings,
 #' progress bars and convergence information. Setting to FALSE(0) produces
 #' error output. Setting silent=2 will produce more verbose error messages and
 #' progress information.
 #' @param control Estimation options for the maximization algorithm. The typically used
-#' control options for method="kem" are below but see  \code{\link{marssMLE}} for the full
+#' control options for method="kem" are below but see  [MARSS::marssMLE] for the full
 #' list of control options.  Note many of these are not allowed if method="BFGS";
-#' see  \code{\link{MARSSoptim}} for the allowed control options for this method.
+#' see  [MARSSoptim()] for the allowed control options for this method.
 #' @param fun.kf What Kalman filter function to use.  MARSS has two:
-#' \code{\link{MARSSkfas}()} which is based on the Kalman filter in the
+#' [MARSSkfas()] which is based on the Kalman filter in the
 #' \href{https://cran.r-project.org/package=KFAS}{KFAS} package based on
-#' Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native
+#' Koopman and Durbin and [MARSSkfss()] which is a native
 #' R implementation of the Kalman filter and smoother in Shumway and
-#' Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()}
+#' Stoffer. The KFAS filter is much faster.  [MARSSkfas()]
 #' modifies the input and output in order to output the lag-one covariance
 #' smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).
 #' @param fold_ids A n x T matrix of integers, with values assigned by the user to folds.

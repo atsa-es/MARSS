@@ -1,5 +1,6 @@
 \name{CSEGtmufigure}
 \alias{CSEGtmufigure}
+\keyword{experimental}
 \title{ Plot Forecast Uncertainty }
 \description{
   Plot the uncertainty in the probability of hitting a percent threshold (quasi-extinction) for a single random walk trajectory.  This is the quasi-extinction probability used in Population Viability Analysis.  The uncertainty is shown as a function of the forecast, where the forecast is defined in terms of the forecast length (number of time steps) and forecasted decline (percentage).  This is a function used by one of the vignettes in the \code{\link{MARSS-package}}. 

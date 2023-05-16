@@ -9,3 +9,4 @@ tests/testthat/dontruntests/_snaps
 tests/testthat/dontruntests/*.*
 inst/.DS_Store
 
+docs

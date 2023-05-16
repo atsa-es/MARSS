@@ -1,8 +1,11 @@
-%\VignetteIndexEntry{User Guide} 
+%\VignetteIndexEntry{User_Guide} 
 %\VignettePackage{MARSS}
+%\VignetteEngine{utils::Sweave}
+%\VignetteKeyword{vignette}
 \documentclass{article}
 \usepackage{hyperref}
 \usepackage{pdfpages}
 \begin{document}
-\includepdf[fitpaper=true,pages=-]{../inst/doc/UserGuide.pdf}
+\SweaveOpts{concordance=TRUE}
+\includepdf[fitpaper=true,pages=-]{UserGuide-static.pdf}
 \end{document}

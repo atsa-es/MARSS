@@ -1,5 +1,7 @@
 \name{MARSS.out}
 \alias{MARSS.out}
+\keyword{experimental}
+
 \title{ Output and Intervals for MARSS MLE objects }
 \description{
   There are a variety of types of outputs and intervals for MARSS models. This help file summarizes them and tells you which function to use to get the output you want.

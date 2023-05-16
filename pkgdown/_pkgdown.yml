@@ -1,0 +1,125 @@
+url: https://atsa-es.github.io/MARSS/
+template:
+  bootstrap: 5
+
+home:
+  links:
+  - text: ATSA Homepage
+    href: http://atsa-es.github.io
+    
+reference:
+- title: Main function
+  desc: >
+    Main fitting function. 
+  contents:
+  - MARSS
+  - MARSS-package
+  - MARSS.marxss
+  - MARSS.dfa
+  - MARSS.marss
+
+- title: Fit methods
+  desc: >
+    Methods for fits.
+  contents:
+  - glance
+  - tidy
+  - coef.marssMLE
+  - fitted.marssMLE
+  - tsSmooth.marssMLE
+  - residuals.marssMLE
+  - accuracy
+
+- title: Plotting
+  contents:
+  - autoplot.marssMLE
+  - plot.marssMLE
+  - plot.marssPredict
+  - plot.marssResiduals
+
+- title: Printing and Summarizing
+  contents:
+  - print.marssMLE
+  - print.marssMODEL
+  - print.marssPredict
+  - toLatex.marssMLE
+
+- title: Prediction and simulation
+  contents:
+  - predict
+  - forecast
+  - accuracy
+  - MARSSboot
+  - MARSSsimulate
+  - predict.marssMLE
+  - forecast.marssMLE
+
+- title: Helper functions
+  desc: >
+    Helper functions for users.
+  contents:
+  - ldiag
+  - MARSSinfo
+  - zscore
+
+- title: Residuals and Fisher Information
+  contents:
+  - residuals.marssMLE
+  - MARSShessian
+  - MARSShessian.numerical
+  - MARSSFisherI
+  - MARSSharveyobsFI
+  - residuals.marssMLE
+  - MARSSresiduals
+  - MARSSresiduals.tT
+  - MARSSresiduals.tt1
+  - MARSSresiduals.tt
+
+- title: Fitting functions
+  contents:
+  - MARSSfit
+  - MARSSkem
+  - MARSSoptim
+  
+- title: Kalman filter and smoother
+  contents:
+  - MARSSkf
+  - MARSSkfss
+  - MARSSkfas
+  - MARSShatyt
+
+- title: Datasets
+  contents:
+  - has_keyword("datasets")
+
+- title: MARSS classes
+  contents:
+  - has_keyword("classes") 
+
+- title: Fit helper functions
+  desc: >
+    Helper functions that are mainly for internal use.
+  contents:
+  - MARSSaic
+  - MARSSinits
+  - MARSSparamCIs
+  - logLik.marssMLE
+  - MARSSvectorizeparam
+  - MARSSinnovationsboot
+  - model.frame.marssMODEL
+
+
+- title: Experimental
+  desc: >
+    Experimental functions. Might be broken.
+  contents:
+  - has_keyword("experimental")
+
+- title: Utility functions
+  desc: >
+    Internal utility methods. Not for users.
+  contents:
+  - has_keyword("internal")
+
+
+

@@ -1,5 +1,6 @@
 \name{MARSS.vectorized}
 \alias{MARSS.vectorized}
+\keyword{experimental}
 
 \title{ Vectorized Multivariate AR-1 State-space Model  }
 

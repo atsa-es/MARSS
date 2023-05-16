@@ -1,5 +1,6 @@
 \name{is.marssMLE}
 \alias{is.marssMLE}
+\keyword{internal}
 
 \title{ Tests marssMLE object for completeness }
 \description{

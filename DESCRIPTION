@@ -12,6 +12,7 @@ Suggests:
     ggplot2,
     gridExtra,
     Hmisc,
+    knitr,
     lattice,
     lme4,
     maps,
@@ -51,3 +52,5 @@ ByteCompile: TRUE
 URL: https://atsa-es.github.io/MARSS/
 BugReports: https://github.com/atsa-es/MARSS/issues
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr, utils

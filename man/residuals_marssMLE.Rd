@@ -88,11 +88,12 @@ library(ggplot2)
 theme_set(theme_bw())
 
 # Show the standard residuals diagnostic plots for state-space models
-autoplot(fit, plot.type="residuals")
+# silent used for examples to not be in interactive mode
+autoplot(fit, plot.type="residuals", silent=TRUE)
 
 # Plot the residuals object; show both for y and x
 d <- residuals(fit, type="tt1")
-autoplot(d)
+autoplot(d, silent=TRUE)
 
 # Manually make a plot of the model residuals (innovations) with intervals
 d <- residuals(fit, type="tt1")

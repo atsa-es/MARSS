@@ -1,0 +1,16 @@
+---
+title: User Guide
+pkgdown:
+  as_is: true
+  extension: pdf
+output: 
+  pdf_document: 
+    extra_dependencies:
+      pdfpages: null
+      hyperref: null
+vignette: >
+  %\VignetteIndexEntry{User Guide}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+\includepdf[fitpaper=true,pages=-]{UserGuide-static.pdf}

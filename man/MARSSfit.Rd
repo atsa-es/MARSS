@@ -7,10 +7,10 @@
 MARSSfit(x, ...)
 }
 \arguments{
-\item{x}{a [marssMLE] object.}
+\item{x}{a \link{marssMLE} object.}
 
 \item{...}{additional arguments for the fitting function}
 }
 \description{
-Uses the method of a marssMLE class object. Will call a function such as [MARSSkem()], [MARSSoptim()] or `MARSStmb()` in the {marssTMB} package.
+Uses the method of a marssMLE class object. Will call a function such as \code{\link[=MARSSkem]{MARSSkem()}}, \code{\link[=MARSSoptim]{MARSSoptim()}} or \code{MARSStmb()} in the {marssTMB} package.
 }

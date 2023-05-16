@@ -27,18 +27,18 @@ can be used and this will be converted to a matrix with time in the
 columns.}
 
 \item{model}{Model specification using a list of parameter matrix text shortcuts or matrices.
-See Details and \code{\link{MARSS.marxss}} for the default form.
+See Details and \code{\link[=MARSS.marxss]{MARSS.marxss()}} for the default form.
 Or better yet open the Quick Start Guide \code{RShowDoc("Quick_Start",package="MARSS")}}
 
-\item{inits}{A list with the same form as the list outputted by \code{coef(fit)}
-that specifies initial values for the parameters. See also \code{\link{MARSS.marxss}}.}
+\item{inits}{A list with the same form as the list output by \code{coef(fit)}
+that specifies initial values for the parameters. See also \code{\link[=MARSS.marxss]{MARSS.marxss()}}.}
 
 \item{method}{Estimation method. MARSS provides an EM algorithm (\code{method="kem"})
-(see \code{\link{MARSSkem}}) and the BFGS algorithm (\code{method="BFGS"})
-(see \code{\link{MARSSoptim}})}
+(see \code{\link[=MARSSkem]{MARSSkem()}}) and the BFGS algorithm (\code{method="BFGS"})
+(see \code{\link[=MARSSoptim]{MARSSoptim()}}). Fast TMB fitting provided by the companion package {marssTMB}.}
 
 \item{form}{The equation form used in the \code{MARSS()} call.  The default is "marxss".
-See \code{\link{MARSS.marxss}} or \code{\link{MARSS.dfa}}}
+See \code{\link[=MARSS.marxss]{MARSS.marxss()}} or \code{\link[=MARSS.dfa]{MARSS.dfa()}}}
 
 \item{silent}{Setting to TRUE(1) suppresses printing of full error messages, warnings,
 progress bars and convergence information. Setting to FALSE(0) produces
@@ -46,16 +46,16 @@ error output. Setting silent=2 will produce more verbose error messages and
 progress information.}
 
 \item{control}{Estimation options for the maximization algorithm. The typically used
-control options for method="kem" are below but see  \code{\link{marssMLE}} for the full
+control options for method="kem" are below but see  \link{marssMLE} for the full
 list of control options.  Note many of these are not allowed if method="BFGS";
-see  \code{\link{MARSSoptim}} for the allowed control options for this method.}
+see  \code{\link[=MARSSoptim]{MARSSoptim()}} for the allowed control options for this method.}
 
 \item{fun.kf}{What Kalman filter function to use.  MARSS has two:
-\code{\link{MARSSkfas}()} which is based on the Kalman filter in the
+\code{\link[=MARSSkfas]{MARSSkfas()}} which is based on the Kalman filter in the
 \href{https://cran.r-project.org/package=KFAS}{KFAS} package based on
-Koopman and Durbin and \code{\link{MARSSkfss}()} which is a native
+Koopman and Durbin and \code{\link[=MARSSkfss]{MARSSkfss()}} which is a native
 R implementation of the Kalman filter and smoother in Shumway and
-Stoffer. The KFAS filter is much faster.  \code{\link{MARSSkfas}()}
+Stoffer. The KFAS filter is much faster.  \code{\link[=MARSSkfas]{MARSSkfas()}}
 modifies the input and output in order to output the lag-one covariance
 smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).}
 
@@ -64,7 +64,7 @@ If not included, data are randomly assigned to one of 10 folds}
 
 \item{future_cv}{Whether or not to use future cross validation (defaults to FALSE), where data up to
 time T-1 are used to predict data at time T. Data are held out by time slices, and
-the `fold_ids` argument is ignored.}
+the \code{fold_ids} argument is ignored.}
 
 \item{n_future_cv}{Number of time slices to hold out for future cross validation. Defaults
 to floor(n_future_cv/3). Predictions are made for the last n_future_cv time steps}
@@ -75,8 +75,8 @@ and defaults to "confidence"}
 \item{...}{not used}
 }
 \value{
-A list object, containing `cv_pred` (a matrix of predictions), `cv_se` (a matrix of SEs),
-`fold_ids` (a matrix of fold ids used as data), and `df` (a dataframe containing
+A list object, containing \code{cv_pred} (a matrix of predictions), \code{cv_se} (a matrix of SEs),
+\code{fold_ids} (a matrix of fold ids used as data), and \code{df} (a dataframe containing
 the original data, predictions, SEs, and folds)
 }
 \description{
@@ -110,3 +110,4 @@ fit <- MARSScv(dat, model = list(
 ), future_cv = TRUE, n_future_cv = 5)
 }
 }
+\keyword{experimental}

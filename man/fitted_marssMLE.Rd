@@ -1,5 +1,6 @@
 \name{fitted.marssMLE}
 \alias{fitted.marssMLE}
+\keyword{coremethods}
 \title{Return fitted values for X(t) and Y(t) in a MARSS model}
 \description{
 
@@ -110,7 +111,7 @@ fit <- MARSS(nile, model = mod.list, silent = TRUE)
 # Plotting
 # There are plot methods for marssMLE objects
 library(ggplot2)
-autoplot(fit)
+autoplot(fit, silent=TRUE)
 
 # Below shows how to make plots manually but all of these can be made
 # with autoplot(fit) or plot(fit)
