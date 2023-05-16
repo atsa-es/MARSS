@@ -26,3 +26,4 @@ tests
 ^docs$
 ^pkgdown$
 ^\.github$
+^inst/oldtex$

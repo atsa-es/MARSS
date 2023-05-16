@@ -9,9 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Elizabeth E. Holmes" />
 
 
-<title>Quick Start Guide</title>
+<title>Computation of Standardized Residuals for MARSS Models</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1356,8 +1357,40 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+p.abstract{
+text-align: center;
+font-weight: bold;
+}
+div.abstract{
+margin: auto;
+width: 90%;
+}
+</style>
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 
 
@@ -1516,517 +1549,1401 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Quick Start Guide</h1>
+<h1 class="title toc-ignore">Computation of Standardized Residuals for
+MARSS Models</h1>
+<h4 class="author">Elizabeth E. Holmes<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></h4>
+<h4 class="date">7 Jan 2020</h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+<p>This report walks through a derivation of the variance-covariance
+matrix for the joint conditional model and state residuals for
+multivariate autoregressive Gaussian state-space (MARSS) models. The
+bulk of the report focuses on smoothations residuals sensu Harvey et al
+(1998), which are the residuals conditioned on all the data <span class="math inline">\(t=1\)</span> to <span class="math inline">\(T\)</span>. The final part of the report covers
+innovations residuals, which are residuals conditioned on the data <span class="math inline">\(t=1\)</span> to <span class="math inline">\(t-1\)</span>.</p>
+<p>The MARSS model can be written: <span class="math inline">\(\pmb{x}_t=\mathbf{B}\pmb{x}_{t-1}+\mathbf{u}+\mathbf{w}_t\)</span>,
+<span class="math inline">\(\pmb{y}_t=\mathbf{Z}\pmb{x}_t+\mathbf{z}+\mathbf{v}_t\)</span>,
+where <span class="math inline">\(\mathbf{w}_t\)</span> and <span class="math inline">\(\mathbf{v}_t\)</span> are independent multivariate
+Gaussian error-terms with variance-covariance matrices <span class="math inline">\(\mathbf{Q}_t\)</span> and <span class="math inline">\(\mathbf{R}_t\)</span> respectively. The joint
+conditional residuals are the <span class="math inline">\(\mathbf{w}_t\)</span> and <span class="math inline">\(\mathbf{v}_t\)</span> conditioned on the observed
+data, which may be incomplete (missing values). Harvey, Koopman and
+Penzer (1998) show a recursive algorithm for the smoothation residuals
+(residuals conditioned on all the data). I show an alternate algorithm
+to compute these residuals using the conditional variances of the states
+and the conditional covariance between unobserved data and states. This
+allows one to compute the variance of un-observed smoothation residuals
+(residuals associated with missing or left-out data), which is needed
+for leave-one-out cross-validation tests using smoothation residuals. I
+show how to modify the Harvey et al. algorithm in the case of missing
+values and how to modify it to return the non-normalized conditional
+residuals. Keywords: Time-series analysis, Kalman filter, residuals,
+maximum-likelihood, vector autoregressive model, dynamic linear model,
+parameter estimation, state-space citation: Holmes, E. E. 2014.
+Computation of standardized residuals for (MARSS) models. Technical
+Report. <a href="https://arxiv.org/abs/1411.0045">arXiv:1411.0045</a></p>
+</div>
 
 </div>
 
 
-<div id="tldr" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> tldr;</h1>
-<p>Put data (<code>y</code>) in a <span class="math inline">\(n \times
-T\)</span> matrix or ts/mts object.</p>
-<p>Specify each of the parameters in a list for the <code>model</code>
-argument.</p>
-<p>Fit with</p>
-<pre><code>fit &lt;- MARSS(y, model=list(...), method=c(&quot;kem&quot;, &quot;BFGS&quot;, &quot;TMB&quot;))</code></pre>
-<p>Choose one method from <code>c(&quot;kem&quot;, &quot;BFGS&quot;, &quot;TMB&quot;)</code>.</p>
-<p><em>Specification of a properly constrained model with a unique
-solution is the responsibility of the user because the {MARSS} package
-has no way to tell if you have specified an insufficiently constrained
-model.</em></p>
-</div>
-<div id="the-marss-model" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> The MARSS model</h1>
-<p>The {MARSS} package fits multivariate autoregressive state-space
-(MARSS) models of the form: <span class="math display">\[\begin{equation}\label{eqn:marss}
+<!-- \citet{} @key for inline citation name (year); \citep [@key] for citation in parens (name year) -->
+<!-- allow lines in matrix -->
+<div style="page-break-after: always;"></div>
+<div id="overview-of-marss-residuals" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Overview of MARSS
+residuals</h1>
+<p>This report discusses the computation of the variance of the
+conditional model and state residuals for MARSS models of the form:
+<span class="math display">\[\begin{equation}\label{eq:residsMARSS}
 \begin{gathered}
 \boldsymbol{x}_t = \mbox{$\mathbf B$}_t\boldsymbol{x}_{t-1} +
-\mbox{$\mathbf U$}_t + \mbox{$\mathbf C$}_t\mbox{$\mathbf c$}_t +
-\mbox{$\mathbf G$}_t\boldsymbol{w}_t, \text{ where } \boldsymbol{W}_t
+\mbox{$\mathbf u$}_t + \boldsymbol{w}_t, \text{ where } \boldsymbol{W}_t
 \sim \,\textup{\textrm{MVN}}(0,\mbox{$\mathbf Q$}_t)\\
 \boldsymbol{y}_t = \mbox{$\mathbf Z$}_t\boldsymbol{x}_t + \mbox{$\mathbf
-A$}_t + \mbox{$\mathbf D$}_t\mbox{$\mathbf d$}_t + \mbox{$\mathbf
-H$}_t\boldsymbol{v}_t, \text{ where } \boldsymbol{V}_t \sim
+a$}_t + \boldsymbol{v}_t, \text{ where } \boldsymbol{V}_t \sim
 \,\textup{\textrm{MVN}}(0,\mbox{$\mathbf R$}_t)\\
-\boldsymbol{X}_1 \sim
+\boldsymbol{X}_0 \sim
 \,\textup{\textrm{MVN}}(\boldsymbol{\xi},\boldsymbol{\Lambda}) \text{ or
-} \boldsymbol{X}_0 \sim
-\,\textup{\textrm{MVN}}(\boldsymbol{\xi},\boldsymbol{\Lambda})
+} \boldsymbol{x}_0 = \boldsymbol{\xi}.
 \end{gathered}
-\end{equation}\]</span> <span class="math inline">\(\mbox{$\mathbf
-c$}\)</span> and <span class="math inline">\(\mbox{$\mathbf d$}\)</span>
-are inputs (aka, exogenous variables or covariates or indicator
-variables) and must have no missing values. The <span class="math inline">\(\mbox{$\mathbf R$}\)</span>, <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> and <span class="math inline">\(\boldsymbol{\Lambda}\)</span> variances can can
-have zeros on the diagonal to specify partially deterministic systems.
-This allows you to write MAR(p) models in MARSS form for example. See
-the User Guide. The {MARSS} package is designed to handle linear
-constraints within the parameter matrices. Linear constraint means you
-can write the elements of the matrix as a linear equation of all the
-other elements. See section below on linear constraints.</p>
-<p>Example: a mean-reverting random walk model with three observation
-time series: <span class="math display">\[\begin{gather}\label{eq:example1}
-\begin{bmatrix}x_1\\ x_2\end{bmatrix}_t
-= \begin{bmatrix}b&amp;0\\ 0&amp;b\end{bmatrix}
-\begin{bmatrix}x_1\\ x_2\end{bmatrix}_{t-1}
-+ \begin{bmatrix}w_1\\ w_2\end{bmatrix}_t, \quad
-\begin{bmatrix}w_1\\ w_2\end{bmatrix}_t \sim
-\,\textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}0\\0\end{bmatrix},\begin{bmatrix}q_{11}&amp;q_{12}\\
-q_{12}&amp;q_{22}\end{bmatrix} \end{pmatrix}
-\\
-\begin{bmatrix}y_1\\y_2\\y_3\end{bmatrix}_t
-= \begin{bmatrix}1&amp;1\\ 0&amp;1\\ 1&amp;0\end{bmatrix}
-\begin{bmatrix}x_1\\x_2\end{bmatrix}_t
-+ \begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t,\quad
-\begin{bmatrix}v_1\\ v_2\\ v_3\end{bmatrix}_t \sim
-\,\textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}a_1\\ 0\\
-0\end{bmatrix},
-\begin{bmatrix}r_{11}&amp;0&amp;0\\ 0&amp;r&amp;0\\
-0&amp;0&amp;r\end{bmatrix} \end{pmatrix}
-\\
-\begin{bmatrix}x_1\\ x_2\end{bmatrix}_0 \sim
-\,\textup{\textrm{MVN}}\begin{pmatrix}\begin{bmatrix}0\\
-0\end{bmatrix},\begin{bmatrix}1&amp;0\\ 0&amp;1\end{bmatrix}
-\end{pmatrix}
-\end{gather}\]</span></p>
-<div id="model-specification" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Model
-specification</h2>
-<p>Model specification is via a list with the structure of each of the
-model parameters: <span class="math inline">\(\mbox{$\mathbf
-B$}\)</span>, <span class="math inline">\(\mbox{$\mathbf U$}\)</span>,
-<span class="math inline">\(\mbox{$\mathbf C$}\)</span>, <span class="math inline">\(\mbox{$\mathbf Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf Z$}\)</span>, <span class="math inline">\(\mbox{$\mathbf A$}\)</span>, <span class="math inline">\(\mbox{$\mathbf D$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span>, <span class="math inline">\(\boldsymbol{\xi}\)</span>, and<span class="math inline">\(\boldsymbol{\Lambda}\)</span>. There is a
-one-to-one correspondence between the model in and the math version of
-the model. The model written in matrix form is translated into
-equivalent matrices (or arrays if time-varying) in code. Matrices that
-combine fixed and estimated values are specified using a list matrix
-with numerical values for fixed values and character names for the
-estimated values.</p>
-<p>For <span class="math inline">\(\ref{eq:example1}\)</span>, this
-would be:</p>
-<pre class="r"><code>B1 &lt;- matrix(list(&quot;b&quot;,0,0,&quot;b&quot;),2,2)
-U1 &lt;- matrix(0,2,1)
-Q1 &lt;- matrix(c(&quot;q11&quot;,&quot;q12&quot;,&quot;q12&quot;,&quot;q22&quot;),2,2)
-Z1 &lt;- matrix(c(1,0,1,1,1,0),3,2)
-A1 &lt;- matrix(list(&quot;a1&quot;,0,0),3,1)
-R1 &lt;- matrix(list(&quot;r11&quot;,0,0,0,&quot;r&quot;,0,0,0,&quot;r&quot;),3,3)
-pi1 &lt;- matrix(0,2,1); V1=diag(1,2)
-model.list &lt;- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)</code></pre>
-<p>The <code>tinitx</code> element tells MARSS whether the initial state
-for <span class="math inline">\(x\)</span> is at <span class="math inline">\(t=1\)</span> (<code>tinitx=1</code>) or <span class="math inline">\(t=0\)</span> (<code>tinitx=0</code>).</p>
-<p>MARSS has a number of text shortcuts for common parameter forms, such
-as <code>&quot;diagonal and unequal&quot;</code>; see below for the possible
-shortcuts.</p>
-</div>
-</div>
-<div id="data-and-fitting" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Data and fitting</h1>
-<div id="data" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Data</h2>
-<p>The data must be entered as a <span class="math inline">\(n \times
-T\)</span> matrix, or a <code>ts()</code> (or mts) object or vector
-(which will be converted to a <span class="math inline">\(n \times
-T\)</span> matrix).</p>
-</div>
-<div id="fit-call" class="section level2" number="3.2">
-<h2><span class="header-section-number">3.2</span> Fit call</h2>
-<p>The call to fit the model is.</p>
-<pre class="r"><code>fit &lt;- MARSS(y, model=model.list)</code></pre>
-<p>See <code>?MARSS</code> for all other arguments. The common ones are
-<code>method</code> to change the fitting method from default of EM
-(slow). See below. <code>control</code> is used to pass in a list to
-control fitting, e.g. <code>control=list(maxit=1000)</code> to increase
-maximum iterations if the fit does not converge.</p>
-<p>Example with simulated data:</p>
-<pre class="r"><code>library(MARSS)
-set.seed(1234)
-x &lt;- rbind(arima.sim(n=50,list(ar=0.95), sd=0.4), 
-           arima.sim(n=50,list(ar=0.95), sd=.02))
-y &lt;- Z1 %*% x + matrix(rnorm(3*50,0,0.1), 3, 50)
-fit &lt;- MARSS(y, model=model.list, silent=TRUE)
-tidy(fit)</code></pre>
-<pre><code>##    term     estimate    std.error      conf.low      conf.up
-## 1  A.a1 0.0184598413 0.0269628326 -0.0343863395 0.0713060221
-## 2 R.r11 0.0188070225 0.0062216241  0.0066128633 0.0310011817
-## 3   R.r 0.0115645650 0.0024433098  0.0067757658 0.0163533641
-## 4   B.b 0.8605716318 0.0634069752  0.7362962441 0.9848470195
-## 5 Q.q11 0.1301323970 0.0288070155  0.0736716842 0.1865931098
-## 6 Q.q12 0.0020987299 0.0029632765 -0.0037091853 0.0079066452
-## 7 Q.q22 0.0001353807 0.0003058603 -0.0004640944 0.0007348558</code></pre>
-</div>
-<div id="different-fitting-methods" class="section level2" number="3.3">
-<h2><span class="header-section-number">3.3</span> Different fitting
-methods</h2>
-<p>The EM algorithm in the {MARSS} package is in R and on top of that EM
-algorithms are famously slow. You can try <code>method=&quot;BFGS&quot;</code> and
-see if that is faster. For some models, it will be much faster and for
-others slower. The companion package {marssTMB} allows you to fit these
-models with TMB and will be the fastest, often much faster. Definitely
-if you are doing Dynamic Factor Analysis or working with large data
-sets, you will want to install {marssTMB} so you can fit with TMB.</p>
-<pre class="r"><code>fit1 &lt;- MARSS(y, model=model.list, silent=TRUE)
-fit2 &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;, silent=TRUE)
-fit3 &lt;- MARSS(y, model=model.list, method=&quot;TMB&quot;, silent=TRUE)</code></pre>
-<pre><code>## Loading required namespace: marssTMB</code></pre>
-<pre class="r"><code>cat(&quot;logLL of the 3 fits:&quot;, c(fit1$logLik, fit2$logLik, fit3$logLik))</code></pre>
-<pre><code>## logLL of the 3 fits: 30.75614 30.82143 28.691</code></pre>
-<p><code>method=&quot;BFGS&quot;</code> and <code>method=&quot;TMB&quot;</code> are both
-using quasi-Newton methods to optimize and these can be sensitive to
-initial conditions. You can run EM a few iterations and run with BFGS,
-and this will guard against poor initial conditions issues.</p>
-<pre class="r"><code>fit1 &lt;- MARSS(y, model=model.list, control = list(maxit=15))
-fit2 &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;, inits = fit1)</code></pre>
-</div>
-<div id="defaults-for-model-list" class="section level2" number="3.4">
-<h2><span class="header-section-number">3.4</span> Defaults for
-<code>model</code> list</h2>
-<p>Form of the model list is <code>list(B=..., U=...)</code> etc.</p>
-<div id="formmarxss" class="section level3" number="3.4.1">
-<h3><span class="header-section-number">3.4.1</span>
-<code>form=&quot;marxss&quot;</code></h3>
-<p>For <code>form=&quot;marxss&quot;</code> (the default), matrix names in the
-model list must be <code>B</code>, <code>U</code>, <code>C</code>,
-<code>c</code>, <code>Q</code>, <code>Z</code>, <code>A</code>,
-<code>D</code>, <code>d</code>, <code>R</code>, <code>x0</code> (<span class="math inline">\(\boldsymbol{\xi}\)</span>), and <code>V0</code>
-(<span class="math inline">\(\boldsymbol{\Lambda}\)</span>), just like
-in Equation <span class="math inline">\(\ref{eqn:marss}\)</span>. There
-are defaults each parameter and you can leave off matrix names and the
-defaults will be used. Type <code>?MARSS.marxss</code> additional
-information.</p>
-<ul>
-<li><code>B=&quot;identity&quot;</code> <span class="math inline">\(m \times
-m\)</span> identity matrix</li>
-<li><code>U=&quot;unequal&quot;</code> Each element in the <span class="math inline">\(m \times 1\)</span> matrix <span class="math inline">\(\mbox{$\mathbf U$}\)</span> is estimated and
-allowed to be different.</li>
-<li><code>Q=&quot;diagonal and unequal&quot;</code> <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> is a diagonal matrix
-and each element on the diagonal is allowed to be different.</li>
-<li><code>Z=&quot;identity&quot;</code> <span class="math inline">\(n \times
-n\)</span> identity matrix thus in the default model each <span class="math inline">\(y\)</span> is associated with one <span class="math inline">\(x\)</span>.</li>
-<li><code>A=&quot;scaling&quot;</code> If <span class="math inline">\(\mbox{$\mathbf Z$}\)</span> is identity, <span class="math inline">\(\mbox{$\mathbf A$}\)</span> is zero. Otherwise,
-the first <span class="math inline">\(y\)</span> associated with a <span class="math inline">\(x\)</span> is set to 0 and the rest are
-estimated.</li>
-<li><code>R=&quot;diagonal and equal&quot;</code> <span class="math inline">\(\mbox{$\mathbf R$}\)</span> is a diagonal matrix
-and each element on the diagonal is the same.</li>
-<li><code>x0=&quot;unequal&quot;</code> Each element in the <span class="math inline">\(m \times 1\)</span> matrix <span class="math inline">\(\boldsymbol{\xi}\)</span> is estimated and allowed
-to be different.</li>
-<li><code>V0=&quot;zero&quot;</code> <span class="math inline">\(\boldsymbol{\Lambda}\)</span> is set to zero thus
-<span class="math inline">\(\boldsymbol{x}_0\)</span> is treated as an
-estimated parameter.</li>
-<li><code>tinitx=0</code> The initial condition for <span class="math inline">\(\boldsymbol{x}\)</span> is set at <span class="math inline">\(t=0\)</span>.</li>
-</ul>
-</div>
-<div id="formdfa" class="section level3" number="3.4.2">
-<h3><span class="header-section-number">3.4.2</span>
-<code>form=&quot;dfa&quot;</code></h3>
-<p>Special form for fitting DFA models. Pass in <code>form=&quot;dfa&quot;</code>
-to the <code>MARSS()</code> call. Typically only these would be in the
-model list:</p>
-<ul>
-<li><code>m=1</code> Number of factors.</li>
-<li><code>R=&quot;diagonal and equal&quot;</code> <span class="math inline">\(\mbox{$\mathbf R$}\)</span> is a diagonal matrix
-and each element on the diagonal is the same.</li>
-<li><code>d=&quot;zero&quot;</code> If there are <span class="math inline">\(p\)</span> covariates, pass in as a <span class="math inline">\(p \times T\)</span> matrix.</li>
-<li><code>D=&quot;unconstrained&quot;</code> if covariates passed in.</li>
-</ul>
-<p>Defaults.</p>
-<ul>
-<li><code>Z</code> A special unconstrained matrix with the upper
-triangle (without the diagonal) set to zero.</li>
-<li><code>Q=&quot;identity&quot;</code> <span class="math inline">\(\mbox{$\mathbf
-Q$}\)</span> is a diagonal matrix and each element on the diagonal is
-allowed to be different.</li>
-<li><code>x0=&quot;zero&quot;</code> Each element in the <span class="math inline">\(m \times 1\)</span> matrix <span class="math inline">\(\boldsymbol{\xi}\)</span> is estimated and allowed
-to be different.</li>
-<li><code>V0=diag(5,n)</code> <span class="math inline">\(\boldsymbol{\Lambda}\)</span> is set to a diagonal
-matrix with 5 on the diagonal.</li>
-<li><code>tinitx=0</code> The initial condition for <span class="math inline">\(\boldsymbol{x}\)</span> is set at <span class="math inline">\(t=0\)</span>.</li>
-<li><code>B=&quot;identity&quot;</code> <span class="math inline">\(m \times
-m\)</span> identity matrix</li>
-<li><code>U=&quot;zero&quot;</code></li>
-<li><code>A=&quot;zero&quot;</code></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="showing-the-model-fits-and-getting-the-parameters" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Showing the model fits
-and getting the parameters</h1>
-<p>There are <code>plot.marssMLE()</code>,
-<code>autoplot.marssMLE()</code>, <code>print</code>,
-<code>summary</code>, <code>coef</code>, <code>fitted</code>,
-<code>residuals</code> and <code>predict</code> functions for marssMLE
-objects. <code>?print.MARSS</code> will show you how to get standard
-output from your fitted model objects and where that output is stored in
-the marssMLE object. See <code>coef.marssMLE()</code> for the different
-formats for displaying the estimated parameters. To see plots of your
-states and fits plus diagnostic plots, use <code>plot(fit)</code> or,
-better, <code>ggplot2::autoplot(fit)</code>. For summaries of the
-residuals (model and state), use the <code>residuals</code> function.
-See <code>?residuals.marssMLE</code>. To produce predictions and
-forecasts from a MARSS model, see <code>?predict.marssMLE</code>.</p>
-</div>
-<div id="tips-and-troubleshooting" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Tips and
-Troubleshooting</h1>
-<div id="tips" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Tips</h2>
-<p>Use <code>ggplot2::autoplot(fit)</code> (or <code>plot(fit)</code>)
-to see a series of standard plots and diagnostics for your model. Use
-<code>tidy(fit)</code> for parameter estimates or
-<code>coef(fit)</code>. Use <code>fitted(fit)</code> for model (<span class="math inline">\(\boldsymbol{y}\)</span>) estimates and
-<code>tsSmooth(fit)</code> for states (<span class="math inline">\(\boldsymbol{x}\)</span>) estimates. You can also
-use <code>fit$states</code> for the states.</p>
-<p>Let’s say you specified your model with some text short-cuts, like
-<code>Q=&quot;unconstrained&quot;</code>, but you want the list matrix for for a
-next step. <code>a &lt;- summary(fit$model)</code> returns that list
-(invisibly). Because the model argument of <code>MARSS()</code> will
-understand a list of list matrices, you can pass in <code>model=a</code>
-to specify the model.
-<code>MARSSkfas(fit, return.kfas.model=TRUE)</code> will return your
-model in {KFAS} format (class SSModel), thus you can use all the
-functions available in the {KFAS} package on your model.</p>
-</div>
-<div id="troubleshooting" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Troubleshooting</h2>
-<p>Try <code>MARSSinfo()</code> if you get errors you don’t understand
-or fitting is taking a long time to converge. When fitting a model with
-<code>MARSS()</code>, pass in <code>silent=2</code> to see what
-<code>MARSS()</code> is doing. This puts it in verbose mode. Use
-<code>fit=FALSE</code> to set up a model without fitting. Let’s say you
-do <code>fit &lt;- MARSS(..., fit=FALSE)</code>. Now you can do
-<code>summary(fit$model)</code> to see what <code>MARSS()</code> thinks
-you are trying to fit.</p>
-<p>You can also try <code>toLatex(fit$model)</code> to make a LaTeX file
-and pdf version of your model (saved in the working directory). This
-loads the {Hmisc} package (and all its dependencies) and requires that
-you are able to process LaTeX files.</p>
-</div>
-</div>
-<div id="more-information-and-tutorials" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> More information and
-tutorials</h1>
-<p>Many example analyses can be found in the MARSS User Guide (<a href="https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf">pdf</a>).
-In addition, recorded lectures and more examples on fitting multivariate
-models can be found at our course <a href="https://atsa-es.github.io/atsa">website</a> and in the ATSA course
-eBook <a href="https://atsa-es.github.io/atsa-labs">html</a>.</p>
-<p>The MARSS User Guide starts with some tutorials on MARSS models and
-walks through many examples showing how to write multivariate
-time-series models in MARSS form. The User Guide also has vignettes: how
-to write AR(p) models in state-space form, dynamic linear models
-(regression models where the regression parameters are AR(p)),
-multivariate regression models with regression parameters that are
-time-varying and enter the non-AR part of your model or the AR part,
-detecting breakpoints using state-space models, and dynamic factor
-analysis. All of these can be written in MARSS form. It also has a
-series of vignettes on analysis of multivariate biological data.</p>
-<p>Background on the algorithms used in the {MARSS} package is included
-in the User Guide.</p>
-</div>
-<div id="shortcuts-and-all-allowed-model-structures" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Shortcuts and all
-allowed model structures</h1>
-<p>All parameters except <code>x0</code> and <code>V0</code> may be
-time-varying. If time-varying, then text shortcuts cannot be used. Enter
-as an array with the 3rd dimension being time. Time dimension must be 1
-or equal to the number of time-steps in the data.</p>
-<p>The model list elements can have the following values:</p>
-<div id="z" class="section level2" number="7.1">
-<h2><span class="header-section-number">7.1</span> <code>Z</code></h2>
-<p>Defaults to <code>&quot;identity&quot;</code>. Can be a text string,
-<code>&quot;identity&quot;</code>, <code>&quot;unconstrained&quot;</code>,
-<code>&quot;diagonal and unequal&quot;</code>, <code>&quot;diagonal and equal&quot;</code>,
-<code>&quot;equalvarcov&quot;</code>, or <code>&quot;onestate&quot;</code>, or a length
-<span class="math inline">\(n\)</span> vector of factors specifying
-which of the <span class="math inline">\(m\)</span> hidden state time
-series correspond to which of the n observation time series. May be
-specified as a <span class="math inline">\(n \times m\)</span> list
-matrix for general specification of both fixed and shared elements
-within the matrix. May also be specified as a numeric <span class="math inline">\(n \times m\)</span> matrix to use a custom fixed
-<span class="math inline">\(\mbox{$\mathbf Z$}\)</span>.
-<code>&quot;onestate&quot;</code> gives a <span class="math inline">\(n \times
-1\)</span> matrix of 1s. The text shortcuts all specify <span class="math inline">\(n \times n\)</span> matrices.</p>
-</div>
-<div id="b" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> <code>B</code></h2>
-<p>Defaults to <code>&quot;identity&quot;</code>. Can be a text string,
-<code>&quot;identity&quot;</code>, <code>&quot;unconstrained&quot;</code>,
-<code>&quot;diagonal and unequal&quot;</code>, <code>&quot;diagonal and equal&quot;</code>,
-<code>&quot;equalvarcov&quot;</code>, <code>&quot;zero&quot;</code>. Can also be specified
-as a list matrix for general specification of both fixed and shared
-elements within the matrix. May also be specified as a numeric <span class="math inline">\(m \times m\)</span> matrix to use custom fixed
-<span class="math inline">\(\mbox{$\mathbf B$}\)</span>, but in this
-case all the eigenvalues of <span class="math inline">\(\mbox{$\mathbf
-B$}\)</span> must fall in the unit circle.</p>
-</div>
-<div id="u-and-x0" class="section level2" number="7.3">
-<h2><span class="header-section-number">7.3</span> <code>U</code> and
-<code>x0</code></h2>
-<p>Defaults to <code>&quot;unequal&quot;</code>. Can be a text string,
-<code>&quot;unconstrained&quot;</code>, <code>&quot;equal&quot;</code>,
-<code>&quot;unequal&quot;</code> or <code>&quot;zero&quot;</code>. May be specified as a
-<span class="math inline">\(m \times 1\)</span> list matrix for general
-specification of both fixed and shared elements within the matrix. May
-also be specified as a numeric <span class="math inline">\(m \times
-1\)</span> matrix to use a custom fixed <span class="math inline">\(\mbox{$\mathbf U$}\)</span> or <span class="math inline">\(\boldsymbol{x}_0\)</span>.</p>
-</div>
-<div id="a" class="section level2" number="7.4">
-<h2><span class="header-section-number">7.4</span> <code>A</code></h2>
-<p>Defaults to <code>&quot;scaling&quot;</code>. Can be a text string,
-<code>&quot;scaling&quot;</code> ,<code>&quot;unconstrained&quot;</code>,
-<code>&quot;equal&quot;</code>, “unequal” or “zero”. May be specified as a n x 1
-list matrix for general specification of both fixed and shared elements
-within the matrix. May also be specified as a numeric <span class="math inline">\(n \times 1\)</span> matrix to use a custom fixed
-<span class="math inline">\(\mbox{$\mathbf A$}\)</span>. Care must be
-taken so that the model is not under-constrained and unsolvable model.
-The default, <code>&quot;scaling&quot;</code>, only applies to <span class="math inline">\(\mbox{$\mathbf Z$}\)</span> matrices that are
-design matrices (only 1s and 0s and all rows sum to 1). When a column in
-<span class="math inline">\(\mbox{$\mathbf Z$}\)</span> has multiple 1s,
-the first row in the <span class="math inline">\(\mbox{$\mathbf
-A$}\)</span> matrix associated with those <span class="math inline">\(\mbox{$\mathbf Z$}\)</span> rows is 0 and the
-other associated <span class="math inline">\(\mbox{$\mathbf A$}\)</span>
-rows have an estimated value. This treats <span class="math inline">\(\mbox{$\mathbf A$}\)</span> as an intercept where
-one intercept for each <span class="math inline">\(\boldsymbol{x}\)</span> (hidden state) is fixed at
-0 and any other intercepts associated with that <span class="math inline">\(\boldsymbol{x}\)</span> have an estimated
-intercept. This ensures a solvable model when <span class="math inline">\(\mbox{$\mathbf Z$}\)</span> is a design
-matrix.</p>
-</div>
-<div id="q-r-and-v0" class="section level2" number="7.5">
-<h2><span class="header-section-number">7.5</span> <code>Q</code>,
-<code>R</code> and <code>V0</code></h2>
-<p>Can be a text string, <code>&quot;identity&quot;</code>,
-<code>&quot;unconstrained&quot;</code>, <code>&quot;diagonal and unequal&quot;</code>,
-<code>&quot;diagonal and equal&quot;</code>, <code>&quot;equalvarcov&quot;</code>, “zero”.
-May be specified as a list matrix for general specification of both
-fixed and shared elements within the matrix. May also be specified as a
-numeric matrix to use a custom fixed matrix.</p>
-<p><code>V0</code> defaults to <code>&quot;zero&quot;</code>, which means that
-<span class="math inline">\(\boldsymbol{x}_0\)</span> is treated as an
-estimated parameter.</p>
-</div>
-<div id="d-and-c" class="section level2" number="7.6">
-<h2><span class="header-section-number">7.6</span> <code>D</code> and
-<code>C</code></h2>
-<p>Defaults to <code>&quot;zero&quot;</code> or if no covariates, defaults to
-<code>&quot;unconstrained&quot;</code>. Can also be any of the options available
-for the variance matrices.</p>
-</div>
-<div id="d-and-c-1" class="section level2" number="7.7">
-<h2><span class="header-section-number">7.7</span> <code>d</code> and
-<code>c</code></h2>
-<p>Defaults to <code>&quot;zero&quot;</code>. Numeric matrix. No missing values
-allowed. Must have 1 column or the same number of columns as the data,
-The numbers of rows in must match the corresponding <span class="math inline">\(\mbox{$\mathbf D$}\)</span> or <span class="math inline">\(\mbox{$\mathbf C$}\)</span> matrix.</p>
-</div>
-<div id="g-and-h" class="section level2" number="7.8">
-<h2><span class="header-section-number">7.8</span> <code>G</code> and
-<code>H</code></h2>
-<p>Defaults to <code>&quot;identity&quot;</code>. Can be specified as a numeric
-matrix or array for time-varying cases. Size must match the
-corresponding <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> or
-<span class="math inline">\(\mbox{$\mathbf R$}\)</span> matrix.</p>
-</div>
-</div>
-<div id="covariates-linear-constraints-and-time-varying-parameters" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Covariates, Linear
-constraints and time-varying parameters</h1>
-<div id="covariates" class="section level2" number="8.1">
-<h2><span class="header-section-number">8.1</span> Covariates</h2>
-<p>Inputs, aka covariates, are in <span class="math inline">\(\mbox{$\mathbf c$}\)</span> and <span class="math inline">\(\mbox{$\mathbf d$}\)</span>. The are passed in via
-the model list and must be a numeric matrix (no missing values). <span class="math inline">\(\mbox{$\mathbf C$}\)</span> and <span class="math inline">\(\mbox{$\mathbf D$}\)</span> are the estimated
-parameters, aka covariate effects.</p>
-<p>Let’s say you have temperature data and you want to include a linear
-effect of temperature that is different for each <span class="math inline">\(\boldsymbol{x}\)</span> time series:</p>
-<pre class="r"><code>temp &lt;- matrix(rnorm(50, seq(0,1,1/50), 0.1),nrow=1)
-C1 &lt;- matrix(c(&quot;temp1&quot;,&quot;temp2&quot;),2,1)
-model.list$C &lt;- C1
-model.list$c &lt;- temp</code></pre>
-<p>Fit as normal:</p>
-<pre class="r"><code>fit &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;)</code></pre>
-<p>A seasonal effect can be easily included via sine/cosine pairs. The
-<code>fourier()</code> function in the {forecast} package simplifies
-this. You will need to make your data into a ts/mts object.</p>
-<pre class="r"><code>yts &lt;- ts(t(y), frequency = 12) # requires time down the rows
-fcov &lt;- forecast::fourier(yts,1) |&gt; t()</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
-##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<p>If you want a factor effect, then you can use the
-<code>seasonaldummy()</code> function in {forecast}</p>
-<pre class="r"><code>yts &lt;- ts(t(y), frequency = 12) # monthly data
-mcov &lt;- forecast::seasonaldummy(yts) |&gt; t() # month factor</code></pre>
-</div>
-<div id="linear-constraints" class="section level2" number="8.2">
-<h2><span class="header-section-number">8.2</span> Linear
-constraints</h2>
-<p>Your model can have simple linear constraints within all the
-parameters except <span class="math inline">\(\mbox{$\mathbf
-Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span>
-and <span class="math inline">\(\boldsymbol{\Lambda}\)</span>. For
-example <span class="math inline">\(1+2a-3b\)</span> is a linear
-constraint. When entering this value for you matrix, you specify this as
-<code>&quot;1+2*a+-3*b&quot;</code>. NOTE: <span class="math inline">\(+\)</span>’s join parts so <code>+-3*b</code> to
-specify <span class="math inline">\(-3b\)</span>. Anything after
-<code>*</code> is a parameter. So <code>1*1</code> has a parameter
-called <code>&quot;1&quot;</code>. Example, let’s change the <span class="math inline">\(\mbox{$\mathbf B$}\)</span> and <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> matrices in the
-previous model to: <span class="math display">\[\begin{equation*}
-\mbox{$\mathbf B$}= \begin{bmatrix}b-0.1&amp;0\\
-0&amp;b+0.1\end{bmatrix}\quad
-\mbox{$\mathbf Q$}= \begin{bmatrix}1&amp;0\\ 0&amp;1\end{bmatrix}\quad
-\mbox{$\mathbf Z$}= \begin{bmatrix}z_1-z_2&amp;2 z_1\\ 0&amp;z_1\\
-z_2&amp;0\end{bmatrix}
-\end{equation*}\]</span> <em><span class="math inline">\(\mbox{$\mathbf
-Q$}\)</span> is fixed because <span class="math inline">\(\mbox{$\mathbf
-Z$}\)</span> is estimated and estimating both creates a statistically
-confounded model (both scale the variance of <span class="math inline">\(\boldsymbol{x}\)</span>).</em></p>
-<p>This would be specified as (notice <code>&quot;1*z1+-1*z2&quot;</code> for
-<code>z1-z2</code>):</p>
-<pre class="r"><code>B1 &lt;- matrix(list(&quot;-0.1+1*b&quot;,0,0,&quot;0.1+1*b&quot;),2,2)
-Q1 &lt;- matrix(list(1,0,0,1),2,2)
-Z1 &lt;- matrix(list(&quot;1*z1+-1*z2&quot;,0,&quot;z2&quot;,&quot;2*z1&quot;,&quot;z1&quot;,0),3,2)
-model.list &lt;- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)</code></pre>
-<p>Fit as usual:</p>
-<pre class="r"><code>fit &lt;- MARSS(y, model=model.list, silent = TRUE)</code></pre>
-</div>
-<div id="time-varying-parameters" class="section level2" number="8.3">
-<h2><span class="header-section-number">8.3</span> Time-varying
-parameters</h2>
-<p>The default model form allows you to pass in a 3-D array for a
-time-varying parameter (<span class="math inline">\(T\)</span> is the
-number of time-steps in your data and is the 3rd dimension in the
-array):<br />
-<span class="math display">\[\begin{equation}\label{qeq:MARSS.tv}
+\end{equation}\]</span> The state and model residuals are respectively
+<span class="math display">\[\begin{equation}\label{eq:resids}
 \begin{gathered}
-\boldsymbol{x}_t = \mbox{$\mathbf B$}_t\boldsymbol{x}_{t-1} +
-\mbox{$\mathbf U$}_t + \mbox{$\mathbf C$}_t\mbox{$\mathbf c$}_t +
-\mbox{$\mathbf G$}_t\boldsymbol{w}_t, \quad
-\boldsymbol{W}_t \sim \,\textup{\textrm{MVN}}(0,\mbox{$\mathbf Q$}_t)\\
-\boldsymbol{y}_t = \mbox{$\mathbf Z$}_t\boldsymbol{x}_t + \mbox{$\mathbf
-A$}_t + \mbox{$\mathbf D$}_t\mbox{$\mathbf d$}_t + \mbox{$\mathbf
-H$}_t\boldsymbol{v}_t, \quad
-\boldsymbol{V}_t \sim \,\textup{\textrm{MVN}}(0,\mbox{$\mathbf R$}_t)\\
-\boldsymbol{x}_{t_0} \sim
-\,\textup{\textrm{MVN}}(\boldsymbol{\xi},\boldsymbol{\Lambda})
+\boldsymbol{w}_t = \boldsymbol{x}_t - \mbox{$\mathbf
+B$}_t\boldsymbol{x}_{t-1} - \mbox{$\mathbf u$}_t\\
+\boldsymbol{v}_t = \boldsymbol{y}_t - \mbox{$\mathbf
+Z$}_t\boldsymbol{x}_t - \mbox{$\mathbf a$}_t .
 \end{gathered}
-\end{equation}\]</span> Zeros are allowed on the diagonals of <span class="math inline">\(\mbox{$\mathbf Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span> and <span class="math inline">\(\boldsymbol{\Lambda}\)</span>. NOTE(!!), the time
-indexing. Make sure you enter your arrays such that the correct
-parameter (or input) at time <span class="math inline">\(t\)</span>
-lines up with <span class="math inline">\(\boldsymbol{x}_t\)</span>;
-e.g., it is common for state equations to have <span class="math inline">\(\mbox{$\mathbf B$}_{t-1}\)</span> lined up with
-<span class="math inline">\(\boldsymbol{x}_t\)</span> so you might need
-to enter the <span class="math inline">\(\mbox{$\mathbf B$}\)</span>
-array such that your <span class="math inline">\(\mbox{$\mathbf
-B$}_{t-1}\)</span> is entered at <code>Bt[,,t]</code> in your code.</p>
-<p>The length of the 3rd dimension must be the same as your data. For
-example, say in your mean-reverting random walk model (the example on
-the first page) you wanted <span class="math inline">\(\mbox{$\mathbf
-B$}(2,2)\)</span> to be one value before <span class="math inline">\(t=20\)</span> and another value after but <span class="math inline">\(\mbox{$\mathbf B$}(1,1)\)</span> to be time
-constant. You can pass in the following:</p>
-<pre class="r"><code>TT &lt;- dim(y)[2]
-B1 &lt;- array(list(),dim=c(2,2,TT))
-B1[,,1:20] &lt;- matrix(list(&quot;b&quot;,0,0,&quot;b_1&quot;),2,2)
-B1[,,21:TT] &lt;- matrix(list(&quot;b&quot;,0,0,&quot;b_2&quot;),2,2)</code></pre>
-<p>Notice the specification is one-to-one to your <span class="math inline">\(\mbox{$\mathbf B$}_t\)</span> matrices on
-paper.</p>
+\end{equation}\]</span> The model (and state) residuals are a random
+variables since <span class="math inline">\(\boldsymbol{y}_t\)</span>
+and <span class="math inline">\(\boldsymbol{x}_t\)</span> are drawn from
+the joint multivariate distribution of <span class="math inline">\(\boldsymbol{Y}_t\)</span> and <span class="math inline">\(\boldsymbol{X}_t\)</span> defined by the MARSS
+equations (Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>). The unconditional
+variance of the model residuals is <span class="math display">\[\begin{equation}\label{eq:unconditiondistofVt}
+\,\textup{\textrm{var}}_{XY}[\boldsymbol{V}_t] =
+\,\textup{\textrm{var}}_{XY}[\boldsymbol{Y}_t - (\mbox{$\mathbf Z$}_t
+\boldsymbol{X}_t + \mbox{$\mathbf a$}_t)] = \mbox{$\mathbf R$}_t\\
+\end{equation}\]</span> based on the distribution of <span class="math inline">\(\boldsymbol{V}_t\)</span> in Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>. <span class="math inline">\(\,\textup{\textrm{var}}_{XY}\)</span> indicates
+that the integration is over the joint unconditional distribution of
+<span class="math inline">\(\boldsymbol{X}\)</span> and <span class="math inline">\(\boldsymbol{Y}\)</span>.</p>
+<p>Once we have data, <span class="math inline">\(\mbox{$\mathbf
+R$}_t\)</span> is not the variance-covariance matrix of our model
+residuals because our residuals are now conditioned on a set of observed
+data. There are two types of conditional model residuals used in MARSS
+analyses: innovations and smoothations. Innovations are the model
+residuals at time <span class="math inline">\(t\)</span> using the
+expected value of <span class="math inline">\(\boldsymbol{X}_t\)</span>
+conditioned on the data from 1 to <span class="math inline">\(t-1\)</span>. Smoothations are the model residuals
+using the expected value of <span class="math inline">\(\boldsymbol{X}_t\)</span> conditioned on all the
+data, <span class="math inline">\(t=1\)</span> to <span class="math inline">\(T\)</span>. Smoothations are used in computing
+standardized residuals for outlier and structural break detection <span class="citation">(<a href="#ref-HarveyKoopman1992" role="doc-biblioref">Harvey and Koopman 1992</a>; <a href="#ref-Harveyetal1998" role="doc-biblioref">Harvey, Koopman, and
+Penzer 1998</a>; <a href="#ref-deJongPenzer1998" role="doc-biblioref">Jong and Penzer 1998</a>; <a href="#ref-CommandeurKoopman2007" role="doc-biblioref">Commandeur and
+Koopman 2007</a>)</span>.</p>
+<p>It should be noted that all the calculations discussed here are
+conditioned on the MARSS parameters: <span class="math inline">\(\mbox{$\mathbf B$}\)</span>, <span class="math inline">\(\mbox{$\mathbf Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf U$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span>, <span class="math inline">\(\mbox{$\mathbf Z$}\)</span> and <span class="math inline">\(\mbox{$\mathbf A$}\)</span>. These are treated as
+known. This is different than standard discussions of residual
+distributions for linear models where the uncertainty in the model
+parameters enters into the calculations (as it enters into the
+calculation of the influence of <span class="math inline">\(\boldsymbol{y}\)</span> on the expected (or
+fitted) value of <span class="math inline">\(\boldsymbol{y}\)</span>).
+In the calculations in this report, <span class="math inline">\(\boldsymbol{y}\)</span> does not affect the
+estimates of the parameters (which are fixed, perhaps at estimated
+values) but does affect the expected value of <span class="math inline">\(\boldsymbol{Y}_t\)</span> by affecting the
+estimate of the expected value and variance of <span class="math inline">\(\boldsymbol{X}_t\)</span>.</p>
 </div>
+<div id="sec:smoothations" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Distribution of MARSS
+smoothation residuals</h1>
+<div style="display:none">
+<span class="math inline">\(\nextSection\)</span>
+</div>
+<p>This section discusses computation of the variance of the model and
+state residuals conditioned on all the data from <span class="math inline">\(t=1\)</span> to <span class="math inline">\(T\)</span>. These MARSS residuals are often used
+for outlier detection and shock detection, and in this case you only
+need the distribution of the model residuals for the observed values.
+However if you wanted to do a leave-one-out cross-validation, you would
+need to know the distribution of the residuals for data points you left
+out (treated as unobserved). The equations in this report give you the
+former and the latter, while the algorithm by <span class="citation">Harvey, Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span> gives
+only the former. These equations for residuals for “left-out” data are
+different that other (typical) discussions of state-space
+cross-validation <span class="citation">(<a href="#ref-deJong1988" role="doc-biblioref">Jong 1988</a>)</span> in that they are conditioned
+on all the data (smoothations residuals) rather than conditioned on data
+up to <span class="math inline">\(t-1\)</span> (innovations
+residuals).</p>
+<div id="notation-and-relations" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Notation and
+relations</h2>
+<p>Throughout, I follow the convention that capital letters are random
+variables and small letters are a realization from the random variable.
+This only applies to random variables; parameters are not random
+variables. Parameters are shown in Roman font while while random
+variables are bold slanted font. Parameters written as capital letters
+are matrices, while parameters written in small letters are strictly
+column matrices.</p>
+<p>In this report, the distribution over which the integration is done
+in an expectation or variance is given by the subscript; e.g., <span class="math inline">\(\,\textup{\textrm{E}}_A[f(A)]\)</span> indicates
+an unconditional expectation over the distribution of <span class="math inline">\(A\)</span> without conditioning on another random
+variable while <span class="math inline">\(\,\textup{\textrm{E}}_{A|b}[f(A)|b]\)</span> would
+indicate an expectation over the distribution of <span class="math inline">\(A\)</span> conditioned on <span class="math inline">\(B=b\)</span>; presumably <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are not independent otherwise <span class="math inline">\(B=b\)</span> would have no effect on <span class="math inline">\(A\)</span>. <span class="math inline">\(\,\textup{\textrm{E}}_{A|b}[f(A)|b]\)</span> is a
+fixed value, not random. It is the expected value when <span class="math inline">\(B=b\)</span>. In contrast, <span class="math inline">\(\,\textup{\textrm{E}}_{A|B}[f(A)|B]\)</span>
+denotes the random variable over all the possible <span class="math inline">\(\,\textup{\textrm{E}}_{A|b}[f(A)|b]\)</span> given
+all the possible <span class="math inline">\(b\)</span> values that
+<span class="math inline">\(B\)</span> might take. The variance of <span class="math inline">\(\,\textup{\textrm{E}}_{A|B}[f(A)|B]\)</span> is
+the variance of this random variable. The variance of <span class="math inline">\(\,\textup{\textrm{E}}_{A|b}[f(A)|b]\)</span> in
+contrast is 0 since it is a fixed value. We will often be working with
+the random variables, <span class="math inline">\(\,\textup{\textrm{E}}_{A|B}[f(A)|B]\)</span> or
+<span class="math inline">\(\,\textup{\textrm{var}}_{A|B}[f(A)|B]\)</span>,
+inside an expectation or variance: such as <span class="math inline">\(\,\textup{\textrm{var}}_B[\,\textup{\textrm{E}}_{A|B}[f(A)|B]]\)</span>.</p>
+<div id="law-of-total-variance" class="section level3" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Law of total
+variance</h3>
+<p>The law of total variance can be written <span class="math display">\[\begin{equation}\label{eq:lawoftotvar}
+\,\textup{\textrm{var}}_A[A] =
+\,\textup{\textrm{var}}_B[\,\textup{\textrm{E}}_{A|B}[A|B]] +
+\,\textup{\textrm{E}}_B[\,\textup{\textrm{var}}_{A|B}[A|B]] .
+\end{equation}\]</span> The subscripts on the inner expectations make it
+explicit that the expectations are being taken over the conditional
+distributions. <span class="math inline">\(\,\textup{\textrm{var}}_{A|B}[A|B]\)</span> and
+<span class="math inline">\(\,\textup{\textrm{E}}_{A|B}[A|B]\)</span>
+are random variables because the <span class="math inline">\(B\)</span>
+in the conditional is a random variable. We take the expectation or
+variance with <span class="math inline">\(B\)</span> fixed at one value,
+<span class="math inline">\(b\)</span>, but <span class="math inline">\(B\)</span> can take other values of <span class="math inline">\(b\)</span> also.</p>
+<p>Going forward, I will write the law or total variance more succinctly
+as <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[A] =
+\,\textup{\textrm{var}}_B[\,\textup{\textrm{E}}[A|B]] +
+\,\textup{\textrm{E}}_B[\,\textup{\textrm{var}}[A|B]] .
+\end{equation}\]</span> I leave off the subscript on the inner
+conditional expectation or variance. Just remember that when you see a
+conditional in an expectation or variance, the integration is over over
+the conditional distribution of <span class="math inline">\(A\)</span>
+conditioned on <span class="math inline">\(B=b\)</span>. Even when you
+see <span class="math inline">\(A|B\)</span>, the conditioning is on
+<span class="math inline">\(B=b\)</span> and the <span class="math inline">\(B\)</span> indicates that this is a random
+variable because <span class="math inline">\(B\)</span> can take
+different <span class="math inline">\(b\)</span> values. When computing
+<span class="math inline">\(\,\textup{\textrm{var}}_B[\,\textup{\textrm{E}}_{A|B}[A|B]]\)</span>,
+we will typically compute <span class="math inline">\(\,\textup{\textrm{E}}_{A|b}[A|b]\)</span> and then
+compute (or infer) the variance or expectation of that over all possible
+values of <span class="math inline">\(b\)</span>.</p>
+<p>The law of total variance will appear in this report in the following
+form: <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}_{XY}[f(\boldsymbol{Y},\boldsymbol{X})] =
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}_{XY|Y^{(1)}}[f(\boldsymbol{Y},\boldsymbol{X})|\boldsymbol{Y}^{(1)}]]
++
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}_{XY|Y^{(1)}}[f(\boldsymbol{Y},\boldsymbol{X})|\boldsymbol{Y}^{(1)}]]
+,
+\end{equation}\]</span> where <span class="math inline">\(f(\boldsymbol{Y}_t,\boldsymbol{X}_t)\)</span> is
+some function of <span class="math inline">\(\boldsymbol{X}_t\)</span>
+and <span class="math inline">\(\boldsymbol{Y}_t\)</span> and <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> is the observed data
+from <span class="math inline">\(t=1\)</span> to <span class="math inline">\(T\)</span> (<span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span> is the unobserved
+data).</p>
+</div>
+</div>
+<div id="model-residuals-conditioned-on-all-the-data" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Model residuals
+conditioned on all the data</h2>
+<p>Define the smoothations <span class="math inline">\(\widehat{\boldsymbol{v}}_t\)</span> as: <span class="math display">\[\begin{equation}\label{eq:vtT}
+\widehat{\boldsymbol{v}}_t= \boldsymbol{y}_t - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf a$}_t,
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> is <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>.
+The smoothation is different from <span class="math inline">\(\boldsymbol{v}_t\)</span> because it uses <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> not <span class="math inline">\(\boldsymbol{x}_t\)</span>; <span class="math inline">\(\boldsymbol{x}_t\)</span> is not known, and <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> is its
+estimate. <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> is output
+by the Kalman smoother. <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> means all the
+observed data from <span class="math inline">\(t=1\)</span> to <span class="math inline">\(T\)</span>. <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> is a sample from the
+random variable <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span>. The unobserved
+<span class="math inline">\(\boldsymbol{y}\)</span> will be termed <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span> and is a sample from
+the random variable <span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span>. When <span class="math inline">\(\boldsymbol{Y}\)</span> appears without a
+superscript, it means both <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span> together. Similarly
+<span class="math inline">\(\boldsymbol{y}\)</span> means both <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span> together—the
+observed data that we use to estimate <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> and the
+unobserved data that we do not use and may or may not know. <span class="math inline">\(\widehat{\boldsymbol{v}}_t\)</span> exists for
+both <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span>, though we might not
+know <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span> and thus
+might not know its corresponding <span class="math inline">\(\widehat{\boldsymbol{v}}_t\)</span>. In some
+cases, however, we do know <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span>; they are data that
+we left out of our model fitting, in say a k-fold or leave-one-out
+cross-validation.</p>
+<p><span class="math inline">\(\widehat{\boldsymbol{v}}_t\)</span> is a
+sample from the random variable <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span>. We want to
+compute the mean and variance of this random variable over all possibles
+values that <span class="math inline">\(\boldsymbol{X}_t\)</span> and
+<span class="math inline">\(\boldsymbol{Y}_t\)</span> might take. The
+mean of <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span>
+is 0 and we are concerned only with computing the variance: <span class="math display">\[\begin{equation}\label{eq:var.vtT}
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t] =
+\,\textup{\textrm{var}}_{XY}[\boldsymbol{Y}_t - \mbox{$\mathbf
+Z$}_t\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{Y}^{(1)}] -
+\mbox{$\mathbf a$}_t] .
+\end{equation}\]</span> Notice we have an unconditional variance over
+<span class="math inline">\({\boldsymbol{X},\boldsymbol{Y}}\)</span> on
+the outside and a conditional expectation over a specific value of <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> on the inside (in
+the <span class="math inline">\(\,\textup{\textrm{E}}[\;]\)</span>).</p>
+<p>From the law of total variance (Equation <span class="math inline">\(\ref{eq:lawoftotvar}\)</span>), we can write the
+variance of the model residuals as <span class="math display">\[\begin{equation}\label{eq:varvvtgeneral}
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t] =
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]]
++
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]]
+.
+\end{equation}\]</span></p>
+<div id="first-term-on-right-hand-side-of-equation" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> First term on right
+hand side of Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span></h3>
+<p>The random variable inside the <span class="math inline">\(\,\textup{\textrm{var}}[\;]\)</span> in the first
+term is <span class="math display">\[\begin{equation}\label{eq:first.term.rhs.varvvtgeneral}
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]=
+\,\textup{\textrm{E}}[(\boldsymbol{Y}_t + \mbox{$\mathbf Z$}_t
+\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{Y}^{(1)}] +
+\mbox{$\mathbf a$}_t)|\boldsymbol{Y}^{(1)}] .
+\end{equation}\]</span> Let’s consider this for a specific value <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>.
+<span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{E}}[(\boldsymbol{Y}_t + \mbox{$\mathbf Z$}_t
+\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] +
+\mbox{$\mathbf a$}_t)|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{E}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}] +
+\mbox{$\mathbf Z$}_t
+\,\textup{\textrm{E}}[\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]|\boldsymbol{y}^{(1)}]
++ \,\textup{\textrm{E}}[\mbox{$\mathbf a$}_t|\boldsymbol{y}^{(1)}] .
+\end{equation}\]</span> <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>
+is a fixed value, and the expected value of a fixed value is itself. So
+<span class="math inline">\(\,\textup{\textrm{E}}[\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]|\boldsymbol{y}^{(1)}]=\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>.
+Thus, <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{E}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}] +
+\mbox{$\mathbf Z$}_t
+\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] +
+\,\textup{\textrm{E}}[\mbox{$\mathbf a$}_t|\boldsymbol{y}^{(1)}] .
+\end{equation}\]</span> We can move the conditional out and write <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}]=
+\,\textup{\textrm{E}}[(\boldsymbol{Y}_t + \mbox{$\mathbf Z$}_t
+\boldsymbol{X}_t + \mbox{$\mathbf
+a$}_t)|\boldsymbol{y}^{(1)}]=\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}].
+\end{equation}\]</span> The right side is <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>,
+no hat on the <span class="math inline">\(\boldsymbol{V}_t\)</span>, and
+this applies for all <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. This means that the
+first term in Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span> can be written
+with no hat on <span class="math inline">\(\boldsymbol{V}\)</span>:
+<span class="math display">\[\begin{equation}\label{eq:no.hat.on.V}
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]]
+=
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]
+.
+\end{equation}\]</span> If <span class="math inline">\(\boldsymbol{Y}_t\)</span> were completely observed
+(no missing values), this would be zero since <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{y}]\)</span>
+would be a fixed value in that case. But <span class="math inline">\(\boldsymbol{Y}_t\)</span> is not assumed to be
+fully observed; it may have <span class="math inline">\(\boldsymbol{Y}^{(2)}_t\)</span> which is
+unobserved, or more precisely, not included in the estimation of <span class="math inline">\(VV_t\)</span> for whatever reason (“unknown”
+because it was unobserved being one reason). The derivation of <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]\)</span>
+is given in <span class="citation">Holmes (<a href="#ref-Holmes2010" role="doc-biblioref">2012</a>)</span>.</p>
+<p>Using the law of total variance, we can re-write <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t]\)</span>
+as: <span class="math display">\[\begin{equation}\label{eq:varianceVt}
+\,\textup{\textrm{var}}[\boldsymbol{V}_t] =
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]
++
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span> From Equation <span class="math inline">\(\ref{eq:varianceVt}\)</span>, we can solve for
+<span class="math inline">\(\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]\)</span>:
+<span class="math display">\[\begin{equation}\label{eq:var.E.vtT}
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]
+= \,\textup{\textrm{var}}[\boldsymbol{V}_t] -
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span> From Equation <span class="math inline">\(\ref{eq:unconditiondistofVt}\)</span>, we know
+that <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t]=\mbox{$\mathbf
+R$}_t\)</span> (this is the unconditional variance). Thus, <span class="math display">\[\begin{equation}\label{eq:var.E.vtT.R}
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]
+= \mbox{$\mathbf R$}_t -
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span></p>
+<p>The second term in Equation <span class="math inline">\(\ref{eq:var.E.vtT.R}\)</span> to the right of the
+equal sign and inside the expectation is <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]\)</span>.
+This is the variance of <span class="math inline">\(\boldsymbol{V}_t\)</span> with <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> held at a specific
+fixed <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. The
+variability in <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+(notice <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> not
+<span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> now) comes
+from <span class="math inline">\(\boldsymbol{X}_t\)</span> and <span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span> which are random
+variables. Let’s compute this variance for a specific <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> value. <span class="math display">\[\begin{equation}\label{eq:varvtcondy}
+\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{var}}[ \boldsymbol{Y}_t - \mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t-\mbox{$\mathbf a$}_t | \boldsymbol{y}^{(1)} ].
+\end{equation}\]</span> Notice that there is no <span class="math inline">\(\,\textup{\textrm{E}}\)</span> (expectation) on
+the <span class="math inline">\(\boldsymbol{X}_t\)</span>; this is <span class="math inline">\(\boldsymbol{V}_t\)</span> not <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span>. <span class="math inline">\(\mbox{$\mathbf a$}_t\)</span> is a fixed value and
+can be dropped.</p>
+<p>Equation <span class="math inline">\(\ref{eq:varvtcondy}\)</span> can
+be written as: <span class="math display">\[\begin{equation}\label{eq:var.Vt.yy}
+\begin{split}
+\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}] &amp;=
+\,\textup{\textrm{var}}[ \boldsymbol{Y}_t - \mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t | \boldsymbol{y}^{(1)} ]\\
+&amp;=\,\textup{\textrm{var}}[ - \mbox{$\mathbf Z$}_t\boldsymbol{X}_t |
+\boldsymbol{y}^{(1)} ] + \,\textup{\textrm{var}}[
+\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}] + \,\textup{\textrm{cov}}[
+\boldsymbol{Y}_t, - \mbox{$\mathbf Z$}_t\boldsymbol{X}_t |
+\boldsymbol{y}^{(1)} ] + \,\textup{\textrm{cov}}[ - \mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t, \boldsymbol{Y}_t | \boldsymbol{y}^{(1)} ]\\
+&amp;=\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf
+Z$}_t^\top + \widetilde{\mbox{$\mathbf U$}}_t^T-
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf Z$}_t^\top -
+\mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top .
+\end{split}
+\end{equation}\]</span> <span class="math inline">\(\widetilde{\boldsymbol{V}}_t^T=
+\,\textup{\textrm{var}}[ \boldsymbol{X}_t | \boldsymbol{y}^{(1)}
+]\)</span> and is output by the Kalman smoother. <span class="math inline">\(\widetilde{\mbox{$\mathbf
+U$}}_t^T=\,\textup{\textrm{var}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]\)</span>
+and <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^T=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>.
+The equations for these are given in <span class="citation">Holmes (<a href="#ref-Holmes2010" role="doc-biblioref">2012</a>)</span> and are
+output by the <code>MARSShatyt()</code> function in the {MARSS} package.
+If there were no missing data, i.e., if <span class="math inline">\(\boldsymbol{y}^{(1)}=\boldsymbol{y}\)</span>, then
+<span class="math inline">\(\widetilde{\mbox{$\mathbf U$}}_t^T\)</span>
+and <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^T\)</span> would be zero because <span class="math inline">\(\boldsymbol{Y}_t\)</span> would be fixed at <span class="math inline">\(\boldsymbol{y}_t\)</span>. This would reduce
+Equation <span class="math inline">\(\ref{eq:var.Vt.yy}\)</span> to
+<span class="math inline">\(\mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top\)</span>. But we
+are concerned with the case where there are missing values. Those
+missing values need not be for all <span class="math inline">\(t\)</span>. That is, there may be some observed
+<span class="math inline">\(y\)</span> at time t and some missing <span class="math inline">\(y\)</span>. <span class="math inline">\(\boldsymbol{y}_t\)</span> is multivariate.</p>
+<p>From Equation <span class="math inline">\(\ref{eq:var.Vt.yy}\)</span>, we know <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+for a specific <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. We want <span class="math inline">\(\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]\)</span>
+which is its expected value over all possible values of <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. <span class="math inline">\(\boldsymbol{V}_t\)</span> is a multivariate normal
+random variable with two random variables <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span>. The conditional
+variance of a multivariate Normal does not depend on the value that you
+are conditioning on. Let the <span class="math inline">\(\mbox{$\mathbf
+A$}\)</span> be a N-dimensional multivariate Normal random variable
+partitioned into <span class="math inline">\(\mbox{$\mathbf
+A$}_1\)</span> and <span class="math inline">\(\mbox{$\mathbf
+A$}_2\)</span> with variance-covariance matrix <span class="math inline">\(\Sigma = \begin{bmatrix} \Sigma_1 &amp;
+\Sigma_{12} \\ \Sigma_21 &amp; \Sigma_{2} \end{bmatrix}\)</span>. The
+variance-covariance matrix of <span class="math inline">\(\mbox{$\mathbf
+A$}\)</span> conditioned on <span class="math inline">\(\mbox{$\mathbf
+A$}_1=\mbox{$\mathbf a$}\)</span> is <span class="math inline">\(\Sigma
+= \begin{bmatrix} 0 &amp; 0 \\ 0 &amp; \Sigma_2 -
+\Sigma_{12}\Sigma_{1}\Sigma_{21} \end{bmatrix}\)</span>. Notice that
+<span class="math inline">\(\mbox{$\mathbf a$}\)</span> does not appear
+in the conditional variance matrix. This means that <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+does not depend on <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. Its variance only
+depends on the MARSS model parameters.</p>
+<p>Because <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+only depends on the MARSS parameters values, <span class="math inline">\(\mbox{$\mathbf Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf B$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span>, etc., the second term
+in Equation <span class="math inline">\(\ref{eq:var.E.vtT}\)</span>,
+<span class="math inline">\(\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}]]\)</span>,
+is equal to <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+(Equation <span class="math inline">\(\ref{eq:var.Vt.yy}\)</span>).
+Putting this into Equation <span class="math inline">\(\ref{eq:var.E.vtT.R}\)</span>, we have <span class="math display">\[\begin{equation}\label{eq:conditionalvtfinala}
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)})]]  =
+\mbox{$\mathbf R$}_t -
+\,\textup{\textrm{var}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}] =
+\mbox{$\mathbf R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top -
+\widetilde{\mbox{$\mathbf U$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_t^T\mbox{$\mathbf Z$}_t^\top + \mbox{$\mathbf
+Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top.
+\end{equation}\]</span> Since <span class="math inline">\(\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)})]]
+=
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)})]]\)</span>
+(Equation <span class="math inline">\(\ref{eq:no.hat.on.V}\)</span>),
+this means that the first term in Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span> is <span class="math display">\[\begin{equation}\label{eq:conditionalvtfinal}
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)})]]  =  \mbox{$\mathbf
+R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top -
+\widetilde{\mbox{$\mathbf U$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_t^T\mbox{$\mathbf Z$}_t^\top + \mbox{$\mathbf
+Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top.
+\end{equation}\]</span></p>
+</div>
+<div id="second-term-on-right-hand-side-of-equation" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Second term on
+right hand side of Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span></h3>
+<p>Consider the second term in Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span>. This term is
+<span class="math display">\[\begin{equation}\label{eq:second.term.rhs.9}
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]]
+=
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[(\boldsymbol{Y}_t-\mbox{$\mathbf
+Z$}_t\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{Y}^{(1)}]-\mbox{$\mathbf
+a$}_t)|\boldsymbol{Y}^{(1)}]] .
+\end{equation}\]</span> The middle term is: <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{Y}^{(1)}]|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span> Let’s solve the inner part for a specific <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>.
+<span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>
+is a fixed value. Thus <span class="math inline">\(\,\textup{\textrm{var}}[\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]|\boldsymbol{y}^{(1)}]=0\)</span>
+since the variance of a fixed value is 0. This is true for all <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> so the middle term
+reduces to 0. <span class="math inline">\(\mbox{$\mathbf a$}_t\)</span>
+is also fixed and its variance is also 0. The covariance between a
+random variable and a fixed value is 0. Thus for a specific <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>,
+the inside of the right hand side expectation reduces to <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]\)</span>
+which is <span class="math inline">\(\widetilde{\mbox{$\mathbf
+U$}}_t^T\)</span>. As noted in the previous section, <span class="math inline">\(\widetilde{\mbox{$\mathbf U$}}_t^T\)</span> is
+only a function of the MARSS parameters; it is not a function of <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> and <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]=\widetilde{\mbox{$\mathbf
+U$}}_t^T\)</span> for all <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. Thus the second
+term in Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span> is simply <span class="math inline">\(\widetilde{\mbox{$\mathbf U$}}_t^T\)</span>: <span class="math display">\[\begin{equation}\label{eq:second.term.rhs.9final}
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}]]
+=
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}]
+= \widetilde{\mbox{$\mathbf U$}}_t^T.
+\end{equation}\]</span></p>
+</div>
+<div id="putting-together-the-first-and-second-terms" class="section level3" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> Putting together
+the first and second terms</h3>
+<p>We can now put the first and second terms in Equation <span class="math inline">\(\ref{eq:varvvtgeneral}\)</span> together
+(Equations <span class="math inline">\(\ref{eq:conditionalvtfinal}\)</span> and <span class="math inline">\(\ref{eq:second.term.rhs.9final}\)</span>) and
+write out the variance of the model residuals: <span class="math display">\[\begin{equation}\label{eq:first.and.secons.vvtgeneral}
+\begin{split}
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t] &amp;=
+\mbox{$\mathbf R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top -
+\widetilde{\mbox{$\mathbf U$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_t^T\mbox{$\mathbf Z$}_t^\top + \mbox{$\mathbf
+Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top +
+\widetilde{\mbox{$\mathbf U$}}_t^T\\
+&amp;= \mbox{$\mathbf R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top +
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf Z$}_t^\top +
+\mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top .
+\end{split}
+\end{equation}\]</span> Equation <span class="math inline">\(\ref{eq:first.and.secons.vvtgeneral}\)</span> will
+reduce to <span class="math inline">\(\mbox{$\mathbf R$}_t -
+\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf
+Z$}_t^\top\)</span> if <span class="math inline">\(\boldsymbol{y}_t\)</span> has no missing values
+since <span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_t^T=
+0\)</span> in this case. If <span class="math inline">\(\boldsymbol{y}_t\)</span> is all missing values,
+<span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_t^T=
+\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^T\)</span> because
+<span class="math display">\[\begin{equation}\label{eq:cov.Yt.Xt.no.missing.vals}
+\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,
+\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t \boldsymbol{X}_t +
+\mbox{$\mathbf a$}_t + \boldsymbol{V}_t,
+\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t \boldsymbol{X}_t,
+\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] = \mbox{$\mathbf Z$}_t
+\,\textup{\textrm{cov}}[\boldsymbol{X}_t,
+\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] = \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T.
+\end{equation}\]</span> The reduction in Equation <span class="math inline">\(\ref{eq:cov.Yt.Xt.no.missing.vals}\)</span> occurs
+because <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span> and by extension <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{X}_t\)</span> are independent in the
+form of MARSS model used in this report (Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>). Thus when <span class="math inline">\(\boldsymbol{y}_t\)</span> is all missing values,
+Equation <span class="math inline">\(\ref{eq:first.and.secons.vvtgeneral}\)</span> will
+reduce to <span class="math inline">\(\mbox{$\mathbf R$}_t +
+\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf
+Z$}_t^\top\)</span> . The behavior if <span class="math inline">\(\boldsymbol{y}_t\)</span> has some missing and
+some not missing values depends on whether <span class="math inline">\(\mbox{$\mathbf R$}_t\)</span> is a diagonal matrix
+or not, i.e., if the <span class="math inline">\(\boldsymbol{y}_t^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{y}_t^{(2)}\)</span> are
+correlated.</p>
+</div>
+</div>
+<div id="state-residuals-conditioned-on-the-data" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> State residuals
+conditioned on the data</h2>
+<p>The state residuals are <span class="math inline">\(\boldsymbol{x}_t
+- (\mbox{$\mathbf B$}_t \boldsymbol{x}_{t-1} + \mbox{$\mathbf
+u$}_t)=\boldsymbol{w}_t\)</span>. The unconditional expected value of
+the state residuals is <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t -
+(\mbox{$\mathbf B$}_t \boldsymbol{X}_{t-1} + \mbox{$\mathbf u$}_t)] =
+\,\textup{\textrm{E}}[\boldsymbol{W}_t] = 0\)</span> and the
+unconditional variance of the state residuals is <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[\boldsymbol{X}_t - (\mbox{$\mathbf B$}_t
+\boldsymbol{X}_{t-1} + \mbox{$\mathbf u$}_t)] =
+\,\textup{\textrm{var}}[\boldsymbol{W}_t] = \mbox{$\mathbf Q$}_t
+\end{equation}\]</span> based on the definition of <span class="math inline">\(\boldsymbol{W}_t\)</span> in Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>. The conditional
+state residuals (conditioned on the data from <span class="math inline">\(t=1\)</span> to <span class="math inline">\(t=T\)</span>) are defined as <span class="math display">\[\begin{equation}
+\widehat{\boldsymbol{w}}_t= \widetilde{\boldsymbol{x}}_t^T-
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{x}}_{t-1}^T- \mbox{$\mathbf
+u$}_t.
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T=
+E[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{x}}_{t-1}^T=
+E[\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}]\)</span>. <span class="math inline">\(\widehat{\boldsymbol{w}}_t\)</span> is a sample
+from the random variable <span class="math inline">\(\widehat{\boldsymbol{W}}_t\)</span>; random over
+different possible data sets. The expected value of <span class="math inline">\(\widehat{\boldsymbol{W}}_t\)</span> is 0, and we
+are concerned with computing its variance.</p>
+<p>We can write the variance of <span class="math inline">\(\boldsymbol{W}_t\)</span> (no hat) using the law
+of total variance. <span class="math display">\[\begin{equation}\label{eq:Wlawoftotvar}
+\,\textup{\textrm{var}}[\boldsymbol{W}_t] =
+\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
++
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+.
+\end{equation}\]</span> Notice that <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{E}}[(\boldsymbol{X}_t - \mbox{$\mathbf B$}_t
+\boldsymbol{X}_{t-1} - \mbox{$\mathbf u$}_t)|\boldsymbol{y}^{(1)}]
+=  \widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf B$}_t
+\widetilde{\boldsymbol{x}}_{t-1}^T- \mbox{$\mathbf u$}_t =
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{W}}_t|\boldsymbol{y}^{(1)}] =
+\widehat{\boldsymbol{w}}_t.
+\end{equation}\]</span> This is true for all <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>, thus <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]\)</span>
+is <span class="math inline">\(\widehat{\boldsymbol{W}}_t\)</span>, and
+<span class="math inline">\(\,\textup{\textrm{var}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+= \,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t]\)</span>. Equation
+<span class="math inline">\(\ref{eq:Wlawoftotvar}\)</span> can thus be
+written <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[\boldsymbol{W}_t] =
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t] +
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+.
+\end{equation}\]</span> Solve for <span class="math inline">\(\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t]\)</span>:
+<span class="math display">\[\begin{equation}\label{eq:varwwt}
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t] =
+\,\textup{\textrm{var}}[\boldsymbol{W}_t] -
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span></p>
+<p>The variance in the expectation on the far right for a specific <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>
+is <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{var}}[ (\boldsymbol{X}_t - \mbox{$\mathbf
+B$}_t\boldsymbol{X}_{t-1}-\mbox{$\mathbf u$}_t) | \boldsymbol{y}^{(1)} ]
+.
+\end{equation}\]</span> <span class="math inline">\(\mbox{$\mathbf
+u$}_t\)</span> is not a random variable and can be dropped. Thus, <span class="math display">\[\begin{equation}\label{eq:var.W.cond.y1}
+\begin{split}
+\,\textup{\textrm{var}}[\boldsymbol{W}_t&amp;|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{var}}[ (\boldsymbol{X}_t - \mbox{$\mathbf
+B$}_t\boldsymbol{X}_{t-1}) | \boldsymbol{y}^{(1)} ] \\
+&amp; = \,\textup{\textrm{var}}[ \boldsymbol{X}_t | \boldsymbol{y}^{(1)}
+] + \,\textup{\textrm{var}}[\mbox{$\mathbf B$}_t\boldsymbol{X}_{t-1} |
+\boldsymbol{y}^{(1)} ] + \,\textup{\textrm{cov}}[\boldsymbol{X}_t,
+-\mbox{$\mathbf B$}_t\boldsymbol{X}_{t-1} | \boldsymbol{y}^{(1)} ] +
+\,\textup{\textrm{cov}}[ -\mbox{$\mathbf B$}_t\boldsymbol{X}_{t-1},
+\boldsymbol{X}_t | \boldsymbol{y}^{(1)} ]\\
+&amp; = \widetilde{\boldsymbol{V}}_t^T+ \mbox{$\mathbf B$}_t
+\widetilde{\boldsymbol{V}}_{t-1}^T\mbox{$\mathbf B$}_t^\top -
+\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top -
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{V}}_{t-1,t}^T.
+\end{split}
+\end{equation}\]</span> Again this is conditional multivariate normal
+variance, and its value does not depend on the value, <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span> that we are
+conditioning on. It depends only on the parameters values, <span class="math inline">\(\mbox{$\mathbf Q$}\)</span>, <span class="math inline">\(\mbox{$\mathbf B$}\)</span>, <span class="math inline">\(\mbox{$\mathbf R$}\)</span>, etc., and is the same
+for all values of <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. So <span class="math inline">\(\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+=
+\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{y}^{(1)}]\)</span>,
+using any value of <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. Thus <span class="math display">\[\begin{equation}\label{eq:E.var.Wt.yt}
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+=  \widetilde{\boldsymbol{V}}_t^T+ \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{V}}_{t-1}^T\mbox{$\mathbf B$}_t^\top -
+\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top -
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{V}}_{t-1,t}^T.
+\end{equation}\]</span></p>
+<p>Putting <span class="math inline">\(\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{var}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]\)</span>
+from Equation <span class="math inline">\(\ref{eq:E.var.Wt.yt}\)</span>
+and <span class="math inline">\(\,\textup{\textrm{var}}[\boldsymbol{W}_t]=\mbox{$\mathbf
+Q$}_t\)</span> into Equation <span class="math inline">\(\ref{eq:varwwt}\)</span>, the variance of the
+conditional state residuals is <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t] = \mbox{$\mathbf
+Q$}_t - \widetilde{\boldsymbol{V}}_t^T- \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{V}}_{t-1}^T\mbox{$\mathbf B$}_t^\top +
+\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top +
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{V}}_{t-1,t}^T.
+\end{equation}\]</span></p>
+</div>
+<div id="covariance-of-the-conditional-model-and-state-residuals" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Covariance of the
+conditional model and state residuals</h2>
+<p>The unconditional model and state residuals, <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span>, are independent by
+definition (in Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>), i.e., <span class="math inline">\(\,\textup{\textrm{cov}}[\boldsymbol{V}_t,\boldsymbol{W}_t]=0\)</span>.
+However the conditional model and state residuals, <span class="math inline">\(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]\)</span>,
+are not independent since both depend on <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>.<br />
+Using the law of total covariance, we can write <span class="math display">\[\begin{equation}\label{eq:covhatVtWt1}
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]
+=
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\widehat{\boldsymbol{W}}_t|\boldsymbol{Y}^{(1)}]]
++
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_t|\boldsymbol{Y}^{(1)}]] .
+\end{equation}\]</span></p>
+<p>For a specific value of <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>,
+the covariance in the second term on the right is <span class="math inline">\(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_t|\boldsymbol{y}^{(1)}]\)</span>. Conditioned
+on a specific value of <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span>, <span class="math inline">\(\widehat{\boldsymbol{W}}_t\)</span> is a fixed
+value, <span class="math inline">\(\widehat{\boldsymbol{w}}_t=
+\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{x}}_{t-1}^T- \mbox{$\mathbf u$}_t\)</span>,
+and conditioned on <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>, <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^T\)</span> and <span class="math inline">\(\widetilde{\boldsymbol{x}}_{t-1}^T\)</span> are
+fixed values. <span class="math inline">\(\mbox{$\mathbf u$}_t\)</span>
+is also fixed; it is a parameter. <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span> is not a fixed
+value because it has <span class="math inline">\(\boldsymbol{Y}_t^{(2)}\)</span> and that is a
+random variable. Thus <span class="math inline">\(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_t|\boldsymbol{y}^{(1)}]\)</span> is the
+covariance between a random variable and a fixed variable and thus the
+covariance is 0. This is true for all <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>. Thus the second
+right-side term in Equation <span class="math inline">\(\ref{eq:covhatVtWt1}\)</span> is zero, and the
+equation reduces to <span class="math display">\[\begin{equation}\label{eq:covhatVtWt3}
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]
+=
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\widehat{\boldsymbol{W}}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span> Notice that <span class="math inline">\(\,\textup{\textrm{E}}[\widehat{\boldsymbol{W}}_t|\boldsymbol{y}^{(1)}]=\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{y}^{(1)}]\)</span>
+and <span class="math inline">\(\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}]=\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]\)</span>
+since <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{y}^{(1)}]=
+\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]-\mbox{$\mathbf
+B$}_t\,\textup{\textrm{E}}[\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}] -
+\mbox{$\mathbf u$}_t = \widetilde{\boldsymbol{x}}_t^T-\mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{x}}_{t-1}^T- \mbox{$\mathbf u$}_t =
+\widehat{\boldsymbol{w}}_t=
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{W}}_t|\boldsymbol{y}^{(1)}]
+\end{equation}\]</span> and <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{y}^{(1)}]=
+\,\textup{\textrm{E}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]-\mbox{$\mathbf
+Z$}_t\,\textup{\textrm{E}}[\boldsymbol{X}_{t}|\boldsymbol{y}^{(1)}] -
+\mbox{$\mathbf a$}_t =
+\,\textup{\textrm{E}}[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}]-\mbox{$\mathbf
+Z$}_t \widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf a$}_t =
+\,\textup{\textrm{E}}[\widehat{\boldsymbol{V}}_t|\boldsymbol{y}^{(1)}] .
+\end{equation}\]</span> Thus the right side of Equation <span class="math inline">\(\ref{eq:covhatVtWt3}\)</span> can be written in
+terms of <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span> instead of <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span> and <span class="math inline">\(\widehat{\boldsymbol{W}}_t\)</span>: <span class="math display">\[\begin{equation}\label{eq:covhatVtWt2}
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]
+=
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]].
+\end{equation}\]</span></p>
+<p>Using the law of total covariance, we can write: <span class="math display">\[\begin{equation}\label{eq:covVtWt}
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t, \boldsymbol{W}_t] =
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]] +
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+.
+\end{equation}\]</span> The unconditional covariance of <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span> is 0. Thus the left side
+of Equation <span class="math inline">\(\ref{eq:covVtWt}\)</span> is 0
+and we can rearrange the equation as <span class="math display">\[\begin{equation}\label{eq:covVtWt2}
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]]
+= -
+\,\textup{\textrm{E}}_{Y^{(1)}}[\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}]] .
+\end{equation}\]</span> Combining Equation <span class="math inline">\(\ref{eq:covhatVtWt2}\)</span> and <span class="math inline">\(\ref{eq:covVtWt2}\)</span>, we get <span class="math display">\[\begin{equation}\label{eq:conditionalcovvtwt}
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]
+= - \,\textup{\textrm{E}}_{Y^{(1)}}[
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}] ] ,
+\end{equation}\]</span> and our problem reduces to solving for the
+conditional covariance of the model and state residuals (right side of
+Equation <span class="math inline">\(\ref{eq:conditionalcovvtwt}\)</span>).</p>
+<p>For a specific <span class="math inline">\(\boldsymbol{Y}^{(1)}=\boldsymbol{y}^{(1)}\)</span>,
+the conditional covariance <span class="math inline">\(\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{y}^{(1)}]\)</span> can be written out as
+<span class="math display">\[\begin{equation}
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{y}^{(1)}] =
+\,\textup{\textrm{cov}}[\boldsymbol{Y}_t-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t-\mbox{$\mathbf a$}_t,\,
+\boldsymbol{X}_t-\mbox{$\mathbf B$}_t\boldsymbol{X}_{t-1}-\mbox{$\mathbf
+u$}_t|\boldsymbol{y}^{(1)}] .
+\end{equation}\]</span> <span class="math inline">\(\mbox{$\mathbf
+a$}_t\)</span> and <span class="math inline">\(\mbox{$\mathbf
+u$}_t\)</span> are fixed values and can be dropped. Thus <span class="math display">\[\begin{equation}
+\begin{split}
+\,\textup{\textrm{cov}}&amp;[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{y}^{(1)}]
+=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t, \boldsymbol{X}_t-\mbox{$\mathbf
+B$}_t\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}] \\
+&amp;
+=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]
++ \,\textup{\textrm{cov}}[\boldsymbol{Y}_t,-\mbox{$\mathbf
+B$}_t\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}] +
+\,\textup{\textrm{cov}}[-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] +
+\,\textup{\textrm{cov}}[-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t,-\mbox{$\mathbf
+B$}_t\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}]\\
+&amp; = \widetilde{\mbox{$\mathbf S$}}_t^T- \widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T+ \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top ,
+\end{split}
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^T=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>
+and <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}]\)</span>;
+the equations for <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^T\)</span> and <span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_{t,t-1}^T\)</span>
+are given in <span class="citation">Holmes (<a href="#ref-Holmes2010" role="doc-biblioref">2012</a>)</span> and are output by the
+<code>MARSShatyt()</code> function in the {MARSS} package.</p>
+<p>Both <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span> are multivariate normal
+random variables that depend on <span class="math inline">\(\boldsymbol{Y}^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{Y}^{(2)}\)</span> and the conditional
+covariance is not a function of the variable that we condition on (in
+this case <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>).
+The conditional covariance is only a function of the MARSS parameters.
+Thus <span class="math display">\[\begin{equation}
+\,\textup{\textrm{E}}_{Y^{(1)}}[
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{Y}^{(1)}] ]=
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_t|\boldsymbol{y}^{(1)}] = \widetilde{\mbox{$\mathbf
+S$}}_t^T- \widetilde{\mbox{$\mathbf S$}}_{t,t-1}^T\mbox{$\mathbf
+B$}_t^\top - \mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^T+
+\mbox{$\mathbf Z$}_t\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf
+B$}_t^\top .
+\end{equation}\]</span> <span class="math inline">\(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]\)</span>
+is the negative of this (Equation <span class="math inline">\(\ref{eq:conditionalcovvtwt}\)</span>), thus <span class="math display">\[\begin{equation}
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,\widehat{\boldsymbol{W}}_t]
+= - \widetilde{\mbox{$\mathbf S$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top + \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top .
+\end{equation}\]</span></p>
+<p>The Harvey et al. algorithm (next section) gives the joint
+distribution of the model residuals at time <span class="math inline">\(t\)</span> and state residuals at time <span class="math inline">\(t+1\)</span>. Using the law of total covariance as
+above, the covariance in this case is <span class="math display">\[\begin{equation}
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\boldsymbol{W}_{t+1}|\boldsymbol{Y}^{(1)}]]
+= - \,\textup{\textrm{E}}_{Y^{(1)}}[
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_{t+1}|\boldsymbol{Y}^{(1)}] ]
+\end{equation}\]</span> and <span class="math display">\[\begin{equation}
+\begin{split}
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_{t+1}|\boldsymbol{y}^{(1)}] &amp;
+=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t-\mbox{$\mathbf a$}_t,\,
+\boldsymbol{X}_{t+1}-\mbox{$\mathbf
+B$}_{t+1}\boldsymbol{X}_t-\mbox{$\mathbf u$}_{t+1}|\boldsymbol{y}^{(1)}]
+\\
+&amp; =\,\textup{\textrm{cov}}[\boldsymbol{Y}_t-\mbox{$\mathbf
+Z$}_t\boldsymbol{X}_t,\, \boldsymbol{X}_{t+1}-\mbox{$\mathbf
+B$}_{t+1}\boldsymbol{X}_t|\boldsymbol{y}^{(1)}] \\
+&amp; = \widetilde{\mbox{$\mathbf S$}}_{t,t+1}^T-
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf B$}_{t+1}^\top -
+\mbox{$\mathbf Z$}_t\widetilde{\boldsymbol{V}}_{t,t+1}^T+ \mbox{$\mathbf
+Z$}_t \widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf B$}_{t+1}^\top .
+\end{split}
+\end{equation}\]</span> Thus, <span class="math display">\[\begin{equation}
+\begin{split}
+\,\textup{\textrm{cov}}_{Y^{(1)}}[\,\textup{\textrm{E}}[\boldsymbol{V}_t|\boldsymbol{Y}^{(1)}],\,\textup{\textrm{E}}[\boldsymbol{W}_{t+1}|\boldsymbol{Y}^{(1)}]]
+&amp; = - \,\textup{\textrm{E}}_{Y^{(1)}}[
+\,\textup{\textrm{cov}}[\boldsymbol{V}_t,
+\boldsymbol{W}_{t+1}|\boldsymbol{Y}^{(1)}] ] \\
+&amp; = - \widetilde{\mbox{$\mathbf S$}}_{t,t+1}^T+
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf B$}_{t+1}^\top +
+\mbox{$\mathbf Z$}_t\widetilde{\boldsymbol{V}}_{t,t+1}^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf B$}_{t+1}^\top.
+\end{split}
+\end{equation}\]</span></p>
+</div>
+<div id="joint-distribution-of-the-conditional-residuals" class="section level2" number="2.5">
+<h2><span class="header-section-number">2.5</span> Joint distribution of
+the conditional residuals</h2>
+<p>We now can write the variance of the joint distribution of the
+conditional residuals. Define <span class="math display">\[\begin{equation}
+\widehat{\varepsilon}_t = \begin{bmatrix}\widehat{\boldsymbol{v}}_t\\
+\widehat{\boldsymbol{w}}_t\end{bmatrix} =
+\begin{bmatrix}\boldsymbol{y}_t - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf a$}_t\\
+\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{x}}_{t-1}^T- \mbox{$\mathbf u$}_t
+\end{bmatrix}.
+\end{equation}\]</span> <span class="math inline">\(\widehat{\varepsilon}_t\)</span> is a sample drawn
+from the distribution of the random variable <span class="math inline">\(\widehat{\mathcal{E}}_t\)</span>. The expected
+value of <span class="math inline">\(\widehat{\mathcal{E}}_t\)</span>
+over all possible <span class="math inline">\(\boldsymbol{y}\)</span> is
+0 and the variance of <span class="math inline">\(\widehat{\mathcal{E}}_t\)</span> is <span class="math display">\[\begin{equation}
+\widehat{\Sigma}_t = \,\textup{\textrm{var}}[\widehat{\mathcal{E}}_t] =
+\begin{bmatrix}[c|c]
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t]&amp;
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_t] \\
+\rule[.5ex]{20ex}{0.25pt} &amp; \rule[.5ex]{20ex}{0.25pt} \\
+(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_t])^\top&amp;
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_t] \end{bmatrix}
+\end{equation}\]</span> which is <span class="math display">\[\begin{equation}\label{eq:jointcondresid1general}
+\begin{bmatrix}[c|c]
+\mbox{$\mathbf R$}_t - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top +
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf
+Z$}_t^\top+\mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf
+S$}}_t^T)^\top&amp;
+- \widetilde{\mbox{$\mathbf S$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top + \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top\\
+\rule[.5ex]{40ex}{0.25pt} &amp; \rule[.5ex]{50ex}{0.25pt} \\
+(- \widetilde{\mbox{$\mathbf S$}}_t^T+ \widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top + \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf
+B$}_t^\top)^\top&amp;
+\mbox{$\mathbf Q$}_t - \widetilde{\boldsymbol{V}}_t^T- \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{V}}_{t-1}^T\mbox{$\mathbf B$}_t^\top +
+\widetilde{\boldsymbol{V}}_{t,t-1}^T\mbox{$\mathbf B$}_t^\top +
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{V}}_{t-1,t}^T\end{bmatrix},
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^T=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>,
+<span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T=\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}]\)</span>,
+<span class="math inline">\(\widetilde{\boldsymbol{V}}_t^T=\,\textup{\textrm{var}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>,
+<span class="math inline">\(\widetilde{\boldsymbol{V}}_{t,t-1}^T=\,\textup{\textrm{cov}}[\boldsymbol{X}_t,\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1)}]\)</span>,
+and <span class="math inline">\(\widetilde{\boldsymbol{V}}_{t-1,t}^T=\,\textup{\textrm{cov}}[\boldsymbol{X}_{t-1},\boldsymbol{X}_t|\boldsymbol{y}^{(1)}]\)</span>.
+This gives the variance of both “observed” model residuals (the ones
+associated with <span class="math inline">\(\boldsymbol{y}^{(1)}\)</span>) and the unobserved
+model residuals (the ones associated with <span class="math inline">\(\boldsymbol{y}^{(2)}\)</span>).<br />
+When there are no missing values in <span class="math inline">\(\boldsymbol{y}_t\)</span>, the <span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_t^T\)</span> and
+<span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_{t,t-1}^T\)</span> terms equal 0 and drop out.</p>
+<p>If the residuals are defined as in <span class="citation">Harvey,
+Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span> with <span class="math inline">\(\widehat{\boldsymbol{v}}_t\)</span> on top and
+<span class="math inline">\(\widehat{\boldsymbol{w}}_{t+1}\)</span> on
+the bottom instead of <span class="math inline">\(\widehat{\boldsymbol{w}}_t\)</span>, then <span class="math display">\[\begin{equation}
+\widehat{\varepsilon}_t = \begin{bmatrix}\widehat{\boldsymbol{v}}_t\\
+\widehat{\boldsymbol{w}}_{t+1}\end{bmatrix} =
+\begin{bmatrix}\boldsymbol{y}_t - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf a$}_t\\
+\widetilde{\boldsymbol{x}}_{t+1}^T- \mbox{$\mathbf
+B$}_{t+1}\widetilde{\boldsymbol{x}}_t^T- \mbox{$\mathbf u$}_{t+1}
+\end{bmatrix}
+\end{equation}\]</span> and the variance of <span class="math inline">\(\widehat{\mathcal{E}}_t\)</span> is <span class="math display">\[\begin{equation}
+\begin{bmatrix}[c|c]
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{V}}_t]&amp;
+\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_{t+1}] \\
+\rule[.5ex]{20ex}{0.25pt} &amp; \rule[.5ex]{20ex}{0.25pt} \\
+(\,\textup{\textrm{cov}}[\widehat{\boldsymbol{V}}_t,
+\widehat{\boldsymbol{W}}_{t+1}])^\top&amp;
+\,\textup{\textrm{var}}[\widehat{\boldsymbol{W}}_{t+1}] \end{bmatrix}
+\end{equation}\]</span> which is <span class="math display">\[\begin{equation}\label{eq:jointcondresid2}
+\begin{bmatrix}[c|c]
+\mbox{$\mathbf R$}_t - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf Z$}_t^\top +
+\widetilde{\mbox{$\mathbf S$}}_t^T\mbox{$\mathbf Z$}_t^\top +
+\mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^T)^\top&amp;
+- \widetilde{\mbox{$\mathbf S$}}_{t,t+1}^T+ \widetilde{\mbox{$\mathbf
+S$}}_t^T\mbox{$\mathbf B$}_{t+1}^\top + \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t+1}^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf B$}_{t+1}^\top \\
+\rule[.5ex]{40ex}{0.25pt} &amp; \rule[.5ex]{50ex}{0.25pt} \\
+(- \widetilde{\mbox{$\mathbf S$}}_{t,t+1}^T+ \widetilde{\mbox{$\mathbf
+S$}}_t^T\mbox{$\mathbf B$}_{t+1}^\top + \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_{t,t+1}^T- \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf
+B$}_{t+1}^\top)^\top&amp;
+\mbox{$\mathbf Q$}_{t+1} - \widetilde{\boldsymbol{V}}_{t+1}^T-
+\mbox{$\mathbf B$}_{t+1}\widetilde{\boldsymbol{V}}_t^T\mbox{$\mathbf
+B$}_{t+1}^\top + \widetilde{\boldsymbol{V}}_{t+1,t}^T\mbox{$\mathbf
+B$}_{t+1}^\top + \mbox{$\mathbf
+B$}_{t+1}\widetilde{\boldsymbol{V}}_{t,t+1}^T\end{bmatrix} .
+\end{equation}\]</span></p>
+</div>
+</div>
+<div id="harvey-et-al.-1998-algorithm-for-the-conditional-residuals" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Harvey et al. 1998
+algorithm for the conditional residuals</h1>
+<div style="display:none">
+<span class="math inline">\(\nextSection\)</span>
+</div>
+<p>Pages 112-113 in <span class="citation">Harvey, Koopman, and Penzer
+(<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span>
+give a recursive algorithm for computing the variance of the conditional
+residuals when the time-varying MARSS equation is written as: <span class="math display">\[\begin{equation}\label{eq:residsMARSSHarvey}
+\begin{gathered}
+\boldsymbol{x}_{t+1} = \mbox{$\mathbf B$}_{t+1}\boldsymbol{x}_t +
+\mbox{$\mathbf u$}_{t+1} + \mbox{$\mathbf H$}_{t+1}\epsilon_{t},\\
+\boldsymbol{y}_t = \mbox{$\mathbf Z$}_t\boldsymbol{x}_t + \mbox{$\mathbf
+a$}_t + \mbox{$\mathbf G$}_t\epsilon_t,\\
+\mbox{ where } \epsilon_t \sim \,\textup{\textrm{MVN}}(0,\mbox{$\mathbf
+I$}_{m+n \times m+n}) \\
+\mbox{$\mathbf H$}_t\mbox{$\mathbf H$}_t^\top=\mbox{$\mathbf Q$}_t,
+\mbox{$\mathbf G$}_t\mbox{$\mathbf G$}_t^\top=\mbox{$\mathbf R$}_t,
+\text{ and } \mbox{$\mathbf H$}_t\mbox{$\mathbf G$}_t^\top =
+\,\textup{\textrm{cov}}[\boldsymbol{W}_t, \boldsymbol{V}_t]
+\end{gathered}
+\end{equation}\]</span> The <span class="math inline">\(\mbox{$\mathbf
+H$}_t\)</span> and <span class="math inline">\(\mbox{$\mathbf
+G$}_t\)</span> matrices specify the variance and covariance of <span class="math inline">\(\boldsymbol{W}_t\)</span> and <span class="math inline">\(\boldsymbol{V}_t\)</span>. <span class="math inline">\(\mbox{$\mathbf H$}_t\)</span> has <span class="math inline">\(m\)</span> rows and <span class="math inline">\(m+n\)</span> columns and <span class="math inline">\(\mbox{$\mathbf G$}_t\)</span> has <span class="math inline">\(n\)</span> rows and <span class="math inline">\(m+n\)</span> columns. In the MARSS equation for
+this report (Equation <span class="math inline">\(\ref{eq:residsMARSS}\)</span>), <span class="math inline">\(\boldsymbol{W}_t\)</span> and <span class="math inline">\(\boldsymbol{V}_t\)</span> are independent. To
+achieve this in the Harvey et al. form (Equation <span class="math inline">\(\ref{eq:residsMARSSHarvey}\)</span>), the first
+<span class="math inline">\(n\)</span> columns of <span class="math inline">\(\mbox{$\mathbf H$}_t\)</span> are all 0 and the
+last <span class="math inline">\(m\)</span> columns of <span class="math inline">\(\mbox{$\mathbf G$}_t\)</span> are all zero.</p>
+<p>The algorithm in <span class="citation">Harvey, Koopman, and Penzer
+(<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span>
+gives the variance of the normalized residuals, the <span class="math inline">\(\epsilon_t\)</span>. I have modified their
+algorithm so it returns the non-normalized residuals: <span class="math display">\[\varepsilon_t=\begin{bmatrix}\mbox{$\mathbf
+G$}_t\epsilon_t\\ \mbox{$\mathbf
+H$}_{t+1}\epsilon_t\end{bmatrix}=\begin{bmatrix}\boldsymbol{v}_t\\
+\boldsymbol{w}_{t+1} \end{bmatrix}.\]</span></p>
+<p>The Harvey et al. algorithm is a backwards recursion using the
+following output from the Kalman filter: the one-step ahead prediction
+covariance <span class="math inline">\(\mbox{$\mathbf F$}_t\)</span>,
+the Kalman gain <span class="math inline">\(\mbox{$\mathbf
+K$}_t\)</span>, <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^{t-1}=\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1),1:{t-1}}]\)</span>
+and <span class="math inline">\(\widetilde{\boldsymbol{V}}_t^{t-1}=\,\textup{\textrm{var}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1),1:{t-1}}]\)</span>.
+In the {MARSS} package, these are output from in , , and .</p>
+<div id="algorithm-for-the-non-normalized-residuals" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Algorithm for the
+non-normalized residuals</h2>
+<p>Start from <span class="math inline">\(t=T\)</span> and work
+backwards to <span class="math inline">\(t=1\)</span>. At time <span class="math inline">\(T\)</span>, <span class="math inline">\(r_T=0_{1
+\times m}\)</span> and <span class="math inline">\(N_T=0_{m \times
+m}\)</span>. <span class="math inline">\(\mbox{$\mathbf
+B$}_{t+1}\)</span> and <span class="math inline">\(\mbox{$\mathbf
+Q$}_{t+1}\)</span> can be set to NA or 0. They will not appear in the
+algorithm at time <span class="math inline">\(T\)</span> since <span class="math inline">\(r_T=0\)</span> and <span class="math inline">\(N_T=0\)</span>. Note that the <span class="math inline">\(\boldsymbol{w}\)</span> residual and its
+associated variance and covariance with <span class="math inline">\(\boldsymbol{v}\)</span> at time <span class="math inline">\(T\)</span> is NA since this residual would be for
+<span class="math inline">\(\boldsymbol{x}_T\)</span> to <span class="math inline">\(\boldsymbol{x}_{T+1}\)</span>.</p>
+<!--
+% algorithm with \GG_t and \HH_t
+% \begin{equation}\label{eq:Harveyalgo}
+% \begin{gathered}
+% \FF_t = \ZZ_t\hatVt\ZZ_t^\top+\RR_t\\
+% G_t= \GG_t\QQ_t\GG_t^\top, \mbox{  }H_t = \HH_t\RR_t\HH_t^\top,  \mbox{ } K_t = \BB_t\KK^{*}_t\\
+% L_t = \BB_t - K_t\ZZ_t, \mbox{ } J_t= H_t - K_t G_t, \mbox{ } u_t = \FF_t^{-1} - K_t^\top r_t\\
+% r_{t-1} = \ZZ_t^\top u_t + \BB_t^\top r_t, \mbox{ } N_{t-1} = K_t^\top N_t K_t + L_t^\top N_t L_t
+% \end{gathered}
+% \end{equation}
+-->
+<p><span class="math display">\[\begin{equation}\label{eq:Harveyalgo}
+\begin{gathered}
+\mbox{$\mathbf Q$}^\prime_{t+1}=\begin{bmatrix}0_{m \times
+n}&amp;\mbox{$\mathbf Q$}_{t+1}\end{bmatrix}, \mbox{    } \mbox{$\mathbf
+R$}^\prime_t=\begin{bmatrix}\mbox{$\mathbf R$}_t^* &amp; 0_{n \times
+m}\end{bmatrix}\\
+\mbox{$\mathbf F$}_t = \mbox{$\mathbf
+Z$}_t^*\widetilde{\boldsymbol{V}}_t^{t-1}{\mbox{$\mathbf
+Z$}_t^*}^\top+\mbox{$\mathbf R$}_t^* , \,\, n \times n \\
+K_t = \mbox{$\mathbf B$}_{t+1}\mbox{$\mathbf K$}_t = \mbox{$\mathbf
+B$}_{t+1} \widetilde{\boldsymbol{V}}_t^{t-1}{\mbox{$\mathbf
+Z$}_t^*}^\top \mbox{$\mathbf F$}_t^{-1}  , \,\, m \times n  \\
+L_t = \mbox{$\mathbf B$}_{t+1} - K_t\mbox{$\mathbf Z$}_t^*  , \,\, m
+\times m \\
+J_t= \mbox{$\mathbf Q$}^\prime_{t+1} - K_t \mbox{$\mathbf
+R$}^\prime_t  , \,\, m \times (n+m) \\
+v_t = \boldsymbol{y}_t^* - \mbox{$\mathbf
+Z$}_t\widetilde{\boldsymbol{x}}_t^{t-1}- \mbox{$\mathbf a$}_t , \,\, n
+\times 1 \\
+u_t = \mbox{$\mathbf F$}_t^{-1} v_t - K_t^\top r_t , \,\, n \times 1 \\
+r_{t-1} = {\mbox{$\mathbf Z$}_t^*}^\top u_t + \mbox{$\mathbf
+B$}_{t+1}^\top r_t , \,\, m \times 1  \\
+N_{t-1} = {\mbox{$\mathbf Z$}_t^*}^\top \mbox{$\mathbf F$}_t^{-1}
+\mbox{$\mathbf Z$}_t^* + L_t^\top N_t L_t   , \,\, m \times m .
+\end{gathered}
+\end{equation}\]</span> <span class="math inline">\(\boldsymbol{y}_t^*\)</span> is the observed data
+at time <span class="math inline">\(t\)</span> with the <span class="math inline">\(i\)</span>-th rows set to 0 if the <span class="math inline">\(i\)</span>-th <span class="math inline">\(y\)</span> is missing. Bolded terms are the same
+as in Equation <span class="math inline">\(\ref{eq:residsMARSSHarvey}\)</span> (and are
+output by ). Unbolded terms are terms used in <span class="citation">Harvey, Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span>. The *
+on <span class="math inline">\(\mbox{$\mathbf Z$}_t\)</span> and <span class="math inline">\(\mbox{$\mathbf R$}_t\)</span>, indicates that they
+are the missing value modified versions discussed in section 6.4 of
+<span class="citation">Shumway and Stoffer (<a href="#ref-ShumwayStoffer2006" role="doc-biblioref">2006</a>)</span> and
+<span class="citation">Holmes (<a href="#ref-Holmes2010" role="doc-biblioref">2012</a>)</span>: to construct <span class="math inline">\(\mbox{$\mathbf Z$}_t^*\)</span> and <span class="math inline">\(\mbox{$\mathbf R$}_t^*\)</span>, the rows of <span class="math inline">\(\mbox{$\mathbf Z$}_t\)</span> corresponding to
+missing rows of <span class="math inline">\(\boldsymbol{y}_t\)</span>
+are set to zero and the <span class="math inline">\((i,j)\)</span> and
+<span class="math inline">\((j,i)\)</span> terms of <span class="math inline">\(\mbox{$\mathbf R$}_t\)</span> corresponding the
+missing rows of <span class="math inline">\(\boldsymbol{y}_t\)</span>
+are set to zero. For the latter, this means if the <span class="math inline">\(i\)</span>-th row of <span class="math inline">\(\boldsymbol{y}_t\)</span> is missing, then then
+the <span class="math inline">\(i\)</span>-th row and column (including
+the value on the diagonal) in <span class="math inline">\(\mbox{$\mathbf
+R$}_t\)</span> are set to 0. Notice that <span class="math inline">\(\mbox{$\mathbf F$}_t\)</span> will have 0’s on the
+diagonal if there are missing values. A modified inverse of <span class="math inline">\(\mbox{$\mathbf F$}_t\)</span> is used: any 0’s on
+the diagonal of <span class="math inline">\(\mbox{$\mathbf
+F$}_t\)</span> are replaced with 1, the inverse is taken, and 1s on
+diagonals is replaced back with 0s.</p>
+<p>The residuals <span class="citation">(<a href="#ref-Harveyetal1998" role="doc-biblioref">Harvey, Koopman, and Penzer 1998</a>, eqn
+24)</span> are <span class="math display">\[\begin{equation}\label{eq:Harveyresiduals}
+\widehat{\varepsilon}_t = \begin{bmatrix}\widehat{\boldsymbol{v}}_t\\
+\widehat{\boldsymbol{w}}_{t+1}\end{bmatrix} =({\mbox{$\mathbf
+R$}^\prime_t})^\top u_t + ({\mbox{$\mathbf Q$}^\prime_{t+1}})^\top r_t
+\end{equation}\]</span> The expected value of <span class="math inline">\(\widehat{\mathcal{E}}_t\)</span> is 0 and its
+variance is <span class="math display">\[\begin{equation}\label{eq:Harveyvariance}
+\widehat{\Sigma]}_t = \,\textup{\textrm{var}}[\widehat{\mathcal{E}}_t]
+={\mbox{$\mathbf R$}^\prime_t}^\top \mbox{$\mathbf F$}_t^{-1}
+\mbox{$\mathbf R$}^\prime_t + J_t^\top N_t J_t .
+\end{equation}\]</span> These <span class="math inline">\(\widehat{\varepsilon}_t\)</span> and <span class="math inline">\(\widehat{\Sigma]}_t\)</span> are for both the
+non-missing and missing <span class="math inline">\(\boldsymbol{y}_t\)</span>. This is a modification
+to the <span class="citation">Harvey, Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span>
+algorithm which does not give the variance for missing <span class="math inline">\(\boldsymbol{y}\)</span>.</p>
+</div>
+<div id="difference-in-notation" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Difference in
+notation</h2>
+<p>In Equation 20 in <span class="citation">Harvey, Koopman, and Penzer
+(<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span>,
+their <span class="math inline">\(T_t\)</span> is my <span class="math inline">\(\mbox{$\mathbf B$}_{t+1}\)</span> and their <span class="math inline">\(H_t H_t^\top\)</span> is my <span class="math inline">\(\mbox{$\mathbf Q$}_{t+1}\)</span>. Notice the
+difference in the time indexing. My time indexing on <span class="math inline">\(\mbox{$\mathbf B$}\)</span> and <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> matches the left <span class="math inline">\(\boldsymbol{x}\)</span> while in theirs, <span class="math inline">\(T\)</span> and <span class="math inline">\(H\)</span> indexing matches the right <span class="math inline">\(\boldsymbol{x}\)</span>. Thus in my implementation
+of their algorithm <span class="citation">(<a href="#ref-Harveyetal1998" role="doc-biblioref">Harvey, Koopman, and Penzer 1998</a>, eqns.
+21-24)</span>, <span class="math inline">\(\mbox{$\mathbf
+B$}_{t+1}\)</span> appears in place of <span class="math inline">\(T_t\)</span> and <span class="math inline">\(\mbox{$\mathbf Q$}_{t+1}\)</span> appears in place
+of <span class="math inline">\(H_t\)</span>. See comments below on
+normalization and the difference between <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> and <span class="math inline">\(H\)</span>.</p>
+<p><span class="citation">(<a href="#ref-Harveyetal1998" role="doc-biblioref">Harvey, Koopman, and Penzer 1998</a>, eqns. 19,
+20)</span> use <span class="math inline">\(G_t\)</span> to refer to the
+<span class="math inline">\(\,\textup{\textrm{chol}}(\mbox{$\mathbf
+R$}_t)^\top\)</span> (non-zero part of the <span class="math inline">\(n
+\times n+m\)</span> matrix) and <span class="math inline">\(H_t\)</span>
+to refer to <span class="math inline">\(\,\textup{\textrm{chol}}(\mbox{$\mathbf
+Q$}_t)^\top\)</span>. I have replaced these with <span class="math inline">\(\mbox{$\mathbf R$}_t^\prime\)</span> and <span class="math inline">\(\mbox{$\mathbf Q$}_t^\prime\)</span> (Equation
+<span class="math inline">\(\ref{eq:Harveyalgo}\)</span>) which causes
+my variant of their algorithm (Equation <span class="math inline">\(\ref{eq:Harveyalgo}\)</span>) to give the
+non-normalized variance of the residuals. The residuals function in the
+{MARSS} package has an option to give either normalized or
+non-normalized residuals.</p>
+<p><span class="math inline">\(\mbox{$\mathbf K$}_t\)</span> is the
+Kalman gain output by the {MARSS} package <code>MARSSkf()</code>
+function. The Kalman gain as used in the <span class="citation">Harvey,
+Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span> algorithm is <span class="math inline">\(K_t=\mbox{$\mathbf B$}_{t+1}\mbox{$\mathbf
+K$}_t\)</span>. Notice that Equation 21 in <span class="citation">Harvey, Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span> has
+<span class="math inline">\(H_t G_t^\top\)</span> in the equation for
+<span class="math inline">\(K_t\)</span>. This is the covariance of the
+state and observation errors, which is allowed to be non-zero given the
+way Harvey et al. write the errors in their Equations 19 and 20. The way
+the {MARSS} package model is written, the state and observation errors
+are independent of each other. Thus <span class="math inline">\(H_t
+G_t^\top = 0\)</span> and this term drops out of the <span class="math inline">\(K_t\)</span> equation in Equation <span class="math inline">\(\ref{eq:Harveyalgo}\)</span>.</p>
+</div>
+<div id="computing-the-normalized-residuals" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Computing the
+normalized residuals</h2>
+<p>To compute the normalized residuals and residuals variance, a block
+diagonal matrix with the inverse of the <span class="math inline">\(\mbox{$\mathbf R$}\)</span> and <span class="math inline">\(\mbox{$\mathbf Q$}\)</span> matrices is used. The
+normalized residuals are: <span class="math display">\[\begin{equation}
+\begin{bmatrix}\mbox{$\mathbf R$}^{-1}_t&amp;0\\0&amp;\mbox{$\mathbf
+Q$}^{-1}_t\end{bmatrix} \widehat{\varepsilon}_t
+\end{equation}\]</span> The variance of the normalized residuals is
+<span class="math display">\[\begin{equation}
+\begin{bmatrix}\mbox{$\mathbf R$}^{-1}_t&amp;0\\0&amp;\mbox{$\mathbf
+Q$}^{-1}_t\end{bmatrix} \widehat{\Sigma]}_t
+\begin{bmatrix}\mbox{$\mathbf R$}^{-1}_t&amp;0\\0&amp;\mbox{$\mathbf
+Q$}^{-1}_t\end{bmatrix}
+\end{equation}\]</span></p>
+</div>
+<div id="computing-the-cholesky-standardized-residuals" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Computing the
+Cholesky standardized residuals</h2>
+<p>The Cholesky standardized residuals are computed by multiplying <span class="math inline">\(\widehat{\varepsilon}_t\)</span> by <span class="math inline">\((\widehat{\Sigma}_t)^{-1/2}\)</span> (the inverse
+of the Cholesky decomposition of the variance-covariance matrix for
+<span class="math inline">\(\widehat{\varepsilon}_t\)</span>): <span class="math display">\[\begin{equation}\label{eq:std.resid}
+\widehat{\varepsilon}_{t, std} =
+(\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t .
+\end{equation}\]</span> These residuals are uncorrelated (across the
+residuals at time <span class="math inline">\(t\)</span> in <span class="math inline">\(\widehat{\varepsilon}_t\)</span>). See <span class="citation">Harvey and Koopman (<a href="#ref-HarveyKoopman1992" role="doc-biblioref">1992</a>)</span> and section V in <span class="citation">Harvey, Koopman, and Penzer (<a href="#ref-Harveyetal1998" role="doc-biblioref">1998</a>)</span> for a
+discussion on how to use these residuals for outlier detection and
+structural break detection.</p>
+<p>It is also common to use the marginal standardized residuals, which
+would be <span class="math inline">\(\widehat{\varepsilon}_t\)</span>
+multiplied by the inverse of the square-root of <span class="math inline">\(\,\textup{\textrm{dg}}(\widehat{\Sigma}_t)\)</span>,
+where <span class="math inline">\(\,\textup{\textrm{dg}}(\mbox{$\mathbf
+A$})\)</span> is a diagonal matrix formed from the diagonal of the
+square matrix <span class="math inline">\(\mbox{$\mathbf A$}\)</span>.
+<span class="math display">\[\begin{equation}
+\widehat{\varepsilon}_{t, mar} =
+\,\textup{\textrm{dg}}(\widehat{\Sigma}_t)^{-1/2}\widehat{\varepsilon}_t
+\end{equation}\]</span> Marginal standardized residuals may be
+correlated at time <span class="math inline">\(t\)</span> (unlike the
+Cholesky standardized residuals) but are a bit easier to interpret when
+there is correlation across the model residuals.</p>
+</div>
+</div>
+<div id="distribution-of-the-marss-innovation-residuals" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Distribution of the
+MARSS innovation residuals</h1>
+<div style="display:none">
+<span class="math inline">\(\nextSection\)</span>
+</div>
+<p>One-step-ahead predictions (innovations) are often shown for MARSS
+models and these are used for likelihood calculations. Innovations are
+the difference between the data at time <span class="math inline">\(t\)</span> minus the prediction of <span class="math inline">\(\boldsymbol{y}_t\)</span> given data up to <span class="math inline">\(t-1\)</span>. This section gives the residual
+variance for the innovations and the analogous values for the states.
+Innovations residuals are the more common residuals discussed for
+state-space models; these are also known as the one-step-ahead
+prediction residuals.</p>
+<div id="one-step-ahead-model-residuals" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> One-step-ahead model
+residuals</h2>
+<p>Define the innovations <span class="math inline">\(\overline{\boldsymbol{v}}_t\)</span> as: <span class="math display">\[\begin{equation}\label{eq:vtt1}
+\overline{\boldsymbol{v}}_t= E[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}_t]
+- \mbox{$\mathbf Z$}_t\widetilde{\boldsymbol{x}}_t^{t-1}- \mbox{$\mathbf
+a$}_t,
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^{t-1}\)</span> is
+<span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1),t-1}]\)</span>
+(expected value of <span class="math inline">\(\boldsymbol{X}_t\)</span>
+conditioned on the data up to time <span class="math inline">\(t-1\)</span>). The random variable, innovations
+over all possible <span class="math inline">\(\boldsymbol{y}_t\)</span>,
+is <span class="math inline">\(\overline{\boldsymbol{V}}_t\)</span>. Its
+mean is 0 and we want to find its variance.</p>
+<p>This is conceptually different than the observed innovations. First,
+this is the random variable innovation. <span class="math inline">\(\boldsymbol{y}^{(1)}_t\)</span> here is not the
+actual data that you observe (the one data set that you have). It’s the
+data that you could observe. <span class="math inline">\(\boldsymbol{y}_t\)</span> is a sample from the
+random variable <span class="math inline">\(\boldsymbol{Y}_t\)</span>
+and <span class="math inline">\(\overline{\boldsymbol{v}}_t\)</span> is
+a sample from the innovations you could observe. Second, <span class="math inline">\(\overline{\boldsymbol{v}}_t\)</span> includes both
+<span class="math inline">\(\boldsymbol{y}_t^{(1)}\)</span> and <span class="math inline">\(\boldsymbol{y}_t^{(2)}\)</span> (observed and
+unobserved <span class="math inline">\(\boldsymbol{y}\)</span>).
+Normally, the innovations for missing data would appear as 0s, e.g.,
+from a call to `MARSSfss()@. For missing data, <span class="math inline">\(\overline{\boldsymbol{v}}_t\)</span> is not
+necessarily 0. For example if <span class="math inline">\(\boldsymbol{y}\)</span> is multivariate and
+correlated with each other through <span class="math inline">\(\mbox{$\mathbf R$}\)</span> or a shared <span class="math inline">\(\boldsymbol{x}\)</span> dependency.</p>
+<p>The derivation of the variance of <span class="math inline">\(\overline{\boldsymbol{V}}_t\)</span> follows the
+exact same steps as the smoothations <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span>, except that
+we condition on the data up to <span class="math inline">\(t-1\)</span>
+not up to <span class="math inline">\(T\)</span>. Thus using Equation
+<span class="math inline">\(\ref{eq:first.and.secons.vvtgeneral}\)</span>, we
+can write the variance directly as: <span class="math display">\[\begin{equation}\label{eq:innov.model}
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t] = \mbox{$\mathbf
+R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^{t-1}\mbox{$\mathbf Z$}_t^\top +
+\widetilde{\mbox{$\mathbf S$}}_t^{t-1}\mbox{$\mathbf Z$}_t^\top +
+\mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^{t-1})^\top
+\end{equation}\]</span> where the <span class="math inline">\(\widetilde{\boldsymbol{V}}_t^{t-1}\)</span> and
+<span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^{t-1}\)</span> are now conditioned on only the data from 1 to
+<span class="math inline">\(t-1\)</span>. <span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_t^{t-1}=
+\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1),
+t-1}] = \,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t \boldsymbol{X}_t +
+\mbox{$\mathbf
+a$}_t+\boldsymbol{V}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1),
+t-1}]\)</span>. <span class="math inline">\(\boldsymbol{y}_t\)</span> is
+not in the conditional since it only includes data up to <span class="math inline">\(t-1\)</span>. Without <span class="math inline">\(\boldsymbol{y}_t\)</span> in the conditional,
+<span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{W}_t\)</span> and by extension <span class="math inline">\(\boldsymbol{V}_t\)</span> and <span class="math inline">\(\boldsymbol{X}_t\)</span> are independent and
+<span class="math inline">\(\,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t
+\boldsymbol{X}_t + \mbox{$\mathbf a$}_t +
+\boldsymbol{V}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1), t-1}] =
+\,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t
+\boldsymbol{X}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1), t-1}] =
+\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^{t-1}\)</span>.
+Therefore, <span class="math inline">\(\mbox{$\mathbf
+Z$}_t(\widetilde{\mbox{$\mathbf S$}}_t^{t-1})^\top = \mbox{$\mathbf
+Z$}_t \widetilde{\boldsymbol{V}}_t^{t-1}\mbox{$\mathbf Z$}_t^\top =
+\widetilde{\mbox{$\mathbf S$}}_t^{t-1}(\mbox{$\mathbf
+Z$}_t)^\top\)</span>. Thus Equation <span class="math inline">\(\ref{eq:innov.model}\)</span> reduces to <span class="math display">\[\begin{equation}\label{eq:innov.model2}
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t] = \mbox{$\mathbf
+R$}_t + \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^{t-1}\mbox{$\mathbf Z$}_t^\top.
+\end{equation}\]</span></p>
+<p>Note <span class="math inline">\(\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]\)</span>
+is a standard output from Kalman filter functions and is used to compute
+the likelihood of the data (conditioned on a set of parameters). In the
+Kalman filter in the {MARSS} package, it is output as from .</p>
+</div>
+<div id="one-step-ahead-state-residuals" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> One-step ahead state
+residuals</h2>
+<p>Define the state residuals conditioned on the data from 1 to <span class="math inline">\(t-1\)</span> as <span class="math inline">\(\overline{\boldsymbol{w}}_t\)</span>. <span class="math display">\[\begin{equation}\label{eq:wtt1}
+\overline{\boldsymbol{w}}_t= \widetilde{\boldsymbol{x}}_t^{t}-
+\mbox{$\mathbf B$}_t\widetilde{\boldsymbol{x}}_{t-1}^{t-1} -
+\mbox{$\mathbf u$}_t,
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\boldsymbol{x}}_{t-1}^{t-1}\)</span> is
+<span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_{t-1}|\boldsymbol{y}^{(1),t-1}]\)</span>
+(expected value of <span class="math inline">\(\boldsymbol{X}_{t-1}\)</span> conditioned on the
+data up to time <span class="math inline">\(t-1\)</span>) and <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^{t}\)</span> is <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_{t}|\boldsymbol{y}^{(1),t}]\)</span>
+(expected value of <span class="math inline">\(\boldsymbol{X}_{t}\)</span> conditioned on the
+data up to time <span class="math inline">\(t\)</span>). From the Kalman
+filter equations: <span class="math display">\[\begin{equation}\label{eq:wtt1.2}
+\widetilde{\boldsymbol{x}}_t^{t}= \mbox{$\mathbf
+B$}_t\widetilde{\boldsymbol{x}}_{t-1}^{t-1} + \mbox{$\mathbf u$}_t +
+\mbox{$\mathbf K$}_t \overline{\boldsymbol{v}}_t
+\end{equation}\]</span> Thus, <span class="math inline">\(\overline{\boldsymbol{w}}_t\)</span> is a
+transformed <span class="math inline">\(\overline{\boldsymbol{v}}_t\)</span>: <span class="math display">\[\begin{equation}\label{eq:wtt1.3}
+\overline{\boldsymbol{w}}_t= \mbox{$\mathbf K$}_t
+\overline{\boldsymbol{v}}_t,
+\end{equation}\]</span> where <span class="math inline">\(\mbox{$\mathbf
+K$}_t\)</span> is the Kalman gain. <span class="math inline">\(\mbox{$\mathbf K$}_t =
+\widetilde{\boldsymbol{V}}_t^{t-1}\mbox{$\mathbf
+Z$}_t^\top[\mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^{t-1}\mbox{$\mathbf Z$}_t^\top +
+\mbox{$\mathbf R$}_t]^{-1}\)</span> and <span class="math inline">\(\mbox{$\mathbf Z$}_t\)</span> is the missing
+values modified <span class="math inline">\(\mbox{$\mathbf
+Z$}_t\)</span> where if the <span class="math inline">\(i\)</span>-th
+<span class="math inline">\(\boldsymbol{y}_t\)</span> is missing, the
+<span class="math inline">\(i\)</span>-th row of <span class="math inline">\(\mbox{$\mathbf Z$}_t\)</span> is set to all 0s
+(Shumway and Stoffer 2006, equation 6.78). Thus the variance of <span class="math inline">\(\overline{\boldsymbol{W}}_{t}\)</span> is <span class="math display">\[\begin{equation}\label{eq:var.Wt}
+\,\textup{\textrm{var}}[\overline{\boldsymbol{W}}_{t}] = \mbox{$\mathbf
+K$}_t \,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]
+\mbox{$\mathbf K$}_t^\top
+\end{equation}\]</span></p>
+</div>
+<div id="joint-distribution-of-the-conditional-one-step-ahead-residuals" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Joint distribution of
+the conditional one-step-ahead residuals</h2>
+<div id="with-the-state-residuals-defined-from-t-1-to-t" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> with the state
+residuals defined from <span class="math inline">\(t-1\)</span> to <span class="math inline">\(t\)</span></h3>
+<p>Define the one-step ahead residuals as <span class="math display">\[\begin{equation}
+\overline{\varepsilon}_t = \begin{bmatrix}\overline{\boldsymbol{v}}_t\\
+\overline{\boldsymbol{w}}_t\end{bmatrix}
+\end{equation}\]</span></p>
+<p>The covariance of <span class="math inline">\(\overline{\boldsymbol{V}}_t\)</span> and <span class="math inline">\(\overline{\boldsymbol{W}}_{t}\)</span> is <span class="math display">\[\begin{equation}\label{eq:covhatVtWtp.onestep}
+\,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\overline{\boldsymbol{W}}_{t+1}]
+= \,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\mbox{$\mathbf
+K$}_{t}\overline{\boldsymbol{V}}_t] =
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]\mbox{$\mathbf
+K$}_{t}^\top
+\end{equation}\]</span></p>
+<p>The joint variance-covariance matrix is <span class="math display">\[\begin{equation}\label{eq:jointcondresid.onestep}
+\overline{\Sigma}_t = \,\textup{\textrm{var}}[\overline{\varepsilon}_t]
+= \begin{bmatrix}[c|c]
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]&amp;  \,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]\mbox{$\mathbf
+K$}_{t}^\top\\
+\rule[.5ex]{20ex}{0.25pt} &amp; \rule[.5ex]{20ex}{0.25pt} \\
+\mbox{$\mathbf
+K$}_{t}\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]&amp;
+\mbox{$\mathbf
+K$}_{t}\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]\mbox{$\mathbf
+K$}_{t}^\top \end{bmatrix},
+\end{equation}\]</span></p>
+<p>Since <span class="math inline">\(\overline{\boldsymbol{w}}_t=\mbox{$\mathbf K$}_t
+\overline{\boldsymbol{v}}_t\)</span>, the state one-step-ahead residuals
+are perfectly correlated with the model one-step-ahead residuals so the
+joint distribution is not useful (all the information is in the variance
+of <span class="math inline">\(\overline{\boldsymbol{V}}_t\)</span>).</p>
+<p>The Cholesky standardized residuals for <span class="math inline">\(\overline{\varepsilon}_t\)</span> are <span class="math display">\[\begin{equation}
+\overline{\Sigma}_t^{-1/2} \overline{\varepsilon}_t
+\end{equation}\]</span> However the Cholesky standardized joint
+residuals cannot be computed since <span class="math inline">\(\overline{\Sigma}_t\)</span> is not positive
+definite. Because <span class="math inline">\(\overline{\boldsymbol{w}}_t\)</span> equals <span class="math inline">\(\mbox{$\mathbf K$}_t
+\overline{\boldsymbol{v}}_t\)</span>, the state residuals are completely
+explained by the model residuals. However we can compute the Cholesky
+standardized model residuals using <span class="math display">\[\begin{equation}
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]^{-1/2}
+\overline{\boldsymbol{v}}_t
+\end{equation}\]</span> <span class="math inline">\(\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]^{-1/2}\)</span>
+is the inverse of the lower triangle of the Cholesky decomposition of
+<span class="math inline">\(\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]\)</span>.</p>
+<p>The marginal standardized joint residuals for <span class="math inline">\(\overline{\varepsilon}_t\)</span> (both model and
+state one-step ahead residuals) can be computed with the inverse of the
+square root of the diagonal of <span class="math inline">\(\overline{\Sigma}_t\)</span>: <span class="math display">\[\begin{equation}
+\,\textup{\textrm{dg}}(\overline{\Sigma}_t)^{-1/2}
+\overline{\varepsilon}_t
+\end{equation}\]</span> where <span class="math inline">\(dg(\mbox{$\mathbf A$})\)</span> is a diagonal
+matrix formed from the diagonal of the square matrix <span class="math inline">\(\mbox{$\mathbf A$}\)</span>.</p>
+</div>
+<div id="with-the-state-residuals-defined-from-t-to-t1" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> with the state
+residuals defined from <span class="math inline">\(t\)</span> to <span class="math inline">\(t+1\)</span></h3>
+<p></p>
+<p>Define the one-step ahead residuals as <span class="math display">\[\begin{equation}
+\overline{\varepsilon}_t^* =
+\begin{bmatrix}\overline{\boldsymbol{v}}_t\\
+\overline{\boldsymbol{w}}_{t+1}\end{bmatrix}
+\end{equation}\]</span></p>
+<p>The covariance of <span class="math inline">\(\overline{\boldsymbol{V}}_t\)</span> and <span class="math inline">\(\overline{\boldsymbol{W}}_{t+1}\)</span> is <span class="math display">\[\begin{equation}\label{eq:covhatVtWtp.onestep.2}
+\,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\overline{\boldsymbol{W}}_{t+1}]
+= \,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\mbox{$\mathbf
+K$}_{t+1}\overline{\boldsymbol{V}}_{t+1}] =
+\,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,
+\overline{\boldsymbol{V}}_{t+1}]\mbox{$\mathbf K$}_{t+1}^\top
+\end{equation}\]</span> Innovations residuals are temporally
+uncorrelated, thus <span class="math inline">\(\,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\overline{\boldsymbol{V}}_{t+1}]=0\)</span>
+and thus <span class="math inline">\(\,\textup{\textrm{cov}}[\overline{\boldsymbol{V}}_t,\overline{\boldsymbol{W}}_{t+1}]=0\)</span>.</p>
+<p>The joint variance-covariance matrix is <span class="math display">\[\begin{equation}\label{eq:jointcondresid.onestep2}
+\overline{\Sigma}_t^* =
+\,\textup{\textrm{var}}[\overline{\varepsilon}_t^*] =
+\begin{bmatrix}[c|c]
+\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_t]&amp;  0\\
+\rule[.5ex]{20ex}{0.25pt} &amp; \rule[.5ex]{20ex}{0.25pt} \\
+0 &amp; \mbox{$\mathbf
+K$}_{t+1}\,\textup{\textrm{var}}[\overline{\boldsymbol{V}}_{t+1}]\mbox{$\mathbf
+K$}_{t+1}^\top \end{bmatrix},
+\end{equation}\]</span></p>
+<p>The Cholesky standardized residuals for <span class="math inline">\(\overline{\varepsilon}_t^*\)</span> are <span class="math display">\[\begin{equation}
+(\overline{\Sigma}_t^*)^{-1/2} \overline{\varepsilon}_t^*
+\end{equation}\]</span> <span class="math inline">\(\overline{\Sigma}_t^*\)</span> is positive
+definite so its Cholesky decomposition can be computed.</p>
+<p>The marginal standardized joint residuals for <span class="math inline">\(\overline{\varepsilon}_t^*\)</span> are: <span class="math display">\[\begin{equation}
+\,\textup{\textrm{dg}}(\overline{\Sigma}_t^*)^{-1/2}
+\overline{\varepsilon}_t^*
+\end{equation}\]</span> where <span class="math inline">\(dg(\mbox{$\mathbf A$})\)</span> is a diagonal
+matrix formed from the diagonal of the square matrix <span class="math inline">\(\mbox{$\mathbf A$}\)</span>.</p>
+</div>
+</div>
+</div>
+<div id="distribution-of-the-marss-contemporaneous-model-residuals" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Distribution of the
+MARSS contemporaneous model residuals</h1>
+<div style="display:none">
+<span class="math inline">\(\nextSection\)</span>
+</div>
+<p>Contemporaneous model residuals are the difference between the data
+at time <span class="math inline">\(t\)</span> minus the prediction of
+<span class="math inline">\(\boldsymbol{y}_t\)</span> given data up to
+<span class="math inline">\(t\)</span>. This section gives the residual
+variance for these residuals. There are no state residuals for this case
+as that would require the expected value of <span class="math inline">\(\boldsymbol{X}_t\)</span> conditioned on the data
+up to <span class="math inline">\(t+1\)</span>.</p>
+<p>Define the contemporaneous model residuals <span class="math inline">\(\dot{\boldsymbol{v}}_t\)</span> as: <span class="math display">\[\begin{equation}\label{eq:vtt}
+\dot{\boldsymbol{v}}_t= E[\boldsymbol{Y}_t|\boldsymbol{y}^{(1)}_t] -
+\mbox{$\mathbf Z$}_t\widetilde{\boldsymbol{x}}_t^{t}- \mbox{$\mathbf
+a$}_t,
+\end{equation}\]</span> where <span class="math inline">\(\widetilde{\boldsymbol{x}}_t^{t}\)</span> is <span class="math inline">\(\,\textup{\textrm{E}}[\boldsymbol{X}_t|\boldsymbol{y}^{(1),t}]\)</span>
+(expected value of <span class="math inline">\(\boldsymbol{X}_t\)</span>
+conditioned on the data up to time <span class="math inline">\(t\)</span>). The random variable, contemporaneous
+model residuals over all possible <span class="math inline">\(\boldsymbol{y}_t\)</span>, is <span class="math inline">\(\dot{\boldsymbol{V}}_t\)</span>. Its mean is 0 and
+we want to find its variance.</p>
+<p>The derivation of the variance of <span class="math inline">\(\dot{\boldsymbol{V}}_t\)</span> follows the exact
+same steps as the smoothations <span class="math inline">\(\widehat{\boldsymbol{V}}_t\)</span>, except that
+we condition on the data up to <span class="math inline">\(t\)</span>
+not up to <span class="math inline">\(T\)</span>. Thus using Equation
+<span class="math inline">\(\ref{eq:first.and.secons.vvtgeneral}\)</span>, we
+can write the variance directly as: <span class="math display">\[\begin{equation}\label{eq:contemp.model}
+\,\textup{\textrm{var}}[\dot{\boldsymbol{V}}_t] = \mbox{$\mathbf R$}_t -
+\mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^{t}\mbox{$\mathbf
+Z$}_t^\top + \widetilde{\mbox{$\mathbf S$}}_t^{t}\mbox{$\mathbf
+Z$}_t^\top + \mbox{$\mathbf Z$}_t(\widetilde{\mbox{$\mathbf
+S$}}_t^{t})^\top
+\end{equation}\]</span> where the <span class="math inline">\(\widetilde{\boldsymbol{V}}_t^{t}\)</span> and
+<span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^{t}\)</span> are now conditioned on only the data from 1 to <span class="math inline">\(t\)</span>. <span class="math inline">\(\widetilde{\mbox{$\mathbf S$}}_t^{t}=
+\,\textup{\textrm{cov}}[\boldsymbol{Y}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1),
+t}] = \,\textup{\textrm{cov}}[\mbox{$\mathbf Z$}_t \boldsymbol{X}_t +
+\mbox{$\mathbf
+a$}_t+\boldsymbol{V}_t,\boldsymbol{X}_t|\boldsymbol{y}^{(1),
+t}]\)</span>. If <span class="math inline">\(\boldsymbol{y}_t\)</span>
+has no missing values, this reduces to <span class="math inline">\(\mbox{$\mathbf R$}_t - \mbox{$\mathbf Z$}_t
+\widetilde{\boldsymbol{V}}_t^{t}\mbox{$\mathbf Z$}_t^\top\)</span> while
+if <span class="math inline">\(\boldsymbol{y}_t\)</span> is all missing
+values, this reduces to <span class="math inline">\(\mbox{$\mathbf R$}_t
++ \mbox{$\mathbf Z$}_t \widetilde{\boldsymbol{V}}_t^{t}\mbox{$\mathbf
+Z$}_t^\top\)</span>. See discussion of this after Equation <span class="math inline">\(\ref{eq:first.and.secons.vvtgeneral}\)</span>.</p>
+<p>Equation <span class="math inline">\(\ref{eq:contemp.model}\)</span>
+gives the equation for the case where <span class="math inline">\(\boldsymbol{y}_t\)</span> is partially observed.
+<span class="math inline">\(\widetilde{\mbox{$\mathbf
+S$}}_t^{t}\)</span> is output by the <code>MARSShatyt()</code> function
+in the {MARSS} package and <span class="math inline">\(\widetilde{\boldsymbol{V}}_t^{t}\)</span> is
+output by the <code>MARSSkfss()</code> function.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-CommandeurKoopman2007" class="csl-entry">
+Commandeur, Jacques J. F., and Siem Jan Koopman. 2007. <em>An
+Introduction to State Space Time Series Analysis</em>. Practical
+Econometrics. Oxford: Oxford University Press.
+</div>
+<div id="ref-HarveyKoopman1992" class="csl-entry">
+Harvey, Andrew, and Siem Jan Koopman. 1992. <span>“Diagnostic Checking
+of Unobserved-Components Time Series Models.”</span> <em>Journal of
+Business and Economic Statistics,</em> 10: 377–89.
+</div>
+<div id="ref-Harveyetal1998" class="csl-entry">
+Harvey, Andrew, Siem Jan Koopman, and Jeremy Penzer. 1998. <span>“Messy
+Time Series: A Unified Approach.”</span> <em>Advances in
+Econometrics</em> 13: 103–43.
+</div>
+<div id="ref-Holmes2010" class="csl-entry">
+Holmes, E. E. 2012. <span>“Derivation of the <span>EM</span> Algorithm
+for Constrained and Unconstrained <span>MARSS</span> Models.”</span>
+Technical report. arXiv:1302.3919 [stat.ME].
+</div>
+<div id="ref-deJong1988" class="csl-entry">
+Jong, Piet de. 1988. <span>“A Cross-Validation Filter for Time Series
+Models.”</span> <em>Biometrika</em> 75 (3): 594–600.
+</div>
+<div id="ref-deJongPenzer1998" class="csl-entry">
+Jong, Piet de, and Jeremy Penzer. 1998. <span>“Diagnosing Shocks in Time
+Series.”</span> <em>Journal of the American Statistical Association</em>
+93 (442): 796–806.
+</div>
+<div id="ref-ShumwayStoffer2006" class="csl-entry">
+Shumway, R. H., and D. S. Stoffer. 2006. <em>Time Series Analysis and
+Its Applications</em>. 2nd ed. New York, New York:
+Springer-Science+Business Media, LLC.
+</div>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Northwest Fisheries Science Center, NOAA Fisheries,
+Seattle, WA 98112, <a href="mailto:eli.holmes@noaa.gov" class="email">eli.holmes@noaa.gov</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 
 

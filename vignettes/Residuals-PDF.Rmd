@@ -6,14 +6,23 @@ author:
 link-citations: yes
 pkgdown:
   as_is: true
+  extension: pdf
 output: 
-  html_document: 
-    toc: true
-    toc_float: true
+  pdf_document: 
+    citation_package: natbib
     number_sections: true
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+    extra_dependencies:
+      caption: ["labelfont={bf}"]
+      hyperref: ["unicode=true", "breaklinks=true"]
+      natbib: round
+      multirow: null
+      footmisc: bottom
+      amsmath: null
+      amsfonts: null
+    toc: true
+    toc_depth: 1
     includes:
-      in_header: mathjax4.html
+      in_header: nextsection.tex
 bibliography: EMDerivation.bib
 biblio-style: apalike
 abstract: |
@@ -23,7 +32,7 @@ abstract: |
     Keywords: Time-series analysis, Kalman filter, residuals, maximum-likelihood, vector autoregressive model, dynamic linear model, parameter estimation, state-space
     citation: Holmes, E. E. 2014. Computation of standardized residuals for (MARSS) models. Technical Report. [arXiv:1411.0045](https://arxiv.org/abs/1411.0045)
 vignette: >
-  %\VignetteIndexEntry{Residuals}
+  %\VignetteIndexEntry{Residuals-PDF}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

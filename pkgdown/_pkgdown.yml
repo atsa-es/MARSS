@@ -1,6 +1,7 @@
 url: https://atsa-es.github.io/MARSS/
 template:
   bootstrap: 5
+  mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
 
 home:
   links:
