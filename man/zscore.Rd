@@ -1,5 +1,6 @@
 \name{zscore}
 \alias{zscore}
+\keyword{user-helper}
 \title{ z-score a vector or matrix }
 \description{
   Removes the mean and standardizes the variance to 1.

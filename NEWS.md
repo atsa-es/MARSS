@@ -2,6 +2,12 @@
 output: html_document
 ---
 
+# MARSS 3.11.7 (GitHub)
+
+## BUGS
+
+* In `predict_marssMLE()`, the newdata model.tsp was not being set.
+
 # MARSS 3.11.6 (GitHub)
 
 This release is focused on adding new method `method="TMB"` which uses the package {marssTMB}.

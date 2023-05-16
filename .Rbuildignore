@@ -13,7 +13,17 @@ favicon.ico
 _config.yml
 _layouts
 License.md
+vignettes/cbe.bst
+vignettes/footmisc.sty
+vignettes/hanging.sty
+vignettes/svmono.cls
+vignettes/versiontest.R
 vignettes/debugger_template.Rnw
 vignettes/debug_manual.R
 vignettes/testing-releases
 tests
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^inst/oldtex$

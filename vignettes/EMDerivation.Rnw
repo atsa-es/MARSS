@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{EM Derivation} 
+%\VignetteIndexEntry{EM_Derivation} 
 %\VignettePackage{MARSS}
 \documentclass[]{article}
 %set margins to 1in without fullsty
@@ -2370,13 +2370,14 @@ Let $\OMG_{t,r}^+$ be a $p \times n$  matrix that extracts the $p$ non-zero rows
 1&0&0\\
 0&0&0\\
 0&0&1
-\end{bmatrix}\\
+\end{bmatrix}
+\\
 \yy_t^+&=\OMG_{t,r}^+ \yy_t = 
 \begin{bmatrix}
 y_1\\
 y_3
 \end{bmatrix}_t\quad\quad
-\yy_t^+&=\II_{t,r}^+ \yy_t = \begin{bmatrix}
+\yy_t^+=\II_{t,r}^+ \yy_t = \begin{bmatrix}
 y_1\\
 0\\
 y_3
@@ -2396,18 +2397,19 @@ Let $\OMG_{t,r}^{(0)}$ be a $(n-p) \times n$  matrix that extracts the $n-p$ zer
 0&0&0\\
 0&1&0\\
 0&0&0
-\end{bmatrix}\\
+\end{bmatrix}
+\\
 \yy_t^{(0)}&=\OMG_{t,r}^{(0)} \yy_t = \begin{bmatrix}
 y_3
 \end{bmatrix}_t\quad\quad
-\yy_t^{(0)}&=\II_{t,r}^{(0)} \yy_t = \begin{bmatrix}
+\yy_t^{(0)}=\II_{t,r}^{(0)} \yy_t = \begin{bmatrix}
 0\\
 y_2\\
 0
 \end{bmatrix}_t
 \end{split}
 \end{equation}
-Similarly,  $\OMG_{t,q}^+$ extracts the associated with the non-zero rows in $\GG_t$ and  $\OMG_{t,q}^{(0)}$ extracts the zero rows.  $\II_{t,q}^+$ and $\II_{t,q}^{(0)}$ are defined similarly.
+Similarly,  $\OMG_{t,q}^+$ extracts the states associated with the non-zero rows in $\GG_t$ and  $\OMG_{t,q}^{(0)}$ extracts the zero rows.  $\II_{t,q}^+$ and $\II_{t,q}^{(0)}$ are defined similarly.
 
 Using these definitions, we can rewrite the state process part of the MARSS model by separating out the deterministic parts. $\xx_t^{(0)}$ is the rows of $\xx_t$ that are associated with all-zero rows of $\GG_t$, that means there is no $w_t$ in the $x_t$ equation for those rows\footnote{$x_{t,i}=\BB_{t,i}\xx_{t-1} + \uu_{t,i}$ where the $i$ subscript means $i$-th row.}
 \begin{equation}\label{eq:degen.model.x1}
@@ -2756,7 +2758,7 @@ If $\BB^{d,d}$ and $\uu^d$ are time-constant, we could use the matrix geometric 
 &\xx_0^d + \uu^d,\quad\text{if }\BB^{d,d} = \II
 \end{split}
 \end{equation}
-where $\BB^{d,d}$ is the block of $d$'s in equation \ref{eq:block.B}. 
+where $\BB^{d,d}$ is the block of $d$'s associated with the deterministic $\xx_t$. 
 
 \subsubsection{Dealing with the $\xx_t^{is}$ elements in the likelihood and associated parameter rows}
 Although $\ww_t^{is}=0$, these terms are connected to the stochastic $\xx$'s in earlier time steps though $\BB$, thus all $\xx_t^{is}$ are possible for a given $\uu_t$, $\BB_t$ or $\xixi$. However, all $\xx_t^{is}$ are not possible conditioned on $\xx_{t-1}$, so we are back in the position that we cannot both change $\xx_t$ and change $\uu_t$.

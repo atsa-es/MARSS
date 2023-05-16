@@ -1,5 +1,6 @@
 \name{CSEGriskfigure}
 \alias{CSEGriskfigure}
+\keyword{experimental}
 \title{ Plot Extinction Risk Metrics }
 \description{
   Generates a six-panel plot of extinction risk metrics used in Population Viability Analysis (PVA). This is a function used by one of the vignettes in the \code{\link{MARSS-package}}. 

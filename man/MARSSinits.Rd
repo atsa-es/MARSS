@@ -1,6 +1,6 @@
 \name{MARSSinits}
 \alias{MARSSinits}
-
+\keyword{helper}
 \title{ Initial Values for MLE }
 \description{
   Sets up generic starting values for parameters for maximum-likelihood estimation algorithms that use an iterative maximization routine needing starting values.   Examples of such algorithms are the EM algorithm in \code{\link{MARSSkem}()} and Newton methods in \code{\link{MARSSoptim}()}.   This is a utility function in the \code{\link{MARSS-package}}.  It is not exported to the user. Users looking for information on specifying initial conditions should look at the help file for \code{\link{MARSS}()} and the User Guide section on initial conditions.

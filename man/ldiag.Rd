@@ -1,5 +1,7 @@
 \name{ldiag}
 \alias{ldiag}
+\keyword{user-helper}
+
 \title{ Return a diagonal list matrix }
 \description{
   Creates a list diagonal matrix where the diagonal can be a combination of numbers and characters. Characters are names of parameters to be estimated.
