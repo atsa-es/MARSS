@@ -111,7 +111,7 @@ fit <- MARSS(nile, model = mod.list, silent = TRUE)
 # Plotting
 # There are plot methods for marssMLE objects
 library(ggplot2)
-autoplot(fit, silent=TRUE)
+autoplot(fit)
 
 # Below shows how to make plots manually but all of these can be made
 # with autoplot(fit) or plot(fit)

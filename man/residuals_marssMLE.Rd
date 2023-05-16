@@ -89,11 +89,11 @@ theme_set(theme_bw())
 
 # Show the standard residuals diagnostic plots for state-space models
 # silent used for examples to not be in interactive mode
-autoplot(fit, plot.type="residuals", silent=TRUE)
+autoplot(fit, plot.type="residuals")
 
 # Plot the residuals object; show both for y and x
 d <- residuals(fit, type="tt1")
-autoplot(d, silent=TRUE)
+autoplot(d)
 
 # Manually make a plot of the model residuals (innovations) with intervals
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
