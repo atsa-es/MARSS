@@ -86,7 +86,7 @@ The intervals returned by \code{fitted.marssMLE()} are for the state predictions
 
 }
 \seealso{
-\code{\link{MARSSkf}}, \code{\link{MARSSresiduals}}, \code{\link{residuals.marssMLE}}, \code{\link{predict.marssMLE}}, \code{\link{tsSmooth.marssMLE}}
+\code{\link{MARSSkf}()}, \code{\link{MARSSresiduals}()}, \code{\link{residuals.marssMLE}()}, \code{\link{predict.marssMLE}()}, \code{\link{tsSmooth.marssMLE}()}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  

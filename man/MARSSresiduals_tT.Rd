@@ -125,7 +125,7 @@ Note, if \code{Harvey=TRUE} then the rows and columns of \code{var.residuals} co
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSresiduals}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{fitted.marssMLE}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{MARSSresiduals}()}, \code{\link{MARSSresiduals.tt1}()}, \code{\link{fitted.marssMLE}()}, \code{\link{plot.marssMLE}()} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]

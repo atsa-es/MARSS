@@ -54,7 +54,7 @@ Objects of class \code{\link{marssMLE}} may be built from scratch but are easier
 \author{
   Eli Holmes, NOAA, Seattle, USA.  
 }
-\seealso{  \code{\link{MARSS}}, \code{\link{MARSSkem}},  \code{\link{marssMLE}},  \code{\link{optim}}
+\seealso{  \code{\link{MARSS}()}, \code{\link{MARSSkem}()},  \code{\link{marssMLE}()},  \code{\link{optim}()}
 }
 \examples{
 dat <- t(harborSealWA)

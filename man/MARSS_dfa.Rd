@@ -65,7 +65,7 @@ A object of class \code{\link{marssMLE}}.  See \code{\link[=print.marssMLE]{prin
   Eli Holmes, NOAA, Seattle, USA. 
   }
 
-\seealso{ \code{\link{MARSS}}, \code{\link{MARSS.marxss}} } 
+\seealso{ \code{\link{MARSS}()}, \code{\link{MARSS.marxss}()} } 
 
 \references{ 
 The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) Analysis of multivariate time-series using the MARSS package. NOAA Fisheries, Northwest Fisheries Science

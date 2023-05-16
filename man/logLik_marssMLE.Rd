@@ -19,7 +19,7 @@
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 }
-\seealso{ \code{\link{MARSSkf}} }
+\seealso{ \code{\link{MARSSkf}()} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11, 12), ]

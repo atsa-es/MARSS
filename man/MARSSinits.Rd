@@ -34,7 +34,7 @@ MARSSinits(MLEobj, inits=list(B=1, U=0, Q=0.05, Z=1, A=0,
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 }
-\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}} }
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}()}, \code{\link{MARSSoptim}()} }
 
 \note{
 Within the base code, a form-specific internal \code{MARSSinits} function is called to allow the output to vary based on form: \code{MARSSinits_dfa}, \code{MARSSinits_marss}, \code{MARSSinits_marxss}.

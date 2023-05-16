@@ -57,6 +57,6 @@ require(ggplot2)
 autoplot(resids, silent=TRUE) # remove silent to be interactive
 
 # only the ACF plots
-autoplot(resids, plot.type = "acf", silent=TRUE)
+# autoplot(resids, plot.type = "acf", silent=TRUE)
 
 }

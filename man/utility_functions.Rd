@@ -35,7 +35,7 @@
   Utility functions for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
 }
 \usage{
-all.equal.vector(x)
+\method{all.equal}{vector}(x)
 convert.model.mat(param.matrix)
 fixed.free.to.formula(fixed,free,dim)
 fully.spec.x(Z, R)

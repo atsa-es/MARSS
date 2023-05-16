@@ -3,9 +3,9 @@ citHeader("To cite the 'MARSS' package in publications use:")
 year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
 vers <- paste("R package version", meta$Version)
 
-citEntry(entry="Manual",
+bibentry(bibtype="Manual",
          title = "MARSS: Multivariate Autoregressive State-Space Modeling",
-         author = personList(as.person("Elizabeth Eli Holmes"),
+         author = c(as.person("Elizabeth Eli Holmes"),
                              as.person("Eric J. Ward"),
                              as.person("Mark D. Scheuerell"),
                              as.person("Kellie Wills")),
@@ -17,9 +17,9 @@ citEntry(entry="Manual",
                "). MARSS: Multivariate Autoregressive State-Space Modeling. ",
                vers, ".", sep="") )
 
-citEntry(entry="Manual",
+bibentry(bibtype="Manual",
          title = paste0("Analysis of multivariate time-series using the MARSS package. Version  ", meta$Version),
-         author = personList(as.person("Elizabeth Eli Holmes"),
+         author = c(as.person("Elizabeth Eli Holmes"),
                              as.person("Mark D. Scheuerell"),
                              as.person("Eric J. Ward")),
          year = year,
@@ -29,9 +29,9 @@ citEntry(entry="Manual",
          textVersion =
          paste0("Holmes, E. E., M. D. Scheuerell, and E. J. Ward (", year, ") Analysis of multivariate time-series using the MARSS package. Version ", meta$Version, ". NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112, DOI: 10.5281/zenodo.5781847" ) )
 
-citEntry(entry="Article",
+bibentry(bibtype="Article",
          title = "MARSS: Multivariate autoregressive state-space models for analyzing time-series data",
-         author = personList(as.person("Elizabeth Eli Holmes"),
+         author = c(as.person("Elizabeth Eli Holmes"),
                              as.person("Eric J. Ward"),
                              as.person("Kellie Wills")),
          year     = {2012},

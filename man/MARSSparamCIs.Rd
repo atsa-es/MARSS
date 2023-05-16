@@ -32,7 +32,7 @@ Center, 2725 Montlake Blvd E., Seattle, WA 98112   Type \code{RShowDoc("UserGuid
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
 }
-\seealso{ \code{\link{MARSSboot}}, \code{\link{MARSSinnovationsboot}}, \code{\link{MARSShessian}}
+\seealso{ \code{\link{MARSSboot}()}, \code{\link{MARSSinnovationsboot}()}, \code{\link{MARSShessian}()}
  }
 \examples{
 dat <- t(harborSealWA)

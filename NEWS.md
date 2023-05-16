@@ -4,6 +4,16 @@ output: html_document
 
 # MARSS 3.11.7 (GitHub)
 
+This release is focused on moving the MARSS User Guide into a separate repository. This will facilitate updating MARSS and converting the User Guide to an eBook.
+
+* Deleted the `inst/doc` folder
+* Added pkgdown. Note this required special files for MathJax in the `pkgdown` folder.
+* Removed packages in `Suggests:` that were associated with the User Guide and tests and not used in examples.
+* Converted `Quick_Start.Rnw` and `Residuals.Rnw` to Rmd so it works better with pkgdown.
+* Updated DESCRIPTION and README to refer to marssTMB.
+* Added marssTMB to Suggests with `Additional_repositories: https://atsa-es.r-universe.dev`
+
+
 ## BUGS
 
 * In `predict_marssMLE()`, the newdata model.tsp was not being set.

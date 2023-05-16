@@ -53,7 +53,7 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.
 }
 \seealso{ 
-  \code{\link{marssMLE}},  \code{\link{marssMODEL}},  \code{\link{MARSSaic}}, \code{\link{MARSShessian}}, \code{\link{MARSSFisherI}}
+  \code{\link{marssMLE}},  \code{\link{marssMODEL}},  \code{\link{MARSSaic}()}, \code{\link{MARSShessian}()}, \code{\link{MARSSFisherI}()}
 }
 \examples{
 # nboot is set low in these examples in order to run quickly

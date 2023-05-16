@@ -74,7 +74,7 @@ See the discussion of residuals for missing and left-out data in \code{\link{MAR
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt1}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{residuals.marssMLE}()}, \code{\link{MARSSresiduals.tT}()}, \code{\link{MARSSresiduals.tt1}()}, \code{\link{plot.marssMLE}()} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]

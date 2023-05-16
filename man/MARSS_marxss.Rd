@@ -66,7 +66,7 @@ A object of class \code{\link{marssMLE}}.  See \code{\link{print.marssMLE}} for 
   Eli Holmes, NOAA, Seattle, USA.
 
   }
-\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.dfa}} } 
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.dfa}()} } 
 \examples{
 \dontrun{
 #See the MARSS man page for examples

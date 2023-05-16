@@ -40,7 +40,7 @@ Holmes, E. E. (2012) Derivation of the EM algorithm for constrained and unconstr
   Eli Holmes, NOAA, Seattle, USA.  
 }
 \seealso{ 
-\code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}}
+\code{\link{MARSS}()}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}()}
 }
 \examples{
 dat <- t(harborSeal)

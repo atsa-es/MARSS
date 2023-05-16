@@ -18,5 +18,5 @@ MARSSkemcheck(MLEobj)
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 }
-\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}} }
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSSkem}()} }
 

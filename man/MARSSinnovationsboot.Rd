@@ -29,7 +29,7 @@ Stoffer, D. S., and K. D. Wall. 1991. Bootstrapping state-space models: Gaussian
 \author{ 
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
 }
-\seealso{ \code{\link{stdInnov}}, \code{\link{MARSSparamCIs}}, \code{\link{MARSSboot}} }
+\seealso{ \code{\link{stdInnov}()}, \code{\link{MARSSparamCIs}()}, \code{\link{MARSSboot}()} }
 \examples{
 dat <- t(kestrel)
 dat <- dat[2:3, ]
