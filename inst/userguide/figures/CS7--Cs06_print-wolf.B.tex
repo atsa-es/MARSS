@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ wolf.B <- coef(kem.2, type = "matrix")$B
+ rownames(wolf.B) <- colnames(wolf.B) <- rownames(royale.dat)
+ print(wolf.B, digits = 2)
+\end{Sinput}
+\begin{Soutput}
+       Wolf Moose
+Wolf   0.77 0.078
+Moose -0.18 0.828
+\end{Soutput}
+\end{Schunk}

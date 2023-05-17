@@ -1,0 +1,9 @@
+\begin{Schunk}
+\begin{Sinput}
+ regions <- list("N", "N", "N", "S", "S")
+ U <- matrix(regions, 5, 1)
+ Q <- matrix(list(0), 5, 5)
+ diag(Q) <- regions
+ kem <- MARSS(dat, model = list(U = U, Q = Q))
+\end{Sinput}
+\end{Schunk}

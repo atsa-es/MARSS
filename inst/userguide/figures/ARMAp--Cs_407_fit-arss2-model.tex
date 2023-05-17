@@ -1,0 +1,16 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(cbind(
+   true = true.2ss,
+   model.no.error = c(NA, coef(ar2ss2, type = "vector")),
+   model.w.error = coef(ar2ss, type = "vector")
+ ))
+\end{Sinput}
+\begin{Soutput}
+    true model.no.error model.w.error
+r   0.50             NA     0.4772368
+b1 -1.50    -0.52826082    -1.4136279
+b2 -0.75     0.03372857    -0.6853180
+q   0.10     0.95834464     0.1404334
+\end{Soutput}
+\end{Schunk}

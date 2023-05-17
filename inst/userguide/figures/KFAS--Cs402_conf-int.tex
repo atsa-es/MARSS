@@ -1,0 +1,22 @@
+\begin{Schunk}
+\begin{Sinput}
+ conf_marss1 <- fitted(fit_marss, type = "ytT", interval = "confidence")
+ head(conf_marss1)
+\end{Sinput}
+\begin{Soutput}
+  .rownames t    y    .fitted       .se  .conf.low
+1      Nile 1 1120   64.38081  30.69706   4.215678
+2      Nile 2 1160  569.63686  90.15920 392.928063
+3      Nile 3  963  809.81105 100.27741 613.270944
+4      Nile 4 1210  981.20113 102.82126 779.675175
+5      Nile 5 1160 1049.85712 103.49271 847.015139
+6      Nile 6 1160 1069.05730 103.67200 865.863912
+   .conf.up
+1  124.5460
+2  746.3456
+3 1006.3512
+4 1182.7271
+5 1252.6991
+6 1272.2507
+\end{Soutput}
+\end{Schunk}

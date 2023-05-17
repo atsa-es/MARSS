@@ -1,0 +1,53 @@
+---
+title: "Testing plot"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This is a vignette to run the plotting functions and check that outputs look ok.
+
+
+
+Load MARSS and check that I am checking the right version.
+```{r message=FALSE}
+library(MARSS)
+library(ggplot2)
+packageVersion("MARSS")
+```
+
+## marssMLE objects
+
+```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+# Little harder model
+
+dat <- t(harborSealWA)
+dat <- dat[2:4, ] # remove the year row
+Qvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[1]]
+Bvals <- c("identity", "diagonal and unequal")[1]
+Rvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[2]]
+plottypes <- eval(formals(MARSS:::autoplot.marssMLE)$plot.type)
+plottypes <- plottypes[!(plottypes %in% c("residuals", "all"))]
+
+for (Q in Qvals) {
+  for (B in Bvals) {
+    for (R in Rvals) {
+      if (B == "diagonal and unequal" && (is.list(Q) || is.list(R))) next
+      mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = dat[, 1, drop = FALSE] * 1.1)
+      if (B != "identity" && R != "zero") mod$tinitx <- 1
+      if (Q == "zero" && R == "zero") next
+      if (Q == "zero" && B != "identity") next
+      kemfit1 <- MARSS(dat, model = mod, silent = TRUE)
+      for(plt in plottypes){
+       conf.int <- TRUE
+      if(plt %in% c("ytt")) conf.int <- FALSE
+      plot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
+      autoplot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
+       }
+    }
+  }
+}
+```
+

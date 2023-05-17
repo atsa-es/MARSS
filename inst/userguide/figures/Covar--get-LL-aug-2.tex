@@ -1,0 +1,7 @@
+\begin{Schunk}
+\begin{Sinput}
+ fit.cov <- fit.aug
+ fit.cov$marss$data[1:dim(data)[1], ] <- NA
+ extra.LL <- MARSSkf(fit.cov)$logLik
+\end{Sinput}
+\end{Schunk}

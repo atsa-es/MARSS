@@ -1,0 +1,715 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS7-, eps=FALSE, split=TRUE}
+\chapter{Estimation of species interaction strengths}
+\label{chap:CSB}
+\chaptermark{B estimation}
+
+<<RUNFIRST, echo=FALSE, keep.source=FALSE, include.source=FALSE>>=
+library(MARSS)
+options(prompt = " ", continue = " ")
+library(xtable)
+tabledir <- "tables/"
+@
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_SpeciesInteractions.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+\section{Background}\index{B matrix!species interaction matrix}
+Multivariate autoregressive models (commonly termed MAR models) have been developed as a tool for analyzing community dynamics from time series data \citep{Ives1995ec, Ivesetal1999, Ivesetal2003, Hamptonetal2013}.  These models are based on a process model for log abundances ($\xx$) of the form
+\begin{equation}
+\xx_t = \BB \xx_{t-1} + \uu + \ww_t \text{ where } \ww_t \sim \MVN(0,\QQ) \label{eq:MSSMX}
+\end{equation}
+$\BB$ is the interaction matrix; self interaction strengths (density-dependence) are on the diagonal and inter-specific interaction strengths are on the off-diagonals such that $\BB_{i,j}$ is the `effect' of species $j$ on species $i$.  This model has  a stochastic equilibrium---it fluctuates around  mean, $(\II-\BB)^{-1}\uu$.
+
+The term $\uu$ determines the mean level but once the system is at equilibrium, it does not affect the fluctuations relative to the mean. To see this, compare two models with $b=0.5$ and $u=1$ versus $u=0$.  The mean for the first is $1/(1-0.5)=2$ and for the second is 0.  If we start both 1 above the mean, the next $x$ is the same distance from the mean: $x_2 = 0.5(2+1)+1=2.5$ and $x_2=0.5(0+1)+0=0.5$. So both end up at 0.5 above the mean.  So once the system is at equilibrium, it is `scale invariant', where $\uu$ is the scaling term.  The way that \citet{Ivesetal2003} write their process model (their Equation 10) is $\XX_t = \AA+\BB\XX_{t-1}+ \EE_t$.  The $\AA$ in Ives's equation is the $\uu$ appearing in Equation \ref{eq:MSSMX} and the $\EE_t$ is our $\ww_t$.  
+
+Often the models include environmental covariates, but we will leave off covariates for the moment and address them at the end of the chapter.  If we add a measurement process\footnote{You can fit a MAR model with no observation error by setting $\RR=0$, but a conditional least-squares algorithm is vastly faster than EM or BFGS for the $\RR=0$ case (assuming no missing data).}, we have a MARSS model:
+\begin{equation}
+\yy_t = \ZZ \xx_t + \aa + \vv_t \text{ where } \vv_t \sim \MVN(0,\RR ) \label{eq:MSSMY}
+\end{equation}
+Typically, we have one time series per species and thus we assume that $m = n$ and $\ZZ$ is an $m \times m$ identity matrix (when $m=n$, $\aa$ is set to 0).  However, it is certainly possible to have multiple time series per species (for example data taken at multiple sites).
+
+In this chapter, we will estimate the $\BB$ matrix of species interactions for a simple wolf-moose system and for a four-species freshwater plankton system.  
+
+\section{Two-species example using wolves and moose}
+Population dynamics of wolves and moose on Isle Royale, Michigan make an interesting case study of a two-species predator-prey interactions.  These populations have been studied intensively since 1958\footnote{There are many publications from this long-term study site; see \url{http://www.isleroyalewolf.org/wolfhome/tech_pubs.html} and the review here \url{http://www.isleroyalewolf.org/data/data/home.html}.}.  Unlike other populations of gray wolves, the Isle Royale population has a diet dominated by one prey item, moose. The only predator of moose on Isle Royale is the gray wolf, as this population is not hunted.  
+
+We will use the wolf and moose winter census data from Isle Royale to learn how to fit community dynamics models to time-series data.  The long-term January (wolf) and February (moose) population estimates are provided at \url{http://www.isleroyalewolf.org}.
+
+The mathematical form of the process model for the wolf-moose population dynamics is
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}x_{w}\\x_{m}\end{bmatrix}_t = \begin{bmatrix}b_{w \rightarrow w}&b_{m \rightarrow w}\\b_{w \rightarrow m}&b_{m \rightarrow m}\end{bmatrix} 
+\begin{bmatrix}x_{w}\\x_{m}\end{bmatrix}_{t-1} + 
+\begin{bmatrix}u_{w}\\u_{m}\end{bmatrix} + \begin{bmatrix}w_{w}\\w_{m}\end{bmatrix}_t \\
+\begin{bmatrix}w_{w}\\w_{m}\end{bmatrix}_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}q_{w}&0\\0&q_{m}\end{bmatrix}\end{pmatrix}
+\end{gathered}
+\end{equation}
+where $w$ denotes wolf and $m$ denotes moose. $w \rightarrow w$ is the effect of wolf on wolf (density-dependence) and $w \rightarrow m$ is the effect of wolf on moose (predation effect on moose).
+
+\subsection{Load in and plot the data}
+We will use 1960 to 2011.  We will hold out 1959 as we will need that year when we look at the effect of covariates.
+<<Cs01_load.wolf.data, echo=TRUE, keep.source=TRUE>>=
+yr1960to2011 <- isleRoyal[, "Year"] >= 1960 & isleRoyal[, "Year"] <= 2011
+royale.dat <- log(t(isleRoyal[yr1960to2011, c("Wolf", "Moose")]))
+@
+
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs02_plotwolfmoosedata, fig=TRUE, keep.source=TRUE, echo=TRUE>>=
+x <- isleRoyal[, "Year"]
+y <- log(isleRoyal[, c("Wolf", "Moose")])
+graphics::matplot(x, y,
+  ylab = "Log count", xlab = "Year", type = "l",
+  lwd = 3, bty = "L", col = "black"
+)
+legend("topright", c("Wolf", "Moose"), lty = c(1, 2), bty = "n")
+@
+\end{center}
+\caption{Plot of the Isle Royale wolf and moose data.}
+\label{fig:wolf}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fit the model to the wolf-moose data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The naive way to fit the model is to use Equations \ref{eq:MSSMY} and \ref{eq:MSSMX} ``as is":
+<<label=bad.wolf.model, eval=FALSE, echo=TRUE, keep.source=TRUE>>=
+royale.model.0 <- list(
+  B = "unconstrained", Q = "diagonal and unequal",
+  R = "diagonal and unequal", U = "unequal"
+)
+kem.0 <- MARSS(royale.dat, model = royale.model.0)
+@
+If you try this, you will notice that it does not converge but stops when it reaches \verb@maxit@ and prints a number of warnings about non-convergence.\index{troubleshooting!B estimation}\index{B matrix!troubleshooting estimation}  The problem is that when you try to estimate $\BB$ and $\uu$, they are often confounded.  This a well-known problem, and you will need to find a way to fix $\uu$ at some value.  If you are willing to assume that the process is at equilibrium (i.e., not recovering to equilibrium from a big perturbation), then you can simply demean the data and set $\uu$ to 0.  It is also common to standardize the variance by dividing by the square root of the variance of the data.  This is called z-scoring the data.
+<<Cs03_z.score.wolf.data, echo=TRUE, keep.source=TRUE>>=
+# if missing values are in the data, they should be NAs
+z.royale.dat <- zscore(royale.dat)
+@
+
+We can fit the model to the z-scored data, but we still have convergence issues.\index{troubleshooting!nonconvergence}\index{B matrix!troubleshooting estimation}
+<<Cs04_fit.model, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
+royale.model.1 <- list(
+  Z = "identity", B = "unconstrained",
+  Q = "diagonal and unequal", R = "diagonal and unequal",
+  U = "zero", tinitx = 1
+)
+cntl.list <- list(allow.degen = FALSE, maxit = 200)
+kem.1 <- MARSS(z.royale.dat, model = royale.model.1, control = cntl.list)
+@
+It looks like $\RR$ is going to zero, meaning that the maximum-likelihood model is a process error only model.   That is not too surprising given that the data look more like a random walk than white noise.  We will set $\RR$ manually to zero and assume that the census is complete (they count all individuals):
+<<Cs05_fit.model.R0, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
+royale.model.2 <- list(
+  Z = "identity", B = "unconstrained",
+  Q = "diagonal and unequal", R = "zero", U = "zero"
+)
+kem.2 <- MARSS(z.royale.dat, model = royale.model.2)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Look at the estimated interactions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{B matrix!estimation}
+The estimated $\BB$ elements are \verb@coef(kem.2)$B@.  
+<<Cs06_print-wolf.B>>=
+wolf.B <- coef(kem.2, type = "matrix")$B
+rownames(wolf.B) <- colnames(wolf.B) <- rownames(royale.dat)
+print(wolf.B, digits = 2)
+@
+The \verb@coef()@ function returns the estimated parameters, but in this case we want to see the estimates in matrix form.  Thus we use \verb@type="matrix"@.  Element row=$i$, col=$j$ in $\BB$ is the effect of species $j$ on species $i$, so $\BB_{2,1}$ is the effect of wolves on moose and $\BB_{1,2}$ is the effect of moose on wolves.    The $\BB$ matrix suggests that wolves have a negative effect on moose and that moose have a positive effect on wolves---as one would expect.  The diagonals are interpreted differently than the off-diagonals since the diagonals are ($b_{i,i}-1$) so subtract off 1 from the diagonals to get the effect of species $i$ on itself.   If the species are density-independent, then $\BB_{i,i}$ would equal 1.  Smaller $\BB_{i,i}$ means more density dependence.   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adding covariates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+It is well-known that moose numbers are strongly affected by winter and summer climate.  The Isle Royale data set provided with MARSS has climate data from climate stations in Northeastern Minnesota, near Isle Royale\footnote{From the Western Regional Climate Center.  See the help file for this dataset for references (\texttt{?isleRoyal}).}.  The covariate data include January-February, July-September and April-May average temperature and precipitation.  Also included are three-year running means of these data, where the number for year $t$ is the average of years $t-1$, $t$ and $t+1$.  We will include these covariates in the analysis to see how they change our interaction estimates.  We have to adjust our covariates because the census numbers are from winter in year $t$ and we want the climate data from the previous year to affect this winter's moose count.  As usual, we will need to demean our covariate data so that we can set $\uu$ equal to zero.  We will standardize the variance also so that we can more easily compare the effects across different covariates.
+
+The mathematical form of our new process model for the wolf-moose population dynamics is
+\begin{equation}
+\begin{gathered}
+\begin{bmatrix}x_{w}\\x_{m}\end{bmatrix}_t = \BB 
+\begin{bmatrix}x_{w}\\x_{m}\end{bmatrix}_{t-1} + 
+\begin{bmatrix}0&0&0\\C_{21}&C_{22}&C_{23}\end{bmatrix} 
+\begin{bmatrix}\text{win temp}\\\text{win precip}\\\text{sum temp}\end{bmatrix}_{t-1}
++ \begin{bmatrix}w_{w}\\w_{m}\end{bmatrix}_t
+\end{gathered}
+\end{equation}
+The $C_{21}$, $C_{22}$, etc. terms are the effect of winter temperature, winter precipitation, previous summer temperature and previous summer precipitation on winter moose numbers.  Since climate is known to mainly affect the moose, we set the climate effects to 0 for wolves (top row of $\CC$).  
+
+First we prepare the covariate data and select the winter temperature and precipitation data and the summer temperature  data.  We need to use the previous year's climate data with this winter's abundance data, so 1959 to 2010.
+<<Cs07_prep-cov-wolf-moose, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
+clim.variables <- c(
+  "jan.feb.ave.temp", "jan.feb.ave.precip",
+  "july.sept.ave.temp"
+)
+yr1959to2010 <- isleRoyal[, "Year"] >= 1959 & isleRoyal[, "Year"] <= 2010
+clim.dat <- t(isleRoyal[yr1959to2010, clim.variables])
+z.score.clim.dat <- zscore(clim.dat)
+@
+A plot of the covariate data against each other indicates that there is not much correlation between winter temperature and precipitation (Figure \ref{fig:wolfcov}, which is good for analysis purposes, but warm winters are somewhat correlated with warm summers.  The latter will make it harder to interpret the effect of winter versus summer temperature although the correlation is not too strong fortunately.
+
+Next we prepare the list with the structure of all the model matrices.  We give descriptive names to the $\CC$ elements so we can remember what each $\CC$ element means.
+<<Cs08_cov.wolf.moose.model, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
+royale.model.3 <- list(
+  Z = "identity", B = "unconstrained",
+  Q = "diagonal and unequal", R = "zero", U = "zero",
+  C = matrix(list(
+    0, "Moose win temp", 0, "Moose win precip",
+    0, "Moose sum temp"
+  ), 2, 3),
+  c = z.score.clim.dat
+)
+@
+Then we fit the model with covariates.
+<<Cs09_fit-cov-wolf-moose-model, eval=TRUE, echo=TRUE, keep.source=TRUE>>=
+kem.3 <- MARSS(z.royale.dat, model = royale.model.3)
+@
+The results suggest what is already known about this system: cold winters and heavy snow are bad for moose as are hot summers.
+
+\setkeys{Gin}{}
+\begin{figure}[htp]
+\begin{center}
+<<Cs10_figwolfcov, fig=TRUE, keep.source=TRUE, echo=FALSE>>=
+cor.fun <- function(x, y) {
+  text(0.5, 0.5, format(cor(x, y), digits = 2), cex = 2)
+}
+pairs(t(z.score.clim.dat), lower.panel = cor.fun)
+@
+\end{center}
+\caption{Pairs plot of the covariate data for Isle Royale with correlations in the lower panel. The \R code that produced this plot was \texttt{cor.fun=function(x, y){text(0.5,0.5,format(cor(x,y),digits=2),cex=2)} pairs(t(z.score.clim.dat),lower.panel=cor.fun)}.}
+\label{fig:wolfcov}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Change the model and data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+You can explore the sensitivity of the $\BB$ estimates when the measurement error is increased by adding white noise to the data:
+<<Cs11_bad-data-2,eval=FALSE>>=
+bad.data <- z.royale.dat + matrix(rnorm(100, 0, sqrt(.2)), 2, 50)
+kem.bad <- MARSS(bad.data, model = model)
+@
+You can change the model by changing the constraints on $\RR$ and $\QQ$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Some settings to improve performance when estimating $\BB$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{troubleshooting!B estimation}\index{B matrix!troubleshooting estimation}
+In the default MARSS model, the value of $\E[\XX_0|\yy_0]$ (what \verb@x0@ denotes when \verb@tinitx=0@ in the model list) is estimated.  If we are estimating the $\BB$ matrix, it is better to set \verb@tinitx=1@ so that we are estimating $\E[\XX_1|\yy_0]$ instead\footnote{If there are many missing values at $t=1$, we might still have problems and have to adjust accordingly.}.  The model will fit either way, but setting \verb@tinitx=1@ in the model list will speed up and stabilize the fitting. It does not make much of a difference for the wolf-moose dataset but can have a large effect for larger models.  The reason is that the likelihood surface for $\E[\XX_1|\yy_0]$ is better behaved when $\BB$ is small.  For example, if $\BB$ equal to 0, there is little information about $\E[\XX_0|\yy_0]$ so the algorithm goes in circles trying to estimate it while there is good information $\E[\XX_1|\yy_0]$ from $\yy_1$.  We could use a prior on the initial $\xx$ but this requires its variance-covariance structure, which depends on the unknown $\BB$ and specifying a variance-covariance structure that conflicts with $\BB$ will change your $\BB$ estimates.\index{troubleshooting!sensitivity to x0 prior}
+
+For the wolf-moose model, we set $\RR=0$.  The EM algorithm (default) cannot estimate \verb@x0@ when \verb@tinitx=1@ therefore to fit the model with \verb@tinitx=1@ we need to use \verb@method="BFGS"@.  This is only for the case when $\RR=0$\footnote{because the update for $(\xx_1^0)_{j+1}$ is $\xx_1^T$ but when $\RR=0$ and $\VV_1^0=0$, $\xx_1^T$ will equal $(\xx_1^0)_j$, i.e., whatever value you started with.  Thus the estimate of $\xx_1^0$ never changes.}
+<<Cs05_fit.model.tinitx1, eval=TRUE, echo=TRUE, keep.source=TRUE, results=hide>>=
+royale.model.4 <- list(
+  B = "unconstrained", U = "zero", Q = "diagonal and unequal",
+  Z = "identity", R = "zero", tinitx = 1
+)
+kem.4 <- MARSS(z.royale.dat, model = royale.model.4)
+@
+
+\index{troubleshooting!degenerate variances}The other setting we may want to change is \verb@allow.degen@ in the control list.  This sets the diagonals of $\QQ$ or $\RR$ to zero if they are heading towards zero.  When the initial $\xx$ is at $t=1$, this can have non-intuitive (not wrong but puzzling; see Appendix \ref{app:warnings}) consequences if $\RR$ is going to zero.   So, we will set \verb@control$allow.degen=FALSE@ and manually set $\RR$ to 0 if needed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Analysis a four-species plankton community}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Ives et al. (2003) presented weekly data on the biomass of two species of phytoplankton and two species of zooplankton in two lakes, one with low planktivory and one with high planktivory.  They used these data to estimate the interaction terms for the four species.  Here we will reanalyze data and compare our results.
+
+Ives et al. (2003) explain the data as: ``The data consist of weekly samples of zooplankton
+and phytoplankton, which for the analyses were divided into two zooplankton groups (Daphnia and non-Daphnia) and two phytoplankton groups (large and small phytoplankton). Daphnia are large, effective herbivores, and small phytoplankton are particularly vulnerable to herbivory, so we anticipate strong interactions between Daphnia and small phytoplankton groups.''    Figure \ref{fig:plankton} shows the data.  What you can see from the figure is that the data are only collected in the summer.  
+
+\subsection{Load in the plankton data}
+<<Cs12_load-plankton-data, eval=TRUE, keep.source=TRUE>>=
+# only use the plankton, daphnia, & non-daphnia
+plank.spp <- c("Large Phyto", "Small Phyto", "Daphnia", "Non-daphnia")
+plank.dat <- ivesDataByWeek[, plank.spp]
+# The data are not logged
+plank.dat <- log(plank.dat)
+# Transpose to get time going across the columns
+plank.dat <- t(plank.dat)
+# make a demeaned version
+d.plank.dat <- (plank.dat - apply(plank.dat, 1, mean, na.rm = TRUE))
+@
+We will demean the data so we can set $\uu$ to 0.  We do not standardize by the variance, however because we are going to fix the $\RR$ variance later as Ives et al. did. 
+
+\setkeys{Gin}{width=\textwidth}
+\begin{figure}[htp]
+\begin{center}
+<<Cs13_plot-plankton-data, fig=TRUE, echo=FALSE,width=8,height=4>>=
+graphics::matplot((1:(52 * 6))[27:295], t(d.plank.dat), type = "l", lty = c(1, 1, 1, 1), lwd = c(1, 1, 3, 3), xlab = "week of study", ylab = "log biomass", xaxt = "n", xlim = c(11, 52 * 6 - 11), bty = "L")
+# axis(1,at=(1:(52*6))[seq(27,295,2)])
+axis(1, at = seq(1, 52 * 6, 2))
+abline(v = c(52 * (1:6)))
+abline(h = 0)
+@
+\end{center}
+\caption{Plot of the demeaned plankton data. Zooplankton are the thicker lines.  Phytoplankton are the thinner lines.}
+\label{fig:plankton}
+\end{figure}
+\setkeys{Gin}{width=.8\textwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\subsection{Specify a MARSS model for the plankton data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+We will start by fitting a model with the following assumptions:
+\begin{itemize}
+\item{All phytoplankton share the same process variance.}
+\item{All zooplankton share the same process variance.}
+\item{Phytoplankton and zooplankton have different measurement variances}
+\item{Measurement errors are independent.}
+\item{Process errors are independent.}
+\end{itemize}
+
+<<Cs14_set-up-plankton-model>>=
+Q <- matrix(list(0), 4, 4)
+diag(Q) <- c("Phyto", "Phyto", "Zoo", "Zoo")
+R <- matrix(list(0), 4, 4)
+diag(R) <- c("Phyto", "Phyto", "Zoo", "Zoo")
+plank.model.0 <- list(
+  B = "unconstrained", U = "zero", Q = Q,
+  Z = "identity", A = "zero", R = R,
+  x0 = "unequal", tinitx = 1
+)
+@
+Why did we set \verb@U="zero"@? Equation \ref{eq:MSSMX} is a stationary model; it fluctuates about a mean.  The $\uu$ in Equation \ref{eq:MSSMX} is a scaling term that just affects the mean level---once the system is at equilibrium.  If we assume that the mean of $\yy$ (the mean of our data) is  a good estimate of the mean of the system (the $\xx$), then we can set $\uu$ equal to zero (and $\aa$).  The initial  states ($\xx$) are set at $t=1$ instead of $t=0$, which improves estimation for large systems.
+
+\subsection{Fit the plankton model and look at the estimated $\BB$ matrix}
+The call to fit the model is:
+<<Cs15_fit-plank-model-0, results=hide>>=
+kem.plank.0 <- MARSS(d.plank.dat, model = plank.model.0)
+@  
+Now we can print the $\BB$ matrix, with a little clean up.
+<<Cs16_print-B-0, keep.source=TRUE>>=
+# Cleaning up the B matrix for printing
+B.0 <- coef(kem.plank.0, type = "matrix")$B[1:4, 1:4]
+rownames(B.0) <- colnames(B.0) <- c("LP", "SP", "D", "ND")
+print(B.0, digits = 2)
+@
+LP stands for large phytoplankton, SP for small phytoplankton, D for Daphnia and ND for non-Daphnia.
+
+We can compare this to the Ives et al. estimates (in their Table 2, bottom right) and see quite a few differences:
+<<Cs17_print-B-Ives, keep.source=TRUE, echo=FALSE>>=
+# Cleaning up the B matrix for printing
+B.Ives.ML <- matrix(c(.5, NA, NA, NA, -.39, .076, NA, .1, NA, -.02, .77, NA, NA, -.1, NA, .55), 4, 4)
+B.Ives.Obs <- matrix(c(.48, NA, NA, NA, -.39, .25, NA, .1, NA, -.17, .74, 0, NA, -.11, 0, .6), 4, 4)
+B.Ives <- B.Ives.Obs
+rownames(B.Ives) <- colnames(B.Ives) <- c("LP", "SP", "D", "ND")
+print(B.Ives, digits = 2, na.print = "--")
+@
+First, you will notice is that the Ives et al. matrix is missing values.  The matrix they show is after a model selection step to determine which interactions had little data support and thus could be set to zero.  Also, they fixed the interactions between Daphnia and non-Daphnia at zero because they do not prey on each other.   The second thing you will notice is that the estimates are not particularly similar.  Next we will try some other ways of fitting the data that are closer to the way that Ives et al. fitted the data.
+
+By the way, if you are curious what would happen if we removed all those NAs, you can run the following code. 
+<<Cs18_test-rm-NAs,eval=FALSE, keep.source=FALSE>>=
+# Example code to see what would happen if we removed the NAs
+test.dat <- d.plank.dat[, !is.na(d.plank.dat[1, ])]
+test <- MARSS(test.dat, model = plank.model.0)
+@
+Removing all the NAs would mean that the end of summer 1 is connected to the beginning of summer 2. This adds some steep steps in the Daphnia time series where Daphnia ended the summer high and started the next summer low. 
+
+\subsection{Look at different ways to fit the model}
+We will try a series of changes to get closer to the way Ives et al. fit the data, and you will see how different assumptions change (or do not change) our species interaction estimates. 
+
+First, we change $\QQ$ to be unconstrained.  Making $\QQ$ diagonal in model 0 meant that we were assuming that whatever environmental factor is driving variation in phytoplankton numbers is uncorrelated with the environmental factor driving zooplankton variation.  That is probably not true since they are all in the same lake.  This case takes awhile to run.
+<<Cs19_fit-plank-model-1, results=hide>>=
+plank.model.1 <- plank.model.0
+plank.model.1$Q <- "unconstrained"
+kem.plank.1 <- MARSS(d.plank.dat, model = plank.model.1)
+@  
+Notice that the $\QQ$ specification changed to ``unconstrained''.  Everything else stays the same as in model 0.  The code now runs longer, and the $\BB$ estimates are not particularly closer to Ives et al.
+<<Cs20_print-B-1, keep.source=TRUE, echo=FALSE>>=
+# Cleaning up the B matrix for printing
+B <- coef(kem.plank.1, type = "matrix")$B[1:4, 1:4]
+rownames(B) <- colnames(B) <- c("LP", "SP", "D", "ND")
+B[B == 0] <- NA
+B.1 <- B
+print(B, digits = 2, na.print = "--")
+@
+
+Next, we will set some of the interactions to zero as in  Table 2 in Ives et al. (2003).  In their table, certain interactions were fixed at 0 (denoted with 0s), and some were made 0 after fitting (the blanks).  We will fix all to zero.   To do this, we need to write out the $\BB$ matrix as a list matrix so that we can have estimated and fixed values (the 0s) in the $\BB$ specification.
+<<Cs21_B-2, echo=TRUE>>=
+B.2 <- matrix(list(0), 4, 4) # set up the list matrix
+diag(B.2) <- c("B11", "B22", "B33", "B44") # give names to diagonals
+# and names to the estimated non-diagonals
+B.2[1, 2] <- "B12"
+B.2[2, 3] <- "B23"
+B.2[2, 4] <- "B24"
+B.2[4, 2] <- "B42"
+print(B.2)
+@ 
+
+As you can see, the $\BB$ matrix now has elements that will be estimated (the names in quotes) and fixed values (the numbers with no quotes).  When preparing your list matrix, make sure your fixed values do not have quotes around them.  If they do, they are strings (class character) not numbers (class numeric), and \verb@MARSS()@ will interpret a string as the name of something to be estimated.  If you use the same name for an element, then \verb@MARSS()@ will force those elements to be shared (have the same value).  
+<<Cs22_fit-plank-model-2, results=hide>>=
+# model 2
+plank.model.2 <- plank.model.1
+plank.model.2$B <- B.2
+kem.plank.2 <- MARSS(d.plank.dat, model = plank.model.2)
+@
+Now we are getting closer to the Ives et al. estimates:
+<<Cs23_print-B-2, keep.source=TRUE, echo=false>>=
+# Cleaning up the B matrix for printing
+B <- coef(kem.plank.2, type = "matrix")$B[1:4, 1:4]
+rownames(B) <- colnames(B) <- c("LP", "SP", "D", "ND")
+B[B == 0] <- NA
+B.2 <- B
+print(B, digits = 2, na.print = "--")
+@
+
+Ives et al. did not estimate $\RR$.  Instead they used a fixed observation variance of 0.04 for phytoplankton and 0.16 for zooplankton\footnote{You can compare this to the estimated observation variances by looking at \texttt{coef(kem.plank.2)\$R}}.  We fit the model with their fixed $\RR$ as follows:
+<<Cs24_fit-plank-model-3, echo=TRUE, results=hide>>=
+# model 3
+plank.model.3 <- plank.model.2
+plank.model.3$R <- diag(c(.04, .04, .16, .16))
+kem.plank.3 <- MARSS(d.plank.dat, model = plank.model.3)
+@
+
+As you can see from Table \ref{ref:tableplank}, we are getting closer to the Ives et al. estimates, but we are still a bit off.  Now we need to add the environmental covariates: phosphorous and fish biomass.
+
+\subsection{Adding covariates}
+\index{covariates}
+A standard way that you will see covariate data added to a MARSS model is the following:
+\begin{equation}\label{eqn:covar}
+\begin{gathered}
+\xx_t = \BB\xx_{t-1} + \uu + \CC\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \ZZ\xx_t + \aa + \DD\dd_t  + \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR) 
+\end{gathered}
+\end{equation}
+$\cc_t$ and $\dd_t$ are covariate data, like temperature. At time $t$ and $\CC$ is a matrix with the (linear) effects of $\cc_t$ on $\xx_t$, and $\DD$ is a matrix with the (linear) effects of $\dd_t$ on $\yy_t$.  
+
+\citet{Ivesetal2003} only include covariates in their process model, and their process model (their Equation 27) is written $\XX_t = \AA+\BB\XX_{t-1} + \CC\UU_t + \EE_t$.  In our  Equation \ref{eqn:covar}, $\UU_t=\cc_t$, and $\CC$ is a $m \times p$ matrix, where $p$ is the number of covariates in $\cc_t$.  We will set their $\AA$ (our $\uu$) to zero by demeaning the $\yy$ and implicitly assuming that the mean of the $\yy$ is a good estimate of the mean of the $\xx$'s.  Thus the model where covariates only affect the underlying process is
+\begin{equation}
+\begin{gathered}
+\xx_t = \BB\xx_{t-1} + \CC\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \xx_t +  \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR) 
+\end{gathered}
+\end{equation}
+
+To fit this model, we first need to prepare the covariate data.  We will just use the phosphorous data.
+<<Cs25_prep-covariates,keep.source=TRUE>>=
+# transpose to make time go across columns
+# drop=FALSE so that R doesn't change our matrix to a vector
+phos <- t(log(ivesDataByWeek[, "Phosph", drop = FALSE]))
+d.phos <- (phos - apply(phos, 1, mean, na.rm = TRUE))
+@
+Why log the covariate data?  It is what Ives et al. did, so we follow their method.  However, in general, you want to think about what relationship you want to assume between the covariates and their effects.  For example, log (or square-root) transformations mean that extremes have less impact relative to their untransformed value and that a small absolute change, say from 0.01 to 0.0001 in the untransformed value, can mean a large difference in the effect since log(0.0001) $<$ log(0.01).
+
+Phosphorous is assumed to only affect phytoplankton so the other terms in $\CC$, corresponding to the zooplankton, are set to 0.
+The $\CC$ matrix is defined as follows:
+\begin{equation}
+\CC=
+\begin{bmatrix}
+C_{LP,phos}\\
+C_{SP,phos}\\
+0\\
+0
+\end{bmatrix}
+\end{equation}
+
+
+To add $\CC$ and $\cc$ to our latest model, we add $\CC$ and $\cc$ to the model list used in the \verb@MARSS()@ call:
+<<Cs26_add-covar-model-3>>=
+plank.model.4 <- plank.model.3
+plank.model.4$C <- matrix(list("C11", "C21", 0, 0), 4, 1)
+plank.model.4$c <- d.phos
+@
+Then we fit the model as usual:
+<<Cs27_plank-model-4, results=hide, keep.source=TRUE>>=
+kem.plank.4 <- MARSS(d.plank.dat, model = plank.model.4)
+@
+Here is the $\CC$ matrix. The $\CC$ terms for the zooplankton are shown as \verb@--@ since they are not applicable (have been set to 0). Temperature and phosphorous have an estimated positive effect on phytoplankton:
+<<Cs28_print-C, keep.source=TRUE, echo=false>>=
+# Cleaning up the C matrix for printing
+Cmat <- coef(kem.plank.4, type = "matrix")$C[1:4, 1, drop = FALSE]
+rownames(Cmat) <- c("LP", "SP", "D", "ND")
+Cmat[Cmat == 0] <- NA
+print(Cmat, digits = 2, na.print = "--")
+@
+
+\subsection{Including a covariate observation model}
+\index{covariates!observed with error}
+The difficulty with the standard approach to including covariates (Equation \ref{eqn:covar}) is that it limits what kind of covariate data you can use and how you model that covariate data.  You have to assume that your covariate data has no error, which is probably not true.  Assuming that your covariate has no error reduces the reported uncertainty in your covariate effect because you did not include uncertainty in those values.  The standard approach also does not allow missing values in your covariate data, which is why we did not include the fish covariate data in the last model. Also you cannot combine multiple instrument time series; for example, if you have two temperature recorders with different error rates and biases.  Perhaps you have one noisy temperature recorder in the first part of your time series and then you switch to a much better recorder in the second half of your time series.  All these problems require pre-analysis massaging of the covariate data, leaving out noisy and gappy covariate data, and making what can feel like arbitrary choices about which covariate time series to include.  This is especially worrisome when the covariates are then incorporated into the model as if they are known without error.
+
+Instead one can include an observation and process model for the covariates just like for the non-covariate data.  Now the covariates are included in $\yy_t$ and are modeled with their own state process(es) in $\xx_t$. A MARSS model with a covariate observation and process model is shown below.  The elements with superscript ${(v)}$ are for the variates and those with superscript ${(c)}$ are for the covariates.  The superscripts just help us keep straight which of the state processes and parameters correspond to abundances and which correspond to the environmental covariates.   
+\begin{equation}\label{eqn:marsscovar}
+\begin{gathered}
+\begin{bmatrix}\xx^{(v)} \\ \xx^{(c)}\end{bmatrix}_t
+= \begin{bmatrix}\BB^{(v)} & \CC \\ 0 & \BB^{(c)}\end{bmatrix}
+\begin{bmatrix}\xx^{(v)} \\ \xx^{(c)}\end{bmatrix}_{t-1}
++ \begin{bmatrix}\uu^{(v)} \\ \uu^{(c)} \end{bmatrix}
++ \ww_t,
+ \text{ } \ww_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\QQ^{(v)} & 0 \\ 0 & \QQ^{(c)} \end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix} \yy^{(v)} \\ \yy^{(c)} \end{bmatrix}_t
+= \begin{bmatrix}\ZZ^{(v)} & 0 \\ 0 & \ZZ^{(c)} \end{bmatrix}
+\begin{bmatrix}\xx^{(v)} \\ \xx^{(c)} \end{bmatrix}_t
++ \begin{bmatrix} \aa^{(v)} \\ \aa^{(c)} \end{bmatrix}
++ \vv_t,
+ \text{ } \vv_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\RR^{(v)} & 0 \\ 0 & \RR^{(c)} \end{bmatrix} \end{pmatrix} 
+\end{gathered}
+\end{equation}
+
+Note that when you fit your covariate and non-covariate data jointly as in Equation \ref{eqn:marsscovar}, your non-covariate data affect the estimates of the covariate models.  When you maximize the likelihood, you do so conditioned on all the data.  The likelihood that is output is the likelihood of the non-covariate and covariate data.  Depending on your system, you might not want the covariate model affected by the non-covariate data.  In this case, you can fit the covariate model separately:
+\begin{equation}\label{eqn:covar.only}
+\begin{gathered}
+\xx^{(c)}_t = \BB^{(c)}\xx^{(c)}_{t-1}+\uu^{(c)}+ \ww_t, \text{ } \ww_t \sim \MVN(0,\QQ^{(c)})  \\
+\yy^{(c)}_t = \ZZ^{(c)}\xx^{(c)}_t+\aa^{(c)}, \text{ } \vv_t \sim \MVN(0,\RR^{(c)}) 
+\end{gathered}
+\end{equation}
+
+At this point, you have another choice.  Do you want the estimated covariates states, the $\xx^{(c)}$, to be affected by the non-covariate data?  For example, you have temperature data.  You can estimates true temperature for the temperature only from the temperature data or you can decide that the non-covariate data has information about the true temperature, because the non-covariate states are affected by the true temperature.  If you want the covariate states to only be affected by the covariate data, then use Equation \ref{eqn:covar} with $\cc_t$ set to your estimates of $\xx^{(c)}$ from Equation \ref{eqn:covar.only}.  Or if you want the non-covariate data to affect the estimates of the covariate states, use Equation \ref{eqn:marsscovar} with the parameters estimated from Equation \ref{eqn:covar.only}.
+
+\subsection{The MARSS model with covariates following Ives et al.}
+\index{covariates}
+Ives et al. used Equation \ref{eqn:covar} for phosphorous and Equation \ref{eqn:marsscovar} for fish biomass. Phosphorous was treated as observed with no error since it was experimentally manipulated and there were no missing values.  Fish biomass was treated as having observation error and was modeled as a autoregressive process with unknown parameters as in Equation \ref{eqn:marsscovar}.  
+
+Their MARSS model takes the form:
+\begin{equation}\label{eqn:ives.marss}
+\begin{gathered}
+\xx_t = \BB\xx_{t-1} + \CC\cc_t + \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \xx_t +  \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR) 
+\end{gathered}
+\end{equation}
+where $\xx$ and $\yy$ are redefined as
+\begin{equation}
+\begin{bmatrix}
+\text{large phyto}\\
+\text{small phyto}\\
+\text{Daphnia}\\
+\text{non-Daphnia zooplank}\\
+\text{fish biomass}
+\end{bmatrix}
+\end{equation}
+The covariate fish biomass appears in $\xx$ because it will be modeled, and its interaction terms (Ives et al.'s $\CC$ terms) appear in $\BB$. Phosphorous appears in the $\cc_t$ terms because it is treated as a known additive term and its interaction terms appear in $\CC$.   Recall that we set $\uu$ to 0 by demeaning the plankton data, so it does not appear above.  The $\ZZ$ matrix does not appear in front of the $\xx_t$ since there is a one-to-one correspondence the $\xx$'s and $\yy$'s, and thus $\ZZ$ is the identity matrix.  
+
+The $\BB$ matrix is
+\begin{equation}
+\BB=\begin{bmatrix}\BB^{(v)} & \CC \\ 0 & \BB^{(c)}\end{bmatrix} = 
+\begin{bmatrix}
+b_{LP} & b_{LP,SP} & 0 & 0 &  0\\
+0 & b_{SP} & b_{SP,D} & b_{SP,ND} & 0\\
+0 & 0 & b_{D} & 0 & C_{D,fish}\\
+0 & b_{ND,SP} & 0 & b_{ND,ND} &C_{ND,fish}\\
+0 & 0 & 0 & 0 & b_{fish}
+\end{bmatrix}
+\label{eqn:marsscovarB}
+\end{equation}
+The $\BB$ elements have some interactions fixed at 0 as in our last model fit.  The $c$'s are the interactions between the fish and the species. We will estimate a $\BB$ term for fish since Ives et al. did, but this is an odd thing to do for the fish data since these data were interpolated from two samples per season.
+
+The $\QQ$ matrix is the same as that in our last model fit, with the addition of an element for the variance for the fish biomass:
+\begin{equation}
+\QQ=\begin{bmatrix}\QQ^{(v)} & 0 \\ 0 & \QQ^{(c)} \end{bmatrix}=  
+  \begin{bmatrix}
+q_{LP} & q_{LP,SP} & q_{LP,D} & q_{LP,ND} & 0\\
+q_{LP,SP} & q_{SP} & q_{SP,D} & q_{SP,ND} & 0\\
+q_{LP,D} & q_{SP,D} & q_{D} & q_{D,ND} & 0\\
+q_{LP,ND} & q_{SP,ND} & q_{D,ND} & q_{ND} & 0\\
+0 & 0 & 0 & 0 & q_{fish}
+\end{bmatrix}
+\label{eqn:marsscovarQ}
+\end{equation}
+Again it is odd to estimate a variance term for data interpolated from two points, but we follow Ives et al. here.
+
+Ives et al. set the observation variance for the logged fish biomass data to 0.36 (page 320 in \citet{Ivesetal2003}).  The observation variances for the plankton data was set as in our previous model.
+\begin{equation}
+\RR=\begin{bmatrix}
+0.04 & 0 & 0 & 0 & 0 \\
+0 & 0.04 & 0 & 0 & 0 \\
+0 & 0 & 0.16 & 0 & 0 \\
+0 & 0 & 0 & 0.16 & 0 \\
+0 & 0 & 0 & 0    & 0.36
+\end{bmatrix}
+\label{eqn:marsscovarR}
+\end{equation}
+
+\subsection{Setting the model structure for the model with fish covariate data}
+ 
+First we need to add the logged fish biomass to our data matrix.
+<<Cs29_add-fish-to-data, keep.source=TRUE>>=
+# transpose to make time go across columns
+# drop=FALSE so that R doesn't change our matrix to a vector
+fish <- t(log(ivesDataByWeek[, "Fish biomass", drop = FALSE]))
+d.fish <- (fish - apply(fish, 1, mean, na.rm = TRUE))
+# plank.dat.w.fish = rbind(plank.dat,fish)
+d.plank.dat.w.fish <- rbind(d.plank.dat, d.fish)
+@
+
+Next make the $\BB$ matrix.  Some elements are estimated and others are fixed at 0.
+<<Cs30_B-covar>>=
+B <- matrix(list(0), 5, 5)
+diag(B) <- list("B11", "B22", "B33", "B44", "Bfish")
+B[1, 2] <- "B12"
+B[2, 3] <- "B23"
+B[2, 4] <- "B24"
+B[4, 2] <- "B42"
+B[1:4, 5] <- list(0, 0, "C32", "C42")
+print(B)
+@
+Now we have a $\BB$ matrix that looks like that in Equation \ref{eqn:marsscovarB}.    
+
+We need to add an extra row to $\CC$ for the fish biomass row in $\xx$:
+<<Cs31_C-covar>>=
+C <- matrix(list("C11", "C21", 0, 0, 0), 5, 1)
+@
+Then we set up the $\RR$ matrix.     
+<<Cs32_R.covar>>=
+R <- matrix(list(0), 5, 5)
+diag(R) <- list(0.04, 0.04, 0.16, 0.16, 0.36)
+@
+ 
+Last, we need to set up the $\QQ$ matrix:
+<<Cs33_Q-covar>>=
+Q <- matrix(list(0), 5, 5)
+Q[1:4, 1:4] <- paste(rep(1:4, times = 4), rep(1:4, each = 4), sep = "")
+Q[5, 5] <- "fish"
+Q[lower.tri(Q)] <- t(Q)[lower.tri(Q)]
+print(Q)
+@
+
+\subsection{Fit the model with covariates}
+The model is the same as the previous model with updated process parameters and updated $\RR$.  We will pass in the updated data matrix with the fish biomass added:
+<<Cs34_fit-covar-model, results=hide, keep.source=TRUE>>=
+plank.model.5 <- plank.model.4
+plank.model.5$B <- B
+plank.model.5$C <- C
+plank.model.5$Q <- Q
+plank.model.5$R <- R
+kem.plank.5 <- MARSS(d.plank.dat.w.fish, model = plank.model.5)
+@
+
+
+This is the new $\BB$ matrix using covariates.
+<<Cs35_print-B, keep.source=TRUE, echo=FALSE>>=
+# Cleaning up the B matrix for printing
+B.5 <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
+rownames(B.5) <- colnames(B.5) <- c("LP", "SP", "D", "ND")
+B.5[B.5 == 0] <- NA
+print(B.5, digits = 2, na.print = "--")
+@
+Now we are getting are getting close to Ives et al.'s estimates.  Compare model 5 in Table \ref{ref:tableplank} to the first column.
+<<makemodeltable, echo=FALSE, keep.source=FALSE>>=
+B.names <- c("B11", "B22", "B33", "B44", "B12", "B23", "B24", "B42")
+# rename kem.plank.0 and kem.plank.1 B to make keeping track of params easier
+rownames(kem.plank.0$par$B) <- paste("B", rep(1:4, times = 4), rep(1:4, each = 4), sep = "")
+rownames(kem.plank.1$par$B) <- paste("B", rep(1:4, times = 4), rep(1:4, each = 4), sep = "")
+names.ests <- c("B11", "B22", "B33", "B44", "B12", "B23", "B24", "B42", "C11", "C21", "C32", "C42")
+Ives.ests.Obs <- c(.48, .25, .74, .6, -.39, -.17, -.11, .1, .25, .25, -.14, -.045)
+Ives.ests.ML <- c(0.5, .076, .77, .55, -.39, -.02, -.1, .1, .2, .32, -.13, -.048)
+model.data <- cbind(
+  Ives.ests.Obs,
+  c(coef(kem.plank.0)$B[B.names, ], NA, NA, NA, NA),
+  c(coef(kem.plank.1)$B[B.names, ], NA, NA, NA, NA),
+  c(coef(kem.plank.2)$B[B.names, ], NA, NA, NA, NA),
+  c(coef(kem.plank.3)$B[B.names, ], NA, NA, NA, NA),
+  c(coef(kem.plank.4)$B[B.names, ], coef(kem.plank.4)$C[c("C11", "C21"), ], NA, NA),
+  c(coef(kem.plank.5)$B[B.names, ], coef(kem.plank.5)$C[c("C11", "C21"), ], coef(kem.plank.5)$B[c("C32", "C42"), ])
+)
+rownames(model.data) <- names.ests
+colnames(model.data) <- c("Ives et al.", "Model 0", "Model 1", "Model 2", "Model 3", "Model 4", "Model 5")
+tmpaln <- "c" # figure out the number of cols automatically
+for (i in 1:ncol(model.data)) tmpaln <- paste(tmpaln, "c", sep = "")
+thetable <- xtable(model.data, caption = "The parameter estimates under the different plankton models.  Models 0 to 3 do not include covariates, so the C elements are blank.  Bij is the effect of species $i$ on species $j$. 1=large phytoplankton, 2=small phytoplankton, 3=Daphnia, 4=non-Daphnia zooplankton. The Ives et al. (2003) estimates are from their table 2 for the low planktivory lake with the observation model.", label = "ref:tableplank", align = tmpaln, digits = 2)
+print(thetable, type = "latex", file = paste(tabledir, "tableplank.tex", sep = ""), include.rownames = TRUE, include.colnames = TRUE, caption.placement = "top", table.placement = "htp", sanitize.text.function = function(x) {
+  x
+}, hline.after = c(-1, 0, nrow(model.data)))
+@
+\input{tables/tableplank}
+
+NOTE! When you include your covariates in your state model (the $\xx$ part), the reported log-likelihood is for the variate plus the covariate data.  If you want just the log-likelihood for the variates, then you should replace the covariate data with NAs and re-run the Kalman filter with your estimated model:
+<<Cs36_logLik-variates>>=
+tmp <- kem.plank.5
+tmp$marss$data[5, ] <- NA
+LL.variates <- MARSSkf(tmp)$logLik
+@
+\verb@MARSSkf()@ is the Kalman filter function and it needs a fitted model as output by a \verb@MARSS()@ call.  We set up a temporary fitted model, \verb@tmp@, equal to our fitted model and then set the covariate data in that to NAs.  Note we need to do this for the marssMODEL object used by \verb@MARSSkf()@, which will be in \verb@MLEobj$marss@.  We then pass that temporary fitted model to \verb@MARSSkf()@ to get the log-likelihood of just the variates.  
+
+\subsection{Discussion}
+The estimates for our last model are fairly close to the Ives et al. estimates, but still a bit different.  There are two big differences between our last model and the Ives et al. analysis.  Ives et al. had data from three lakes and the estimate of $\QQ$ used the data from all lakes.   
+
+Combining data, whether it be from different areas or years, can be done in a MARSS model as follows.  Let $\yy_1$ be the first data set (say from site 1) and $\yy_2$ be the second data set (say from site 2).  Then a MARSS model with shared parameters values across datasets would be
+\begin{equation}
+\begin{gathered}
+\xx^+_t = \BB^+\xx^+_{t-1} + \uu^+  \ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ^+) \\
+\yy^+_t = \ZZ^+\xx^+_t + \aa^+  + \vv_t, \text{ where } \vv_t \sim \MVN(0,\RR^+)
+\end{gathered}
+\label{eqn:combine2}
+\end{equation}
+where the  $+$ matrices are stacked matrices from the different sites (1 and 2):
+\begin{equation}
+\label{eqn:combinedata}
+\begin{gathered}
+\begin{bmatrix}\xx_{1,t} \\ \xx_{2,t}\end{bmatrix}
+= \begin{bmatrix}\BB & 0 \\ 0 & \BB \end{bmatrix}
+\begin{bmatrix}\xx_{1,t-1} \\ \xx_{2,t-1}\end{bmatrix}
++ \begin{bmatrix}\uu \\ \uu \end{bmatrix}
++ \ww_t,
+ \text{ } \ww_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\QQ & \qq \\ \qq & \QQ \end{bmatrix} \end{pmatrix}  \\
+\\   
+\begin{bmatrix} \yy_{1,t} \\ \yy_{2,t} \end{bmatrix}
+= \begin{bmatrix}\ZZ & 0 \\ 0 & \ZZ \end{bmatrix}
+\begin{bmatrix}\xx_{1,t} \\ \xx_{2,t} \end{bmatrix}
++ \begin{bmatrix} \aa \\ \aa \end{bmatrix}
++ \vv_t,
+ \text{ } \vv_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}\RR & 0 \\ 0 & \RR \end{bmatrix} \end{pmatrix}  
+\end{gathered}
+\end{equation}
+The $\qq$ in the process variance allows that the environmental variability  might be correlated between datasets, e.g., if they are replicate plots that are nearby.  If you did not want all the parameters shared, then you replace the $\BB$ in $\BB^+$ with $\BB_1$ and $\BB_2$, say.
+
+The second big difference is that Ives et al. did not demean their data, but estimated $\uu$.  We could have done that too, but with all the NAs in the data (during winter), estimating $\uu$ is not robust and takes a long time.   You can try the analysis on the data that has not been demeaned and set \verb@U="unequal"@.  The results are not particularly different, but it takes a long, long,...long time to converge.
+
+You can also try using the actual fish data instead of the interpolated data.  Fish biomass was estimated at the end and start of the season, so only the values at the start and finish of strings of fish numbers are the real data.  The others are interpolated.  You can fill in those interpolated values with NAs (missing values) and rerun.  The results are not appreciably different, but the effect of fish drops a bit as you might expect when you have less fish information.  You don't see it here, but your estimated confidence in the fish effects would also drop since this estimate is based on less fish data.
+
+\section{Stability metrics from estimated interaction matrices}
+\index{B matrix!stability metrics}
+The previous sections focused on estimation of the $\BB$ and $\CC$ matrices.  The estimated $\BB$ matrix gives a picture of the species interactions, but it also can be used to compute metrics of the intrinsic community stability \citep{Ivesetal2003}.  Here we illustrate how to compute these metrics; the reader should see  \citet{Ivesetal2003} for details on the meaning of each.
+
+For the examples here, we will use the estimated $\BB$ and $\QQ$ matrices from our model 5:
+<<Cs37_BQ.5>>=
+B <- coef(kem.plank.5, type = "matrix")$B[1:4, 1:4]
+Q <- coef(kem.plank.5, type = "matrix")$Q[1:4, 1:4]
+@
+
+\subsection{Return rate metrics}
+Return rate metrics measure how rapidly the system returns to the stationary distribution of species abundances after it is perturbed away from the stationary distribution.  With a deterministic ($\QQ=0$) MARSS community model, the equilibrium is a point or stable limit cycle.  In a stochastic model ($\QQ \neq 0$), the equilibrium is stochastic and is a stationary distribution.
+Rate of return to the stochastic equilibrium is the rate at which the distribution converges to the stationary distribution after a perturbation away from this stationary distribution.
+The more rapid the convergence, the more stable the system.
+
+The rate of return of the mean of the stationary distribution is governed by the dominant eigenvalue of $\BB$.  We can compute this as:
+<<Cs38_max.eigen>>=
+max(eigen(B)$values)
+@
+The rate of return of the variance of the stationary distribution is governed by the dominant eigenvalue of $\BB \otimes \BB$:
+<<Cs39_max.eig.kron.b>>=
+max(eigen(kronecker(B, B))$values)
+@
+
+\subsection{Variance metrics}
+These metrics measure the variance of the stationary distribution of species abundances (with variance due to environmental drivers removed) relative to the process error variance.  The system is considered more stable when the stationary distribution variance is low relative to the process error variance.
+
+To compute variance metrics, we need to first compute the variance-covariance matrix for the stationary distribution, $\VV_\infty$:
+<<Cs40_Vinfty>>=
+m <- nrow(B)
+vecV <- solve(diag(m * m) - kronecker(B, B)) %*% as.vector(Q)
+V_inf <- matrix(vecV, nrow = m, ncol = m)
+@
+A measure of the proportion of the ``volume'' of the stationary distribution due to species interactions is given by the square of the determinant of the $\BB$ matrix (Eqn. 24  in \citet{Ivesetal2003}):
+<<Cs41_det.b.squared>>=
+abs(det(B))^2
+@
+To compare stability across systems of different sizes, you scale by the number of species:
+<<Cs42_det.b.scaled>>=
+abs(det(B))^(2 / nrow(B))
+@
+
+\subsection{Reactivity metrics}
+Reactivity measure how the system responds to a perturbation.  A highly reactive system tends to move farther away from a stable equilibrium immediately after a perturbation, even though the system will eventually return to the equilibrium.  High reactivity occurs when species interactions greatly amplify the environmental variance to produce a stationary distribution
+with high variances in the abundance of individual species.
+
+Both metrics of reactivity of estimates of the average expected change in distance from the mean of the stationary distribution.  The first uses estimates of $\QQ$ and $\VV_\infty$.
+<<Cs43_covar.sigma.Vinf>>=
+-sum(diag(Q)) / sum(diag(V_inf))
+@
+Estimation of $\QQ$ is prone to high uncertainty.  Another metric that uses only $\BB$ is the worst-case reactivity.  This is given by
+<<Cs44_worse.case.reactivity>>=
+max(eigen(t(B) %*% B)$values) - 1
+@
+
+\section{Further information}
+MAR modeling and models have been used estimate species interaction strengths, stability metrics, and environmental drivers for a variety of freshwater plankton systems \citep{Ives1995ec, Ivesetal1999, Ivesetal2003, Hamptonetal2008, Hamptonetal2006, HamptonSchindler2006, KlugCottingham2001}.  They have been used to gain much insight into the dynamics of ecological communities and how environmental drivers affect the system.  See \citet{Hamptonetal2013} for a review of the literature using MAR models to understand plankton dynamics.
+
+<<Reset, echo=FALSE, keep.source=FALSE>>=
+options(prompt = "> ", continue = "+ ")
+options(width = 120)
+@

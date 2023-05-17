@@ -1,0 +1,63 @@
+\begin{Schunk}
+\begin{Sinput}
+ inits <- list(Q = 1)
+ kem <- MARSS(dat, model = model.list, inits = inits)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 134 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 134 iterations. 
+Log-likelihood: -236.6064 
+AIC: 489.2127   AICc: 489.8888   
+ 
+                    Estimate
+R.diag                0.0686
+Q.(1,1)               1.0079
+Q.(2,1)              -0.0296
+Q.(2,2)               0.1004
+D.(Greens,Temp)       0.3312
+D.(Bluegreens,Temp)   0.2531
+D.(Greens,TP)        -0.0294
+D.(Bluegreens,TP)     0.0345
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\begin{Sinput}
+ # or
+ inits <- list(Q = matrix(c(1, 0, 1), 3, 1))
+ kem <- MARSS(dat, model = model.list, inits = inits)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 134 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 134 iterations. 
+Log-likelihood: -236.6064 
+AIC: 489.2127   AICc: 489.8888   
+ 
+                    Estimate
+R.diag                0.0686
+Q.(1,1)               1.0079
+Q.(2,1)              -0.0296
+Q.(2,2)               0.1004
+D.(Greens,Temp)       0.3312
+D.(Bluegreens,Temp)   0.2531
+D.(Greens,TP)        -0.0294
+D.(Bluegreens,TP)     0.0345
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,48 @@
+\begin{Schunk}
+\begin{Sinput}
+ royale.model.1 <- list(
+   Z = "identity", B = "unconstrained",
+   Q = "diagonal and unequal", R = "diagonal and unequal",
+   U = "zero", tinitx = 1
+ )
+ cntl.list <- list(allow.degen = FALSE, maxit = 200)
+ kem.1 <- MARSS(z.royale.dat, model = royale.model.1, control = cntl.list)
+\end{Sinput}
+\begin{Soutput}
+Warning! Reached maxit before parameters converged. Maxit was 200.
+ neither abstol nor log-log convergence tests were passed.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+WARNING: maxit reached at  200  iter before convergence.
+ Neither abstol nor log-log convergence test were passed.
+ The likelihood and params are not at the MLE values.
+ Try setting control$maxit higher.
+Log-likelihood: -75.56383 
+AIC: 171.1277   AICc: 173.4933   
+ 
+                     Estimate
+R.(Wolf,Wolf)        0.001433
+R.(Moose,Moose)      0.000362
+B.(1,1)              0.768031
+B.(2,1)             -0.178990
+B.(1,2)              0.078335
+B.(2,2)              0.827922
+Q.(X.Wolf,X.Wolf)    0.455214
+Q.(X.Moose,X.Moose)  0.178661
+x0.X.Wolf            0.002926
+x0.X.Moose          -1.192645
+Initial states (x0) defined at t=1
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+
+Convergence warnings
+ Warning: the  R.(Wolf,Wolf)  parameter value has not converged.
+ Warning: the  R.(Moose,Moose)  parameter value has not converged.
+ Warning: the  x0.X.Wolf  parameter value has not converged.
+ Warning: the  logLik  parameter value has not converged.
+ Type MARSSinfo("convergence") for more info on this warning.
+\end{Soutput}
+\end{Schunk}

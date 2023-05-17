@@ -1,0 +1,27 @@
+###################################################
+### code chunk number 33: Cs23_out.tab.hc
+###################################################
+out.tab.hc <- NULL
+fits.hc <- list()
+for (i in 1:length(Z.models.hc)) {
+  for (j in 1:length(Q.models)) {
+    if (i == 1 & j == 3) next # Q3 is only for Hood Separate model
+    Q.model <- Q.models[[j]]
+    fit.model <- c(list(Z = Z.models.hc[[i]], Q = Q.model), model.constant)
+    fit <- MARSS(sealData.hc,
+      model = fit.model,
+      silent = TRUE, control = list(maxit = 1000)
+    )
+    out <- data.frame(
+      H = names(Z.models.hc)[i], Q = names(Q.models)[j], U = U.model,
+      logLik = fit$logLik, AICc = fit$AICc, num.param = fit$num.params,
+      m = length(unique(Z.models.hc[[i]])),
+      num.iter = fit$numIter, converged = !fit$convergence,
+      stringsAsFactors = FALSE
+    )
+    out.tab.hc <- rbind(out.tab.hc, out)
+    fits.hc <- c(fits.hc, list(fit))
+  }
+}
+
+

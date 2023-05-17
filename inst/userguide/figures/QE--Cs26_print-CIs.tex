@@ -1,0 +1,23 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(kem.with.hess.CIs)
+\end{Sinput}
+\begin{Soutput}
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 390 iterations. 
+Log-likelihood: -30.98719 
+AIC: 71.97439   AICc: 72.89747   
+ 
+       ML.Est  Std.Err   low.CI   up.CI
+R.diag 0.1402 0.024797  0.09155 0.18876
+U.1    0.0477 0.010444  0.02723 0.06817
+Q.diag 0.0000 0.000566 -0.00111 0.00111
+x0.N   6.9292 0.123820  6.68657 7.17193
+x0.S   5.9550 0.171024  5.61979 6.29019
+Initial states (x0) defined at t=0
+
+CIs calculated at alpha = 0.05 via method=hessian 
+\end{Soutput}
+\end{Schunk}

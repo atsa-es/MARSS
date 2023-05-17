@@ -1,0 +1,25 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model)
+ resid_kfas <- residuals(kfs, type = "recursive")
+ resid_marss <- residuals(fit_marss,
+   type = "tt1",
+   standardization = "marginal"
+ )
+ resid_marss <- subset(resid_marss, name == "model")
+ df <- cbind(
+   MARSS = resid_marss$.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+         MARSS      KFAS
+[1,] 1120.0000 1120.0000
+[2,] 1127.8849 1127.8849
+[3,]  566.2762  566.2762
+[4,]  566.5180  566.5180
+[5,]  250.5766  250.5766
+[6,]  130.6143  130.6143
+\end{Soutput}
+\end{Schunk}

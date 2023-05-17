@@ -1,0 +1,55 @@
+\begin{Schunk}
+\begin{Sinput}
+ kemz.3 <- MARSS(dat.z, model = dfa.model, control = cntl.list)
+\end{Sinput}
+\begin{Soutput}
+Warning! Reached maxit before parameters converged. Maxit was 50.
+ neither abstol nor log-log convergence tests were passed.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+WARNING: maxit reached at  50  iter before convergence.
+ Neither abstol nor log-log convergence test were passed.
+ The likelihood and params are not at the MLE values.
+ Try setting control$maxit higher.
+Log-likelihood: -782.202 
+AIC: 1598.404   AICc: 1599.463   
+ 
+                            Estimate
+Z.z11                         0.4163
+Z.z21                         0.5364
+Z.z31                         0.2780
+Z.z41                         0.5179
+Z.z51                         0.1611
+Z.z22                         0.6757
+Z.z32                        -0.2381
+Z.z42                        -0.2381
+Z.z52                        -0.2230
+Z.z33                         0.2305
+Z.z43                        -0.1225
+Z.z53                         0.3887
+R.(Cryptomonas,Cryptomonas)   0.6705
+R.(Diatoms,Diatoms)           0.0882
+R.(Greens,Greens)             0.7201
+R.(Unicells,Unicells)         0.1865
+R.(Other.algae,Other.algae)   0.5441
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+
+Convergence warnings
+10 warnings. First 10 shown.  Type cat(object$errors) to see the full list.
+ Warning: the  Z.z51  parameter value has not converged.
+ Warning: the  Z.z32  parameter value has not converged.
+ Warning: the  Z.z52  parameter value has not converged.
+ Warning: the  Z.z33  parameter value has not converged.
+ Warning: the  Z.z43  parameter value has not converged.
+ Warning: the  R.(Diatoms,Diatoms)  parameter value has not converged.
+ Warning: the  R.(Greens,Greens)  parameter value has not converged.
+ Warning: the  R.(Other.algae,Other.algae)  parameter value has not converged.
+ Warning: the  logLik  parameter value has not converged.
+ Type MARSSinfo("convergence") for more info on this warning.
+\end{Soutput}
+\end{Schunk}

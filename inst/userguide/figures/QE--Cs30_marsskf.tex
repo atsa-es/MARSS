@@ -1,0 +1,29 @@
+\begin{Schunk}
+\begin{Sinput}
+ kf <- MARSSkf(kem)
+ names(kf)
+\end{Sinput}
+\begin{Soutput}
+ [1] "xtT"        "VtT"        "Vtt1T"      "x0T"       
+ [5] "V0T"        "x01T"       "V10T"       "x00T"      
+ [9] "V00T"       "Vtt"        "Vtt1"       "J"         
+[13] "J0"         "Kt"         "xtt1"       "xtt"       
+[17] "Innov"      "Sigma"      "kfas.model" "logLik"    
+[21] "ok"         "errors"    
+\end{Soutput}
+\begin{Sinput}
+ # if you only need the logLik, 
+ MARSSkf(kem, only.logLik = TRUE)
+\end{Sinput}
+\begin{Soutput}
+$logLik
+[1] -30.98719
+\end{Soutput}
+\begin{Sinput}
+ # or
+ logLik(kem)
+\end{Sinput}
+\begin{Soutput}
+'log Lik.' -30.98719 (df=5)
+\end{Soutput}
+\end{Schunk}

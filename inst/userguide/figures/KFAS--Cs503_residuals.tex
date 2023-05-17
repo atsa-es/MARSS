@@ -1,0 +1,28 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model)
+ resid_kfas <- rstandard(kfs,
+   type = "recursive",
+   standardization_type = "cholesky"
+ )
+ resid_marss <- residuals(fit_marss,
+   type = "tt1",
+   standardization = "Cholesky"
+ )
+ resid_marss <- subset(resid_marss, name == "model")
+ df <- cbind(
+   MARSS = resid_marss$.std.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+         MARSS      KFAS
+[1,] 5.9974062 5.9974062
+[2,] 5.0412268 5.0412268
+[3,] 2.3111324 2.3111324
+[4,] 2.2420611 2.2420611
+[5,] 0.9829438 0.9829438
+[6,] 0.5111253 0.5111253
+\end{Soutput}
+\end{Schunk}

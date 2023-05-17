@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ mod.nile.stoch <- mod.nile
+ mod.nile.stoch$x0 <- fit_kfas_stoch$model$a1
+ mod.nile.stoch$V0 <- fit_kfas_stoch$model$P1
+ fit_em_stoch <- MARSS(dat, model = mod.nile.stoch, silent = TRUE)
+ fit_bfgs_stoch <- MARSS(dat,
+   model = mod.nile.stoch, inits = inits,
+   method = "BFGS", silent = TRUE
+ )
+\end{Sinput}
+\end{Schunk}

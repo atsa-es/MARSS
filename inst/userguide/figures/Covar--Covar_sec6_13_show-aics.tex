@@ -1,0 +1,19 @@
+\begin{Schunk}
+\begin{Sinput}
+ data.frame(
+   Model = c("Fixed", "Cubic", "Fourier"),
+   AICc = round(c(
+     seas.mod.1$AICc,
+     seas.mod.2$AICc,
+     seas.mod.3$AICc
+   ), 1),
+   stringsAsFactors = FALSE
+ )
+\end{Sinput}
+\begin{Soutput}
+    Model   AICc
+1   Fixed 1188.4
+2   Cubic 1144.9
+3 Fourier 1127.4
+\end{Soutput}
+\end{Schunk}

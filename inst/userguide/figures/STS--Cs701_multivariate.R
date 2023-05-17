@@ -1,0 +1,18 @@
+###################################################
+### code chunk number 29: Cs701_multivariate
+###################################################
+set.seed(100)
+TT <- 60
+t <- 1:TT
+q <- 0.01
+r <- 0.01
+trend <- 0.2 * sin((1:TT) / 4)
+level <- cumsum(rnorm(TT, trend, sqrt(q)))
+
+# Simulated data
+n <- 5
+miss.percent <- 0.5
+ym <- matrix(1, n, 1) %*% level + matrix(rnorm(TT * n, 0, sqrt(r * 100)), n, TT)
+ym[sample(n * TT, miss.percent * n * TT)] <- NA
+
+

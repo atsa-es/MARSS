@@ -1,0 +1,13 @@
+\begin{Schunk}
+\begin{Sinput}
+ mod3.lm <- lm(Employed ~ 1 + GNP.deflator + GNP + Unemployed
+   + Armed.Forces + Population + Year, data = longley)
+ c(coef(mod3.lm), logLik = logLik(mod3.lm))
+\end{Sinput}
+\begin{Soutput}
+  (Intercept)  GNP.deflator           GNP    Unemployed 
+-3.482259e+03  1.506187e-02 -3.581918e-02 -2.020230e-02 
+ Armed.Forces    Population          Year        logLik 
+-1.033227e-02 -5.110411e-02  1.829151e+00  9.066497e-01 
+\end{Soutput}
+\end{Schunk}

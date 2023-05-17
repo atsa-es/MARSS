@@ -1,0 +1,25 @@
+\begin{Schunk}
+\begin{Sinput}
+ conf_marss2_t1 <- predict(fit_marss,
+   type = "ytt1",
+   interval = "confidence", level = 0.95
+ )
+ head(conf_marss2_t1$pred)
+\end{Sinput}
+\begin{Soutput}
+  .rownames t    y   estimate        se      Lo 95
+1      Nile 1 1120    0.00000  31.62278  -61.97950
+2      Nile 2 1160   32.11507 127.20661 -217.20530
+3      Nile 3  963  396.72378 161.74287   79.71359
+4      Nile 4 1210  643.48197 173.12206  304.16897
+5      Nile 5 1160  909.42338 176.38593  563.71332
+6      Nile 6 1160 1029.38565 177.27798  681.92720
+      Hi 95
+1   61.9795
+2  281.4354
+3  713.7340
+4  982.7950
+5 1255.1334
+6 1376.8441
+\end{Soutput}
+\end{Schunk}

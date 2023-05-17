@@ -1,0 +1,16 @@
+\begin{Schunk}
+\begin{Sinput}
+ arima(noisy.data, order = c(2, 0, 2), include.mean = FALSE)
+\end{Sinput}
+\begin{Soutput}
+Call:
+arima(x = noisy.data, order = c(2, 0, 2), include.mean = FALSE)
+
+Coefficients:
+          ar1      ar2     ma1     ma2
+      -1.4448  -0.6961  0.9504  0.3428
+s.e.   0.0593   0.0427  0.0686  0.0482
+
+sigma^2 estimated as 0.9069:  log likelihood = -1368.99,  aic = 2747.99
+\end{Soutput}
+\end{Schunk}

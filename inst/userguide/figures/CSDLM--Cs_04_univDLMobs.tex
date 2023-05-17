@@ -1,0 +1,10 @@
+\begin{Schunk}
+\begin{Sinput}
+ # for observation eqn
+ Z <- array(NA, c(1, m, TT)) # NxMxT; empty for now
+ Z[1, 1, ] <- rep(1, TT) # Nx1; 1's for intercept
+ Z[1, 2, ] <- CUI.z # Nx1; regr variable
+ A <- matrix(0) # 1x1; scalar = 0
+ R <- matrix("r") # 1x1; scalar = r
+\end{Sinput}
+\end{Schunk}

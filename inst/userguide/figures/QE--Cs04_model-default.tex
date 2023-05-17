@@ -1,0 +1,39 @@
+\begin{Schunk}
+\begin{Sinput}
+ kem <- MARSS(dat)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 38 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 38 iterations. 
+Log-likelihood: 19.13428 
+AIC: -6.268557   AICc: 3.805517   
+ 
+                    Estimate
+R.diag               0.00895
+U.X.SJF              0.06839
+U.X.SJI              0.07163
+U.X.EBays            0.04179
+U.X.PSnd             0.05226
+U.X.HC              -0.00279
+Q.(X.SJF,X.SJF)      0.03205
+Q.(X.SJI,X.SJI)      0.01098
+Q.(X.EBays,X.EBays)  0.00706
+Q.(X.PSnd,X.PSnd)    0.00414
+Q.(X.HC,X.HC)        0.05450
+x0.X.SJF             5.98647
+x0.X.SJI             6.72487
+x0.X.EBays           6.66212
+x0.X.PSnd            5.83969
+x0.X.HC              6.60482
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

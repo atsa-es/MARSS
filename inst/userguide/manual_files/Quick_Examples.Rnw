@@ -1,0 +1,519 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/QE-, eps=FALSE, split=TRUE}
+\chapter{Short Examples}
+\label{chap:Examples}
+\chaptermark{Examples}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Quick\_Examples.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
+
+<<RUNFIRST, echo=FALSE, include.source=FALSE>>=
+library(MARSS)
+options(prompt = " ", continue = " ", width = 60)
+@
+<<Cs00_load_library, echo=FALSE>>=
+library(MARSS)
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this chapter, we work through a series of short examples to illustrate the \{MARSS\} package functions.  This chapter is oriented towards those who are already somewhat familiar with multivariate (or vector) autoregressive state-space (MARSS or VARSS) models and want to get started quickly.  We provide little explanatory text.  Those unfamiliar with MARSS (or VARSS) models might prefer to start with the application chapters. 
+
+In these examples, we will use the default \verb@form="marxss"@ argument for a \verb@MARSS()@ call.  This specifies a MARSS model of the form:
+\begin{subequations}\label{eqn:marss.qe}
+\begin{gather}
+\xx_t = \BB_t\xx_{t-1} + \uu_t + \CC_t\cc_t + \GG_t\ww_t, \text{ where } \ww_t \sim \MVN(0,\QQ_t)\\
+\yy_t = \ZZ_t\xx_t + \aa_t + \DD_t\dd_t + \HH_t\vv_t, \text{ where } \vv_t \sim \MVN(0,\RR_t)\\
+\xx_1 \sim \MVN(\pipi,\LAM) \text{ or } \xx_0 \sim \MVN(\pipi,\LAM)
+\end{gather}
+\end{subequations} 
+The $\cc$ and $\dd$ are inputs (not estimated).  In the examples here, we leave off $\cc$ and $\dd$.  We address including inputs only briefly at the end of the chapter.  See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  We will also not use $\GG_t$ or $\HH_t$ in this chapter. 
+
+\subsection{Output from model fits}
+
+\{MARSS\} provides the following functions for output from fitted model objects. These functions output data frames in long form. There are companion functions which return the same information as lists in matrix form.
+
+\begin{itemize}
+\item \verb@fitted(fit)@ Model and state fitted values (predictions). This is the right-side of the $\yy$ and $\xx$ equations without the error terms. Will return confidence and prediction intervals.
+\item \verb@tidy(fit)@ Parameter estimates and confidence intervals.\index{fitted values}
+\item \verb@logLik(fit)@, \verb@AIC(fit)@ Log-likelihood and AIC.\index{likelihood}\index{AIC}
+\item \verb@residuals(fit)@ Innovations, smoothations, and contemporaneous model and state residuals.\index{residuals}
+\item \verb@predict(fit)@, \verb@forecast(fit)@ Predictions and forecasts. Use \verb@?predict.marssMLE@ for information. \verb@ggplot2::autoplot(fr)@, where \verb@fr <- forecast(fit)@, plots the forecasts.\index{plotting!predictions}\index{forecasting}
+\item \verb@plot(fit)@, \verb@ggplot2::autoplot(fit)@ A series of informative and diagnostic plots. Individual plots can be selected.\index{plotting}
+\item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"xtT"@, \verb@"xtt"@ or \verb@"xtt1@.  Kalman filter and smoother output. Expected value of $\XX$ (states) conditioned on all data, data 1 to $t$ or data 1 to $t-1$. \verb@MARSSkf(fit)@ returns the same in a list of matrices.\index{Kalman filter and smoother}
+\item \verb@stats::tsSmooth(fit, type=...)@, with \verb@...@ equal to \verb@"ytT"@, \verb@"ytt"@ or \verb@"ytt1@. These are the expected values of the y (left side of the y equation with the error terms). \verb@MARSShatyt(fit)@ returns the same in matrix form. Analogous to \verb@MARSSkf(fit)@ but for the $\yy$ equation. Most users will likely want \verb@fitted()@ which is the model fitted values (expected value of the right side of the $\yy$ equation without the error term).
+\end{itemize}
+
+\section{Fixed and estimated elements in parameter matrices}
+Suppose one has a MARSS model (Equation \ref{eqn:marss.qe}) with the following structure:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\end{bmatrix}
+= \begin{bmatrix}b_1&0.1\\b_2&2\end{bmatrix}
+\begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\end{bmatrix}
++ \begin{bmatrix}u\\u\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\end{bmatrix},
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\end{bmatrix},\begin{bmatrix}q_1&q_3\\q_3&q_2\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\end{bmatrix}
+= \begin{bmatrix}z_1&0\\z_2&z_2\\0&3\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\end{bmatrix},
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\\0\end{bmatrix},\begin{bmatrix}r&0&0\\0&r&0\\0&0&1\end{bmatrix} \end{pmatrix}  \\
+\xx_0 \sim \MVN\begin{pmatrix}\begin{bmatrix}\pi_1\\ \pi_2\end{bmatrix},\begin{bmatrix}1&0\\0&1\end{bmatrix} \end{pmatrix} 
+\end{gather*}
+Notice how this model mixes fixed values, estimated values and shared values.
+
+In MARSS, model structure is specified using a list with the names, \verb@Z@, \verb@A@, \verb@R@, \verb@B@, \verb@U@, \verb@Q@, \verb@x0@ and \verb@V0@.  Each element is matrix (class matrix) with the same dimensions as the matrix of the same name in the MARSS model.  \{MARSS\} distinguishes between the estimated and fixed values in a matrix by using a list matrix in which you can have numeric and character elements.  Numeric elements are fixed; character elements are names of things to be estimated.  The model above would be specified as:
+<<Cs01_model-gen-spec, eval=TRUE>>=
+Z <- matrix(list("z1", "z2", 0, 0, "z2", 3), 3, 2)
+A <- matrix(0, 3, 1)
+R <- matrix(list(0), 3, 3)
+diag(R) <- c("r", "r", 1)
+B <- matrix(list("b1", 0.1, "b2", 2), 2, 2)
+U <- matrix(c("u", "u"), 2, 1)
+Q <- matrix(c("q1", "q3", "q3", "q2"), 2, 2)
+x0 <- matrix(c("pi1", "pi2"), 2, 1)
+V0 <- diag(1, 2)
+model.gen <- list(Z = Z, A = A, R = R, B = B, U = U, 
+                  Q = Q, x0 = x0, V0 = V0, tinitx = 0)
+@
+Notice that there is a one-to-one correspondence between the model list in \R and the model on paper.  Fitting the model is then just a matter of passing the data and model list to the \verb@MARSS@ function:
+<<Cs02_model-general, eval=FALSE, keep.source=TRUE>>=
+kem <- MARSS(dat, model = model.gen)
+@
+
+\index{troubleshooting!sensitivity to x0 prior}If you work often with MARSS models then you will probably know whether prior sensitivity is a problem for your types of MARSS applications.  If so, note that the \{MARSS\} package is unusual in that it allows you to set $\LAM=0$ and treat $\pipi$ (initial $\xx$) as an unknown estimated parameter\index{prior}.  This eliminates the prior and thus the prior sensitivity problems---at the cost of adding $m$ parameters.  Depending on your application, you may need to set the initial conditions at $t=1$ instead of the default of $t=0$.  If you are unsure, look in the index and read all the sections that talk about troubleshooting priors.
+
+\section{Different numbers of state processes}
+Here we show a series of short examples using a dataset on Washington harbor seals (\verb@?harborSealWA@), which has five observation time series.   The dataset is a little unusual in that it has four missing years from years 2 to 5.  This causes some interesting issues with prior specification.  Before starting the harbor seal examples, we set up the data, making time go across the columns and removing the year column:
+<<Cs03_enterdata, include.source=FALSE, keep.source=T>>=
+dat <- t(harborSealWA)
+dat <- dat[2:nrow(dat), ] # remove the year row
+@
+
+\subsection{One hidden state process for each observation time series}
+This is the default model for the \verb@MARSS()@ function.  In this case, $n=m$, the observation errors are i.i.d. and the process errors are independent and have different variances.  The elements in $\uu$ are all different (meaning, they are not forced to be the same).  Mathematically, the MARSS model being fit is:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\\x_{3,t-1}\\x_{4,t-1}\\x_{5,t-1}\end{bmatrix}
++ \begin{bmatrix}u_1\\u_2\\u_3\\u_4\\u_5\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\\w_{3,t}\\w_{4,t}\\w_{5,t}\end{bmatrix},
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix},\begin{bmatrix}q_1&0&0&0&0\\0&q_2&0&0&0\\0&0&q_3&0&0\\0&0&0&q_4&0\\0&0&0&0&q_5\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix},
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix}\begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix},\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+This is the default model, so you can fit it by simply passing \verb@dat@ to \verb@MARSS()@\index{functions!MARSS}.  
+<<Cs04_model-default, include.source=FALSE, keep.source=TRUE>>=
+kem <- MARSS(dat)
+@
+The output warns you that the convergence tolerance is high.  You can set it lower by passing in \verb@control=list(conv.test.slope.tol=0.1)@.  \verb@MARSS()@ is automatically creating parameter names since you did not tell it the names. To see exactly where each parameter element appears in its parameter matrix, type \verb@summary(kem$model)@.
+ 
+ Though it is not necessary to specify the model for this example since it is the default, here is how you could do so using matrices: 
+<<Cs05_B-setup, eval=FALSE>>=
+B <- Z <- diag(1, 5)
+U <- matrix(c("u1", "u2", "u3", "u4", "u5"), 5, 1)
+x0 <- A <- matrix(0, 5, 1)
+R <- Q <- matrix(list(0), 5, 5)
+diag(R) <- "r"
+diag(Q) <- c("q1", "q2", "q3", "q4", "q5")
+@
+Notice that when a matrix has both fixed and estimated elements (like $\RR$ and $\QQ$), a list matrix is used to allow you to specify the fixed elements as numeric and to give the estimated elements character names.
+<<Cs06_model-default-time, echo=FALSE, results=hide>>=
+kem.time <- system.time(MARSS(dat, silent = TRUE))
+@
+
+The default MLE method is the EM algorithm (\verb@method="kem"@).  You can also use a quasi-Newton method\index{estimation!quasi-Newton} (BFGS) 
+by setting \verb@method="BFGS"@\index{estimation!BFGS}.  
+<<Cs07_model-bfgs, include.source=FALSE>>=
+bfgs <- MARSS(dat, method = "BFGS")
+@
+<<Cs08_model-bfgs-time, echo=FALSE, results=hide>>=
+bfgs.time <- system.time(MARSS(dat, silent = TRUE, method = "BFGS"))
+@
+Using the default EM convergence criteria, the EM algorithm stops at a log-likelihood a little lower than the BFGS algorithm does, but the EM algorithm was faster, $\Sexpr{ round(bfgs.time[1]/kem.time[1],1) }$ times faster, in this case.
+If you wanted to use the EM fit as the initial conditions\index{initial conditions!setting for BFGS}, pass in the \verb@inits@ argument using the \verb@$par@ element (or \verb@coef(fit,form="marss")@) of the EM fit.  
+<<Cs09_model-bfgs2, keep.source=TRUE, results=hide >>=
+bfgs2 <- MARSS(dat, method = "BFGS", inits = kem$par)
+@
+The BFGS algorithm now converges in $\Sexpr{ bfgs2$numIter }$ iterations. Output not shown.
+
+\index{troubleshooting!sensitivity to x0 prior}We mentioned that the missing years from year 2 to 4 creates an interesting issue with the prior specification. The default behavior of MARSS is to treat the initial state as at $t=0$ instead of $t=1$. Usually this doesn't make a difference, but for this dataset, if we set the prior at $t=1$, the MLE estimate of $\RR$ becomes 0.  If we estimate $\xx_1$ as a parameter and let $\RR$ go to 0, the likelihood will go to infinity (slowly but surely)\index{prior!troubleshooting}.  This is neither an error nor a pathology, but is probably not what you would like to have happen.   Note that the BFGS algorithm will not find the maximum in this case; it will stop before $\RR$ gets small and the likelihood gets very large.   However, the EM algorithm will climb up the peak.  You can try it by running the following code.  It will report warnings which you can read about in Appendix \ref{app:warnings}.
+<<Cs10_model-default, eval=FALSE, keep.source=TRUE>>=
+kem.strange <- MARSS(dat, model = list(tinitx = 1))
+@
+
+\subsection{Five correlated hidden state processes}
+This is the same model except that the five hidden states have correlated process errors.  Mathematically, this is the model:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
+= \begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\\x_{3,t-1}\\x_{4,t-1}\\x_{5,t-1}\end{bmatrix}
++ \begin{bmatrix}u_1\\u_2\\u_3\\u_4\\u_5\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\\w_{3,t}\\w_{4,t}\\w_{5,t}\end{bmatrix}, 
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix}0,
+ \begin{bmatrix}q_1&c_{1,2}&c_{1,3}&c_{1,4}&c_{1,5}\\c_{1,2}&q_2&c_{2,3}&c_{2,4}&c_{2,5}\\
+ c_{1,3}&c_{2,3}&q_3&c_{3,4}&c_{3,5}\\c_{1,4}&c_{2,4}&c_{3,4}&q_4&c_{4,5}\\
+ c_{1,5}&c_{2,5}&c_{3,5}&c_{4,5}&q_5\end{bmatrix} \end{pmatrix} \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix}, 
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+$\BB$ is not shown in the top equation; it is a $m \times m$ identity matrix.  To fit, use \verb@MARSS()@\index{functions!MARSS} with the \verb@model@ argument set (output not shown).
+<<Cs11_model-corr1, keep.source=TRUE, results=hide>>=
+kem <- MARSS(dat, model = list(Q = "unconstrained"))
+@
+This shows one of the text shortcuts, \verb@"unconstrained"@, which means estimate all elements in the matrix.  This shortcut can be used for all parameter matrices.  
+
+\subsection{Five equally correlated hidden state processes}
+This is the same model except that now there is only one process error variance and one process error covariance.  Mathematically, the model is:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
+= \begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\\x_{3,t-1}\\x_{4,t-1}\\x_{5,t-1}\end{bmatrix}
++ \begin{bmatrix}u_1\\u_2\\u_3\\u_4\\u_5\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\\w_{3,t}\\w_{4,t}\\w_{5,t}\end{bmatrix},
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix} 0,
+ \begin{bmatrix}q&c&c&c&c\\c&q&c&c&c\\c&c&q&c&c\\c&c&c&q&c\\c&c&c&c&q\end{bmatrix} \end{pmatrix} \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix},
+ \textrm{  } \vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+Again $\BB$ is not shown in the top equation; it is a $m \times m$ identity matrix.  To fit, use the following code (output not shown):
+<<Cs12_model-corr2, include.source=F, keep.source=T, results=hide>>=
+kem <- MARSS(dat, model = list(Q = "equalvarcov"))
+@
+The shortcut `\verb@"equalvarcov"@ means one value on the diagonal and one on the off-diagonal.  It can be used for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
+
+\subsection{Five hidden state processes with a ``north'' and a ``south'' $\uu$ and $\QQ$ elements}
+Here we fit a model with five independent hidden states where each observation time series is an independent observation of a different hidden trajectory
+but the hidden trajectories 1-3 share their $\uu$ and $\QQ$ elements, while hidden trajectories 4-5 share theirs.  This is the model:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
+= \begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\\x_{3,t-1}\\x_{4,t-1}\\x_{5,t-1}\end{bmatrix}
++ \begin{bmatrix}u_n\\u_n\\u_n\\u_s\\u_s\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\\w_{3,t}\\w_{4,t}\\w_{5,t}\end{bmatrix},  
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}q_n&0&0&0&0\\0&q_n&0&0&0\\0&0&q_n&0&0\\0&0&0&q_s&0\\0&0&0&0&q_s\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix},
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+To fit we use the following code:  
+<<Cs13_model-u-NS, keep.source=TRUE, results=hide>>=
+regions <- list("N", "N", "N", "S", "S")
+U <- matrix(regions, 5, 1)
+Q <- matrix(list(0), 5, 5)
+diag(Q) <- regions
+kem <- MARSS(dat, model = list(U = U, Q = Q))
+@
+Only $\uu$ and $\QQ$ need to be specified since the other parameters are at their default values.  
+
+\subsection{Fixed observation error variance}
+Here we fit the same model but with a known observation error variance.  This is the model:
+\begin{gather*}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
+= \begin{bmatrix}x_{1,t-1}\\x_{2,t-1}\\x_{3,t-1}\\x_{4,t-1}\\x_{5,t-1}\end{bmatrix}
++ \begin{bmatrix}u_n\\u_n\\u_n\\u_s\\u_s\end{bmatrix}
++ \begin{bmatrix}w_{1,t}\\w_{2,t}\\w_{3,t}\\w_{4,t}\\w_{5,t}\end{bmatrix},
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}q_n&0&0&0&0\\0&q_n&0&0&0\\0&0&q_n&0&0\\0&0&0&q_s&0\\0&0&0&0&q_s\end{bmatrix} \end{pmatrix}  \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0&0&0&0\\0&1&0&0&0\\0&0&1&0&0\\0&0&0&1&0\\0&0&0&0&1\end{bmatrix}
+\begin{bmatrix}x_{1,t}\\x_{2,t}\\x_{3,t}\\x_{4,t}\\x_{5,t}\end{bmatrix}
++ \begin{bmatrix}0\\0\\0\\0\\0\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix},  \\
+\\
+\vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}0.01&0&0&0&0\\0&0.01&0&0&0\\0&0&0.01&0&0\\0&0&0&0.01&0\\0&0&0&0&0.01\end{bmatrix} \end{pmatrix} \\
+\end{gather*}
+To fit this model, use the following code (output not shown):\index{functions!MARSS}
+<<Cs14_model-u-NS-fixR, keep.source=TRUE, results=hide>>=
+regions <- list("N", "N", "N", "S", "S")
+U <- matrix(regions, 5, 1)
+Q <- matrix(list(0), 5, 5)
+diag(Q) <- regions
+R <- diag(0.01, 5)
+kem <- MARSS(dat, model = list(U = U, Q = Q, R = R))
+@
+
+\subsection{One hidden state and five i.i.d. observation time series}
+Instead of five hidden state trajectories, we specify that there is only one and all the observations are observing that one trajectory. Mathematically, the model is:
+\begin{gather*}
+x_{t}= x_{t-1} + u + w_{t}, \text{ } w_t \sim \N(0,q)  \\  \\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1\\1\\1\\1\\1\end{bmatrix}
+x_{t} + \begin{bmatrix}0\\a_2\\a_3\\a_4\\a_5\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix},
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+Note the default model for $\RR$ is \verb@"diagonal and equal"@' so we can leave this off when specifying the \verb@model@ argument.  To fit, use this code (output not shown):
+<<Cs15_model-pan1, keep.source=TRUE>>=
+Z <- factor(c(1, 1, 1, 1, 1))
+kem <- MARSS(dat, model = list(Z = Z))
+@
+You can also pass in $\ZZ$ exactly as it is in the equation: \verb@Z=matrix(1,5,2)@, but the factor shorthand is handy if you need to assign different observed time series to different underlying state time series (see next examples).   The default $\aa$ form is \verb@"scaling"@, which means that the first $\yy$ row associated with a given $x$ has $a=0$ and the rest are estimated.
+
+\subsection{One hidden state and five independent observation time series with different variances}
+Mathematically, this model is:
+\begin{gather*}
+x_{t}= x_{t-1} + u + w_{t}, \text{ } w_t \sim \N(0,q)  \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1\\1\\1\\1\\1\end{bmatrix}
+x_{t} + \begin{bmatrix}0\\a_2\\a_3\\a_4\\a_5\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix}, 
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix} 0,\begin{bmatrix}r_1&0&0&0&0\\0&r_2&0&0&0\\0&0&r_3&0&0\\0&0&0&r_4&0\\0&0&0&0&r_5\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+To fit this model:  \index{functions!MARSS}
+<<Cs16_model-pan2, keep.source=TRUE>>=
+Z <- factor(c(1, 1, 1, 1, 1))
+R <- "diagonal and unequal"
+kem <- MARSS(dat, model = list(Z = Z, R = R))
+@
+
+\subsection{Two hidden state processes}
+Here we fit a model with two hidden states (north and south) where observation time series 1-3 are for the north and 4-5 are for the south.  We make the hidden state processes independent (meaning a diagonal $\QQ$ matrix) but with the same process variance.  We make the observation errors i.i.d. (the default) and the $\uu$ elements equal.  Mathematically, this is the model:
+\begin{gather*}
+\begin{bmatrix}x_{n,t}\\x_{s,t}\end{bmatrix}
+= \begin{bmatrix}x_{n,t-1}\\x_{s,t-1}\end{bmatrix}
++ \begin{bmatrix}u\\u\end{bmatrix}
++ \begin{bmatrix}w_{n,t}\\w_{s,t}\end{bmatrix},   
+ \textrm{ } \ww_t \sim \MVN\begin{pmatrix} 0,
+ \begin{bmatrix}q&0\\0&q\end{bmatrix} \end{pmatrix} \\
+\\
+\begin{bmatrix}y_{1,t}\\y_{2,t}\\y_{3,t}\\y_{4,t}\\y_{5,t}\end{bmatrix}
+= \begin{bmatrix}1&0\\1&0\\1&0\\0&1\\0&1\end{bmatrix}
+\begin{bmatrix}x_{n,t}\\x_{s,t}\end{bmatrix}
++ \begin{bmatrix}0\\a_2\\a_3\\0\\a_5\end{bmatrix}
++ \begin{bmatrix}v_{1,t}\\ v_{2,t}\\ v_{3,t}\\ v_{4,t}\\ v_{5,t}\end{bmatrix}, 
+ \textrm{ } \vv_t \sim \MVN\begin{pmatrix}0,\begin{bmatrix}r&0&0&0&0\\0&r&0&0&0\\0&0&r&0&0\\0&0&0&r&0\\0&0&0&0&r\end{bmatrix} \end{pmatrix}  \\
+\end{gather*}
+To fit the model, use the following code (output not shown):
+<<Cs17_model-two1, keep.source=TRUE, results=hide>>=
+Z <- factor(c("N", "N", "N", "S", "S"))
+Q <- "diagonal and equal"
+U <- "equal"
+kem <- MARSS(dat, model = list(Z = Z, Q = Q, U = U))
+@
+You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples).  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
+
+\section{Linear constraints}
+
+Your model can have simple linear constraints within all the parameters except $\QQ$, $\RR$ and $\LAM$.  For example $1+2a-3b$ is a linear constraint. When entering this value for your matrix, you specify this as \verb@"1+2*a+-3*b"@. NOTE: $+$'s join parts so use \verb@"+-3*b"@ to specify $-3b$. Anything after \verb@*@ is a parameter. So \verb@1*1@ has a parameter called \verb@"1"@. Example, let's specify the following $\BB$, $\QQ$ and $\ZZ$ matrices:
+\begin{equation*}
+\UU = \begin{bmatrix}u-0.1\\ u+0.1\end{bmatrix}\quad
+\QQ = \begin{bmatrix}q_{11}&0\\ 0.01&0\end{bmatrix}\quad
+\ZZ = \begin{bmatrix}z_1-z_2&2z_1\\ 0&z_1\\ z_2&0 \\ 0&z_3 \\ 0&1+z_3\end{bmatrix}
+\end{equation*}
+
+This would be specified as (notice \verb@"1*z1+-1*z2"@ for $z_1-z_2$):
+<<model.spec2, eval=FALSE>>=
+U <- matrix(list("-0.1+1*u","0.1+1*u"),2,1)
+Q <- matrix(list("q11",0,0,0.01),2,2)
+Z <- matrix(list("1*z1+-1*z2",0,"z2",0,0,"2*z1","z1",0,"z3","1+z3"),5,2)
+@
+We need to fix $\AA$ if $\ZZ$ is estimated.
+<<Cs17_model-two2, keep.source=TRUE, results=hide>>=
+kem <- MARSS(dat, model = list(Z = Z, Q = Q, U = U, A="zero"))
+@
+
+\section{Time-varying parameters}
+Time-varying parameters are specified by passing in an array of matrices (list, numeric or character) where the 3rd dimension of the array is time and must be the same value as the 2nd (time) dimension of the data matrix.  No text shortcuts are allowed for time-varying parameters; you need to use the matrix form.
+
+For example, let's say we wanted a different $\uu$ for the first half versus second half of the harbor seal time series.  We would pass in an array for $\uu$ as follows:
+<<Cs18_model-time-varying, keep.source=TRUE, results=hide>>=
+U1 <- matrix("t1", 5, 1)
+U2 <- matrix("t2", 5, 1)
+Ut <- array(U2, dim = c(dim(U1), dim(dat)[2]))
+TT <- dim(dat)[2]
+Ut[, , 1:floor(TT / 2)] <- U1
+kem.tv <- MARSS(dat, model = list(U = Ut, Q = "diagonal and equal"))
+@
+You can have some elements in a parameter matrix be time-constant and some be time-varying:
+<<Cs19b_model-time-varying2, keep.source=TRUE, results=hide>>=
+U1 <- matrix(c(rep("t1", 4), "hc"), 5, 1)
+U2 <- matrix(c(rep("t2", 4), "hc"), 5, 1)
+Ut <- array(U2, dim = c(dim(U1), dim(dat)[2]))
+Ut[, , 1:floor(TT / 2)] <- U1
+kem.tv <- MARSS(dat, model = list(U = Ut, Q = "diagonal and equal"))
+@
+Note that how the time-varying model is specified for MARSS is the same as you would write the time-varying model on paper in matrix math form.
+
+\section{Including inputs (or covariates)}
+\index{covariates}
+In MARSS models with covariates, the covariates are often treated as inputs and appear as either the $\cc$ or $\dd$ in Equation \ref{eqn:marss.qe}, depending on the application. However, more generally, $\cc$ and $\dd$ are simply inputs that are fully-known (no missing values). $\cc_t$ is the $p \times 1$ vector of inputs at time $t$ which affect the states and $\dd_t$ is a $q \times 1$ vector of inputs (potentially the same as $\cc_t$), which affect the observations.   
+
+$\CC_t$ is an $m \times p$ matrix of coefficients relating the effects of $\cc_t$ to the $m \times 1$ state vector $\xx_t$, and $\DD_t$ is an $n \times q$ matrix of coefficients relating the effects of $\dd_t$ to the $n \times 1$ observation vector $\yy_t$.  The elements of $\CC$ and $\DD$ can be estimated, and their form is specified much like the other matrices.
+
+With the \verb@MARSS()@ function, one can fit a model with inputs by simply passing in \verb@model$c@ and/or \verb@model$d@ in the \verb@MARSS()@ call as a $p \times T$ or $q \times T$ matrix, respectively.  The form for $\CC_t$ and $\DD_t$ is similarly specified by passing in \verb@model$C@ and/or \verb@model$D@.  If $\CC$ and $\DD$ are not time-varying, they are passed in as a 2-dimensional matrix.  If they are time-varying, they must be passed in as an 3-dimensional array with the 3rd dimension equal to the number of time steps.
+
+See Chapter \ref{chap:covariates} for extended examples of including covariates as inputs in a MARSS model.  Also note that it is not necessary to have your covariates appear in $\cc$ and/or $\dd$.  That is a common form, however in some MARSS models, covariates will appear in one of the parameter matrices as fixed values.
+
+\section{Printing and summarizing models and model fits}
+\index{print}\index{functions!print}
+The package includes print functions for marssMODEL objects and marssMLE objects (fitted models).\index{functions!summary}\index{print!marssMODEL}\index{print!marssMLE}
+<<Cs19_model-print, results=hide>>=
+print(kem)
+print(kem$model)
+@
+This will print the basic information on model structure and model fit that you have seen in the previous examples.  The package also includes a summary function for models.
+<<Cs20_model-summary, results=hide>>=
+summary(kem$model)
+@
+Output for the summary function is not shown because it is verbose. It prints each matrix with the fixed elements denoted with their values and the free elements denoted by their names.  This is very helpful for confirming exactly what model structure you are fitting to the data.
+
+The print function will also print various other types of output such as a vector of the estimated parameters, the estimated states, the state standard errors, etc. You use the \verb@what@ argument in the print call to specify the desired output.\index{print!par} Type \verb@?print.MARSS@ to see a list of the types of output that can be printed with a \verb@print@ call.  If you want to use the output from print instead of printing to the console, then assign the print call to a value:\index{print!states}
+<<Cs23_model-print-R>>=
+x <- print(kem, what = "states", silent = TRUE)
+@
+
+The package also includes the common functions for working with the output from fitted models: \verb@residuals(fit)@, \verb@coef(fit)@ (the estimated parameters), \verb@fitted(fit)@, \verb@logLik(fit)@ and \verb@predict(fit)@.
+
+\section{Tidy output}
+
+The \verb@tidy()@ and \verb@glance()@ functions will provide summaries as a data.frame for use in further analyses and for passing to \verb@ggplot()@.\index{tidy}\index{functions!tidy}
+
+<<Cs24_model-tidy-R>>=
+tidy(kem)
+glance(kem)
+@
+
+\section{Confidence intervals on a fitted model}
+\index{confidence intervals!Hessian approximation}
+The function \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} is used to compute confidence intervals with a default $\alpha$ level of 0.05.  The default is to compute approximate confidence intervals using the Hessian matrix (\verb@method="hessian"@).  Confidence intervals can also be computed  via parametric (\verb@method="parametric"@)   or non-parametric (\verb@method="innovations"@)  bootstrapping.  Note, if you want confidence intervals on variances, then it is unwise to use the Hessian approximation as it is symmetric and variances are constrained to be positive.
+
+\subsection{Approximate confidence intervals from the Hessian matrix}
+The default method for \verb@MARSSparamCIs()@ computes approximate confidence intervals using an analytically computed Hessian matrix \citep[section 3.4.5]{Harvey1989}.  The call is:
+<<Cs25_CIs-hessian, include.source=F, keep.source=T>>=
+kem.with.hess.CIs <- MARSSparamCIs(kem)
+@
+See \verb@?MARSShessian@ for a discussion of the Hessian calculations.
+Use \verb@print@ or just type the marssMLE object name to see the confidence intervals:
+<<Cs26_print-CIs>>=
+print(kem.with.hess.CIs)
+@
+
+\subsection{Confidence intervals from a parametric bootstrap}
+\index{confidence intervals!parametric bootstrap}
+Use \verb@method="parametric"@ to use a parametric bootstrap to compute confidence intervals and  bias using a parametric bootstrap. 
+<<Cs27_CIs-pboot, include.source=F, keep.source=T>>=
+kem.w.boot.CIs <- MARSSparamCIs(kem, method = "parametric", nboot = 10)
+# nboot should be more like 1000, but set low for example's sake
+print(kem.w.boot.CIs)
+@
+
+\section{Vectors of just the estimated parameters}
+Often it is useful to have a vector of the estimated parameters.  For example, if you are writing a call to \texttt{optim()}, you will need a 
+vector of just the estimated parameters\index{functions!coef}.  You can use the function \verb@coef()@:
+<<Cs28_parvec, include.source=FALSE, keep.source=TRUE>>=
+parvec <- coef(kem, type = "vector")
+parvec
+@
+If you need the parameters as a matrix, use \verb@type = "matrix"@.
+
+\section{Kalman filter and smoother output}
+All the standard Kalman filter and smoother output (along with the lag-one covariance smoother output) is available using the \verb@tsSmooth()@\index{functions!tsSmooth} and \verb@MARSSkf()@\index{functions!MARSSkf}\index{Kalman filter and smoother}\index{lag-1 covariance smoother} functions.  Read the help file (\verb@?MARSSkf@) for details and meanings of the names in the output list. \verb@tsSmooth()@ returns a data frame in long form. You need to pass in the type of conditioning you want (on all data, data 1 to $t$ or data 1 to $t-1$).
+<<Cs29_tsSmooth, keep.source=TRUE>>=
+df <- tsSmooth(kem)
+head(df)
+@
+\verb@MARSSkf()@ returns a list with all the filter and smoother output (including variance matrices) in matrix and array form.
+<<Cs30_marsskf, keep.source=TRUE>>=
+kf <- MARSSkf(kem)
+names(kf)
+# if you only need the logLik, 
+MARSSkf(kem, only.logLik = TRUE)
+# or
+logLik(kem)
+@
+
+\section{Degenerate variance estimates}\index{troubleshooting!degenerate}
+If your data are short relative to the number of parameters you are estimating, then you are liable to find that some of the variance elements are degenerate (equal to zero).  Try the following:
+<<Cs31_like.kem.degen, include.source=F, keep.source=T>>=
+dat.short <- dat[1:4, 1:10]
+kem.degen <- MARSS(dat.short, control = list(allow.degen = FALSE))
+@
+This will print a warning that the maximum number of iterations was reached before convergence of some of the $\QQ$ parameters.  It might be that if you just ran a few more iterations the variances will converge.  So first try setting \verb@control$maxit@ higher.
+<<Cs32_like.kem200, eval=FALSE, include.source=FALSE, keep.source=TRUE>>=
+kem.degen2 <- MARSS(dat.short, control = list(
+  maxit = 1000,
+  allow.degen = FALSE
+), silent = 2)
+@
+Output not shown, but if you run the code, you will see that some of the $\QQ$ terms are still not converging.  MARSS can detect if a variance is going to zero and it will try zero to see if that has a higher likelihood.  Try removing the \verb@allow.degen=FALSE@ which was turning off this feature.
+<<Cs33_like.kem.allow.degen, include.source=F, keep.source=TRUE>>=
+kem.short <- MARSS(dat.short)
+@
+So three of the four $\QQ$ elements are going to zero.  This often happens when you do not have enough data to estimate both observation and process variance.  
+
+Perhaps we are trying to estimate too many variances.  We can try using only one variance value in $\QQ$ and one $u$ value in $\uu$:
+<<Cs34_like.kem200, include.source=FALSE, keep.source=TRUE>>=
+kem.small <- MARSS(dat.short, model = list(
+  Q = "diagonal and equal",
+  U = "equal"
+))
+@
+No, there are simply not enough data to estimate both process and observation variances.  
+
+\section{Bootstrap parameter estimates}
+\index{bootstrap}
+You can easily produce bootstrap parameter estimates from a fitted model using \verb@MARSSboot()@\index{functions!MARSSboot}: 
+<<Cs35_boot, keep.source=TRUE>>=
+boot.params <- MARSSboot(kem,
+  nboot = 20, output = "parameters", sim = "parametric"
+)$boot.params
+@
+Use \verb@silent=TRUE@ to stop the progress bar from printing. The function will also produce parameter sets generated using the Hessian matrix (\verb@sim="hessian"@) or a non-parametric bootstrap (\verb@sim="innovations"@).
+
+
+\section{Data simulation}\index{simulation}
+\subsection{Simulated data from a fitted MARSS model}
+Data can be simulated from  marssMLE object using \verb@MARSSsimulate()@\index{functions!MARSSsimulate}.
+<<Cs36_sim, include.source=F, keep.source=T>>=
+sim.data <- MARSSsimulate(kem, nsim = 2, tSteps = 100)$sim.data
+@
+Then you might want to estimate parameters from the simulated data.  Above we created two simulated datasets (\texttt{nsim=2}).  We will fit to the first one. Here the default settings for \verb@MARSS()@ are used.
+<<Cs37_sim-fit, include.source=F, keep.source=T, results=hide>>=
+kem.sim.1 <- MARSS(sim.data[, , 1])
+@
+Then we might like to see the likelihood\index{likelihood} of the second set of simulated data under the model fit to the first set of data.  We do that with the Kalman filter function.  This function takes a marssMLE object (as output by say the \verb@MARSS()@ function), and we have to replace the data in kem.sim.1 with the second set of simulated data.\index{likelihood!MARSSkf function}
+<<Cs38_sim-like, include.source=F, keep.source=T>>=
+kem.sim.2 <- kem.sim.1
+kem.sim.2$model$data <- sim.data[, , 2]
+MARSSkf(kem.sim.2)$logLik
+@ 
+
+\section{Bootstrap AIC} 
+The function \verb@MARSSaic()@\index{model selection!MARSSaic function}\index{functions!MARSSaic} computes a bootstrap AIC for model selection purposes.  \verb@output="AICbp"@ will produce a parameter bootstrap\index{model selection!bootstrap AIC, AICbp}.  Use \verb@output="AICbb"@ to produce a non-parametric bootstrap\index{model selection!bootstrap AIC, AICbb} AIC. You will need a large number of bootstraps (\verb@nboot@). We use only 10 bootstraps to show you how to compute AICb with the \{MARSS\} package, but the AICbp estimate will be terrible with this few bootstraps. \verb@nboot@ should be more like 1000.
+<<Cs39_AICb, keep.source=TRUE>>= 
+kem.with.AICb <- MARSSaic(kem,
+  output = "AICbp",
+  Options = list(nboot = 10, silent = TRUE)
+)
+
+print(kem.with.AICb)
+@
+
+
+\section{Convergence}\index{troubleshooting!non-convergence}
+MARSS uses two convergence tests.  The first is
+$$\mathrm{logLik}_{i+1}-\mathrm{logLik}_i < \mathrm{tol}$$
+This is called \verb@abstol@ (meaning absolute tolerance) in the output.  The second is called the \verb@conv.test.slope@. This looks at the slope of the log parameter value (or likelihood) versus log iteration number and asks whether that is close to zero (not changing).  
+
+If you are having trouble getting the model to converge, then start by addressing the following 1) Are you trying to fit a bad model, e.g., fitting a non-stationary model to stationary data or fitting a model that specifies independence of errors or states to data that clearly violate that assumption or fitting a model that implies a particular stationary distribution to data that strongly violate that? 2) Do you have confounded parameters, e.g., two parameters that have the same effect (e.g., effectively two intercepts)?, 3) Are you trying to fit a model to 1 data point somewhere, e.g., in a big multivariate dataset with lots of missing values?  4) How many parameters are you trying to estimate per data point? 5) Check your residuals (look at the QQplots in \verb@plot(fit)@) for normality.  6) Did you do any data transformations that would cause one of the variances to go to zero? Replacing 0s with a constant will do that.  Try replacing them with NAs (missing).  Do you have long strings of constant numbers in your data?  Binned data often look like that, and that will drive $\QQ$ to 0.
+
+<<reset, echo=F, include.source=F>>=
+options(prompt = "> ", continue = " +", width = 120)
+@

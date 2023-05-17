@@ -1,0 +1,92 @@
+---
+title: "Testing prediction plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This is a vignette to run the plotting functions and check that outputs look ok.
+
+Load MARSS and check that I am checking the right version.
+```{r message=FALSE}
+library(MARSS)
+library(ggplot2)
+packageVersion("MARSS")
+```
+
+## marssPredict objects
+
+```{r echo=FALSE}
+# Little harder model
+
+dat <- t(harborSealWA)
+dat <- dat[2:4, ] # remove the year row
+Qvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[1]]
+Bvals <- c("identity", "diagonal and unequal")[1]
+Rvals <- list("unconstrained", "diagonal and equal", "equalvarcov", "zero")[[2]]
+plottypes <- eval(formals(MARSS:::autoplot.marssMLE)$plot.type)
+plottypes <- plottypes[!(plottypes %in% c("residuals", "all"))]
+
+for (Q in Qvals) {
+  for (B in Bvals) {
+    for (R in Rvals) {
+      if (B == "diagonal and unequal" && (is.list(Q) || is.list(R))) next
+      mod <- list(Q = Q, Z = "identity", R = R, B = B, U = "zero", x0 = dat[, 1, drop = FALSE] * 1.1)
+      if (B != "identity" && R != "zero") mod$tinitx <- 1
+      if (Q == "zero" && R == "zero") next
+      if (Q == "zero" && B != "identity") next
+      kemfit1 <- MARSS(dat, model = mod, silent = TRUE)
+    }}}
+```
+
+```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+      for(interval in c("none", "confidence", "prediction")){
+        for(type in c("ytt1", "ytT", "xtT", "ytt", "xtt1")){
+          for(h in c(0, 10)){
+          pred <- predict(kemfit1, type=type, interval=interval, n.ahead=h)
+          plot(pred)
+          p <- autoplot(pred)
+          print(p)
+        }
+        }
+      }
+```
+
+## newdata
+
+```{r echo=FALSE}
+# Covariate example
+fulldat <- lakeWAplanktonTrans
+years <- fulldat[,"Year"]>=1965 & fulldat[,"Year"]<1975
+dat <- t(fulldat[years,c("Greens", "Bluegreens")])
+dat <- zscore(dat)
+covariates <- rbind(
+  Temp = fulldat[years, "Temp"],
+  TP = fulldat[years, "TP"])
+covariates <- zscore(covariates)
+A <- U <- "zero"
+B <- Z <- "identity"
+R <- diag(0.16,2)
+Q <- "equalvarcov"
+C <- "unconstrained"
+model.list <- list(B=B,U=U,Q=Q,Z=Z,A=A,R=R,C=C,c=covariates)
+fit <- MARSS(dat, model=model.list, silent=TRUE)
+```
+
+
+```{r echo=FALSE, fig.hold=TRUE, out.width="50%"}
+      for(interval in c("none", "confidence", "prediction")){
+        for(type in c("ytt1", "ytT", "xtT", "ytt", "xtt1")){
+          for(x0 in list("use.model", "reestimate", matrix(0,2,1))){
+          pred <- predict(fit,  newdata=list(y=dat[,1:10], c=matrix(5,2,10)), x0=x0, type=type, interval=interval)
+          plot(pred)
+          p <- autoplot(pred)
+          print(p)
+        }
+        }
+      }
+```
+
+

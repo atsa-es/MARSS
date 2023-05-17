@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(cbind(
+   true = true.3[c("b1", "b2", "b3", "q")],
+   estimates.no.miss = coef(ar3, type = "vector")
+ ))
+\end{Sinput}
+\begin{Soutput}
+    true estimates.no.miss
+b1 -1.50        -1.5130316
+b2 -0.75        -0.6755283
+b3  0.05         0.1368458
+q   1.00         1.1267684
+\end{Soutput}
+\end{Schunk}

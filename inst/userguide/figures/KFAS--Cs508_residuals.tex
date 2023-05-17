@@ -1,0 +1,22 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model, smoothing = "disturbance")
+ resid_kfas <- residuals(kfs, type = "state")
+ resid_marss <- residuals(fit_marss, type = "tT")
+ resid_marss <- subset(resid_marss, name == "state")
+ df <- cbind(
+   MARSS = resid_marss$.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+         MARSS      KFAS
+[1,] 505.25604 505.25604
+[2,] 240.17420 240.17420
+[3,] 171.39008 171.39008
+[4,]  68.65598  68.65598
+[5,]  19.20019  19.20019
+[6,] -21.63444 -21.63444
+\end{Soutput}
+\end{Schunk}

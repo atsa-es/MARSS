@@ -1,0 +1,11 @@
+\begin{Schunk}
+\begin{Sinput}
+ covariates <- rbind(
+   Temp = fulldat[years, "Temp"],
+   TP = fulldat[years, "TP"]
+ )
+ # demean the covariates
+ the.mean <- apply(covariates, 1, mean, na.rm = TRUE)
+ covariates <- covariates - the.mean
+\end{Sinput}
+\end{Schunk}

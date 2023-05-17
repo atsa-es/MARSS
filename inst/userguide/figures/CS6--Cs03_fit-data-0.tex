@@ -1,0 +1,17 @@
+\begin{Schunk}
+\begin{Sinput}
+ # The data is in a ts format, and we need a matrix
+ dat <- t(as.matrix(Nile))
+ rownames(dat) <- "Nile"
+ kem.0 <- MARSS(dat, model = mod.nile.0, silent = TRUE)
+ summary(kem.0)
+\end{Sinput}
+\begin{Soutput}
+m: 1 state process(es) named X.Nile
+n: 1 observation time series named Nile
+
+  term estimate
+1  R.r 28351.57
+2 x0.a   919.35
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,20 @@
+\begin{Schunk}
+\begin{Sinput}
+ B <- matrix(list(0), 5, 5)
+ diag(B) <- list("B11", "B22", "B33", "B44", "Bfish")
+ B[1, 2] <- "B12"
+ B[2, 3] <- "B23"
+ B[2, 4] <- "B24"
+ B[4, 2] <- "B42"
+ B[1:4, 5] <- list(0, 0, "C32", "C42")
+ print(B)
+\end{Sinput}
+\begin{Soutput}
+     [,1]  [,2]  [,3]  [,4]  [,5]   
+[1,] "B11" "B12" 0     0     0      
+[2,] 0     "B22" "B23" "B24" 0      
+[3,] 0     0     "B33" 0     "C32"  
+[4,] 0     "B42" 0     "B44" "C42"  
+[5,] 0     0     0     0     "Bfish"
+\end{Soutput}
+\end{Schunk}

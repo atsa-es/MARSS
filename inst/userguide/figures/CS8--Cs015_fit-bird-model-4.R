@@ -1,0 +1,12 @@
+###################################################
+### code chunk number 31: Cs015_fit-bird-model-4
+###################################################
+model.b4 <- list()
+model.b4$Q <- "diagonal and unequal"
+model.b4$R <- "diagonal and equal"
+model.b4$Z <- factor(c("BC", "AB-SK", "AB-SK"))
+model.b4$A <- "scaling"
+model.b4$U <- "unequal"
+kem.b4 <- MARSS(birddat, model = model.b4)
+
+

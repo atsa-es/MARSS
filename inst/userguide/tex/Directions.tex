@@ -1,0 +1,19 @@
+In this part, we walk you through some longer analyses using MARSS models for a variety of different applications.  Most of these are analyses of ecological data, but the same models are used in many other fields.  These longer examples will take you through both the conceptual steps (with pencil and paper) and a \R step which translates the conceptual model into code. 
+
+\section*{Set-up}
+\begin{itemize}
+\item If you haven't already, install the \{MARSS\} package from CRAN.
+\item Type in \texttt{library(MARSS)} at the \R command line to load the package after you install it.
+\end{itemize}
+
+\section*{Tips}
+\begin{itemize}
+\item \verb@summary(fit$model)@, where \verb@fit = MARSS(...)@, will print detailed information on the structure of the MARSS model. This allows you to double check the model you are fitting.  
+\item \verb@tidy(fit)@ will print the parameter estimates with approximate CIs (based on the Hessian).
+\item \verb@ggplot2::autoplot(fit)@ will print a standard set of state-space plots and diagnostic plots.
+\item When you run \verb@MARSS()@, it will output the number of iterations used.  If you reached the maximum, re-run with \texttt{control=list(maxit=...)} set higher than the default. 
+\item If you mis-specify the model, \texttt{MARSS()} will post an error that should give you an idea of the problem (make sure \verb@silent=FALSE@ to see full error reports).  Remember, the number of rows in your data is $n$, time is across the columns, and the length of the vector of factors passed in for \verb@model$Z@ must be $n$ while the number of unique factors must be $m$, the number of $x$ hidden state trajectories in your model.
+\item The missing value indicator is NA.
+\item Running \texttt{MARSS(data)}, with no arguments except your data, will fit a MARSS model with $m=n$, a diagonal $\QQ$ matrix with $m$ variances, and i.i.d. observation errors.
+\item Try \texttt{MARSSinfo()} at the command line if you get errors or warnings you don't understand.  You might find insight there.  Or look at the warnings and errors notes in Appendix \ref{app:warnings}.
+\end{itemize}

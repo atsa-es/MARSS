@@ -1,0 +1,21 @@
+\begin{Schunk}
+\begin{Sinput}
+ fit2$kf <- MARSSkfss(fit2)
+ fit3$kf <- MARSSkfss(fit3)
+ fit4$kf <- MARSSkfss(fit4)
+ df <- data.frame(
+   StructTS = fit1$fitted, fit2 = fit2$kf$xtt[1, ],
+   fit.bfgs = fit3$kf$xtt[1, ], fit.em = fit4$kf$xtt[1, ]
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+     level     fit2 fit.bfgs   fit.em
+1 1.265000 1.265000 1.265000 1.265000
+2 1.132475 1.132475 1.132546 1.136460
+3 1.200246 1.200246 1.200210 1.198366
+4 1.457141 1.457141 1.457002 1.449322
+5 1.448101 1.448101 1.448104 1.448054
+6 1.123611 1.123611 1.123786 1.133389
+\end{Soutput}
+\end{Schunk}

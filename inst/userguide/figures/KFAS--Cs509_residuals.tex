@@ -1,0 +1,56 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model, smoothing = "disturbance")
+ resid_kfas <- rstandard(kfs,
+   type = "state",
+   standardization_type = "marginal"
+ )
+ resid_marss <- residuals(fit_marss,
+   type = "tT",
+   standardization = "marginal"
+ )
+ resid_marss <- subset(resid_marss, name == "state")
+ df <- cbind(
+   MARSS = resid_marss$.std.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+          MARSS       KFAS
+[1,]  5.9899274  5.9899274
+[2,]  3.2550586  3.2550586
+[3,]  2.4247425  2.4247425
+[4,]  0.9832026  0.9832026
+[5,]  0.2758730  0.2758730
+[6,] -0.3111264 -0.3111264
+\end{Soutput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model, smoothing = "disturbance")
+ resid_kfas <- rstandard(kfs,
+   type = "state",
+   standardization_type = "cholesky"
+ )
+ resid_marss <- residuals(fit_marss,
+   type = "tT",
+   standardization = "Block.Cholesky"
+ )
+ resid_marss <- subset(resid_marss, name == "state")
+ df <- cbind(
+   MARSS = resid_marss$.std.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+          MARSS       KFAS
+[1,]  5.9899274  5.9899274
+[2,]  3.2550586  3.2550586
+[3,]  2.4247425  2.4247425
+[4,]  0.9832026  0.9832026
+[5,]  0.2758730  0.2758730
+[6,] -0.3111264 -0.3111264
+\end{Soutput}
+\end{Schunk}

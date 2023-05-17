@@ -1,0 +1,8 @@
+###################################################
+### code chunk number 41: Cs713_multivariate
+###################################################
+Z <- matrix(c(1, 0), n, 2, byrow = TRUE)
+mod.list <- c(mod.list.x, list(Z = Z, R = "diagonal and unequal", A = "scaling"))
+fitm2 <- MARSS(ym2, model = mod.list, method = "BFGS", inits = list(x0 = 0))
+
+

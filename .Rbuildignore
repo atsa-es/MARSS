@@ -27,6 +27,7 @@ tests
 ^pkgdown$
 ^\.github$
 ^inst/oldtex$
+^inst/userguide$
 inst/doc/mathdefs.tex
 ^revdep$
 ^cran-comments.md$

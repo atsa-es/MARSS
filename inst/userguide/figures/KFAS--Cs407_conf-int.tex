@@ -1,0 +1,18 @@
+\begin{Schunk}
+\begin{Sinput}
+ conf_kfas_t1 <- predict(fit_kfas$model,
+   interval = "confidence",
+   se.fit = TRUE, filtered = TRUE
+ )
+ head(conf_kfas_t1)
+\end{Sinput}
+\begin{Soutput}
+            fit        lwr       upr    se.fit
+[1,]    0.00000  -61.97950   61.9795  31.62278
+[2,]   32.11507 -217.20530  281.4354 127.20661
+[3,]  396.72378   79.71359  713.7340 161.74287
+[4,]  643.48197  304.16897  982.7950 173.12206
+[5,]  909.42338  563.71332 1255.1334 176.38593
+[6,] 1029.38565  681.92720 1376.8441 177.27798
+\end{Soutput}
+\end{Schunk}

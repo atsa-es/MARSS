@@ -1,0 +1,25 @@
+\begin{Schunk}
+\begin{Sinput}
+ var.Eytt1_fit <-
+   fitted(fit_marss, type = "ytt1", interval = "confidence")$.se^2
+ var.Eytt1_hatyt <-
+   MARSShatyt(fit_marss, only.kem = FALSE)$var.Eytt1
+ cbind(
+   P_mu = kf_kfas$P_mu[1:n], fitted = var.Eytt1_fit[1:n],
+   MARSShatyt = var.Eytt1_hatyt[1:n]
+ )
+\end{Sinput}
+\begin{Soutput}
+          P_mu   fitted MARSShatyt
+ [1,]  1000.00  1000.00    1000.00
+ [2,] 16181.52 16181.52   16181.52
+ [3,] 26160.75 26160.75   26160.75
+ [4,] 29971.25 29971.25   29971.25
+ [5,] 31112.00 31112.00   31112.00
+ [6,] 31427.48 31427.48   31427.48
+ [7,] 31512.79 31512.79   31512.79
+ [8,] 31535.71 31535.71   31535.71
+ [9,] 31541.86 31541.86   31541.86
+[10,] 31543.51 31543.51   31543.51
+\end{Soutput}
+\end{Schunk}

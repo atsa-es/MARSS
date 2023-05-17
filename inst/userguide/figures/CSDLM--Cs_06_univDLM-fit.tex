@@ -1,0 +1,28 @@
+\begin{Schunk}
+\begin{Sinput}
+ dlm1 <- MARSS(dat, inits = inits.list, model = mod.list)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 115 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 115 iterations. 
+Log-likelihood: -40.03813 
+AIC: 90.07627   AICc: 91.74293   
+ 
+      Estimate
+R.r    0.15708
+Q.q1   0.11264
+Q.q2   0.00564
+x0.X1 -3.34023
+x0.X2 -0.05388
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

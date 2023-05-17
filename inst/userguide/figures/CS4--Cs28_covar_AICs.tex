@@ -1,0 +1,18 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(cbind(
+   model = c("no covars", "Temp", "TP", "Temp & TP"),
+   AICc = round(c(
+     the.fit$AICc, kemz.temp$AICc, kemz.TP$AICc,
+     kemz.both$AICc
+   ))
+ ), quote = FALSE)
+\end{Sinput}
+\begin{Soutput}
+     model     AICc
+[1,] no covars 1582
+[2,] Temp      1518
+[3,] TP        1568
+[4,] Temp & TP 1522
+\end{Soutput}
+\end{Schunk}

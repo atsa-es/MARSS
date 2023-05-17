@@ -1,0 +1,16 @@
+\begin{Schunk}
+\begin{Sinput}
+ h <- diag(1 / sqrt(diag(Q.unc)))
+ Q.corr <- h %*% Q.unc %*% h
+ rownames(Q.corr) <- unique(Z4)
+ colnames(Q.corr) <- unique(Z4)
+ Q.corr
+\end{Sinput}
+\begin{Soutput}
+          nc        is        ps        sc
+nc 1.0000000 0.5970202 0.6421536 0.9163056
+is 0.5970202 1.0000000 0.9970869 0.2271385
+ps 0.6421536 0.9970869 1.0000000 0.2832502
+sc 0.9163056 0.2271385 0.2832502 1.0000000
+\end{Soutput}
+\end{Schunk}

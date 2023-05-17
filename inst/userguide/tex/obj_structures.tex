@@ -1,0 +1,81 @@
+\chapter{Package MARSS:  Object structures}
+
+\section*{Model objects: class marssMODEL}
+Objects of class `marssMODEL'\index{objects!marssMODEL} specify Multivariate Autoregressive State Space (MARSS) models. The \verb@model@ component of an ML estimation object (class marssMLE; see below) is a marssMODEL object. These objects have the following components:
+
+  \begin{description}
+    \item[\textbf{data}]{ An optional matrix (not data frame), in which each row is a time series (time across columns). }
+    \item[\textbf{fixed}]{ A list with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying which elements of each parameter are fixed. }
+    \item[\textbf{free}]{ A list with 8 matrices Z, A, R, B, U, Q, x0, V0, specifying which elements of each parameter are to be estimated. }
+    \item[\textbf{M}]{ An array of dim $n \times n \times T$ (an $n \times n$ missing values matrix for each time point).  Each matrix is diagonal with 0 at the $i,i$ value if the $i$-th value of $\yy$ is missing, and 1 otherwise.} 
+    \item[\textbf{miss.value}]{ Deprecated. Replace missing values with NAs before passing to MARSS. }
+  \end{description}
+
+  The matrices in \verb@fixed@ and \verb@free@ work as pairs to specify the fixed and free elements for each model parameter. The dimensions for \verb@fixed@ and \verb@free@ matrices are as follows, where $n$ is the number of observation time series and $m$ is the number of state processes:
+  \begin{description}
+    \item[\textbf{Z}]{ n x m }
+    \item[\textbf{B}]{ m x m }
+    \item[\textbf{U}]{ m x 1 }
+    \item[\textbf{Q}]{ m x m }
+    \item[\textbf{A}]{ n x 1 }
+    \item[\textbf{R}]{ n x n }
+    \item[\textbf{x0}]{ m x 1 }
+    \item[\textbf{V0}]{ m x m }
+  \end{description} 
+
+\section*{MARSSinputs}\index{objects!inputs}
+
+All the user inputs to a \verb@MARSS()@ call are put into a list and then passed to a function called \verb@MARSS.form()@ where \verb@form@ is the text specified by the form argument, e.g., \verb@MARSS.marss()@.  This function is used to create the marssMODEL object and then \verb@MARSScheckinputs()@ is called to error check the other arguments.
+
+  \begin{description}
+  
+  \item[\textbf{data}]{ A matrix (not data frame) of observations (rows) $\times$ time (columns).  }
+  \item[\textbf{model}]{ The specification is form dependent.  For the default marxss form, the inputs are a list with up to 14  elements Z, A, R, B, U, Q, x0, V0, C, c, D, d, tinitx, diffuse }
+  \item[\textbf{inits}]{ A list with up to 10 matrices Z, A, R, B, U, Q, x0, V0, C, D specifying initial values for parameters. Dimensions are given in the class `marssMODEL' section. }
+  \item[\textbf{miss.value}]{ Deprecated. Specifies missing value representation (default is NA). }
+  \item[\textbf{method}]{ The method used for estimation: `kem' for EM, `BFGS' for quasi-Newton.}
+  \item[\textbf{form}]{ The form to use to interpret the `model' argument and create the marssMODEL object.}
+  \item[\textbf{control}]{ List of estimation options. These are method dependent. }  
+  \end{description}
+
+
+\section*{ML estimation objects: class marssMLE}\index{objects!marssMLE}
+
+Objects of class marssMLE\index{objects!marssMLE} specify maximum-likelihood estimation for a MARSS model, both before and after fitting. A minimal marssMLE object contains components \verb@model, start@ and \verb@control@, which must be present for estimation by functions like \verb@MARSSkem()@\index{functions!MARSSkem}.
+
+  \begin{description}
+    \item[\textbf{model}]{ MARSS model specification (an object of class `marssMODEL'). }
+    \item[\textbf{start}]{ List with 7 matrices A, R, B, U, Q, x0, V0, specifying initial values for parameters. Dimensions are given in the class marssMODEL section. }
+    \item[\textbf{control}]{ A list specifying estimation options. For \verb@method="kem"@, these are
+    \begin{description}
+      \item[\textit{minit}]{ Minimum number of iterations in the maximization algorithm. } 
+      \item[\textit{maxit}]{ Maximum number of iterations in the maximization algorithm. } 
+      \item[\textit{abstol}]{ Optional tolerance for log-likelihood change.  If log-likelihood decreases less than this amount relative to the previous iteration, the EM algorithm exits. } 
+      \item[\textit{trace}]{ A positive integer. If not zero, a record will be created of each variable the maximization iterations. The information recorded depends on the maximization method.}
+      \item[\textit{safe}]{If TRUE, \verb@MARSSkem()@ will rerun \verb@MARSSkf()@ after each individual parameter update rather than only after all parameters are updated.  }
+      \item{\textit{silent}}{ Suppresses printing of progress bar and convergence information. }    
+    \end{description}
+  }
+  \end{description}
+
+\verb@MARSSkem()@\index{functions!MARSSkem} appends the following components to the marssMLE' object: 
+
+  \begin{description}
+  \item[\textbf{method}]{ A string specifying the estimation method (`kem' for estimation by \verb@MARSSkem()@). }
+  \item[\textbf{par}]{ A list with 8 matrices of estimated parameter values Z, A, R, B, U, Q, x0, V0. If there are fixed elements in the matrices, the corresponding elements in \verb@$par@ are set to the fixed values.}
+  \item[\textbf{kf}]{ A list containing Kalman filter/smoother output. See Chapter \ref{chap:mainfunctions} }
+  \item[\textbf{numIter}]{ Number of iterations required for convergence. }
+  \item[\textbf{convergence}]{ Convergence status. }
+  \item[\textbf{logLik}]{ the exact Log-likelihood. See Section \ref{sec:exactlikelihood}.}
+  \item[\textbf{errors}]{ any error messages }
+  \item[\textbf{iter.record}]{ record of the parameter values at each iteration (if \verb@control$trace=1@) }
+\end{description}
+
+Several functions append additional components to the `marssMLE' object\index{objects!marssMLE} passed in. These include:
+
+  \begin{description}
+  \item{\verb@MARSSaic()@}{ Appends \verb@AIC, AICc, AICbb, AICbp@, depending on the AIC flavors requested.\index{functions!MARSSaic} }
+  \item{\verb@MARSShessian()@}{ Appends \verb@Hessian, gradient, parMean@ and \verb@parSigma@.\index{functions!MARSShessian} }
+  \item{\verb@MARSSparamCIs()@}{ Appends \verb@par.se, par.bias, par.upCI@ and \verb@par.lowCI@.\index{functions!MARSSparamCIs}}
+  \end{description}
+

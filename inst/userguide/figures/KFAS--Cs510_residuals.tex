@@ -1,0 +1,33 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model, smoothing = "disturbance")
+ test <- cbind(
+   b = fit_kfas$model$Q[1, 1, 1] - kfs$V_eta[1, 1, ],
+   a = MARSSresiduals(fit_marss, type = "tT")$var.residuals[2, 2, ]
+ )
+ test <- as.data.frame(test)
+ test$diff <- test$b - test$a
+ head(test)
+\end{Sinput}
+\begin{Soutput}
+         b        a          diff
+1 7115.082 7115.082  0.000000e+00
+2 5444.212 5444.212  2.728484e-12
+3 4996.203 4996.203  1.818989e-12
+4 4876.079 4876.079 -5.456968e-12
+5 4843.870 4843.870  1.818989e-12
+6 4835.234 4835.234  0.000000e+00
+\end{Soutput}
+\begin{Sinput}
+ tail(test)
+\end{Sinput}
+\begin{Soutput}
+           b        a         diff
+95  4825.374 4825.374 1.818989e-12
+96  4807.095 4807.095 1.818989e-12
+97  4738.924 4738.924 1.818989e-12
+98  4484.677 4484.677 0.000000e+00
+99  3536.451 3536.451 5.456968e-12
+100    0.000       NA           NA
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ model_Nile <- SSModel(Nile ~ SSMtrend(
+   degree = 1,
+   Q = list(matrix(NA))
+ ),
+ H = matrix(NA)
+ )
+ kinits <- c(log(var(Nile)), log(var(Nile)))
+ fit_kfas_default <- fitSSM(model_Nile, kinits, method = "BFGS")
+\end{Sinput}
+\end{Schunk}

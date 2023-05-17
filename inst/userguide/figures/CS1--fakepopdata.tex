@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ x[1] <- init
+ for (t in 2:nYr) {
+   x[t] <- x[t - 1] + sim.u + rnorm(1, mean = 0, sd = sqrt(sim.Q))
+ }
+\end{Sinput}
+\end{Schunk}

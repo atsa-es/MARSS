@@ -1,0 +1,28 @@
+\begin{Schunk}
+\begin{Sinput}
+ kem.with.AICb <- MARSSaic(kem,
+   output = "AICbp",
+   Options = list(nboot = 10, silent = TRUE)
+ )
+ print(kem.with.AICb)
+\end{Sinput}
+\begin{Soutput}
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 390 iterations. 
+Log-likelihood: -30.98719 
+AIC: 71.97439   AICc: 72.89747   AICbp(param): 73.31084   
+ 
+       Estimate
+R.diag   0.1402
+U.1      0.0477
+Q.diag   0.0000
+x0.N     6.9292
+x0.S     5.9550
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

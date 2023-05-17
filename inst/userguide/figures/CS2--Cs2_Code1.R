@@ -1,0 +1,41 @@
+###################################################
+### code chunk number 10: Cs2_Code1
+###################################################
+# Code to fit the single population model with i.i.d. errors
+# Read in data
+dat <- t(harborSealWA) # MARSS needs time ACROSS columns
+years <- dat[1, ]
+n <- nrow(dat) - 1
+dat <- dat[2:nrow(dat), ]
+legendnames <- (unlist(dimnames(dat)[1]))
+
+# estimate parameters
+Z.model <- factor(c(1, 1, 1, 1, 1))
+R.model <- "diagonal and equal"
+kem1 <- MARSS(dat, model = list(Z = Z.model, R = R.model))
+
+# make figure
+graphics::matplot(years, t(dat),
+  xlab = "", ylab = "Index of log abundance",
+  pch = c("1", "2", "3", "4", "5"), ylim = c(5, 9), bty = "L"
+)
+lines(years, kem1$states - 1.96 * kem1$states.se,
+  type = "l",
+  lwd = 1, lty = 2, col = "red"
+)
+lines(years, kem1$states + 1.96 * kem1$states.se,
+  type = "l",
+  lwd = 1, lty = 2, col = "red"
+)
+lines(years, kem1$states, type = "l", lwd = 2)
+title("Observations and total population estimate", cex.main = .9)
+
+coef(kem1, type = "vector") # parameter estimates as a vector
+
+# show estimated elements for each parameter matrix as a list
+coef(kem1)
+
+kem1$logLik # show the log-likelihood
+kem1$AIC # show the AIC
+
+

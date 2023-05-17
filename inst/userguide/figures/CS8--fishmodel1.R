@@ -1,0 +1,12 @@
+###################################################
+### code chunk number 19: fishmodel1
+###################################################
+fishdat <- t(rockfish[, 2:dim(rockfish)[2]])
+Q.model <- "diagonal and equal"
+R.model <- "diagonal and unequal"
+U.model <- "equal"
+Z.model <- factor(rep(1, dim(fishdat)[1]))
+model1 <- list(Z = Z.model, Q = Q.model, R = R.model, U = U.model)
+kem1 <- MARSS(fishdat, model = model1)
+
+

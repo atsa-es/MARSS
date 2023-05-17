@@ -1,0 +1,26 @@
+\begin{Schunk}
+\begin{Sinput}
+ kem.rock1 <- MARSS(flatrecdat, model = list(Q = matrix(0.01)))
+\end{Sinput}
+\begin{Soutput}
+Success! algorithm run for 15 iterations. abstol and log-log tests passed.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Algorithm ran 15 (=minit) iterations and convergence was reached. 
+Log-likelihood: 2.58355 
+AIC: 0.8329002   AICc: 1.721789   
+ 
+      Estimate
+R.R     0.0226
+U.U    -0.0656
+x0.x0   0.0754
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}
