@@ -1,0 +1,17 @@
+###################################################
+### code chunk number 60: Cs702_globaltemp
+###################################################
+data("GlobalTemp")
+model_temp <- SSModel(GlobalTemp ~ SSMtrend(1, Q = NA, type = "common"),
+  H = matrix(NA, 2, 2)
+)
+kinits <- chol(cov(GlobalTemp))[c(1, 4, 3)]
+kinits <- c(0.5 * log(0.1), log(kinits[1:2]), kinits[3])
+kfas_temp_default <- fitSSM(model_temp, kinits, method = "BFGS")
+model_temp_stoch <- model_temp
+model_temp_stoch$a1[1, 1] <- 0
+model_temp_stoch$P1[1, 1] <- 1000 * max(diag(var(GlobalTemp)))
+model_temp_stoch$P1inf[1, 1] <- 0
+kfas_temp_stoch <- fitSSM(model_temp_stoch, kinits, method = "BFGS")
+
+

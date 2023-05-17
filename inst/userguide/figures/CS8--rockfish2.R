@@ -1,0 +1,9 @@
+###################################################
+### code chunk number 15: rockfish2
+###################################################
+graphics::matplot(rockfish[rec.years, 1], recdat, ylab = "", xlab = "Rec CPUE")
+lines(rockfish[rec.years, 1], as.vector(kem.rock1$states), col = "red", lty = 2, lwd = 2)
+lines(rockfish[rec.years, 1], as.vector(kem.rock2$states), col = "blue", lty = 1, lwd = 2)
+title("Puget Sound Total Rockfish Recreational CPUE data")
+
+

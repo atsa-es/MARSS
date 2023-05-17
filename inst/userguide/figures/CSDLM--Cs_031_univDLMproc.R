@@ -1,0 +1,10 @@
+###################################################
+### code chunk number 5: Cs_031_univDLMproc
+###################################################
+# for process eqn
+B <- diag(m) # 2x2; Identity
+U <- matrix(0, nrow = m, ncol = 1) # 2x1; both elements = 0
+Q <- matrix(list(0), m, m) # 2x2; all 0 for now
+diag(Q) <- c("q1", "q2") # 2x2; diag = (q1,q2)
+
+

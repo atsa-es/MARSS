@@ -1,0 +1,14 @@
+\begin{Schunk}
+\begin{Sinput}
+ mod4.gls <- gls(Employed ~ 1 + GNP.deflator + GNP + Unemployed
+   + Armed.Forces + Population + Year,
+ correlation = corAR1(), data = longley, method = "ML"
+ )
+ mod4.gls.phi <- coef(mod4.gls$modelStruct[[1]], unconstrained = FALSE)
+ c(mod4.gls.phi, logLik = logLik(mod4.gls))
+\end{Sinput}
+\begin{Soutput}
+       Phi     logLik 
+-0.7288684  4.3865475 
+\end{Soutput}
+\end{Schunk}

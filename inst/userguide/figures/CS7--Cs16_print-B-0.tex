@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ # Cleaning up the B matrix for printing
+ B.0 <- coef(kem.plank.0, type = "matrix")$B[1:4, 1:4]
+ rownames(B.0) <- colnames(B.0) <- c("LP", "SP", "D", "ND")
+ print(B.0, digits = 2)
+\end{Sinput}
+\begin{Soutput}
+      LP   SP       D     ND
+LP  0.77 0.29 -0.0182  0.131
+SP  0.19 0.51  0.0052 -0.045
+D  -0.43 2.29  0.4916  0.389
+ND -0.33 1.35 -0.2180  0.831
+\end{Soutput}
+\end{Schunk}

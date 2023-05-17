@@ -1,0 +1,17 @@
+\begin{Schunk}
+\begin{Sinput}
+ head(okanaganRedds)
+\end{Sinput}
+\begin{Soutput}
+     Year aerial ground
+[1,] 1956     37     NA
+[2,] 1957     53     NA
+[3,] 1958     94     NA
+[4,] 1959     50     NA
+[5,] 1960     29     NA
+[6,] 1961     NA     NA
+\end{Soutput}
+\begin{Sinput}
+ logRedds <- log(t(okanaganRedds)[c("aerial", "ground"), ])
+\end{Sinput}
+\end{Schunk}

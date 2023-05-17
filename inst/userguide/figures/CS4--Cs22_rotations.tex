@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ # rotate factor loadings
+ Z.rot <- Z.est %*% H.inv
+ # rotate trends
+ trends.rot <- solve(H.inv) %*% the.fit$states
+\end{Sinput}
+\end{Schunk}

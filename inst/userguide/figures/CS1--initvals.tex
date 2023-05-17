@@ -1,0 +1,13 @@
+\begin{Schunk}
+\begin{Sinput}
+ sim.u <- -0.05 # growth rate
+ sim.Q <- 0.02 # process error variance
+ sim.R <- 0.05 # non-process error variance
+ nYr <- 50 # number of years of data to generate
+ fracmissing <- 0.1 # fraction of years that are missing
+ init <- 7 # log of initial pop abundance
+ years <- seq(1:nYr) # sequence 1 to nYr
+ x <- rep(NA, nYr) # replicate NA nYr times
+ y <- rep(NA, nYr)
+\end{Sinput}
+\end{Schunk}

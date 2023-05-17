@@ -1,0 +1,9 @@
+###################################################
+### code chunk number 10: set-up-rockfish-data
+###################################################
+rec.names <- paste("Rec..targeting.bottomfish.", 1:4, sep = "")
+rec.years <- apply(!is.na(rockfish[, rec.names]), 1, any)
+recdat <- rockfish[rec.years, rec.names]
+flatrecdat <- apply(recdat, 1, sum, na.rm = TRUE)
+
+

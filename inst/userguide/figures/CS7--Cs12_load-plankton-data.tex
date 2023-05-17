@@ -1,0 +1,13 @@
+\begin{Schunk}
+\begin{Sinput}
+ # only use the plankton, daphnia, & non-daphnia
+ plank.spp <- c("Large Phyto", "Small Phyto", "Daphnia", "Non-daphnia")
+ plank.dat <- ivesDataByWeek[, plank.spp]
+ # The data are not logged
+ plank.dat <- log(plank.dat)
+ # Transpose to get time going across the columns
+ plank.dat <- t(plank.dat)
+ # make a demeaned version
+ d.plank.dat <- (plank.dat - apply(plank.dat, 1, mean, na.rm = TRUE))
+\end{Sinput}
+\end{Schunk}

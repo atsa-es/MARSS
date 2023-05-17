@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ Z <- matrix(c(1, 0, 0, 0, 1, 0), 2, 3, byrow = TRUE)
+ m <- 3
+ mod.list.x <- list(
+   x0 = matrix(list("x0.1", "x0.2", 0), nrow = m), tinitx = 1,
+   V0 = matrix(1e+06 * vy, m, m) + diag(1e-10, m),
+   Q = ldiag(list("q", "q", "qt")),
+   B = matrix(c(1, 0, 1, 0, 1, 1, 0, 0, 1), m, m, byrow = TRUE),
+   U = "zero"
+ )
+ mod.list <- c(mod.list.x, mod.list.y, list(Z = Z))
+ fitm3 <- MARSS(ym, model = mod.list, method = "BFGS", inits = list(x0 = 0))
+\end{Sinput}
+\end{Schunk}

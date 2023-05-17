@@ -1,0 +1,14 @@
+###################################################
+### code chunk number 10: Cs_08_univDLM-fore-mean
+###################################################
+# get list of Kalman filter output
+kf.out <- MARSSkfss(dlm1)
+# forecasts of regr parameters; 2xT matrix
+eta <- kf.out$xtt1
+# ts of E(forecasts)
+fore.mean <- vector()
+for (t in 1:TT) {
+  fore.mean[t] <- Z[, , t] %*% eta[, t, drop = F]
+}
+
+

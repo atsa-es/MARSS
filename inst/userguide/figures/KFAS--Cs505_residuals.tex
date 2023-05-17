@@ -1,0 +1,28 @@
+\begin{Schunk}
+\begin{Sinput}
+ kfs <- KFS(fit_kfas$model)
+ resid_kfas <- rstandard(kfs,
+   type = "pearson",
+   standardization_type = "marginal"
+ )
+ resid_marss <- residuals(fit_marss,
+   type = "tT",
+   standardization = "marginal"
+ )
+ resid_marss <- subset(resid_marss, name == "model")
+ df <- cbind(
+   MARSS = resid_marss$.std.resids,
+   KFAS = as.vector(resid_kfas)
+ )
+ head(df)
+\end{Sinput}
+\begin{Soutput}
+         MARSS      KFAS
+[1,] 5.8169639 5.8169639
+[2,] 3.6792994 3.6792994
+[3,] 0.9925797 0.9925797
+[4,] 1.4988347 1.4988347
+[5,] 0.7236875 0.7236875
+[6,] 0.5980134 0.5980134
+\end{Soutput}
+\end{Schunk}

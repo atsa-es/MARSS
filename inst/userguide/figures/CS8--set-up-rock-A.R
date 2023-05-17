@@ -1,0 +1,12 @@
+###################################################
+### code chunk number 13: set-up-rock-A
+###################################################
+A.model <- array(list(0), dim = c(1, 1, dim(recdat)[1]))
+manage.A <- !is.na(recdat[, "Rec..targeting.bottomfish.2"])
+A.model[1, 1, manage.A] <- "manag.A"
+manage.B <- !is.na(recdat[, "Rec..targeting.bottomfish.3"])
+A.model[1, 1, manage.B] <- "manag.B"
+manage.C <- !is.na(recdat[, "Rec..targeting.bottomfish.4"])
+A.model[1, 1, manage.C] <- "manag.C"
+
+

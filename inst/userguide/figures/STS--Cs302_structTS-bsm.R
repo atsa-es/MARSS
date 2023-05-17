@@ -1,0 +1,15 @@
+###################################################
+### code chunk number 13: Cs302_structTS-bsm
+###################################################
+makeB <- function(nf) {
+  B <- matrix(0, nf + 1L, nf + 1L)
+  B[1L:2L, 1L:2L] <- c(1, 0, 1, 1)
+  B[3L, ] <- c(0, 0, rep(-1, nf - 1L))
+  if (nf >= 3L) {
+    ind <- 3:nf
+    B[cbind(ind + 1L, ind)] <- 1
+  }
+  return(B)
+}
+
+

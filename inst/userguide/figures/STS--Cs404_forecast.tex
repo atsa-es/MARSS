@@ -1,0 +1,20 @@
+\begin{Schunk}
+\begin{Sinput}
+ rbind(
+   pred1 = fr1$pred, pred2 = fr2$pred$estimate[fr2$ft],
+   se1 = fr1$se, se2 = fr2$pred$se[fr2$ft]
+ )
+\end{Sinput}
+\begin{Soutput}
+            [,1]       [,2]       [,3]       [,4]
+pred1 3.13012626 2.83148104 2.58096900 2.94787202
+pred2 3.13012626 2.83148104 2.58096900 2.94787202
+se1   0.05450291 0.05465622 0.05773393 0.06022966
+se2   0.05450291 0.05465622 0.05773393 0.06022966
+            [,5]
+pred1 3.17754896
+pred2 3.17754896
+se1   0.08818051
+se2   0.08818051
+\end{Soutput}
+\end{Schunk}

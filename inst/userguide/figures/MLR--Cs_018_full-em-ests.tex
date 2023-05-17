@@ -1,0 +1,12 @@
+\begin{Schunk}
+\begin{Sinput}
+ par.names <- c("A.intercept", paste("D", eVar.names, sep = "."))
+ c(coef(mod3.em, type = "vector")[par.names], logLik = mod3.em$logLik)
+\end{Sinput}
+\begin{Soutput}
+   A.intercept D.GNP.deflator          D.GNP   D.Unemployed 
+ -3.482258e+03   1.506187e-02  -3.581917e-02  -2.020230e-02 
+D.Armed.Forces   D.Population         D.Year         logLik 
+ -1.033227e-02  -5.110413e-02   1.829151e+00   9.066497e-01 
+\end{Soutput}
+\end{Schunk}

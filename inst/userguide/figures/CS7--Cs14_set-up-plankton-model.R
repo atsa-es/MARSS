@@ -1,0 +1,14 @@
+###################################################
+### code chunk number 17: Cs14_set-up-plankton-model
+###################################################
+Q <- matrix(list(0), 4, 4)
+diag(Q) <- c("Phyto", "Phyto", "Zoo", "Zoo")
+R <- matrix(list(0), 4, 4)
+diag(R) <- c("Phyto", "Phyto", "Zoo", "Zoo")
+plank.model.0 <- list(
+  B = "unconstrained", U = "zero", Q = Q,
+  Z = "identity", A = "zero", R = R,
+  x0 = "unequal", tinitx = 1
+)
+
+

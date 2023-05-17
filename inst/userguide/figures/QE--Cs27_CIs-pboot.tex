@@ -1,0 +1,26 @@
+\begin{Schunk}
+\begin{Sinput}
+ kem.w.boot.CIs <- MARSSparamCIs(kem, method = "parametric", nboot = 10)
+ # nboot should be more like 1000, but set low for example's sake
+ print(kem.w.boot.CIs)
+\end{Sinput}
+\begin{Soutput}
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 390 iterations. 
+Log-likelihood: -30.98719 
+AIC: 71.97439   AICc: 72.89747   
+ 
+       ML.Est Std.Err low.CI up.CI  Est.Bias Unbias.Est
+R.diag 0.1402 0.01504 0.1069 0.146  0.014664     0.1548
+U.1    0.0477 0.00743 0.0377 0.061 -0.000801     0.0469
+Q.diag 0.0000 0.00000 0.0000 0.000  0.000000     0.0000
+x0.N   6.9292 0.11110 6.7520 7.111 -0.004267     6.9250
+x0.S   5.9550 0.16560 5.5664 6.056  0.073431     6.0284
+Initial states (x0) defined at t=0
+
+CIs calculated at alpha = 0.05 via method=parametric 
+Bias calculated via  bootstrapping with  bootstraps. 
+\end{Soutput}
+\end{Schunk}

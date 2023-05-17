@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(cbind(
+   true = true.2[2:4],
+   estimates.no.miss = coef(ar2, type = "vector"),
+   estimates.w.miss = coef(ar2.gappy, type = "vector")
+ ))
+\end{Sinput}
+\begin{Soutput}
+    true estimates.no.miss estimates.w.miss
+b1 -1.50        -1.5816137       -1.5549387
+b2 -0.75        -0.7767462       -0.7463820
+q   1.00         0.8091055        0.8868251
+\end{Soutput}
+\end{Schunk}

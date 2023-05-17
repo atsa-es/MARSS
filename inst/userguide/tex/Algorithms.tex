@@ -1,0 +1,115 @@
+\chapter{Algorithms used in the \{MARSS\} package}\label{chap:algorithms}
+
+\section{The full time-varying MARSS model}
+
+In mathematical form, the model that is being fit with the package is
+\begin{equation}\label{qeq:MARSS.ex.vec}
+\begin{gathered}
+\xx_t = (\xx_{t-1}^\top \otimes \II_m)\vec(\BB_t) + (\uu_t^\top \otimes \II_m)\vec(\UU_t) + \ww_t, \quad
+\WW_t \sim \MVN(0,\QQ_t)\\
+\yy_t = (\xx_t^\top \otimes \II_n)\vec(\ZZ_t) + (\aa_t^\top \otimes \II_n)\vec(\AA_t) + \vv_t, \quad
+\VV_t \sim \MVN(0,\RR_t)\\
+\xx_{t_0} = \pipi+\FF\ll, 
+\LL \sim \MVN(0,\LAM)
+\end{gathered}
+\end{equation}
+Each model parameter matrix, $\BB_t$, $\UU_t$, $\QQ_t$, $\ZZ_t$, $\AA_t$, and $\RR_t$, is written as a time-varying linear model, $\ff_t+\DD_t\mm$, where $\ff$ and $\DD$ are fully-known (not estimated and no missing values) and $\mm$ is a column vector of the estimates elements of the parameter matrix:
+\begin{gather*}
+\vec(\BB_t) = \ff_{t,b} + \DD_{t,b}\bbeta\quad
+\vec(\UU_t) = \ff_{t,u} + \DD_{t,u}\uupsilon\quad
+\vec(\QQ_t) = \ff_{t,q} + \DD_{t,q}\qq\\
+\vec(\ZZ_t) = \ff_{t,z} + \DD_{t,z}\zzeta\quad
+\vec(\AA_t) = \ff_{t,a} + \DD_{t,a}\aalpha\quad
+\vec(\RR_t) = \ff_{t,r} + \DD_{t,r}\rr\\
+\vec(\LAM)= \ff_\lambda+\DD_\lambda\llambda \quad
+\vec(\pipi)= \ff_\pi+\DD_\pi\pp
+\end{gather*}
+
+The internal model specification (element \verb@$marss@ in a fitted marssMLE object output by a \verb@MARSS()@ call) is a list with the $\ff_t$ (``fixed") and $\DD_t$ (``free") matrices for each parameter.   
+The output from fitting are the vectors, $\bbeta$, $\uupsilon$, etc.  The trick is to rewrite the user's linear multivariate problem into the general form (Equation \ref{qeq:MARSS.ex.vec}).  MARSS does this using functions that take more familiar arguments as input and then constructs the $\ff_t$ and $\DD_t$ matrices.  Because the $\ff_t$ and $\DD_t$ can be whatever the user wants (assuming they are the right shape), this allows users to include covariates, trends (linear, sinusoidal, etc) or indicator variables in a variety of ways.  It also means that terms like $1+b+2c$ can appear in the parameter matrices.
+  
+Although the above form looks unusual, it is equivalent to the commonly seen form but leads to a log-likelihood function where all terms have form 
+$\MM\mm$, where $\MM$ is a matrix and $\mm$ is a column vector of only the different estimated values.  This makes it easy to do the partial differentiation with respect
+to $\mm$ necessary for the EM algorithm and as a result, easy to impose linear constraints and structure on the elements in a parameter matrix \citep{Holmes2010}.
+
+\section{Maximum-likelihood parameter estimation}
+
+\subsection{EM algorithm}\index{estimation!EM}
+
+Function \verb@MARSSkem()@\index{functions!MARSSkem} in the \{MARSS\} package provides a maximum-likelihood algorithm for parameter estimation based on an Expectation-Maximization (EM) algorithm  \citep{Holmes2010}. EM algorithms are widely used algorithms that extend maximum-likelihood estimation to cases where there are hidden random variables in a model \citep{Dempsteretal1977, Harvey1989, HarveyShephard1993, McLachlanKrishnan2008}.   Expectation-Maximization algorithms for unconstrained MARSS models have been around for many years and algorithms for certain constrained cases have also been published.  What makes the EM algorithm in MARSS different is that it is a general constrained algorithm that allows generic linear constraints among matrix elements (thus allows fixed, shared and linear combinations of estimated elements). 
+
+The EM algorithm finds the maximum-likelihood estimates of the parameters in a MARSS model using an iterative process.  Starting with an initial set of parameters\footnote{You can choose these however you wish, however choosing something not too far off from the correct values will make the algorithm go faster.}, which we will denote $\hat{\Theta}_1$, an updated parameter set $\hat{\Theta}_2$ is obtaining by finding the $\hat{\Theta}_2$ that maximizes the expected value of the likelihood over the distribution of the states ($\XX$) conditioned on $\hat{\Theta}_1$. This distributon of states is computed via the Kalman smoother (Section \ref{sec:kalmanfilter}).  Mathematically, each iteration of an EM algorithm does this maximization:
+\begin{align}\label{eqn:EM}
+	\hat{\Theta}_2 &= \arg\underset{\Theta}{\max} \quad \E_{\XX|\hat{\Theta}_1}[\log L(\Theta |\YY=\yy_1^T,\XX)] \nonumber
+\end{align}
+Then using $\hat{\Theta}_2$, the distibution of $\XX$ conditioned on $\hat{\Theta}_2$ is computed.  Then that distibution along with $\hat{\Theta}_2$ in place of $\hat{\Theta}_1$ is used in Equation \ref{eqn:EM} to produce an updated parameter set $\hat{\Theta}_3$.  This is repeated until the expected log-likelihood stops increasing (or increases less than some set tolerance level).
+
+Implementing this algorithm is straight-forward, hence its popularity.
+\begin{enumerate}
+	\item Set an initial set of parameters, $\hat{\Theta}_1$
+	\item E step: using the model for the hidden states ($\XX$) and $\hat{\Theta}_1$, calculate the expected values of $\XX$ conditioned on all the data $\yy_1^T$; this is \verb@xtT@ output by the Kalman smoother (function \verb@MARSSkf()@).  Also calculate expected values of any functions of $\XX$ (or $\YY$ if there are missing $\YY$ values) that appear in your expected log-likelihood function.
+	\item M step: put those $\E[\XX | \YY=\yy_1^T, \hat{\Theta}_1]$ and $\E[g(\XX) | \YY=\yy_1^T, \hat{\Theta}_1]$ into your expected log-likelihood function in place of $\XX$ (and $g(\XX)$) and maximize with respect to $\Theta$.  This gives you $\hat{\Theta}_2$.
+	\item Repeat the E and M steps until the log likelihood stops increasing.
+\end{enumerate}
+
+The EM equations used in the \{MARSS\} package (function \verb@MARSSkem()@\index{functions!MARSSkem}) are described in \citet{Holmes2010} and are extensions of those in \citet{ShumwayStoffer1982} and \citet{GhahramaniHinton1996}.  Our EM algorithm is an extended version because our algorithm is for cases where there are constraints within the parameter matrices (shared values, linear combinations, diagonal structure, block-diagonal structure, ...), where there are fixed values within the parameter matrices, or where there may be 0s on the diagonal of $\QQ$, $\RR$ and $\LAM$.
+
+The EM algorithm is a hill-climbing algorithm and like all hill-climbing algorithms can get stuck on local maxima\index{likelihood!troubleshooting}\index{likelihood!multimodal}\index{troubleshooting!local maxima}.  See Chapter \ref{chap:inits} for a discussion on how to implement a Monte-Carlo initial conditions search based on \citet{Biernackietal2003} to minimize this problem.  EM algorithms are also known to get close to the maximum very quickly but then creep toward the absolute maximum.  Once in the vicinity of the maximum, quasi-Newton methods\index{estimation!Newton methods} find the absolute maximum much faster, but they can be  sensitive to initial conditions. In practice, we have found the EM algorithm to be much faster for some types of MARSS models while BFGS is faster for others, so often we will try both.
+
+\section{Kalman filter and smoother}\index{estimation!Kalman filter}\index{estimation!Kalman smoother}\label{sec:kalmanfilter}
+
+The Kalman filter \citep{Kalman1960} is a recursive algorithm that solves for the expected value of the hidden states (the $\XX$) in a MARSS model (Equation \ref{eqn:marss}) at time $t$ conditioned on the data up to time $t$: $\E[\XX_t|\yy_1^t]$.  The Kalman filter gives the optimal (lowest mean square error) estimate of the unobserved $\xx_t$ based on the observed data up to time $t$ for this class of linear dynamical system.  The Kalman smoother \citep{Rauchetal1965} solves for the expected value of the hidden state(s) conditioned on all the data: $\E[\XX_t|\yy_1^T]$.  If the errors in the stochastic process are Gaussian, then the estimators from the Kalman filter and smoother are also the maximum-likelihood estimates.  
+
+However, even if the the errors are not Gaussian, the estimators are optimal in the sense that they are estimators with the least variability possible.  This robustness is one reason the Kalman filter is so powerful---it provides well-behaving estimates of the hidden states for all kinds of multivariate autoregressive processes, not just Gaussian processes.  The Kalman filter and smoother are widely used in time-series analysis, and there are many textbooks covering it and its applications.  In the interest of giving the reader a single point of reference, we use \citet{ShumwayStoffer2006} as our primary reference.  
+
+The \verb@MARSSkf()@\index{functions!MARSSkf} function provides the Kalman filter and smoother output using one of two algorithms (specified by \verb@fun.kf@).  The algorithm in 
+\verb@MARSSkfss()@ is that shown in \citet{ShumwayStoffer2006}.  This algorithm is not computationally efficient; see \citet[section 4.3]{Koopmanetal1998} for a more efficient Kalman filter implementation. The Koopman et al. implementation is provided in the functions \verb@MARSSkfas()@ using the \{KFAS\} package \citep{Helske2017}.  \verb@MARSSkfss()@ (and \verb@MARSSkfas()@ with a few exceptions) has the following outputs:
+\begin{description}
+\item[\texttt{xtt1 }] The expected value of $\XX_t$ conditioned on the data up to time $t-1$.
+\item[\texttt{xtt  }] The expected value of $\XX_t$ conditioned on the data up to time $t$.
+\item[\texttt{xtT  }] The expected value of $\XX_t$ conditioned on all the data from time $1$ to $T$.  These are called the smoothed state estimates.
+\item[\texttt{Vtt1 }] The variance of $\XX_t$ conditioned on the data up to time $t-1$.  Denoted $P_t^{t-1}$ in section 6.2 in \citet{ShumwayStoffer2006}.
+\item[\texttt{Vtt  }] The variance of $\XX_t$ conditioned on the data up to time $t$. Denoted $P_t^t$ in section 6.2 in \citet{ShumwayStoffer2006}.
+\item[\texttt{VtT  }] The variance of $\XX_t$ conditioned on all the data from time $1$ to $T$.
+\item[\texttt{Vtt1T}] The lag-one covariance of $\XX_t$ and $\XX_{t-1}$ conditioned on all the data, $1$ to $T$.
+\item[\texttt{Kt   }] The Kalman gain.  This is part of the update equations and relates to the amount \verb@xtt1@ is updated by the data at time $t$ to produce \verb@xtt@.    Not  output by \verb@MARSSkfas@.
+\item[\texttt{J    }] This is similar to the Kalman gain but is part of the Kalman smoother.  See Equation 6.49 in \citet{ShumwayStoffer2006}.     Not  output by \verb@MARSSkfas@.
+\item[\texttt{Innov}] This has the innovations at time $t$, defined as $\ep_t \equiv \yy_t$-$\E[\YY_t]$.  These are the residuals, the difference between the data and their predicted values.  See Equation 6.24 in \citet{ShumwayStoffer2006}. Not  output by \verb@MARSSkfas@.
+\item[\texttt{Sigma}] This has the $\Sigma_t$, the variance-covariance matrices for the innovations at time $t$.  This is used for the calculation of confidence intervals, the s.e. on the state estimates and the likelihood.  See Equation 6.25 in \citet{ShumwayStoffer2006} for the $\Sigma_t$ calculation.  Not  output by \verb@MARSSkfas@.
+\item[\texttt{logLik}] The log-likelihood of the data conditioned on the model parameters.  
+\end{description}
+
+\section{The exact likelihood}\index{likelihood}
+\label{sec:exactlikelihood}
+The likelihood of the data given a set of MARSS parameters is part of the output of the \verb@MARSSkfss()@\index{functions!MARSSkfss} and \verb@MARSSkfas()@\index{functions!MARSSkfas}
+ functions.  The likelihood computation is based on the innovations form of the likelihood\index{likelihood!innovations algorithm} \citep{Schweppe1965} and uses the output from the Kalman filter:
+\begin{equation}
+\log \Lik(\Theta | data) = -\frac{N}{2\log(2\pi)} - \frac{1}{2}\left( \sum_{t=1}^T\log |\Sigma_t| + \sum_{t=1}^T (\ep_t)^\top \Sigma_t^{-1} \ep_t \right)
+\label{eq:loglike}
+\end{equation}
+where $N$ is the total number of data points, $\ep_t$ is the innovations at time $t$ and $|\Sigma_t|$ is the determinant of the innovations variance-covariance matrix at time $t$.  This likelihood function is shown in Equation 6.62 in \citet{ShumwayStoffer2006}. However there are a few differences between the log-likelihood output by \verb@MARSSkf()@\index{functions!MARSSkf} and that described in \citet{ShumwayStoffer2006}.
+
+The standard likelihood calculation (Equation 6.62 in \citet{ShumwayStoffer2006}) is biased when there are missing values in the data, and the missing data modifications\index{likelihood!missing value modifications} discussed in Section 6.4 in \citet{ShumwayStoffer2006} do not correct for this bias. \citet{Harvey1989}, Section 3.4.7, discusses at length that the standard missing values correction leads to an inexact likelihood when there are missing values. The bias is minor if there are few missing values, but it becomes severe as the number of missing values increases.  Many ecological datasets have high fractions of missing values and this  leads to a very biased likelihood if one uses the inexact formula.  \citet{Harvey1989} provides some non-trivial ways to compute the exact likelihood.  
+
+The \{MARSS\} package uses instead the exact likelihood correction for missing values that is presented in Section 12.3 in \citet{BrockwellDavis1991}\index{missing values!likelihood correction}\index{likelihood!and missing values}.  This solution is straight-forward to implement.  The correction involves the following changes to $\ep_t$ and $\Sigma_t$ in the Equation \ref{eq:loglike}.  Suppose the value $y_{i,t}$ is missing.  First, the corresponding $i$-th value of $\ep_t$ is set to 0.  Second, the $i$-th diagonal value of $\Sigma_t$ is set to 1 and the off-diagonal elements on the $i$-th column and $i$-th row are set to 0. 
+
+\section{Parametric and innovations bootstrapping}
+Bootstrapping\index{bootstrap!parametric}\index{bootstrap!innovations} can be used to construct frequentist confidence intervals on the parameter estimates \citep{StofferWall1991} and to compute the small-sample AIC corrector for MARSS models \citep{CavanaughShumway1997}; the functions \verb@MARSSparamCIs()@\index{functions!MARSSparamCIs} and \verb@MARSSaic()@\index{functions!MARSSaic} do these computations. 
+
+The \verb@MARSSboot()@\index{functions!MARSSboot} function provides both parametric and innovations bootstrapping of MARSS models.  
+The innovations\index{bootstrap!innovations} bootstrap algorithm by \citet{StofferWall1991}  bootstraps the model residuals (the innovations).  This is a semi-parametric bootstrap since is uses, partially, the maximum-likelihood parameter estimates.  This algorithm cannot be used if there are missing values in the data.  Also for short time series, it gives biased bootstraps because one cannot resample the first few innovations.  
+
+\verb@MARSSboot()@ also provides a fully parametric\index{bootstrap!parametric} bootstrap.  This uses the maximum-likelihood MARSS parameters to simulate data from which bootstrap parameter estimates are obtained.  Our research \citep{HolmesWard2010} indicates that this provides unbiased bootstrap parameter estimates, and it works with datasets with missing values\index{missing values!and parametric bootstrap}.  Lastly, \verb@MARSSboot()@ can also output parameters sampled from the Hessian matrix.  
+
+\section{Simulation and forecasting}
+The \verb@MARSSsimulate()@\index{functions!MARSSsimulate} function simulates\index{simulation} from a fitted marssMLE object (e.g., output from a \verb@MARSS()@ call).  It uses \verb@rmvnorm()@ (in package \{mvtnorm\}) to produce draws of the process and observation errors from multivariate normal distributions for each time step.  
+
+\section{Model selection}\index{model selection}
+The package provides the \verb@MARSSaic()@\index{functions!MARSSaic} function (accessed with \verb@AIC()@) for computing AIC\index{model selection!AIC}, AICc\index{model selection!AICc} and AICb.  The latter is a small-sample corrector for autoregressive state-space models.  The bias problem with AIC and AICc for short time-series data has been shown in \citet{CavanaughShumway1997} and \citet{HolmesWard2010}.  AIC and AICc tend to select overly complex MARSS models when the time-series data are short.  AICb corrects this bias.  The algorithm for a non-parametric AICb\index{model selection!bootstrap AIC, AICbb} is given in \citet{CavanaughShumway1997}.  Their algorithm uses the innovations\index{bootstrap!innovations} bootstrap \citep{StofferWall1991}, which means it cannot be used when there are missing data.  We added a parametric AICb\index{model selection!bootstrap AIC, AICbp} \citep{HolmesWard2010}, which uses a parametric bootstrap\index{bootstrap!parametric}. This algorithm allows one to compute AICb when there are missing data\index{missing values!and AICb} and it provides unbiased AIC even for short time series.  See \citet{HolmesWard2010} for discussion and testing of parametric AICb for MARSS models. 
+
+AICb\index{model selection!bootstrap AIC} is comprised of the familiar AIC fit term, $-2 \log L$, plus a penalty term that is the mean difference between the log likelihood the data under the bootstrapped maximum-likelihood parameter estimates and the log likelihood of the data under the original maximum-likelihood parameter estimate:
+\begin{equation}
+	AICb = -2 \log \Lik(\hat{\Theta} | \yy) + 2 \bigg( \frac{1}{N_b}\sum_{i=1}^{N_b} -\log \frac{\Lik(\hat{\Theta}^*(i) | \yy)}{\Lik(\hat{\Theta} | \yy)}\bigg)
+\label{eq:AICb}
+\end{equation}
+where $\hat{\Theta}$ is the maximum-likelihood parameter set under the original data $\yy$, $\hat{\Theta}^*(i)$ is a maximum-likelihood parameter set estimated from the $i$-th bootstrapped data set $\yy^*(i)$, and $N_b$ is the number of bootstrap data sets.  It is important to notice that the likelihood in the AICb\index{model selection!bootstrap AIC} equation is $\Lik(\hat{\Theta}^* | \yy)$ not $\Lik(\hat{\Theta}^* | \yy^*)$.  In other words, we are taking the average of the likelihood of the original data given the bootstrapped parameter sets. 

@@ -1,0 +1,7 @@
+\begin{Schunk}
+\begin{Sinput}
+ ggplot(fitted2, aes(x = t, y = .estimate)) +
+   geom_line() +
+   facet_wrap(~.rownames, ncol = 1, scale = "free_y")
+\end{Sinput}
+\end{Schunk}

@@ -1,0 +1,18 @@
+###################################################
+### code chunk number 44: Cs716_multivariate
+###################################################
+set.seed(100)
+TT <- 60
+t <- 1:TT
+q <- 0.5
+qt <- 0.01
+r <- 0.1
+b <- 0.5
+trend <- 0.2 * sin((1:TT) / 4)
+level1 <- cumsum(rnorm(TT, trend, sqrt(q)))
+level2 <- cumsum(rnorm(TT, trend, sqrt(q)))
+
+# Simulated data
+ym <- rbind(level1, level2) + matrix(rnorm(TT * 2, 0, sqrt(r)), 2, TT)
+
+

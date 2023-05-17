@@ -1,0 +1,480 @@
+\SweaveOpts{keep.source=TRUE, prefix.string=./figures/CS3-, eps=FALSE, split=TRUE}
+\chapter{Identifying spatial population structure and covariance}
+\label{chap:CSpopstruc}
+\chaptermark{Spatial population structure and covariance}
+<<RUNFIRST, echo=FALSE>>=
+library(MARSS)
+options(prompt=" ", continue=" ")
+@
+
+<<Cs00_required_libraries, echo=FALSE>>=
+library(MARSS)
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Harbor seals on the U.S. west coast}
+%Add footnote with instructions for getting code
+\blfootnote{Type \texttt{RShowDoc("Chapter\_SealPopStructure.R",package="MARSS")} at the R command line to open a file with all the code for the examples in this chapter.}
+
+\index{MARSS model!multivariate example}In this application, we use harbor seal abundance estimates along the west coast to examine large-scale spatial structure.  Harbor seals are distributed along the west coast of the U.S. from California to Washington.  The populations have been surveyed at haul-out sites since the mid-1970s (Figure \ref{fig:CS3.fig1}) and have been increasing steadily since the 1972 Marine Mammal Protection Act. See \verb@?harborSeal@ for the data sources.
+
+For management purposes, three stocks are recognized: the CA stock, the OR/WA coastal stock which consists of four regions (Northern/Southern Oregon, Coastal Estuaries, Olympic Peninsula), and the inland WA stock which consists of the regions in the WA inland waters minus Hood Canal (Figure \ref{fig:CS3.fig1}).  Differences exist in the demographics across regions (e.g., pupping dates), however mtDNA analyses and tagging studies support the larger stock structure.  Harbor seals are known for strong site fidelity, but at the same time travel large distances to forage.
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{figure}[htp]
+\begin{center}
+\includegraphics[totalheight=0.8\textheight]{"../figures/CAORWA"}
+\end{center}
+\caption{Map of spatial distribution of harbor seal survey regions in Washington and Oregon. In addition to these nine survey regions, we also have data from the Georgia Strait just north of the San Juan Islands, the California coast and the Channels Islands in Southern California.}
+\label{fig:CS3.fig1}
+\end{figure}
+%~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Our goal is to address the following questions about spatial structure: 1) Does population abundance data support the existing management boundaries, or are there alternative groupings that receive more support?, 2) Do subpopulations (if they exist) experience independent environmental variability or correlated variability? and 3) Does the Hood Canal site represent a distinct subpopulation?   To address these questions, we will mathematically formulate different hypotheses about population structure via different MARSS models.  We will then compare the data support for different models using model selection\index{model selection} criteria, specifically AICc and AIC weights.
+
+\subsection{MARSS models for a population with spatial structure}
+The mathematical form of the model we will use is 
+\begin{equation}\label{eqn:spat.struc.marss}
+\begin{gathered}
+\xx_t = \xx_{t-1}+\uu+\ww_t \text{ where } \ww_t \sim \MVN(0,\QQ) \\
+\yy_t = \ZZ\xx_t+\aa+\vv_t \text{ where } \vv_t \sim \MVN(0,\RR)  \\
+ \xx_0 \sim \MVN(\pipi,\LAM) 
+ \end{gathered}   
+\end{equation}
+$\BB$ is in front of $\xx$ but is left off above since it is the identity matrix\footnote{a diagonal matrix with 1s on the diagonal}. We will use  $\ZZ$, $\uu$, and $\QQ$ to specify different hypotheses about the population structure. The form of $\aa$ will be ``scaling'' in all cases.  Aerial survey methodology has been relatively constant across time and space, and we will assume that all the time series from each region has identical and independent observation error variance, which means a diagonal $\RR$ matrix with one variance term on the diagonal\footnote{The sampling regions have different number of sites where animals are counted.  But we are working with log counts. We assume that the distribution of percent errors is the same (the probability of a 10\% over-count is the same) and thus that the variances are similar on the log-scale.}.
+
+Each call to \texttt{MARSS()} will look like
+<<label=kemcall, eval=FALSE>>=
+fit <- MARSS(sealData, model=list(
+  Z = Z.model, Q = Q.model, ...))
+@
+where the \verb@...@ are components of the model list that are the same across all models.
+We will specify different \verb@Z.model@ and \verb@Q.model@ in order to model different population spatial structures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Question 1, How many distinct subpopulations?}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We will start by evaluating the data support for the following hypotheses about the population structure: 
+\begin{description}
+\item [H1] 3 subpopulations defined by stock
+\item [H2] 2 subpopulations defined by coastal versus WA inland
+\item [H3] 2 subpopulations defined by north and south split in the middle of Oregon
+\item [H4] 4 subpopulations defined by N coastal, S coastal, SJF+Georgia Strait, and Puget Sound
+\item [H5] All regions are part of the same panmictic population
+\item [H6] Each of the 11 regions is a subpopulation
+\end{description}
+
+We will analyze each of these under the assumption of independent process errors with each subpopulation having different variances or the same variance.  
+
+\subsection{Specify the $\ZZ$ matrices}
+The $\ZZ$ matrices specify the relationship between the survey regions and the subpopulations and allow us to specify the spatial population structures in the hypotheses. Each column of $\ZZ$ corresponds to a different subpopulation and associates regions with particular subpopulations.  For example for hypothesis 1, column 1 of the $\ZZ$ matrix is OR/WA Coastal, column 2 is inland WA (ps for Puget Sound) and column 3 is CA.  The $\ZZ$ matrix for hypotheses 1, 2, 4, and 5 take the following form:
+
+\bigskip
+\bigskip
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{rc|ccc|cc|cc|cc|cccc|cc|c|}
+ && \multicolumn{3}{c|}{H1} &&& \multicolumn{2}{c|}{H2} &&& \multicolumn{4}{c|}{H4} &&& H5\\
+ && \multicolumn{3}{c|}{$\ZZ$}  &&& \multicolumn{2}{c|}{$\ZZ$} &&& \multicolumn{4}{c|}{$\ZZ$} &&& $\ZZ$ \\
+                          &&  wa.or & ps & ca &&& coast & ps &&& nc & is & ps & sc &&& pan \\
+\texttt{Coastal Estuaries}&&  1 & 0 & 0 &&& 1 & 0 &&& 1 & 0 & 0 & 0 &&& 1 \\
+\texttt{Olympic Peninsula}&&  1 & 0 & 0 &&& 1 & 0 &&& 1 & 0 & 0 & 0 &&& 1 \\
+\texttt{Str. Juan de Fuca}&&  0 & 1 & 0 &&& 0 & 1 &&& 0 & 1 & 0 & 0 &&& 1 \\
+\texttt{San Juan Islands} &&  0 & 1 & 0 &&& 0 & 1 &&& 0 & 1 & 0 & 0 &&& 1 \\
+\texttt{Eastern Bays}     &&  0 & 1 & 0 &&& 0 & 1 &&& 0 & 0 & 1 & 0 &&& 1 \\
+\texttt{Puget Sound}      &&  0 & 1 & 0 &&& 0 & 1 &&& 0 & 0 & 1 & 0 &&& 1 \\
+\texttt{CA.Mainland}      &&  0 & 0 & 1 &&& 1 & 0 &&& 0 & 0 & 0 & 1 &&& 1 \\
+\texttt{CA.ChannelIslands}&&  0 & 0 & 1 &&& 1 & 0 &&& 0 & 0 & 0 & 1 &&& 1 \\
+\texttt{OR North Coast}   &&  1 & 0 & 0 &&& 1 & 0 &&& 1 & 0 & 0 & 0 &&& 1 \\
+\texttt{OR South Coast}   &&  1 & 0 & 0 &&& 1 & 0 &&& 0 & 0 & 0 & 1 &&& 1 \\
+\texttt{Georgia Strait}   &&  0 & 1 & 0 &&& 0 & 1 &&& 0 & 1 & 0 & 0 &&& 1 \\
+\end{tabular} 
+\end{center}
+\end{table}
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+To tell \verb@MARSS()@ the form of $\ZZ$, we construct the same matrix in R.  For example, for hypotheses 1, we can write:
+<<Z.model, keep.source=TRUE>>=
+Z.model <- matrix(0, 11, 3)
+Z.model[c(1, 2, 9, 10), 1] <- 1 # which elements in col 1 are 1
+Z.model[c(3:6, 11), 2] <- 1 # which elements in col 2 are 1
+Z.model[7:8, 3] <- 1 # which elements in col 3 are 1
+@
+
+MARSS has a shortcut for making this kind of $\ZZ$ matrix using \verb@factor()@. The following code specifies the same $\ZZ$ matrix:
+<<Z.model.1>>=
+Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), "ca", "ca", "wa.or", "wa.or", "bc"))
+@
+Each element in the \verb@c()@ vector is for one of the rows of $\ZZ$ and indicates which column the ``1'' appears in or which row of your data belongs to which subpopulation. Notice the vector is 11 elements in length; one element for each row of data (in this case survey region).
+
+\subsection{Specify the $\uu$ structure}
+We will assume that subpopulations can have a unique population growth rate. Mathematically, this means that the $\uu$ matrix in Equation \ref{eqn:spat.struc.marss} looks like this for hypotheses 1 (3 subpopulations):
+$$
+\begin{bmatrix}
+u_1\\
+u_2\\
+u_3
+\end{bmatrix}
+$$
+To specify this, we construct \verb@U.model@ as a character matrix where shared elements have the same character name.  For example, 
+<<U.model14>>=
+U.model <- matrix(c("u1", "u2", "u3"), 3, 1)
+@
+for a three subpopulation model.  Alternatively, we can use the shortcut \verb@U.model="unequal"@.
+
+\subsection{Specify the $\QQ$ structures}
+For our first analysis, we fit a model where the subpopulations experience independent process errors.   We will use two different types of independent process errors: independent process errors with different variances and independent process errors with identical variance.  Independence is specified with a diagonal variance-covariance matrix with 0s on the off-diagonals.
+
+Independent process errors with different variances is a diagonal matrix with different values on the diagonal:
+$$
+\begin{bmatrix}
+q_1&0&0\\
+0&q_2&0\\
+0&0&q_3
+\end{bmatrix}
+$$
+This matrix has fixed numeric values, the zeros, combined with symbols $q_1$, $q_2$ and $q_3$, representing estimated values.  We specified this for \verb@MARSS()@ using a list matrix which combines numeric values (the fixed zeros) with character values (names of the estimated elements).  The following produces this and printing it shows that it combines numeric values and character strings in quotes.
+<<Q.model1, keep.source=TRUE>>=
+Q.model <- matrix(list(0), 3, 3)
+diag(Q.model) <- c("q1", "q2", "q3")
+Q.model
+@
+We can also use the shortcut \verb@Q.model="diagonal and unequal"@.
+@
+
+Independent process errors with identical variance is a diagonal matrix with one value on the diagonal:
+$$
+\begin{bmatrix}
+q&0&0\\
+0&q&0\\
+0&0&q
+\end{bmatrix}
+$$
+<<Q.model2, keep.source=TRUE>>=
+Q.model <- matrix(list(0), 3, 3)
+diag(Q.model) <- "q"
+Q.model
+@
+The shortcut for this form is \verb@Q.model="diagonal and equal"@.
+
+\section{Fit the different models}
+
+The dataset \verb@harborSeal@ is a 29-year dataset of abundance indices for each of 12 regions between 1975-2004 (Figure \ref{fig:harborSeal}). We start by setting up our data matrix.  We will leave off Hood Canal (column 8) for now.
+<<Cs01_set.up.data, keep.source=TRUE>>=
+years <- harborSeal[, 1] # first col is years
+# leave off Hood Canal data for now
+sealData <- t(harborSeal[, c(2:7, 9:13)])
+@
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[htp]
+\begin{center}
+<<Cs02_fig1,fig=TRUE,echo=FALSE,width=6,height=6>>=
+par(mfrow = c(4, 3), mar = c(2, 2, 2, 2))
+for (i in 2:dim(harborSeal)[2]) {
+  plot(years, harborSeal[, i], xlab = "", ylab = "", 
+       main = colnames(harborSeal)[i])
+}
+@
+\end{center}
+\caption{Plot of the of the harbor seal sites in the harborSeal dataset. Each point is an index of the harbor seal abundance in that region. }
+\label{fig:harborSeal}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We will set up our models so we can fit all of them with one loop of code. 
+
+First the $\ZZ$ models.
+<<Cs03_set.up.Z.models>>=
+# H1 stock
+Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), "ca", "ca", "wa.or", "wa.or", "bc"))
+# H2 coastal+PS
+Z2 <- factor(c(rep("coast", 2), rep("ps", 4), rep("coast", 4), "ps"))
+# H3 N and S
+Z3 <- factor(c(rep("N", 6), "S", "S", "N", "S", "N"))
+# H4 North Coast, Inland Strait, Puget Sound, South Coast
+Z4 <- factor(c("nc", "nc", "is", "is", "ps", "ps", "sc", "sc", "nc", "sc", "is"))
+# H5 panmictic
+Z5 <- factor(rep("pan", 11))
+# H6 Site
+Z6 <- factor(1:11) # site
+Z.models <- list(Z1, Z2, Z3, Z4, Z5, Z6)
+names(Z.models) <-
+  c("stock", "coast+PS", "N-S", "NC+Strait+PS+SC", "panmictic", "site")
+@
+Next we set up the $\QQ$ models.
+<<Cs04_Q.models>>=
+Q.models <- c("diagonal and equal", "diagonal and unequal")
+@
+The rest of the model matrices have the same form across all models.
+<<Cs04a_other.models>>=
+U.model <- "unequal"
+R.model <- "diagonal and equal"
+A.model <- "scaling"
+B.model <- "identity"
+x0.model <- "unequal"
+V0.model <- "zero"
+model.constant <- list(
+  U = U.model, R = R.model, A = A.model,
+  x0 = x0.model, V0 = V0.model, tinitx = 0
+)
+@
+
+We loop through the models, fit and store the results:
+<<Cs05_run.the.models, keep.source=TRUE>>=
+out.tab <- NULL
+fits <- list()
+for (i in 1:length(Z.models)) {
+  for (Q.model in Q.models) {
+    fit.model <- c(list(Z = Z.models[[i]], Q = Q.model), model.constant)
+    fit <- MARSS(sealData,
+      model = fit.model,
+      silent = TRUE, control = list(maxit = 1000)
+    )
+    out <- data.frame(
+      H = names(Z.models)[i], Q = Q.model, U = U.model,
+      logLik = fit$logLik, AICc = fit$AICc, num.param = fit$num.params,
+      m = length(unique(Z.models[[i]])),
+      num.iter = fit$numIter, converged = !fit$convergence,
+      stringsAsFactors = FALSE
+    )
+    out.tab <- rbind(out.tab, out)
+    fits <- c(fits, list(fit))
+    if (i == 5) next # one m for panmictic so only run 1 Q
+  }
+}
+@
+
+\section{Summarize the data support}
+\index{model selection!AIC weights}
+We will use AICc and AIC weights to summarize the data support for the different hypotheses.  First we will sort the fits based on AICc:
+<<Cs06_sort.results>>=
+min.AICc <- order(out.tab$AICc)
+out.tab.1 <- out.tab[min.AICc, ]
+@
+Next we add the $\Delta$AICc values by subtracting the lowest AICc:
+<<Cs07_add.delta.aicc>>=
+out.tab.1 <- cbind(out.tab.1,
+  delta.AICc = out.tab.1$AICc - out.tab.1$AICc[1]
+)
+@
+Relative likelihood is defined as $\exp(-\Delta \mathrm{AICc}/2)$.
+<<Cs08_add.delta.aicc>>=
+out.tab.1 <- cbind(out.tab.1,
+  rel.like = exp(-1 * out.tab.1$delta.AICc / 2)
+)
+@
+The AIC weight for a model is its relative likelihood divided by the sum of all the relative likelihoods.  
+<<Cs09_aic.weight>>=
+out.tab.1 <- cbind(out.tab.1,
+  AIC.weight = out.tab.1$rel.like / sum(out.tab.1$rel.like)
+)
+@
+
+Let's look at the model weights (\verb@out.tab.1@):
+<<Cs10_print.table, echo=FALSE>>=
+out.tab.1$delta.AICc <- round(out.tab.1$delta.AICc, digits = 2)
+out.tab.1$AIC.weight <- round(out.tab.1$AIC.weight, digits = 3)
+print(out.tab.1[, c("H", "Q", "delta.AICc", "AIC.weight")], row.names = FALSE)
+@
+
+It appears that a population structure north and south coast subpopulations and two inland subpopulations is more supported than any of the other population structures---under the assumption of independent process errors. The latter means that good and bad years are not correlated across the subpopulations.  The stock structure, supported by genetic information, does not appear to correspond to independent subpopulations and the individual survey regions, which are characterized by differential pupping times, does not appear to correspond to independent subpopulations either.
+
+Figure \ref{fig:northsouth} shows the the four subpopulation trajectories estimated by the best fit model.  The trajectories have been rescaled so that each starts at 0 in 1975 (to facilitate comparison).
+
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{figure}[htp]
+\begin{center}
+<<Cs11_fignorthsouth,fig=TRUE,echo=FALSE,width=5,height=5>>=
+best.fit <- fits[min.AICc][[1]]
+graphics::matplot(years, t(best.fit$states - best.fit$states[, 1]),
+  ylab = "Abundance index", xlab = "",
+  type = "l", lwd = 2, col = "black"
+)
+legend("topleft", c("North Coastal", "Inland Straits", "Puget Sound", "South Coastal"), lwd = 2, lty = c(1:4), bty = "n")
+@
+\end{center}
+\caption{Estimated trajectories for the four subpopulations in the best-fit model.  The plots have been rescaled so that each is at 0 at 1975.}
+\label{fig:northsouth}
+\end{figure}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\section{Question 2, Are the subpopulations independent?}
+The assumption of independent process errors is unrealistic given ocean conditions are correlated across large spatial scales.  We will repeat the analysis allowing correlated process errors using two different $\QQ$ models.  The first correlated $\QQ$ model is correlated process errors with the same variance and covariance.  For a model with three subpopulations, this $\QQ$ would look like:
+$$
+\begin{bmatrix}
+q&c&c\\
+c&q&c\\
+c&c&q
+\end{bmatrix}
+$$
+We can construct this like so
+<<Q.model3, keep.source=TRUE>>=
+#identical variances
+Q.model <- matrix("c", 3, 3)
+diag(Q.model) <- "q"
+@
+or use the short-cut \verb@Q.model="equalvarcov"@.
+The second type of correlated $\QQ$ we will use is allows each subpopulation to have a different process variance and covariances. For a model with three subpopulations, this is the following variance-covariance matrix:
+$$
+\begin{bmatrix}
+q_1&c_{1,2}&c_{1,3}\\
+c_{1,2}&q_2&c_{2,3}\\
+c_{1,2}&c_{2,3}&q_3
+\end{bmatrix}
+$$
+Constructing this is tedious in R, but there is a short-cut: \verb@Q.model="unconstrained"@.
+
+We will re-run all the $\ZZ$ matrices with these two extra $\QQ$ types and add them to our results table.
+<<Cs12_new.Q.model, keep.source=TRUE>>=
+for (i in 1:length(Z.models)) {
+  if (i == 5) next # don't rerun panmictic
+  for (Q.model in c("equalvarcov", "unconstrained")) {
+    fit.model <- c(list(Z = Z.models[[i]], Q = Q.model), model.constant)
+    fit <- MARSS(sealData,
+      model = fit.model,
+      silent = TRUE, control = list(maxit = 1000)
+    )
+    out <- data.frame(
+      H = names(Z.models)[i], Q = Q.model, U = U.model,
+      logLik = fit$logLik, AICc = fit$AICc, num.param = fit$num.params,
+      m = length(unique(Z.models[[i]])),
+      num.iter = fit$numIter, converged = !fit$convergence,
+      stringsAsFactors = FALSE
+    )
+    out.tab <- rbind(out.tab, out)
+    fits <- c(fits, list(fit))
+  }
+}
+@
+
+Again we sort the models by AICc and compute model weights.
+<<Cs13_out.tab.2>>=
+min.AICc <- order(out.tab$AICc)
+out.tab.2 <- out.tab[min.AICc, ]
+fits <- fits[min.AICc]
+out.tab.2 <- cbind(out.tab.2, delta.AICc = out.tab.2$AICc - out.tab.2$AICc[1])
+out.tab.2 <- cbind(out.tab.2, rel.like = exp(-1 * out.tab.2$delta.AICc / 2))
+out.tab.2 <- cbind(out.tab.2, AIC.weight = out.tab.2$rel.like / sum(out.tab.2$rel.like))
+@
+
+Examination of the expanded results table (\verb@out.tab.2@) shows there is strong support for correlated process errors; top 10 models shown:
+<<Cs14_out.tab.2, echo=FALSE>>=
+out.tab.2$AIC.weight <- round(out.tab.2$AIC.weight, digits = 3)
+out.tab.2$delta.AICc <- round(out.tab.2$delta.AICc, digits = 2)
+print(out.tab.2[1:10, c("H", "Q", "delta.AICc", "AIC.weight")], row.names = FALSE)
+@
+The model weight for ``equalvarcov'', ``unconstrained'', versus ``diagonal and equal'' is 
+<<Cs15_equalvarcov.weight>>=
+c(
+  sum(out.tab.2$AIC.weight[out.tab.2$Q == "equalvarcov"]),
+  sum(out.tab.2$AIC.weight[out.tab.2$Q == "unconstrained"]),
+  sum(out.tab.2$AIC.weight[out.tab.2$Q == "diagonal and equal"])
+)
+@
+
+\subsection{Looking at the correlation structure in the $\QQ$ matrix}
+The 3rd model in the output table is a model with all elements of the process error variance-covariance matrix estimated.  Estimating a variance-covariance matrix with so many extra parameters is not supported relative to a constrained variance-covariance matrix with two parameters (compare the AICc for the 1st model and 3rd model) but looking at the full variance-covariance matrix shows some interesting and not surprising patterns.
+
+The $\QQ$ matrix is recovered from the model fit using this command
+<<Cs16_Q.mat>>=
+Q.unc <- coef(fits[[3]], type = "matrix")$Q
+@
+The diagonal of this matrix shows that each region appears to experience process variability of a similar magnitude:
+<<Cs17_Q.diag>>=
+diag(Q.unc)
+@
+We can compute the correlation matrix as follows.  Row names are added to make the matrix more readable.
+<<Cs18_Q.corr, keep.source=TRUE>>=
+h <- diag(1 / sqrt(diag(Q.unc)))
+Q.corr <- h %*% Q.unc %*% h
+rownames(Q.corr) <- unique(Z4)
+colnames(Q.corr) <- unique(Z4)
+
+Q.corr
+@
+
+The correlation matrix indicates that the inland strait (`is' in the table) subpopulation experiences process errors (good and bad years) that are almost perfectly correlated with the Puget Sound subpopulation though the two have different population growth rates (Figure \ref{fig:northsouth}).  Similarly the north and south coastal subpopulations (`nc' and `sc') experience highly correlated process errors, though again population growth rates are much higher to the north.  There is much higher correlation between the process errors of the north coastal subpopulation and the nearby inland straits and Puget Sound subpopulations than between the two inland subpopulations and the much farther south coastal subpopulation.  These patterns are not ecologically surprising but are not easy to discern looking at the raw count data.
+
+
+\section{Question 3, Is the Hood Canal independent?}
+In the initial analysis, the data from Hood Canal were removed.  Hood Canal has experienced a series of hypoxic events which has led to large perturbations to the harbor seal prey.  We will add the Hood Canal data back in and look at whether treating Hood Canal as separate is supported compared to treating it as part of the Puget Sound subpopulation in the top model.
+
+<<Cs19_add.hood.canal, keep.source=TRUE>>=
+sealData.hc <- rbind(sealData, harborSeal[, 8])
+rownames(sealData.hc)[12] <- "Hood.Canal"
+@
+Here are the two $\ZZ$ matrices for a `Hood Canal in the Puget Sound' and `Hood Canal separate' model:
+<<Cs20_hood.z.models>>=
+ZH1 <- factor(c("nc", "nc", "is", "is", "ps",
+  "ps", "sc", "sc", "nc", "sc", "is", "ps"))
+ZH2 <- factor(c("nc", "nc", "is", "is", "ps",
+  "ps", "sc", "sc", "nc", "sc", "is", "hc"))
+Z.models.hc <- list(ZH1, ZH2)
+names(Z.models.hc) <- c("hood.in.ps", "hood.separate")
+@
+
+We will test three different $\QQ$ matrices: a matrix with one variance and one covariance, an unconstrained variance-covariance matrix and a variance-covariance matrix where the Hood Canal subpopulation has independent process errors.
+<<Cs21_hood.uqr.models>>=
+Q3 <- matrix(list("offdiag"), 5, 5)
+diag(Q3) <- "q"
+Q3[, 5] <- 0
+Q3[5, ] <- 0
+Q3[5, 5] <- "q.hc"
+Q.models <- list("equalvarcov", "unconstrained", Q3)
+names(Q.models) <- c("equalvarcov", "unconstrained", "hood.independent")
+@
+The independent Hood Canal $\QQ$ allow correlation between the other four subpopulations but none between Hood Canal and those four:
+<<Cs22_hood-q3>>=
+Q.models$hood.independent
+@
+
+As before, we loop through the model and create a results table:
+<<Cs23_out.tab.hc, keep.source=TRUE>>=
+out.tab.hc <- NULL
+fits.hc <- list()
+for (i in 1:length(Z.models.hc)) {
+  for (j in 1:length(Q.models)) {
+    if (i == 1 & j == 3) next # Q3 is only for Hood Separate model
+    Q.model <- Q.models[[j]]
+    fit.model <- c(list(Z = Z.models.hc[[i]], Q = Q.model), model.constant)
+    fit <- MARSS(sealData.hc,
+      model = fit.model,
+      silent = TRUE, control = list(maxit = 1000)
+    )
+    out <- data.frame(
+      H = names(Z.models.hc)[i], Q = names(Q.models)[j], U = U.model,
+      logLik = fit$logLik, AICc = fit$AICc, num.param = fit$num.params,
+      m = length(unique(Z.models.hc[[i]])),
+      num.iter = fit$numIter, converged = !fit$convergence,
+      stringsAsFactors = FALSE
+    )
+    out.tab.hc <- rbind(out.tab.hc, out)
+    fits.hc <- c(fits.hc, list(fit))
+  }
+}
+@
+
+We sort the results by AICc and compute the $\Delta$AICc.
+<<Cs24_sort.aicc.hc>>=
+min.AICc <- order(out.tab.hc$AICc)
+out.tab.hc <- out.tab.hc[min.AICc, ]
+out.tab.hc <- cbind(out.tab.hc, delta.AICc = out.tab.hc$AICc - out.tab.hc$AICc[1])
+out.tab.hc <- cbind(out.tab.hc, rel.like = exp(-1 * out.tab.hc$delta.AICc / 2))
+out.tab.hc <- cbind(out.tab.hc, AIC.weight = out.tab.hc$rel.like / sum(out.tab.hc$rel.like))
+@
+The results table (\verb@out.tab.hc@) indicates strong support for treating Hood Canal as a separate subpopulation but not support for completely independent process errors.
+<<Cs25_out.tab.2, echo=FALSE>>=
+out.tab.hc$AIC.weight <- round(out.tab.hc$AIC.weight, digits = 3)
+out.tab.hc$delta.AICc <- round(out.tab.hc$delta.AICc, digits = 2)
+print(out.tab.hc[, c("H", "Q", "delta.AICc", "AIC.weight")], row.names = FALSE)
+@
+
+
+\section{Discussion}
+In this chapter, we used model selection and AICc model weights to explore the temporal correlation structure in the harbor seal abundance data from the U.S. west coast.  We used the term `subpopulation', however it should be kept in mind that we are actually looking at the data support for different spatial patterns of temporal correlation in the process errors.  Treating region A and B as a `subpopulation' in this context means that we are asking if the counts from A and B can be treated as observations of the same underlying stochastic trajectory.
+
+Metapopulation structure refers to a case where a larger population is composed of a collection of smaller temporally independent subpopulations.  Metapopulation structure buffers the variability seen in the larger population and has important consequences for the viability of a population.  We tested for temporal independence using diagonal versus non-diagonal $\QQ$ matrices.  Although the west coast harbor seal population appears to be divided into `subpopulations' that experience different population growth rates, there is strong temporal correlation in the year-to-year variability experienced in these subpopulations.  This suggests that this harbor seal population does not function as a true metapopulation with independent subpopulations but rather as a collection of subpopulations that are temporally correlated.

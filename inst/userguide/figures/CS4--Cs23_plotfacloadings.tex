@@ -1,0 +1,25 @@
+\begin{Schunk}
+\begin{Sinput}
+ # plot the factor loadings
+ spp <- rownames(dat.z)
+ minZ <- 0.05
+ m <- dim(trends.rot)[1]
+ ylims <- c(-1.1 * max(abs(Z.rot)), 1.1 * max(abs(Z.rot)))
+ par(mfrow = c(ceiling(m / 2), 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
+ for (i in 1:m) {
+   plot(c(1:N.ts)[abs(Z.rot[, i]) > minZ], as.vector(Z.rot[abs(Z.rot[, i]) > minZ, i]),
+     type = "h", lwd = 2, xlab = "", ylab = "", xaxt = "n", ylim = ylims, xlim = c(0, N.ts + 1)
+   )
+   for (j in 1:N.ts) {
+     if (Z.rot[j, i] > minZ) {
+       text(j, -0.05, spp[j], srt = 90, adj = 1, cex = 0.9)
+     }
+     if (Z.rot[j, i] < -minZ) {
+       text(j, 0.05, spp[j], srt = 90, adj = 0, cex = 0.9)
+     }
+     abline(h = 0, lwd = 1, col = "gray")
+   } # end j loop
+   mtext(paste("Factor loadings on trend", i, sep = " "), side = 3, line = .5)
+ } # end i loop
+\end{Sinput}
+\end{Schunk}

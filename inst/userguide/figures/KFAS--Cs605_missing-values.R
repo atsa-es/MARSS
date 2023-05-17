@@ -1,0 +1,15 @@
+###################################################
+### code chunk number 57: Cs605_missing-values
+###################################################
+fitted_kfas_NA <- data.frame(
+  smooth = as.vector(fitted(fit_kfas_NA$model)),
+  one.step.ahead = as.vector(fitted(fit_kfas_NA$model, filtered = TRUE)),
+  name = "KFAS"
+)
+fitted_marss_NA <- data.frame(
+  smooth = fitted(fit_marss_NA, type = "ytT")$.fitted,
+  one.step.ahead = fitted(fit_marss_NA, type = "ytt1")$.fitted,
+  name = "MARSS"
+)
+
+

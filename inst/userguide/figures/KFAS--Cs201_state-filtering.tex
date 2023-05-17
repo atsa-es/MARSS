@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ fit_kfas <- fit_kfas_stoch
+ fit_marss <- fit_em_stoch
+ fit_marss$par$Q[1, 1] <- fit_kfas$model$Q
+ fit_marss$par$R[1, 1] <- fit_kfas$model$H
+\end{Sinput}
+\end{Schunk}

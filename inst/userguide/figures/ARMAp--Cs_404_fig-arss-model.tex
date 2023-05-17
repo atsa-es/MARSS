@@ -1,0 +1,27 @@
+\begin{Schunk}
+\begin{Sinput}
+ ar2ss <- MARSS(noisy.data, model = model.list.2ss)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 101 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 101 iterations. 
+Log-likelihood: -1368.796 
+AIC: 2745.592   AICc: 2745.632   
+ 
+     Estimate
+R.r     0.477
+B.b1   -1.414
+B.b2   -0.685
+Q.q     0.140
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

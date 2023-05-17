@@ -1,0 +1,37 @@
+\begin{Schunk}
+\begin{Sinput}
+ Z <- factor(c(1, 1, 1, 1, 1))
+ R <- "diagonal and unequal"
+ kem <- MARSS(dat, model = list(Z = Z, R = R))
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 24 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 24 iterations. 
+Log-likelihood: 16.66199 
+AIC: -9.323982   AICc: -3.944671   
+ 
+                Estimate
+A.SJI            0.79555
+A.EBays          0.27540
+A.PSnd          -0.53694
+A.HC            -0.60874
+R.(SJF,SJF)      0.03229
+R.(SJI,SJI)      0.03528
+R.(EBays,EBays)  0.01352
+R.(PSnd,PSnd)    0.01082
+R.(HC,HC)        0.19609
+U.U              0.05270
+Q.Q              0.00604
+x0.x0            6.26676
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,21 @@
+\begin{Schunk}
+\begin{Sinput}
+ rbind(
+   MARSS = c(
+     Q = coef(fit_marss_NA, type = "matrix")$Q,
+     R = coef(fit_marss_NA, type = "matrix")$R,
+     logLik = logLik(fit_marss_NA)
+   ),
+   KFAS = c(
+     Q = fit_kfas_NA$model$Q,
+     R = fit_kfas_NA$model$H,
+     logLik = -1 * fit_kfas_NA$optim.out$value
+   )
+ )
+\end{Sinput}
+\begin{Soutput}
+             Q        R    logLik
+MARSS 22133.85 52955.30 -433.0319
+KFAS  22084.75 53400.57 -433.0312
+\end{Soutput}
+\end{Schunk}

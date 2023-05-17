@@ -1,0 +1,68 @@
+\begin{Schunk}
+\begin{Sinput}
+ dat <- t(harborSeal)
+ dat <- dat[c(2, nrow(dat)), ]
+ fit1 <- MARSS(dat)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 59 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 59 iterations. 
+Log-likelihood: 11.68334 
+AIC: -9.366688   AICc: -5.366688   
+ 
+                                          Estimate
+R.diag                                     0.00653
+U.X.CoastalEstuaries                       0.06083
+U.X.Georgia.Strait                         0.08278
+Q.(X.CoastalEstuaries,X.CoastalEstuaries)  0.02048
+Q.(X.Georgia.Strait,X.Georgia.Strait)      0.00889
+x0.X.CoastalEstuaries                      7.37351
+x0.X.Georgia.Strait                        8.40877
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\begin{Sinput}
+ MCinits <- MARSSmcinit(fit1, control = list(numInits = 10))
+\end{Sinput}
+\begin{Soutput}
+> Starting Monte Carlo Initializations
+          |2%      |20%      |40%      |60%      |80%      |100%
+Progress: ||||||||||||||||||||||||||||||||||||||||||||||||||
+\end{Soutput}
+\begin{Sinput}
+ fit2 <- MARSS(dat, inits = MCinits)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 48 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 48 iterations. 
+Log-likelihood: 11.68305 
+AIC: -9.366097   AICc: -5.366097   
+ 
+                                          Estimate
+R.diag                                     0.00654
+U.X.CoastalEstuaries                       0.06083
+U.X.Georgia.Strait                         0.08278
+Q.(X.CoastalEstuaries,X.CoastalEstuaries)  0.02046
+Q.(X.Georgia.Strait,X.Georgia.Strait)      0.00888
+x0.X.CoastalEstuaries                      7.37352
+x0.X.Georgia.Strait                        8.40880
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,32 @@
+\begin{Schunk}
+\begin{Sinput}
+ Z <- factor(c(1, 1, 1, 1, 1))
+ kem <- MARSS(dat, model = list(Z = Z))
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 28 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 28 iterations. 
+Log-likelihood: 3.593276 
+AIC: 8.813447   AICc: 11.13603   
+ 
+        Estimate
+A.SJI    0.80153
+A.EBays  0.28245
+A.PSnd  -0.54802
+A.HC    -0.62665
+R.diag   0.04523
+U.U      0.04759
+Q.Q      0.00429
+x0.x0    6.39199
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,7 @@
+\begin{Schunk}
+\begin{Sinput}
+ m <- nrow(B)
+ vecV <- solve(diag(m * m) - kronecker(B, B)) %*% as.vector(Q)
+ V_inf <- matrix(vecV, nrow = m, ncol = m)
+\end{Sinput}
+\end{Schunk}

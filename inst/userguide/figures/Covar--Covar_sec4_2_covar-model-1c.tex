@@ -1,0 +1,34 @@
+\begin{Schunk}
+\begin{Sinput}
+ model.list$B <- "diagonal and unequal"
+ kem <- MARSS(dat, model = model.list)
+\end{Sinput}
+\begin{Soutput}
+Success! algorithm run for 15 iterations. abstol and log-log tests passed.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Algorithm ran 15 (=minit) iterations and convergence was reached. 
+Log-likelihood: -236.6106 
+AIC: 493.2211   AICc: 494.2638   
+ 
+                              Estimate
+B.(X.Greens,X.Greens)           0.1981
+B.(X.Bluegreens,X.Bluegreens)   0.7672
+Q.diag                          0.4899
+Q.offdiag                      -0.0221
+x0.X.Greens                    -1.2915
+x0.X.Bluegreens                -0.4179
+C.(X.Greens,Temp)               0.2844
+C.(X.Bluegreens,Temp)           0.1655
+C.(X.Greens,TP)                 0.0332
+C.(X.Bluegreens,TP)             0.1340
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

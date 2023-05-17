@@ -1,0 +1,25 @@
+\begin{Schunk}
+\begin{Sinput}
+ model <- mod.nile.3
+ kem.3 <- MARSS(dat,
+   model = model, inits = list(x0 = matrix(c(1000, -4), 2, 1)),
+   control = list(maxit = 20), silent = TRUE
+ )
+ kem.3 <- MARSS(dat,
+   model = model, inits = kem.3,
+   method = "BFGS", silent = TRUE
+ )
+ summary(kem.3)
+\end{Sinput}
+\begin{Soutput}
+m: 2 state process(es) named X1 X2
+n: 1 observation time series named Nile
+
+  term      estimate
+1  R.r  1.611549e+04
+2  Q.q  8.427672e+02
+3  Q.p  3.693550e-07
+4 x0.x  1.118521e+03
+5 x0.u -3.108126e+00
+\end{Soutput}
+\end{Schunk}

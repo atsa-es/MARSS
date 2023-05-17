@@ -1,0 +1,149 @@
+
+PC
+Open up command prompt from start menu
+#1 make sure Makefile is updated to Sweave and Stangle any new .Rnw files added to the User Guide
+#2 make sure R is updated and all packages needed for vignettes are installed in RStudio (fine if local) .packages(all.available=TRUE)
+
+cd to folder with the source code (e.g. Dropbox)
+R CMD build MARSS_source_3.x (build the tar.gz file)
+R CMD build MARSS (if building MARSS in GitHub folder)
+
+#not used
+##R CMD INSTALL --build MARSS_X.X.tar.gz  (build the windows binaries from the tar.gz)
+##*Note if you make a zip from RStudio it will not have the vignettes
+
+Mac
+Open terminal. Cd to Documents/GitHub
+# if on a branch, open shell in Git tab within RStudio
+
+cd ~/Documents/GitHub
+R CMD build MARSS
+#install.packages(path\MARSS.tar.gz, repos=NULL)
+cp MARSS_3.10.12.tar.gz ~/Dropbox/MARSS_3.10.12.tar.gz
+cd ~/Dropbox 
+rm -r MARSS
+rm -r MARSS_3.10.12.tar
+gunzip MARSS_3.10.12.tar.gz
+tar xopf MARSS_3.10.12.tar
+rm MARSS/vignettes/Makefile 
+R CMD build --no-build-vignettes MARSS
+rm -r MARSS.Rcheck
+R CMD check --timings --as-cran MARSS_3.10.12.tar.gz
+
+  #need to check with vignette building because CRAN checks
+
+
+1/6/2020 procedure
+Open terminal; copy and right-click should put text
+
+C:
+cd "C:/Users/Eli.Holmes/Documents/GitHub"
+R CMD build MARSS
+rm -r "C:/Users/Eli.Holmes/Dropbox/MARSS"
+cp MARSS_3.10.12.tar.gz "C:/Users/Eli.Holmes/Dropbox/MARSS_3.10.12.tar.gz"
+cd "C:/Users/Eli.Holmes/Dropbox"
+tar -xvzf MARSS_3.10.12.tar.gz
+rm "C:/Users/Eli.Holmes/Dropbox/MARSS/vignettes/Makefile"
+R CMD build --no-build-vignettes MARSS
+rm -r "C:/Users/Eli.Holmes/Dropbox/MARSS.Rcheck"
+Rcmd check --timings --as-cran MARSS_3.10.12.tar.gz
+
+MAC
+cd ~/Documents/GitHub
+rm MARSS_3.11.4.tar.gz
+R CMD build MARSS
+rm -r ~/Dropbox/MARSS
+rm ~/Dropbox/MARSS_3.11.4.tar.gz
+cp MARSS_3.11.4.tar.gz ~/Dropbox/MARSS_3.11.4.tar.gz
+cd ~/Dropbox
+tar -xvzf MARSS_3.11.4.tar.gz
+rm ~/Dropbox/MARSS/vignettes/Makefile
+R CMD build --no-build-vignettes MARSS
+rm -r ~/Dropbox/MARSS.Rcheck
+R CMD check --timings --as-cran MARSS_3.11.4.tar.gz
+
+# Running checks without building the vignettes
+devtools::check(document = FALSE, vignettes=FALSE)
+
+# Just checking examples
+devtools::run_examples(pkg="~/Documents/GitHub/MARSS", document=FALSE, fresh=TRUE)
+
+# spellcheck the whole package
+# devtools::install_github("ropensci/spelling")
+spelling::spell_check_package()
+fils <- dir("vignettes/manual_files", full.names = TRUE)
+fils <- fils[stringr::str_detect(fils, "Rnw")]
+spelling::spell_check_files(fils, ignore = spelling::get_wordlist(pkg = "."), lang = "en_US")
+
+# Check Manual
+setwd("~/Documents/GitHub")
+devtools::build_manual(pkg="MARSS")
+
+# Run version tests (compare versions)
+versiontest.R
+
+# Run tests
+devtools::test()
+
+# Update the doc folder for GitHub
+# This has to be done manually by copying from
+# Dropbox/MARSS/inst/doc into GitHub/MARSS/inst/doc
+
+
+Submitting to CRAN once it is really ready
+* make sure the most recent R is installed and Rtools
+* Re-read the submission guideline to see if anything has changed
+* submit on https://cran.r-project.org/submit.html
+
+
+Out of date info below
+
+Check that it can be built with no warnings
+* Rcmd check --no-vignettes --timings --as.cran from RStudio to debug the man files and examples
+* no warnings! nada.
+
+
+Clean up the tar.gz that goes to CRAN
+
+* Run R CMD build MARSS_source to make the user guide and MARSS_X.X.tar.gz file
+* Extract the tar.gz file and save MARSS somewhere. Path must not have spaces! So 'My Documents' won't work.  Click on it, extract to temp folder, then extract to dropbox
+* Go into MARSS/vignettes /inst/doc and delete the Makefile, and any other files that should not be there
+* edit DESCRIPTION buildVignettes: no
+* [If the manual pdf is large, try compressing] Go into inst/doc and open Manual.pdf in Acobat.  Under advanced click pdfoptimizer and run.  Just save file back on Manual.pdf
+* Run R CMD build --no-build-vignettes MARSS to remake MARSS_X.X.tar.gz w/o the makefiles
+* Run Rcmd check --as-cran MARSS_X.X.tar.gz to check that the package will install and will run its examples, and that the documentation is complete and can be processed.  No errors allowed. Lately it is getting hung on directory spaces. cd to c: (yes, you need to go to C:) and use Rcmd check "C:\Documents and Settings\...\MARSS_X.X.tar.gz".  If you need to go back and forth between build and check, then it is easier to open a new terminal window for building.  Note, the check files will be in folder MARSS.Rcheck at the level where the command was run (so if you cd'd to C:, look for it at C:).
+* look at the timings file to make sure nothing takes too long.  5 sec max.
+* the build process will put the Rnw files doc folder and I want the pdfs with same name so that CRAN does not build the Rnw.  The Rnw is a flag to CRAN to list the vignettes on the package CRAN page.  UserGuide.Rnw is a dummy file to trick CRAN into adding the UserGuide pdf on the package page.
+
+Submitting to CRAN
+upload the .tar.gz file, using anonymous as log-in name and your e-mail address as password, to ftp://CRAN.R-project.org/incoming/ (note: use ‘ftp’ and not ‘sftp’ to connect to this server) and send a message to CRAN@R-project.org about it.  Subject of email should be "CRAN submission MARSS 3.X"  Explain what the version does.  Must come from eli.holmes@noaa.gov.  Make sure to send in plain text.  Gmail has plain option under 'more options' (bottom corner little arrow).
+
+
+
+Debugging slow vignette builds
+
+Find where R is putting the build
+Sys.getenv("Temp")
+
+Go there and look for the folder where time stamp is recent
+It'll look something like  Rtmp6nx6Pj\Rbuildd4d2caf
+Navigate to doc/figures and see where it hangs
+Often the problem is with tex step.  If it throws an error, it doesn't report the error, just stops.
+
+If it is stopping on a .tex file, run the tex file right from the folder to diagnose the problem.
+
+If MikTex cannot find Sweave.sty, go into MikTeX preferences.  Check that the roots points to R_newest_version\share\texmf   As you update R and remove old versions, that root can get deleted.
+
+
+Testing the package
+# See R code in Testing_package.R
+see versiontest.R in inst doc of MARSS package
+
+
+RStudio instructions
+Under More, use Build Source Package
+Then extract the tar.gz file and get rid of Makefile and .Rdata file following instructions above
+Add --timings to check under More
+
+
+

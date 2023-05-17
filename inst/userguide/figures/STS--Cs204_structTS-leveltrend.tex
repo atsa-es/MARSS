@@ -1,0 +1,19 @@
+\begin{Schunk}
+\begin{Sinput}
+ fit2$kf <- MARSSkfss(fit2)
+ fit3$kf <- MARSSkfss(fit3)
+ fit4$kf <- MARSSkfss(fit4)
+ data.frame(
+   StructTS = fit1$fitted[, 2], fit2 = fit2$kf$xtt[2, ],
+   fit.bfgs = fit3$kf$xtt[2, ], fit.em = fit4$kf$xtt[2, ]
+ )[1:5, ]
+\end{Sinput}
+\begin{Soutput}
+      StructTS         fit2     fit.bfgs       fit.em
+1  0.000000000  0.000000000  0.000000000  0.000000000
+2 -0.003519920 -0.003519920 -0.003518509 -0.003546573
+3  0.005201072  0.005201072  0.005203550  0.005264063
+4  0.006762808  0.006762808  0.006759700  0.006890458
+5  0.007290557  0.007290557  0.007286018  0.007429600
+\end{Soutput}
+\end{Schunk}

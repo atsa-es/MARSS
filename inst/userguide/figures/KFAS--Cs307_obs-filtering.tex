@@ -1,0 +1,23 @@
+\begin{Schunk}
+\begin{Sinput}
+ ytT_fit <- fitted(fit_marss, type = "ytT")$.fitted
+ ytT_hatyt <- MARSShatyt(fit_marss)$ytT
+ cbind(
+   a = kf_kfas$muhat[1:n], fitted = ytT_fit[1:n],
+   MARSShatyt = ytT_hatyt[1:n], Nile = Nile[1:n]
+ )
+\end{Sinput}
+\begin{Soutput}
+               a     fitted MARSShatyt Nile
+ [1,]   64.38081   64.38081       1120 1120
+ [2,]  569.63686  569.63686       1160 1160
+ [3,]  809.81105  809.81105        963  963
+ [4,]  981.20113  981.20113       1210 1210
+ [5,] 1049.85712 1049.85712       1160 1160
+ [6,] 1069.05730 1069.05730       1160 1160
+ [7,] 1047.42286 1047.42286        813  813
+ [8,] 1131.04778 1131.04778       1230 1230
+ [9,] 1170.24168 1170.24168       1370 1370
+[10,] 1119.74113 1119.74113       1140 1140
+\end{Soutput}
+\end{Schunk}

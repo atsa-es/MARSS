@@ -1,0 +1,17 @@
+\begin{Schunk}
+\begin{Sinput}
+ pred_kfas <- predict(fit_kfas$model,
+   interval = "prediction", se.fit = TRUE
+ )
+ head(pred_kfas)
+\end{Sinput}
+\begin{Soutput}
+            fit       lwr       upr    se.fit
+[1,]   64.38081 -301.3345  430.0961  30.69706
+[2,]  569.63686  167.9481  971.3256  90.15920
+[3,]  809.81105  399.0120 1220.6101 100.27741
+[4,]  981.20113  567.9935 1394.4088 102.82126
+[5,] 1049.85712  636.0060 1463.7082 103.49271
+[6,] 1069.05730  655.0339 1483.0807 103.67200
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,15 @@
+\begin{Schunk}
+\begin{Sinput}
+ print(cbind(
+   model = c("3 trends", "2 trends"),
+   AICc = round(c(kemz.3$AICc, kemz.2$AICc))
+ ),
+ quote = FALSE
+ )
+\end{Sinput}
+\begin{Soutput}
+     model    AICc
+[1,] 3 trends 1589
+[2,] 2 trends 1608
+\end{Soutput}
+\end{Schunk}

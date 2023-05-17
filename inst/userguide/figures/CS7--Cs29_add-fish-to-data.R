@@ -1,0 +1,11 @@
+###################################################
+### code chunk number 32: Cs29_add-fish-to-data
+###################################################
+# transpose to make time go across columns
+# drop=FALSE so that R doesn't change our matrix to a vector
+fish <- t(log(ivesDataByWeek[, "Fish biomass", drop = FALSE]))
+d.fish <- (fish - apply(fish, 1, mean, na.rm = TRUE))
+# plank.dat.w.fish = rbind(plank.dat,fish)
+d.plank.dat.w.fish <- rbind(d.plank.dat, d.fish)
+
+

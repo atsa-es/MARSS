@@ -1,0 +1,35 @@
+\begin{Schunk}
+\begin{Sinput}
+ royale.model.2 <- list(
+   Z = "identity", B = "unconstrained",
+   Q = "diagonal and unequal", R = "zero", U = "zero"
+ )
+ kem.2 <- MARSS(z.royale.dat, model = royale.model.2)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 16 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 16 iterations. 
+Log-likelihood: -81.53121 
+AIC: 179.0624   AICc: 180.5782   
+ 
+                    Estimate
+B.(1,1)               0.7670
+B.(2,1)              -0.1788
+B.(1,2)               0.0783
+B.(2,2)               0.8277
+Q.(X.Wolf,X.Wolf)     0.4485
+Q.(X.Moose,X.Moose)   0.1758
+x0.X.Wolf             0.1471
+x0.X.Moose           -1.4089
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

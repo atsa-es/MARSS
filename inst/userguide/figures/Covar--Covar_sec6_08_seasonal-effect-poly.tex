@@ -1,0 +1,8 @@
+\begin{Schunk}
+\begin{Sinput}
+ C.2 <- coef(seas.mod.2, type = "matrix")$C
+ seas.2 <- C.2 %*% month.cov
+ rownames(seas.2) <- phytos
+ colnames(seas.2) <- month.abb
+\end{Sinput}
+\end{Schunk}

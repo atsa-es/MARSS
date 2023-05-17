@@ -1,0 +1,183 @@
+\chapter{Model specification in the core functions}
+\label{chap:modelspec}
+Most users will not directly work with the core functions nor build marssMODEL objects from scratch.  Instead, they will interact with the core functions via the function \verb@MARSS()@ described in Chapter \ref{chap:MARSS}.  With the \verb@MARSS()@  function, the user specifies the model structure with matrices or text strings (``diagonal'', ``unconstrained'', etc.) and \verb@MARSS()@ builds the marssMODEL object.   However, a basic understanding of the structure of marssMODEL objects is useful if one wants to  interact directly with the core functions.
+
+\section{The fixed and free components of the model parameters}\index{model specification!in marssMODEL objects}
+In a marssMODEL object, each parameter is written in vec form and specificed by the equation of the form $\ff + \DD\bbeta$ as in Equation 77 in \citet{Holmes2010}. $\ff$ is the fixed matrix, $\DD$ is the free matrix and $\bbeta$ is the column vector of parameters.  In a marssMODEL object, the \verb@fixed@ list has the $\ff$ for each parameter matrix, the \verb@free@ list has the $\DD$ matrix for each parameter matrix, and \verb@par@ in the marssMLE object has the $\bbeta$ column vector of estimated parameters.
+
+\section{Examples}
+
+\subsection{$\QQ$ is a diagonal matrix with one variance value}
+In this case, there is only one value on the diagonal and the off-diagonals are 0.  Thus there is only one estimated parameter and the fixed values are all 0.
+\begin{equation*}
+\QQ = \left[ \begin{array}{ccc}
+    \alpha & 0 & 0 \\
+    0 & \alpha & 0 \\
+    0 & 0 & \alpha \end{array} \right]
+\end{equation*}
+\verb@fixed$Q@ is
+\begin{equation*}
+\ff = \left[ \begin{array}{c}
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0 \\
+    0
+    \end{array} \right] 
+\end{equation*}
+\verb@par$Q@ is
+\begin{equation*}
+\bbeta =
+ \left[ \begin{array}{c}
+    "alpha" 
+\end{array} \right]
+\end{equation*}
+and \verb@free$Q@ is
+\begin{equation*}
+\DD = \left[ \begin{array}{c}
+    1 \\
+    0 \\
+    0 \\
+    0 \\
+    1 \\
+    0 \\
+    0 \\
+    0 \\
+    1
+ \end{array} \right]
+\end{equation*}
+Notice that $\ff + \DD\bbeta$ is the vec of $\QQ$.
+ 
+\subsection{$\QQ$ is a diagonal matrix with unique variance values}
+
+\begin{equation*}
+\QQ = \left[ \begin{array}{ccc}
+    \alpha_1 & 0 & 0 \\
+    0 & \alpha_2 & 0 \\
+    0 & 0 & \alpha_3 \end{array} \right]
+\end{equation*}
+The fixed matrix is the same with all 0s, but the par and free matrices change. \verb@par$Q@ is
+\begin{equation*}
+\bbeta =
+ \left[ \begin{array}{c}
+    "alpha1" \\
+    "alpha2" \\
+    "alpha3" \\
+\end{array} \right]
+\end{equation*}
+and \verb@free$Q@ is
+\begin{equation*}
+\DD = \left[ \begin{array}{ccc}
+    1 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 0\\
+    0 & 0 & 1
+ \end{array} \right]
+\end{equation*}
+
+\subsection{$\QQ$ has one variance and one covariance}
+
+\begin{equation*}
+\QQ = \left[ \begin{array}{ccc}
+    \alpha & \beta & \beta \\
+    \beta & \alpha & \beta \\
+    \beta & \beta & \alpha \end{array} \right]
+\end{equation*}
+The fixed vector is still the same, all zero.  \verb@par$Q@ is
+\begin{equation*}
+\bbeta =
+ \left[ \begin{array}{c}
+    "alpha" \\
+    "beta" 
+\end{array} \right]
+\end{equation*}
+and \verb@free$Q@ is
+\begin{equation*}
+\DD = \left[ \begin{array}{cc}
+    1 & 0\\
+    0 & 1\\
+    0 & 1\\
+    0 & 1\\
+    1 & 0\\
+    0 & 1\\
+    0 & 1\\
+    0 & 1\\
+    1 & 0
+ \end{array} \right]
+\end{equation*}
+
+\subsection{$\QQ$ is unconstrained}
+
+Since $\QQ$ is a variance-covariance matrix, it must be symmetric across the diagonal.  
+\begin{equation*}
+ \QQ =
+ \left[ \begin{array}{ccc}
+    \alpha_1 & \beta_1 & \beta_2 \\
+    \beta_1 & \alpha_2 & \beta_3 \\
+    \beta_2 & \beta_3 & \alpha_3 
+    \end{array} \right] 
+\end{equation*}
+There are no fixed values in $\QQ$ so $\ff$ is still all zero.  \verb@par$Q@ is
+\begin{equation*}
+\bbeta =
+ \left[ \begin{array}{c}
+    "alpha1" \\
+    "beta1" \\
+    "beta2" \\
+    "alpha2" \\
+    "beta3" \\
+    "alpha3"
+\end{array} \right]
+\end{equation*}
+and \verb@free$Q@ is
+\begin{equation*}
+\DD = \left[ \begin{array}{cccccc}
+    1 & 0 & 0 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0\\
+    0 & 0 & 1 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0 & 0 & 0\\
+    0 & 0 & 0 & 1 & 0 & 0\\
+    0 & 0 & 0 & 0 & 1 & 0\\
+    0 & 0 & 1 & 0 & 0 & 0\\
+    0 & 0 & 0 & 0 & 1 & 0\\
+    0 & 0 & 0 & 0 & 0 & 1
+ \end{array} \right]
+\end{equation*}
+
+\subsection{$\QQ$ is fixed}
+
+For example,
+\begin{equation*}
+\QQ = \left[ \begin{array}{ccc}
+    0.1 & 0 & 0 \\
+    0 & 0.1 & 0 \\
+    0 & 0 & 0.1 \end{array} \right]
+\end{equation*}
+The \verb@fixed$Q@ matrix is
+\begin{equation*}
+     \left[ \begin{array}{c}
+    0.1 \\
+    0 \\
+    0 \\
+    0 \\
+    0.1 \\
+    0 \\
+    0 \\
+    0 \\
+    0.1
+ \end{array} \right]
+\end{equation*}
+There are no estimated parameters so the free matrix is $9 \times 0$ and the par matrix is $0 \times 1$.
+
+\section{Limits on the model forms that can be fit}
+
+The main limitation is that one must specify a model that has only one solution.  The core functions will allow you to attempt to fit an improper model (one with multiple solutions).  If you do this accidentally, it may or may not be obvious that you have a problem.  The estimation functions may chug along happily and return some solution.  Careful thought about your model structure and the structure of the estimated parameter matrices will help you determine if your model is under-constrained and unsolvable.  

@@ -1,0 +1,94 @@
+\input{tex/headerfile}
+\input{tex/mathdefs}
+\makeindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{Sweave}
+<<RUNFIRST, echo=F, include.source=F>>=
+library(MARSS)
+options(prompt = " ", continue = " ")
+options(width = 60)
+@
+
+\setcounter{tocdepth}{1} %no subsections in toc
+% see the list of further useful packages
+% in the Reference Guide, Sects. 2.3, 3.1-3.3
+
+%% Set PDF 1.5 and compression, including object compression
+%% Needed for MiKTeX -- most other distributions default to this
+\ifx\pdfoutput\undefined
+\else
+  \ifx\pdfoutput\relax
+  \else
+    \ifnum\pdfoutput>0
+      % PDF output
+      \pdfminorversion=5
+      \pdfcompresslevel=9
+      \pdfobjcompresslevel=2
+    \fi
+  \fi
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\author{E. E. Holmes, M. D. Scheuerell, and E. J. Ward}
+\title{Analysis of multivariate time series using the MARSS package}
+\subtitle{version \Sexpr{packageDescription("MARSS", fields = "Version")}}
+\maketitle
+\include{./tex/dedic}
+
+
+\frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{./tex/preface}
+
+\tableofcontents
+
+\mainmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{The MARSS package}
+\include{./tex/Introduction}
+\include{./tex/Functions}
+\include{./tex/Algorithms}
+\part{Fitting models with \{MARSS\} }
+\include{./tex/MARSS}
+\include{./Quick_Examples}
+\include{./Setting_Inits}
+%\include{./CIs}
+\part{Applications}
+\include{./tex/Directions}
+\include{./Case_Study_1}
+\include{./Case_Study_2}
+\include{./Case_Study_3}
+\include{./Case_Study_4}
+\include{./Case_Study_5}
+\include{./Case_Study_6}
+\include{./Covariates}
+\include{./Case_Study_7}
+\include{./Case_Study_8}
+\include{./Case_Study_dlm1}
+\include{./Case_Study_mlr}
+\include{./MARp}
+\include{./Structural_TS}
+\include{./KFAS}
+\part{Appendices}
+\appendix
+\include{./tex/warnings}
+\include{./tex/obj_structures}
+\include{./tex/ModelSpec} 
+\include{./tex/SSreferences}
+
+\bookmarksetup{startatroot} % don't want refs to be part of appendices part
+\backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{./tex/Manual}
+\bibliographystyle{cbe}
+
+\printindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<Reset, echo=F>>=
+options(prompt = "> ", continue = "+ ")
+options(width = 120)
+@
+
+\end{document}

@@ -1,0 +1,37 @@
+\begin{Schunk}
+\begin{Sinput}
+ bfgs <- MARSS(dat, method = "BFGS")
+\end{Sinput}
+\begin{Soutput}
+Success! Converged in 34 iterations.
+Function MARSSkfas used for likelihood calculation.
+
+MARSS fit is
+Estimation method: BFGS 
+Estimation converged in 34 iterations. 
+Log-likelihood: 19.13936 
+AIC: -6.278712   AICc: 3.795362   
+ 
+                    Estimate
+R.diag               0.00849
+U.X.SJF              0.06838
+U.X.SJI              0.07152
+U.X.EBays            0.04188
+U.X.PSnd             0.05233
+U.X.HC              -0.00271
+Q.(X.SJF,X.SJF)      0.03368
+Q.(X.SJI,X.SJI)      0.01124
+Q.(X.EBays,X.EBays)  0.00722
+Q.(X.PSnd,X.PSnd)    0.00437
+Q.(X.HC,X.HC)        0.05600
+x0.X.SJF             5.98437
+x0.X.SJI             6.72169
+x0.X.EBays           6.65689
+x0.X.PSnd            5.83527
+x0.X.HC              6.60425
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,41 @@
+\begin{Schunk}
+\begin{Sinput}
+ U <- x0 <- "zero"
+ Q <- "unconstrained"
+ d <- covariates
+ A <- "zero"
+ D <- "unconstrained"
+ R <- "diagonal and equal"
+ model.list <- list(
+   U = U, Q = Q, A = A, R = R,
+   D = D, d = d, x0 = x0
+ )
+ kem <- MARSS(dat, model = model.list)
+\end{Sinput}
+\begin{Soutput}
+Success! abstol and log-log tests passed at 72 iterations.
+Alert: conv.test.slope.tol is 0.5.
+Test with smaller values (<0.1) to ensure convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+Estimation converged in 72 iterations. 
+Log-likelihood: -236.5911 
+AIC: 489.1822   AICc: 489.8582   
+ 
+                    Estimate
+R.diag                0.0720
+Q.(1,1)               0.9946
+Q.(2,1)              -0.0290
+Q.(2,2)               0.0976
+D.(Greens,Temp)       0.3572
+D.(Bluegreens,Temp)   0.2537
+D.(Greens,TP)        -0.0215
+D.(Bluegreens,TP)     0.0354
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+\end{Soutput}
+\end{Schunk}

@@ -1,0 +1,44 @@
+\begin{Schunk}
+\begin{Sinput}
+ dat.short <- dat[1:4, 1:10]
+ kem.degen <- MARSS(dat.short, control = list(allow.degen = FALSE))
+\end{Sinput}
+\begin{Soutput}
+Warning! Abstol convergence only. Maxit (=500) reached before log-log convergence.
+
+MARSS fit is
+Estimation method: kem 
+Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+WARNING: Abstol convergence only no log-log convergence.
+ maxit (=500) reached before log-log convergence.
+ The likelihood and params might not be at the ML values.
+ Try setting control$maxit higher.
+Log-likelihood: 11.67854 
+AIC: 2.642914   AICc: 63.30958   
+ 
+                    Estimate
+R.diag              1.22e-02
+U.X.SJF             9.79e-02
+U.X.SJI             1.09e-01
+U.X.EBays           9.28e-02
+U.X.PSnd            1.11e-01
+Q.(X.SJF,X.SJF)     1.89e-02
+Q.(X.SJI,X.SJI)     1.03e-05
+Q.(X.EBays,X.EBays) 8.24e-06
+Q.(X.PSnd,X.PSnd)   3.05e-05
+x0.X.SJF            5.96e+00
+x0.X.SJI            6.73e+00
+x0.X.EBays          6.60e+00
+x0.X.PSnd           5.71e+00
+Initial states (x0) defined at t=0
+
+Standard errors have not been calculated. 
+Use MARSSparamCIs to compute CIs and bias estimates.
+
+Convergence warnings
+ Warning: the  Q.(X.SJI,X.SJI)  parameter value has not converged.
+ Warning: the  Q.(X.EBays,X.EBays)  parameter value has not converged.
+ Warning: the  Q.(X.PSnd,X.PSnd)  parameter value has not converged.
+ Type MARSSinfo("convergence") for more info on this warning.
+\end{Soutput}
+\end{Schunk}
