@@ -32,7 +32,7 @@ MARSSsimulate(object, tSteps = NULL, nsim = 1, silent = TRUE,
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
 }
 \seealso{ 
-  \code{\link{marssMODEL}}, \code{\link{marssMLE}}, \code{\link{MARSSboot}} 
+  \code{\link{marssMODEL}}, \code{\link{marssMLE}}, \code{\link{MARSSboot}()} 
 }
 \examples{
 d <- harborSeal[, c(2, 11)]

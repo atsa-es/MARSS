@@ -19,7 +19,7 @@ Harvey (1989) discusses missing observations in section 3.4.7.  However, the \co
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSShessian}}, \code{\link{MARSSparamCIs}} }
+\seealso{ \code{\link{MARSShessian}()}, \code{\link{MARSSparamCIs}()} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]

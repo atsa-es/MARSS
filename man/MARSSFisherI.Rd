@@ -31,7 +31,7 @@ There has been research on computing the observed Fisher Information matrix from
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSharveyobsFI}}, \code{\link{MARSShessian.numerical}}, \code{\link{MARSSparamCIs}}, \code{\link{marssMLE}} }
+\seealso{ \code{\link{MARSSharveyobsFI}()}, \code{\link{MARSShessian.numerical}}, \code{\link{MARSSparamCIs}}, \code{\link{marssMLE}} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[2:4, ]

@@ -23,7 +23,7 @@ See Holmes (2012) for a discussion of MARSS models in vectorized form.
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
 }
-\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marss}}, \code{\link{MARSS.marxss}} } 
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marss}()}, \code{\link{MARSS.marxss}()} } 
 \examples{
 dat <- t(harborSealWA)
 dat <- dat[2:4, ] 

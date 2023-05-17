@@ -17,7 +17,7 @@
 	 }
 }
 \seealso{
-\code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}}, \code{\link{forecast.marssMLE}}
+\code{\link{plot.marssPredict}()}, \code{\link{predict.marssMLE}()}, \code{\link{forecast.marssMLE}()}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, WA.

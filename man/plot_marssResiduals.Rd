@@ -54,9 +54,9 @@ resids <- residuals(fit)
 
 require(ggplot2)
 # plots of residuals versus time, QQ-norm plot, and ACF
-autoplot(resids, silent=TRUE) # remove silent to be interactive
+autoplot(resids)
 
 # only the ACF plots
-autoplot(resids, plot.type = "acf", silent=TRUE)
+# autoplot(resids, plot.type = "acf")
 
 }

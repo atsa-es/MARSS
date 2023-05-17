@@ -1659,20 +1659,18 @@ methods</h2>
 <p>The EM algorithm in the {MARSS} package is in R and on top of that EM
 algorithms are famously slow. You can try <code>method=&quot;BFGS&quot;</code> and
 see if that is faster. For some models, it will be much faster and for
-others slower. The companion package {marssTMB} allows you to fit these
-models with TMB and will be the fastest, often much faster. Definitely
-if you are doing Dynamic Factor Analysis or working with large data
-sets, you will want to install {marssTMB} so you can fit with TMB.</p>
-<pre class="r"><code>fit1 &lt;- MARSS(y, model=model.list, silent=TRUE)
-fit2 &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;, silent=TRUE)
-fit3 &lt;- MARSS(y, model=model.list, method=&quot;TMB&quot;, silent=TRUE)</code></pre>
-<pre><code>## Loading required namespace: marssTMB</code></pre>
-<pre class="r"><code>cat(&quot;logLL of the 3 fits:&quot;, c(fit1$logLik, fit2$logLik, fit3$logLik))</code></pre>
-<pre><code>## logLL of the 3 fits: 30.75614 30.82143 28.691</code></pre>
+others slower. The companion package {<a href="https://atsa-es.github.io/marssTMB/">marssTMB</a>} allows you to
+fit these models with TMB and will be the fastest, often much faster.
+Definitely if you are doing Dynamic Factor Analysis or working with
+large data sets, you will want to use {marssTMB}.</p>
+<pre class="r"><code>fit1 &lt;- MARSS(y, model=model.list)
+fit2 &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;)
+fit3 &lt;- MARSS(y, model=model.list, method=&quot;TMB&quot;)</code></pre>
 <p><code>method=&quot;BFGS&quot;</code> and <code>method=&quot;TMB&quot;</code> are both
 using quasi-Newton methods to optimize and these can be sensitive to
-initial conditions. You can run EM a few iterations and run with BFGS,
-and this will guard against poor initial conditions issues.</p>
+initial conditions. You can run EM a few iterations use that as initial
+conditions for BFGS or TMB, and this will guard against poor initial
+conditions issues.</p>
 <pre class="r"><code>fit1 &lt;- MARSS(y, model=model.list, control = list(maxit=15))
 fit2 &lt;- MARSS(y, model=model.list, method=&quot;BFGS&quot;, inits = fit1)</code></pre>
 </div>
@@ -1804,10 +1802,10 @@ you are able to process LaTeX files.</p>
 <div id="more-information-and-tutorials" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> More information and
 tutorials</h1>
-<p>Many example analyses can be found in the MARSS User Guide (<a href="https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf">pdf</a>).
+<p>Many example analyses can be found in the MARSS User Guide (<a href="https://CRAN.R-project.org/package=MARSS/vignettes/UserGuide.pdf">pdf</a>).
 In addition, recorded lectures and more examples on fitting multivariate
-models can be found at our course <a href="https://atsa-es.github.io/atsa">website</a> and in the ATSA course
-eBook <a href="https://atsa-es.github.io/atsa-labs">html</a>.</p>
+models can be found at our course <a href="https://atsa-es.github.io/atsa/">website</a> and in the ATSA
+course eBook <a href="https://atsa-es.github.io/atsa-labs/">html</a>.</p>
 <p>The MARSS User Guide starts with some tutorials on MARSS models and
 walks through many examples showing how to write multivariate
 time-series models in MARSS form. The User Guide also has vignettes: how

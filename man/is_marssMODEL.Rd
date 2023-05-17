@@ -60,6 +60,6 @@ A vector of error messages or NULL is no errors.
   Eli Holmes, NOAA, Seattle, USA.  
 }
 
-\seealso{ \code{\link{MARSS}}, \code{\link{MARSS.marxss}}, \code{\link{marssMODEL}} } 
+\seealso{ \code{\link{MARSS}()}, \code{\link{MARSS.marxss}()}, \code{\link{marssMODEL}} } 
 
 

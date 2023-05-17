@@ -82,7 +82,7 @@ The MARSS User Guide:  Holmes, E. E., E. J. Ward, and M. D. Scheuerell (2012) An
   Eli Holmes, NOAA, Seattle, USA.  
 }
 \seealso{ 
-\code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}}, \code{\link[KFAS]{KFAS}}
+\code{\link{MARSS}()}, \code{\link{marssMODEL}}, \code{\link{MARSSkem}()}, \code{\link[KFAS]{KFAS}()}
 }
 
 \examples{

@@ -86,7 +86,7 @@ The intervals returned by \code{fitted.marssMLE()} are for the state predictions
 
 }
 \seealso{
-\code{\link{MARSSkf}}, \code{\link{MARSSresiduals}}, \code{\link{residuals.marssMLE}}, \code{\link{predict.marssMLE}}, \code{\link{tsSmooth.marssMLE}}
+\code{\link{MARSSkf}()}, \code{\link{MARSSresiduals}()}, \code{\link{residuals.marssMLE}()}, \code{\link{predict.marssMLE}()}, \code{\link{tsSmooth.marssMLE}()}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
@@ -111,7 +111,7 @@ fit <- MARSS(nile, model = mod.list, silent = TRUE)
 # Plotting
 # There are plot methods for marssMLE objects
 library(ggplot2)
-autoplot(fit, silent=TRUE)
+autoplot(fit)
 
 # Below shows how to make plots manually but all of these can be made
 # with autoplot(fit) or plot(fit)

@@ -49,7 +49,7 @@
 \author{ 
   Eli Holmes and based off of \code{plot.forecast} in the forecast package written by Rob J Hyndman & Mitchell O'Hara-Wild.
 }
-\seealso{ \code{\link{predict.marssMLE}} }
+\seealso{ \code{\link{predict.marssMLE}()} }
 \examples{
 data(harborSealWA)
 dat <- t(harborSealWA[, -1])

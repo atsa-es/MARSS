@@ -57,7 +57,7 @@ Note: \code{y} in \code{newdata}. Data along with covariates can be passed into 
  \eqn{\mathbf{y}}{y} rows that are being forecasted are NAs and the \eqn{\mathbf{y}}{y} rows that are known are passed in with \code{newdata}.
 }
 \seealso{
-\code{\link{plot.marssPredict}}, \code{\link{predict.marssMLE}}
+\code{\link{plot.marssPredict}()}, \code{\link{predict.marssMLE}()}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  

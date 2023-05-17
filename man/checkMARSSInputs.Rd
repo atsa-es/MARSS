@@ -38,7 +38,7 @@ If arguments \code{inits} or \code{control} are not provided by the user, they w
   Kellie Wills, NOAA, Seattle, USA.
 }
 \seealso{ 
-  \code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{checkModelList}} 
+  \code{\link{MARSS}()}, \code{\link{marssMODEL}}, \code{\link{checkModelList}()} 
 }
 
 

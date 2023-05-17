@@ -20,11 +20,10 @@ y <- Z1 %*% x + matrix(rnorm(3*50,0,0.1), 3, 50)
 fit <- MARSS(y, model=model.list, silent=TRUE)
 tidy(fit)
 
-## -----------------------------------------------------------------------------
-fit1 <- MARSS(y, model=model.list, silent=TRUE)
-fit2 <- MARSS(y, model=model.list, method="BFGS", silent=TRUE)
-fit3 <- MARSS(y, model=model.list, method="TMB", silent=TRUE)
-cat("logLL of the 3 fits:", c(fit1$logLik, fit2$logLik, fit3$logLik))
+## ----eval=FALSE---------------------------------------------------------------
+#  fit1 <- MARSS(y, model=model.list)
+#  fit2 <- MARSS(y, model=model.list, method="BFGS")
+#  fit3 <- MARSS(y, model=model.list, method="TMB")
 
 ## ----results="hide"-----------------------------------------------------------
 fit1 <- MARSS(y, model=model.list, control = list(maxit=15))

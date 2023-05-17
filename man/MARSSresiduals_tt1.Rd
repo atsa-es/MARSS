@@ -105,7 +105,7 @@ with the variance of \eqn{\mathbf{V}_t}{V(t)} and \eqn{\mathbf{W}_t}{W(t)} equal
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSresiduals.tT}}, \code{\link{MARSSresiduals.tt}},  \code{\link{fitted.marssMLE}}, \code{\link{plot.marssMLE}} }
+\seealso{ \code{\link{MARSSresiduals.tT}()}, \code{\link{MARSSresiduals.tt}()},  \code{\link{fitted.marssMLE}()}, \code{\link{plot.marssMLE}()} }
 \examples{
   dat <- t(harborSeal)
   dat <- dat[c(2,11),]

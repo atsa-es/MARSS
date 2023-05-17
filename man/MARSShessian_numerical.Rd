@@ -21,7 +21,7 @@ MARSShessian.numerical(MLEobj, fun=c("fdHess", "optim"))
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSharveyobsFI}}, \code{\link{MARSShessian}}, \code{\link{MARSSparamCIs}} }
+\seealso{ \code{\link{MARSSharveyobsFI}()}, \code{\link{MARSShessian}()}, \code{\link{MARSSparamCIs}()} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]

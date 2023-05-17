@@ -91,7 +91,7 @@ For \code{type="ytT"}, the predictions are conceptually the same as predictions 
 
 }
 \seealso{
-\code{\link{plot.marssPredict}}, \code{\link{fitted.marssMLE}}
+\code{\link{plot.marssPredict}()}, \code{\link{fitted.marssMLE}()}
 }
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  

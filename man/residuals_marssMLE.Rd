@@ -89,14 +89,13 @@ theme_set(theme_bw())
 
 # Show the standard residuals diagnostic plots for state-space models
 # silent used for examples to not be in interactive mode
-autoplot(fit, plot.type="residuals", silent=TRUE)
+autoplot(fit, plot.type="residuals")
 
 # Plot the residuals object; show both for y and x
 d <- residuals(fit, type="tt1")
-autoplot(d, silent=TRUE)
+autoplot(d)
 
 # Manually make a plot of the model residuals (innovations) with intervals
-d <- residuals(fit, type="tt1")
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma
 d$.conf.up <- d$.fitted-qnorm(0.05/2)*d$.sigma
 ggplot(data = d) +
@@ -111,12 +110,11 @@ ggplot(data = d) +
 # are for t. So (value-fitted)[t] matches .resids[t+1] NOT .resids[t]
 # This is only for state residuals. For model residuals, the time-indexing matches.
 d <- residuals(fit, type="tT")
-d <- subset(d, name=="state")
+dsub <- subset(d, name=="state")
 # note t in col 1 matches t+1 in col 2
-head(cbind(.resids=d$.resids, valminusfitted=d$value-d$.fitted))
+head(cbind(.resids=dsub$.resids, valminusfitted=dsub$value-dsub$.fitted))
 
 # Make a plot of the smoothation residuals
-d <- residuals(fit, type="tT")
 ggplot(data = d) +
   geom_point(aes(t, value-.fitted), na.rm=TRUE) +
   facet_grid(~.rownames+name) +

@@ -39,7 +39,7 @@ A object of class \code{\link{marssMLE}}.
   Eli Holmes, NOAA, Seattle, USA.
 
   }
-\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marxss}} } 
+\seealso{ \code{\link{marssMODEL}}, \code{\link{MARSS.marxss}()} } 
 \examples{
 \dontrun{
 # See the MARSS man page for examples

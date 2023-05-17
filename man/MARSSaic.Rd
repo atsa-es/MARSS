@@ -41,7 +41,7 @@ Cavanaugh, J. E., and R. H. Shumway. 1997. A bootstrap variant of AIC for state-
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.
 }
-\seealso{ \code{\link{MARSSboot}} }
+\seealso{ \code{\link{MARSSboot}()} }
 \examples{
 dat <- t(harborSealWA)
 dat <- dat[2:3, ]

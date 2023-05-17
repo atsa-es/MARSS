@@ -87,7 +87,7 @@ state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \href{h
   Eli Holmes and Eric Ward, NOAA, Seattle, USA.  
 }
 \seealso{ 
-  \code{\link{MARSSkf}}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}}, \code{\link{MARSSinfo}}
+  \code{\link{MARSSkf}()}, \code{\link{marssMLE}}, \code{\link{MARSSoptim}()}, \code{\link{MARSSinfo}()}
   }  
 \examples{
 dat <- t(harborSeal)

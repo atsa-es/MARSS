@@ -28,7 +28,7 @@ See \code{\link{MARSSFisherI}} for a discussion of the observed Fisher Informati
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSFisherI}}, \code{\link{MARSSharveyobsFI}}, \code{\link{MARSShessian.numerical}}, \code{\link{MARSSparamCIs}}, \code{\link{marssMLE}} }
+\seealso{ \code{\link{MARSSFisherI}()}, \code{\link{MARSSharveyobsFI}()}, \code{\link{MARSShessian.numerical}()}, \code{\link{MARSSparamCIs}()}, \code{\link{marssMLE}} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[c(2, 11), ]

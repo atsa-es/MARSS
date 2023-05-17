@@ -25,7 +25,7 @@ This is a helper function to check that all the model list that will be passed t
   Eli Holmes, NOAA, Seattle, USA.
 }
 \seealso{ 
-  \code{\link{MARSS}}, \code{\link{marssMODEL}}, \code{\link{checkModelList}} 
+  \code{\link{MARSS}()}, \code{\link{marssMODEL}}, \code{\link{checkModelList}} 
 }
 
 

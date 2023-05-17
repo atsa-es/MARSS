@@ -26,7 +26,7 @@ output:
     toc_depth: 1
     includes:
       in_header: nextsection.tex
-  rmarkdown::html_vignette:
+  rmarkdown::html_vignette: 
     toc: yes
     toc_depth: 1
     mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
@@ -134,14 +134,13 @@ tidy(fit)
 
 ## Different fitting methods
 
-The EM algorithm in the \{MARSS\} package is in R and on top of that EM algorithms are famously slow.  You can try `method="BFGS"` and see if that is faster.  For some models, it will be much faster and for others slower. The companion package {marssTMB} allows you to fit these models with TMB and will be the fastest, often much faster. Definitely if you are doing Dynamic Factor Analysis or working with large data sets, you will want to install {marssTMB} so you can fit with TMB.
-```{r}
-fit1 <- MARSS(y, model=model.list, silent=TRUE)
-fit2 <- MARSS(y, model=model.list, method="BFGS", silent=TRUE)
-fit3 <- MARSS(y, model=model.list, method="TMB", silent=TRUE)
-cat("logLL of the 3 fits:", c(fit1$logLik, fit2$logLik, fit3$logLik))
+The EM algorithm in the \{MARSS\} package is in R and on top of that EM algorithms are famously slow.  You can try `method="BFGS"` and see if that is faster.  For some models, it will be much faster and for others slower. The companion package {[marssTMB](https://atsa-es.github.io/marssTMB/)} allows you to fit these models with TMB and will be the fastest, often much faster. Definitely if you are doing Dynamic Factor Analysis or working with large data sets, you will want to use {marssTMB}.
+```{r eval=FALSE}
+fit1 <- MARSS(y, model=model.list)
+fit2 <- MARSS(y, model=model.list, method="BFGS")
+fit3 <- MARSS(y, model=model.list, method="TMB")
 ```
-`method="BFGS"` and `method="TMB"` are both using quasi-Newton methods to optimize and these can be sensitive to initial conditions. You can run EM a few iterations and run with BFGS, and this will guard against poor initial conditions issues. 
+`method="BFGS"` and `method="TMB"` are both using quasi-Newton methods to optimize and these can be sensitive to initial conditions. You can run EM a few iterations use that as initial conditions for BFGS or TMB, and this will guard against poor initial conditions issues. 
 
 ```{r results="hide"}
 fit1 <- MARSS(y, model=model.list, control = list(maxit=15))
@@ -207,7 +206,7 @@ You can also try `toLatex(fit$model)` to make a LaTeX file and pdf version of yo
 
 # More information and tutorials
 
-Many example analyses can be found in the MARSS User Guide ([pdf](https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf)). In addition, recorded lectures and more examples on fitting multivariate models can be found at our course [website](https://atsa-es.github.io/atsa) and in the ATSA course eBook [html](https://atsa-es.github.io/atsa-labs).
+Many example analyses can be found in the MARSS User Guide ([pdf](https://CRAN.R-project.org/package=MARSS/vignettes/UserGuide.pdf)). In addition, recorded lectures and more examples on fitting multivariate models can be found at our course [website](https://atsa-es.github.io/atsa/) and in the ATSA course eBook [html](https://atsa-es.github.io/atsa-labs/).
 
 The MARSS User Guide starts with some tutorials on MARSS models and walks through many examples showing how to write multivariate time-series models in MARSS form.  The User Guide also has vignettes: how to write AR(p) models in state-space form, dynamic linear models (regression models where the regression parameters are AR(p)), multivariate regression models with regression parameters that are time-varying and enter the non-AR part of your model or the AR part, detecting breakpoints using state-space models, and dynamic factor analysis.  All of these can be written in MARSS form.  It also has a series of vignettes on analysis of multivariate biological data. 
 
