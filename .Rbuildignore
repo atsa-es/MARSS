@@ -29,7 +29,10 @@ tests
 ^inst/userguide$
 ^inst/derivations$
 ^inst/testing-releases$
+^inst/Makedoc
 inst/doc/mathdefs.tex
 ^revdep$
 ^cran-comments.md$
 ^inst/doc/UserGuide-static\.pdf$
+^doc$
+^Meta$

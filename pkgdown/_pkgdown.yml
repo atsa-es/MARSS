@@ -127,6 +127,7 @@ articles:
 - title: Vignettes
   contents:
   - Quick_Start
+  - Learning_MARSS
 - title: Algorithm Reports
   desc: EM Derivation [PDF](https://atsa-es.r-universe.dev/MARSS/doc/EMDerivation.pdf)<br>Conditional Residuals [PDF](https://atsa-es.r-universe.dev/MARSS/doc/Residuals.pdf)
   contents:
