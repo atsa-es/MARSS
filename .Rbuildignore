@@ -20,7 +20,6 @@ vignettes/svmono.cls
 vignettes/versiontest.R
 vignettes/debugger_template.Rnw
 vignettes/debug_manual.R
-vignettes/testing-releases
 tests
 ^_pkgdown\.yml$
 ^docs$
@@ -28,6 +27,8 @@ tests
 ^\.github$
 ^inst/oldtex$
 ^inst/userguide$
+^inst/derivations$
+^inst/testing-releases$
 inst/doc/mathdefs.tex
 ^revdep$
 ^cran-comments.md$

@@ -29,8 +29,8 @@ Holmes, E. E., Ward, E. J. and Wills, K. (2012) MARSS: Multivariate Autoregressi
 
 You can also cite the package and user guide:
 
-Elizabeth E. Holmes, Eric J. Ward, Mark D. Scheuerell and Kellie Wills (2020). MARSS:
-  Multivariate Autoregressive State-Space Modeling. R package version 3.11.4.
+Elizabeth E. Holmes, Eric J. Ward, Mark D. Scheuerell and Kellie Wills (2023). MARSS:
+  Multivariate Autoregressive State-Space Modeling. R package version 3.11.7.
   
 Holmes, E. E., M. D. Scheuerell, and E. J. Ward (", year, ") Analysis of multivariate time-series using the MARSS package. Version ", meta$Version, ". NOAA Fisheries, Northwest Fisheries Science Center, 2725 Montlake Blvd E., Seattle, WA 98112, DOI: 10.5281/zenodo.5781847
   
