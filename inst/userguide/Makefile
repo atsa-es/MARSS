@@ -64,10 +64,14 @@ pdf:
 	pdflatex Manual.tex
 	makeindex Manual
 	pdflatex Manual.tex
-	cat Manual.pdf > UserGuide.pdf
+	
+compact:
+  Rscript -e "tools::compactPDF("Manual.pdf", gs_quality = "ebook")"
+	cat Manual.pdf > ./doc/UserGuide.pdf
 
 clean:
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot Rplots.ps Rplots.pdf
 	$(RM) *.tex
 	$(RM) *.R
 	$(RM) Manual.pdf
+
