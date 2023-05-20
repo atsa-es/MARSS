@@ -87,13 +87,16 @@ fit <- MARSS(dat, model = list(Z = factor(c("WA", "OR", "OR"))))
 library(ggplot2)
 theme_set(theme_bw())
 
-# Show the standard residuals diagnostic plots for state-space models
-# silent used for examples to not be in interactive mode
+\dontrun{
+# Show a series of standard residuals diagnostic plots for state-space models
 autoplot(fit, plot.type="residuals")
+}
 
-# Plot the residuals object; show both for y and x
 d <- residuals(fit, type="tt1")
+\dontrun{
+# Make a series of diagnostic plots from a residuals object
 autoplot(d)
+}
 
 # Manually make a plot of the model residuals (innovations) with intervals
 d$.conf.low <- d$.fitted+qnorm(0.05/2)*d$.sigma

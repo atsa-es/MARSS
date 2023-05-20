@@ -1,0 +1,312 @@
+\relax 
+\citation{McLachlanKrishnan2008}
+\citation{Harvey1989}
+\citation{Borman2009}
+\citation{ShumwayStoffer1982}
+\citation{GhahramaniHinton1996,RoweisGhahramani1999}
+\citation{Wuetal1996}
+\citation{Zuuretal2003a}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Overview}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}The MARSS model}{2}{}\protected@file@percent }
+\newlabel{eq:MARSS}{{1}{2}}
+\newlabel{eq:MARSSx}{{1a}{2}}
+\newlabel{eq:MARSSy}{{1b}{2}}
+\newlabel{eq:MARSSx1}{{1c}{2}}
+\newlabel{eq:MARSS.ex}{{2}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}The joint log-likelihood function}{3}{}\protected@file@percent }
+\newlabel{eq:jointL}{{5}{3}}
+\citation{JohnsonWichern2007}
+\citation{ShumwayStoffer2006}
+\citation{ShumwayStoffer2006,Zuuretal2003a}
+\newlabel{eq:logL}{{6}{4}}
+\newlabel{eq:logL.V0.is.0}{{7}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Missing values}{4}{}\protected@file@percent }
+\newlabel{sec:missing}{{1.3}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}The EM algorithm}{5}{}\protected@file@percent }
+\newlabel{sec:EMalgorithm}{{2}{5}}
+\newlabel{eq:EMalg}{{8}{5}}
+\newlabel{eq:EMalg.j}{{9}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}The expected log-likelihood function}{5}{}\protected@file@percent }
+\newlabel{sec:expLL}{{2.1}{5}}
+\citation{ShumwayStoffer2006}
+\newlabel{eq:expLL}{{10}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}The expectations used in the derivation}{6}{}\protected@file@percent }
+\newlabel{sec:expectations}{{2.2}{6}}
+\newlabel{eq:expectations}{{11}{6}}
+\newlabel{eq:hatVt}{{11e}{6}}
+\newlabel{eq:hatWt}{{11g}{6}}
+\newlabel{eq:comp.formula.variance}{{12}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Notes on multivariate expectations. For the following examples, let $\mbox  {$\pmb  {X}$}$ be a vector of length three, $X_1,X_2,X_3$. $f()$ is the probability distribution function (pdf). $C$ is a constant (not a random variable).\relax }}{7}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:MultivariateExpectations}{{1}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}The unconstrained update equations}{7}{}\protected@file@percent }
+\newlabel{sec:generalupdate}{{3}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Matrix calculus need for the derivation}{7}{}\protected@file@percent }
+\newlabel{sec:MatrixDerivatives}{{3.1}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The update equation for $\mbox  {$\mathbf  u$}$ (unconstrained)}{8}{}\protected@file@percent }
+\newlabel{eq:u.unconstrained1}{{21}{8}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Derivatives of a scalar with respect to vectors and matrices. In the following $a$ is a scalar (unrelated to $\mbox  {$\mathbf  a$}$), $\mbox  {$\mathbf  a$}$ and $\mbox  {$\mathbf  c$}$ are $n \times 1$ column vectors, $\mbox  {$\mathbf  b$}$ and $\mbox  {$\mathbf  d$}$ are $m \times 1$ column vectors, $\mbox  {$\mathbf  D$}$ is a $n \times m$ matrix, $\mbox  {$\mathbf  C$}$ is a $n \times n$ matrix, and $\mbox  {$\mathbf  A$}$ is a diagonal $n \times n$ matrix (0s on the off-diagonals). $\mbox  {$\mathbf  C$}^{-1}$ is the inverse of $\mbox  {$\mathbf  C$}$, $\mbox  {$\mathbf  C$}^\top $ is the transpose of $\mbox  {$\mathbf  C$}$, $\mbox  {$\mathbf  C$}^{-\top } = \big  (\mbox  {$\mathbf  C$}^{-1}\big  )^\top = \big  (\mbox  {$\mathbf  C$}^\top \big  )^{-1}$, and $|\mbox  {$\mathbf  C$}|$ is the determinant of $\mbox  {$\mathbf  C$}$. Note, all the numerators in the differentials on the far left reduce to scalars. Although the matrix names may be the same as those of matrices referred to in the text, the matrices in this table are dummy matrices used to show the matrix derivative relations.\relax }}{9}{}\protected@file@percent }
+\newlabel{tab:MatrixDerivatives}{{2}{9}}
+\newlabel{eq:derivproductrule}{{14}{9}}
+\newlabel{eq:derivaTc}{{15}{9}}
+\newlabel{eq:derivaTDb}{{16}{9}}
+\newlabel{eq:derivlogDet}{{17}{9}}
+\newlabel{eq:derivbDTCDd}{{18}{9}}
+\newlabel{eq:derivaTCa}{{19}{9}}
+\newlabel{eq:derivInv}{{20}{9}}
+\newlabel{eq:u.unconstrained2}{{22}{10}}
+\newlabel{eq:u.unconstrained3}{{23}{10}}
+\newlabel{eq:u.unconstrained4}{{24}{10}}
+\newlabel{eq:uupdate.unconstrained}{{25}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}The update equation for $\mbox  {$\mathbf  B$}$ (unconstrained)}{10}{}\protected@file@percent }
+\newlabel{eq:B.unconstrained1}{{26}{10}}
+\newlabel{eq:B.unconstrained2}{{27}{10}}
+\newlabel{eq:B.unconstrained3}{{28}{10}}
+\newlabel{eq:B.unconstrained4}{{29}{11}}
+\newlabel{eq:B.update.unconstrained}{{30}{11}}
+\newlabel{eq:B.update.blockdiag}{{31}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}The update equation for $\mbox  {$\mathbf  Q$}$ (unconstrained)}{11}{}\protected@file@percent }
+\newlabel{subsec:Qunconstrained}{{3.4}{11}}
+\newlabel{eq:Q.unconstrained1}{{32}{11}}
+\citation{HendersonSearle1979}
+\newlabel{eq:Q.unconstrained2}{{33}{12}}
+\newlabel{eq:Q.unconstrained3}{{34}{12}}
+\newlabel{eq:Q.unconstrained4}{{35}{12}}
+\newlabel{eq:Q.unconstrained5}{{36}{12}}
+\newlabel{eq:Q.update.unconstrained}{{37}{12}}
+\newlabel{eq:Q.update.blockdiag}{{38}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Update equation for $\mbox  {$\mathbf  a$}$ (unconstrained)}{13}{}\protected@file@percent }
+\newlabel{sec:unconstA}{{3.5}{13}}
+\newlabel{eq:a.unconstrained1}{{39}{13}}
+\newlabel{eq:a.unconstrained2}{{40}{13}}
+\newlabel{eq:a.unconstrained3}{{41}{13}}
+\newlabel{eq:a.unconstrained4}{{42}{13}}
+\newlabel{eq:a.update.unconstrained}{{43}{13}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}The update equation for $\mbox  {$\mathbf  Z$}$ (unconstrained)}{13}{}\protected@file@percent }
+\newlabel{eq:Z.unconstrained1}{{44}{13}}
+\newlabel{eq:Z.unconstrained2}{{45}{14}}
+\newlabel{eq:Z.unconstrained3}{{46}{14}}
+\newlabel{eq:Z.unconstrained4}{{47}{14}}
+\newlabel{eq:Z.update.unconstrained}{{48}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7}The update equation for $\mbox  {$\mathbf  R$}$ (unconstrained)}{14}{}\protected@file@percent }
+\newlabel{eq:R.unconstrained1}{{49}{14}}
+\newlabel{eq:R.unconstrained2}{{50}{14}}
+\newlabel{eq:R.unconstrained3}{{51}{14}}
+\newlabel{eq:R.unconstrained4}{{52}{14}}
+\citation{ShumwayStoffer2006}
+\citation{GhahramaniHinton1996}
+\newlabel{eq:R.unconstrained5}{{53}{15}}
+\newlabel{eq:R.update.unconstrained}{{54}{15}}
+\newlabel{eq:R.update.blockdiag}{{55}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8}Update equation for $\mbox  {\boldmath  $\xi $}$ and $\mbox  {\boldmath  $\Lambda $}$ (unconstrained), stochastic initial state}{15}{}\protected@file@percent }
+\newlabel{eq:pi.unconstrained1}{{56}{15}}
+\newlabel{eq:pi.unconstrained2}{{57}{15}}
+\newlabel{eq:pi.unconstrained3}{{58}{15}}
+\newlabel{eq:pi.unconstrained4}{{59}{15}}
+\newlabel{eq:pi.update.unconstrained}{{60}{15}}
+\newlabel{eq:V0.update.unconstrained}{{61}{16}}
+\newlabel{eq:pix1.update.unconstrained}{{62}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.9}Update equation for $\mbox  {\boldmath  $\xi $}$ (unconstrained), fixed $\mbox  {$\pmb  {x}$}_0$}{16}{}\protected@file@percent }
+\newlabel{eq:pi.unconstrained.V0.is.0}{{64}{16}}
+\newlabel{eq:pi.unconstrained.V0.is.0.2}{{65}{16}}
+\newlabel{eq:pi.unconstrained.V0.is.0.3}{{66}{16}}
+\newlabel{eq:pi.unconstrained.V0.is.0.4}{{67}{16}}
+\newlabel{eq:pi.unconstrained.V0.is.0.5}{{68}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.10}Update equation for $\mbox  {\boldmath  $\xi $}$ (unconstrained), fixed $\mbox  {$\pmb  {x}$}_1$}{17}{}\protected@file@percent }
+\newlabel{sec:xi.unconstrained.x1}{{3.10}{17}}
+\newlabel{eq:pi.unconstrained.V0.is.0.t.1.1}{{71}{17}}
+\newlabel{eq:pi.unconstrained.V0.is.0.t.1.2}{{73}{17}}
+\citation{KoopmanOoms2011}
+\citation{Koopman1993}
+\newlabel{eq:pi.unconstrained.V0.is.0.t.1.3}{{74}{18}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}The time-varying MARSS model with linear constraints}{18}{}\protected@file@percent }
+\newlabel{sec:tvMARSS}{{4}{18}}
+\newlabel{eq:MARSS.ex2}{{75}{18}}
+\newlabel{eq:MARSS.ex.vec}{{76}{18}}
+\newlabel{eq:MARSS.ex.vec.2}{{77}{18}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}MARSS model with linear constraints}{19}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Kronecker and vec relations. Here $\mbox  {$\mathbf  A$}$ is $n \times m$, $\mbox  {$\mathbf  B$}$ is $m \times p$, $\mbox  {$\mathbf  C$}$ is $p \times q$, and $\mbox  {$\mathbf  E$}$ and $\mbox  {$\mathbf  D$}$ are $p \times p$. $\mbox  {$\mathbf  a$}$ is a $m \times 1$ column vector and $\mbox  {$\mathbf  b$}$ is a $p \times 1$ column vector. The symbol $\otimes $ stands for the Kronecker product: $\mbox  {$\mathbf  A$}\otimes \mbox  {$\mathbf  C$}$ is a $np \times mq$ matrix. The identity matrix, $\mbox  {$\mathbf  I$}_n$, is a $n \times n$ diagonal matrix with ones on the diagonal.\relax }}{20}{}\protected@file@percent }
+\newlabel{tab:VecRelations}{{3}{20}}
+\newlabel{eq:vec.a}{{78}{20}}
+\newlabel{eq:vec.Aa}{{79}{20}}
+\newlabel{eq:vec.AB}{{80}{20}}
+\newlabel{eq:vec.ABC}{{81}{20}}
+\newlabel{eq:vec.aTBa}{{82}{20}}
+\newlabel{eq:kron.prod}{{83}{20}}
+\newlabel{eq:kron.column.vec}{{84}{20}}
+\newlabel{eq:kron.column.quad.vec}{{85}{20}}
+\newlabel{eq:kron.column.column.vec}{{86}{20}}
+\newlabel{eq:kron.trans}{{87}{20}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}A MARSS model with exogenous variables}{21}{}\protected@file@percent }
+\newlabel{eq:MARSS.simple.ex}{{88}{21}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}A general MARSS model with exogenous variables}{21}{}\protected@file@percent }
+\newlabel{eq:MARSS.general.ex}{{89}{21}}
+\newlabel{eq:MARSS.ex3}{{90}{22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}The expected log-likelihood function}{22}{}\protected@file@percent }
+\newlabel{eq:MARSS.ex.reformed}{{91}{22}}
+\newlabel{eq:logL.vec.general}{{92}{23}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}The constrained update equations}{23}{}\protected@file@percent }
+\newlabel{sec:constrained}{{5}{23}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}The general $\mbox  {$\mathbf  u$}$ update equations}{23}{}\protected@file@percent }
+\newlabel{eq:u.general1}{{93}{23}}
+\newlabel{eq:u.general1b}{{94}{24}}
+\newlabel{eq:u.general4}{{95}{24}}
+\newlabel{eq:u.general5}{{96}{24}}
+\newlabel{eq:u.general.update1}{{97}{24}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}The general $\mbox  {$\mathbf  a$}$ update equation}{24}{}\protected@file@percent }
+\newlabel{sec:constA}{{5.2}{24}}
+\newlabel{eq:general.a.update}{{98}{24}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}The general $\mbox  {\boldmath  $\xi $}$ update equation, stochastic initial state}{24}{}\protected@file@percent }
+\newlabel{eq:pi.general1}{{99}{24}}
+\newlabel{eq:pi.general2}{{100}{24}}
+\newlabel{eq:pi.update.general1}{{101}{24}}
+\newlabel{eq:pi.update.general2}{{102}{24}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}The general $\mbox  {\boldmath  $\xi $}$ update equation, fixed $\mbox  {$\pmb  {x}$}_0$}{25}{}\protected@file@percent }
+\newlabel{sec:xi.constrained.x0}{{5.4}{25}}
+\newlabel{eq:logL.vec.general.V0.is.0b}{{103}{25}}
+\newlabel{eq:pi.constrained.V0.is.0}{{104}{25}}
+\newlabel{eq:pi.constrained.V0.is.0.4}{{107}{25}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}The general $\mbox  {\boldmath  $\xi $}$ update equation, fixed $\mbox  {$\pmb  {x}$}_1$}{25}{}\protected@file@percent }
+\newlabel{sec:general.x1.update}{{5.5}{25}}
+\newlabel{eq:logL.vec.general.V0.is.0.x1}{{109}{25}}
+\newlabel{eq:pix1.unconstrained.V0.is.0.t.1.3}{{112}{26}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}The general $\mbox  {$\mathbf  B$}$ update equation}{26}{}\protected@file@percent }
+\newlabel{eq:B.general1}{{115}{26}}
+\newlabel{eq:B.general1b}{{117}{26}}
+\newlabel{eq:B.expect1}{{121}{27}}
+\newlabel{eq:B.expect2}{{122}{27}}
+\newlabel{eq:B.expect3}{{123}{27}}
+\newlabel{eq:B.general4}{{125}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}The general $\mbox  {$\mathbf  Z$}$ update equation}{27}{}\protected@file@percent }
+\newlabel{sec:constZ}{{5.7}{27}}
+\newlabel{eq:general.Z.update}{{126}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}The general $\mbox  {$\mathbf  Q$}$ update equation}{27}{}\protected@file@percent }
+\newlabel{sec:constrained.Q}{{5.8}{27}}
+\newlabel{eq:Q.general}{{127}{28}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.8.1}Special case: diagonal $\mbox  {$\mathbf  Q$}$ matrix (with shared or unique parameters)}{28}{}\protected@file@percent }
+\newlabel{eq:Q.gendiag2}{{129}{29}}
+\newlabel{eq:Q.gendiag3}{{131}{29}}
+\newlabel{eq:Q.gendiag4}{{132}{29}}
+\newlabel{eq:Q.diag.update}{{133}{29}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.8.2}Special case: $\mbox  {$\mathbf  Q$}$ with one variance and one covariance}{30}{}\protected@file@percent }
+\newlabel{eq:Q.eqvarcov1}{{134}{30}}
+\newlabel{eq:Q.eqvarcov2}{{135}{30}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.8.3}Special case: a block-diagonal matrices with replicated blocks}{30}{}\protected@file@percent }
+\newlabel{sec:Q.block.diagonal}{{5.8.3}{30}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.8.4}Special case: a symmetric blocked matrix}{31}{}\protected@file@percent }
+\newlabel{sec:Q.symmetric blocked}{{5.8.4}{31}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.8.5}The general case: a block-diagonal matrix with general blocks}{32}{}\protected@file@percent }
+\newlabel{sec:Q.general}{{5.8.5}{32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}The general $\mbox  {$\mathbf  R$}$ update equation}{32}{}\protected@file@percent }
+\newlabel{eq:R.general}{{136}{32}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Computing the expectations in the update equations}{32}{}\protected@file@percent }
+\newlabel{sec:compexpectations}{{6}{32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Expectations involving only $\mbox  {$\pmb  {X}$}_t$}{33}{}\protected@file@percent }
+\newlabel{sec:kalman.smoother}{{6.1}{33}}
+\newlabel{eq:kfsoutput}{{141}{33}}
+\citation{ShumwayStoffer2006}
+\citation{ShumwayStoffer2006}
+\newlabel{eq:xt}{{141a}{34}}
+\newlabel{eq:Pt}{{141d}{34}}
+\newlabel{eq:Ptt1}{{141e}{34}}
+\newlabel{eq:kffilteroutput}{{142}{34}}
+\newlabel{eq:kffilter}{{143}{34}}
+\newlabel{eq:xtt1}{{143a}{34}}
+\newlabel{eq:Vtt1}{{143b}{34}}
+\newlabel{eq:xtt}{{143c}{34}}
+\newlabel{eq:Vtt}{{143d}{34}}
+\newlabel{eq:Kt}{{143e}{34}}
+\newlabel{eq:kfsmoother}{{144}{34}}
+\newlabel{eq:xt1T}{{144a}{34}}
+\newlabel{eq:Vt1T}{{144b}{34}}
+\newlabel{eq:Jt}{{144c}{34}}
+\newlabel{eq:VTT1T}{{144e}{34}}
+\newlabel{eq:Vtt1T}{{144f}{34}}
+\newlabel{eq:yaZ.miss}{{145}{35}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Expectations involving $\mbox  {$\pmb  {Y}$}_t$}{35}{}\protected@file@percent }
+\newlabel{sec:exp.Y}{{6.2}{35}}
+\newlabel{eq:Yt.exp}{{149}{35}}
+\newlabel{eq:hatyt}{{149a}{35}}
+\newlabel{eq:hatOt}{{149b}{35}}
+\newlabel{eq:hatyxttm}{{149c}{35}}
+\newlabel{eq:hatyxt}{{149d}{35}}
+\newlabel{eq.IRt}{{149e}{35}}
+\newlabel{eq:IRt}{{149f}{35}}
+\newlabel{eq:IRt.degen}{{150}{36}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Derivation of the expected value of $\mbox  {$\pmb  {Y}$}_t$}{36}{}\protected@file@percent }
+\newlabel{eq:cond.multi.normal}{{153}{36}}
+\newlabel{eq:varY}{{156}{36}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Derivation of the expected value of $\mbox  {$\pmb  {Y}$}_t\mbox  {$\pmb  {Y}$}_t^\top $}{37}{}\protected@file@percent }
+\newlabel{eq:var.Y.cond.x}{{160}{37}}
+\newlabel{eq:cond.var.Y}{{163}{38}}
+\newlabel{eq:law.total.var.Y}{{164}{38}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Derivation of the expected value of $\mbox  {$\pmb  {Y}$}_t\mbox  {$\pmb  {X}$}_t^\top $}{38}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Derivation of the expected value of $\mbox  {$\pmb  {Y}$}_t\mbox  {$\pmb  {X}$}_{t-1}^\top $}{39}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Degenerate variance models}{39}{}\protected@file@percent }
+\newlabel{sec:degenerate}{{7}{39}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Rewriting the state and observation models for degenerate variance systems}{39}{}\protected@file@percent }
+\newlabel{eq:degen.model.x1}{{173}{40}}
+\newlabel{eq:degen.model.y1}{{174}{40}}
+\newlabel{eq:degen.model2}{{175}{40}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Identifying the fully deterministic $\mbox  {$\pmb  {x}$}$ rows}{41}{}\protected@file@percent }
+\newlabel{sec:ident.xds}{{7.2}{41}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1}Redefining the $\mbox  {$\pmb  {x}$}_t^d$ elements in the likelihood}{43}{}\protected@file@percent }
+\newlabel{eq:xt.det.sum}{{189}{43}}
+\newlabel{eq:xt.det.sum2}{{190}{44}}
+\newlabel{eq:EXtd}{{192}{44}}
+\newlabel{eq:xt.geo}{{193}{44}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.2}Dealing with the $\mbox  {$\pmb  {x}$}_t^{is}$ elements in the likelihood and associated parameter rows}{44}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Expected log-likelihood for degenerate models}{45}{}\protected@file@percent }
+\newlabel{eq:degen.logL.x0}{{195}{45}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Logical constraints to ensure a consistent system of equations}{46}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.1}Constraint 1: $\mbox  {$\mathbf  Z$}$ does not lead to an over-determined observation process}{46}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.4.2}Constraint 2: the state processes are not over-constrained. }{47}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}EM algorithm modifications for degenerate models}{47}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}$\mbox  {$\mathbf  R$}$ and $\mbox  {$\mathbf  Q$}$ update equations}{47}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}$\mbox  {$\mathbf  Z$}$ and $\mbox  {$\mathbf  a$}$ update equations}{47}{}\protected@file@percent }
+\citation{Harvey1989}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}$\mbox  {$\mathbf  u$}$ update equation}{48}{}\protected@file@percent }
+\newlabel{eq:u.update.degen.2}{{203}{48}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}$\mbox  {$\mathbf  u$}^{(0)}$ is not estimated}{48}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}$\mbox  {$\mathbf  u$}^d$ is estimated}{48}{}\protected@file@percent }
+\newlabel{eq:degen.logL.u}{{204}{48}}
+\newlabel{eq:degen.u.update.Deltas}{{205}{49}}
+\newlabel{eq:p.degen.update.u}{{206}{49}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}$\mbox  {\boldmath  $\xi $}$ update equation}{49}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.4.1}$\mbox  {\boldmath  $\xi $}$ is stochastic}{49}{}\protected@file@percent }
+\newlabel{eq:p.degen.update.x0.0.a}{{207}{49}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.4.2}$\mbox  {\boldmath  $\xi $}^{(0)}$ is not estimated}{49}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.4.3}$\mbox  {\boldmath  $\xi $}^{(0)}$ is estimated}{49}{}\protected@file@percent }
+\newlabel{eq:degen.logL.x0.0}{{208}{49}}
+\newlabel{eq:degen.x0.update.Deltas}{{209}{50}}
+\newlabel{eq:p.degen.update.x0.0.a.fixed}{{210}{50}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.4.4}When $\mbox  {$\mathbf  H$}_t$ has 0 rows in addition to $\mbox  {$\mathbf  G$}_t$}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}$\mbox  {$\mathbf  B$}^{(0)}$ update equation for degenerate models}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Kalman filter and smoother modifications for degenerate models}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Modifications due to degenerate $\mbox  {$\mathbf  R$}$ and $\mbox  {$\mathbf  Q$}$}{50}{}\protected@file@percent }
+\newlabel{eq:KKt.2}{{211}{51}}
+\newlabel{eq:Jt.2}{{213}{51}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Modifications due to fixed initial states}{52}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Summary of requirements for degenerate models}{52}{}\protected@file@percent }
+\citation{Biernackietal2003}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Implementation comments}{53}{}\protected@file@percent }
+\newlabel{sec:implementation}{{11}{53}}
+\citation{GhahramaniHinton1996}
+\bibdata{./EMDerivation}
+\bibcite{Biernackietal2003}{{1}{2003}{{Biernacki et~al.}}{{}}}
+\bibcite{Borman2009}{{2}{2009}{{Borman}}{{}}}
+\bibcite{GhahramaniHinton1996}{{3}{1996}{{Ghahramani and Hinton}}{{}}}
+\bibcite{Harvey1989}{{4}{1989}{{Harvey}}{{}}}
+\bibcite{HendersonSearle1979}{{5}{1979}{{Henderson and Searle}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {12}MARSS R package}{54}{}\protected@file@percent }
+\bibcite{JohnsonWichern2007}{{6}{2007}{{Johnson and Wichern}}{{}}}
+\bibcite{KoopmanOoms2011}{{7}{2011}{{Koopman and Ooms}}{{}}}
+\bibcite{Koopman1993}{{8}{1993}{{Koopman}}{{}}}
+\bibcite{McLachlanKrishnan2008}{{9}{2008}{{McLachlan and Krishnan}}{{}}}
+\bibcite{RoweisGhahramani1999}{{10}{1999}{{Roweis and Ghahramani}}{{}}}
+\bibcite{ShumwayStoffer2006}{{11}{2006}{{Shumway and Stoffer}}{{}}}
+\bibcite{ShumwayStoffer1982}{{12}{1982}{{Shumway and Stoffer}}{{}}}
+\bibcite{Wuetal1996}{{13}{1996}{{Wu et~al.}}{{}}}
+\bibcite{Zuuretal2003a}{{14}{2003}{{Zuur et~al.}}{{}}}
+\bibstyle{apalike}
+\gdef \@abspage@last{55}

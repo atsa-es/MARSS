@@ -50,6 +50,7 @@ importFrom(generics,tidy)
 
 ## register S3 methods
 export(MARSSfit) # method
+S3method(MARSSfit, default)
 S3method(MARSSfit, kem)
 S3method(MARSSfit, BFGS)
 

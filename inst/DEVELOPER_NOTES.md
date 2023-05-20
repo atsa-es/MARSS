@@ -154,6 +154,8 @@ These are the tests in `tests/testthat`. All should pass but some give warnings.
 cd inst
 make
 ```
+However I usually run it one target at a time.
+
 
 Now using the final tar.gz file do the final tests.
   
@@ -164,10 +166,6 @@ cd ~/Dropbox
 rm -r ~/Dropbox/MARSS.Rcheck
 R CMD check --timings --as-cran MARSS_3.11.7.tar.gz
 ```
-
-
-However I usually run it one target at a time.
-
 
 ## Check on other OS
 
