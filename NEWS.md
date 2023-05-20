@@ -2,7 +2,7 @@
 output: html_document
 ---
 
-# MARSS 3.11.7 (CRAN)
+# MARSS 3.11.8 (CRAN 2023-05-20)
 
 This combines the changes in GitHub releases 3.11.7 and 3.11.6.
 
@@ -29,6 +29,10 @@ This release is focused on moving the MARSS User Guide and derivation files into
 * Added `MARSS.dfa()` to the manual built by CRAN by removing keyword internal.
 * Added `inst/DEVELOPER_NOTES.md`
 * Minor change to make the v and w in `EMDerivation.Rnw` in slant font as they are random variables.
+
+## OTHER
+
+* renamed `all.equal.vector` to `vector.all.equal()` so it is not interpreted as a method of `all.equal()`.
 
 
 # MARSS 3.11.6 (GitHub)

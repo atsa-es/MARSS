@@ -1,5 +1,5 @@
 RM = rm -f
-version = 3.11.7
+version = 3.11.8
 GitHubdir = ~/Documents/GitHub
 tmpdir = ~/Dropbox
 

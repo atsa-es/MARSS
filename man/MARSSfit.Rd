@@ -12,5 +12,9 @@ MARSSfit(x, ...)
 \item{...}{additional arguments for the fitting function}
 }
 \description{
-Uses the method of a marssMLE class object. Will call a function such as \code{\link[=MARSSkem]{MARSSkem()}}, \code{\link[=MARSSoptim]{MARSSoptim()}} or \code{MARSStmb()} in the {marssTMB} package.
+This is an internal function used by \code{\link[=MARSS]{MARSS()}}. It is not
+intended for use by users but needs to be exported so
+{marssTMB} can use it. Uses the method of a marssMLE class object.
+Will call a function such as \code{\link[=MARSSkem]{MARSSkem()}}, \code{\link[=MARSSoptim]{MARSSoptim()}} in the
+MARSS package or \code{MARSStmb()} in the {marssTMB} package.
 }

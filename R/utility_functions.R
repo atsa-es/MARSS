@@ -869,7 +869,7 @@ is.solvable <- function(A, y = NULL) {
   return("unique")
 }
 
-all.equal.vector <- function(x) {
+vector.all.equal <- function(x) {
   all(sapply(as.list(x[-1]), FUN = function(z) {
     identical(z, unlist(x[1]))
   }))

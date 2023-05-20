@@ -369,7 +369,7 @@ build.eqn.tex <- function(eqn, eqn.special, x, greek, digits, simplify, headfoot
               # The following tests for that
               mat2D <- array(mat, dim = c(dim(mat)[1] * dim(mat)[2], dim(mat)[3])) # reform to be 2D
               # test equality within row; will return TRUE if dim 3 = 1
-              if (all(apply(mat, 1, all.equal.vector))) { # not time-varying
+              if (all(apply(mat, 1, vector.all.equal))) { # not time-varying
                 mat <- sub3D(mat, t = 1) # not time-varying so just use the mat at t=1
               } else { # is time-varying
                 if (!simplify) { # then there will be an equation for each parameter at time t
@@ -378,7 +378,7 @@ build.eqn.tex <- function(eqn, eqn.special, x, greek, digits, simplify, headfoot
                 } else { # do simplify
                   # step 1: figure out which parameter elements are time-varying
                   mat2D <- array(mat, dim = c(dim(mat)[1] * dim(mat)[2], dim(mat)[3])) # reform to be 2D, matrix(vec(mat),t)
-                  tv.elem <- !apply(mat2D, 1, all.equal.vector) # which elements are time varying
+                  tv.elem <- !apply(mat2D, 1, vector.all.equal) # which elements are time varying
                   # step 2: replace that element with the name el2(i)_t
                   tv.name <- paste(el2, "(", 1:dim(mat2D)[1], ")_", el2.time, sep = "")
                   # step 3: set up a mat to be t=1; will replace time=varying ones
@@ -443,9 +443,9 @@ parameters.time.varying <- function(eqn, eqn.special, x) {
       if (model.dims[[el2]][3] == 1) next # it is not time-varying
       # Even if 3D, it might not be time-varying if all elements are the same
       testtv <- FALSE
-      if (!all(apply(fixed[[el2]], 1, all.equal.vector))) testtv <- TRUE # time-varying
+      if (!all(apply(fixed[[el2]], 1, vector.all.equal))) testtv <- TRUE # time-varying
       mat2D <- array(free[[el2]], dim = c(dim(free[[el2]])[1] * dim(free[[el2]])[2], dim(free[[el2]])[3]))
-      if (!all(apply(mat2D, 1, all.equal.vector))) testtv <- TRUE # time-varying
+      if (!all(apply(mat2D, 1, vector.all.equal))) testtv <- TRUE # time-varying
       if (!testtv) { # not time-varying
         next
       } else {

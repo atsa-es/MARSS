@@ -27,7 +27,7 @@
 \alias{ pinv }
 \alias{ pcholinv }
 \alias{ pchol }
-\alias{ all.equal.vector }
+\alias{ vector.all.equal }
 \keyword{internal}
 
 \title{ Utility Functions }
@@ -35,7 +35,7 @@
   Utility functions for MARSS functions in the \code{\link{MARSS-package}}.  These are not exported but can be accessed using the \code{MARSS:::} prefix.
 }
 \usage{
-\method{all.equal}{vector}(x)
+vector.all.equal(x)
 convert.model.mat(param.matrix)
 fixed.free.to.formula(fixed,free,dim)
 fully.spec.x(Z, R)
@@ -108,7 +108,7 @@ vec(x)
   \item \code{ pcholinv } is the inverse based on the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.
   \item \code{ pchol } returns the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).
   \item \code{ is.solvable } returns information on the solvability of the linear system y=Ax using the SVD decomposition.
-  \item \code{ all.equal.vector } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
+  \item \code{ vector.all.equal } tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.
   \item \code{ parmat } constructs the parameter matrix with both the fixed and free values from the vectorized form in a \code{\link{marssMLE}} object.  Users should use \code{\link[=coef.marssMLE]{coef}}.
   \item \code{ fully.spec.x } returns a list with 0 and 1 showing which x are fully specified by data when \code{R} has zeros on the diagonal. Used by \code{\link{MARSSkfss}()}.
 
