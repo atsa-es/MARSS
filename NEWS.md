@@ -2,7 +2,11 @@
 output: html_document
 ---
 
-# MARSS 3.11.7 (GitHub)
+# MARSS 3.11.7 (CRAN)
+
+This combines the changes in GitHub releases 3.11.7 and 3.11.6.
+
+# MARSS 3.11.7 (GitHub 2023-05-19)
 
 This release is focused on moving the MARSS User Guide and derivation files into a `inst/userguide` and `inst/derivations` along with Makefiles to build. This will facilitate updating MARSS and converting the User Guide to an eBook.
 

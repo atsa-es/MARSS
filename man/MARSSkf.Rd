@@ -67,7 +67,7 @@ Ghahramani, Z. and Hinton, G.E. (1996) Parameter estimation for linear dynamical
 Holmes, E. E. (2012).  Derivation of the EM algorithm for constrained and unconstrained multivariate autoregressive
 state-space (MARSS) models.  Technical Report. arXiv:1302.3919 [stat.ME] \code{RShowDoc("EMDerivation",package="MARSS")} to open a copy.
 
-Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. \href{https://CRAN.R-project.org/package=KFAS}
+Jouni Helske (2012). KFAS: Kalman filter and smoother for exponential family state space models. \href{https://CRAN.R-project.org/package=KFAS}{https://CRAN.R-project.org/package=KFAS}
   
 Koopman, S.J. and Durbin J. (2000). Fast filtering and smoothing for non-stationary time series models, Journal of American Statistical Association, 92, 1630-38.
 
