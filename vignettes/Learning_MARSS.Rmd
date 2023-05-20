@@ -16,7 +16,7 @@ The MARSS R package: <https://cran.r-project.org/package=MARSS> is part
 of the [Applied Time Series Analysis](https://atsa-es.github.io/) for
 Environmental Science suite of software and educational material for
 time series analysis. See the GitHub repository for the [MARSS source
-code](https://github.com/atsa-es/MARSS).
+code](https://github.com/atsa-es/MARSS). For fast fitting to large datasets or DFA models, see our companion package, [marssTMB](https://atsa-es.github.io/marssTMB/). 
 <br>
 <br>
 

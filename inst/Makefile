@@ -24,12 +24,14 @@ build:
 	rm -r -f ${tmpdir}/MARSS
 	rm -f ${tmpdir}/MARSS_${version}.tar.gz
 	cp -p $(GitHubdir)/MARSS_${version}.tar.gz ${tmpdir}/MARSS_${version}.tar.gz
+	cd $(tmpdir) && tar -xvzf ${tmpdir}/MARSS_${version}.tar.gz
 
 movetodoc:
-	cd $(tmpdir) && tar -xvzf ${tmpdir}/MARSS_${version}.tar.gz
 	rm -f ${tmpdir}/MARSS/inst/doc/*.pdf
 	cp -a -p ${GitHubdir}/MARSS/inst/derivations/doc/*.pdf ${tmpdir}/MARSS/inst/doc
 	cp -a -p ${GitHubdir}/MARSS/inst/userguide/doc/. $(tmpdir)/MARSS/inst/doc/
+	cp -a -p ${GitHubdir}/MARSS/inst/derivations/doc/. ${GitHubdir}/MARSS/inst/doc/
+	cp -a -p ${GitHubdir}/MARSS/inst/userguide/doc/. $(GitHubdir)/MARSS/inst/doc/
 
 rebuild:
 	cd $(tmpdir) && R CMD build --no-build-vignettes MARSS
