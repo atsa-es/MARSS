@@ -20,7 +20,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">MARSS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.11.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.11.8</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,8 +64,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for vector</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">vector.all.equal</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu">convert.model.mat</span><span class="op">(</span><span class="va">param.matrix</span><span class="op">)</span></span>
 <span><span class="fu">fixed.free.to.formula</span><span class="op">(</span><span class="va">fixed</span>,<span class="va">free</span>,<span class="va">dim</span><span class="op">)</span></span>
 <span><span class="fu">fully.spec.x</span><span class="op">(</span><span class="va">Z</span>, <span class="va">R</span><span class="op">)</span></span>
@@ -183,7 +182,7 @@
 <li><p><code> pcholinv </code> is the inverse based on the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).  These appear as 0 row/columns in the returned inverse.</p></li>
 <li><p><code> pchol </code> returns the Cholesky decomposition but modified to allow 0s on the diagonal of x (with corresponding 0 row/column).</p></li>
 <li><p><code> is.solvable </code> returns information on the solvability of the linear system y=Ax using the SVD decomposition.</p></li>
-<li><p><code> all.equal.vector </code> tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.</p></li>
+<li><p><code> vector.all.equal </code> tests if the all the elements in a vector, matrix, or array are all equal.  Works on list matrices too.</p></li>
 <li><p><code> parmat </code> constructs the parameter matrix with both the fixed and free values from the vectorized form in a <code><a href="marssMLE-class.html">marssMLE</a></code> object.  Users should use <code><a href="coef_marssMLE.html">coef</a></code>.</p></li>
 <li><p><code> fully.spec.x </code> returns a list with 0 and 1 showing which x are fully specified by data when <code>R</code> has zeros on the diagonal. Used by <code><a href="MARSSkf.html">MARSSkfss</a>()</code>.</p></li>
 </ul></div>
