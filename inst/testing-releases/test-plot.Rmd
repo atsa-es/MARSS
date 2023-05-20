@@ -43,6 +43,7 @@ for (Q in Qvals) {
       for(plt in plottypes){
        conf.int <- TRUE
       if(plt %in% c("ytt")) conf.int <- FALSE
+      cat(Q, B, R, plt, "\n")
       plot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
       autoplot(kemfit1, plot.type=plt, silent=TRUE, conf.int = conf.int)
        }
@@ -50,4 +51,6 @@ for (Q in Qvals) {
   }
 }
 ```
+
+
 

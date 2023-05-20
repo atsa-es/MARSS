@@ -1,6 +1,11 @@
 RM = rm -f
 
-all:	sweave stangle makeRfiles pdf clean
+all:	cleandoc sweave stangle makeRfiles pdf compact clean
+
+cleandoc: 
+		rm -r -f ./doc/
+		rm -d -f ./doc/
+		mkdir ./doc/
 
 sweave: 
 	"$(R_HOME)/bin/R" CMD Sweave ./manual_files/Quick_Examples.Rnw
@@ -66,7 +71,7 @@ pdf:
 	pdflatex Manual.tex
 	
 compact:
-  Rscript -e "tools::compactPDF("Manual.pdf", gs_quality = "ebook")"
+	Rscript -e "tools::compactPDF('Manual.pdf', gs_quality = 'ebook')"
 	cat Manual.pdf > ./doc/UserGuide.pdf
 
 clean:

@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 43: Cs29_plotbestcovarfits
+### code chunk number 42: Cs29_plotbestcovarfits
 ###################################################
 par.mat <- coef(kemz.temp, type = "matrix")
 fit.b <- par.mat$Z %*% kemz.temp$states + matrix(par.mat$A, nrow = N.ts, ncol = TT)

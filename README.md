@@ -2,9 +2,9 @@
 
 MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS R package estimates the parameters of linear MARSS models with Gaussian errors.  This class of model is extremely important in the study of linear stochastic dynamical systems, and these models are important in many different fields, including economics, engineering, genetics, physics and ecology.  The model class has different names in different fields, for example in some fields they are termed dynamic linear models (DLMs) or vector autoregressive (VAR) state-space models.  The MARSS package allows you to easily fit time-varying constrained and unconstrained MARSS models with or without covariates via maximum-likelihood using an EM algorithm or BFGS. Fast fitting with TMB is available with the companion package [marssTMB](https://atsa-es.github.io/marssTMB/).
 
-[![cran version](http://www.r-pkg.org/badges/version/MARSS)](https://cran.r-project.org/package=MARSS)
+[![cran version](https://www.r-pkg.org/badges/version/MARSS)](https://cran.r-project.org/package=MARSS)
 [![github](https://img.shields.io/github/v/release/atsa-es/MARSS?color=brightgreen&label=GitHub)](https://github.com/atsa-es/MARSS/releases/latest)
-[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/r-hub/cranlogs.app)
+[![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/r-hub/cranlogs.app)
 [![](https://cranlogs.r-pkg.org/badges/MARSS?color=FFD700)](https://www.r-pkg.org/pkg/MARSS)
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 
@@ -69,6 +69,9 @@ Type `citation("MARSS")` at the command line to get the most up to data citation
 
 To see our publications using MARSS models, see the [Applied Time Series Analysis website](https://atsa-es.github.io/).
 
+### Developers
+
+See `inst/DEVELOPER_NOTES.md` for instructions on creating a release from the repository.
 
 ### NOAA Disclaimer
 

@@ -172,7 +172,7 @@ autoplot.marssMLE <-
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
-        invisible(plts)
+        return(plts[[1]])
       }
     }
 
@@ -246,7 +246,7 @@ autoplot.marssMLE <-
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
-        invisible(plts)
+        return(plts[[1]])
       }
     }
 
@@ -292,7 +292,7 @@ autoplot.marssMLE <-
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
-        invisible(plts)
+        return(plts[[1]])
       }
     }
 
@@ -355,7 +355,7 @@ autoplot.marssMLE <-
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
-        invisible(plts)
+        return(plts[[1]])
       }
     }
 
@@ -393,6 +393,7 @@ autoplot.marssMLE <-
       if (conf.int) {
         if (grepl("std", i)) {
           df$sigma <- 1
+          df$sigma[is.na(df$value)] <- 0
         } else {
           df$sigma <- df$.sigma
           df$sigma[is.na(df$value)] <- 0 # will never be the case for x so not really needed here
@@ -416,7 +417,7 @@ autoplot.marssMLE <-
       }
       plts[[i]] <- p1
       if (length(plot.type) == 1) {
-        invisible(plts)
+        return(plts[[1]])
       }
     }
 
@@ -489,9 +490,7 @@ autoplot.marssMLE <-
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
-      if (length(plot.type) == 1) {
-        invisible(plts)
-      }
+      if (length(plot.type) == 1) return(plts[[1]])
     }
 
     # ACF plots
@@ -574,9 +573,7 @@ autoplot.marssMLE <-
         p1 <- p1 + ggplot2::labs(caption = paste0(strwrap(note), collapse = "\n")) + ggplot2::theme(plot.caption = ggplot2::element_text(size = 7.5, hjust = 0))
       }
       plts[[i]] <- p1
-      if (length(plot.type) == 1) {
-        invisible(plts)
-      }
+      if (length(plot.type) == 1) return(plts[[1]])
     }
 
     for (i in names(plts)) {
@@ -595,6 +592,5 @@ autoplot.marssMLE <-
         if (!silent) cat("Finished plots.\n")
       }
     }
-
-    invisible(plts)
+    if(silent) invisible(plts)
   }

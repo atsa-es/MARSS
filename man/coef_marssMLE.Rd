@@ -29,7 +29,7 @@
   Eli Holmes, NOAA, Seattle, USA.  
 }
 \seealso{
-\code{\link{tidy.marssMLE}()}, \code{\link{print.marssMLE}()} 
+\code{\link[=tidy.marssMLE]{tidy}()}, \code{\link[=print.marssMLE]{print}()} 
 }
 \examples{ 
 dat <- t(harborSeal)

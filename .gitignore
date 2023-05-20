@@ -10,3 +10,5 @@ tests/testthat/dontruntests/*.*
 inst/.DS_Store
 
 docs
+/doc/
+/Meta/

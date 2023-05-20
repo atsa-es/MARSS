@@ -65,7 +65,7 @@ for (Q in list("unconstrained", "diagonal and equal", "equalvarcov", "zero")) {
       })
     }}}
 
-fit <- MARSS(dat, model=list(U=array(c("u1", "u2", "u3", "u4"),dim=c(3,1,22)) ))
+fit <- MARSS(dat, model=list(U=array(c("u1", "u2", "u3", "u4"),dim=c(3,1,22)) ), silent=TRUE)
 p1 <- predict(fit, newdata=list(t=1:4+10, y=dat[,1:4+3]))
 test_that("predict1", {
   expect_true(inherits(p1, "marssPredict"))
@@ -78,7 +78,7 @@ p1 <- predict(fit, newdata=list(y=dat[,1:4], t=20+1:4, c=1:100))
 test_that("predict3", {
   expect_true(inherits(p1, "marssPredict"))
 })
-fit <- MARSS(dat, model=list(U=array(c("u1", "u2", "u3", "u4"),dim=c(3,1,22)), c=matrix(rnorm(3*22), 3, 22) ))
+fit <- MARSS(dat, model=list(U=array(c("u1", "u2", "u3", "u4"),dim=c(3,1,22)), c=matrix(rnorm(3*22), 3, 22) ), silent = TRUE)
 p1 <- try(predict(fit, newdata=list(y=dat[,1:4], t=20+1:4)))
 test_that("predict4", {
   expect_true(inherits(p1, "try-error"))

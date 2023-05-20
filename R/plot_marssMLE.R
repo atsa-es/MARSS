@@ -228,6 +228,7 @@ plot.marssMLE <-
       # need to adjust sigma for making a polygon
       if (grepl("std", i)) {
         df$.sigma <- 1
+        df$.sigma[is.na(df$value)] <- 0
       } else {
         df$.sigma[is.na(df$value)] <- 0
       }
@@ -251,7 +252,9 @@ plot.marssMLE <-
             cex = plotpar$point.size
           )
           if (conf.int) {
-            polygon(c(t, rev(t)), c(ymin, rev(ymax)), col = plotpar$ci.col, border = plotpar$ci.border, lwd = plotpar$ci.lwd, lty = plotpar$ci.lty)
+            df2 <- data.frame(x=c(t, rev(t)), y=c(ymin, rev(ymax)))
+            df2 <- na.omit(df2)
+            polygon(df2$x, df2$y, col = plotpar$ci.col, border = plotpar$ci.border, lwd = plotpar$ci.lwd, lty = plotpar$ci.lty)
             points(t, .resids, col = plotpar$point.col, pch = plotpar$point.pch, cex = plotpar$point.size)
           }
           title(plt)

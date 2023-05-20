@@ -47,15 +47,13 @@
 \def\TH{\mbox{\boldmath $\Theta$}}
 \def\UPS{\mbox{\boldmath $\Upsilon$}}
 \def\XI{\mbox{\boldmath $\Xi$}}
+%% Parameters are bold face
+\def\ZZ{\mbox{$\mathbf Z$}}	\def\zz{\mbox{$\mathbf z$}}
 \def\AA{\mbox{$\mathbf A$}}	\def\aa{\mbox{$\mathbf a$}}
-\def\Ab{\mbox{$\mathbf D$}} \def\Aa{\mbox{$\mathbf d$}} \def\Am{\PI}
-\def\BB{\mbox{$\mathbf B$}}	\def\bb{\mbox{$\mathbf b$}} \def\Bb{\mbox{$\mathbf J$}} \def\Ba{\mbox{$\mathbf L$}} \def\Bm{\UPS}
+\def\BB{\mbox{$\mathbf B$}}	\def\bb{\mbox{$\mathbf b$}}
 \def\CC{\mbox{$\mathbf C$}}	\def\cc{\mbox{$\mathbf c$}}
-\def\Ca{\Delta} \def\Cb{\GAM}
 \def\DD{\mbox{$\mathbf D$}}	\def\dd{\mbox{$\mathbf d$}}
 \def\EE{\mbox{$\mathbf E$}}	\def\ee{\mbox{$\mathbf e$}}
-\def\E{\,\textup{\textrm{E}}}	
-\def\EXy{\,\textup{\textrm{E}}_{\text{{\bf XY}}}}
 \def\FF{\mbox{$\mathbf F$}} \def\ff{\mbox{$\mathbf f$}}
 \def\GG{\mbox{$\mathbf G$}}	\def\gg{\mbox{$\mathbf g$}}
 \def\HH{\mbox{$\mathbf H$}}	\def\hh{\mbox{$\mathbf h$}}
@@ -63,33 +61,39 @@
 \def\IIm{\mbox{$\mathbf I$}}
 \def\JJ{\mbox{$\mathbf J$}}
 \def\KK{\mbox{$\mathbf K$}}
-\def\LL{\mbox{$\mathbf L$}}	\def\ll{\mbox{$\mathbf l$}}
 \def\MM{\mbox{$\mathbf M$}}  \def\mm{\mbox{$\mathbf m$}}
-\def\N{\,\textup{\textrm{N}}}
-\def\MVN{\,\textup{\textrm{MVN}}}
 \def\OO{\mbox{$\mathbf O$}}
 \def\PP{\mbox{$\mathbf P$}}  \def\pp{\mbox{$\mathbf p$}}
-\def\QQ{\mbox{$\mathbf Q$}}	 \def\qq{\mbox{$\mathbf q$}} \def\Qb{\mbox{$\mathbf G$}}  \def\Qm{\mathbb{Q}}
-\def\RR{\mbox{$\mathbf R$}}	 \def\rr{\mbox{$\mathbf r$}} \def\Rb{\mbox{$\mathbf H$}}	\def\Rm{\mathbb{R}}
+\def\QQ{\mbox{$\mathbf Q$}}	 \def\qq{\mbox{$\mathbf q$}}
+\def\Qb{\mbox{$\mathbf G$}}  \def\Qm{\mathbb{Q}}
+\def\RR{\mbox{$\mathbf R$}}	 \def\rr{\mbox{$\mathbf r$}}
+\def\Rb{\mbox{$\mathbf H$}}	\def\Rm{\mathbb{R}}
 \def\SS{\mbox{$\mathbf S$}}
 \def\TT{\mbox{$\mathbf T$}}
 \def\UU{\mbox{$\mathbf U$}}	\def\uu{\mbox{$\mathbf u$}}
 \def\Ub{\mbox{$\mathbf C$}} \def\Ua{\mbox{$\mathbf c$}} \def\Um{\UPS}
-\def\VV{\mbox{$\mathbf V$}}	\def\vv{\mbox{$\mathbf v$}}
-\def\WW{\mbox{$\mathbf W$}}	\def\ww{\mbox{$\mathbf w$}}
-%\def\XX{\mbox{$\mathbf X$}}
+%% Random variables in slant
+\def\VV{\mbox{$\pmb{V}$}}	\def\vv{\mbox{$\pmb{v}$}}
+\def\WW{\mbox{$\pmb{W}$}}	\def\ww{\mbox{$\pmb{w}$}}
 \def\XX{\mbox{$\pmb{X}$}}	\def\xx{\mbox{$\pmb{x}$}}
-%\def\xx{\mbox{$\mathbf x$}}
-%\def\YY{\mbox{$\mathbf Y$}}
 \def\YY{\mbox{$\pmb{Y}$}}	\def\yy{\mbox{$\pmb{y}$}}
-%\def\yy{\mbox{$\mathbf y$}}
-\def\ZZ{\mbox{$\mathbf Z$}}	\def\zz{\mbox{$\mathbf z$}}	\def\Zb{\mbox{$\mathbf M$}} \def\Za{\mbox{$\mathbf N$}} \def\Zm{\XI}
+\def\LL{\mbox{$\pmb{L}$}}	\def\ll{\mbox{$\pmb{l}$}}
+%% Other stuff
+\def\Ab{\mbox{$\mathbf D$}} \def\Aa{\mbox{$\mathbf d$}} \def\Am{\PI}
+\def\Ba{\mbox{$\mathbf L$}} \def\Bm{\UPS} \def\Bb{\mbox{$\mathbf J$}}
+\def\Ca{\Delta} \def\Cb{\GAM}
+\def\Za{\mbox{$\mathbf N$}} \def\Zm{\XI}
+\def\Zb{\mbox{$\mathbf M$}}
 \def\zer{\mbox{\boldmath $0$}}
+\def\E{\,\textup{\textrm{E}}}	
 \def\vec{\,\textup{\textrm{vec}}}
 \def\var{\,\textup{\textrm{var}}}
 \def\cov{\,\textup{\textrm{cov}}}
 \def\diag{\,\textup{\textrm{diag}}}
 \def\trace{\,\textup{\textrm{trace}}}
+\def\N{\,\textup{\textrm{N}}}
+\def\MVN{\,\textup{\textrm{MVN}}}
+\def\EXy{\,\textup{\textrm{E}}_{\text{{\bf XY}}}}
 \def\hatxt{\widetilde{\mbox{$\mathbf x$}}_t}
 \def\hatxone{\widetilde{\mbox{$\mathbf x$}}_1}
 \def\hatxzero{\widetilde{\mbox{$\mathbf x$}}_0}
@@ -140,6 +144,10 @@
 \author{Elizabeth Eli Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Derivation of an EM algorithm for constrained and unconstrained multivariate autoregressive state-space (MARSS) models}
+\date{original 16 Feb 2013 \\
+{\small \emph{typo in Eqn 124}, 14 Apr 2018 \\
+\emph{added derivation of variance of Y conditioned on y and x}, 3 Feb 2020 \\
+\emph{typo in eqn 29-31}, 20 Oct 2020}}
 \maketitle
 \begin{abstract}
 This report presents an Expectation-Maximization (EM) algorithm for estimation of the maximum-likelihood parameter values of constrained multivariate autoregressive Gaussian state-space (MARSS) models.  The MARSS model can be written: x(t)=Bx(t-1)+u+w(t), y(t)=Zx(t)+a+v(t), where w(t) and v(t) are multivariate normal error-terms with variance-covariance matrices Q and R respectively.  MARSS models are a class of dynamic linear model and vector autoregressive model state-space model. Shumway and Stoffer presented an unconstrained EM algorithm for this class of models in 1982, and a number of researchers have presented EM algorithms for specific types of constrained MARSS models since then.  In this report, I present a general EM algorithm for constrained MARSS models, where the constraints are on the elements within the parameter matrices (B,u,Q,Z,a,R). The constraints take the form vec(M)=f+Dm, where M is the parameter matrix, f is a column vector of fixed values, D is a matrix of multipliers, and m is the column vector of estimated values.  This allows a wide variety of constrained parameter matrix forms.  The presentation is for a time-varying MARSS model, where time-variation enters through the fixed (meaning not estimated) f(t) and D(t) matrices for each parameter.  The algorithm allows missing values in y and partially deterministic systems where 0s appear on the diagonals of Q or R.

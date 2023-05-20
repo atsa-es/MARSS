@@ -38,13 +38,13 @@ mod.nile.stoch$x0 <- fit_kfas_stoch$model$a1
 mod.nile.stoch$V0 <- fit_kfas_stoch$model$P1
 fit_em_stoch <- MARSS(dat, model = mod.nile.stoch, silent = TRUE)
 fit_bfgs_stoch <- MARSS(dat,
-  model = mod.nile.stoch, inits = inits,
-  method = "BFGS", silent = TRUE
+                        model = mod.nile.stoch, inits = inits,
+                        method = "BFGS", silent = TRUE
 )
 
 marss_kfas_model <- MARSSkfas(fit_em_stoch,
-  return.kfas.model = TRUE,
-  return.lag.one = FALSE
+                              return.kfas.model = TRUE,
+                              return.lag.one = FALSE
 )$kfas.model
 marss_kfas_model$Q[1, 1, 1] <- NA
 marss_kfas_model$H[1, 1, 1] <- NA
@@ -85,8 +85,8 @@ fit_marss$par$Q[1, 1] <- fit_kfas$model$Q
 fit_marss$par$R[1, 1] <- fit_kfas$model$H
 
 kf_kfas <- KFS(fit_kfas$model,
-  filtering = "state",
-  smoothing = "state", simplify = FALSE
+               filtering = "state",
+               smoothing = "state", simplify = FALSE
 )
 kf_marss <- MARSSkfss(fit_marss)
 
@@ -116,8 +116,8 @@ test_that("fits Nile Vtt", {
 ### observation filtering tests
 ###################################################
 f_kfas <- KFS(fit_kfas$model,
-  filtering = "signal",
-  smoothing = "signal", simplify = FALSE
+              filtering = "signal",
+              smoothing = "signal", simplify = FALSE
 )
 f_marss <- MARSSkfss(fit_marss)
 
@@ -126,7 +126,8 @@ n <- 100
 ytt1_fit <- fitted(fit_marss, type = "ytt1")$.fitted
 ytt1_hatyt <- MARSShatyt(fit_marss, only.kem = FALSE)$ytt1
 test_that("fits Nile ytt1", {
-  expect_equivalent(f_kfas$m[1:n], ytt1_fit[1:n], ytt1_hatyt[1:n])
+  expect_equivalent(f_kfas$m[1:n], ytt1_fit[1:n])
+  expect_equivalent(f_kfas$m[1:n], ytt1_hatyt[1:n])
 })
 
 var.Eytt1_fit <-
@@ -156,60 +157,65 @@ test_that("fits Nile var.EytT", {
 ###################################################
 
 conf_kfas <- predict(fit_kfas$model,
-  interval = "confidence",
-  se.fit = TRUE
+                     interval = "confidence",
+                     se.fit = TRUE
 )
 conf_marss1 <- fitted(fit_marss, type = "ytT", interval = "confidence")
 
 conf_marss2 <- predict(fit_marss,
-  type = "ytT",
-  interval = "confidence", level = 0.95
+                       type = "ytT",
+                       interval = "confidence", level = 0.95
 )
 class(conf_kfas) <- "matrix"
 test_that("fits Nile CI", {
-  expect_equivalent(conf_kfas, as.matrix(conf_marss1[, c(".fitted", ".conf.low", ".conf.up", ".se")]), as.matrix(conf_marss2$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
+  expect_equivalent(conf_kfas, as.matrix(conf_marss1[, c(".fitted", ".conf.low", ".conf.up", ".se")]))
+  expect_equivalent(conf_kfas, as.matrix(conf_marss2$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
 })
 
 pred_kfas <- predict(fit_kfas$model,
-  interval = "prediction", se.fit = TRUE
+                     interval = "prediction", se.fit = TRUE
 )
 pred_marss1 <- fitted(fit_marss, type = "ytT", interval = "prediction")
 pred_marss2 <- predict(fit_marss,
-  type = "ytT",
-  interval = "prediction", level = 0.95
+                       type = "ytT",
+                       interval = "prediction", level = 0.95
 )
 class(pred_kfas) <- "matrix"
+pred_kfas <- pred_kfas[, c("fit", "lwr", "upr")]
 test_that("fits Nile PI", {
-  expect_equivalent(pred_kfas, as.matrix(pred_marss1[, c(".fitted", ".lwr", ".upr", ".sd")]), as.matrix(pred_marss2$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
+  expect_equivalent(pred_kfas, as.matrix(pred_marss1[, c(".fitted", ".lwr", ".upr")]))
+  expect_equivalent(pred_kfas, as.matrix(pred_marss2$pred[, c("estimate", "Lo 95", "Hi 95")]))
 })
 
 conf_kfas_t1 <- predict(fit_kfas$model,
-  interval = "confidence",
-  se.fit = TRUE, filtered = TRUE
+                        interval = "confidence",
+                        se.fit = TRUE, filtered = TRUE
 )
 class(conf_kfas_t1) <- "matrix"
 conf_marss1_t1 <- fitted(fit_marss, type = "ytt1", interval = "confidence")
 conf_marss2_t1 <- predict(fit_marss,
-  type = "ytt1",
-  interval = "confidence", level = 0.95
+                          type = "ytt1",
+                          interval = "confidence", level = 0.95
 )
 test_that("fits Nile CI t1", {
-  expect_equivalent(conf_kfas_t1, as.matrix(conf_marss1_t1[, c(".fitted", ".conf.low", ".conf.up", ".se")]), as.matrix(conf_marss2_t1$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
+  expect_equivalent(conf_kfas_t1, as.matrix(conf_marss1_t1[, c(".fitted", ".conf.low", ".conf.up", ".se")]))
+  expect_equivalent(conf_kfas_t1, as.matrix(conf_marss2_t1$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
 })
 
 pred_kfas_t1 <- predict(fit_kfas$model,
-  interval = "prediction",
-  se.fit = TRUE, filtered = TRUE
+                        interval = "prediction",
+                        se.fit = TRUE, filtered = TRUE
 )
-
 class(pred_kfas_t1) <- "matrix"
+pred_kfas_t1 <- pred_kfas_t1[, c("fit", "lwr", "upr")]
 pred_marss1_t1 <- fitted(fit_marss, type = "ytt1", interval = "prediction")
 pred_marss2_t1 <- predict(fit_marss,
-  type = "ytt1",
-  interval = "prediction", level = 0.95
+                          type = "ytt1",
+                          interval = "prediction", level = 0.95
 )
 test_that("fits Nile PI t1", {
-  expect_equivalent(pred_kfas_t1, as.matrix(pred_marss1_t1[, c(".fitted", ".lwr", ".upr", ".sd")]), as.matrix(pred_marss2_t1$pred[, c("estimate", "Lo 95", "Hi 95", "se")]))
+  expect_equivalent(pred_kfas_t1, as.matrix(pred_marss1_t1[, c(".fitted", ".lwr", ".upr")]))
+  expect_equivalent(pred_kfas_t1, as.matrix(pred_marss2_t1$pred[, c("estimate", "Lo 95", "Hi 95")]))
 })
 
 ###################################################
@@ -219,8 +225,8 @@ test_that("fits Nile PI t1", {
 kfs <- KFS(fit_kfas$model)
 resid_kfas <- residuals(kfs, type = "recursive")
 resid_marss <- residuals(fit_marss,
-  type = "tt1",
-  standardization = "marginal"
+                         type = "tt1",
+                         standardization = "marginal"
 )
 resid_marss <- subset(resid_marss, name == "model")
 test_that("fits Nile model residuals recursive", {
@@ -228,12 +234,12 @@ test_that("fits Nile model residuals recursive", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "recursive",
-  standardization_type = "marginal"
+                        type = "recursive",
+                        standardization_type = "marginal"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tt1",
-  standardization = "marginal"
+                         type = "tt1",
+                         standardization = "marginal"
 )
 resid_marss <- subset(resid_marss, name == "model")
 test_that("fits Nile model residuals marginal", {
@@ -241,12 +247,12 @@ test_that("fits Nile model residuals marginal", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "recursive",
-  standardization_type = "cholesky"
+                        type = "recursive",
+                        standardization_type = "cholesky"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tt1",
-  standardization = "Cholesky"
+                         type = "tt1",
+                         standardization = "Cholesky"
 )
 resid_marss <- subset(resid_marss, name == "model")
 test_that("fits Nile model residuals cholesky", {
@@ -261,12 +267,12 @@ test_that("fits Nile model residuals pearson", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "pearson",
-  standardization_type = "marginal"
+                        type = "pearson",
+                        standardization_type = "marginal"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tT",
-  standardization = "marginal"
+                         type = "tT",
+                         standardization = "marginal"
 )
 resid_marss <- subset(resid_marss, name == "model")
 test_that("fits Nile model residuals pearson marginal", {
@@ -274,12 +280,12 @@ test_that("fits Nile model residuals pearson marginal", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "pearson",
-  standardization_type = "cholesky"
+                        type = "pearson",
+                        standardization_type = "cholesky"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tT",
-  standardization = "Cholesky"
+                         type = "tT",
+                         standardization = "Cholesky"
 )
 resid_marss <- subset(resid_marss, name == "model")
 test_that("fits Nile model residuals pearson cholesky", {
@@ -302,12 +308,12 @@ test_that("fits Nile state residuals", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "state",
-  standardization_type = "marginal"
+                        type = "state",
+                        standardization_type = "marginal"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tT",
-  standardization = "marginal"
+                         type = "tT",
+                         standardization = "marginal"
 )
 resid_marss <- subset(resid_marss, name == "state")
 test_that("fits Nile state residuals marginal", {
@@ -315,12 +321,12 @@ test_that("fits Nile state residuals marginal", {
 })
 
 resid_kfas <- rstandard(kfs,
-  type = "state",
-  standardization_type = "cholesky"
+                        type = "state",
+                        standardization_type = "cholesky"
 )
 resid_marss <- residuals(fit_marss,
-  type = "tT",
-  standardization = "Block.Cholesky"
+                         type = "tT",
+                         standardization = "Block.Cholesky"
 )
 resid_marss <- subset(resid_marss, name == "state")
 test_that("fits Nile state residuals block cholesky", {
@@ -356,8 +362,8 @@ model_NileNA_stoch$P1inf[1, 1] <- 0
 kinits <- c(log(var(Nile)), log(var(Nile)))
 fit_kfas_NA <- fitSSM(model_NileNA_stoch, kinits, method = "BFGS")
 fit_marss_NA <- MARSS(as.vector(NileNA),
-  model = mod.nile.stoch,
-  inits = inits, method = "BFGS", silent = TRUE
+                      model = mod.nile.stoch,
+                      inits = inits, method = "BFGS", silent = TRUE
 )
 vals <- rbind(
   MARSS = c(
@@ -407,7 +413,7 @@ context("KFAS GlobalTemp fits")
 
 data("GlobalTemp")
 model_temp <- SSModel(GlobalTemp ~ SSMtrend(1, Q = NA, type = "common"),
-  H = matrix(NA, 2, 2)
+                      H = matrix(NA, 2, 2)
 )
 kinits <- chol(cov(GlobalTemp))[c(1, 4, 3)]
 kinits <- c(0.5 * log(0.1), log(kinits[1:2]), kinits[3])
@@ -429,8 +435,8 @@ mod.list$V0 <- kfas_temp_stoch$model$P1
 marss_temp_stoch_em <- MARSS(t(GlobalTemp), model = mod.list, silent = TRUE)
 # use inits from a short run of EM algorithm
 inits <- MARSS(t(GlobalTemp),
-  model = mod.list, control = list(maxit = 20),
-  silent = TRUE
+               model = mod.list, control = list(maxit = 20),
+               silent = TRUE
 )
 marss_temp_stoch_bfgs <- MARSS(t(GlobalTemp), model = mod.list, inits = inits, method = "BFGS", silent = TRUE)
 
@@ -485,17 +491,17 @@ test_that("xtT GlobalTemp MARSS bfgs vs KFAS", {
 
 kfs <- KFS(kfas_temp_stoch$model, smoothing = "disturbance")
 resid_kfas <- rstandard(kfs,
-  type = "state",
-  standardization_type = "cholesky"
+                        type = "state",
+                        standardization_type = "cholesky"
 )
 resid_marss <- residuals(marss_temp_stoch_bfgs,
-  type = "tT",
-  standardization = "Block.Cholesky"
+                         type = "tT",
+                         standardization = "Block.Cholesky"
 )
 resid_marss <- subset(resid_marss, name == "state")
 resid_test <- residuals(marss_test,
-  type = "tT",
-  standardization = "Block.Cholesky"
+                        type = "tT",
+                        standardization = "Block.Cholesky"
 )
 resid_test <- subset(resid_test, name == "state")
 

@@ -3,7 +3,7 @@
 
 \title{ Summary methods for marssMLE objects }
 \description{
-A brief summary of the fit: number of state and observation time series and the estimates. See also \code{\link{glance.marssMLE}()} and \code{\link{tidy.marssMLE}()} for other summary like output.
+A brief summary of the fit: number of state and observation time series and the estimates. See also \code{\link[=glance.marssMLE]{glance}()} and \code{\link[=tidy.marssMLE]{tidy}()} for other summary like output.
 }
 \usage{
 \method{summary}{marssMLE}(object, digits = max(3, getOption("digits") - 3), ...)
@@ -16,7 +16,7 @@ A brief summary of the fit: number of state and observation time series and the 
 \value{
   Returns `object` invisibly.
 }
-\seealso{ \code{\link{glance.marssMLE}()}, \code{\link{tidy.marssMLE}()} } 
+\seealso{ \code{\link[=glance.marssMLE]{glance}()}, \code{\link[=tidy.marssMLE]{tidy}()} } 
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 }

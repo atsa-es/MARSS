@@ -26,13 +26,15 @@ for (i in 2:dim(harborSeal)[2]) {
 ### code chunk number 11: Cs03_set.up.Z.models
 ###################################################
 # H1 stock
-Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), "ca", "ca", "wa.or", "wa.or", "bc"))
+Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), 
+               "ca", "ca", "wa.or", "wa.or", "bc"))
 # H2 coastal+PS
 Z2 <- factor(c(rep("coast", 2), rep("ps", 4), rep("coast", 4), "ps"))
 # H3 N and S
 Z3 <- factor(c(rep("N", 6), "S", "S", "N", "S", "N"))
 # H4 North Coast, Inland Strait, Puget Sound, South Coast
-Z4 <- factor(c("nc", "nc", "is", "is", "ps", "ps", "sc", "sc", "nc", "sc", "is"))
+Z4 <- factor(c("nc", "nc", "is", "is", "ps", "ps", 
+               "sc", "sc", "nc", "sc", "is"))
 # H5 panmictic
 Z5 <- factor(rep("pan", 11))
 # H6 Site
@@ -169,9 +171,9 @@ for (i in 1:length(Z.models)) {
 min.AICc <- order(out.tab$AICc)
 out.tab.2 <- out.tab[min.AICc, ]
 fits <- fits[min.AICc]
-out.tab.2 <- cbind(out.tab.2, delta.AICc = out.tab.2$AICc - out.tab.2$AICc[1])
-out.tab.2 <- cbind(out.tab.2, rel.like = exp(-1 * out.tab.2$delta.AICc / 2))
-out.tab.2 <- cbind(out.tab.2, AIC.weight = out.tab.2$rel.like / sum(out.tab.2$rel.like))
+out.tab.2$delta.AICc <- out.tab.2$AICc - out.tab.2$AICc[1]
+out.tab.2$rel.like <- exp(-1 * out.tab.2$delta.AICc / 2)
+out.tab.2$AIC.weight <- out.tab.2$rel.like / sum(out.tab.2$rel.like)
 
 
 ###################################################
@@ -283,9 +285,9 @@ for (i in 1:length(Z.models.hc)) {
 ###################################################
 min.AICc <- order(out.tab.hc$AICc)
 out.tab.hc <- out.tab.hc[min.AICc, ]
-out.tab.hc <- cbind(out.tab.hc, delta.AICc = out.tab.hc$AICc - out.tab.hc$AICc[1])
-out.tab.hc <- cbind(out.tab.hc, rel.like = exp(-1 * out.tab.hc$delta.AICc / 2))
-out.tab.hc <- cbind(out.tab.hc, AIC.weight = out.tab.hc$rel.like / sum(out.tab.hc$rel.like))
+out.tab.hc$delta.AICc <- out.tab.hc$AICc - out.tab.hc$AICc[1]
+out.tab.hc$rel.like <- exp(-1 * out.tab.hc$delta.AICc / 2)
+out.tab.hc$AIC.weight <- out.tab.hc$rel.like / sum(out.tab.hc$rel.like)
 
 
 ###################################################

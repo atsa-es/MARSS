@@ -1,3 +1,13 @@
+# 05-18-2023
+
+cd ~/Documents/GitHub/MARSS/inst
+make --makefile=Makedoc
+make --makefile=Makerelease
+
+
+# Everything below is old
+
+
 
 PC
 Open up command prompt from start menu
@@ -116,7 +126,7 @@ Clean up the tar.gz that goes to CRAN
 * the build process will put the Rnw files doc folder and I want the pdfs with same name so that CRAN does not build the Rnw.  The Rnw is a flag to CRAN to list the vignettes on the package CRAN page.  UserGuide.Rnw is a dummy file to trick CRAN into adding the UserGuide pdf on the package page.
 
 Submitting to CRAN
-upload the .tar.gz file, using anonymous as log-in name and your e-mail address as password, to ftp://CRAN.R-project.org/incoming/ (note: use ‘ftp’ and not ‘sftp’ to connect to this server) and send a message to CRAN@R-project.org about it.  Subject of email should be "CRAN submission MARSS 3.X"  Explain what the version does.  Must come from eli.holmes@noaa.gov.  Make sure to send in plain text.  Gmail has plain option under 'more options' (bottom corner little arrow).
+upload the .tar.gz file, using anonymous as log-in name and your e-mail address as password, to ftp://CRAN.R-project.org/incoming/ (note: use ?ftp? and not ?sftp? to connect to this server) and send a message to CRAN@R-project.org about it.  Subject of email should be "CRAN submission MARSS 3.X"  Explain what the version does.  Must come from eli.holmes@noaa.gov.  Make sure to send in plain text.  Gmail has plain option under 'more options' (bottom corner little arrow).
 
 
 

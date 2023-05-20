@@ -4,7 +4,7 @@
 
 \title{ Plot MARSS marssResiduals objects }
 \description{
-  Plots residuals using the output from a \code{\link{residuals.marssMLE}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
+  Plots residuals using the output from a \code{\link[=residuals.marssMLE]{residuals}()} call. By default all available residuals plots are plotted.  Individual plots can be plotted by passing in \code{plot.type}.  If an individual plot is made using \code{autoplot()}, the ggplot object is returned which can be further manipulated. Plots are only shown for those residual types in the \code{\link{marssResiduals}} object.
 }
 \usage{
 \method{plot}{marssResiduals}(x, plot.type = c("all", "residuals", "qqplot", "acf"), 
@@ -39,7 +39,7 @@ The plot types are as follows:
 \describe{
 \item{\code{"all"}}{ All the residuals in the residuals object plus QQ plots and ACF plots. }
 \item{\code{"residuals"}}{ Only residuals versus time. }
-\item{\code{"qqplot"}}{ Only QQplots. Visual normality test for the residuals.} 
+\item{\code{"qqplot"}}{ Only QQ plots. Visual normality test for the residuals.} 
 \item{\code{"acf"}}{ ACF of the residuals. If \code{x$type is "ytt1"}, these are the one-step-ahead (aka innovations) residuals and they should be temporally independent. }
 }
 }

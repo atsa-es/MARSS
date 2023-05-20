@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 40: fit_covar
+### code chunk number 39: fit_covar
 ###################################################
 if (!saved.res) {
   model.list <- list(m = 2, R = "unconstrained")

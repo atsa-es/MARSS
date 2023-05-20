@@ -4,19 +4,28 @@ output: html_document
 
 # MARSS 3.11.7 (GitHub)
 
-This release is focused on moving the MARSS User Guide into a separate repository. This will facilitate updating MARSS and converting the User Guide to an eBook.
+This release is focused on moving the MARSS User Guide and derivation files into a `inst/userguide` and `inst/derivations` along with Makefiles to build. This will facilitate updating MARSS and converting the User Guide to an eBook.
 
-* Deleted the `inst/doc` folder
 * Added pkgdown. Note this required special files for MathJax in the `pkgdown` folder.
 * Removed packages in `Suggests:` that were associated with the User Guide and tests and not used in examples.
-* Converted `Quick_Start.Rnw` and `Residuals.Rnw` to Rmd so it works better with pkgdown.
+* Converted `Quick_Start.Rnw` to Rmd so it works better with pkgdown and renders to html for CRAN.
 * Updated DESCRIPTION and README to refer to marssTMB.
 * Added marssTMB to Suggests with `Additional_repositories: https://atsa-es.r-universe.dev`
-
 
 ## BUGS
 
 * In `predict_marssMLE()`, the newdata model.tsp was not being set.
+* In `plot.marssMLE()`, the CIs for the state residuals did not plot correctly because there is always a NA at the end.
+* In `autoplot.marssMLE(), two plots would always be plotted if one plot type was specified.
+
+## DOCUMENTATION
+
+* Added `vignettes/Learning_MARSS.Rmd`
+* Fixed various equation formatting typos (unbolded x's and x's that should have been X's in expectations).
+* Added `MARSS.dfa()` to the manual built by CRAN by removing keyword internal.
+* Added `inst/DEVELOPER_NOTES.md`
+* Minor change to make the v and w in `EMDerivation.Rnw` in slant font as they are random variables.
+
 
 # MARSS 3.11.6 (GitHub)
 
@@ -26,7 +35,7 @@ This release is focused on adding new method `method="TMB"` which uses the packa
 * Added the generic function `MARSSfit()` and methods for "kem" and "BFGS".
 * Added the defaults to `R/onLoad.R` and made it easier to specify new methods and constraints on methods
 * Made changes to `checkMARSSinputs.R`, `is_marssMLE.R` and `is.validvarcov()` so they are not so specific to `method="BFGS"` but work for any methods with similar constraints.
-* Export MARSSvectorizeparam(). Need when writing methods for MARSSfit() generic.
+* Export `MARSSvectorizeparam()`. Need when writing methods for `MARSSfit()` generic.
 * Added {generics} as a dependency and removed {forecast} and {broom} from Suggests. Cleaned up examples and text throughout to remove references to these packages.
 
 ## BUGS
@@ -110,7 +119,7 @@ This is an update based on version 3.11.2 (GitHub release). It is mainly focused
 * Added notation definitions to the Kalman smoother algorithm section for `xtt` and `xtt1` etc.
 * Added information on how to get CIs on rotated loadings to DFA chapter.
 * Cleaned up MARSSkf.Rd sections on initial conditions and cleaned up equation formatting so looks better in pdf format.
-* Added section on normalization calculations to Residuals.Rnw.
+* Added section on normalization calculations to `Residuals.Rnw`.
 * Cleaned up notation for conditional expectations in the man files.
 * Fixed bug in the Covariates chapter which was not showing the B estimates for `kem.plank.4`.
 

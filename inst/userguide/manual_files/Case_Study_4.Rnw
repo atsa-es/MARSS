@@ -770,36 +770,7 @@ First, it looks like this model captures some of the high frequency variation (i
 
 \begin{figure}[htp]
 \begin{center}
-<<Cs25c_plotbestfits, eval=TRUE, echo=FALSE, fig=TRUE, height=6, width=6>>=
-# plot the fits
-ylbl <- rownames(dat.z)
-w_ts <- seq(dim(dat.z)[2])
-par(mfcol = c(3, 2), mar = c(3, 4, 1.5, 0.5), oma = c(0.4, 1, 1, 1))
-for (i in 1:N.ts) {
-  up <- fit.b$up[i, ]
-  mn <- fit.b$ex[i, ]
-  lo <- fit.b$lo[i, ]
-  plot(w_ts, mn,
-    xlab = "", ylab = ylbl[i], xaxt = "n", type = "n", cex.lab = 1.2,
-    ylim = c(min(lo), max(up))
-  )
-  axis(1, 12 * (0:dim(dat.z)[2]) + 1, 1980 + 0:dim(dat.z)[2])
-  points(w_ts, dat.z[i, ], pch = 16, col = "blue")
-  lines(w_ts, up, col = "darkgray")
-  lines(w_ts, mn, col = "black", lwd = 2)
-  lines(w_ts, lo, col = "darkgray")
-}
-@
-\end{center}
-\caption{Plot of the 2-state model fits to the phytoplankton data.}
-\label{fig:CS4.bestfits}
-\end{figure}
-
-Alternatively, you can use the \verb@residuals()@ function to obtain a summary of the estimates and use \verb@ggplot()@ to plot.\index{dynamic factor analysis!residuals}
-
-\begin{figure}[htp]
-\begin{center}
-<<Cs25d_plotwithaugment, fig=TRUE, height=6, width=6, results=hide>>=
+<<Cs25d_plotwithaugment, fig=TRUE, height=6, width=6, results=hide, echo=FALSE>>=
 require(ggplot2)
 alpha <- 0.05
 theme_set(theme_bw())
@@ -815,8 +786,8 @@ ggplot(data = subset(d, name=="model")) +
   ylab("Count")
 @
 \end{center}
-\caption{Plot of the 2-state model fits to the phytoplankton data using ggplot.}
-\label{fig:CS4.bestfits.augment}
+\caption{Plot of the 2-state model fits to the phytoplankton data.}
+\label{fig:CS4.bestfits}
 \end{figure}
 
 \section{Adding covariates}

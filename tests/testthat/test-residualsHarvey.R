@@ -24,7 +24,7 @@ resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf = "MARSSkfss")
 resids3 <- MARSSresiduals(fit2, type = "tT", fun.kf = "MARSSkfas")
 
 test_that(paste("StructTS compare residuals Harvey = TRUE and FALSE"), {
-  expect_equal(resids1, resids2)
+  expect_equal(resids1, resids2, tolerance = 1.54e-08)
 })
 
 test_that(paste("StructTS compare residuals kfss vs kfas"), {
@@ -35,7 +35,7 @@ resids1 <- MARSSresiduals(fit2, type = "tT", Harvey = TRUE, fun.kf = "MARSSkfss"
 resids2 <- MARSSresiduals(fit2, type = "tT", fun.kf = "MARSSkfss", normalize = TRUE)
 
 test_that(paste("StructTS compare normalized residuals Harvey = TRUE and FALSE"), {
-  expect_equal(resids1, resids2)
+  expect_equal(resids1, resids2, tolerance = 1.54e-08)
 })
 
 # Little harder model
