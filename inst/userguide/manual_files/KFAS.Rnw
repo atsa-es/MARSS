@@ -71,7 +71,7 @@ mod.nile <- list(
   tinitx = 1
 )
 @
-The default initial conditions in the \{MARSS\} package is to estimate $x_1$ as a parameter (and set $V_1$ to zero). This default behavior prevents prior information about the covariance structure of the states from affecting the estimates, though for some models, the initial conditions estimation is not well defined (in which case setting a stochastic prior is helpful).
+The default initial condition in the \{MARSS\} package is to estimate $x_1$ as a parameter (and set $V_1$ to zero). This default behavior prevents prior information about the covariance structure of the states from affecting the estimates, though for some models, the initial conditions estimation is not well defined (in which case setting a stochastic prior is helpful).
 
 We will fit with the EM and BFGS algorithm in the \{MARSS\} package. We will start the BFGS algorithm at the same initial conditions used in our \{KFAS\} fitting call, although this isn't quite the same because \{MARSS\} and \{KFAS\} are using different approaches to ensure that the variances stay positive-definite during the BFGS maximization steps.
 <<Cs104_fitting-models, eval=TRUE>>=
@@ -217,10 +217,12 @@ n <- 10
 <<Cs305_obs-filtering>>=
 ytt1_fit <- fitted(fit_marss, type = "ytt1")$.fitted
 ytt1_hatyt <- MARSShatyt(fit_marss, only.kem = FALSE)$ytt1
-cbind(m = kf_kfas$m[1:n], fitted = ytt1_fit[1:n], MARSShatyt = ytt1_hatyt[1:n])
+cbind(m = kf_kfas$m[1:n], 
+      fitted = ytt1_fit[1:n], 
+      MARSShatyt = ytt1_hatyt[1:n])
 @
 
-\item \verb@kf_kfas$P_mu@ is the variance-covariance matrix of the expected value of $\YY_t$ conditioned on the data from time step 1 to time step $t-1$. \verb@MARSShatyt(fit_marss)$var.Eytt1@ returns the same values; "var.Eytt1" indicates that it is the variance of the expected value of $\YY_t$ conditioned on data up to time step $t-1$.  In \{MARSS\}, the standard errors of the one-step ahead prediction are also returned by \verb@fitted(..., type = "ytt1", interval = "confidence")@. Using \verb@fitted()@, you can output the values as matrices instead of a data frame if you need the variance-covariance matrices not just standard errors.
+\item \verb@kf_kfas$P_mu@ is the variance-covariance matrix of the expected value of $\YY_t$ conditioned on the data from time step 1 to time step $t-1$. \verb@MARSShatyt(fit_marss)$var.Eytt1@ returns the same values; \verb@var.Eytt1@ indicates that it is the variance of the expected value of $\YY_t$ conditioned on data up to time step $t-1$.  In \{MARSS\}, the standard errors of the one-step ahead prediction are also returned by \verb@fitted()@ with \verb@type = "ytt1"@ and \verb@interval = "confidence"@. Using \verb@fitted()@, you can output the values as matrices instead of a data frame if you need the variance-covariance matrices not just standard errors.
 <<Cs306_obs-filtering>>=
 var.Eytt1_fit <-
   fitted(fit_marss, type = "ytt1", interval = "confidence")$.se^2

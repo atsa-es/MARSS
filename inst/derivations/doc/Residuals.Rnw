@@ -178,6 +178,8 @@
 \author{E. E. Holmes\footnote{Northwest Fisheries Science Center, NOAA Fisheries, Seattle, WA 98112, 
        eli.holmes@noaa.gov, http://faculty.washington.edu/eeholmes}}
 \title{Computation of Standardized Residuals for MARSS Models}
+\date{original 31 Oct 2014 \\ 
+\small{\emph{added normalization calculations, 20 Oct 2020}}}
 \maketitle
 \begin{abstract}
 This report walks through a derivation of the variance-covariance matrix for the joint conditional model and state residuals for multivariate autoregressive Gaussian state-space (MARSS) models. The bulk of the report focuses on `smoothations' residuals \citep{Harveyetal1998}, which are the residuals conditioned on all the data $t=1$ to $T$. The final part of the report covers `innovations' residuals, which are residuals conditioned on the data $t=1$ to $t-1$. 

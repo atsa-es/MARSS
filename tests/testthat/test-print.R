@@ -30,9 +30,9 @@ for(val in what){
 
 for(i in c(1,4)){
   fit <- fits[[i]]
-  tmp <- try(MARSSparamCIs(fit))
+  tmp <- try(MARSSparamCIs(fit), silent=TRUE)
   if(inherits(tmp, "try-error")){
-    fit <- MARSSparamCIs(fit, hessian.fun="fdHess")
+    fit <- MARSSparamCIs(fit, hessian.fun="optim")
   }else{ fit <- tmp }
   what <- list("par.se", "par.upCI", "par.lowCI")
   

@@ -16,8 +16,7 @@ zscore(x, mean.only = FALSE)
   n = number of observation (y) time series.   T = number of time steps in the time series.
   
   The z-scored values (z) of a matrix of y values are
-\eqn{z_i = \Sigma^{-1}(y_i-\bar{y})}
-  where \deqn{\Sigma} is a diagonal matrix with the standard deviations of each time series (row) along the diagonal, and \deqn{\bar{y}} is a vector of the means. 
+\eqn{z_i = \Sigma^{-1}(y_i-\bar{y})} where \eqn{\Sigma} is a diagonal matrix with the standard deviations of each time series (row) along the diagonal, and \eqn{\bar{y}} is a vector of the means. 
 }
 \value{
   n x T matrix of z-scored values.

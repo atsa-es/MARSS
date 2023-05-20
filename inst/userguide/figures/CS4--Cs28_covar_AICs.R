@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 42: Cs28_covar_AICs
+### code chunk number 41: Cs28_covar_AICs
 ###################################################
 print(cbind(
   model = c("no covars", "Temp", "TP", "Temp & TP"),

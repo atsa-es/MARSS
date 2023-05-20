@@ -1,3 +1,5 @@
+library(MARSS)
+
 model.list <- list()
 
 name <- "RW_1D_a"
@@ -151,6 +153,7 @@ library(tidyverse)
 library("tseries")
 library("dplyr")
 library(quantmod)
+library(MARSS)
 
 # 2) Get data from Quantmod and prepare data frame for estimation
 

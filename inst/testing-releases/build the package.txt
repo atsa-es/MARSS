@@ -1,16 +1,11 @@
 # 05-18-2023
 
-cd ~/Documents/GitHub
-rm MARSS_3.11.7.tar.gz
-R CMD build MARSS
-rm -r ~/Dropbox/MARSS
-rm ~/Dropbox/MARSS_3.11.7.tar.gz
-cp MARSS_3.11.7.tar.gz ~/Dropbox/MARSS_3.11.7.tar.gz
-cd ~/Dropbox
-tar -xvzf MARSS_3.11.7.tar.gz
 cd ~/Documents/GitHub/MARSS/inst
 make --makefile=Makedoc
-R CMD build --no-build-vignettes MARSS
+make --makefile=Makerelease
+
+
+# Everything below is old
 
 
 

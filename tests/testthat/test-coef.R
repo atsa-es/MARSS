@@ -36,7 +36,7 @@ for(val in what){
   for(i in c(1:2, 5)){
     fit <- fits[[i]]
     if( val!="par"){ 
-      p1 <- try(coef(MARSSparamCIs(fit), what=val))
+      p1 <- try(coef(MARSSparamCIs(fit), what=val), silent = TRUE)
       test_that(paste("coef class", i, val), {
         expect_true(inherits(p1, "try-error"))
       })
@@ -51,9 +51,9 @@ for(val in what){
   for(i in c(3,6)){
     fit <- fits[[i]]
     if( val!="par"){ 
-      p1 <- try(coef(MARSSparamCIs(fit), what=val))
+      p1 <- try(coef(MARSSparamCIs(fit), what=val), silent = TRUE)
     }else{
-      p1 <- try(coef(fit))
+      p1 <- try(coef(fit), silent = TRUE)
     }
     test_that(paste("coef class", i, val), {
       expect_true(inherits(p1, "try-error"))

@@ -18,7 +18,7 @@ MARSSsimulate(object, tSteps = NULL, nsim = 1, silent = TRUE,
 }
 \details{
   Optional argument \code{miss.loc} is an array of dimensions n x tSteps x nsim, specifying where to put missing values
-  in the simulated data. If missing, this would be constructed using \code{MLEobj$marss$data}.  If the locations of the missing values are the same for all simulations, \code{miss.loc} can be a matrix of dim=c(n, tSteps) (the original data for example).  The default, if \code{miss.loc} is left off, is that there are no missing values even if \code{MLEobj$marss$data} has missing values. 
+  in the simulated data. If missing, this would be constructed using \code{MLEobj$marss$data}.  If the locations of the missing values are the same for all simulations, \code{miss.loc} can be a matrix of \code{dim=c(n, tSteps)} (the original data for example).  The default, if \code{miss.loc} is left off, is that there are no missing values even if \code{MLEobj$marss$data} has missing values. 
 }
 \value{
   \item{sim.states}{ Array (dim m x tSteps x nsim) of state processes simulated from parameter estimates. m is the number of states (rows in X).}

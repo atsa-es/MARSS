@@ -64,8 +64,8 @@
 \details{
 The plot types are as follows:
 \describe{
-\item{\code{"fitted.y"}}{ This plots the fitted y, which is the expected value of Y conditioned on the data from \eqn{t=1} to \eqn{t-1}, \eqn{t} or \eqn{T}. It is \eqn{Z*xtT + a}. The data are plotted for reference but note that the lines and intervals are for new data not the observed data.}
-\item{\code{"fitted.x"}}{ This plots the fitted x, which is the expected value of X conditioned on the data from \eqn{t=1} to \eqn{t-1} or \eqn{T}. It is \eqn{B*E[x(t-1)|y] + u}. The \eqn{E[x(t)|y]} are plotted for reference but note that the lines and intervals are for new X. This is not the estimated states; these are used for residuals calculations. If you want the state estimates use \code{xtT} (or \code{xtt}).}
+\item{\code{"fitted.y"}}{ This plots the fitted \eqn{\mathbf{y}}{y}, which is the expected value of \eqn{\mathbf{Y}}{Y} conditioned on the data from \eqn{t=1} to \eqn{t-1}, \eqn{t} or \eqn{T}. It is \eqn{\mathbf{Z}\mathbf{x}_t^T + \mathbf{a}}{Z*xtT + a}. The data are plotted for reference but note that the lines and intervals are for new data not the observed data.}
+\item{\code{"fitted.x"}}{ This plots the fitted x, which is the expected value of \eqn{\mathbf{X}}{X} conditioned on the data from \eqn{t=1} to \eqn{t-1} or \eqn{T}. It is \eqn{B \textrm{E}[\mathbf{X}_{t-1}|\mathbf{y}] + u}{B*E[X(t-1)|y] + u}. The \eqn{\textrm{E}[\mathbf{X}_t|\mathbf{y}]}{E[X(t)|y]} are plotted for reference but note that the lines and intervals are for new \eqn{\mathbf{x}}{x}. This is not the estimated states; these are used for residuals calculations. If you want the state estimates use \code{xtT} (or \code{xtt}).}
 \item{\code{"xtT"}}{  The estimated states from the Kalman smoother (conditioned on all the data). }
 \item{\code{"xtt1"}}{  The estimated states conditioned on the data up to \eqn{t-1}. Kalman filter output. }
 \item{\code{"model.resids.ytT"}, \code{"model.resids.ytt1"}, \code{"model.resids.ytt"}}{Model residuals (data minus fitted y). \code{ytT} indicates smoothation residuals, \code{ytt1} indicates innovation residuals (the standard state-space residuals), and \code{ytt} are the residuals conditioned on data up to \eqn{t}. }
@@ -73,8 +73,8 @@ The plot types are as follows:
 \item{\code{"std"}}{ \code{std} in front of any of the above plot names indicates that the plots are for the standardized residuals. }
 \item{\code{"qqplot"}}{ Visual normality test for the residuals, model or state. } 
 \item{\code{"acf"}}{ ACF of the residuals. The only residuals that should be temporally independent are the innovation residuals: \code{acf.model.residuals.ytt1} and \code{acf.std.model.residuals.ytt1}. This ACF is a standard residuals diagnostic for state-space models. The other ACF plots will show temporal dependence and are not used for diagnostics. }
-\item{\code{"ytT"}}{ The expected value of \eqn{Y} conditioned on all the data. Use this for estimates of the missing data points. Note for non-missing \eqn{y} values, the expected value of \eqn{Y} is \eqn{y}. } 
-\item{\code{"ytt"}, \code{ytt1}}{ The expected value of \eqn{Y} conditioned on the data from 1 to \eqn{t} or \eqn{t-1}. } 
+\item{\code{"ytT"}}{ The expected value of \eqn{\mathbf{Y}}{Y} conditioned on all the data. Use this for estimates of the missing data points. Note for non-missing \eqn{\mathbf{y}}{y} values, the expected value of \eqn{\mathbf{Y}}{Y} is \eqn{\mathbf{y}}{y}. } 
+\item{\code{"ytt"}, \code{ytt1}}{ The expected value of \eqn{\mathbf{Y}}{Y} conditioned on the data from 1 to \eqn{t} or \eqn{t-1}. } 
 }
 
 The plot parameters can be passed in as a list to change the look of the plots. For \code{plot.marssMLE()}, the default is \code{plot.par = list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1, line.col = "black", line.size = 1, line.linetype = "solid", ci.col = "grey70", ci.border = NA, ci.lwd = 1, ci.lty = 1)}. For \code{autoplot.marssMLE}, the default is \code{plot.par = list(point.pch = 19, point.col = "blue", point.fill = "blue", point.size = 1, line.col = "black", line.size = 1, line.linetype = "solid", ci.fill = "grey70", ci.col = "grey70", ci.linetype = "solid", ci.linesize = 0, ci.alpha = 0.6)}.

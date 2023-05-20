@@ -307,7 +307,7 @@ Q <- "diagonal and equal"
 U <- "equal"
 kem <- MARSS(dat, model = list(Z = Z, Q = Q, U = U))
 @
-You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix \verb@Z=matrix(c(1,1,1,0,0,0,0,0,1,1),5,2)@; the \verb@factor@ notation is a shortcut for making a design matrix (as $\ZZ$ is in these examples).  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
+You can also pass in $\ZZ$ exactly as it is in the equation as a numeric matrix; the \verb@factor@ notation is simply a shortcut for making this design matrix (as $\ZZ$ is in these examples).  \verb@"equal"@ is a shortcut meaning all elements in a matrix are constrained to be equal.  It can be used for all column matrices ($\aa$, $\uu$ and $\pipi$).  \verb@"diagonal and equal"@ can be used as a shortcut for all square matrices ($\BB$, $\QQ$, $\RR$, and $\LAM$).
 
 \section{Linear constraints}
 
@@ -339,7 +339,8 @@ U2 <- matrix("t2", 5, 1)
 Ut <- array(U2, dim = c(dim(U1), dim(dat)[2]))
 TT <- dim(dat)[2]
 Ut[, , 1:floor(TT / 2)] <- U1
-kem.tv <- MARSS(dat, model = list(U = Ut, Q = "diagonal and equal"))
+Qde <- "diagonal and equal"
+kem.tv <- MARSS(dat, model = list(U = Ut, Q = Qde))
 @
 You can have some elements in a parameter matrix be time-constant and some be time-varying:
 <<Cs19b_model-time-varying2, keep.source=TRUE, results=hide>>=
@@ -347,7 +348,7 @@ U1 <- matrix(c(rep("t1", 4), "hc"), 5, 1)
 U2 <- matrix(c(rep("t2", 4), "hc"), 5, 1)
 Ut <- array(U2, dim = c(dim(U1), dim(dat)[2]))
 Ut[, , 1:floor(TT / 2)] <- U1
-kem.tv <- MARSS(dat, model = list(U = Ut, Q = "diagonal and equal"))
+kem.tv <- MARSS(dat, model = list(U = Ut, Q = Qde))
 @
 Note that how the time-varying model is specified for MARSS is the same as you would write the time-varying model on paper in matrix math form.
 
@@ -407,10 +408,10 @@ print(kem.with.hess.CIs)
 
 \subsection{Confidence intervals from a parametric bootstrap}
 \index{confidence intervals!parametric bootstrap}
-Use \verb@method="parametric"@ to use a parametric bootstrap to compute confidence intervals and  bias using a parametric bootstrap. 
+Use \verb@method="parametric"@ to use a parametric bootstrap to compute confidence intervals and  bias using a parametric bootstrap. Note, \verb@nboot@ should be more like 1000, but it is set low here so the example runs quickly.
+
 <<Cs27_CIs-pboot, include.source=F, keep.source=T>>=
 kem.w.boot.CIs <- MARSSparamCIs(kem, method = "parametric", nboot = 10)
-# nboot should be more like 1000, but set low for example's sake
 print(kem.w.boot.CIs)
 @
 

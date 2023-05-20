@@ -6,8 +6,8 @@
   This is the main function for fitting multivariate autoregressive state-space (MARSS) models with linear constraints.  Scroll down to the bottom to see some short examples.  To open a guide to show you how to get started quickly, type \code{RShowDoc("Quick_Start",package="MARSS")}.  To open the MARSS User Guide from the command line, type \code{RShowDoc("UserGuide",package="MARSS")}. To get an overview of the package and all its main functions and how to get output (parameter estimates, fitted values, residuals, Kalmin filter or smoother output, or plots), go to \code{\link{MARSS-package}}. If \code{MARSS()} is throwing errors or warnings that you don't understand, try the Troubleshooting section of the user guide or type \code{\link{MARSSinfo}()} at the command line.
   
 The default MARSS model form is "marxss", which is Multivariate Auto-Regressive(1) eXogenous inputs State-Space model:
-\deqn{\mathbf{x}_{t} = \mathbf{B}_t \mathbf{x}_{t-1} + \mathbf{u}_t + \mathbf{C}_t \mathbf{c}_t + \mathbf{G}_t \mathbf{w}_t, \textrm{ where } \mathbf{w}_t \sim \textrm{MVN}(0,\mathbf{Q}_t)}{x(t) = B(t) x(t-1) + u(t) + C(t) c(t) + G(t) w(t), where w(t) ~ MVN(0,Q(t))}
-\deqn{\mathbf{y}_t = \mathbf{Z}_t \mathbf{x}_t + \mathbf{a}_t + \mathbf{D}_t \mathbf{d}_t + \mathbf{H}_t \mathbf{v}_t, \textrm{ where } \mathbf{v}_t \sim \textrm{MVN}(0,\mathbf{R}_t)}{y(t) = Z(t) x(t) + a(t) + D(t) d(t) + H(t) v(t), where v(t) ~ MVN(0,R(t))}
+\deqn{\mathbf{x}_{t} = \mathbf{B}_t \mathbf{x}_{t-1} + \mathbf{u}_t + \mathbf{C}_t \mathbf{c}_t + \mathbf{G}_t \mathbf{w}_t, \textrm{ where } \mathbf{W}_t \sim \textrm{MVN}(0,\mathbf{Q}_t)}{x(t) = B(t) x(t-1) + u(t) + C(t) c(t) + G(t) w(t), where W(t) ~ MVN(0,Q(t))}
+\deqn{\mathbf{y}_t = \mathbf{Z}_t \mathbf{x}_t + \mathbf{a}_t + \mathbf{D}_t \mathbf{d}_t + \mathbf{H}_t \mathbf{v}_t, \textrm{ where } \mathbf{V}_t \sim \textrm{MVN}(0,\mathbf{R}_t)}{y(t) = Z(t) x(t) + a(t) + D(t) d(t) + H(t) v(t), where V(t) ~ MVN(0,R(t))}
 \deqn{\mathbf{X}_1 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) \textrm{ or } \mathbf{X}_0 \sim \textrm{MVN}(\mathbf{x0}, \mathbf{V0}) }{X(1) ~ MVN(x0, V0) or X(0) ~  MVN(x0, V0) }
 The parameters are everything except \eqn{\mathbf{x}}{x}, \eqn{\mathbf{y}}{y}, \eqn{\mathbf{v}}{v}, \eqn{\mathbf{w}}{w}, \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d}. \eqn{\mathbf{y}}{y} are data (missing values allowed). \eqn{\mathbf{c}}{c} and \eqn{\mathbf{d}}{d} are inputs (no missing values allowed). All parameters (except \eqn{\mathbf{x0}}{x0} and \eqn{\mathbf{V0}}{V0}) can be time-varying but by default, all are time-constant (and the MARSS equation is generally written without the \eqn{t} subscripts on the parameter matrices). All parameters can be zero, including the variance matrices. 
 
@@ -48,7 +48,7 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
       \item{\code{maxit}}{   Maximum number of iterations to be used in the maximization routine (if needed by method) (positive integer). }
       \item{\code{min.iter.conv.test}}{ Minimum iterations to run before testing convergence via the slope of the log parameter versus log iterations.} 
       \item{\code{conv.test.deltaT=9}}{ Number of iterations to use for the testing convergence via the slope of the log parameter versus log iterations. }
-      \item{\code{conv.test.slope.tol}}{ The slope of the log parameter versus log iteration to use as the cut-off for convergence.  The default is 0.5 which is a bit high.  For final analyses, this should be set lower.  If you want to only use abstol as your convergence test, then to something very large, for example conv.test.slope.tol=1000.  Type \code{MARSSinfo(11)} to see some comments of when you might want to do this.}
+      \item{\code{conv.test.slope.tol}}{ The slope of the log parameter versus log iteration to use as the cut-off for convergence.  The default is 0.5 which is a bit high.  For final analyses, this should be set lower.  If you want to only use abstol as your convergence test, then to something very large, for example \code{conv.test.slope.tol=1000}.  Type \code{MARSSinfo(11)} to see some comments on when you might want to do this.}
       \item{\code{abstol}}{ The logLik.(iter-1)-logLik.(iter) convergence tolerance for the maximization routine. To meet convergence both the abstol and slope tests must be passed.} 
       \item{\code{allow.degen}}{ Whether to try setting \eqn{\mathbf{Q}}{Q} or \eqn{\mathbf{R}}{R} elements to zero if they appear to be going to zero. }
       \item{\code{trace}}{ An integer specifying the level of information recorded and error-checking run during the algorithms.  \code{trace=0}, specifies basic error-checking and brief error-messages; \code{trace>0} will print full error messages. In addition if trace>0, the Kalman filter output will be added to the outputted \code{marssMLE} object.  Additional information recorded depends on the method of maximization. For the EM algorithm, a record of each parameter estimate for each EM iteration will be added.   See \code{\link{optim}} for trace output details for the BFGS method.   \code{trace=-1} will turn off most internal error-checking and most error messages.  The internal error checks are time expensive so this can speed up model fitting.  This is particularly useful for bootstrapping and simulation studies. It is also useful if you get an error saying that \code{MARSS()} stops in \code{\link{MARSSkfss}()} due to a \code{chol()} call. \code{MARSSkfss()} uses matrix inversions and for some models these are unstable (high condition value). \code{MARSSkfss()} is used for error-checks and does not need to be called normally. }
@@ -73,7 +73,7 @@ If you are working with models with time-varying parameters, it is important to 
 }
 
 \value{
-  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), see \code{\link{print.marssMLE}}, \code{\link{tidy.marssMLE}}, \code{\link{MARSSresiduals}} and \code{\link{plot.marssMLE}}.  
+  An object of class \code{\link{marssMLE}}.  The structure of this object is discussed below, but if you want to know how to get specific output (like residuals, coefficients, smoothed states, confidence intervals, etc), see \code{\link{print.marssMLE}()}, \code{\link{tidy.marssMLE}()}, \code{\link{MARSSresiduals}()} and \code{\link{plot.marssMLE}()}.  
   
   The outputted \code{\link{marssMLE}} object has the following components:
   \item{model}{ MARSS model specification. It is a \code{\link{marssMODEL}} object in the form specified by the user in the \code{MARSS()} call.  This is used by print functions so that the user sees the expected form.}
@@ -84,11 +84,11 @@ If you are working with models with time-varying parameters, it is important to 
   \item{method}{ Estimation method. }
   If \code{fit=TRUE}, the following are also added to the \code{\link{marssMLE}} object.
   If \code{fit=FALSE}, a \code{\link{marssMLE}} object ready for fitting via the specified \code{method} is returned.
-  \item{par}{ A list of estimated parameter values in marss form. Use \code{\link[=print.marssMLE]{print}()}, \code{\link{tidy.marssMLE}()} or \code{\link[=coef.marssMLE]{coef}()} for outputing the model estimates in the \code{MARSS()} call (e.g. the default "marxss" form).}
-  \item{states}{ The expected value of \eqn{\mathbf{x}}{x} conditioned on all the data, i.e. smoothed states. }
-  \item{states.se}{ The standard errors of the expected value of \eqn{\mathbf{x}}{x}. }
-  \item{ytT}{ The expected value of \eqn{\mathbf{y}}{y} conditioned on all the data.  Note this is just \eqn{y} for those \eqn{y} that are not missing. }
-  \item{ytT.se}{ The standard errors of the expected value of \eqn{\mathbf{y}}{y}. Note this is 0 for any non-missing \eqn{y}.}
+  \item{par}{ A list of estimated parameter values in marss form. Use \code{\link[=print.marssMLE]{print}()}, \code{\link[=tidy.marssMLE]{tidy}()} or \code{\link[=coef.marssMLE]{coef}()} for outputing the model estimates in the \code{MARSS()} call (e.g. the default "marxss" form).}
+  \item{states}{ The expected value of \eqn{\mathbf{X}}{X} conditioned on all the data, i.e. smoothed states. }
+  \item{states.se}{ The standard errors of the expected value of \eqn{\mathbf{X}}{X}. }
+  \item{ytT}{ The expected value of \eqn{\mathbf{Y}}{Y} conditioned on all the data.  Note this is just \eqn{y} for those \eqn{y} that are not missing. }
+  \item{ytT.se}{ The standard errors of the expected value of \eqn{\mathbf{Y}}{Y}. Note this is 0 for any non-missing \eqn{y}.}
   \item{numIter}{ Number of iterations required for convergence. }
   \item{convergence}{ Convergence status. 0 means converged successfully, 3 means all parameters were fixed (so model did not need to be fit) and -1 means call was made with \code{fit=FALSE} and parameters were not fixed (thus no \code{$par} element and Kalman filter/smoother cannot be run).  Anything else is a warning or error. 2 means the \code{\link{marssMLE}} object has an error; the object is returned so you can debug it.  The other numbers are errors during fitting.  The error code depends on the fitting method.  See \code{\link{MARSSkem}} and \code{\link{MARSSoptim}}. }
   \item{logLik}{ Log-likelihood. }
@@ -110,8 +110,8 @@ Holmes, E. E., E. J. Ward and K. Wills. (2012) MARSS: Multivariate autoregressiv
   Eli Holmes, Eric Ward and Kellie Wills, NOAA, Seattle, USA.  
 }
 \seealso{
-\code{\link{marssMLE}}, \code{\link{MARSSkem}}, \code{\link{MARSSoptim}}, \code{\link{MARSSkf}}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}}, \code{\link{plot.marssMLE}}, \code{\link{print.marssMODEL}}, \code{\link{MARSS.marxss}}, \code{\link{MARSS.dfa}},  \code{\link{fitted.marssMLE}}, \code{\link{residuals.marssMLE}}, \code{\link{MARSSresiduals}}, \code{\link{predict.marssMLE}}, \code{\link{tsSmooth.marssMLE}},
-\code{\link{tidy.marssMLE}}, \code{\link{coef.marssMLE}} 
+\code{\link{marssMLE}}, \code{\link{MARSSkem}()}, \code{\link{MARSSoptim}()}, \code{\link{MARSSkf}()}, \code{\link{MARSS-package}}, \code{\link{print.marssMLE}()}, \code{\link{plot.marssMLE}()}, \code{\link{print.marssMODEL}()}, \code{\link{MARSS.marxss}()}, \code{\link{MARSS.dfa}()},  \code{\link[=fitted.marssMLE]{fitted}()}, \code{\link[=residuals.marssMLE]{residuals}()}, \code{\link{MARSSresiduals}()}, \code{\link[=predict.marssMLE]{predict}()}, \code{\link[=tsSmooth.marssMLE]{tsSmooth}()},
+\code{\link[=tidy.marssMLE]{tidy}()}, \code{\link[=coef.marssMLE]{coef}()} 
 }
 \examples{
 dat <- t(harborSealWA)

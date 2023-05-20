@@ -5,6 +5,7 @@
  Ut <- array(U2, dim = c(dim(U1), dim(dat)[2]))
  TT <- dim(dat)[2]
  Ut[, , 1:floor(TT / 2)] <- U1
- kem.tv <- MARSS(dat, model = list(U = Ut, Q = "diagonal and equal"))
+ Qde <- "diagonal and equal"
+ kem.tv <- MARSS(dat, model = list(U = Ut, Q = Qde))
 \end{Sinput}
 \end{Schunk}

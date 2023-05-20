@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 54: KFAS.Rnw:684-691
+### code chunk number 54: KFAS.Rnw:686-693
 ###################################################
 mod.nile.stoch.kfas <- mod.nile.stoch
 mod.nile.stoch.kfas$Q <- matrix(fit_kfas_NA$model$Q)

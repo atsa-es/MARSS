@@ -8,9 +8,6 @@ output:
     toc: true
     toc_float: true
     number_sections: true
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-    includes:
-      in_header: mathjax4.html
   pdf_document: 
     citation_package: natbib
     number_sections: true
@@ -24,16 +21,9 @@ output:
       amsfonts: null
     toc: true
     toc_depth: 1
-    includes:
-      in_header: nextsection.tex
   rmarkdown::html_vignette: 
     toc: yes
     toc_depth: 1
-    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
-    includes:
-      in_header: mathjax4.html
-bibliography: EMDerivation.bib
-biblio-style: apalike
 vignette: >
   %\VignetteIndexEntry{Quick Start Guide}
   %\VignetteEncoding{UTF-8}
@@ -60,7 +50,7 @@ Choose one method from `c("kem", "BFGS", "TMB")`.
 # The MARSS model
 
 The \{MARSS\} package fits multivariate autoregressive state-space (MARSS) models of the form:
-\begin{equation}\label{eqn:marss}
+\begin{equation}
 \begin{gathered}
 \xx_t = \BB_t\xx_{t-1} + \UU_t + \CC_t\cc_t + \GG_t\ww_t, \text{ where } \WW_t \sim \MVN(0,\QQ_t)\\
 \yy_t = \ZZ_t\xx_t + \AA_t + \DD_t\dd_t + \HH_t\vv_t, \text{ where } \VV_t \sim \MVN(0,\RR_t)\\
@@ -70,7 +60,7 @@ The \{MARSS\} package fits multivariate autoregressive state-space (MARSS) model
 $\cc$ and $\dd$ are inputs (aka, exogenous variables or covariates or indicator variables) and must have no missing values.  The $\RR$, $\QQ$ and $\LAM$ variances can can have zeros on the diagonal to specify partially deterministic systems.  This allows you to write MAR(p) models in MARSS form for example. See the User Guide. The \{MARSS\} package is designed to handle linear constraints within the parameter matrices.  Linear constraint means you can write the elements of the matrix as a linear equation of all the other elements. See section below on linear constraints.
 
 Example: a mean-reverting random walk model with three observation time series:
-\begin{gather}\label{eq:example1}
+\begin{gather}
 \begin{bmatrix}x_1\\ x_2\end{bmatrix}_t
 = \begin{bmatrix}b&0\\ 0&b\end{bmatrix}
 \begin{bmatrix}x_1\\ x_2\end{bmatrix}_{t-1}
@@ -92,7 +82,7 @@ Example: a mean-reverting random walk model with three observation time series:
 Model specification is via a list with the structure of each of the model parameters: $\BB$, $\UU$, $\CC$, $\QQ$, 
 $\ZZ$, $\AA$, $\DD$, $\RR$, $\xixi$, and$\LAM$. There is a one-to-one correspondence between the model in \R and the math version of the model. The model written in matrix form is translated into equivalent matrices (or arrays if time-varying) in \R  code. Matrices that combine fixed and estimated values are specified using a list matrix with numerical values for fixed values and  character names for the estimated values. 
 
-For \ref{eq:example1}, this would be:
+For the MARSS model above, this would be:
 ```{r}
 B1 <- matrix(list("b",0,0,"b"),2,2)
 U1 <- matrix(0,2,1)
@@ -154,7 +144,7 @@ Form of the model list is `list(B=..., U=...)` etc.
 ### `form="marxss"`
 
 For `form="marxss"` (the default), matrix names in the model list must be `B`, `U`, `C`, `c`, `Q`, 
-`Z`, `A`, `D`, `d`, `R`, `x0` ($\xixi$), and `V0` ($\LAM$), just like in Equation \ref{eqn:marss}.  There are defaults each parameter and you can leave off matrix names and the defaults will be used. Type `?MARSS.marxss` additional information.
+`Z`, `A`, `D`, `d`, `R`, `x0` ($\xixi$), and `V0` ($\LAM$), just like in the MARSS equation.  There are defaults each parameter and you can leave off matrix names and the defaults will be used. Type `?MARSS.marxss` additional information.
 
 * `B="identity"` $m \times m$ identity matrix
 * `U="unequal"` Each element in the $m \times 1$ matrix $\UU$ is estimated and allowed to be different.
@@ -309,7 +299,7 @@ fit <- MARSS(y, model=model.list, silent = TRUE)
 ## Time-varying parameters
 
 The default model form allows you to pass in a 3-D array for a time-varying parameter ($T$ is the number of time-steps in your data and is the 3rd dimension in the array):  
-\begin{equation}\label{qeq:MARSS.tv}
+\begin{equation}
 \begin{gathered}
 \xx_t = \BB_t\xx_{t-1} + \UU_t + \CC_t\cc_t + \GG_t\ww_t, \quad
 \WW_t \sim \MVN(0,\QQ_t)\\

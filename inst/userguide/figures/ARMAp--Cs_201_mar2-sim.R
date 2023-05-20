@@ -3,6 +3,7 @@
 ###################################################
 TT <- 50
 true.2 <- c(r = 0, b1 = -1.5, b2 = -0.75, q = 1)
-temp1 <- arima.sim(n = TT, list(ar = true.2[c("b1", "b2")]), sd = sqrt(true.2["q"]))
+temp1 <- arima.sim(n = TT, list(ar = true.2[c("b1", "b2")]), 
+                   sd = sqrt(true.2["q"]))
 
 

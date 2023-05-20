@@ -396,7 +396,7 @@ for (i in 1:N.ts) {
 
 
 ###################################################
-### code chunk number 37: Cs25d_plotwithaugment
+### code chunk number 36: Cs25d_plotwithaugment
 ###################################################
 require(ggplot2)
 alpha <- 0.05
@@ -414,14 +414,14 @@ ggplot(data = subset(d, name=="model")) +
 
 
 ###################################################
-### code chunk number 38: Cs26_set-up-covar
+### code chunk number 37: Cs26_set-up-covar
 ###################################################
 temp <- t(plankdat[years, "Temp", drop = FALSE])
 TP <- t(plankdat[years, "TP", drop = FALSE])
 
 
 ###################################################
-### code chunk number 39: Cs27_fit_covar_echo
+### code chunk number 38: Cs27_fit_covar_echo
 ###################################################
 model.list <- list(m = 2, R = "unconstrained")
 kemz.temp <- MARSS(dat.spp.1980,
@@ -439,7 +439,7 @@ kemz.both <- MARSS(dat.spp.1980,
 
 
 ###################################################
-### code chunk number 42: Cs28_covar_AICs
+### code chunk number 41: Cs28_covar_AICs
 ###################################################
 print(cbind(
   model = c("no covars", "Temp", "TP", "Temp & TP"),
@@ -451,7 +451,7 @@ print(cbind(
 
 
 ###################################################
-### code chunk number 43: Cs29_plotbestcovarfits
+### code chunk number 42: Cs29_plotbestcovarfits
 ###################################################
 par.mat <- coef(kemz.temp, type = "matrix")
 fit.b <- par.mat$Z %*% kemz.temp$states + matrix(par.mat$A, nrow = N.ts, ncol = TT)

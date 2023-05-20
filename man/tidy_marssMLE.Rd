@@ -14,7 +14,7 @@
   
   \item{conf.int}{ Whether to compute confidence and prediction intervals on the estimates. }
   
-  \item{conf.level}{ Confidence level. alpha=1-conf.level}
+  \item{conf.level}{ Confidence level. \code{alpha=1-conf.level}}
 
   \item{...}{Optional arguments.  If \code{conf.int=TRUE}, then arguments to specify how CIs are computed can be passed in. See details and \code{\link{MARSSparamCIs}}. }
 

@@ -84,7 +84,7 @@ vec(x)
   \item{ zero.rows.ok, zero.cols.ok }{ Means the design matrix can have all zero rows or columns. }
   \item{ strict }{ Specifies whether the design matrix must be only 0s and 1s. }
   \item{ by.row }{ For is.fixed, reports whether is.fixed by row rather than for the whole matrix. }
-  \item{ chol }{ For pcholinv, use chol2inv(chol()) if TRUE otherwise use solve(). }
+  \item{ chol }{ For pcholinv, use \code{chol2inv(chol())} if TRUE otherwise use solve(). }
   \item{ MLEobj}{ A \code{\link{marssMLE}} object. }
   \item{ MODELobj}{ A \code{\link{marssMODEL}} object. }
   \item{ elem }{ The parameter matrix of a marss model to return. }

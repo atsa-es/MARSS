@@ -2,7 +2,7 @@
 \alias{MARSSparamCIs}
 \title{ Standard Errors, Confidence Intervals and Bias for MARSS Parameters }
 \description{
-Computes standard errors, confidence intervals and bias for the maximum-likelihood estimates of MARSS model parameters.  If you want confidence intervals on the estimated hidden states, see \code{\link{print.marssMLE}} and look for "states.cis".
+Computes standard errors, confidence intervals and bias for the maximum-likelihood estimates of MARSS model parameters.  If you want confidence intervals on the estimated hidden states, see \code{\link{print.marssMLE}()} and look for \code{states.cis}.
 }
 \usage{
 MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot =
@@ -18,9 +18,9 @@ MARSSparamCIs(MLEobj, method = "hessian", alpha = 0.05, nboot =
   \item{silent}{ If false, a progress bar is shown for "parametric" and "innovations" methods. }
 }
 \details{
-  Approximate confidence intervals (CIs) on the model parameters may be calculated from the observed Fisher Information matrix ("Hessian CIs", see \code{\link{MARSSFisherI}}) or parametric or non-parametric (innovations) bootstrapping using \code{nboot} bootstraps.  The Hessian CIs are based on the asymptotic normality of MLE parameters under a large-sample approximation.  The Hessian computation for variance-covariance matrices is a symmetric approximation and the lower CIs for variances might be negative.  Bootstrap estimates of parameter bias are reported if method "parametric" or "innovations" is specified.
+  Approximate confidence intervals (CIs) on the model parameters may be calculated from the observed Fisher Information matrix ("Hessian CIs", see \code{\link{MARSSFisherI}()}) or parametric or non-parametric (innovations) bootstrapping using \code{nboot} bootstraps.  The Hessian CIs are based on the asymptotic normality of MLE parameters under a large-sample approximation.  The Hessian computation for variance-covariance matrices is a symmetric approximation and the lower CIs for variances might be negative.  Bootstrap estimates of parameter bias are reported if method "parametric" or "innovations" is specified.
   
-Note, these are added to the \code{par}  elements of a \code{\link{marssMLE}} object but are in "marss" form not "marxss" form. Thus the \code{MLEobj$par.upCI} and related elements that are added to the \code{\link{marssMLE}} object may not look familiar to the user.  Instead the user should extract these elements using \code{print(MLEobj)} and passing in the argument \code{what} set to "par.se","par.bias","par.lowCIs", or "par.upCIs".  See \code{\link{print.marssMLE}}. Or use \code{\link{tidy.marssMLE}}.
+Note, these are added to the \code{par}  elements of a \code{\link{marssMLE}} object but are in "marss" form not "marxss" form. Thus the \code{MLEobj$par.upCI} and related elements that are added to the \code{\link{marssMLE}} object may not look familiar to the user.  Instead the user should extract these elements using \code{print(MLEobj)} and passing in the argument \code{what} set to "par.se","par.bias","par.lowCIs", or "par.upCIs".  See \code{\link[=print.marssMLE]{print}()}. Or use \code{\link[=tidy.marssMLE]{tidy}()}.
 }
 \value{
   \code{MARSSparamCIs} returns the \code{\link{marssMLE}} object passed in, with additional components \code{par.se}, \code{par.upCI}, \code{par.lowCI}, \code{par.CI.alpha}, \code{par.CI.method}, \code{par.CI.nboot} and \code{par.bias} (if method is "parametric" or "innovations").

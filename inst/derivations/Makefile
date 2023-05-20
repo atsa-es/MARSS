@@ -26,8 +26,8 @@ movetodoc:
 	rm -r -f ./doc/
 	rm -d -f ./doc/
 	mkdir ./doc/
-	cp *.Rnw ./doc/
-	cp *.pdf ./doc/
+	cp -p *.Rnw ./doc/
+	cp -p *.pdf ./doc/
 
 clean:
 	$(RM) *.log *.aux *.ilg *.ind *.idx *.blg *.bbl *.out *.Rout *.toc *.lof *.lot

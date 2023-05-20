@@ -49,8 +49,8 @@ The pred data frame has the following columns:
 \item{.rownames}{ Names of the data or states. }
 \item{t}{ Time step. }
 \item{y}{ The data if \code{type} is \code{"ytT"}, \code{"ytt"} or \code{"ytt1"}. }
-\item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on all the data if \code{type="xtT"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
-\item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x_t} conditioned on the data 1 to \eqn{t} if \code{type="xtt1"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{xtT}{ The estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on all the data if \code{type="xtT"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
+\item{xtt}{ The estimate of \eqn{\mathbf{x}_t}{x(t)} conditioned on the data 1 to \eqn{t} if \code{type="xtt1"}. From \code{\link[=tsSmooth.marssMLE]{tsSmooth}()}. }
 \item{estimate}{Model predicted values of observations (\eqn{\mathbf{y}}{y}) or the states (\eqn{\mathbf{x}}{x}). See details.}
 
 If intervals are returned, the following are added to the data frame:
@@ -67,7 +67,7 @@ If intervals are returned, the following are added to the data frame:
 
 The \code{type="xtT"} forecast is the states forecast conditioned on all the data. If \code{n.ahead !=0}, then 'data' that is being conditioned on is the original data (model data) plus any data in \code{newdata$y} for the h forecast time steps. Note, typically forecasts would not have data, since they are forecasts, but \code{predict.marssMLE()} allows you to specify data for the forecast time steps if you need to. If the model includes covariates (\eqn{\mathbf{c}}{c} and/or \eqn{\mathbf{d}}{d} matrices passed into the \code{model} list in the \code{\link{MARSS}()} call), then \code{c} and/or \code{d} must be passed into \code{newdata}. 
 
-The \code{type="ytT"} forecast is the expected value of NEW data (\eqn{\mathbf{y}}{y}) conditioned on the data used for fitting. The data used for fitting is the same as for \code{type="xtT"} (above). The \eqn{\mathbf{y}}{y} forecast is \code{Z xtT[,T+i] + A + D d[,T+i]}. 
+The \code{type="ytT"} forecast is the expected value of NEW data (\eqn{\mathbf{Y}}{Y}) conditioned on the data used for fitting. The data used for fitting is the same as for \code{type="xtT"} (above). The \eqn{\mathbf{y}}{y} forecast is \code{Z xtT[,T+i] + A + D d[,T+i]}. 
 
 If the model has time-varying parameters, the value of the parameters at the last time step are used for the forecast.
 

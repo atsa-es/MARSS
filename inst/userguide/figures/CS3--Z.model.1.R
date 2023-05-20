@@ -1,6 +1,7 @@
 ###################################################
 ### code chunk number 5: Z.model.1
 ###################################################
-Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), "ca", "ca", "wa.or", "wa.or", "bc"))
+Z1 <- factor(c("wa.or", "wa.or", rep("ps", 4), 
+               "ca", "ca", "wa.or", "wa.or", "bc"))
 
 

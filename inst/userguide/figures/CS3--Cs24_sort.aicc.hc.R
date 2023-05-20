@@ -3,8 +3,8 @@
 ###################################################
 min.AICc <- order(out.tab.hc$AICc)
 out.tab.hc <- out.tab.hc[min.AICc, ]
-out.tab.hc <- cbind(out.tab.hc, delta.AICc = out.tab.hc$AICc - out.tab.hc$AICc[1])
-out.tab.hc <- cbind(out.tab.hc, rel.like = exp(-1 * out.tab.hc$delta.AICc / 2))
-out.tab.hc <- cbind(out.tab.hc, AIC.weight = out.tab.hc$rel.like / sum(out.tab.hc$rel.like))
+out.tab.hc$delta.AICc <- out.tab.hc$AICc - out.tab.hc$AICc[1]
+out.tab.hc$rel.like <- exp(-1 * out.tab.hc$delta.AICc / 2)
+out.tab.hc$AIC.weight <- out.tab.hc$rel.like / sum(out.tab.hc$rel.like)
 
 

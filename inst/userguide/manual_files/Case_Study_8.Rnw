@@ -437,7 +437,8 @@ kem.b4 <- MARSS(birddat, model = model.b4)
 
 The AICc values for the four models are
 <<Cs016_aics>>=
-c(mod1 = kem.b1$AICc, mod2 = kem.b2$AICc, mod3 = kem.b3$AICc, mod4 = kem.b4$AICc)
+c(mod1 = kem.b1$AICc, mod2 = kem.b2$AICc, 
+  mod3 = kem.b3$AICc, mod4 = kem.b4$AICc)
 @
 The last model is superior to the others based on AICc.  Figure \ref{fig:fig6} shows the fits for this model.
 

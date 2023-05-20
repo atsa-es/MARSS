@@ -1,5 +1,5 @@
 ###################################################
-### code chunk number 39: Cs27_fit_covar_echo
+### code chunk number 38: Cs27_fit_covar_echo
 ###################################################
 model.list <- list(m = 2, R = "unconstrained")
 kemz.temp <- MARSS(dat.spp.1980,

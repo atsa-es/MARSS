@@ -1,7 +1,6 @@
 \begin{Schunk}
 \begin{Sinput}
  kem.w.boot.CIs <- MARSSparamCIs(kem, method = "parametric", nboot = 10)
- # nboot should be more like 1000, but set low for example's sake
  print(kem.w.boot.CIs)
 \end{Sinput}
 \begin{Soutput}
@@ -12,12 +11,12 @@ Estimation converged in 390 iterations.
 Log-likelihood: -30.98719 
 AIC: 71.97439   AICc: 72.89747   
  
-       ML.Est Std.Err low.CI  up.CI  Est.Bias Unbias.Est
-R.diag 0.1402 0.01298 0.1232 0.1633 -0.003122      0.137
-U.1    0.0477 0.00432 0.0437 0.0563 -0.000692      0.047
-Q.diag 0.0000 0.00000 0.0000 0.0000  0.000000      0.000
-x0.N   6.9292 0.06453 6.8214 7.0229 -0.000623      6.929
-x0.S   5.9550 0.10245 5.8315 6.1304 -0.026871      5.928
+       ML.Est Std.Err low.CI  up.CI Est.Bias Unbias.Est
+R.diag 0.1402 0.03432 0.0952 0.1944  0.00452      0.145
+U.1    0.0477 0.00499 0.0453 0.0602 -0.00375      0.044
+Q.diag 0.0000 0.00000 0.0000 0.0000  0.00000      0.000
+x0.N   6.9292 0.07054 6.7644 6.9582  0.07132      7.001
+x0.S   5.9550 0.07363 5.7622 5.9828  0.10829      6.063
 Initial states (x0) defined at t=0
 
 CIs calculated at alpha = 0.05 via method=parametric 
