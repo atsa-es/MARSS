@@ -2,6 +2,12 @@
 output: html_document
 ---
 
+# MARSS 3.11.9 (GitHub)
+
+## ENHANCEMENT
+
+* Added the error message coming from a try-error to the message printed for the user.
+
 # MARSS 3.11.8 (CRAN 2023-05-20)
 
 This combines the changes in GitHub releases 3.11.7 and 3.11.6.

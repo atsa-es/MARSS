@@ -174,7 +174,7 @@ MARSS <- function(y,
       MLEobj.test$par <- MLEobj$start
       kftest <- try(MARSSkf(MLEobj.test), silent = TRUE)
       if (inherits(kftest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter/smoother (KF) from running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output. You could try trace=-1 to bypass the initial KF check if you are using method='BFGS' and know the logLik function will run.\n")
+        cat("Error: Stopped in MARSS() before fitting because", fun.kf, "stopped.  Something in the model structure prevents the Kalman filter/smoother (KF) from running.\n Try setting fun.kf to use a different KF function (MARSSkfss or MARSSkfas) or use fit=FALSE and check the model you are trying to fit. You can also try trace=1 to get more progress output. You could try trace=-1 to bypass the initial KF check if you are using method='BFGS' and know the logLik function will run.\n\n", kftest$condition)
         MLEobj.test$convergence <- 2
         return(MLEobj.test)
       }
@@ -190,7 +190,7 @@ MARSS <- function(y,
     if (fit && !model.is.fixed && MLEobj$control$trace != -1 && MLEobj$method %in% kem.methods) {
       Eytest <- try(MARSShatyt(MLEobj.test), silent = TRUE)
       if (inherits(Eytest, "try-error")) {
-        cat("Error: Stopped in MARSS() before fitting because MARSShatyt() stopped.  Something is wrong with the model structure that prevents MARSShatyt() running.\n\n")
+        cat("Error: Stopped in MARSS() before fitting because MARSShatyt() stopped.  Something is wrong with the model structure that prevents MARSShatyt() running.\n\n", Eytest$condition)
         MLEobj.test$convergence <- 2
         MLEobj.test$Ey <- Eytest
         return(MLEobj.test)
@@ -210,7 +210,7 @@ MARSS <- function(y,
       ## Fit and add param estimates to the object
       MLEobj <- try(MARSSfit(MLEobj), silent = TRUE)
       if (inherits(MLEobj, "try-error")) {
-        cat(paste("Error: Stopped in MARSS() when trying to fit.  Try control$trace=1 for more information. You can also try another fitting method by passing in the method argument. This is especially helpful if you are seeing a chol error.\n"))
+        cat(paste("Error: Stopped in MARSS() when trying to fit.  Try control$trace=1 for more information. You can also try another fitting method by passing in the method argument. This is especially helpful if you are seeing a chol error.\n\n", MLEobj$condition))
         MLEobj.test$convergence <- 2
         return(MLEobj.test)
       }
@@ -269,7 +269,7 @@ MARSS <- function(y,
         if (fun.kf == "MARSSkfas") {
           kfss <- try(MARSSkfss(MLEobj, smoother = FALSE), silent = TRUE)
           if (inherits(kfss, "try-error") || !kfss$ok) {
-            msg <- "Not available. MARSSkfss() returned error."
+            msg <- c("Not available. MARSSkfss() returned error.", kfss$condition)
             kfss <- list(Innov = msg, Sigma = msg, J = msg, Kt = msg)
           }
         } else {

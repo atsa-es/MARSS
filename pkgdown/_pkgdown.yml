@@ -128,8 +128,8 @@ articles:
   contents:
   - Quick_Start
   - Learning_MARSS
-- title: Algorithm Reports
-  desc: EM Derivation [PDF](https://atsa-es.r-universe.dev/MARSS/doc/EMDerivation.pdf)<br>Conditional Residuals [PDF](https://atsa-es.r-universe.dev/MARSS/doc/Residuals.pdf)
+- title: PDFs
+  desc: User Guide [PDF](https://atsa-es.r-universe.dev/MARSS/doc/UserGuide.pdf)<br>EM Derivation [PDF](https://atsa-es.r-universe.dev/MARSS/doc/EMDerivation.pdf)<br>Conditional Residuals [PDF](https://atsa-es.r-universe.dev/MARSS/doc/Residuals.pdf)
   contents:
 
 

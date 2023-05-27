@@ -123,7 +123,7 @@ MARSShatyt <- function(MLEobj, only.kem = TRUE) {
         Rinv <- try(chol(mho.r %*% pari$R %*% t.mho.r))
         # Catch errors before entering chol2inv
         if (inherits(Rinv, "try-error")) {
-          return(list(ok = FALSE, errors = "Stopped in MARSShatyt: chol(R) error.\n"))
+          return(list(ok = FALSE, errors = c("Stopped in MARSShatyt: chol(R) error.\n", Rinv$condition)))
         }
         Rinv <- chol2inv(Rinv)
         Delta.r <- I.n - pari$R %*% t.mho.r %*% Rinv %*% mho.r
