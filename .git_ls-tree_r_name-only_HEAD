@@ -1,4 +1,6 @@
 .Rbuildignore
+.git_diff_name-only
+.git_ls-tree_r_name-only_HEAD
 .gitattributes
 .github/.gitignore
 .github/ISSUE_TEMPLATE/bug_report.md
@@ -8,7 +10,7 @@
 .github/workflows/pkgdown.yaml
 .gitignore
 DESCRIPTION
-License.md
+LICENSE
 NAMESPACE
 NEWS.md
 R/CSEGriskfigure.R
