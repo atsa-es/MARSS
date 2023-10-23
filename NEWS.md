@@ -7,6 +7,7 @@ output: html_document
 ## ENHANCEMENT
 
 * Added the error message coming from a try-error to the message printed for the user.
+* Updated to GPL-3 license.
 
 # MARSS 3.11.8 (CRAN 2023-05-20)
 
