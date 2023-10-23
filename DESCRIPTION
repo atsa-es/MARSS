@@ -33,7 +33,7 @@ Description: The MARSS package provides maximum-likelihood parameter
     dynamic linear models, outlier and shock detection, and multivariate AR-p models.  
     Online workshops (lectures, eBook, and computer labs) 
     at <https://atsa-es.github.io/>.
-License: GPL-2
+License: GPL-3
 LazyData: yes
 BuildVignettes: yes
 ByteCompile: TRUE
