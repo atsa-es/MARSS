@@ -6,7 +6,6 @@ MARSS stands for Multivariate Auto-Regressive(1) State-Space. The MARSS R packag
 [![github](https://img.shields.io/github/v/release/atsa-es/MARSS?color=brightgreen&label=GitHub)](https://github.com/atsa-es/MARSS/releases/latest)
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/MARSS?)](https://github.com/r-hub/cranlogs.app)
 [![](https://cranlogs.r-pkg.org/badges/MARSS?color=FFD700)](https://www.r-pkg.org/pkg/MARSS)
-[![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 
 
 ### INSTALL {#install}
@@ -72,6 +71,22 @@ To see our publications using MARSS models, see the [Applied Time Series Analysi
 ### Developers
 
 See `inst/DEVELOPER_NOTES.md` for instructions on creating a release from the repository.
+
+### License
+
+The MARSS package as a whole is distributed under GPL-3 (GNU GENERAL PUBLIC
+LICENSE version 3).
+
+In addition this software has the following license addendum:
+
+Software code created by U.S. Government employees is not subject to
+copyright in the United States (17 U.S.C. §105). The United State
+s/Department of Commerce reserve all rights to seek and obtain copyright
+protection in countries other than the United States for Software authored
+in its entirety by the Department of Commerce. To this end, the Department
+of Commerce hereby grants to Recipient a royalty-free, nonexclusive license
+to use, copy, and create derivative works of the Software outside of the
+United States.
 
 ### NOAA Disclaimer
 
