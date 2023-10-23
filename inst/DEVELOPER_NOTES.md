@@ -1,3 +1,7 @@
+# Pkgdown
+
+The pkgdown webpage will be automatically updated whenever a push is made to the main or master branch.
+
 # Steps for a release
 
 Once a release is ready, all tests done and documentation checked, the Makefile in `inst/doc` is run. I usually run one target at a time starting with `make movetovignettes`. Before doing this, I build the User Guide and run it through a few compressors: Adobe and then https://github.com/atsa-es/pdfsizeopt-readme.
