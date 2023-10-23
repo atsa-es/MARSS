@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   Learning_MARSS: Learning_MARSS.html
   Quick_Start: Quick_Start.html
-last_built: 2023-10-23T20:48Z
+last_built: 2023-10-23T20:54Z
 urls:
   reference: https://atsa-es.github.io/MARSS/reference
   article: https://atsa-es.github.io/MARSS/articles
