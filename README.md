@@ -40,7 +40,7 @@ Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS=TRUE)
 
 ### DOCUMENTATION and TUTORIALS  {#documentation}
 
-- [Quick Start Guide](https://CRAN.R-project.org/package=MARSS/vignettes/Quick_Start.pdf).
+- [Quick Start Guide](https://CRAN.R-project.org/package=MARSS/vignettes/Quick_Start.html).
 - [User Manual](https://CRAN.R-project.org/package=MARSS/vignettes/UserGuide.pdf) - The extensive user manual included in the package has many examples of how to fit MARSS models to a variety of data sets.
 - [ATSA lab book](https://atsa-es.github.io/atsa-labs/) - Many applications are also covered in our Applied Time Series Analysis book developed from the labs in our course.
 - [ATSA course website](https://atsa-es.github.io/atsa/) - We have lectures and all material from our course on our course website. Select the Lectures tab to find the lecture material and videos of lectures.
