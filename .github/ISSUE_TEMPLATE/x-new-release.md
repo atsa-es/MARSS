@@ -7,13 +7,7 @@ assignees: eeholmes
 
 ---
 
-Running install from the RStudio build tag will tend to add detritus in the vignettes folder. You will need to clean that.
-
-Some files have roxygen code and you will need to run
-```
-devtools::document(roclets = c('rd'))
-```
-to update the Rd files for those files.
+## Preliminary work before the final is ready.
 
 - [ ] Run checks without building the vignettes
 ```
@@ -23,7 +17,6 @@ devtools::check(document = FALSE, vignettes=FALSE)
 ```
 devtools::run_examples(pkg="~/Documents/GitHub/MARSS", document=FALSE, fresh=TRUE)
 ```
-
 - [ ] spellcheck the whole package
 ```
 #devtools::install_github("ropensci/spelling")
@@ -39,33 +32,30 @@ setwd("~/Documents/GitHub")
 devtools::build_manual(pkg="MARSS")
 ```
 
-- [ ] Build the package into tar.gz. Note do not use `devtools::build()` it destroys the `inst/doc` folder.
-Note, the Mac LaTeX installation doesn't install packages on the fly. You may need to install the needed packages. From terminal: `tlmgr install imakeindex`, `tlmgr install collection-fontsrecommended`, `tlmgr install footmisc`, tlmgr install appendix`, plus a few more in header.tex.
- 
-Open terminal
-```
-cd ~/Documents/GitHub
-rm MARSS_3.11.4.tar.gz
-R CMD build MARSS
-rm -r ~/Dropbox/MARSS
-rm ~/Dropbox/MARSS_3.11.4.tar.gz
-cp MARSS_3.11.4.tar.gz ~/Dropbox/MARSS_3.11.4.tar.gz
-cd ~/Dropbox
-tar -xvzf MARSS_3.11.4.tar.gz
-rm ~/Dropbox/MARSS/vignettes/Makefile
-R CMD build --no-build-vignettes MARSS
-```
+## Documentation
 
+Follow instructions in DEVELOPER_NOTES.md in `inst` to prepare the documentation pdfs
+  - [ ] EMDerivation
+  - [ ] Residuals
+  - [ ] User Guide
+
+Compress documentation pdfs
+  - [ ] Manually compress the pdfs in the doc folder Dropbox/MARSS/inst/userguide and Dropbox/MARSS/inst/derivations
+
+## Build final tar.gz
+
+- [ ] Build the package into tar.gz using DEVELOPER_NOTES.md in `inst` to prepare the tar.gz file. That has a makefile (inst/makefile) that has all the steps to prepare the tar.gz properly. Also the userguide and derivations folders have make files for creating those.  Note do not use `devtools::build()` it destroys the `inst/doc` folder. Note, the Mac LaTeX installation doesn't install packages on the fly. You may need to install the needed packages. From terminal: `tlmgr install imakeindex`, `tlmgr install collection-fontsrecommended`, `tlmgr install footmisc`, tlmgr install appendix`, plus a few more in header.tex.
+ 
 Run version tests
 - [ ] Run this `vignettes/versiontest.R`
 
 - [ ] Run checks on the built package
 ```
+cd ~/Dropbox
 rm -r ~/Dropbox/MARSS.Rcheck
-R CMD check --timings --as-cran MARSS_3.11.4.tar.gz
+R CMD check --timings --as-cran MARSS_3.11.9.tar.gz
 ```
-
-Run internal tests 
+Run internal tests on the new tar.gz
   - [ ] Run `tests/model.R` to set up models for tests
   - [ ] Then run `devtools::test()` but I find running the tests one by one in RStudio is easier to make sense of. Some tests will through errors, but all test should pass. Errors are correct if the test passes and result should be try-error.
        - [ ] test.coef
@@ -79,22 +69,23 @@ Run internal tests
        - [ ] test-structTS
        - [ ] test-tt
 
-Check the documentation pdfs
+Check the documentation pdfs and html files in Dropbox/MARSS/inst/doc
   - [ ] EMDerivation
-  - [ ] Quick Start
   - [ ] Residuals
   - [ ] User Guide
+  - [ ]  Quick Start
+  - [ ] Learning_MARSS
 
-Compress documentation pdfs
+If needed compress documentation pdfs some more
   - [ ] Manually compress the pdfs in the doc folder Dropbox/MARSS/inst/doc
   - [ ] Rebuild package with smaller docs, and then re-Run checks on the built package to see that it passes size checks
 ```
 R CMD build --no-build-vignettes MARSS
 rm -r ~/Dropbox/MARSS.Rcheck
-R CMD check --timings --as-cran MARSS_3.11.4.tar.gz
+R CMD check --timings --as-cran MARSS_3.11.9.tar.gz
 ```
 
-Update the doc folder for GitHub. This has to be done manually by copying from
+Finally update the doc folder for GitHub. This has to be done manually by copying from
   - [ ] Dropbox/MARSS/inst/doc into GitHub/MARSS/inst/doc
 
 Prepare for release:
@@ -126,7 +117,6 @@ Instead use
 
 Submit to CRAN:
 
-
 You could do this, but I upload the tag.gz to CRAN
 * `usethis::use_version('patch')`
 * `devtools::submit_cran()`
@@ -135,3 +125,4 @@ You could do this, but I upload the tag.gz to CRAN
 Wait for CRAN...
 
 * [ ] Accepted :tada:
+
