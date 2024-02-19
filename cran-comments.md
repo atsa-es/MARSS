@@ -1,8 +1,10 @@
+This is a minor update to fix some formatting errors in Rd files.
+
 ## Tested on OS
 
-* `rhub::check_for_cran()`
+* `rhub::check_for_cran()` on tar.gz
 * M1 MacBook
-* R versions 4.3
+* R versions 4.3.2
 
 ## R CMD check results
 
@@ -21,20 +23,3 @@
      
 This is correct.
      
-─  checking CRAN incoming feasibility ... [20s] NOTE
-   Maintainer: 'Elizabeth Eli Holmes <eli.holmes@noaa.gov>'
-   
-*  New maintainer:
-     Elizabeth Eli Holmes <eli.holmes@noaa.gov>
-   Old maintainer(s):
-     Elizabeth Holmes - NOAA Federal <eli.holmes@noaa.gov>
-     
-Correct. I changed to using Authors@R format
-
-
-## revdepcheck results
-
-We checked 2 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
