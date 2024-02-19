@@ -57,7 +57,7 @@ The default settings for the optional arguments are set in \code{MARSSsettings.R
   \item{...}{ Optional arguments passed to function specified by form. }
 }
 \details{
-The \code{model} argument specifies the structure of your model. There is a one-to-one correspondence between how you would write your model in matrix form on the whiteboard and how you specify the model for \code{MARSS()}.  Many different types of multivariate time-series models can be converted to the MARSS form. See the \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} and \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf}{Quick Start Guide} for examples. 
+The \code{model} argument specifies the structure of your model. There is a one-to-one correspondence between how you would write your model in matrix form on the whiteboard and how you specify the model for \code{MARSS()}.  Many different types of multivariate time-series models can be converted to the MARSS form. See the \href{https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf}{User Guide} and \href{https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.html}{Quick Start Guide} for examples. 
 
 The MARSS package has two forms for standard users: marxss and dfa.
 \describe{
