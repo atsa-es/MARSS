@@ -67,30 +67,73 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     
 
-<p>The object has the following attributes:</p><ul><li><p>form The form that the model object is in.</p></li>
-<li><p>par.names The names of each parameter matrix in the model.</p></li>
-<li><p>model.dims A list with the dimensions of all the matrices in non-vectorized form.</p></li>
-<li><p>X.names Names for the X rows.</p></li>
-<li><p>Y.names Names for the Y rows.</p></li>
-<li><p>equation The model equation.  Used to write the model in LaTeX.</p></li>
-</ul><p>These attributes are set in the MARSS_form.R file, in the <code>MARSS.form()</code> function and must be internally consistent with the elements of the model.  These attributes are used for internal error checking.</p>
+<p>The object has the following attributes:</p><dl><dt>form</dt>
+<dd><p>The form that the model object is in.</p></dd>
+
+  <dt>par.names</dt>
+<dd><p>The names of each parameter matrix in the model.</p></dd>
+
+  <dt>model.dims</dt>
+<dd><p>A list with the dimensions of all the matrices in non-vectorized form.</p></dd>
+
+  <dt>X.names</dt>
+<dd><p>Names for the X rows.</p></dd>
+ 
+  <dt>Y.names</dt>
+<dd><p>Names for the Y rows.</p></dd>
+ 
+  <dt>equation</dt>
+<dd><p>The model equation.  Used to write the model in LaTeX.</p></dd>
+ 
+
+</dl><p>These attributes are set in the MARSS_form.R file, in the <code>MARSS.form()</code> function and must be internally consistent with the elements of the model.  These attributes are used for internal error checking.</p>
 <p>Each parameter matrix in a MARSS equation can be written in vectorized form: vec(P) = f + Dp, where f is the fixed part, p are the estimated parameters, and D is the matrix that transforms the p into a vector to be added to f.</p>
-<p>An object of class <code>marssMODEL</code> is a list with elements:</p><ul><li><p>data Data supplied by user.</p></li>
-<li><p>fixed A list with the f row vectors for each parameter matrix.</p></li>
-<li><p>free A list with the D matrices for each parameter matrix.</p></li>
-<li><p>tinitx At what t, 0 or 1, is the initial x defined at?</p></li>
-<li><p>diffuse Whether a diffuse initial prior is used.  TRUE or FALSE.  Not used unless <code>method="BFGS"</code> was used.</p></li>
-</ul><p>For the marss form, the matrices are called:   Z, A, R, B, U, Q, x0, V0.  This is the form used by all internal algorithms, thus alternate forms must be transformed to marss form before fitting.  For the marxss form (the default form in a <code><a href="MARSS.html">MARSS</a>()</code> call), the matrices are called: Z,  A,  R,  B,  U, Q, D, C, d, c, x0, V0.</p>
-<p>Each form, should have a file called MARSS_form.R, with the following functions.  Let foo be some form.</p><ul><li><p>MARSS.foo(MARSS.call) This is called in <code><a href="MARSS.html">MARSS</a>()</code> and takes the input from the <code><a href="MARSS.html">MARSS</a>()</code> call (a list called MARSS.call) and returns that list with two model objects added. First is a model object in marss form in the $marss element and a model object in the form foo.</p></li>
-<li><p>marss_to_foo(marssMLE or marssMODEL) If called with marssMODEL (in form marss), marss_to_foo returns a model in form foo.  If marss_to_foo is called with a <code><a href="marssMLE-class.html">marssMLE</a></code> object (which must have a $marss element by definition), it returns a $model element in form foo and all if the marssMLE object has par, par.se, par.CI, par.bias, start elements, these are also converted to foo form. The function is mainly used by print.foo which needs the par (and related) elements of a marssMLE object to be in foo form for printing.</p></li>
-<li><p>foo_to_marss(marssMODEL or marssMLE) This converts marssMODEL(form=foo) to marssMODEL(form=marss).  This transformation is always possible since MARSS only works for models for which this is possible. If called with marssMODEL, it returns only a <code>marssMODEL</code> object.  If called with a <code><a href="marssMLE-class.html">marssMLE</a></code> object, it adds the <code>$marss</code> element with a <code>marssMODEL</code> in "marss" form and if the par (or related) elements exists, these are converted to "marss" form.</p></li>
-<li><p>print_foo(marssMLE or marssMODEL) print.marssMLE prints the par (and par.se and start) element of a marssMLE object but does not make assumptions about its form. Normally this element is in form=marss.  print.marssMLE checks for a print_foo function and runs that on the marssMLE object first.  This allows one to call foo_to_marss() to covert the par (and related) element to foo form so they look familiar to the user (the marss form will look strange). If called with marssMLE, print_foo returns a marssMLE object with the par (and related) elements in foo form.  If called with a marssMODEL, print_foo returns a marssMODEL in foo form.</p></li>
-<li><p>coef_foo(marssMLE) See print_foo.  coef.marssMLE also uses the par (and related) elements.</p></li>
-<li><p>predict_foo(marssMLE) Called by predict.marssMLE to do any needed conversions.  Typically a form will want the newdata element in a particular format and this will need to be converted to marss form. This returns an updated marssMLE object and newdata.</p></li>
-<li><p>describe_foo(marssMODEL) Called by describe.marssMODEL to do allow custom description output.</p></li>
-<li><p>is.marssMODEL_foo(marssMODEL) Check that the model object in foo form has all the parts it needs and that these have the proper size and form.</p></li>
-<li><p>MARSSinits_foo(marssMLE, inits.list) Allows customization of the inits used by the form. Returns an inits list in marss form.</p></li>
-</ul></div>
+<p>An object of class <code>marssMODEL</code> is a list with elements:</p><dl><dt>data</dt>
+<dd><p>Data supplied by user.</p></dd>
+
+  <dt>fixed</dt>
+<dd><p>A list with the f row vectors for each parameter matrix.</p></dd>
+
+  <dt>free</dt>
+<dd><p>A list with the D matrices for each parameter matrix.</p></dd>
+
+  <dt>tinitx</dt>
+<dd><p>At what t, 0 or 1, is the initial x defined at?</p></dd>
+ 
+  <dt>diffuse</dt>
+<dd><p>Whether a diffuse initial prior is used.  TRUE or FALSE.  Not used unless <code>method="BFGS"</code> was used.</p></dd>
+ 
+  
+</dl><p>For the marss form, the matrices are called:   Z, A, R, B, U, Q, x0, V0.  This is the form used by all internal algorithms, thus alternate forms must be transformed to marss form before fitting.  For the marxss form (the default form in a <code><a href="MARSS.html">MARSS</a>()</code> call), the matrices are called: Z,  A,  R,  B,  U, Q, D, C, d, c, x0, V0.</p>
+<p>Each form, should have a file called MARSS_form.R, with the following functions.  Let foo be some form.</p><dl><dt>MARSS.foo(MARSS.call)</dt>
+<dd><p>This is called in <code><a href="MARSS.html">MARSS</a>()</code> and takes the input from the <code><a href="MARSS.html">MARSS</a>()</code> call (a list called MARSS.call) and returns that list with two model objects added. First is a model object in marss form in the $marss element and a model object in the form foo.</p></dd>
+
+  <dt>marss_to_foo(marssMLE or marssMODEL)</dt>
+<dd><p>If called with marssMODEL (in form marss), marss_to_foo returns a model in form foo.  If marss_to_foo is called with a <code><a href="marssMLE-class.html">marssMLE</a></code> object (which must have a $marss element by definition), it returns a $model element in form foo and all if the marssMLE object has par, par.se, par.CI, par.bias, start elements, these are also converted to foo form. The function is mainly used by print.foo which needs the par (and related) elements of a marssMLE object to be in foo form for printing.</p></dd>
+
+  <dt>foo_to_marss(marssMODEL or marssMLE)</dt>
+<dd><p>This converts marssMODEL(form=foo) to marssMODEL(form=marss).  This transformation is always possible since MARSS only works for models for which this is possible. If called with marssMODEL, it returns only a <code>marssMODEL</code> object.  If called with a <code><a href="marssMLE-class.html">marssMLE</a></code> object, it adds the <code>$marss</code> element with a <code>marssMODEL</code> in "marss" form and if the par (or related) elements exists, these are converted to "marss" form.</p></dd>
+
+  <dt>print_foo(marssMLE or marssMODEL)</dt>
+<dd><p>print.marssMLE prints the par (and par.se and start) element of a marssMLE object but does not make assumptions about its form. Normally this element is in form=marss.  print.marssMLE checks for a print_foo function and runs that on the marssMLE object first.  This allows one to call foo_to_marss() to covert the par (and related) element to foo form so they look familiar to the user (the marss form will look strange). If called with marssMLE, print_foo returns a marssMLE object with the par (and related) elements in foo form.  If called with a marssMODEL, print_foo returns a marssMODEL in foo form.</p></dd>
+ 
+  <dt>coef_foo(marssMLE)</dt>
+<dd><p>See print_foo.  coef.marssMLE also uses the par (and related) elements.</p></dd>
+
+  <dt>predict_foo(marssMLE)</dt>
+<dd><p>Called by predict.marssMLE to do any needed conversions.  Typically a form will want the newdata element in a particular format and this will need to be converted to marss form. This returns an updated marssMLE object and newdata.</p></dd>
+
+ <dt>describe_foo(marssMODEL)</dt>
+<dd><p>Called by describe.marssMODEL to do allow custom description output.</p></dd>
+ 
+ <dt>is.marssMODEL_foo(marssMODEL)</dt>
+<dd><p>Check that the model object in foo form has all the parts it needs and that these have the proper size and form.</p></dd>
+
+  <dt>MARSSinits_foo(marssMLE, inits.list)</dt>
+<dd><p>Allows customization of the inits used by the form. Returns an inits list in marss form.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
     <p></p><dl><dt>print</dt>

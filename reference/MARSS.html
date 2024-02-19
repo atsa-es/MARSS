@@ -130,28 +130,47 @@ $$\left[\begin{array}{c c c} a+2b &amp; 1 &amp; a\\ 1+3a+b &amp; 0 &amp; b \\ 0 
   <dt>silent</dt>
 <dd><p>Setting to TRUE(1) suppresses printing of full error messages, warnings, progress bars and convergence information. Setting to FALSE(0) produces error output. Setting silent=2 will produce more verbose error messages and progress information.</p></dd>
 
-    <dt>fun.kf</dt>
+  <dt>fun.kf</dt>
 <dd><p>What Kalman filter function to use.  MARSS has two: <code><a href="MARSSkf.html">MARSSkfas</a>()</code> which is based on the Kalman filter in the <a href="https://cran.r-project.org/package=KFAS" class="external-link">KFAS</a> package based on Koopman and Durbin and <code><a href="MARSSkf.html">MARSSkfss</a>()</code> which is a native R implementation of the Kalman filter and smoother in Shumway and Stoffer. The KFAS filter is much faster.  <code><a href="MARSSkf.html">MARSSkfas</a>()</code> modifies the input and output in order to output the lag-one covariance smoother needed for the EM algorithm (per page 321 in Shumway and Stoffer (2000).</p></dd>
 
   <dt>control</dt>
-<dd><p>Estimation options for the maximization algorithm. The typically used control options for method="kem" are below but see  <code><a href="marssMLE-class.html">marssMLE</a></code> for the full list of control options.  Note many of these are not allowed if method="BFGS"; see  <code><a href="MARSSoptim.html">MARSSoptim</a></code> for the allowed control options for this method.</p><ul><li><p><code>minit</code>   The minimum number of iterations to do in the maximization routine (if needed by method). If <code>method="kem"</code>, this is an easy way to up the iterations and see how your estimates are converging. (positive integer)</p></li>
-<li><p><code>maxit</code>   Maximum number of iterations to be used in the maximization routine (if needed by method) (positive integer).</p></li>
-<li><p><code>min.iter.conv.test</code> Minimum iterations to run before testing convergence via the slope of the log parameter versus log iterations.</p></li>
-<li><p><code>conv.test.deltaT=9</code> Number of iterations to use for the testing convergence via the slope of the log parameter versus log iterations.</p></li>
-<li><p><code>conv.test.slope.tol</code> The slope of the log parameter versus log iteration to use as the cut-off for convergence.  The default is 0.5 which is a bit high.  For final analyses, this should be set lower.  If you want to only use abstol as your convergence test, then to something very large, for example <code>conv.test.slope.tol=1000</code>.  Type <code>MARSSinfo(11)</code> to see some comments on when you might want to do this.</p></li>
-<li><p><code>abstol</code> The logLik.(iter-1)-logLik.(iter) convergence tolerance for the maximization routine. To meet convergence both the abstol and slope tests must be passed.</p></li>
-<li><p><code>allow.degen</code> Whether to try setting \(\mathbf{Q}\) or \(\mathbf{R}\) elements to zero if they appear to be going to zero.</p></li>
-<li><p><code>trace</code> An integer specifying the level of information recorded and error-checking run during the algorithms.  <code>trace=0</code>, specifies basic error-checking and brief error-messages; <code>trace&gt;0</code> will print full error messages. In addition if trace&gt;0, the Kalman filter output will be added to the outputted <code>marssMLE</code> object.  Additional information recorded depends on the method of maximization. For the EM algorithm, a record of each parameter estimate for each EM iteration will be added.   See <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></code> for trace output details for the BFGS method.   <code>trace=-1</code> will turn off most internal error-checking and most error messages.  The internal error checks are time expensive so this can speed up model fitting.  This is particularly useful for bootstrapping and simulation studies. It is also useful if you get an error saying that <code>MARSS()</code> stops in <code><a href="MARSSkf.html">MARSSkfss</a>()</code> due to a <code><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol()</a></code> call. <code><a href="MARSSkf.html">MARSSkfss()</a></code> uses matrix inversions and for some models these are unstable (high condition value). <code><a href="MARSSkf.html">MARSSkfss()</a></code> is used for error-checks and does not need to be called normally.</p></li>
-<li><p><code>safe</code>  Setting <code>safe=TRUE</code> runs the Kalman smoother after each parameter update rather than running the smoother only once after updated all parameters.  The latter is faster but is not a strictly correct EM algorithm.  In most cases, <code>safe=FALSE</code> (default) will not change the fits.  If this setting does cause problems, you will know because you will see an error regarding the log-likelihood dropping and it will direct you to set <code>safe=TRUE</code>.</p></li>
-</ul><p></p></dd>
+<dd><p>Estimation options for the maximization algorithm. The typically used control options for method="kem" are below but see  <code><a href="marssMLE-class.html">marssMLE</a></code> for the full list of control options.  Note many of these are not allowed if method="BFGS"; see  <code><a href="MARSSoptim.html">MARSSoptim</a></code> for the allowed control options for this method.</p><dl><dt><code>minit</code></dt>
+<dd><p>The minimum number of iterations to do in the maximization routine (if needed by method). If <code>method="kem"</code>, this is an easy way to up the iterations and see how your estimates are converging. (positive integer)</p></dd>
+ 
+      <dt><code>maxit</code></dt>
+<dd><p>Maximum number of iterations to be used in the maximization routine (if needed by method) (positive integer).</p></dd>
 
-    <dt>...</dt>
+      <dt><code>min.iter.conv.test</code></dt>
+<dd><p>Minimum iterations to run before testing convergence via the slope of the log parameter versus log iterations.</p></dd>
+ 
+      <dt><code>conv.test.deltaT=9</code></dt>
+<dd><p>Number of iterations to use for the testing convergence via the slope of the log parameter versus log iterations.</p></dd>
+
+      <dt><code>conv.test.slope.tol</code></dt>
+<dd><p>The slope of the log parameter versus log iteration to use as the cut-off for convergence.  The default is 0.5 which is a bit high.  For final analyses, this should be set lower.  If you want to only use abstol as your convergence test, then to something very large, for example <code>conv.test.slope.tol=1000</code>.  Type <code>MARSSinfo(11)</code> to see some comments on when you might want to do this.</p></dd>
+
+      <dt><code>abstol</code></dt>
+<dd><p>The logLik.(iter-1)-logLik.(iter) convergence tolerance for the maximization routine. To meet convergence both the abstol and slope tests must be passed.</p></dd>
+ 
+      <dt><code>allow.degen</code></dt>
+<dd><p>Whether to try setting \(\mathbf{Q}\) or \(\mathbf{R}\) elements to zero if they appear to be going to zero.</p></dd>
+
+      <dt><code>trace</code></dt>
+<dd><p>An integer specifying the level of information recorded and error-checking run during the algorithms.  <code>trace=0</code>, specifies basic error-checking and brief error-messages; <code>trace&gt;0</code> will print full error messages. In addition if trace&gt;0, the Kalman filter output will be added to the outputted <code>marssMLE</code> object.  Additional information recorded depends on the method of maximization. For the EM algorithm, a record of each parameter estimate for each EM iteration will be added.   See <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></code> for trace output details for the BFGS method.   <code>trace=-1</code> will turn off most internal error-checking and most error messages.  The internal error checks are time expensive so this can speed up model fitting.  This is particularly useful for bootstrapping and simulation studies. It is also useful if you get an error saying that <code>MARSS()</code> stops in <code><a href="MARSSkf.html">MARSSkfss</a>()</code> due to a <code><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol()</a></code> call. <code><a href="MARSSkf.html">MARSSkfss()</a></code> uses matrix inversions and for some models these are unstable (high condition value). <code><a href="MARSSkf.html">MARSSkfss()</a></code> is used for error-checks and does not need to be called normally.</p></dd>
+
+      <dt><code>safe</code></dt>
+<dd><p>Setting <code>safe=TRUE</code> runs the Kalman smoother after each parameter update rather than running the smoother only once after updated all parameters.  The latter is faster but is not a strictly correct EM algorithm.  In most cases, <code>safe=FALSE</code> (default) will not change the fits.  If this setting does cause problems, you will know because you will see an error regarding the log-likelihood dropping and it will direct you to set <code>safe=TRUE</code>.</p></dd>
+
+  
+</dl><p></p></dd>
+
+  <dt>...</dt>
 <dd><p>Optional arguments passed to function specified by form.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The <code>model</code> argument specifies the structure of your model. There is a one-to-one correspondence between how you would write your model in matrix form on the whiteboard and how you specify the model for <code>MARSS()</code>.  Many different types of multivariate time-series models can be converted to the MARSS form. See the <a href="https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf" class="external-link">User Guide</a> and <a href="https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.pdf" class="external-link">Quick Start Guide</a> for examples.</p>
+    <p>The <code>model</code> argument specifies the structure of your model. There is a one-to-one correspondence between how you would write your model in matrix form on the whiteboard and how you specify the model for <code>MARSS()</code>.  Many different types of multivariate time-series models can be converted to the MARSS form. See the <a href="https://cran.r-project.org/package=MARSS/vignettes/UserGuide.pdf" class="external-link">User Guide</a> and <a href="https://cran.r-project.org/package=MARSS/vignettes/Quick_Start.html" class="external-link">Quick Start Guide</a> for examples.</p>
 <p>The MARSS package has two forms for standard users: marxss and dfa.</p><dl><dt><code><a href="MARSS_marxss.html">MARSS.marxss</a></code></dt>
 <dd><p>This is the default form. This is a MARSS model with (optional) inputs \(\mathbf{c}_t\) or \(\mathbf{d}_t\). Most users will want this help page.</p></dd>
 

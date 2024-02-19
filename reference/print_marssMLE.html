@@ -81,23 +81,56 @@
 <dd><p>Other arguments for print.</p></dd>
 
   <dt>what</dt>
-<dd><p>What to print.  Default is "fit".  If you input what as a vector, print returns a list. See examples.</p><ul><li><p>"model" The model parameters with names for the estimated parameters.  The output is customized by the form of the model that was fit.  This info is in <code> attr(x$model, "form") </code>.</p></li>
-<li><p>"par"  A list of only the estimated values in each matrix. Each model matrix has it's own list element. Standard function: <code>coef(x)</code></p></li>
-<li><p>"start" or "inits"  The values that the optimization algorithm was started at. Note, <code>x$start</code> shows this in form="marss" while <code>print</code> shows it in whatever form is in <code> attr(x$model, "form") </code>.</p></li>
-<li><p>"paramvector"  A vector of all the estimated values in each matrix. Standard function: <code>coef(x, type="vector")</code>.  See <code><a href="coef_marssMLE.html">coef</a>()</code>.</p></li>
-<li><p>"par.se","par.bias","par.lowCIs","par.upCIs"  A vector the estimated parameter standard errors, parameter bias, lower and upper confidence intervals. Standard function: <code>MARSSparamCIs(x)</code>  See <code><a href="MARSSparamCIs.html">MARSSparamCIs</a>()</code>.</p></li>
-<li><p>"xtT" or "states"  The estimated states conditioned on all the data. <code>x$states</code></p></li>
-<li><p>"data"  The data. This is in <code>x$model$data</code></p></li>
-<li><p>"logLik"  The log-likelihood. Standard function: <code>x$logLik</code>.  See <code><a href="MARSSkf.html">MARSSkf</a>()</code> for a discussion of the computation of the log-likelihood for MARSS models.</p></li>
-<li><p>"ytT"  The expected value of the data conditioned on all the data.  Returns the data if present and the expected value if missing. This is in <code>x$ytT</code> (ytT is analogous to xtT).</p></li>
-<li><p>"states.se"  The state standard errors. <code>x$states.se</code></p></li>
-<li><p>"states.cis"  Approximate confidence intervals for the states. See <code><a href="MARSSparamCIs.html">MARSSparamCIs</a>()</code>.</p></li>
-<li><p>"model.residuals"  The one-step ahead model residuals or innovations. \(\mathbf{y}_t - \textrm{E}[\mathbf{Y}_t|\mathbf{y}_1^{t-1}]\), aka actual data at time \(t\) minus the expected value of the data conditioned on the data from \(t=1\) to \(t-1\). Standard function: <code>residuals(x, type="tt1")</code>  See <code><a href="MARSSresiduals.html">MARSSresiduals</a>()</code> for a discussion of residuals in the context of MARSS models.</p></li>
-<li><p>"state.residuals"  The smoothed state residuals. \(\mathbf{x}_t^T- \textrm{E}[\mathbf{X}_t|\mathbf{x}_{t-1}^T]\), aka the expected value of the states at time \(t\) conditioned on all the data minus the expected value of the states at time \(t\) conditioned on \(\mathbf{x}_{t-1}^T]\). Standard function: <code>residuals(x, type="tT")</code>  See <code><a href="MARSSresiduals.html">MARSSresiduals</a>()</code>.</p></li>
-<li><p>parameter name  Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Standard function: <code>coef(x, type="matrix")$elem</code></p></li>
-<li><p>"kfs"  The Kalman filter and smoother output.  See <code><a href="MARSSkf.html">MARSSkf</a>()</code> for a description of the output. The full kf output is not normally attached to the output from a <code><a href="MARSS.html">MARSS</a>()</code> call.  This will run the filter/smoother if needed and return the list invisibly.  So assign the output as <code>foo=print(x,what="kfs")</code></p></li>
-<li><p>"Ey"  The expectations involving y conditioned on all the data.  See <code><a href="MARSShatyt.html">MARSShatyt</a>()</code> for a discussion of these expectations.  This output is not normally attached to the output from a <code><a href="MARSS.html">MARSS</a>()</code> call--except <code>ytT</code> which is the predicted value of any missing y. The list is returned invisibly so assign the output as <code>foo=print(x,what="Ey")</code>.</p></li>
-</ul><p></p></dd>
+<dd><p>What to print.  Default is "fit".  If you input what as a vector, print returns a list. See examples.</p><dl><dt> "model"</dt>
+<dd><p>The model parameters with names for the estimated parameters.  The output is customized by the form of the model that was fit.  This info is in <code> attr(x$model, "form") </code>.</p></dd>
+
+    <dt> "par" </dt>
+<dd><p>A list of only the estimated values in each matrix. Each model matrix has it's own list element. Standard function: <code>coef(x)</code></p></dd>
+
+    <dt> "start" or "inits" </dt>
+<dd><p>The values that the optimization algorithm was started at. Note, <code>x$start</code> shows this in form="marss" while <code>print</code> shows it in whatever form is in <code> attr(x$model, "form") </code>.</p></dd>
+
+    <dt> "paramvector" </dt>
+<dd><p>A vector of all the estimated values in each matrix. Standard function: <code>coef(x, type="vector")</code>.  See <code><a href="coef_marssMLE.html">coef</a>()</code>.</p></dd>
+
+    <dt> "par.se","par.bias","par.lowCIs","par.upCIs" </dt>
+<dd><p>A vector the estimated parameter standard errors, parameter bias, lower and upper confidence intervals. Standard function: <code>MARSSparamCIs(x)</code>  See <code><a href="MARSSparamCIs.html">MARSSparamCIs</a>()</code>.</p></dd>
+
+    <dt> "xtT" or "states" </dt>
+<dd><p>The estimated states conditioned on all the data. <code>x$states</code></p></dd>
+
+    <dt> "data" </dt>
+<dd><p>The data. This is in <code>x$model$data</code></p></dd>
+
+    <dt> "logLik" </dt>
+<dd><p>The log-likelihood. Standard function: <code>x$logLik</code>.  See <code><a href="MARSSkf.html">MARSSkf</a>()</code> for a discussion of the computation of the log-likelihood for MARSS models.</p></dd>
+
+    <dt> "ytT" </dt>
+<dd><p>The expected value of the data conditioned on all the data.  Returns the data if present and the expected value if missing. This is in <code>x$ytT</code> (ytT is analogous to xtT).</p></dd>
+
+    <dt> "states.se" </dt>
+<dd><p>The state standard errors. <code>x$states.se</code></p></dd>
+
+    <dt> "states.cis" </dt>
+<dd><p>Approximate confidence intervals for the states. See <code><a href="MARSSparamCIs.html">MARSSparamCIs</a>()</code>.</p></dd>
+
+    <dt> "model.residuals" </dt>
+<dd><p>The one-step ahead model residuals or innovations. \(\mathbf{y}_t - \textrm{E}[\mathbf{Y}_t|\mathbf{y}_1^{t-1}]\), aka actual data at time \(t\) minus the expected value of the data conditioned on the data from \(t=1\) to \(t-1\). Standard function: <code>residuals(x, type="tt1")</code>  See <code><a href="MARSSresiduals.html">MARSSresiduals</a>()</code> for a discussion of residuals in the context of MARSS models.</p></dd>
+
+    <dt> "state.residuals" </dt>
+<dd><p>The smoothed state residuals. \(\mathbf{x}_t^T- \textrm{E}[\mathbf{X}_t|\mathbf{x}_{t-1}^T]\), aka the expected value of the states at time \(t\) conditioned on all the data minus the expected value of the states at time \(t\) conditioned on \(\mathbf{x}_{t-1}^T]\). Standard function: <code>residuals(x, type="tT")</code>  See <code><a href="MARSSresiduals.html">MARSSresiduals</a>()</code>.</p></dd>
+
+    <dt> parameter name </dt>
+<dd><p>Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Standard function: <code>coef(x, type="matrix")$elem</code></p></dd>
+
+    <dt> "kfs" </dt>
+<dd><p>The Kalman filter and smoother output.  See <code><a href="MARSSkf.html">MARSSkf</a>()</code> for a description of the output. The full kf output is not normally attached to the output from a <code><a href="MARSS.html">MARSS</a>()</code> call.  This will run the filter/smoother if needed and return the list invisibly.  So assign the output as <code>foo=print(x,what="kfs")</code></p></dd>
+
+    <dt> "Ey" </dt>
+<dd><p>The expectations involving y conditioned on all the data.  See <code><a href="MARSShatyt.html">MARSShatyt</a>()</code> for a discussion of these expectations.  This output is not normally attached to the output from a <code><a href="MARSS.html">MARSS</a>()</code> call--except <code>ytT</code> which is the predicted value of any missing y. The list is returned invisibly so assign the output as <code>foo=print(x,what="Ey")</code>.</p></dd>
+
+      
+</dl><p></p></dd>
 
   <dt>form</dt>
 <dd><p>By default, print uses the model form specified in the call to <code><a href="MARSS.html">MARSS</a>()</code>.  This information is in <code> attr(marssMLE$model, "form") </code>, however you can specify a different form.  <code> form="marss" </code> should always work since this is the model form in which the model objects are stored (in <code>marssMLE$marss</code>).</p></dd>

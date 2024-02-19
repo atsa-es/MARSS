@@ -77,11 +77,20 @@
 <dd><p>Other arguments. Not used.</p></dd>
 
   <dt>type</dt>
-<dd><p>What to output.  Default is "list". Options are</p><ul><li><p>"list"  A list of only the estimated values in each matrix. Each model matrix has it's own list element.</p></li>
-<li><p>"vector"  A vector of all the estimated values in each matrix.</p></li>
-<li><p>"matrix"  A list of the parameter matrices each parameter with fixed values at their fixed values and the estimated values at their estimated values. Time-varying parameters, including d and c in a marxss form model, are returned as an array with time in the 3rd dimension.</p></li>
-<li><p>parameter name  Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Note, time-varying parameters, including d and c in a marxss form model, are returned as an array with time in the 3rd dimension.</p></li>
-</ul><p></p></dd>
+<dd><p>What to output.  Default is "list". Options are</p><dl><dt> "list" </dt>
+<dd><p>A list of only the estimated values in each matrix. Each model matrix has it's own list element.</p></dd>
+
+    <dt> "vector" </dt>
+<dd><p>A vector of all the estimated values in each matrix.</p></dd>
+
+    <dt> "matrix" </dt>
+<dd><p>A list of the parameter matrices each parameter with fixed values at their fixed values and the estimated values at their estimated values. Time-varying parameters, including d and c in a marxss form model, are returned as an array with time in the 3rd dimension.</p></dd>
+
+    <dt> parameter name </dt>
+<dd><p>Returns the parameter matrix for that parameter with fixed values at their fixed values and the estimated values at their estimated values. Note, time-varying parameters, including d and c in a marxss form model, are returned as an array with time in the 3rd dimension.</p></dd>
+
+  
+</dl><p></p></dd>
 
   <dt>form</dt>
 <dd><p>This argument can be ignored. By default, the model form specified in the call to <code><a href="MARSS.html">MARSS</a>()</code> is used to determine how to display the coefficients.  This information is in <code> attr(object$model,"form") </code>.  The default form is <code>"marxss"</code>; see <code><a href="MARSS_marxss.html">MARSS.marxss</a>()</code>.  However, the internal functions convert this to form <code>"marss"</code>; see <code><a href="MARSS_marss.html">MARSS.marss</a>()</code>. The marss form of the model is stored (in <code>object$marss</code>). You can look at the coefficients in marss form by passing in <code>form="marss"</code>.</p></dd>
