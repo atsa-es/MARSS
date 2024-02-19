@@ -22,10 +22,10 @@ A list with the following components (n is the number of state processes). Follo
   \item{ytt}{ E[Y(t) | Y(1,1:t)=y(1,1:t)] (n x T matrix). }
   \item{OtT}{ E[Y(t) t(Y(t)) | Y(1,1:T)=y(1,1:T)] (n x n x T array). }
   \item{var.ytT}{ var[Y(t) | Y(1,1:T)=y(1,1:T)] (n x n x T array). }
-  \item{var.EytT}{ var_X[E_{Y|x}[Y(t) | Y(1,1:T)=y(1,1:T), X(t)=x(t)]] (n x n x T array). }
+  \item{var.EytT}{ var_X[E_Y[Y(t) | Y(1,1:T)=y(1,1:T), X(t)=x(t)]] (n x n x T array). }
   \item{Ott1}{  E[Y(t) t(Y(t)) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x T array). }
   \item{var.ytt1}{ var[Y(t) | Y(1,1:t-1)=y(1,1:t-1)] (n x n x T array). }
-  \item{var.Eytt1}{ var_X[E_{Y|x}[Y(t) | Y(1,1:t-1)=y(1,1:t-1), X(t)=x(t)]] (n x n x T array). }
+  \item{var.Eytt1}{ var_X[E_Y[Y(t) | Y(1,1:t-1)=y(1,1:t-1), X(t)=x(t)]] (n x n x T array). }
   \item{Ott}{ E[Y(t) t(Y(t)) | Y(1,1:t)=y(1,1:t)] (n x n x T array). }
   \item{yxtT}{ E[Y(t) t(X(t)) | Y(1,1:T)=y(1,1:T)] (n x m x T array). }
   \item{yxtt1T}{ E[Y(t) t(X(t-1)) | Y(1,1:T)=y(1,1:T)] (n x m x T array). }

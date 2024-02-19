@@ -12,7 +12,7 @@
   \item{object}{ A \code{\link{marssMLE}} object.  }
   \item{...}{ Other arguments. Not used. }
   \item{type}{ What to output.  Default is "list". Options are
-  \itemize{
+  \describe{
     \item{ "list" }{ A list of only the estimated values in each matrix. Each model matrix has it's own list element.}
     \item{ "vector" }{ A vector of all the estimated values in each matrix. }
     \item{ "matrix" }{ A list of the parameter matrices each parameter with fixed values at their fixed values and the estimated values at their estimated values. Time-varying parameters, including d and c in a marxss form model, are returned as an array with time in the 3rd dimension. }

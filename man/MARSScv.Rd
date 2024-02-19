@@ -35,7 +35,7 @@ that specifies initial values for the parameters. See also \code{\link[=MARSS.ma
 
 \item{method}{Estimation method. MARSS provides an EM algorithm (\code{method="kem"})
 (see \code{\link[=MARSSkem]{MARSSkem()}}) and the BFGS algorithm (\code{method="BFGS"})
-(see \code{\link[=MARSSoptim]{MARSSoptim()}}). Fast TMB fitting provided by the companion package {marssTMB}.}
+(see \code{\link[=MARSSoptim]{MARSSoptim()}}). Fast TMB fitting provided by the companion package marssTMB.}
 
 \item{form}{The equation form used in the \code{MARSS()} call.  The default is "marxss".
 See \code{\link[=MARSS.marxss]{MARSS.marxss()}} or \code{\link[=MARSS.dfa]{MARSS.dfa()}}}

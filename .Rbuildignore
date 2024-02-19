@@ -4,6 +4,8 @@
 .Rhistory
 .RData
 .gitignore
+.git_diff_name-only
+.git_ls-tree_r_name-only_HEAD
 ^\.github$
 
 License.md

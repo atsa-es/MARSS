@@ -31,7 +31,7 @@ data(redstart)
 The data are supplied as a matrix with years in the first column and counts in the second (and higher) columns.
 }
 \source{
-\itemize{
+\describe{
 \item{graywhales }{ Gerber L. R., Master D. P. D. and Kareiva P. M. (1999) Gray whales and the value of monitoring data in implementing the U.S. Endangered Species Act.  Conservation Biology, 13, 1215-1219.}
 \item{grouse }{ Hays D. W., Tirhi M. J. and Stinson D. W. (1998) Washington state status report for the sharptailed grouse. Washington Department Fish and Wildlife, Olympia, WA. 57 pp.}
 \item{prairiechicken }{ Peterson M. J. and Silvy N. J. (1996) Reproductive stages limiting productivity of the endangered Attwater's prairie chicken. Conservation Biology, 10, 1264-1276.}

@@ -27,7 +27,7 @@ data(lakeWAplankton)
 The data are provided as a matrix with time running down the rows.
 }
 \source{
-\itemize{
+\describe{
 \item{\code{ivesDataLP} and \code{ivesDataByWeek}}{ Ives, A. R. Dennis, B. Cottingham, K. L. Carpenter, S. R. (2003) Estimating community stability and ecological interactions from time-series data. Ecological Monographs, 73, 301-330. }
 \item{\code{lakeWAplanktonTrans}}{ Hampton, S. E. Scheuerell, M. D. Schindler, D. E. (2006)  Coalescence in the Lake Washington story: Interaction strengths in a planktonic food web. Limnology and Oceanography, 51, 2042-2051. }
 \item{\code{lakeWAplanktonRaw}}{ Adapted from the Lake Washington database of Dr. W. T. Edmondson, as funded by the Andrew Mellon Foundation; data courtesy of Dr. Daniel Schindler, University of Washington, Seattle, WA.}

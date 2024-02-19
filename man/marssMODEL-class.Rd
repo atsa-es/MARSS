@@ -13,7 +13,7 @@
 \details{
 
 The object has the following attributes:
-\itemize{
+\describe{
   \item{form}{ The form that the model object is in. }
   \item{par.names}{ The names of each parameter matrix in the model. }
   \item{model.dims}{ A list with the dimensions of all the matrices in non-vectorized form. }
@@ -27,7 +27,7 @@ These attributes are set in the MARSS_form.R file, in the \code{MARSS.form()} fu
 Each parameter matrix in a MARSS equation can be written in vectorized form: vec(P) = f + Dp, where f is the fixed part, p are the estimated parameters, and D is the matrix that transforms the p into a vector to be added to f.
 
 An object of class \code{marssMODEL} is a list with elements:
-\itemize{
+\describe{
   \item{data}{ Data supplied by user. }
   \item{fixed}{ A list with the f row vectors for each parameter matrix.  }
   \item{free}{ A list with the D matrices for each parameter matrix. }
@@ -38,7 +38,7 @@ An object of class \code{marssMODEL} is a list with elements:
 For the marss form, the matrices are called:   Z, A, R, B, U, Q, x0, V0.  This is the form used by all internal algorithms, thus alternate forms must be transformed to marss form before fitting.  For the marxss form (the default form in a \code{\link{MARSS}()} call), the matrices are called: Z,  A,  R,  B,  U, Q, D, C, d, c, x0, V0.
 
 Each form, should have a file called MARSS_form.R, with the following functions.  Let foo be some form.
-\itemize{
+\describe{
   \item{MARSS.foo(MARSS.call)}{ This is called in \code{\link{MARSS}()} and takes the input from the \code{\link{MARSS}()} call (a list called MARSS.call) and returns that list with two model objects added. First is a model object in marss form in the $marss element and a model object in the form foo.}
   \item{marss_to_foo(marssMLE or marssMODEL)}{ If called with marssMODEL (in form marss), marss_to_foo returns a model in form foo.  If marss_to_foo is called with a \code{\link{marssMLE}} object (which must have a $marss element by definition), it returns a $model element in form foo and all if the marssMLE object has par, par.se, par.CI, par.bias, start elements, these are also converted to foo form. The function is mainly used by print.foo which needs the par (and related) elements of a marssMLE object to be in foo form for printing.}
   \item{foo_to_marss(marssMODEL or marssMLE)}{ This converts marssMODEL(form=foo) to marssMODEL(form=marss).  This transformation is always possible since MARSS only works for models for which this is possible. If called with marssMODEL, it returns only a \code{\link{marssMODEL}} object.  If called with a \code{\link{marssMLE}} object, it adds the \code{$marss} element with a \code{\link{marssMODEL}} in "marss" form and if the par (or related) elements exists, these are converted to "marss" form. }
