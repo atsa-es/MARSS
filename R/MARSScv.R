@@ -11,7 +11,7 @@
 #' that specifies initial values for the parameters. See also [MARSS.marxss()].
 #' @param method Estimation method. MARSS provides an EM algorithm (`method="kem"`)
 #' (see [MARSSkem()]) and the BFGS algorithm (`method="BFGS"`)
-#' (see [MARSSoptim()]). Fast TMB fitting provided by the companion package {marssTMB}.
+#' (see [MARSSoptim()]). Fast TMB fitting provided by the companion package marssTMB.
 #' @param form The equation form used in the \code{MARSS()} call.  The default is "marxss".
 #' See [MARSS.marxss()] or [MARSS.dfa()]
 #' @param silent Setting to TRUE(1) suppresses printing of full error messages, warnings,

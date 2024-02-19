@@ -28,6 +28,8 @@
 \alias{ pcholinv }
 \alias{ pchol }
 \alias{ vector.all.equal }
+\alias{ fully.spec.x }
+\alias{ marssMODEL.to.list }
 \keyword{internal}
 
 \title{ Utility Functions }
