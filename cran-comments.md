@@ -2,7 +2,7 @@
 
 * `rhub::check_for_cran()`
 * M1 MacBook
-* R versions 4.3 and 4.2
+* R versions 4.3
 
 ## R CMD check results
 
