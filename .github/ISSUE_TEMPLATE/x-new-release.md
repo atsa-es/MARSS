@@ -114,16 +114,20 @@ Upload package to CRAN
 - [ ] https://cran.r-project.org/submit.html
 
 
-The items below are for cases where you are submitting the package files without any extra processing. I process my vignette PDFs separately, so the below won't work. But when submitting there is a link to check the tar.gz file on Windows.
-
-
+The items below are for cases where you are submitting the package files without any extra processing. I process my vignette PDFs separately, so the below won't work. 
 
 * `devtools::check_win_devel()`
 * `rhub::check_for_cran()`
 *  `revdepcheck::revdep_check(num_workers = 4)`
 
+Instead use
+* The link to check the tar.gz file on Windows.
+* `rhub::check_for_cran("../rhub::check_for_cran("../MARSS_3.11.9.tar.gz")` on the processed tar.gz file
+
 Submit to CRAN:
 
+
+You could do this, but I upload the tag.gz to CRAN
 * `usethis::use_version('patch')`
 * `devtools::submit_cran()`
 * Approve email
