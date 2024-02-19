@@ -7,6 +7,14 @@ assignees: eeholmes
 
 ---
 
+Running install from the RStudio build tag will tend to add detritus in the vignettes folder. You will need to clean that.
+
+Some files have roxygen code and you will need to run
+```
+devtools::document(roclets = c('rd'))
+```
+to update the Rd files for those files.
+
 - [ ] Run checks without building the vignettes
 ```
 devtools::check(document = FALSE, vignettes=FALSE)
