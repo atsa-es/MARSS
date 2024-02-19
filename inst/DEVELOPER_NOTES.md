@@ -4,7 +4,7 @@ The pkgdown webpage will be automatically updated whenever a push is made to the
 
 # Steps for a release
 
-Once a release is ready, all tests done and documentation checked, the Makefile in `inst/doc` is run. I usually run one target at a time starting with `make movetovignettes`. Before doing this, I build the User Guide and run it through a few compressors: Adobe and then https://github.com/atsa-es/pdfsizeopt-readme.
+Once a release is ready, all tests done and documentation checked, the Makefile in `inst/doc` is run. I usually run one target at a time starting with `make movetovignettes` then `make build` etc. This makefile will ensure that all the pieces of the tar.gz are in place. Before doing this, I build the User Guide and run it through a few compressors: Adobe and then https://github.com/atsa-es/pdfsizeopt-readme.
 
 ## Spellcheck the whole package
 
