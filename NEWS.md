@@ -42,7 +42,7 @@ This release is focused on moving the MARSS User Guide and derivation files into
 * renamed `all.equal.vector` to `vector.all.equal()` so it is not interpreted as a method of `all.equal()`.
 
 
-# MARSS 3.11.6 (GitHub)
+# MARSS 3.11.6 (GitHub) (2023-05-11)
 
 This release is focused on adding new method `method="TMB"` which uses the package {marssTMB}.
 
