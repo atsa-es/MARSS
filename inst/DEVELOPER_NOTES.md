@@ -45,11 +45,11 @@ cd inst/userguide
 make
 ```
 
-You can update both by 
+You can update both user guide and derivations using
 
 ```
 cd inst
-make --makefile=Makedoc
+make manual
 ```
 
 ## Check the documentation pdfs
@@ -63,9 +63,17 @@ Will be in `inst/userguide/doc` and `inst/derivations/doc`
 ## Compress User Guide
 
   - [ ] Manually compress the UserGuide.pdf in the inst/userguide/doc folder in Dropbox/MARSS/inst/doc with `https://github.com/atsa-es/pdfsizeopt-readme`
-  - [ ] Rebuild package with smaller docs, and then re-Run checks on the built package to see that it passes size checks
-
-Should be about 1.3M
+  The pdf should be about 1.1 to 1.3M
+  - [ ] Check the vignettes folder that it does not have extra stuff. Should have only EMDerivation.Rnw, Quick_Start.Rmd      atsa-labs-cover.jpg, EMDerivation.bib, Residuals.Rnw, index.html
+Learning_MARSS.Rmd, UserGuide.Rnw, mathdefs.tex
+  - [ ] Rebuild package with smaller docs, and then re-Run checks on the built package to see that it passes size checks (code below)
+  Run this to rebuild
+```
+make movetovignettes
+make build
+make movetodoc
+make rebuild
+```
 
 ## Manually update the inst/doc for GitHub
 
@@ -95,7 +103,8 @@ Run and check and then delete the detritus.
 
 ```
 rm -r ~/Dropbox/MARSS.Rcheck
-R CMD check --timings --as-cran MARSS_3.11.7.tar.gz
+cd ~/Dropbox
+R CMD check --timings --as-cran MARSS_3.11.10.tar.gz
 ```
 
 ## Run internal tests 
@@ -168,7 +177,7 @@ Now using the final tar.gz file do the final tests.
 ```
 cd ~/Dropbox
 rm -r ~/Dropbox/MARSS.Rcheck
-R CMD check --timings --as-cran MARSS_3.11.7.tar.gz
+R CMD check --timings --as-cran MARSS_3.11.10.tar.gz
 ```
 
 ## Check on other OS
