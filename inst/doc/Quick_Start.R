@@ -9,7 +9,7 @@ pi1 <- matrix(0,2,1); V1=diag(1,2)
 model.list <- list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  fit <- MARSS(y, model=model.list)
+# fit <- MARSS(y, model=model.list)
 
 ## -----------------------------------------------------------------------------
 library(MARSS)
@@ -21,9 +21,9 @@ fit <- MARSS(y, model=model.list, silent=TRUE)
 tidy(fit)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  fit1 <- MARSS(y, model=model.list)
-#  fit2 <- MARSS(y, model=model.list, method="BFGS")
-#  fit3 <- MARSS(y, model=model.list, method="TMB")
+# fit1 <- MARSS(y, model=model.list)
+# fit2 <- MARSS(y, model=model.list, method="BFGS")
+# fit3 <- MARSS(y, model=model.list, method="TMB")
 
 ## ----results="hide"-----------------------------------------------------------
 fit1 <- MARSS(y, model=model.list, control = list(maxit=15))
