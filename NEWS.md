@@ -2,6 +2,12 @@
 output: html_document
 ---
 
+# MARSS 3.11.10 (CRAN 2025-09-09)
+
+Very minor update.
+
+* Fixed some Rd link errors that caused NOTEs on CRAN.
+
 # MARSS 3.11.9 (CRAN 2024-02-19)
 
 Very minor cosmetic update.

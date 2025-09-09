@@ -1,8 +1,8 @@
 Package: MARSS
 Type: Package
 Title: Multivariate Autoregressive State-Space Modeling
-Version: 3.11.9
-Date: 2024-02-19
+Version: 3.11.10
+Date: 2025-09-10
 Depends: R (>= 3.5.0)
 Imports: 
     generics (>= 0.1.2), graphics, grDevices, KFAS (>= 1.0.1), mvtnorm, nlme, stats, utils
@@ -11,7 +11,10 @@ Suggests:
     ggplot2,
     Hmisc,
     knitr,
-    marssTMB
+    lme4,
+    maps,
+    marssTMB,
+    tidyr
 Authors@R: 
     c(person("Elizabeth Eli", "Holmes", , "eli.holmes@noaa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9128-8393")),
@@ -39,7 +42,7 @@ BuildVignettes: yes
 ByteCompile: TRUE
 URL: https://atsa-es.github.io/MARSS/
 BugReports: https://github.com/atsa-es/MARSS/issues
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 VignetteBuilder: knitr, utils

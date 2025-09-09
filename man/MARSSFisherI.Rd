@@ -18,7 +18,7 @@ MARSSFisherI(MLEobj, method = c("Harvey1989", "fdHess", "optim"))
   \item{method}{ The method to use for computing the observed Fisher Information matrix. Options are \code{"Harvey1989"} to use the Harvey (1989) recursion, which is an analytical solution, \code{"fdHess"} or \code{"optim"} which are two numerical methods.  Although 'optim' can be passed to the function, 'fdHess' is used for all numerical estimates used in the MARSS package.}
  }
 \details{
-   Method 'fdHess' uses \code{\link{fdHess}()} from package \code{\link{nlme}} to numerically estimate the Hessian of the negative log-likelihood function at the MLEs. Method 'optim' uses \code{\link{optim}()} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object. The \code{par} element of the \code{\link{marssMLE}} object is the MLE.  
+   Method 'fdHess' uses \code{\link[nlme]{fdHess}()} from package \code{nlme} to numerically estimate the Hessian of the negative log-likelihood function at the MLEs. Method 'optim' uses \code{\link[stats]{optim}()} with \code{hessian=TRUE} and \code{list(maxit=0)} to ensure that the Hessian is computed at the values in the \code{par} element of the MLE object. The \code{par} element of the \code{\link{marssMLE}} object is the MLE.  
    
 Method 'Harvey1989' (the default) uses the recursion in Harvey (1989) to compute the observed Fisher Information of a MARSS model analytically. See Holmes (2016c) for a discussion of the Harvey (1989) algorithm and see Holmes (2017) on how to implement the algorithm for MARSS models with linear constraints (the type of MARSS models that the MARSS R package addresses).
    
@@ -31,7 +31,7 @@ There has been research on computing the observed Fisher Information matrix from
 \author{ 
   Eli Holmes, NOAA, Seattle, USA.  
 } 
-\seealso{ \code{\link{MARSSharveyobsFI}()}, \code{\link{MARSShessian.numerical}}, \code{\link{MARSSparamCIs}}, \code{\link{marssMLE}} }
+\seealso{ \code{\link{MARSSharveyobsFI}()}, \code{\link{MARSShessian.numerical}()}, \code{\link{MARSSparamCIs}()}, \code{\link{marssMLE}} }
 \examples{
 dat <- t(harborSeal)
 dat <- dat[2:4, ]
